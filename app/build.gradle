@@ -1,0 +1,197 @@
+/*
+ * Copyright (C) 2018 by MinterTeam
+ * @link https://github.com/MinterTeam
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkVersion minterMaxSdk
+    buildToolsVersion minterBuildTools
+    defaultConfig {
+        applicationId "network.minter.bipwallet"
+        minSdkVersion minterMinSdk
+        targetSdkVersion minterMaxSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'CheckResult', 'DefaultLocale'
+        abortOnError false
+        ignoreWarnings true
+    }
+
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
+        }
+
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
+            testProguardFile 'proguard-test-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    flavorDimensions "env"
+
+    productFlavors {
+        netMain {
+            dimension "env"
+        }
+
+        netTest {
+            dimension "env"
+        }
+    }
+}
+
+ext {
+    nav_version = "1.0.0-alpha01"
+}
+
+dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
+
+    // sdk
+    implementation project(':mintercore')
+    implementation project(':minter_blockchain_api')
+    implementation project(':minter_explorer_api')
+    implementation project(path: ':myminter')
+
+    // support
+    implementation "com.android.support:appcompat-v7:${minterLibSupport}"
+    implementation "com.android.support:support-annotations:${minterLibSupport}"
+    implementation "com.android.support:recyclerview-v7:${minterLibSupport}"
+    implementation "com.android.support:cardview-v7:${minterLibSupport}"
+    implementation "com.android.support:support-v13:${minterLibSupport}"
+    implementation "com.android.support:design:${minterLibSupport}"
+    implementation "com.android.support:support-vector-drawable:${minterLibSupport}"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
+    // android arch
+    implementation "android.arch.paging:runtime:1.0.0"
+    implementation "android.arch.paging:rxjava2:1.0.0-rc1"
+
+    // common
+    implementation 'com.budiyev.android:code-scanner:1.9.0'
+    implementation 'com.google.zxing:core:3.3.3'
+    implementation 'com.google.zxing:android-core:3.3.0'
+    implementation 'com.google.zxing:android-integration:3.3.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.jakewharton.timber:timber:4.5.1'
+    implementation 'org.parceler:parceler-api:1.1.10'
+    annotationProcessor 'org.parceler:parceler:1.1.10'
+    implementation "com.orhanobut:hawk:2.0.1"
+    implementation 'com.annimon:stream:1.1.9'
+    implementation 'net.danlew:android.joda:2.9.9.1'
+    implementation('com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.6.0') {
+        exclude group: 'joda-time'
+        exclude group: 'com.google.code.gson'
+    }
+    implementation("com.github.hotchemi:permissionsdispatcher:3.3.1") {
+        // if you don't use android.app.Fragment you can exclude support for them
+        exclude module: "support-v13"
+    }
+    annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
+
+    // Annotations and DI
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
+    implementation 'com.google.dagger:dagger:2.16'
+    implementation 'com.google.dagger:dagger-android-support:2.16'
+    compileOnly 'javax.annotation:jsr250-api:1.0'
+
+    // MVP
+    implementation 'com.arello-mobile:moxy:1.5.3'
+    implementation 'com.arello-mobile:moxy-android:1.5.3'
+    implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
+    annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
+
+    // Reactive
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+
+    // networking
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+
+    //ui
+    implementation "com.github.edwardstock:BlurDialogFragment:1.0.1"
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation 'com.github.edwardstock:edittext-mask:1.0.7'
+    implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
+    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'de.hdodenhof:circleimageview:2.1.0'
+    implementation 'com.github.bachors:Android-Prefix-Input:1.1'
+    annotationProcessor 'com.edwardstock.android:barber-compiler:1.0.0'
+    implementation 'com.edwardstock.android:barber-api:1.0.0'
+    compileOnly 'com.edwardstock.android:barber-annotations:1.0.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    implementation 'com.redmadrobot:inputmask:3.4.4'
+    implementation 'com.pnikosis:materialish-progress:1.7'
+
+    // anim
+    implementation 'ru.bullyboo.animation:text_counter:1.0.2'
+
+    // testing
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation "com.android.support:support-annotations:${minterLibSupport}"
+    testImplementation "com.android.support:support-annotations:${minterLibSupport}"
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    testImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    testImplementation 'com.android.support.test:rules:1.0.2'
+
+}
+repositories {
+    mavenCentral()
+}

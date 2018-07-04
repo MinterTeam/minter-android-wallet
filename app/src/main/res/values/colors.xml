@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2018 by MinterTeam
+  ~ @link https://github.com/MinterTeam
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<resources>
+    <color name="colorPrimary">#502EC2</color>
+    <color name="colorPrimaryHalf">#60502EC2</color>
+
+    <color name="colorPrimaryFocused">#19502EC2</color>
+    <color name="colorPrimaryPressed">#33502EC2</color>
+    <color name="colorPrimaryDark">#492AB2</color>
+    <color name="colorAccent">@color/colorHighlight</color>
+    <color name="colorHighlight">#D4CBF2</color>
+    <color name="textColorPrimary">#000000</color>
+    <color name="textColorSecondary">#000000</color>
+    <color name="textColorWhite">@color/white</color>
+    <color name="textColorGreen">#35B65C</color>
+    <color name="errorColor">#C83A3A</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="greySeparator">#FFE1E1E1</color>
+    <color name="bottom_navigation_color">@color/colorPrimaryDark</color>
+    <color name="textColorGrey">#929292</color>
+    <color name="greyBackground">#F0F0F0</color>
+    <color name="bg_alert_dialog">#B2FFFFFF</color>
+    <color name="btn_disabled">#929292</color>
+    <color name="btn_disabled_transparent">#80929292</color>
+    <color name="colorInactive">#929292</color>
+
+</resources>

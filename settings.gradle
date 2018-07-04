@@ -1,0 +1,1 @@
+include ':app', ':mintercore', ':minter_blockchain_api', ':minter_explorer_api', ':myminter'

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Wallet" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:colorControlHighlight">@color/colorHighlight</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:fontFamily">@font/_ubuntu_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+
+        <item name="colorControlHighlight">#c6c5c5</item>
+        <item name="colorControlNormal">#c6c5c5</item>
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+
+        <item name="android:textColorHint">#60000000</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+
+        <item name="buttonStyle">@style/Wallet.Button</item>
+        <item name="android:buttonStyle">@style/Wallet.Button</item>
+        <item name="borderlessButtonStyle">@style/Wallet.Button</item>
+        <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
+        <!--<item name="actionButtonStyle">@style/Wallet.Button</item>-->
+        <!--<item name="android:actionButtonStyle">@style/Wallet.Button</item>-->
+
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+</resources>

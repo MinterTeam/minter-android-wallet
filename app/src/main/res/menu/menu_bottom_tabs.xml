@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bottom_coins"
+        android:icon="@drawable/ic_menu_coins"
+        android:title="@string/menu_item_coins"
+        />
+
+    <item
+        android:id="@+id/bottom_send"
+        android:icon="@drawable/ic_menu_send"
+        android:title="@string/menu_item_send"
+        />
+
+    <item
+        android:id="@+id/bottom_receive"
+        android:icon="@drawable/ic_menu_receive"
+        android:title="@string/menu_item_receive"
+        />
+
+    <item
+        android:id="@+id/bottom_settings"
+        android:icon="@drawable/ic_menu_settings"
+        android:title="@string/menu_item_settings"
+        />
+</menu>

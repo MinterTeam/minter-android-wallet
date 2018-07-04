@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+curl -X GET "https://my.beta.minter.network/api/v1/service/delete/by/username/$1"

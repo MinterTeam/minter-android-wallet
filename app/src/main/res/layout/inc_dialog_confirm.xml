@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/margin_edges"
+    android:paddingTop="@dimen/margin_edges"
+    android:paddingEnd="@dimen/margin_edges"
+    >
+
+    <TextView
+        android:id="@+id/dialog.text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/_ubuntu_regular"
+        android:textSize="@dimen/text_size_14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:maxLines="4"
+        tools:text="@tools:sample/lorem/random"
+        />
+
+
+    <Button
+        android:id="@+id/action.confirm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_edges"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog.text"
+        tools:text="Agree"
+        />
+
+    <Button
+        android:id="@+id/action.decline"
+        style="@style/Wallet.Button.White.BlueBorder"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_edges"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action.confirm"
+        tools:text="Not agree"
+        />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="@dimen/margin_edges"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action.decline"
+        />
+
+</android.support.constraint.ConstraintLayout>
