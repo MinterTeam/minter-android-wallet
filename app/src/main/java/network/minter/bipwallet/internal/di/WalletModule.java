@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.di;
 
@@ -231,7 +232,7 @@ public class WalletModule {
     public SharedPreferences providePreferences(Context context) {
         return context
                 .getSharedPreferences(context.getString(R.string.user_local_settings_key),
-                                      Context.MODE_PRIVATE);
+                        Context.MODE_PRIVATE);
     }
 }
 

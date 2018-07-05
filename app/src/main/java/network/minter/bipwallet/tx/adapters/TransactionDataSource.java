@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.tx.adapters;
 
@@ -85,7 +86,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         mLoadState = loadState;
     }
 
-    public static ObservableSource<ExpResult<List<HistoryTransaction>>> mapAddressesInfo(List<MinterAddress> addresses, MyInfoRepository infoRepo, ExpResult<List<HistoryTransaction>> items) {
+    public static ObservableSource<ExpResult<List<HistoryTransaction>>> mapAddressesInfo(List<MinterAddress> myAddresses, MyInfoRepository infoRepo, ExpResult<List<HistoryTransaction>> items) {
         if (items.result == null || items.result.isEmpty()) {
             return Observable.just(items);
         }
@@ -98,7 +99,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 continue;
             }
 
-            if (tx.isIncoming(addresses)) {
+            if (tx.isIncoming(myAddresses)) {
                 add = tx.<HistoryTransaction.TxSendCoinResult>getData().from;
             } else {
                 add = tx.<HistoryTransaction.TxSendCoinResult>getData().to;

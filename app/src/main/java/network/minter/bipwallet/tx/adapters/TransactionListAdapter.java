@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.tx.adapters;
 
@@ -256,7 +257,8 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
 
             final String am;
 
-            if (!item.isIncoming(myAddresses)) {
+            final boolean isIncoming = item.isIncoming(myAddresses);
+            if (!isIncoming) {
                 if (txItem.getUsername() != null) {
                     title.setText(String.format("@%s", txItem.getUsername()));
                 } else {
@@ -273,7 +275,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
                 if (txItem.getUsername() != null) {
                     title.setText(txItem.getUsername());
                 } else {
-                    title.setText(data.to.toShortString());
+                    title.setText(data.from.toShortString());
                 }
                 am = String.format("+ %s", data.amount.toPlainString());
                 amount.setText(am);

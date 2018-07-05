@@ -82,10 +82,12 @@ android {
     productFlavors {
         netMain {
             dimension "env"
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
         }
 
         netTest {
             dimension "env"
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
         }
     }
 }
@@ -143,6 +145,7 @@ dependencies {
         exclude module: "support-v13"
     }
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
+    implementation 'com.github.centrifugal:centrifuge-android:0.36'
 
     // Annotations and DI
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
@@ -151,7 +154,7 @@ dependencies {
     implementation 'com.google.dagger:dagger-android-support:2.16'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    // MVP
+    // MVP ignore 1.5.5 - not working with inner class interfaces, waiting for 1.5.6
     implementation 'com.arello-mobile:moxy:1.5.3'
     implementation 'com.arello-mobile:moxy-android:1.5.3'
     implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
@@ -176,6 +179,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
     implementation 'com.makeramen:roundedimageview:2.3.0'
+    // don't update to 2.2.0 - some issues when using elevation
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.github.bachors:Android-Prefix-Input:1.1'
     annotationProcessor 'com.edwardstock.android:barber-compiler:1.0.0'

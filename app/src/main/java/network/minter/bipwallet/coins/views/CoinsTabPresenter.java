@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
@@ -59,7 +58,6 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
-import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 import network.minter.blockchainapi.repo.BlockChainAccountRepository;
 import network.minter.explorerapi.models.HistoryTransaction;
 import network.minter.explorerapi.repo.ExplorerAddressRepository;
@@ -70,6 +68,7 @@ import network.minter.my.repo.MyInfoRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
+import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
 
 /**
  * MinterWallet. 2018
@@ -101,7 +100,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .setBinder((itemViewHolder, item, position) -> {
                     if (item.type == HistoryTransaction.Type.Send) {
                         HistoryTransaction.TxSendCoinResult sendResult = item.getData();
-                        if (item.isIncoming(myAddresses)) {
+                        final boolean isIncoming = item.isIncoming(myAddresses);
+                        if (isIncoming) {
                             itemViewHolder.amount.setText(String.format("+ %s", sendResult.amount.toPlainString()));
                             itemViewHolder.amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
                         } else {
@@ -112,7 +112,11 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                         if (item.username != null) {
                             itemViewHolder.title.setText(String.format("@%s", item.username));
                         } else {
-                            itemViewHolder.title.setText(sendResult.to.toShortString());
+                            if (isIncoming) {
+                                itemViewHolder.title.setText(sendResult.from.toShortString());
+                            } else {
+                                itemViewHolder.title.setText(sendResult.to.toShortString());
+                            }
                         }
 
                         itemViewHolder.avatar.setImageUrl(item.getAvatar());
@@ -195,7 +199,9 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 });
 
         safeSubscribeIoToUi(
-                txRepo.observe().switchMap(items -> TransactionDataSource.mapAddressesInfo(myAddresses, infoRepo, items)).subscribeOn(Schedulers.io())
+                txRepo.observe()
+                        .switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
+                        .subscribeOn(Schedulers.io())
         )
                 .subscribe(res -> {
                     mTransactionsAdapter.dispatchChanges(HistoryTransactionDiffUtil.class, Stream.of(res).limit(5).toList(), true);

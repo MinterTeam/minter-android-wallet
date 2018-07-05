@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal;
 
@@ -60,12 +61,6 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-//@ParcelClasses({
-//        @ParcelClass(MyAddressData.class),
-//        @ParcelClass(MinterAddress.class),
-//        @ParcelClass(BytesData.class),
-//        @ParcelClass(EncryptedString.class),
-//})
 public class Wallet extends MultiDexApplication implements HasActivityInjector, HasServiceInjector {
 
     public static final Locale LC_EN = Locale.US;

@@ -50,6 +50,8 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
@@ -58,6 +60,7 @@ import network.minter.bipwallet.home.views.HomePresenter;
 import network.minter.bipwallet.internal.BaseMvpActivity;
 import network.minter.bipwallet.internal.system.BackPressedDelegate;
 import network.minter.bipwallet.internal.system.BackPressedListener;
+import network.minter.bipwallet.services.livebalance.ServiceConnector;
 import timber.log.Timber;
 
 /**
@@ -153,11 +156,24 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
         setupTabAdapter();
         setupBottomNavigation();
+
+        if (BuildConfig.ENABLE_LIVE_BALANCE) {
+            ServiceConnector.bind(this);
+            ServiceConnector.onConnected()
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(res -> res.setOnMessageListener(message -> {
+                        Timber.d("WS ON MESSAGE[%s]: %s", message.getChannel(), message.getData());
+                    }));
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (BuildConfig.ENABLE_LIVE_BALANCE) {
+            ServiceConnector.release(this);
+        }
+
         HomeModule.destroy();
         Timber.d("Destroy");
     }
