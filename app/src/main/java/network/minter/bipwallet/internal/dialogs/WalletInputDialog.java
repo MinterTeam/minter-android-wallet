@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.dialogs;
 
@@ -56,7 +57,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.BaseValidator;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class WalletInputDialog extends WalletDialog {
-    @BindView(R.id.input_layout_stub) ViewStub mInputStub;
+    @BindView(R.id.layout_input_stub) ViewStub mInputStub;
     @BindView(R.id.input_description) TextView description;
     @BindView(R.id.action) Button action;
     private Builder mBuilder;

@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.tx.ui;
 
@@ -64,7 +65,7 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
     @BindView(R.id.list) RecyclerView list;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.progress) ProgressBar progress;
-    @BindView(R.id.swipeRefreshContainer) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void setAdapter(RecyclerView.Adapter<?> adapter) {

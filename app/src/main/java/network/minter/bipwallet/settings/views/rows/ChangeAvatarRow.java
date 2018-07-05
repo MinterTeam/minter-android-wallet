@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.settings.views.rows;
 
@@ -113,7 +114,7 @@ public class ChangeAvatarRow implements MultiRowContract.Row<ChangeAvatarRow.Vie
     }
 
     public static class ViewHolder extends MultiRowAdapter.RowViewHolder {
-        @BindView(R.id.userAvatar) BipCircleImageView avatar;
+        @BindView(R.id.user_avatar) BipCircleImageView avatar;
         @BindView(R.id.action) Button action;
         @BindView(R.id.progress) ProgressBar progress;
 

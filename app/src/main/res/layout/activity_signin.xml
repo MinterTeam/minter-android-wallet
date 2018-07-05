@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -80,7 +81,7 @@
             >
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/inputLayoutUsername"
+                android:id="@+id/layout_input_username"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
@@ -96,7 +97,7 @@
 
                 <network.minter.bipwallet.internal.views.text.PrefixEditText
                     android:tag="username"
-                    android:id="@+id/inputUsername"
+                    android:id="@+id/input_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="-3dp"
@@ -109,7 +110,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/inputLayoutPassword"
+                android:id="@+id/layout_input_password"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
@@ -118,13 +119,13 @@
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/inputLayoutUsername"
+                app:layout_constraintTop_toBottomOf="@id/layout_input_username"
                 app:layout_goneMarginTop="0dp"
                 app:passwordToggleDrawable="@null"
                 >
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/inputPassword"
+                    android:id="@+id/input_password"
                     android:tag="password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -144,11 +145,11 @@
                 android:text="@string/btn_continue"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/inputLayoutPassword"
+                app:layout_constraintTop_toBottomOf="@id/layout_input_password"
                 />
 
             <TextView
-                android:id="@+id/errorText"
+                android:id="@+id/error_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/errorColor"

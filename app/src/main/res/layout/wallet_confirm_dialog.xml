@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -72,7 +73,7 @@
             >
 
             <TextView
-                android:id="@+id/dialog.text"
+                android:id="@+id/dialog_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/_ubuntu_regular"
@@ -86,25 +87,25 @@
 
 
             <Button
-                android:id="@+id/action.confirm"
+                android:id="@+id/action_confirm"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dialog.text"
+                app:layout_constraintTop_toBottomOf="@id/dialog_text"
                 tools:text="Agree"
                 />
 
             <Button
-                android:id="@+id/action.decline"
+                android:id="@+id/action_decline"
                 style="@style/Wallet.Button.White.BlueBorder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/action.confirm"
+                app:layout_constraintTop_toBottomOf="@id/action_confirm"
                 tools:text="Not agree"
                 />
 
@@ -113,7 +114,7 @@
                 android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/action.decline"
+                app:layout_constraintTop_toBottomOf="@id/action_decline"
                 />
 
         </android.support.constraint.ConstraintLayout>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
@@ -56,7 +57,9 @@
 
         <activity
             android:name="network.minter.bipwallet.auth.ui.AuthActivity"
-            android:theme="@style/Wallet.Splash">
+            android:launchMode="singleTop"
+            android:theme="@style/Wallet.Splash"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -73,37 +76,49 @@
             />
 
         <activity
-            android:name="com.blikoon.qrcodescanner.QrCodeActivity"
-            android:theme="@style/Wallet"
-            />
-
-        <activity
             android:name=".home.ui.HomeActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Wallet"
             android:windowSoftInputMode="stateHidden"
             />
-        <activity android:name=".auth.ui.RegisterActivity"/>
-        <activity android:name=".auth.ui.SigninActivity"/>
-        <activity android:name=".addresses.ui.AddressListActivity"/>
-        <activity android:name=".addresses.ui.AddressItemActivity"/>
+        <activity
+            android:name=".auth.ui.RegisterActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Wallet"/>
+        <activity
+            android:name=".auth.ui.SigninActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Wallet"/>
+        <activity
+            android:name=".addresses.ui.AddressListActivity"
+            android:theme="@style/Wallet"/>
+        <activity
+            android:name=".addresses.ui.AddressItemActivity"
+            android:theme="@style/Wallet"
+            />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Wallet.CropImage"
             />
         <activity
-            android:name=".sending.ui.DialogTxSendActivity"
-            android:theme="@style/Wallet.DialogActivity"
-            />
-        <activity android:name=".tx.ui.TransactionListActivity"/>
+            android:name=".tx.ui.TransactionListActivity"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".sending.ui.QRCodeScannerActivity"
+            android:launchMode="singleTop"
             android:theme="@style/Wallet"
             />
         <activity
             android:name=".receiving.ui.QRPreviewActivity"
-            android:theme="@style/Wallet"
+            android:launchMode="singleTop"
+            android:theme="@style/Wallet.FullScreen"
             />
-        <activity android:name=".exchange.ui.ConvertCoinActivity"/>
-        <activity android:name=".settings.ui.PasswordChangeMigrationActivity"/>
+        <activity
+            android:name=".exchange.ui.ConvertCoinActivity"
+            android:launchMode="singleTop"/>
+        <activity
+            android:name=".settings.ui.PasswordChangeMigrationActivity"
+            android:launchMode="singleTop"/>
     </application>
 
 </manifest>

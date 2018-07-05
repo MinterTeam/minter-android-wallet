@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.advanced.ui;
 
@@ -64,9 +65,9 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements Advan
     public static final String EXTRA_FOR_RESULT = "EXTRA_FOR_RESULT";
     public static final String EXTRA_TITLE = "EXTRA_TITLE";
 
-    @BindView(R.id.actionGenerate) Button actionGenerate;
-    @BindView(R.id.actionActivate) Button actionActivate;
-    @BindView(R.id.seedInput) TextInputEditText seedInput;
+    @BindView(R.id.action_generate) Button actionGenerate;
+    @BindView(R.id.action_activate) Button actionActivate;
+    @BindView(R.id.input_seed) TextInputEditText seedInput;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Inject Provider<AdvancedMainPresenter> presenterProvider;

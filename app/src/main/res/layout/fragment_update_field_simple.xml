@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -53,7 +54,7 @@
             >
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/field.layout"
+                android:id="@+id/field_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -68,7 +69,7 @@
                 >
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/field.input"
+                    android:id="@+id/field_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="-3dp"
@@ -78,7 +79,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <Button
-                android:id="@+id/field.action"
+                android:id="@+id/field_action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
@@ -87,13 +88,13 @@
                 android:text="@string/btn_save"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/field.layout"
+                app:layout_constraintTop_toBottomOf="@id/field_layout"
                 />
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="@dimen/margin_edges"
-                app:layout_constraintTop_toBottomOf="@id/field.action"
+                app:layout_constraintTop_toBottomOf="@id/field_action"
                 />
 
         </android.support.constraint.ConstraintLayout>

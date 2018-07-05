@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -107,14 +108,14 @@
                 android:textStyle="bold"
                 android:textSize="@dimen/text_size_default"
                 android:fontFamily="@font/ubuntu_mono"
-                app:layout_constraintEnd_toStartOf="@id/actionCopy"
+                app:layout_constraintEnd_toStartOf="@id/action_copy"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sep1"
                 tools:text="vague soft expose improve gaze kitten pass point select access battle wish"
                 />
 
             <TextView
-                android:id="@+id/actionCopy"
+                android:id="@+id/action_copy"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -141,7 +142,7 @@
                 />
 
             <android.support.constraint.ConstraintLayout
-                android:id="@+id/securedBy"
+                android:id="@+id/row_secured_by"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
@@ -157,18 +158,18 @@
                 >
 
                 <TextView
-                    android:id="@+id/secHint"
+                    android:id="@+id/secured_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Secured By"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/secName"
+                    app:layout_constraintEnd_toStartOf="@id/secured_name"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     />
 
                 <TextView
-                    android:id="@+id/secName"
+                    android:id="@+id/secured_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/margin_edges_quart"
@@ -176,13 +177,13 @@
                     android:textAlignment="viewEnd"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/secIcon"
-                    app:layout_constraintStart_toEndOf="@id/secHint"
+                    app:layout_constraintEnd_toStartOf="@id/secured_icon"
+                    app:layout_constraintStart_toEndOf="@id/secured_label"
                     app:layout_constraintTop_toTopOf="parent"
                     />
 
                 <ImageView
-                    android:id="@+id/secIcon"
+                    android:id="@+id/secured_icon"
                     android:layout_width="24dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/margin_edges"
@@ -201,11 +202,11 @@
                 android:background="@color/greySeparator"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/securedBy"
+                app:layout_constraintTop_toBottomOf="@id/row_secured_by"
                 />
 
             <android.support.constraint.ConstraintLayout
-                android:id="@+id/saveMnemonicLayout"
+                android:id="@+id/row_save_mnemonic"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
@@ -219,7 +220,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/saveHint"
+                    android:id="@+id/label_save_mnemonic"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="I've saved the phrase"
@@ -229,7 +230,7 @@
                     />
 
                 <Switch
-                    android:id="@+id/saveSwitch"
+                    android:id="@+id/switch_save_mnemonic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/margin_edges"
@@ -246,7 +247,7 @@
                 android:background="@color/greySeparator"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/saveMnemonicLayout"
+                app:layout_constraintTop_toBottomOf="@id/row_save_mnemonic"
                 />
 
             <Button

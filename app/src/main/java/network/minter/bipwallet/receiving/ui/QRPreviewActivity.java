@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.receiving.ui;
 
@@ -55,8 +56,6 @@ public class QRPreviewActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
-//        finishAfterTransition();
         supportFinishAfterTransition();
     }
 
@@ -73,6 +72,7 @@ public class QRPreviewActivity extends BaseActivity {
 
         setContentView(R.layout.activity_qr_preview);
         final ImageView iv = findViewById(R.id.iv);
+        iv.setOnClickListener(v -> onBackPressed());
         Wallet.app().image()
                 .load(new File(getIntent().getStringExtra(EXTRA_FILE_PATH)))
                 .resize(Wallet.app().display().getWidth(), Wallet.app().display().getHeight())
@@ -86,7 +86,6 @@ public class QRPreviewActivity extends BaseActivity {
                     @Override
                     public void onError(Exception t) {
                         Timber.w(t, "Unable to load image");
-//                        iv.setImageResource(R.drawable.ic_qr);
                         supportStartPostponedEnterTransition();
                     }
                 });

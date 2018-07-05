@@ -66,11 +66,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
 
     @Inject Provider<CoinsTabPresenter> presenterProvider;
     @InjectPresenter CoinsTabPresenter presenter;
-    @BindView(R.id.userAvatar) BipCircleImageView avatar;
+    @BindView(R.id.user_avatar) BipCircleImageView avatar;
     @BindView(R.id.username) TextView username;
-    @BindView(R.id.balanceInt) TextView balanceInt;
-    @BindView(R.id.balanceFract) TextView balanceFract;
-    @BindView(R.id.balanceCoinName) TextView balanceCoinName;
+    @BindView(R.id.balance_int) TextView balanceInt;
+    @BindView(R.id.balance_fractions) TextView balanceFract;
+    @BindView(R.id.balance_coin_name) TextView balanceCoinName;
     @BindView(R.id.list) RecyclerView list;
     private Unbinder mUnbinder;
 

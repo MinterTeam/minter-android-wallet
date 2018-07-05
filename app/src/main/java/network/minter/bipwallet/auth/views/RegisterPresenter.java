@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.auth.views;
 
@@ -83,7 +84,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
             public void onTextChanged(EditText editText, boolean valid) {
                 final String val = editText.getText().toString();
                 switch (editText.getId()) {
-                    case R.id.inputUsername:
+                    case R.id.input_username:
                         mRegisterData.username = val;
                         if(!mRegisterData.username.isEmpty() && mRegisterData.username.charAt(0) == '@') {
                             mRegisterData.username = mRegisterData.username.substring(1);
@@ -95,7 +96,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
                     case R.id.inputEmail:
                         mRegisterData.email = val;
                         break;
-                    case R.id.inputPhone:
+                    case R.id.input_phone:
                         mRegisterData.phone = val;
                         break;
                 }

@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -16,7 +42,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="62dp"
         android:paddingEnd="62dp"
-        app:layout_constraintBottom_toTopOf="@id/actionCreateWallet"
+        app:layout_constraintBottom_toTopOf="@id/action_create_wallet"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,7 +51,7 @@
         />
 
     <Button
-        android:id="@+id/actionCreateWallet"
+        android:id="@+id/action_create_wallet"
         style="@style/Wallet.Button.White"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -33,13 +59,13 @@
         android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="@dimen/margin_edges"
         android:text="Create wallet"
-        app:layout_constraintBottom_toTopOf="@id/actionAdvancedMode"
+        app:layout_constraintBottom_toTopOf="@id/action_advanced_mode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
 
     <Button
-        android:id="@+id/actionAdvancedMode"
+        android:id="@+id/action_advanced_mode"
         style="@style/Wallet.Button.Blue.WhiteBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -48,13 +74,13 @@
         android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="@dimen/margin_edges"
         android:text="Advanced mode"
-        app:layout_constraintBottom_toTopOf="@id/actionSignin"
+        app:layout_constraintBottom_toTopOf="@id/action_signin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
 
     <Button
-        android:id="@+id/actionSignin"
+        android:id="@+id/action_signin"
         style="@style/Wallet.Button.Blue.WhiteBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -63,12 +89,12 @@
         android:layout_marginBottom="32dp"
         android:text="Sign in"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/actionHelp"
+        app:layout_constraintEnd_toStartOf="@id/action_help"
         app:layout_constraintStart_toStartOf="parent"
         />
 
     <Button
-        android:id="@+id/actionHelp"
+        android:id="@+id/action_help"
         style="@style/Wallet.Button.Blue.WhiteBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -79,7 +105,7 @@
         android:text="Help"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/actionSignin"
+        app:layout_constraintStart_toEndOf="@id/action_signin"
         />
 
 

@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.di;
 
@@ -43,7 +44,6 @@ import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.di.annotations.FragmentScope;
-import network.minter.bipwallet.sending.ui.DialogTxSendActivity;
 import network.minter.bipwallet.settings.ui.PasswordChangeMigrationActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 
@@ -94,10 +94,6 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @ActivityScope
     TransactionListActivity transactionListActivityInjector();
-
-    @ContributesAndroidInjector
-    @ActivityScope
-    DialogTxSendActivity dialogTxSendActivityInjector();
 
     @ContributesAndroidInjector(modules = ExchangeModule.class)
     @ActivityScope

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -35,7 +36,7 @@
     >
 
     <TextView
-        android:id="@+id/address.title"
+        android:id="@+id/address_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/margin_inset"
@@ -50,7 +51,7 @@
 
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/row.address"
+        android:id="@+id/row_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -68,14 +69,14 @@
             android:fontFamily="@font/_ubuntu_regular"
             android:transitionName="address_name"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/action.copy"
+            app:layout_constraintEnd_toStartOf="@id/action_copy"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Mx86d167ffe6c81dd83a20e3731ed66dddaac42488"
             />
 
         <Button
-            android:id="@+id/action.copy"
+            android:id="@+id/action_copy"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -104,46 +105,46 @@
         >
 
         <TextView
-            android:id="@+id/balance.label"
+            android:id="@+id/balance_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_regular"
             android:text="Balance"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/balance.value"
+            app:layout_constraintEnd_toStartOf="@id/balance_value"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <TextView
-            android:id="@+id/balance.value"
+            android:id="@+id/balance_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_medium"
             android:textSize="@dimen/text_size_default"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/balance.label"
+            app:layout_constraintStart_toEndOf="@id/balance_label"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="12.00112233445566778899"
 
             />
 
         <ProgressBar
-            android:id="@+id/balance.progress"
+            android:id="@+id/balance_progress"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toEndOf="@id/balance.label"
+            app:layout_constraintStart_toEndOf="@id/balance_label"
             app:layout_constraintTop_toTopOf="parent"
             />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/row.secured"
+        android:id="@+id/row_secured"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
@@ -156,20 +157,20 @@
         >
 
         <TextView
-            android:id="@+id/secured.label"
+            android:id="@+id/secured_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_regular"
             android:text="Secured by"
             android:transitionName="secured_by_label"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/secured.value"
+            app:layout_constraintEnd_toStartOf="@id/secured_value"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <TextView
-            android:id="@+id/secured.value"
+            android:id="@+id/secured_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_medium"
@@ -177,7 +178,7 @@
             android:transitionName="secured_by_value"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/secured.label"
+            app:layout_constraintStart_toEndOf="@id/secured_label"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Bip Wallet"
             />
@@ -196,25 +197,25 @@
         >
 
         <TextView
-            android:id="@+id/default.label"
+            android:id="@+id/default_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_regular"
             android:text="Set as main"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/default.switch"
+            app:layout_constraintEnd_toStartOf="@id/default_switch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <Switch
-            android:id="@+id/default.switch"
+            android:id="@+id/default_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_edges"
             android:checked="false"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/default.label"
+            app:layout_constraintStart_toEndOf="@id/default_label"
             />
     </android.support.constraint.ConstraintLayout>
 

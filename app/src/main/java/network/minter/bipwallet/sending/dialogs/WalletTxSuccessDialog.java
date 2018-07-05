@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.sending.dialogs;
 
@@ -45,7 +46,7 @@ import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
  */
 public class WalletTxSuccessDialog extends WalletDialog {
     private final Builder mBuilder;
-    @BindView(R.id.recipient_avatar) BipCircleImageView avatar;
+    @BindView(R.id.tx_recipient_avatar) BipCircleImageView avatar;
     @BindView(R.id.tx_recipient_name) TextView recipientName;
     @BindView(R.id.action_view_tx) Button actionViewTx;
     @BindView(R.id.action_close) Button actionClose;

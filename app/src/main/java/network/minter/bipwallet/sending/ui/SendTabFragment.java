@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.sending.ui;
 
@@ -82,14 +83,14 @@ import permissions.dispatcher.RuntimePermissions;
 public class SendTabFragment extends HomeTabFragment implements SendTabModule.SendView {
     @Inject Provider<SendTabPresenter> presenterProvider;
     @InjectPresenter SendTabPresenter presenter;
-    @BindView(R.id.coin_input) TextInputEditText coinInput;
-    @BindView(R.id.recipient_layout) TextInputLayout recipientLayout;
-    @BindView(R.id.recipient_input) TextInputEditText recipientInput;
-    @BindView(R.id.amount_layout) TextInputLayout amountLayout;
-    @BindView(R.id.amount_input) TextInputEditText amountInput;
+    @BindView(R.id.input_coin) TextInputEditText coinInput;
+    @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
+    @BindView(R.id.input_recipient) TextInputEditText recipientInput;
+    @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
+    @BindView(R.id.input_amount) TextInputEditText amountInput;
     @BindView(R.id.free_value) Switch freeValue;
     @BindView(R.id.action) Button actionSend;
-    @BindView(R.id.action_read_qr) View actionScanQR;
+    @BindView(R.id.action_scan_qr) View actionScanQR;
     private Unbinder mUnbinder;
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;

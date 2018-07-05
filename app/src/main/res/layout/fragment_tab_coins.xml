@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -73,13 +74,13 @@
                     android:textColor="@color/textColorWhite"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/userAvatar"
+                    app:layout_constraintEnd_toStartOf="@id/user_avatar"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="\@username"
                     />
 
                 <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-                    android:id="@+id/userAvatar"
+                    android:id="@+id/user_avatar"
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:layout_marginEnd="@dimen/margin_edges"
@@ -100,7 +101,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/messagesContainer"
+        android:id="@+id/container_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:animateLayoutChanges="true"
@@ -141,7 +142,7 @@
                     >
 
                     <TextView
-                        android:id="@+id/balanceTitle"
+                        android:id="@+id/balance_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
@@ -149,32 +150,32 @@
                         android:textColor="@color/textColorWhite"
                         android:textSize="15sp"
                         android:textStyle="normal"
-                        app:layout_constraintBottom_toTopOf="@id/balanceInt"
+                        app:layout_constraintBottom_toTopOf="@id/balance_int"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         />
 
                     <TextView
-                        android:id="@+id/balanceInt"
+                        android:id="@+id/balance_int"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
                         android:textColor="@color/textColorWhite"
                         android:textSize="28sp"
                         android:textStyle="normal"
-                        app:layout_constraintBottom_toTopOf="@id/space.bottom"
-                        app:layout_constraintEnd_toStartOf="@id/balanceFract"
+                        app:layout_constraintBottom_toTopOf="@id/space_bottom"
+                        app:layout_constraintEnd_toStartOf="@id/balance_fractions"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintHorizontal_chainStyle="packed"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/balanceTitle"
+                        app:layout_constraintTop_toBottomOf="@id/balance_title"
                         app:layout_constraintVertical_bias="1"
                         tools:text="120 912"
                         />
 
                     <TextView
-                        android:id="@+id/balanceFract"
+                        android:id="@+id/balance_fractions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="2dp"
@@ -182,16 +183,16 @@
                         android:textColor="@color/textColorWhite"
                         android:textSize="18sp"
                         android:textStyle="normal"
-                        app:layout_constraintBottom_toTopOf="@id/space.bottom"
-                        app:layout_constraintEnd_toStartOf="@id/balanceCoinName"
-                        app:layout_constraintStart_toEndOf="@id/balanceInt"
-                        app:layout_constraintTop_toBottomOf="@id/balanceTitle"
+                        app:layout_constraintBottom_toTopOf="@id/space_bottom"
+                        app:layout_constraintEnd_toStartOf="@id/balance_coin_name"
+                        app:layout_constraintStart_toEndOf="@id/balance_int"
+                        app:layout_constraintTop_toBottomOf="@id/balance_title"
                         app:layout_constraintVertical_bias=".8"
                         tools:text=".492404"
                         />
 
                     <TextView
-                        android:id="@+id/balanceCoinName"
+                        android:id="@+id/balance_coin_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_edges_half"
@@ -200,15 +201,15 @@
                         android:textColor="@color/textColorWhite"
                         android:textSize="18sp"
                         android:textStyle="normal"
-                        app:layout_constraintBottom_toTopOf="@id/space.bottom"
+                        app:layout_constraintBottom_toTopOf="@id/space_bottom"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/balanceFract"
-                        app:layout_constraintTop_toBottomOf="@id/balanceTitle"
+                        app:layout_constraintStart_toEndOf="@id/balance_fractions"
+                        app:layout_constraintTop_toBottomOf="@id/balance_title"
                         app:layout_constraintVertical_bias=".8"
                         />
 
                     <Space
-                        android:id="@+id/space.bottom"
+                        android:id="@+id/space_bottom"
                         android:layout_width="0dp"
                         android:layout_height="10dp"
                         app:layout_constraintBottom_toBottomOf="parent"

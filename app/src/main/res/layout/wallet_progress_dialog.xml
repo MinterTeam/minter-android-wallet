@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -81,15 +82,15 @@
                 android:layout_width="55dp"
                 app:matProg_progressIndeterminate="true"
                 android:layout_height="55dp"
-                app:layout_constraintBottom_toBottomOf="@id/dialog.text"
-                app:layout_constraintEnd_toStartOf="@id/dialog.text"
+                app:layout_constraintBottom_toBottomOf="@id/dialog_text"
+                app:layout_constraintEnd_toStartOf="@id/dialog_text"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/dialog.text"
+                app:layout_constraintTop_toTopOf="@id/dialog_text"
                 app:layout_constraintVertical_bias=".5"
                 />
 
             <TextView
-                android:id="@+id/dialog.text"
+                android:id="@+id/dialog_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"

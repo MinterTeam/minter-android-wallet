@@ -1,6 +1,31 @@
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
+ * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ ******************************************************************************/
+
 package network.minter.bipwallet.auth.ui;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,7 +48,6 @@ import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.AuthModule;
 import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
-import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 
 /**
  * MinterWallet. 2018
@@ -33,10 +57,10 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthView {
     @Inject Provider<AuthPresenter> authPresenterProvider;
     @InjectPresenter AuthPresenter presenter;
-    @BindView(R.id.actionCreateWallet) Button actionCreateWallet;
-    @BindView(R.id.actionAdvancedMode) Button actionAdvancedMode;
-    @BindView(R.id.actionSignin) Button actionSignin;
-    @BindView(R.id.actionHelp) Button actionHelp;
+    @BindView(R.id.action_create_wallet) Button actionCreateWallet;
+    @BindView(R.id.action_advanced_mode) Button actionAdvancedMode;
+    @BindView(R.id.action_signin) Button actionSignin;
+    @BindView(R.id.action_help) Button actionHelp;
 
     @Override
     public void setOnCreateWallet(View.OnClickListener listener) {

@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.auth.ui;
 
@@ -67,14 +68,14 @@ import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 public class RegisterActivity extends BaseMvpInjectActivity implements AuthModule.RegisterView {
     @Inject Provider<RegisterPresenter> presenterProvider;
     @InjectPresenter RegisterPresenter presenter;
-    @BindView(R.id.inputLayoutUsername) TextInputLayout usernameLayout;
-    @BindView(R.id.inputLayoutPassword) TextInputLayout passwordLayout;
-    @BindView(R.id.inputLayoutPasswordRepeat) TextInputLayout passwordRepeatLayout;
-    @BindView(R.id.inputLayoutEmail) TextInputLayout emailLayout;
-    @BindView(R.id.inputLayoutPhone) TextInputLayout phoneLayout;
+    @BindView(R.id.layout_input_username) TextInputLayout usernameLayout;
+    @BindView(R.id.layout_input_password) TextInputLayout passwordLayout;
+    @BindView(R.id.layout_input_password_repeat) TextInputLayout passwordRepeatLayout;
+    @BindView(R.id.layout_input_email) TextInputLayout emailLayout;
+    @BindView(R.id.layout_input_phone) TextInputLayout phoneLayout;
     @BindView(R.id.action) Button action;
     @BindView(R.id.toolbar) ToolbarProgress toolbar;
-    @BindView(R.id.errorText) TextView errorText;
+    @BindView(R.id.error_text) TextView errorText;
     private InputGroup mInputGroup;
 
     @Override

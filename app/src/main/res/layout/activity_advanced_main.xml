@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -74,7 +75,7 @@
             android:layout_height="wrap_content"
             >
             <Button
-                android:id="@+id/actionGenerate"
+                android:id="@+id/action_generate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
@@ -94,7 +95,7 @@
                 android:background="@color/greySeparator"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/actionGenerate"
+                app:layout_constraintTop_toBottomOf="@id/action_generate"
                 />
 
             <TextView
@@ -113,7 +114,7 @@
 
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/seedInputLayout"
+                android:id="@+id/layout_input_seed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
@@ -128,7 +129,7 @@
                 >
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/seedInput"
+                    android:id="@+id/input_seed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text|textMultiLine"
@@ -137,7 +138,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <Button
-                android:id="@+id/actionActivate"
+                android:id="@+id/action_activate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
@@ -146,7 +147,7 @@
                 android:text="Activate"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/seedInputLayout"
+                app:layout_constraintTop_toBottomOf="@id/layout_input_seed"
                 />
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

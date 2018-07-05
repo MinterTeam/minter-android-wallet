@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.sending.dialogs;
 
@@ -52,7 +53,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
 public final class WalletTxStartDialog extends WalletDialog {
 
     @BindView(R.id.dialog_amount) TextView amount;
-    @BindView(R.id.recipient_avatar) BipCircleImageView avatar;
+    @BindView(R.id.tx_recipient_avatar) BipCircleImageView avatar;
     @BindView(R.id.tx_recipient_name) TextView recipientName;
     @BindView(R.id.action_confirm) Button actionConfirm;
     @BindView(R.id.action_decline) Button actionDecline;

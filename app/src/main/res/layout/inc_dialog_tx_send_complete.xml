@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,7 +37,7 @@
     >
 
     <TextView
-        android:id="@+id/tx.description"
+        android:id="@+id/tx_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/tx_send_success_dialog_description"
@@ -48,7 +49,7 @@
         />
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-        android:id="@+id/recipient.avatar"
+        android:id="@+id/tx_recipient_avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="@dimen/margin_edges_half"
@@ -61,11 +62,11 @@
         app:civ_border_width="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx.description"
+        app:layout_constraintTop_toBottomOf="@id/tx_description"
         />
 
     <TextView
-        android:id="@+id/tx.recipient_name"
+        android:id="@+id/tx_recipient_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_half"
@@ -74,13 +75,13 @@
         android:textSize="@dimen/text_size_14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recipient.avatar"
+        app:layout_constraintTop_toBottomOf="@id/tx_recipient_avatar"
         tools:text="\@PavelDurov"
         />
 
 
     <Button
-        android:id="@+id/action.view_tx"
+        android:id="@+id/action_view_tx"
         style="@style/Wallet.Button.White.BlueBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -88,11 +89,11 @@
         android:text="@string/btn_view_tx"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx.recipient_name"
+        app:layout_constraintTop_toBottomOf="@id/tx_recipient_name"
         />
 
     <Button
-        android:id="@+id/action.close"
+        android:id="@+id/action_close"
         style="@style/Wallet.Button.White.BlueBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -100,7 +101,7 @@
         android:text="@string/btn_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action.view_tx"
+        app:layout_constraintTop_toBottomOf="@id/action_view_tx"
         />
 
     <Space
@@ -108,7 +109,7 @@
         android:layout_height="@dimen/margin_edges"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action.close"
+        app:layout_constraintTop_toBottomOf="@id/action_close"
         />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.coins.views.rows;
 
@@ -167,7 +168,7 @@ public class ListWithButtonRow implements MultiRowContract.Row<ListWithButtonRow
         @BindView(R.id.title) TextView title;
         @BindView(R.id.action) Button action;
         @BindView(R.id.list) RecyclerView list;
-        @BindView(R.id.emptyTitle) TextView emptyTitle;
+        @BindView(R.id.empty_title) TextView emptyTitle;
         @BindView(R.id.progress) ProgressBar progress;
 
         public ViewHolder(View itemView) {

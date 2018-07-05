@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -35,7 +36,7 @@
     >
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-        android:id="@+id/userAvatar"
+        android:id="@+id/user_avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="@dimen/margin_inset"
@@ -57,10 +58,10 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/userAvatar"
-        app:layout_constraintEnd_toEndOf="@id/userAvatar"
-        app:layout_constraintStart_toStartOf="@id/userAvatar"
-        app:layout_constraintTop_toTopOf="@id/userAvatar"
+        app:layout_constraintBottom_toBottomOf="@id/user_avatar"
+        app:layout_constraintEnd_toEndOf="@id/user_avatar"
+        app:layout_constraintStart_toStartOf="@id/user_avatar"
+        app:layout_constraintTop_toTopOf="@id/user_avatar"
         tools:visibility="visible"
         />
 
@@ -75,7 +76,7 @@
         android:text="@string/btn_change_avatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/userAvatar"
+        app:layout_constraintStart_toEndOf="@id/user_avatar"
         app:layout_constraintTop_toTopOf="parent"
         />
 </android.support.constraint.ConstraintLayout>

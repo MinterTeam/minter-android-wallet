@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.auth.views;
 
@@ -77,12 +78,12 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
         getViewState().setOnTextChangedListener(new InputGroup.OnTextChangedListener() {
             @Override
             public void onTextChanged(EditText editText, boolean valid) {
-                if (editText.getId() == R.id.inputUsername) {
+                if (editText.getId() == R.id.input_username) {
                     mLoginData.username = editText.getText().toString();
                     if (!mLoginData.username.isEmpty() && mLoginData.username.charAt(0) == '@') {
                         mLoginData.username = mLoginData.username.substring(1);
                     }
-                } else if (editText.getId() == R.id.inputPassword) {
+                } else if (editText.getId() == R.id.input_password) {
                     mLoginData.rawPassword = editText.getText().toString();
                 }
             }

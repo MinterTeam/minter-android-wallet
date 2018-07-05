@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -34,7 +35,7 @@
     >
 
     <TextView
-        android:id="@+id/tx.description"
+        android:id="@+id/tx_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/margin_edges"
@@ -48,7 +49,7 @@
         />
 
     <TextView
-        android:id="@+id/tx.countdown"
+        android:id="@+id/tx_countdown"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_half"
@@ -59,7 +60,7 @@
         android:textSize="@dimen/text_size_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx.description"
+        app:layout_constraintTop_toBottomOf="@id/tx_description"
         tools:text="54 seconds"
         />
 
@@ -71,7 +72,7 @@
         android:background="@color/greySeparator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx.countdown"
+        app:layout_constraintTop_toBottomOf="@id/tx_countdown"
         />
 
     <TextView

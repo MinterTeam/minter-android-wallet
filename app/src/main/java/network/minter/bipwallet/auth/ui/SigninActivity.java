@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.auth.ui;
 
@@ -62,11 +63,11 @@ public class SigninActivity extends BaseMvpInjectActivity implements AuthModule.
 
     @Inject Provider<SigninPresenter> presenterProvider;
     @InjectPresenter SigninPresenter presenter;
-    @BindView(R.id.inputLayoutUsername) TextInputLayout usernameLayout;
-    @BindView(R.id.inputLayoutPassword) TextInputLayout passwordLayout;
+    @BindView(R.id.layout_input_username) TextInputLayout usernameLayout;
+    @BindView(R.id.layout_input_password) TextInputLayout passwordLayout;
     @BindView(R.id.action) Button action;
     @BindView(R.id.toolbar) ToolbarProgress toolbar;
-    @BindView(R.id.errorText) TextView errorText;
+    @BindView(R.id.error_text) TextView errorText;
     private InputGroup mInputGroup;
 
     @Override
@@ -78,14 +79,7 @@ public class SigninActivity extends BaseMvpInjectActivity implements AuthModule.
     public void setOnSubmit(View.OnClickListener listener) {
         action.setOnClickListener(listener);
 
-        usernameLayout.getEditText().setOnEditorActionListener((v, actionId, event) -> {
-            if(actionId == EditorInfo.IME_ACTION_NEXT) {
-                usernameLayout.getEditText().clearFocus();
-                passwordLayout.getEditText().requestFocus();
-                return true;
-            }
-            return false;
-        });
+        usernameLayout.setNextFocusDownId(R.id.layout_input_password);
         passwordLayout.getEditText().setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 listener.onClick(textView);

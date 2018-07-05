@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.advanced.ui;
 
@@ -66,13 +67,13 @@ public class AdvancedGenerateActivity extends BaseMvpInjectActivity implements A
     @Inject Provider<AdvancedGeneratePresenter> presenterProvider;
     @InjectPresenter AdvancedGeneratePresenter presenter;
 
-    @BindView(R.id.actionCopy) View actionCopy;
-    @BindView(R.id.saveSwitch) Switch saveSwitch;
+    @BindView(R.id.action_copy) View actionCopy;
+    @BindView(R.id.switch_save_mnemonic) Switch saveSwitch;
     @BindView(R.id.action) Button action;
     @BindView(R.id.mnemonic) TextView mnemonicPhrase;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.securedBy) View securedBySelector;
-    @BindView(R.id.secName) TextView securedByValue;
+    @BindView(R.id.row_secured_by) View securedBySelector;
+    @BindView(R.id.secured_name) TextView securedByValue;
 
     @Override
     public void setOnCopy(View.OnClickListener listener) {

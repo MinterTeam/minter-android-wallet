@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -82,7 +83,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/input.description"
+                    android:id="@+id/input_description"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -92,15 +93,15 @@
                     />
 
                 <ViewStub
-                    android:id="@+id/input.layout.stub"
+                    android:id="@+id/layout_input_stub"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_edges"
-                    android:inflatedId="@id/input.layout"
+                    android:inflatedId="@id/layout_input"
                     android:layout="@layout/inc_dialog_input_simple"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/input.description"
+                    app:layout_constraintTop_toBottomOf="@id/input_description"
                     />
 
                 <Button
@@ -111,8 +112,8 @@
                     android:text="@string/btn_submit"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/input.layout"
-                    tools:layout_constraintTop_toBottomOf="@id/input.layout.stub"
+                    app:layout_constraintTop_toBottomOf="@id/layout_input"
+                    tools:layout_constraintTop_toBottomOf="@id/layout_input_stub"
                     />
 
                 <Space

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,7 +37,7 @@
     >
 
     <TextView
-        android:id="@+id/dialog.amount"
+        android:id="@+id/dialog_amount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/_ubuntu_bold"
@@ -49,7 +50,7 @@
         />
 
     <TextView
-        android:id="@+id/tx.to_text"
+        android:id="@+id/tx_to_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_half"
@@ -58,11 +59,11 @@
         android:textSize="@dimen/text_size_14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog.amount"
+        app:layout_constraintTop_toBottomOf="@id/dialog_amount"
         />
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-        android:id="@+id/recipient.avatar"
+        android:id="@+id/tx_recipient_avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="@dimen/margin_edges_half"
@@ -75,11 +76,11 @@
         app:civ_border_width="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx.to_text"
+        app:layout_constraintTop_toBottomOf="@id/tx_to_label"
         />
 
     <TextView
-        android:id="@+id/tx.recipient_name"
+        android:id="@+id/tx_recipient_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_half"
@@ -88,31 +89,31 @@
         android:textSize="@dimen/text_size_14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recipient.avatar"
+        app:layout_constraintTop_toBottomOf="@id/tx_recipient_avatar"
         tools:text="\@PavelDurov"
         />
 
 
     <Button
-        android:id="@+id/action.confirm"
+        android:id="@+id/action_confirm"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx.recipient_name"
+        app:layout_constraintTop_toBottomOf="@id/tx_recipient_name"
         tools:text="Agree"
         />
 
     <Button
-        android:id="@+id/action.decline"
+        android:id="@+id/action_decline"
         style="@style/Wallet.Button.White.BlueBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action.confirm"
+        app:layout_constraintTop_toBottomOf="@id/action_confirm"
         tools:text="Not agree"
         />
 
@@ -121,7 +122,7 @@
         android:layout_height="@dimen/margin_edges"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action.decline"
+        app:layout_constraintTop_toBottomOf="@id/action_decline"
         />
 
 </android.support.constraint.ConstraintLayout>

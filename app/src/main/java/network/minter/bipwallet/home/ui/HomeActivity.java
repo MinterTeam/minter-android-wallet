@@ -70,8 +70,8 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     @InjectPresenter HomePresenter presenter;
 
     //    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.bottomNavigation) BottomNavigationViewEx bottomNavigation;
-    @BindView(R.id.homePager) ViewPager homePager;
+    @BindView(R.id.navigation_bottom) BottomNavigationViewEx bottomNavigation;
+    @BindView(R.id.home_pager) ViewPager homePager;
 
     @Inject @HomeTabsClasses List<Class<? extends HomeTabFragment>> tabsClasses;
     private SparseArray<WeakReference<HomeTabFragment>> mActiveTabs = new SparseArray<>();
