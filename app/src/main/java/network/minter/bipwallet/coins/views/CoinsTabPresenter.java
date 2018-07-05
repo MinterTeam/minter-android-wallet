@@ -165,8 +165,12 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         super.onFirstViewAttach();
         if (session.getRole() == AuthSession.AuthType.Advanced) {
             getViewState().hideAvatar();
+        } else {
+            getViewState().setUsername(String.format("@%s", session.getUser().data.username));
         }
+        getViewState().setOnAvatarClick(v -> getViewState().startTab(R.id.bottom_settings));
         getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
+
         mTransactionsRow = new ListWithButtonRow.Builder("Latest transactions")
                 .setAction("All transactions", this::onClickStartTransactionList)
                 .setAdapter(mTransactionsAdapter)

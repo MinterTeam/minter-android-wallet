@@ -115,7 +115,6 @@
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
@@ -135,7 +134,7 @@
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorPrimary"
+                    android:background="@color/colorPrimaryDarker"
                     android:paddingStart="@dimen/margin_edges"
                     android:paddingTop="@dimen/margin_edges_half"
                     app:layout_collapseMode="pin"

@@ -29,6 +29,7 @@ package network.minter.bipwallet.coins.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,6 +54,7 @@ import network.minter.bipwallet.coins.views.CoinsTabPresenter;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
+import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import timber.log.Timber;
@@ -148,6 +150,13 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @Override
     public void startConvertCoins() {
         getActivity().startActivity(new Intent(getActivity(), ConvertCoinActivity.class));
+    }
+
+    @Override
+    public void startTab(@IdRes int tab) {
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).setCurrentPageById(tab);
+        }
     }
 
     @ProvidePresenter

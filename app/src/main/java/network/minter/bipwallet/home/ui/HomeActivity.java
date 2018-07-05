@@ -29,6 +29,7 @@ package network.minter.bipwallet.home.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -68,18 +69,17 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
     @Inject Provider<HomePresenter> presenterProvider;
     @InjectPresenter HomePresenter presenter;
+    @Inject @HomeTabsClasses List<Class<? extends HomeTabFragment>> tabsClasses;
 
-    //    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.navigation_bottom) BottomNavigationViewEx bottomNavigation;
     @BindView(R.id.home_pager) ViewPager homePager;
 
-    @Inject @HomeTabsClasses List<Class<? extends HomeTabFragment>> tabsClasses;
     private SparseArray<WeakReference<HomeTabFragment>> mActiveTabs = new SparseArray<>();
     private List<BackPressedListener> mBackPressedListeners = new ArrayList<>(1);
 
     @Override
     public void setCurrentPage(int position) {
-
+        homePager.setCurrentItem(position);
     }
 
     @Override
@@ -121,6 +121,11 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     @Override
     public void hideProgress() {
 
+    }
+
+    public void setCurrentPageById(@IdRes int tab) {
+        int pos = presenter.getBottomPositionById(tab);
+        setCurrentPage(pos);
     }
 
     @ProvidePresenter
