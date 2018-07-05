@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.home.ui;
 
@@ -147,6 +148,13 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
         setupTabAdapter();
         setupBottomNavigation();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        HomeModule.destroy();
+        Timber.d("Destroy");
     }
 
     private void setupTabAdapter() {

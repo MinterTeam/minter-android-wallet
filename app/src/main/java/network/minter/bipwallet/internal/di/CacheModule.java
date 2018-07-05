@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,24 +22,24 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.di;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import dagger.Binds;
-import dagger.MapKey;
 import dagger.Module;
 import dagger.Provides;
-import dagger.multibindings.IntoMap;
+import dagger.multibindings.IntoSet;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
+import network.minter.bipwallet.internal.di.annotations.Cached;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.explorerapi.MinterExplorerApi;
 import network.minter.explorerapi.models.HistoryTransaction;
@@ -51,20 +52,15 @@ import network.minter.explorerapi.models.HistoryTransaction;
 @Module
 public abstract class CacheModule {
 
-    @SuppressWarnings("unchecked")
     @Provides
     @WalletApp
-    public static CacheManager provideCacheManager(@CachedMapKey Map<String, CachedRepository> cachedDependencies) {
+    public static CacheManager provideCacheManager(@Cached Set<CachedRepository> cachedDependencies) {
         CacheManager cache = new CacheManager();
-        if (cachedDependencies == null) return cache;
-
-        for (CachedRepository item : cachedDependencies.values()) {
-            cache.add(item);
-        }
-
+        cache.addAll(cachedDependencies);
         return cache;
     }
 
+    // Just providing cached repositories
     @Provides
     @WalletApp
     public static CachedRepository<UserAccount, AccountStorage> provideAccountStorage(AccountStorage accountStorage) {
@@ -77,14 +73,16 @@ public abstract class CacheModule {
         return new CachedRepository<>(new CachedExplorerTransactionRepository(storage, secretStorage, api.getApiService()));
     }
 
+    // Bindings for CacheManager
     @Binds
-    @IntoMap
-    @CachedMapKey
+    @IntoSet
+    @Cached
     @WalletApp
-    public abstract CachedRepository provideCachedAccountStorage(CachedRepository<UserAccount, AccountStorage> cache);
+    public abstract CachedRepository provideExplorerRepoForCache(CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cache);
 
-    @MapKey
-    @interface CachedMapKey {
-        String value() default "cached";
-    }
+    @Binds
+    @IntoSet
+    @Cached
+    @WalletApp
+    public abstract CachedRepository provideAccountStorageForCache(CachedRepository<UserAccount, AccountStorage> cache);
 }

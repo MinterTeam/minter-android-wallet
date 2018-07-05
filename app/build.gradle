@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 plugins {
     id 'com.android.application'
@@ -91,16 +92,21 @@ android {
 
 ext {
     nav_version = "1.0.0-alpha01"
+    minterSdkVersions = "1.0.0"
 }
 
 dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
     // sdk
-    implementation project(':mintercore')
-    implementation project(':minter_blockchain_api')
-    implementation project(':minter_explorer_api')
-    implementation project(path: ':myminter')
+    netTestImplementation "network.minter.android:minter-android-core-testnet:${minterSdkVersions}"
+    netMainImplementation "network.minter.android:minter-android-core:${minterSdkVersions}"
+    netTestImplementation "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersions}"
+    netMainImplementation "network.minter.android:minter-android-blockchain:${minterSdkVersions}"
+    netTestImplementation "network.minter.android:minter-android-explorer-testnet:${minterSdkVersions}"
+    netMainImplementation "network.minter.android:minter-android-explorer:${minterSdkVersions}"
+    netTestImplementation "network.minter.android:minter-android-myminter-testnet:${minterSdkVersions}"
+    netMainImplementation "network.minter.android:minter-android-myminter:${minterSdkVersions}"
 
     // support
     implementation "com.android.support:appcompat-v7:${minterLibSupport}"
@@ -113,8 +119,8 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     // android arch
-    implementation "android.arch.paging:runtime:1.0.0"
-    implementation "android.arch.paging:rxjava2:1.0.0-rc1"
+    implementation "android.arch.paging:runtime:1.0.1"
+    implementation "android.arch.paging:rxjava2:1.0.1"
 
     // common
     implementation 'com.budiyev.android:code-scanner:1.9.0'

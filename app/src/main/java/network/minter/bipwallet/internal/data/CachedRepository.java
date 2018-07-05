@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.data;
 
@@ -116,7 +117,8 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
      * Clear data and set data expired
      */
     public void clear() {
-        mData = null;
+        Timber.d("Call clear on entity %s", mEntity.getClass().getName());
+        mData = mEntity.initialData();
         mDataIsReady = false;
         expire();
     }

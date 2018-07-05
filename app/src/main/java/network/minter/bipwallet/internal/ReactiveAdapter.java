@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal;
 
@@ -38,6 +39,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import network.minter.blockchainapi.MinterBlockChainApi;
 import network.minter.blockchainapi.models.BCResult;
+import network.minter.explorerapi.MinterExplorerApi;
 import network.minter.explorerapi.models.ExpResult;
 import network.minter.my.MyMinterApi;
 import network.minter.my.models.MyResult;
@@ -247,7 +249,7 @@ public class ReactiveAdapter {
     }
 
     public static <T> ExpResult<T> createExpErrorResult(final String json) {
-        Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
+        Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
         return gson.fromJson(json, new TypeToken<ExpResult<T>>() {
         }.getType());
     }

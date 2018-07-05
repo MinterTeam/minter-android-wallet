@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.coins.ui;
 
@@ -45,6 +46,7 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.views.CoinsTabPresenter;
@@ -53,6 +55,7 @@ import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import timber.log.Timber;
 
 /**
  * MinterWallet. 2018
@@ -69,6 +72,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @BindView(R.id.balanceFract) TextView balanceFract;
     @BindView(R.id.balanceCoinName) TextView balanceCoinName;
     @BindView(R.id.list) RecyclerView list;
+    private Unbinder mUnbinder;
 
     @Override
     public void onAttach(Context context) {
@@ -81,7 +85,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_coins, container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -98,6 +102,13 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
         }
 
         avatar.setImageUrl(url);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
+        Timber.d("Destroy");
     }
 
     @Override
