@@ -7,3 +7,5 @@
 /captures
 .externalNativeBuild
 gradle/**
+.keychain
+app/fabric.properties

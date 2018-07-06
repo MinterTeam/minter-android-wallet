@@ -33,6 +33,8 @@ import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -65,6 +67,7 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
 
     public static final Locale LC_EN = Locale.US;
     public static final Locale LC_RU = new Locale("ru", "RU");
+    public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("dev") || BuildConfig.FLAVOR.equalsIgnoreCase("prod");
     private static WalletComponent app;
 
     static {
@@ -95,14 +98,21 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     public void onCreate() {
         super.onCreate();
 
-        Timber.plant(new Timber.DebugTree());
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+
+        if (ENABLE_CRASHLYTICS) {
+            Timber.plant(new CrashlyticsTree());
+        }
 
         Rx.init();
 
         Locale.setDefault(LC_EN);
 
+
         app = DaggerWalletComponent.builder()
-                .walletModule(new WalletModule(this, BuildConfig.DEBUG, false))
+                .walletModule(new WalletModule(this, BuildConfig.DEBUG, ENABLE_CRASHLYTICS))
                 .helpersModule(new HelpersModule())
                 .repoModule(new RepoModule())
                 .build();
@@ -118,6 +128,27 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     @Override
     public AndroidInjector<Service> serviceInjector() {
         return dispatchingServiceInjector;
+    }
+
+    public class CrashlyticsTree extends Timber.Tree {
+        private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
+        private static final String CRASHLYTICS_KEY_TAG = "tag";
+        private static final String CRASHLYTICS_KEY_MESSAGE = "message";
+
+        @Override
+        protected void log(int priority, String tag, String message, Throwable t) {
+            if (priority == Log.ERROR || priority == Log.WARN) {
+                Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
+                Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
+                Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
+
+                if (t == null) {
+                    Crashlytics.logException(new Exception(message));
+                } else {
+                    Crashlytics.logException(t);
+                }
+            }
+        }
     }
 
     public static class Rx {
@@ -225,29 +256,6 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
                     tAction.accept(throwable);
                 }
             };
-        }
-    }
-
-    public class CrashlyticsTree extends Timber.Tree {
-        private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
-        private static final String CRASHLYTICS_KEY_TAG = "tag";
-        private static final String CRASHLYTICS_KEY_MESSAGE = "message";
-
-        @Override
-        protected void log(int priority, String tag, String message, Throwable t) {
-            if (priority != Log.ERROR) {
-                return;
-            }
-
-//            Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
-//            Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
-//            Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
-//
-            if (t == null) {
-//                Crashlytics.logException(new Exception(message));
-            } else {
-//                Crashlytics.logException(t);
-            }
         }
     }
 }

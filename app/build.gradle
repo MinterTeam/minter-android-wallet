@@ -27,6 +27,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'io.fabric'
 }
 
 android {
@@ -37,7 +38,7 @@ android {
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
         versionCode 1
-        versionName "1.0"
+        versionName "0.7.0-beta"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -57,14 +58,25 @@ android {
         additionalParameters "--no-version-vectors"
     }
 
+    signingConfigs {
+        config {
+            keyAlias getProperty("minter_key_alias")
+            keyPassword getProperty("minter_key_password")
+            storeFile file(getProperty("minter_key_store_file"))
+            storePassword getProperty("minter_key_store_password")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.config
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
         }
 
         debug {
+            signingConfig signingConfigs.config
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
@@ -85,7 +97,17 @@ android {
             buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
         }
 
+        netMainNoCrashlytics {
+            dimension "env"
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
+        }
+
         netTest {
+            dimension "env"
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
+        }
+
+        netTestNoCrashlytics {
             dimension "env"
             buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
         }
@@ -102,13 +124,21 @@ dependencies {
 
     // sdk
     netTestImplementation "network.minter.android:minter-android-core-testnet:${minterSdkVersions}"
+    netTestNoCrashlyticsImplementation "network.minter.android:minter-android-core-testnet:${minterSdkVersions}"
     netMainImplementation "network.minter.android:minter-android-core:${minterSdkVersions}"
+    netMainNoCrashlyticsImplementation "network.minter.android:minter-android-core:${minterSdkVersions}"
     netTestImplementation "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersions}"
+    netTestNoCrashlyticsImplementation "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersions}"
     netMainImplementation "network.minter.android:minter-android-blockchain:${minterSdkVersions}"
+    netMainNoCrashlyticsImplementation "network.minter.android:minter-android-blockchain:${minterSdkVersions}"
     netTestImplementation "network.minter.android:minter-android-explorer-testnet:${minterSdkVersions}"
+    netTestNoCrashlyticsImplementation "network.minter.android:minter-android-explorer-testnet:${minterSdkVersions}"
     netMainImplementation "network.minter.android:minter-android-explorer:${minterSdkVersions}"
+    netMainNoCrashlyticsImplementation "network.minter.android:minter-android-explorer:${minterSdkVersions}"
     netTestImplementation "network.minter.android:minter-android-myminter-testnet:${minterSdkVersions}"
+    netTestNoCrashlyticsImplementation "network.minter.android:minter-android-myminter-testnet:${minterSdkVersions}"
     netMainImplementation "network.minter.android:minter-android-myminter:${minterSdkVersions}"
+    netMainNoCrashlyticsImplementation "network.minter.android:minter-android-myminter:${minterSdkVersions}"
 
     // support
     implementation "com.android.support:appcompat-v7:${minterLibSupport}"
@@ -123,6 +153,10 @@ dependencies {
     // android arch
     implementation "android.arch.paging:runtime:1.0.1"
     implementation "android.arch.paging:rxjava2:1.0.1"
+
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
+        transitive = true
+    }
 
     // common
     implementation 'com.budiyev.android:code-scanner:1.9.0'
@@ -155,9 +189,13 @@ dependencies {
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP ignore 1.5.5 - not working with inner class interfaces, waiting for 1.5.6
+    //noinspection GradleDependency
     implementation 'com.arello-mobile:moxy:1.5.3'
+    //noinspection GradleDependency
     implementation 'com.arello-mobile:moxy-android:1.5.3'
+    //noinspection GradleDependency
     implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
+    //noinspection GradleDependency
     annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
 
     // Reactive
@@ -180,11 +218,13 @@ dependencies {
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
     implementation 'com.makeramen:roundedimageview:2.3.0'
     // don't update to 2.2.0 - some issues when using elevation
+    //noinspection GradleDependency
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.github.bachors:Android-Prefix-Input:1.1'
     annotationProcessor 'com.edwardstock.android:barber-compiler:1.0.0'
     implementation 'com.edwardstock.android:barber-api:1.0.0'
     compileOnly 'com.edwardstock.android:barber-annotations:1.0.0'
+    //noinspection GradleDependency
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
     implementation 'com.redmadrobot:inputmask:3.4.4'
     implementation 'com.pnikosis:materialish-progress:1.7'

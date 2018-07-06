@@ -32,6 +32,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name="network.minter.bipwallet.internal.Wallet"
@@ -42,6 +44,11 @@
         android:supportsRtl="true"
         android:theme="@style/Wallet"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="e0c0d96cb82d0098481845be3477bc7970f956e3"
+            />
 
         <provider
             android:name=".internal.system.WalletFileProvider"

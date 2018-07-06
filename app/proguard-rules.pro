@@ -47,3 +47,14 @@
 -dontwarn io.netty.**
 
 -dontwarn java.lang.management.**
+
+
+# Crashlytics
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+# DexGuard
+#-keepresourcexmlelements manifest/application/meta-data@name=io.fabric.ApiKey
+-printmapping mapping.txt
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**

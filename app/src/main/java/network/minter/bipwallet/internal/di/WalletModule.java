@@ -30,6 +30,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.GsonBuilder;
 import com.orhanobut.hawk.Hawk;
@@ -42,6 +44,7 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import io.fabric.sdk.android.Fabric;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.auth.AuthSession;
@@ -64,7 +67,7 @@ import timber.log.Timber;
 public class WalletModule {
     private Context mContext;
     private boolean mDebug;
-    private boolean mEnableExternalLog = false;
+    private boolean mEnableExternalLog;
 
     public WalletModule(Context context, boolean debug, boolean enableExternalLog) {
         mContext = context;
@@ -79,6 +82,13 @@ public class WalletModule {
         MinterExplorerApi.initialize(debug);
         MyMinterApi.initialize(debug);
         JodaTimeAndroid.init(context);
+
+        initCrashlytics();
+    }
+
+    private void initCrashlytics() {
+        CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(!mEnableExternalLog).build();
+        Fabric.with(mContext, new Crashlytics.Builder().core(core).build());
     }
 
     @Provides
@@ -124,12 +134,10 @@ public class WalletModule {
 
     @Provides
     public ApiService.Builder provideApiService(AuthSession session, GsonBuilder gsonBuilder) {
-//        ApiService.IntentBuilder builder = new ApiService.IntentBuilder(BuildConfig.BASE_API_URL, gsonBuilder);
         ApiService.Builder builder = new ApiService.Builder("", gsonBuilder);
 
         builder
                 .setEmptyAuthTokenListener(session::logout)
-//                .setTokenGetter(() -> String.format("Bearer %s", session.getAuthToken()))
                 .setDebug(mDebug)
                 .setAuthHeaderName("Authorization")
                 .addHeader("User-Agent", "Minter Android " + String.valueOf(BuildConfig.VERSION_CODE))
@@ -149,11 +157,6 @@ public class WalletModule {
     public GsonBuilder provideGsonBuilder() {
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .setDateFormat(DateHelper.DATE_FORMAT_SIMPLE);
-
-//        gsonBuilder.registerTypeAdapter(Dog.class, new DogDeserializer());
-//        gsonBuilder.registerTypeAdapter(SitterShort.class, new SitterShortDeserializer<>());
-//        gsonBuilder.registerTypeAdapter(Sitter.class, new SitterDeserializer());
-
         Converters.registerAll(gsonBuilder);
 
         return gsonBuilder;
@@ -165,68 +168,6 @@ public class WalletModule {
     public SessionStorage provideSessionStorage(Context context, GsonBuilder gsonBuilder) {
         return new SessionStorage(context, gsonBuilder);
     }
-
-//    @Provides
-//    @Named("sessionVerifier")
-//    public Observable<Boolean> provideSessionVerifier(final AuthSession session) {
-//        if (!session.isLoggedIn()) {
-//            session.restore();
-//        }
-//
-//        if (!session.isLoggedIn()) {
-//            Timber.d("Session is not valid. Auth required.");
-//            return Observable.just(false);
-//        }
-//
-//        return Observable.create(emitter -> {
-//            final TokenVerifier verifier = new TokenVerifier()
-//                    .setDebug(mDebug)
-//                    .setMethod(TokenVerifier.Method.POST)
-//                    .setBaseUrl(BuildConfig.BASE_API_URL)
-//                    .setToken(session.getAuthToken())
-//                    .setPath("/v1/auth/verify");
-//
-//            verifier.verify()
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeOn(Schedulers.io())
-//                    .subscribe(result -> {
-//                        Timber.i("Restoring session. Everything is ok");
-//                        if (verifier.isValid()) {
-//                            //@TODO
-////                                String token = FirebaseInstanceId.getInstance().getToken();
-////                                if (token != null) {
-//                            // userRepository.setDeviceToken(token);
-////                                }
-//
-//                            emitter.onNext(true);
-//                            emitter.onComplete();
-//                        } else {
-//                            session.logout();
-//                            emitter.onNext(false);
-//                            emitter.onComplete();
-//                        }
-//                    }, t -> {
-//                        if (t instanceof NetworkException) {
-//                            if (((NetworkException) t).getStatusCode() == 401 || ((NetworkException) t).getStatusCode() == 403) {
-//                                Timber.i("Token is not valid. Destroying session");
-//                                session.logout();
-//                                emitter.onNext(false);
-//                                emitter.onComplete();
-//                                return;
-//                            }
-//                        }
-//
-//                        emitter.onError(t);
-//                    });
-//        });
-//    }
-
-//    @Provides
-//    @Named("userId")
-//    @BipApp
-//    public long provideUserId(AuthSession session) {
-//        return session.getUser() != null ? session.getUser().getId() : 0;
-//    }
 
     @Provides
     public SharedPreferences providePreferences(Context context) {

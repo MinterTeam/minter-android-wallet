@@ -34,12 +34,14 @@ buildscript {
         mavenLocal()
         google()
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0-beta02'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
@@ -54,6 +56,7 @@ allprojects {
         maven { url "https://maven.edwardstock.com/artifactory/libs-release-local" }
         maven { url "https://repo1.maven.org/maven2/com/google/zxing/" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/'}
+        maven { url 'https://maven.fabric.io/public' }
 
     }
 }
