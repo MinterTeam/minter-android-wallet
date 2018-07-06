@@ -327,6 +327,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
             final HistoryTransaction.TxConvertCoinResult data = item.getTx().getData();
             title.setText(item.getTx().hash.toShortString());
             amount.setText(String.format("- %s", firstNonNull(data.amount, new BigDecimal(0)).toPlainString()));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
             subamount.setText(String.format("%s -> %s", firstNonNull(data.getFromCoin(), "<unknown>"), firstNonNull(data.getToCoin(), "<unknown>")));
             coinFrom.setText(firstNonNull(data.getFromCoin(), "<unknown>"));
             coinTo.setText(firstNonNull(data.getToCoin(), "<unknown>"));
