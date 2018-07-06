@@ -56,6 +56,7 @@ import network.minter.explorerapi.MinterExplorerApi;
 import network.minter.mintercore.MinterSDK;
 import network.minter.mintercore.internal.api.ApiService;
 import network.minter.my.MyMinterApi;
+import okhttp3.Cache;
 import timber.log.Timber;
 
 /**
@@ -77,10 +78,15 @@ public class WalletModule {
                 .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
                 .build();
 
+        Cache httpCache = new Cache(context.getCacheDir(), 10 * 1024 * 1024/*10 mb*/);
+
         MinterSDK.initialize();
         MinterBlockChainApi.initialize(debug);
         MinterExplorerApi.initialize(debug);
         MyMinterApi.initialize(debug);
+
+        MinterExplorerApi.getInstance().getApiService().setCache(httpCache);
+        MyMinterApi.getInstance().getApiService().setCache(httpCache);
         JodaTimeAndroid.init(context);
 
         initCrashlytics();
