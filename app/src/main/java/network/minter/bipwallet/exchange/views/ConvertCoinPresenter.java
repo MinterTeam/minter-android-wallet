@@ -200,7 +200,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
     }
 
     private void onClickMaximum(View view) {
-        getViewState().setAmountSpending(mFromAccount.balance.toPlainString());
+        getViewState().setAmountSpending(mFromAccount.balance.subtract(Transaction.PAID_TX_COST).toPlainString());
     }
 
     private void onClickSelectAccount(View view) {
@@ -215,7 +215,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
         mFromAccount = accountItem;
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
         getViewState().setOutAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), accountItem.balance.toString()));
-        getViewState().setMaximumTitle(String.format("Use max. %s %s", accountItem.balance.toString(), accountItem.coin.toUpperCase()));
+        getViewState().setMaximumTitle(String.format("Use max. %s %s", accountItem.balance.subtract(Transaction.PAID_TX_COST).toString(), accountItem.coin.toUpperCase()));
 
         if (!initial) {
             onAmountChanged(false);
@@ -284,6 +284,10 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
         }
 
         if (incoming) {
+            if (mToAmount.compareTo(new BigDecimal(0)) <= 0) {
+                mIgnoreAmountChange.set(false);
+                return;
+            }
             rxCallBc(coinRepo.getCoinExchangeCurrency(mFromAccount.coin, mToCoin, mToAmount))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -295,7 +299,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                         mIgnoreAmountChange.set(true);
                         getViewState().setError("income_coin", null);
                         if (!res.isSuccess()) {
-                            if (res.code == BCResult.ResultCode.EmptyResponse) {
+                            if (res.code == BCResult.ResultCode.EmptyResponse || res.statusCode == 404) {
                                 getViewState().setError("income_coin", "Coin not found");
                                 mIgnoreAmountChange.set(false);
                                 return;
@@ -314,6 +318,10 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                         Timber.e(t, "Unable to get currency for in amount");
                     });
         } else {
+            if (mFromAmount.compareTo(new BigDecimal(0)) <= 0) {
+                mIgnoreAmountChange.set(false);
+                return;
+            }
             rxCallBc(coinRepo.getCoinExchangeCurrency(mToCoin, mFromAccount.coin, mFromAmount))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -325,7 +333,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                         mIgnoreAmountChange.set(true);
                         getViewState().setError("income_coin", null);
                         if (!res.isSuccess()) {
-                            if (res.code == BCResult.ResultCode.EmptyResponse) {
+                            if (res.code == BCResult.ResultCode.EmptyResponse || res.statusCode == 404) {
                                 getViewState().setError("income_coin", "Coin not found");
                                 mIgnoreAmountChange.set(false);
                                 return;
