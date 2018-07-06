@@ -258,28 +258,26 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
             final String am;
 
             final boolean isIncoming = item.isIncoming(myAddresses);
-            if (!isIncoming) {
+
+            if (isIncoming) {
                 if (txItem.getUsername() != null) {
                     title.setText(String.format("@%s", txItem.getUsername()));
-                } else {
-                    if (data.to != null) {
-                        title.setText(data.to.toShortString());
-                    }
-
-                }
-
-                am = String.format("- %s", data.amount.toPlainString());
-                amount.setText(am);
-                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
-            } else {
-                if (txItem.getUsername() != null) {
-                    title.setText(txItem.getUsername());
                 } else {
                     title.setText(data.from.toShortString());
                 }
                 am = String.format("+ %s", data.amount.toPlainString());
                 amount.setText(am);
                 amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+            } else {
+                if (txItem.getUsername() != null) {
+                    title.setText(String.format("@%s", txItem.getUsername()));
+                } else {
+                    title.setText(data.to.toShortString());
+                }
+
+                am = String.format("- %s", data.amount.toPlainString());
+                amount.setText(am);
+                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
             }
 
             fromValue.setText(data.from.toString());

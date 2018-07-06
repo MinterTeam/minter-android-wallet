@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.advanced.models;
 
@@ -36,6 +37,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.my.MyMinterApi;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 
@@ -83,7 +85,7 @@ public class AccountItem implements Serializable, Cloneable {
 
     public String getAvatar() {
         if (avatar == null) {
-            return "https://my.beta.minter.network/api/v1/avatar/by/user/1";
+            return MyMinterApi.getCoinAvatarUrl(coin.toUpperCase());
         }
         return avatar;
     }

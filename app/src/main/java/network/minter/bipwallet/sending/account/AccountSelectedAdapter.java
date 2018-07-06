@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.sending.account;
 
@@ -73,12 +74,7 @@ public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelected
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final AccountItem item = mItems.get(position);
-        if (item.avatar != null) {
-            holder.avatar.setImageUrl(item.avatar);
-        } else {
-            holder.avatar.setImageResource(R.drawable.img_avatar_default);
-        }
-
+        holder.avatar.setImageUrlFallback(item.getAvatar(), R.drawable.img_avatar_default);
         holder.title.setText(String.format("%s (%s)", item.coin.toUpperCase(), item.balance.toString()));
         holder.subtitle.setText(item.address.toShortString());
 

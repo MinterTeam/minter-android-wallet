@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.views.widgets;
 
@@ -92,6 +93,16 @@ final class RemoteImageViewDelegate implements RemoteImageView {
                         Timber.w(e, "Unable to load image %s", url);
                     }
                 });
+    }
+
+    @Override
+    public void setImageUrlFallback(String url, int fallbackResId) {
+        if (url == null) {
+            mImage.get().setImageResource(fallbackResId);
+            return;
+        }
+
+        setImageUrl(url);
     }
 
     @Override

@@ -26,7 +26,6 @@
 
 package network.minter.bipwallet.exchange.views;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
@@ -43,7 +42,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.R;
@@ -57,7 +55,6 @@ import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
-import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.BCResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
@@ -129,41 +126,35 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
             return;
         }
 
-        getViewState().startDialog(new WalletDialog.DialogExecutor() {
-            @Override
-            public WalletDialog run(Context ctx) {
-                WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
-                        .setText("Please, wait few seconds")
-                        .create();
+        getViewState().startDialog(ctx -> {
+            WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
+                    .setText("Please, wait few seconds")
+                    .create();
 
-                dialog.setCancelable(false);
+            dialog.setCancelable(false);
 
-                safeSubscribeIoToUi(rxCallBc(accountRepo.getTransactionCount(mFromAccount.address)))
-                        .onErrorResumeNext(convertToBcErrorResult())
-                        .switchMap(new Function<BCResult<BigInteger>, ObservableSource<BCResult<BytesData>>>() {
-                            @Override
-                            public ObservableSource<BCResult<BytesData>> apply(BCResult<BigInteger> cntRes) {
-                                if (!cntRes.isSuccess()) {
-                                    return Observable.just(BCResult.copyError(cntRes));
-                                }
+            safeSubscribeIoToUi(rxCallBc(accountRepo.getTransactionCount(mFromAccount.address)))
+                    .onErrorResumeNext(convertToBcErrorResult())
+                    .switchMap((Function<BCResult<BigInteger>, ObservableSource<BCResult<BytesData>>>) cntRes -> {
+                        if (!cntRes.isSuccess()) {
+                            return Observable.just(BCResult.copyError(cntRes));
+                        }
 
-                                final Transaction<TxConvertCoin> tx = Transaction.newConvertCoinTransaction(cntRes.result.add(new BigInteger("1")))
-                                        .setAmount(mFromAmount)
-                                        .setFromCoin(mFromAccount.coin)
-                                        .setToCoin(mToCoin)
-                                        .build();
+                        final Transaction<TxConvertCoin> tx = Transaction.newConvertCoinTransaction(cntRes.result.add(new BigInteger("1")))
+                                .setAmount(mFromAmount)
+                                .setFromCoin(mFromAccount.coin)
+                                .setToCoin(mToCoin)
+                                .build();
 
-                                final SecretData data = secretStorage.getSecret(mFromAccount.address);
-                                final TransactionSign sign = tx.sign(data.getPrivateKey());
+                        final SecretData data = secretStorage.getSecret(mFromAccount.address);
+                        final TransactionSign sign = tx.sign(data.getPrivateKey());
 
-                                return safeSubscribeIoToUi(rxCallBc(accountRepo.sendTransaction(sign)))
-                                        .onErrorResumeNext(convertToBcErrorResult());
-                            }
-                        }).subscribe(ConvertCoinPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
+                        return safeSubscribeIoToUi(rxCallBc(accountRepo.sendTransaction(sign)))
+                                .onErrorResumeNext(convertToBcErrorResult());
+                    }).subscribe(ConvertCoinPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
 
 
-                return dialog;
-            }
+            return dialog;
         });
     }
 
@@ -282,7 +273,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
         }
 
         if (incoming) {
-            rxCallBc(coinRepo.getCoinCurrencyConversion(mFromAccount.coin, mToCoin, mToAmount))
+            rxCallBc(coinRepo.getCoinExchangeCurrency(mFromAccount.coin, mToCoin, mToAmount))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcErrorResult())
@@ -309,32 +300,29 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                         Timber.e(t, "Unable to get currency for in amount");
                     });
         } else {
-            rxCallBc(coinRepo.getCoinCurrencyConversion(mToCoin, mFromAccount.coin, mFromAmount))
+            rxCallBc(coinRepo.getCoinExchangeCurrency(mToCoin, mFromAccount.coin, mFromAmount))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcErrorResult())
                     .debounce(300, TimeUnit.MILLISECONDS)
                     .distinctUntilChanged()
                     .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .subscribe(new Consumer<BCResult<BigInteger>>() {
-                        @Override
-                        public void accept(BCResult<BigInteger> res) {
-                            getViewState().setError("income_coin", null);
-                            if (!res.isSuccess()) {
-                                if (res.code == BCResult.ResultCode.EmptyResponse) {
-                                    getViewState().setError("income_coin", "Coin not found");
-                                    return;
-                                }
-                                Timber.w(new BCResponseException(res));
+                    .subscribe(res -> {
+                        getViewState().setError("income_coin", null);
+                        if (!res.isSuccess()) {
+                            if (res.code == BCResult.ResultCode.EmptyResponse) {
+                                getViewState().setError("income_coin", "Coin not found");
                                 return;
                             }
-                            BigDecimal amount = new BigDecimal(res.result).divide(Transaction.VALUE_MUL_DEC);
-                            Timber.d("%s %s = %s %s", mFromAmount.toPlainString(), mFromAccount.coin, amount, mToCoin);
-                            getViewState().setAmountGetting(amount.toPlainString());
-                            mToAmount = amount;
-                            getViewState().setSubmitEnabled(mFromAmount.compareTo(mFromAccount.balance) <= 0);
-                            mIgnoreAmountChange.set(false);
+                            Timber.w(new BCResponseException(res));
+                            return;
                         }
+                        BigDecimal amount = new BigDecimal(res.result).divide(Transaction.VALUE_MUL_DEC);
+                        Timber.d("%s %s = %s %s", mFromAmount.toPlainString(), mFromAccount.coin, amount, mToCoin);
+                        getViewState().setAmountGetting(amount.toPlainString());
+                        mToAmount = amount;
+                        getViewState().setSubmitEnabled(mFromAmount.compareTo(mFromAccount.balance) <= 0);
+                        mIgnoreAmountChange.set(false);
                     }, t -> {
                         mIgnoreAmountChange.set(false);
                         Timber.e(t, "Unable to get currency for out amount");
