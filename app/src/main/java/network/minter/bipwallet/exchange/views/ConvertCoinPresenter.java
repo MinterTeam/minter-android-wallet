@@ -52,6 +52,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.ui.WalletTxConvertStartDialog;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
@@ -126,6 +127,16 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
             return;
         }
 
+        getViewState().startDialog(ctx -> new WalletTxConvertStartDialog.Builder(ctx, "Convert coin")
+                .setAmount(mFromAmount)
+                .setFromCoin(mFromAccount.coin)
+                .setToCoin(mToCoin)
+                .setPositiveAction("Convert!", (d, w) -> onStartExecuteTransaction())
+                .setNegativeAction("Cancel")
+                .create());
+    }
+
+    private void onStartExecuteTransaction() {
         getViewState().startDialog(ctx -> {
             WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
                     .setText("Please, wait few seconds")
@@ -281,13 +292,16 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                     .distinctUntilChanged()
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
+                        mIgnoreAmountChange.set(true);
                         getViewState().setError("income_coin", null);
                         if (!res.isSuccess()) {
                             if (res.code == BCResult.ResultCode.EmptyResponse) {
                                 getViewState().setError("income_coin", "Coin not found");
+                                mIgnoreAmountChange.set(false);
                                 return;
                             }
                             Timber.w(new BCResponseException(res));
+                            mIgnoreAmountChange.set(false);
                             return;
                         }
                         BigDecimal amount = new BigDecimal(res.result).divide(Transaction.VALUE_MUL_DEC);
@@ -308,13 +322,16 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                     .distinctUntilChanged()
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
+                        mIgnoreAmountChange.set(true);
                         getViewState().setError("income_coin", null);
                         if (!res.isSuccess()) {
                             if (res.code == BCResult.ResultCode.EmptyResponse) {
                                 getViewState().setError("income_coin", "Coin not found");
+                                mIgnoreAmountChange.set(false);
                                 return;
                             }
                             Timber.w(new BCResponseException(res));
+                            mIgnoreAmountChange.set(false);
                             return;
                         }
                         BigDecimal amount = new BigDecimal(res.result).divide(Transaction.VALUE_MUL_DEC);

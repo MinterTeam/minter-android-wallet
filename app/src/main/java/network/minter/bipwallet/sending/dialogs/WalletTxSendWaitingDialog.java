@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.sending.dialogs;
 
@@ -44,7 +45,7 @@ import network.minter.bipwallet.internal.system.TickHandler;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class WalletTxWaitingDialog extends WalletDialog implements TickHandler.TickListener {
+public class WalletTxSendWaitingDialog extends WalletDialog implements TickHandler.TickListener {
 
     private final Builder mBuilder;
     @BindView(R.id.tx_countdown) TextView countdown;
@@ -52,7 +53,7 @@ public class WalletTxWaitingDialog extends WalletDialog implements TickHandler.T
     @BindView(R.id.action_express) Button actionExpress;
     private TickHandler mTickHandler;
 
-    public WalletTxWaitingDialog(@NonNull Context context, Builder builder) {
+    public WalletTxSendWaitingDialog(@NonNull Context context, Builder builder) {
         super(context);
         mBuilder = builder;
     }
@@ -96,7 +97,7 @@ public class WalletTxWaitingDialog extends WalletDialog implements TickHandler.T
         actionExpress.setOnClickListener(v -> {
             mTickHandler.stop();
             if (mBuilder.hasPositiveListener()) {
-                mBuilder.getPositiveListener().onClick(WalletTxWaitingDialog.this, BUTTON_POSITIVE);
+                mBuilder.getPositiveListener().onClick(WalletTxSendWaitingDialog.this, BUTTON_POSITIVE);
             }
         });
 
@@ -109,7 +110,7 @@ public class WalletTxWaitingDialog extends WalletDialog implements TickHandler.T
         void onCountDown(long tick, boolean isEnd);
     }
 
-    public static class Builder extends WalletDialogBuilder<WalletTxWaitingDialog, Builder> {
+    public static class Builder extends WalletDialogBuilder<WalletTxSendWaitingDialog, Builder> {
         private long mCountdownSeconds = 60L;
         private OnCountdownListener mCountdownListener;
         private CharSequence mFee; //todo ?
@@ -132,8 +133,8 @@ public class WalletTxWaitingDialog extends WalletDialog implements TickHandler.T
             return this;
         }
 
-        public WalletTxWaitingDialog create() {
-            return new WalletTxWaitingDialog(mContext, this);
+        public WalletTxSendWaitingDialog create() {
+            return new WalletTxSendWaitingDialog(mContext, this);
         }
     }
 

@@ -59,9 +59,9 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.MyResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.sending.SendTabModule;
-import network.minter.bipwallet.sending.dialogs.WalletTxStartDialog;
-import network.minter.bipwallet.sending.dialogs.WalletTxSuccessDialog;
-import network.minter.bipwallet.sending.dialogs.WalletTxWaitingDialog;
+import network.minter.bipwallet.sending.dialogs.WalletTxSendStartDialog;
+import network.minter.bipwallet.sending.dialogs.WalletTxSendSuccessDialog;
+import network.minter.bipwallet.sending.dialogs.WalletTxSendWaitingDialog;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.blockchainapi.models.BCResult;
 import network.minter.blockchainapi.models.operational.Transaction;
@@ -209,7 +209,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void startSendDialog() {
         getViewState().startDialog(ctx -> {
-            final WalletTxStartDialog dialog = new WalletTxStartDialog.Builder(ctx, "You're sending")
+            final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, "You're sending")
                     .setAmount(new BigDecimal(mAmount.toString()))
                     .setAvatarUrl(mAvatar)
                     .setRecipientName(mToName)
@@ -224,7 +224,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onStartWaitingDialog(DialogInterface dialogInterface, int which) {
         getViewState().startDialog(ctx -> {
-            final WalletTxWaitingDialog dialog = new WalletTxWaitingDialog.Builder(ctx, "Please wait")
+            final WalletTxSendWaitingDialog dialog = new WalletTxSendWaitingDialog.Builder(ctx, "Please wait")
                     .setCountdownSeconds(10, (tick, isEnd) -> {
                         if (isEnd) {
                             onStartExecuteTransaction(false);
@@ -295,7 +295,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
         accountStorage.update(true);
         txRepo.update(true);
-        getViewState().startDialog(ctx -> new WalletTxSuccessDialog.Builder(ctx, "Success!")
+        getViewState().startDialog(ctx -> new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
                 .setRecipientName(mToName)
                 .setAvatar(mAvatar)
                 .setPositiveAction("View transaction", (d, v) -> {

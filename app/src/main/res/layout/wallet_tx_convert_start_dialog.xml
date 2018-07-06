@@ -76,33 +76,34 @@
             >
 
             <TextView
+                android:id="@+id/dialog_amount_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/_ubuntu_bold"
+                android:text="Convert"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
                 android:id="@+id/dialog_amount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_half"
                 android:fontFamily="@font/_ubuntu_bold"
                 android:textAlignment="center"
                 android:textSize="@dimen/text_size_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="1000000000000000.102030405060708090"
-                />
-
-            <TextView
-                android:id="@+id/tx_to_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges_half"
-                android:text="@string/tx_send_begin_dialog_recipient_label"
-                android:textAlignment="center"
-                android:textSize="@dimen/text_size_14"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dialog_amount"
+                app:layout_constraintTop_toBottomOf="@id/dialog_amount_label"
+                tools:text="10000000"
                 />
 
             <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-                android:id="@+id/tx_recipient_avatar"
+                android:id="@+id/tx_from_coin_avatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="@dimen/margin_edges_half"
@@ -113,13 +114,58 @@
                 app:civ_border_color="@color/white"
                 app:civ_border_overlay="true"
                 app:civ_border_width="2dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tx_to_label"
+                app:layout_constraintEnd_toEndOf="@id/tx_from_coin_name"
+                app:layout_constraintStart_toStartOf="@id/tx_from_coin_name"
+                app:layout_constraintTop_toBottomOf="@id/dialog_amount"
                 />
 
             <TextView
-                android:id="@+id/tx_recipient_name"
+                android:id="@+id/tx_to_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:text="@string/tx_send_begin_dialog_recipient_label"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintBottom_toBottomOf="@id/tx_from_coin_avatar"
+                app:layout_constraintEnd_toStartOf="@id/tx_to_coin_avatar"
+                app:layout_constraintStart_toEndOf="@id/tx_from_coin_avatar"
+                app:layout_constraintTop_toBottomOf="@id/dialog_amount"
+                />
+
+            <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
+                android:id="@+id/tx_to_coin_avatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:background="@drawable/bg_image_round_shadow"
+                android:elevation="4dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img_avatar_default"
+                app:civ_border_color="@color/white"
+                app:civ_border_overlay="true"
+                app:civ_border_width="2dp"
+                app:layout_constraintEnd_toEndOf="@id/tx_to_coin_name"
+                app:layout_constraintStart_toStartOf="@id/tx_to_coin_name"
+                app:layout_constraintTop_toBottomOf="@id/dialog_amount"
+                />
+
+            <TextView
+                android:id="@+id/tx_from_coin_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:fontFamily="@font/_ubuntu_bold"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toStartOf="@id/tx_to_coin_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tx_from_coin_avatar"
+                tools:text="BIPBIPBIPB"
+                />
+
+            <TextView
+                android:id="@+id/tx_to_coin_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges_half"
@@ -127,11 +173,10 @@
                 android:textAlignment="center"
                 android:textSize="@dimen/text_size_14"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tx_recipient_avatar"
-                tools:text="\@PavelDurov"
+                app:layout_constraintStart_toEndOf="@id/tx_from_coin_name"
+                app:layout_constraintTop_toBottomOf="@id/tx_to_coin_avatar"
+                tools:text="BLTCOINQWE"
                 />
-
 
             <Button
                 android:id="@+id/action_confirm"
@@ -140,7 +185,7 @@
                 android:layout_marginTop="@dimen/margin_edges_medium"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tx_recipient_name"
+                app:layout_constraintTop_toBottomOf="@id/tx_from_coin_name"
                 tools:text="Agree"
                 />
 

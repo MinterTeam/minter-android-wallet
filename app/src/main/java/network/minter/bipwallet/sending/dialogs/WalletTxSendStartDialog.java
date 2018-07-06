@@ -50,7 +50,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public final class WalletTxStartDialog extends WalletDialog {
+public final class WalletTxSendStartDialog extends WalletDialog {
 
     @BindView(R.id.dialog_amount) TextView amount;
     @BindView(R.id.tx_recipient_avatar) BipCircleImageView avatar;
@@ -60,7 +60,7 @@ public final class WalletTxStartDialog extends WalletDialog {
 
     private Builder mBuilder;
 
-    public WalletTxStartDialog(@NonNull Context context, Builder builder) {
+    public WalletTxSendStartDialog(@NonNull Context context, Builder builder) {
         super(context);
         mBuilder = builder;
     }
@@ -80,21 +80,21 @@ public final class WalletTxStartDialog extends WalletDialog {
         actionConfirm.setText(mBuilder.getPositiveTitle());
         actionConfirm.setOnClickListener(v -> {
             if (mBuilder.hasPositiveListener()) {
-                mBuilder.getPositiveListener().onClick(WalletTxStartDialog.this, BUTTON_POSITIVE);
+                mBuilder.getPositiveListener().onClick(WalletTxSendStartDialog.this, BUTTON_POSITIVE);
             }
         });
 
         actionDecline.setText(mBuilder.getNegativeTitle());
         actionDecline.setOnClickListener(v -> {
             if (mBuilder.hasNegativeListener()) {
-                mBuilder.getNegativeListener().onClick(WalletTxStartDialog.this, BUTTON_NEGATIVE);
+                mBuilder.getNegativeListener().onClick(WalletTxSendStartDialog.this, BUTTON_NEGATIVE);
             } else {
                 dismiss();
             }
         });
     }
 
-    public static final class Builder extends WalletDialogBuilder<WalletTxStartDialog, Builder> {
+    public static final class Builder extends WalletDialogBuilder<WalletTxSendStartDialog, Builder> {
         private BigDecimal mAmount;
         private String mAvatarUrl;
         private CharSequence mRecipientName;
@@ -124,18 +124,18 @@ public final class WalletTxStartDialog extends WalletDialog {
             return this;
         }
 
-        public WalletTxStartDialog.Builder setNegativeAction(CharSequence title, Dialog.OnClickListener listener) {
+        public WalletTxSendStartDialog.Builder setNegativeAction(CharSequence title, Dialog.OnClickListener listener) {
             return super.setAction(BUTTON_NEGATIVE, title, listener);
         }
 
-        public WalletTxStartDialog.Builder setPositiveAction(CharSequence title, OnClickListener listener) {
+        public WalletTxSendStartDialog.Builder setPositiveAction(CharSequence title, OnClickListener listener) {
             return super.setAction(BUTTON_POSITIVE, title, listener);
         }
 
-        public WalletTxStartDialog create() {
+        public WalletTxSendStartDialog create() {
             checkNotNull(mRecipientName, "Recipient name required");
             checkNotNull(mAmount, "Amount required");
-            return new WalletTxStartDialog(mContext, this);
+            return new WalletTxSendStartDialog(mContext, this);
         }
 
         public Builder setCoin(String coin) {

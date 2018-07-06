@@ -44,14 +44,14 @@ import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class WalletTxSuccessDialog extends WalletDialog {
+public class WalletTxSendSuccessDialog extends WalletDialog {
     private final Builder mBuilder;
     @BindView(R.id.tx_recipient_avatar) BipCircleImageView avatar;
     @BindView(R.id.tx_recipient_name) TextView recipientName;
     @BindView(R.id.action_view_tx) Button actionViewTx;
     @BindView(R.id.action_close) Button actionClose;
 
-    protected WalletTxSuccessDialog(@NonNull Context context, Builder builder) {
+    protected WalletTxSendSuccessDialog(@NonNull Context context, Builder builder) {
         super(context);
         mBuilder = builder;
     }
@@ -70,7 +70,7 @@ public class WalletTxSuccessDialog extends WalletDialog {
 
         actionViewTx.setOnClickListener(v -> {
             if (mBuilder.hasPositiveListener()) {
-                mBuilder.getPositiveListener().onClick(WalletTxSuccessDialog.this, BUTTON_POSITIVE);
+                mBuilder.getPositiveListener().onClick(WalletTxSendSuccessDialog.this, BUTTON_POSITIVE);
             }
         });
         actionClose.setOnClickListener(v -> {
@@ -79,7 +79,7 @@ public class WalletTxSuccessDialog extends WalletDialog {
 
     }
 
-    public static class Builder extends WalletDialogBuilder<WalletTxSuccessDialog, WalletTxSuccessDialog.Builder> {
+    public static class Builder extends WalletDialogBuilder<WalletTxSendSuccessDialog, WalletTxSendSuccessDialog.Builder> {
         private CharSequence mRecipientName;
         private String mAvatarUrl;
 
@@ -111,8 +111,8 @@ public class WalletTxSuccessDialog extends WalletDialog {
         }
 
         @Override
-        public WalletTxSuccessDialog create() {
-            return new WalletTxSuccessDialog(mContext, this);
+        public WalletTxSendSuccessDialog create() {
+            return new WalletTxSendSuccessDialog(mContext, this);
         }
     }
 }
