@@ -94,6 +94,30 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
     @Inject
     public CoinsTabPresenter() {
+    }
+
+    @Override
+    public void attachView(CoinsTabModule.CoinsTabView view) {
+        super.attachView(view);
+        myAddresses = secretRepo.getAddresses();
+
+        txRepo.update();
+        accountStorage.update();
+
+        getViewState().setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.clear();
+        mTransactionsAdapter.clear();
+        mCoinsAdapter.clear();
+    }
+
+    @Override
+    protected void onFirstViewAttach() {
+        super.onFirstViewAttach();
         mAdapter = new MultiRowAdapter();
         mTransactionsAdapter = new SimpleRecyclerAdapter.Builder<HistoryTransaction, ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
@@ -139,34 +163,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
 
                 }).build();
-    }
 
-    @Override
-    public void attachView(CoinsTabModule.CoinsTabView view) {
-        super.attachView(view);
-        myAddresses = secretRepo.getAddresses();
 
-        txRepo.update();
-        accountStorage.update();
-
-        getViewState().setAdapter(mAdapter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAdapter.clear();
-        mTransactionsAdapter.clear();
-        mCoinsAdapter.clear();
-        mTransactionsAdapter = null;
-        mCoinsAdapter = null;
-        mTransactionsRow = null;
-        mCoinsRow = null;
-    }
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
         if (session.getRole() == AuthSession.AuthType.Advanced) {
             getViewState().hideAvatar();
         } else {
