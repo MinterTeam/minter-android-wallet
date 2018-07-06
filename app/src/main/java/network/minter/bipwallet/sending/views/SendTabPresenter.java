@@ -162,18 +162,22 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             return;
         }
         if (mToAddress != null) {
-            startSendDialog();
+            resolveUserInfo(mToAddress.toString(), false);
             return;
         }
 
         if (mToName.toString().substring(0, 2).equals(MinterSDK.PREFIX_ADDRESS)) {
             mToAddress = mToName;
-            startSendDialog();
+            resolveUserInfo(mToName.toString(), false);
             return;
         }
 
+        resolveUserInfo(mToName.toString(), true);
+    }
+
+    private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
         getViewState().startDialog(ctx -> {
-            rxCallMy(infoRepo.findAddressByInput(mToName.toString()))
+            rxCallMy(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(convertToMyErrorResult())
                     .subscribeOn(Schedulers.io())
@@ -182,17 +186,23 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         if (result.isSuccess()) {
                             mAvatar = result.data.user.getAvatar().getUrl();
                             mToAddress = result.data.address.toString();
+                            mToName = String.format("@%s", result.data.user.username);
                             getViewState().setRecipientError(null);
                             startSendDialog();
                         } else {
-                            mToAddress = null;
-                            onErrorSearchUser(result);
-                            Timber.d(new MyResponseException(result), "Unable to find address");
+                            if (failOnNotFound) {
+                                mToAddress = null;
+                                onErrorSearchUser(result);
+                                Timber.d(new MyResponseException(result), "Unable to find address");
+                            } else {
+                                getViewState().setRecipientError(null);
+                                startSendDialog();
+                            }
                         }
                     }, Wallet.Rx.errorHandler());
 
             return new WalletProgressDialog.Builder(ctx, "Searching address")
-                    .setText(String.format("Please, wait, we are searching address for user \"%s\"", mToName))
+                    .setText(String.format("Please, wait, we are searching address for user \"%s\"", searchBy))
                     .create();
         });
     }
