@@ -74,6 +74,7 @@ public class WalletModule {
         mContext = context;
         mDebug = debug;
         mEnableExternalLog = enableExternalLog;
+        initCrashlytics();
         Hawk.init(mContext)
                 .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
                 .build();
@@ -88,8 +89,6 @@ public class WalletModule {
         MinterExplorerApi.getInstance().getApiService().setCache(httpCache);
         MyMinterApi.getInstance().getApiService().setCache(httpCache);
         JodaTimeAndroid.init(context);
-
-        initCrashlytics();
     }
 
     private void initCrashlytics() {
