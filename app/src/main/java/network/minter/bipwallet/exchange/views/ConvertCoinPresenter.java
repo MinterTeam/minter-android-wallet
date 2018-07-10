@@ -39,11 +39,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.advanced.models.SecretData;
@@ -71,6 +73,7 @@ import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.mintercore.MinterSDK.PREFIX_TX;
 
 /**
@@ -91,6 +94,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
     private BigDecimal mToAmount = new BigDecimal(0);
     private BigDecimal mFromAmount = new BigDecimal(0);
     private AtomicBoolean mIgnoreAmountChange = new AtomicBoolean(false);
+    private BehaviorSubject<Boolean> mInputChange;
 
     @Inject
     public ConvertCoinPresenter() {
@@ -112,6 +116,12 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                         onAccountSelected(mFromAccount, true);
                     }
                 });
+
+        mInputChange = BehaviorSubject.create();
+        unsubscribeOnDestroy(mInputChange
+                .toFlowable(BackpressureStrategy.LATEST)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .subscribe(this::onAmountChanged));
 
         getViewState().setSubmitEnabled(false);
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
@@ -218,20 +228,21 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
         getViewState().setMaximumTitle(String.format("Use max. %s %s", accountItem.balance.subtract(Transaction.PAID_TX_COST).toString(), accountItem.coin.toUpperCase()));
 
         if (!initial) {
-            onAmountChanged(false);
+            mInputChange.onNext(false);
         }
     }
 
     private void onInputChanged(EditText editText, boolean valid) {
         final String text = editText.getText().toString();
-        Timber.d("Input changed %s", Wallet.app().context().getResources().getResourceName(editText.getId()));
+
         switch (editText.getId()) {
             case R.id.input_incoming_coin:
                 mToCoin = text;
-                onAmountChanged(true);
+                mInputChange.onNext(!bdGT(mFromAmount, 0) || bdGT(mToAmount, 0) || (mFromAmount == null && mToAmount == null));
                 break;
             case R.id.input_incoming_amount:
                 if (mIgnoreAmountChange.get()) {
+                    Timber.d("Locked incoming amount (val: %s)", text);
                     break;
                 }
                 if (!text.isEmpty()) {
@@ -240,10 +251,11 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                     mToAmount = new BigDecimal(0);
                 }
                 getViewState().setSubmitEnabled(mFromAmount.compareTo(mFromAccount.balance) <= 0);
-                onAmountChanged(true);
+                mInputChange.onNext(true);
                 break;
             case R.id.input_outgoing_amount:
                 if (mIgnoreAmountChange.get()) {
+                    Timber.d("Locked outgoing amount (val: %s)", text);
                     break;
                 }
 
@@ -253,7 +265,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                     mFromAmount = new BigDecimal(0);
                 }
                 getViewState().setSubmitEnabled(mFromAmount.compareTo(mFromAccount.balance) <= 0);
-                onAmountChanged(false);
+                mInputChange.onNext(false);
                 break;
         }
     }
@@ -263,17 +275,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
             return;
         }
         getViewState().setSubmitEnabled(mFromAmount.compareTo(mFromAccount.balance) <= 0);
-        mIgnoreAmountChange.set(true);
 
-        /*
-        to:   OTHER = ?
-        from: MNT   = 5
-        query: OTHER = fromCoin=MNT&toCoin=OTHER&value=5
-
-        to:   OTHER = 10
-        from: MNT   = ?
-        query: MNT = fromCoin=OTHER&toCoin=MNT&value=10
-         */
         if (mToAmount == null) {
             mToAmount = new BigDecimal(1);
             getViewState().setAmountGetting("1");
@@ -284,16 +286,10 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
         }
 
         if (incoming) {
-            if (mToAmount.compareTo(new BigDecimal(0)) <= 0) {
-                mIgnoreAmountChange.set(false);
-                return;
-            }
-            rxCallBc(coinRepo.getCoinExchangeCurrency(mFromAccount.coin, mToCoin, mToAmount))
+            rxCallBc(coinRepo.getCoinExchangeCurrency(mToCoin, mFromAccount.coin, mToAmount))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcErrorResult())
-                    .debounce(300, TimeUnit.MILLISECONDS)
-                    .distinctUntilChanged()
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         mIgnoreAmountChange.set(true);
@@ -318,16 +314,10 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
                         Timber.e(t, "Unable to get currency for in amount");
                     });
         } else {
-            if (mFromAmount.compareTo(new BigDecimal(0)) <= 0) {
-                mIgnoreAmountChange.set(false);
-                return;
-            }
-            rxCallBc(coinRepo.getCoinExchangeCurrency(mToCoin, mFromAccount.coin, mFromAmount))
+            rxCallBc(coinRepo.getCoinExchangeCurrency(mFromAccount.coin, mToCoin, mFromAmount))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcErrorResult())
-                    .debounce(300, TimeUnit.MILLISECONDS)
-                    .distinctUntilChanged()
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         mIgnoreAmountChange.set(true);

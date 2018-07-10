@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.coins.repos;
 
@@ -99,9 +100,6 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
                     .subscribe(res -> {
                         synchronized (mLock) {
                             res.result.fillDefaultsOnEmpty();
-                            if (address == null) {
-                                Timber.w("Address is null!");
-                            }
                             mRawBalances.put(address, res.result);
                         }
 
@@ -124,7 +122,8 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
                         balance.getCoin(),
                         entry.getKey(),
                         balance.getAmount(),
-                        balance.getUsdAmount()
+                        balance.getUsdAmount(),
+                        balance.baseCoinAmount
                 ));
             }
         }

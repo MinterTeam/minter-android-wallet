@@ -46,6 +46,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
 public class UserAccount implements Serializable, Cloneable {
     List<AccountItem> mAccounts;
     BigDecimal mTotalBalance;
+    BigDecimal mTotalBalanceBase;
     BigDecimal mTotalBalanceUsd;
     int mHashCode;
 
@@ -53,18 +54,21 @@ public class UserAccount implements Serializable, Cloneable {
         mAccounts = new ArrayList<>(accounts);
         mTotalBalance = new BigDecimal(0);
         mTotalBalanceUsd = new BigDecimal(0);
+        mTotalBalanceBase = new BigDecimal(0);
         for (AccountItem item : mAccounts) {
             mTotalBalance = mTotalBalance.add(item.balance);
             mTotalBalanceUsd = mTotalBalanceUsd.add(item.balanceUsd);
+            mTotalBalanceBase = mTotalBalance.add(item.balanceBase);
         }
-        mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd);
+        mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd, mTotalBalanceBase);
     }
 
-    public UserAccount(List<AccountItem> accounts, BigDecimal totalBalance, BigDecimal totalBalanceUsd) {
+    public UserAccount(List<AccountItem> accounts, BigDecimal totalBalance, BigDecimal totalBalanceUsd, BigDecimal totalBalanceBase) {
         mAccounts = new ArrayList<>(accounts);
         mTotalBalance = firstNonNull(totalBalance, new BigDecimal(0));
         mTotalBalanceUsd = firstNonNull(totalBalanceUsd, new BigDecimal(0));
-        mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd);
+        mTotalBalanceBase = firstNonNull(totalBalanceBase, new BigDecimal(0));
+        mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd, mTotalBalanceBase);
     }
 
     UserAccount() {
@@ -98,6 +102,13 @@ public class UserAccount implements Serializable, Cloneable {
             mTotalBalance = new BigDecimal(0);
         }
         return mTotalBalance;
+    }
+
+    public BigDecimal getTotalBalanceBase() {
+        if (mTotalBalanceBase == null) {
+            mTotalBalanceBase = new BigDecimal(0);
+        }
+        return mTotalBalanceBase;
     }
 
     public BigDecimal getTotalBalanceUsd() {

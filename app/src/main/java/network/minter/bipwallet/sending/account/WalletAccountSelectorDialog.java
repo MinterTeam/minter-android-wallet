@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.sending.account;
 
@@ -101,13 +102,13 @@ public class WalletAccountSelectorDialog extends WalletDialog {
             return this;
         }
 
-        public Builder addItem(String avatar, String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd) {
-            mItems.add(new AccountItem(avatar, coin, address, balance, balanceUsd));
+        public Builder addItem(String avatar, String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd, BigDecimal balanceBase) {
+            mItems.add(new AccountItem(avatar, coin, address, balance, balanceUsd, balanceBase));
             return this;
         }
 
-        public Builder addItem(String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd) {
-            mItems.add(new AccountItem(coin, address, balance, balanceUsd));
+        public Builder addItem(String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd, BigDecimal balanceBase) {
+            mItems.add(new AccountItem(coin, address, balance, balanceUsd, balanceBase));
             return this;
         }
 

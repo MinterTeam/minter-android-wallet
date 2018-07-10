@@ -162,6 +162,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
             ServiceConnector.onConnected()
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe(res -> res.setOnMessageListener(message -> {
+
                         Timber.d("WS ON MESSAGE[%s]: %s", message.getChannel(), message.getData());
                     }));
         }
@@ -170,8 +171,9 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (BuildConfig.ENABLE_LIVE_BALANCE) {
+        if (BuildConfig.ENABLE_LIVE_BALANCE && isFinishing()) {
             ServiceConnector.release(this);
+            Timber.d("Disconnecting service");
         }
 
         HomeModule.destroy();

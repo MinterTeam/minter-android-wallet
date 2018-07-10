@@ -154,6 +154,12 @@ public class BalanceUpdatedService extends Service {
         disconnect();
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        disconnect();
+        return super.onUnbind(intent);
+    }
+
     public void setOnMessageListener(DataMessageListener listener) {
         mListener = listener;
     }

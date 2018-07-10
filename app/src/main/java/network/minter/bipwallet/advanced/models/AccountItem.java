@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.advanced.models;
 
+import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 
 import org.parceler.Parcel;
@@ -53,6 +54,7 @@ public class AccountItem implements Serializable, Cloneable {
     public String coin;
     public MinterAddress address;
     public BigDecimal balance;
+    public BigDecimal balanceBase;
     public BigDecimal balanceUsd;
     int mHashCode;
 
@@ -63,20 +65,24 @@ public class AccountItem implements Serializable, Cloneable {
         address = another.address;
         balanceUsd = another.balanceUsd;
         balance = another.balance;
+        balanceBase = another.balanceBase;
         mHashCode = another.mHashCode;
     }
 
-    public AccountItem(String avatar, String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd) {
-        this(coin, address, balance, balanceUsd);
+    public AccountItem(String avatar, String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd, BigDecimal balanceBase) {
+        this(coin, address, balance, balanceUsd, balanceBase);
         this.avatar = avatar;
     }
 
-    public AccountItem(String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd) {
+    @SuppressWarnings("NullableProblems")
+    public AccountItem(@NonNull String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd, BigDecimal balanceBase) {
         this.id = UUID.randomUUID().toString();
         this.coin = checkNotNull(coin, "Coin name required");
         this.address = checkNotNull(address, "Address required");
         this.balance = balance;
         this.balanceUsd = balanceUsd;
+        this.balanceBase = balanceBase;
+        this.avatar = MyMinterApi.getCoinAvatarUrl(coin);
         mHashCode = Objects.hash(id, avatar, coin, address, balance, balanceUsd);
     }
 

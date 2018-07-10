@@ -190,7 +190,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .subscribe(res -> {
                     Timber.d("Update coins list");
                     mCoinsAdapter.dispatchChanges(AccountItem.DiffUtilImpl.class, res.getAccounts());
-                    final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(res.getTotalBalance());
+                    final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(res.getTotalBalanceBase());
                     getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
