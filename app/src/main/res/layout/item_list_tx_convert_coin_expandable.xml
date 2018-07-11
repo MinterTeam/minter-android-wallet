@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -22,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -63,18 +64,63 @@
             />
 
         <TextView
-            android:id="@+id/item_title"
+            android:id="@+id/item_title_type"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_min"
+            android:layout_marginEnd="@dimen/margin_min"
+            android:text="Exchange"
+            android:textColor="@color/textColorGrey"
+            android:textSize="@dimen/text_size_11"
+            app:layout_constraintBottom_toTopOf="@id/item_title"
+            app:layout_constraintEnd_toStartOf="@id/item_amount"
+            app:layout_constraintStart_toEndOf="@id/item_avatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            />
+
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
             android:textSize="@dimen/text_size_default"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/item_amount"
+            app:layout_constraintEnd_toStartOf="@id/item_title_separator"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Mt7fe5...46cd82"
+            app:layout_constraintTop_toBottomOf="@id/item_title_type"
+            tools:text="BIP"
+            />
+
+        <ImageView
+            android:id="@+id/item_title_separator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/item_title"
+            app:layout_constraintEnd_toStartOf="@id/item_title_second"
+            app:layout_constraintStart_toEndOf="@id/item_title"
+            app:layout_constraintTop_toTopOf="@id/item_title"
+            app:layout_constraintVertical_bias=".7"
+            app:srcCompat="@drawable/ic_text_arrow_right"
+            />
+
+        <TextView
+            android:id="@+id/item_title_second"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_min"
+            android:layout_marginEnd="@dimen/margin_min"
+            android:textSize="@dimen/text_size_default"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/item_title"
+            app:layout_constraintEnd_toStartOf="@id/item_amount"
+            app:layout_constraintStart_toEndOf="@id/item_title_separator"
+            app:layout_constraintTop_toTopOf="@id/item_title"
+            tools:text="MCD"
+
             />
 
         <TextView

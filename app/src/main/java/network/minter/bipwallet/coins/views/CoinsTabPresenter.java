@@ -50,7 +50,6 @@ import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepositor
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.utils.HistoryTransactionDiffUtil;
 import network.minter.bipwallet.coins.views.rows.ListWithButtonRow;
-import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
@@ -58,6 +57,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
+import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
 import network.minter.blockchainapi.repo.BlockChainAccountRepository;
 import network.minter.explorerapi.models.HistoryTransaction;
 import network.minter.explorerapi.repo.ExplorerAddressRepository;
@@ -88,7 +88,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     @Inject MyInfoRepository infoRepo;
     private List<MinterAddress> myAddresses = new ArrayList<>();
     private MultiRowAdapter mAdapter;
-    private SimpleRecyclerAdapter<HistoryTransaction, ItemViewHolder> mTransactionsAdapter;
+    private TransactionShortListAdapter mTransactionsAdapter;
     private SimpleRecyclerAdapter<AccountItem, ItemViewHolder> mCoinsAdapter;
     private ListWithButtonRow mTransactionsRow, mCoinsRow;
 
@@ -119,39 +119,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         mAdapter = new MultiRowAdapter();
-        mTransactionsAdapter = new SimpleRecyclerAdapter.Builder<HistoryTransaction, ItemViewHolder>()
-                .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
-                .setBinder((itemViewHolder, item, position) -> {
-                    if (item.type == HistoryTransaction.Type.Send) {
-                        HistoryTransaction.TxSendCoinResult sendResult = item.getData();
-                        final boolean isIncoming = item.isIncoming(myAddresses);
-                        if (isIncoming) {
-                            itemViewHolder.amount.setText(String.format("+ %s", sendResult.amount.toPlainString()));
-                            itemViewHolder.amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
-                        } else {
-                            itemViewHolder.amount.setText(String.format("- %s", sendResult.amount.toPlainString()));
-                            itemViewHolder.amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
-                        }
-
-                        if (item.username != null) {
-                            itemViewHolder.title.setText(String.format("@%s", item.username));
-                        } else {
-                            if (isIncoming) {
-                                itemViewHolder.title.setText(sendResult.from.toShortString());
-                            } else {
-                                itemViewHolder.title.setText(sendResult.to.toShortString());
-                            }
-                        }
-
-                        itemViewHolder.avatar.setImageUrl(item.getAvatar());
-                        itemViewHolder.subname.setText(sendResult.coin.toUpperCase());
-                    } else {
-                        itemViewHolder.avatar.setImageUrl(item.getAvatar());
-                        itemViewHolder.title.setText(item.hash.toShortString());
-                        itemViewHolder.amount.setText(item.type.name());
-
-                    }
-                }).build();
+        mTransactionsAdapter = new TransactionShortListAdapter(myAddresses);
 
         mCoinsAdapter = new SimpleRecyclerAdapter.Builder<AccountItem, ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
@@ -163,7 +131,6 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
 
                 }).build();
-
 
         if (session.getRole() == AuthSession.AuthType.Advanced) {
             getViewState().hideAvatar();

@@ -43,6 +43,8 @@ import java.util.Collection;
 import java.util.List;
 
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper;
+import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher;
+import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
@@ -54,7 +56,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
-public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> implements DiffUtilDispatcherDelegate<Data> {
 
     private Builder<Data, VH> mBuilder;
 
@@ -64,6 +66,20 @@ public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> ext
 
     public List<Data> getItems() {
         return mBuilder.data;
+    }
+
+    public void setItems(Data[] items) {
+        setItems(CollectionsHelper.asList(items));
+    }
+
+    @Override
+    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<Data> items, boolean detectMoves) {
+        DiffUtilDispatcher.dispatchChanges(this, diffUtilCallbackCls, items, detectMoves);
+    }
+
+    @Override
+    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<Data> items) {
+        DiffUtilDispatcher.dispatchChanges(this, diffUtilCallbackCls, items);
     }
 
     public void setItems(List<Data> items) {
@@ -76,47 +92,6 @@ public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> ext
 
     public void setItems(Collection<Data> collection) {
         setItems(new ArrayList<>(collection));
-    }
-
-    public void setItems(Data[] items) {
-        setItems(CollectionsHelper.asList(items));
-    }
-
-    /**
-     * @param diffUtilCallbackCls Class must contain constructor with 2 lists (old and new)
-     * @param items
-     * @param <T>
-     */
-    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<Data> items, boolean detectMoves) {
-        checkNotNull(items, "Data can't be null. Provide empty list if you have no data");
-
-        if (getItemCount() == 0 && !items.isEmpty()) {
-            setItems(items);
-            notifyItemRangeInserted(0, items.size());
-            return;
-        }
-
-        final List<Data> old = getItems();
-        setItems(items);
-        DiffUtil.Callback cb;
-
-        try {
-            cb = diffUtilCallbackCls.getDeclaredConstructor(List.class, List.class).newInstance(old, items);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(cb, detectMoves);
-        diffResult.dispatchUpdatesTo(this);
-    }
-
-    /**
-     * @param diffUtilCallbackCls Object must contains construct with 2 lists (old and new)
-     * @param items
-     * @param <T>
-     */
-    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<Data> items) {
-        dispatchChanges(diffUtilCallbackCls, items, false);
     }
 
     public void addItem(Data item) {
