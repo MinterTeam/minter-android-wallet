@@ -26,10 +26,14 @@
 
 package network.minter.bipwallet.tx.ui;
 
+import android.app.Activity;
+import android.app.Service;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,6 +52,7 @@ import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
 import network.minter.explorerapi.MinterExplorerApi;
@@ -151,7 +156,25 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
                 presenter.onScrolledTo(((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
             }
         });
+    }
 
+    public static final class Builder extends ActivityBuilder {
 
+        public Builder(@NonNull Activity from) {
+            super(from);
+        }
+
+        public Builder(@NonNull Fragment from) {
+            super(from);
+        }
+
+        public Builder(@NonNull Service from) {
+            super(from);
+        }
+
+        @Override
+        protected Class<?> getActivityClass() {
+            return TransactionListActivity.class;
+        }
     }
 }

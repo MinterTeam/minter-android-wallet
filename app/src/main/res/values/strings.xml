@@ -1,6 +1,7 @@
-<!--
-  ~ Copyright (C) 2018 by MinterTeam
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -21,7 +22,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  -->
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <resources>
     <!--constants-->
@@ -104,4 +105,7 @@
     <string name="btn_change_password">Change password</string>
     <string name="hint_change_password_old">Current password</string>
 
+    <string name="notification_balance_update_name">Balance updates</string>
+    <string name="notification_balance_list_tx_label">View transactions</string>
+    <string name="notification_balance_update_description">Updating balance notifications</string>
 </resources>

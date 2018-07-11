@@ -38,10 +38,6 @@ import com.centrifugal.centrifuge.android.credentials.Token;
 import com.centrifugal.centrifuge.android.credentials.User;
 import com.centrifugal.centrifuge.android.listener.ConnectionListener;
 import com.centrifugal.centrifuge.android.listener.DataMessageListener;
-import com.centrifugal.centrifuge.android.listener.JoinLeaveListener;
-import com.centrifugal.centrifuge.android.listener.SubscriptionListener;
-import com.centrifugal.centrifuge.android.message.presence.JoinMessage;
-import com.centrifugal.centrifuge.android.message.presence.LeftMessage;
 import com.centrifugal.centrifuge.android.subscription.SubscriptionRequest;
 
 import java.util.concurrent.TimeUnit;
@@ -49,7 +45,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
@@ -79,67 +76,6 @@ public class BalanceUpdatedService extends Service {
     public void onCreate() {
         super.onCreate();
         AndroidInjection.inject(this);
-        rxCallExp(addressRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(res -> {
-                    final String uid = String.valueOf(session.getUser().getData().id);
-                    Timber.d("Connecting to: channel=%s, token=%s, timestamp=%d", res.result.channel, res.result.token, res.result.timestamp);
-                    mClient = new Centrifugo.Builder("wss://92.53.87.98:8000/connection/websocket")
-                            .setReconnectConfig(new ReconnectConfig(10, 3, TimeUnit.SECONDS))
-                            .setUser(new User(uid, res.result.token))
-                            .setToken(new Token(res.result.token, String.valueOf(res.result.timestamp)))
-                            .build();
-
-                    mClient.setConnectionListener(new ConnectionListener() {
-                        @Override
-                        public void onWebSocketOpen() {
-                            Timber.d("Opened connection");
-                        }
-
-                        @Override
-                        public void onConnected() {
-                            Timber.d("Connected");
-                        }
-
-                        @Override
-                        public void onDisconnected(int code, String reason, boolean remote) {
-                            Timber.d("Disconnected[%d]: %s (by remote:%b)", code, reason, remote);
-                        }
-                    });
-                    mClient.setSubscriptionListener(new SubscriptionListener() {
-                        @Override
-                        public void onSubscribed(String channelName) {
-                            Timber.d("Subscribed %s", channelName);
-                        }
-
-                        @Override
-                        public void onUnsubscribed(String channelName) {
-                            Timber.d("Unsubscribed %s", channelName);
-                        }
-
-                        @Override
-                        public void onSubscriptionError(String channelName, String error) {
-                            Timber.w("Subscription error %s, %s", channelName, error);
-                        }
-                    });
-                    mClient.setJoinLeaveListener(new JoinLeaveListener() {
-                        @Override
-                        public void onJoin(JoinMessage joinMessage) {
-                            Timber.d("Joined %s (%s) %s", joinMessage.getUser(), joinMessage.getBody().toString(), joinMessage.getError());
-                        }
-
-                        @Override
-                        public void onLeave(LeftMessage leftMessage) {
-
-                        }
-                    });
-                    mClient.setDataMessageListener(mListener);
-                    mClient.connect();
-                    mClient.subscribe(new SubscriptionRequest(res.result.channel, res.result.token));
-
-                });
-
     }
 
     @Override
@@ -172,6 +108,7 @@ public class BalanceUpdatedService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        connect();
         return mBinder;
     }
 
@@ -179,9 +116,53 @@ public class BalanceUpdatedService extends Service {
         return mClient;
     }
 
+    private void connect() {
+        rxCallExp(addressRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
+                .subscribeOn(Schedulers.io())
+                .switchMap(res -> Observable.create((ObservableOnSubscribe<Centrifugo>) emitter -> {
+                    final String uid = String.valueOf(session.getUser().getData().id);
+                    Centrifugo client = new Centrifugo.Builder("ws://92.53.87.98:8000/connection/websocket")
+                            .setReconnectConfig(new ReconnectConfig(10, 10, TimeUnit.SECONDS))
+                            .setUser(new User(uid, res.result.token))
+                            .setToken(new Token(res.result.token, String.valueOf(res.result.timestamp)))
+                            .build();
+
+                    client.setConnectionListener(new ConnectionListener() {
+                        @Override
+                        public void onWebSocketOpen() {
+                            Timber.d("Opened connection");
+                        }
+
+                        @Override
+                        public void onConnected() {
+                            Timber.d("Connected");
+                        }
+
+                        @Override
+                        public void onDisconnected(int code, String reason, boolean remote) {
+                            Timber.d("Disconnected[%d]: %s (by remote:%b)", code, reason, remote);
+                        }
+                    });
+
+                    try {
+                        client.setDataMessageListener(mListener);
+                        client.connect();
+                        client.subscribe(new SubscriptionRequest(res.result.channel, res.result.token));
+                    } catch (Throwable t) {
+                        emitter.onError(t);
+                        return;
+                    }
+
+                    emitter.onNext(client);
+                    emitter.onComplete();
+                }))
+                .subscribe(res -> mClient = res);
+    }
+
     private void disconnect() {
         if (mClient == null) return;
         mClient.disconnect();
+        mClient = null;
     }
 
     public final class LocalBinder extends Binder {

@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.auth.ui;
 
@@ -165,7 +166,7 @@ public class InputGroup {
     }
 
     public InputGroup addFilter(EditText editText, InputFilter filter) {
-        final InputFilter[] oldFilters = (InputFilter[]) firstNonNull(editText.getFilters(), new InputFilter[0]);
+        final InputFilter[] oldFilters = firstNonNull(editText.getFilters(), new InputFilter[0]);
         final InputFilter[] newFilters = new InputFilter[oldFilters.length + 1];
         System.arraycopy(oldFilters, 0, newFilters, 0, oldFilters.length);
         newFilters[oldFilters.length] = filter;

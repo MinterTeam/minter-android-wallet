@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.internal.di;
 
@@ -49,6 +50,7 @@ import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
 import network.minter.blockchainapi.repo.BlockChainAccountRepository;
 import network.minter.blockchainapi.repo.BlockChainCoinRepository;
 import network.minter.explorerapi.models.HistoryTransaction;
@@ -71,6 +73,7 @@ import network.minter.my.repo.MyProfileRepository;
         RepoModule.class,
         InjectorsModule.class,
         CacheModule.class,
+        NotificationModule.class,
 })
 @WalletApp
 public interface WalletComponent {
@@ -96,6 +99,9 @@ public interface WalletComponent {
     SharedPreferences prefs();
     GsonBuilder gsonBuilder();
     CacheManager cache();
+
+    // notification
+    BalanceNotificationManager balanceNotifications();
 
     // repositories
     SecretStorage secretStorage();

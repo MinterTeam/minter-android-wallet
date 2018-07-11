@@ -51,6 +51,15 @@
         <!--<item name="android:actionButtonStyle">@style/Wallet.Button</item>-->
     </style>
 
+    <style name="Wallet.External" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:textColorSecondaryInverse">@color/textColorSecondary</item>
+    </style>
+
     <style name="Wallet.FullScreen" parent="Wallet">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>

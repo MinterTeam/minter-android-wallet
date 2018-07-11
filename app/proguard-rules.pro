@@ -6,6 +6,8 @@
 -keepattributes Signature
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions, InnerClasses
+-keepattributes EnclosingMethod
+-keep class com.google.gson.** { *; }
 
 # Retain generated class which implement Unbinder.
 -keep public class * implements butterknife.Unbinder { public <init>(**, android.view.View); }

@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,12 +22,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.advanced.repo;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +44,7 @@ import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
 import network.minter.bipwallet.internal.data.CachedEntity;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.explorerapi.repo.ExplorerAddressRepository;
+import network.minter.mintercore.crypto.MinterAddress;
 
 /**
  * MinterWallet. 2018
@@ -67,6 +71,44 @@ public class AccountStorage implements CachedEntity<UserAccount> {
         }
 
         return new UserAccount(Collections.emptyList());
+    }
+
+    public static BigDecimal calcBalanceBase(List<AccountItem> items, final String coin, final MinterAddress address) {
+        final Optional<BigDecimal> res = Stream.of(items)
+                .filter(item -> item.getCoin().equals(coin))
+                .filter(item -> item.getAddress().equals(address))
+                .map(AccountItem::getBalanceBase)
+                .reduce(BigDecimal::add);
+
+        if (!res.isPresent()) {
+            return new BigDecimal(0);
+        }
+
+        return res.get();
+    }
+
+    public static BigDecimal calcBalanceBase(List<AccountItem> items) {
+        final Optional<BigDecimal> res = Stream.of(items)
+                .map(AccountItem::getBalanceBase)
+                .reduce(BigDecimal::add);
+
+        if (!res.isPresent()) {
+            return new BigDecimal(0);
+        }
+
+        return res.get();
+    }
+
+    public List<AccountItem> getAccountItems() {
+        if (mStorage.contains(KEY_BALANCE)) {
+            return mStorage.<UserAccount>get(KEY_BALANCE).getAccounts();
+        }
+
+        return Collections.emptyList();
+    }
+
+    public UserAccount getAccount() {
+        return initialData();
     }
 
     /**

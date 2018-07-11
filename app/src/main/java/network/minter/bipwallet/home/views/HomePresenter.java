@@ -1,6 +1,7 @@
-/*
- * Copyright (C) 2018 by MinterTeam
+/*******************************************************************************
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -21,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ ******************************************************************************/
 
 package network.minter.bipwallet.home.views;
 
@@ -35,11 +36,19 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.HomeTabsClasses;
+import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.services.livebalance.ServiceConnector;
+import timber.log.Timber;
+
+import static network.minter.bipwallet.internal.Wallet.app;
 
 /**
  * MinterWallet. 2018
@@ -59,12 +68,26 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
 
     @Inject @HomeTabsClasses
     List<Class<? extends network.minter.bipwallet.home.HomeTabFragment>> tabsClasses;
-
+    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     private int mLastPosition = 0;
 
     @Inject
     public HomePresenter() {
+    }
 
+    @Override
+    public void attachView(HomeModule.HomeView view) {
+        super.attachView(view);
+        getViewState().setCurrentPage(mLastPosition);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (BuildConfig.ENABLE_LIVE_BALANCE) {
+            ServiceConnector.release(app().context());
+            Timber.d("Disconnecting service");
+        }
     }
 
     public void onPageSelected(int position) {
@@ -99,5 +122,19 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
 
     public int getBottomPositionById(int itemId) {
         return mClientBottomIdPositionMap.get(itemId);
+    }
+
+    @Override
+    protected void onFirstViewAttach() {
+        super.onFirstViewAttach();
+        if (BuildConfig.ENABLE_LIVE_BALANCE) {
+            ServiceConnector.bind(app().context());
+            ServiceConnector.onConnected()
+                    .subscribe(res -> res.setOnMessageListener(message -> {
+                        accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message.getData()));
+                        app().explorerTransactionsRepoCache().update(true);
+                        Timber.d("WS ON MESSAGE[%s]: %s", message.getChannel(), message.getData());
+                    }));
+        }
     }
 }

@@ -114,6 +114,14 @@ public class AccountItem implements Serializable, Cloneable {
         return balance;
     }
 
+    public BigDecimal getBalanceBase() {
+        if (balanceBase == null) {
+            balanceBase = new BigDecimal(0);
+        }
+
+        return balanceBase;
+    }
+
     public BigDecimal getBalanceUsd() {
         if (balanceUsd == null) {
             balanceUsd = new BigDecimal(0);
@@ -135,6 +143,14 @@ public class AccountItem implements Serializable, Cloneable {
     @Override
     public int hashCode() {
         return mHashCode;
+    }
+
+    public String getCoin() {
+        return coin.toUpperCase();
+    }
+
+    public MinterAddress getAddress() {
+        return address;
     }
 
     public static class DiffUtilImpl extends DiffUtil.Callback {

@@ -46,8 +46,8 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
 public class UserAccount implements Serializable, Cloneable {
     List<AccountItem> mAccounts;
     BigDecimal mTotalBalance;
-    BigDecimal mTotalBalanceBase;
     BigDecimal mTotalBalanceUsd;
+    BigDecimal mTotalBalanceBase;
     int mHashCode;
 
     public UserAccount(List<AccountItem> accounts) {
@@ -56,9 +56,9 @@ public class UserAccount implements Serializable, Cloneable {
         mTotalBalanceUsd = new BigDecimal(0);
         mTotalBalanceBase = new BigDecimal(0);
         for (AccountItem item : mAccounts) {
-            mTotalBalance = mTotalBalance.add(item.balance);
-            mTotalBalanceUsd = mTotalBalanceUsd.add(item.balanceUsd);
-            mTotalBalanceBase = mTotalBalance.add(item.balanceBase);
+            mTotalBalance = mTotalBalance.add(item.getBalance());
+            mTotalBalanceUsd = mTotalBalanceUsd.add(item.getBalanceUsd());
+            mTotalBalanceBase = mTotalBalanceBase.add(item.getBalanceBase());
         }
         mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd, mTotalBalanceBase);
     }
@@ -81,7 +81,8 @@ public class UserAccount implements Serializable, Cloneable {
         UserAccount that = (UserAccount) o;
         return Objects.equals(mAccounts, that.mAccounts) &&
                 Objects.equals(mTotalBalance, that.mTotalBalance) &&
-                Objects.equals(mTotalBalanceUsd, that.mTotalBalanceUsd);
+                Objects.equals(mTotalBalanceUsd, that.mTotalBalanceUsd) &&
+                Objects.equals(mTotalBalanceBase, that.mTotalBalanceBase);
     }
 
     @Override
