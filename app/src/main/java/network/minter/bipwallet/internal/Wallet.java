@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,14 +22,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.internal;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Service;
 import android.os.Build;
-import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
@@ -63,7 +63,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class Wallet extends MultiDexApplication implements HasActivityInjector, HasServiceInjector {
+public class Wallet extends Application implements HasActivityInjector, HasServiceInjector {
 
     public static final Locale LC_EN = Locale.US;
     public static final Locale LC_RU = new Locale("ru", "RU");
@@ -87,7 +87,7 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
      * Wallet.app().display().getWidth()
      * Wallet.app().res(); et cetera
      *
-     * @return
+     * @return WalletComponent
      * @see WalletComponent
      */
     public static WalletComponent app() {
@@ -128,27 +128,6 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     @Override
     public AndroidInjector<Service> serviceInjector() {
         return dispatchingServiceInjector;
-    }
-
-    public class CrashlyticsTree extends Timber.Tree {
-        private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
-        private static final String CRASHLYTICS_KEY_TAG = "tag";
-        private static final String CRASHLYTICS_KEY_MESSAGE = "message";
-
-        @Override
-        protected void log(int priority, String tag, String message, Throwable t) {
-            if (priority == Log.ERROR || priority == Log.WARN) {
-                Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
-                Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
-                Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
-
-                if (t == null) {
-                    Crashlytics.logException(new Exception(message));
-                } else {
-                    Crashlytics.logException(t);
-                }
-            }
-        }
     }
 
     public static class Rx {
@@ -256,6 +235,27 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
                     tAction.accept(throwable);
                 }
             };
+        }
+    }
+
+    public class CrashlyticsTree extends Timber.Tree {
+        private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
+        private static final String CRASHLYTICS_KEY_TAG = "tag";
+        private static final String CRASHLYTICS_KEY_MESSAGE = "message";
+
+        @Override
+        protected void log(int priority, String tag, String message, Throwable t) {
+            if (priority == Log.ERROR || priority == Log.WARN) {
+                Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
+                Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
+                Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
+
+                if (t == null) {
+                    Crashlytics.logException(new Exception(message));
+                } else {
+                    Crashlytics.logException(t);
+                }
+            }
         }
     }
 }

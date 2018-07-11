@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -67,7 +68,7 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
 
     @Override
     public Observable<List<HistoryTransaction>> getUpdatableData() {
-        return rxCallExp(getService().getTransactions(
+        return rxCallExp(getInstantService().getTransactions(
                 Stream.of(mSecretStorage.getAddresses()).map(MinterAddress::toString).toList()
         ))
                 .map(res -> res.result)
