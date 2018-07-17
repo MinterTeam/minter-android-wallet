@@ -40,6 +40,7 @@ import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -62,7 +63,7 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
 
-        amount.setText(String.format("- %s", item.getTx().fee.toPlainString()));
+        amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
 
         final HistoryTransaction.TxDeclareCandidacyResult data = item.getTx().getData();

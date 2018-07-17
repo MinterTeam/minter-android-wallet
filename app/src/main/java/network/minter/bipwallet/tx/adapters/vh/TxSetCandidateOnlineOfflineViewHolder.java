@@ -36,6 +36,8 @@ import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+
 /**
  * minter-android-wallet. 2018
  *
@@ -55,7 +57,7 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
         super.bind(item);
         final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = item.getTx().getData();
 
-        amount.setText(String.format("- %s", item.getTx().fee.toPlainString()));
+        amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
         itemTitleType.setText(item.getTx().type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
         if (data.pubKey != null) {

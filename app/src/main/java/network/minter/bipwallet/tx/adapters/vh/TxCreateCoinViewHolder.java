@@ -41,6 +41,7 @@ import network.minter.explorer.models.HistoryTransaction;
 import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -66,7 +67,7 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
         final String coinSymbol = firstNonNull(data.getSymbol(), "<unknown>");
         avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(coinSymbol), MinterProfileApi.getCoinAvatarUrl("MNT"));
         title.setText(coinSymbol);
-        amount.setText(String.format("- %s", firstNonNull(item.getTx().fee, new BigDecimal(0)).toPlainString()));
+        amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
         coinName.setText(firstNonNull(data.name, "<unknown>"));
         this.coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));

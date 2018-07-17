@@ -29,6 +29,8 @@ package network.minter.bipwallet.internal.helpers;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
+
 /**
  * Dogsy. 2017
  *
@@ -118,6 +120,10 @@ public final class MathHelper {
             return false;
         }
         return from.compareTo(to) <= 0;
+    }
+
+    public static String bdHuman(BigDecimal source) {
+        return firstNonNull(source, new BigDecimal(0)).stripTrailingZeros().toPlainString();
     }
 
     // BigInteger

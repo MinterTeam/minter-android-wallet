@@ -29,8 +29,6 @@ package network.minter.bipwallet.tx.adapters.vh;
 import android.view.View;
 import android.widget.TextView;
 
-import java.math.BigDecimal;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
@@ -39,6 +37,7 @@ import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -63,12 +62,12 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
         title.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         titleSecond.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
         avatar.setImageResource(R.drawable.img_avatar_exchange);
-        amount.setText(String.format("- %s", firstNonNull(data.amount, new BigDecimal(0)).toPlainString()));
+        amount.setText(String.format("- %s", bdHuman(data.amount.add(item.getTx().fee))));
         amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         subamount.setText(title.getText());
         coinFrom.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         coinTo.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
-        convertAmount.setText(firstNonNull(data.amount, new BigDecimal(0)).toPlainString());
+        convertAmount.setText(bdHuman(data.amount));
     }
 
     @Override

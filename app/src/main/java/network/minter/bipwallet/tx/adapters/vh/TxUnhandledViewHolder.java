@@ -35,6 +35,8 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.MinterSDK;
 
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+
 /**
  * minter-android-wallet. 2018
  *
@@ -53,7 +55,7 @@ public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         title.setText(item.getTx().hash.toShortString());
-        amount.setText(String.format("- %s", item.getTx().fee.toPlainString()));
+        amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
         if (item.getTx().type != null) {
             txType.setText(item.getTx().type.name());
