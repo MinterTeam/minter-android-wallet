@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.sending.dialogs;
 
@@ -112,7 +112,7 @@ public class WalletTxSendSuccessDialog extends WalletDialog {
 
         @Override
         public WalletTxSendSuccessDialog create() {
-            return new WalletTxSendSuccessDialog(mContext, this);
+            return new WalletTxSendSuccessDialog(getContext(), this);
         }
     }
 }

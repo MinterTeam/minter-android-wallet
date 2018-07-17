@@ -46,8 +46,8 @@
     <string name="frag_coins_last_transactions_title">Latest transactions</string>
     <string name="input_signin_password">Your password</string>
     <string name="input_signin_username">Your @username</string>
-    <string name="input_signin_username_invalid">Invalid username</string>
-    <string name="input_signin_password_invalid">Password must contain at least 6 symbols</string>
+    <string name="input_username_invalid">Invalid username</string>
+    <string name="input_password_invalid">Password must contain at least 6 symbols</string>
     <string name="input_signin_password_not_match">Password does not match</string>
     <string name="address_list_description">Addresses are similar to bank accounts except for being operated only by you.\n\nAll funds are received and sent from Main Address which is linked to your profile data—@username, email, or mobile number.</string>
     <string name="address_item_secured_bip_description">This address is secured by Bip Wallet. We recommend you to get full control over your address by using one of the following options:</string>

@@ -47,9 +47,10 @@ import network.minter.profile.repo.ProfileAddressRepository;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * TODO: refactoring
  */
 @InjectViewState
 public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.MainView> {
@@ -90,7 +91,10 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
                 if (session.getRole() == AuthSession.AuthType.Basic) {
                     // if basic user, we adding address to local repo and to server
                     // here we ask password to encrypt seed and send to server, and then finishing with success result
-                    getViewState().askPassword((field, val) -> onPasswordConfirmed(field, val, address));
+                    getViewState().askPassword((dialog, field, val) -> {
+                        onPasswordConfirmed(val, address);
+                        dialog.dismiss();
+                    });
                 } else {
                     // if adding address in advanced mode, finishing with success result
                     if (mForResult) {
@@ -129,7 +133,7 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
         mForResult = intent.getBooleanExtra(AdvancedMainActivity.EXTRA_FOR_RESULT, false);
     }
 
-    private boolean onPasswordConfirmed(String fieldName, String value, final MinterAddress address) {
+    private boolean onPasswordConfirmed(String value, final MinterAddress address) {
         getViewState().showProgress(null, "Encrypting...");
         safeSubscribeIoToUi(
                 rxCallMy(addressRepo.addAddress(repo.getSecret(address).toAddressData(repo.getAddresses().isEmpty(), true, value)))

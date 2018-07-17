@@ -25,43 +25,29 @@
  */
 package network.minter.bipwallet.internal.helpers.forms.validators;
 
-import android.util.Patterns;
-
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * minter-android-wallet. 2017
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class EmailValidator extends BaseValidator {
+public class MinterUsernameValidator extends RegexValidator {
+    private final static Pattern PATTERN = Pattern.compile("^@[a-zA-Z0-9_]{5,32}$");
 
-    private final static Pattern VALID_EMAIL_ADDRESS_REGEX = Patterns.EMAIL_ADDRESS;
-
-    public EmailValidator(boolean required) {
-        super("Invalid E-Mail address", required);
+    public MinterUsernameValidator() {
+        super(PATTERN.pattern());
     }
 
-    public EmailValidator() {
-        super("Invalid E-Mail address");
+    public MinterUsernameValidator(boolean required) {
+        super(PATTERN.pattern(), required);
     }
 
-    public EmailValidator(CharSequence errorMessage) {
-        super(errorMessage);
+    public MinterUsernameValidator(CharSequence errorMessage) {
+        super(PATTERN, errorMessage);
     }
 
-    public EmailValidator(CharSequence errorMessage, boolean required) {
-        super(errorMessage, required);
-    }
-
-    @Override
-    protected boolean getCondition(CharSequence value) {
-        if(!isRequired() && (value == null || value.length() == 0)) {
-            return true;
-        }
-
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(value);
-        return matcher.find();
+    public MinterUsernameValidator(CharSequence errorMessage, boolean required) {
+        super(PATTERN, errorMessage, required);
     }
 }

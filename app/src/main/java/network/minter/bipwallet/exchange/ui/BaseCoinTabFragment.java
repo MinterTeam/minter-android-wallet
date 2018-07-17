@@ -33,6 +33,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,6 +98,8 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
             Timber.d("Filter: source=%s, start=%d, end=%d, dest=%s, destStart=%d, destEnd=%d", source, start, end, dest, dstart, dend);
             return source.toString().toUpperCase().replaceAll("[^A-Z]", "");
         });
+
+        calculationView.setInputType(InputType.TYPE_NULL);
     }
 
     @Override

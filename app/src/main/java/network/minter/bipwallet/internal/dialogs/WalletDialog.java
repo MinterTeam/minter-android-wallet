@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -51,6 +52,11 @@ public abstract class WalletDialog extends Dialog {
 
     protected WalletDialog(@NonNull Context context) {
         super(context, R.style.Wallet_Dialog);
+    }
+
+    public static void dismissInstance(WalletInputDialog inputDialog) {
+        if (inputDialog == null) return;
+        inputDialog.dismiss();
     }
 
     @Override

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -67,12 +68,12 @@ public interface SettingsTabModule {
 
     interface SettingsTabView extends MvpView {
         void startLogin();
-        void startEditField(SettingsFieldType type, CharSequence label, String fieldNamed, String value);
         void setMainAdapter(RecyclerView.Adapter<?> mainAdapter);
         void setAdditionalAdapter(RecyclerView.Adapter<?> additionalAdapter);
         void startAddressList();
-        void startChangePassword();
         void startAvatarChooser();
         void startPasswordChange();
+        void showMessage(CharSequence message);
+        void startDialog(WalletDialog.DialogExecutor executor);
     }
 }

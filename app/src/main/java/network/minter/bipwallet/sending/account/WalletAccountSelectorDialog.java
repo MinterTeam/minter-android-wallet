@@ -94,7 +94,7 @@ public class WalletAccountSelectorDialog extends WalletDialog {
 
         @Override
         public WalletAccountSelectorDialog create() {
-            return new WalletAccountSelectorDialog(mContext, this);
+            return new WalletAccountSelectorDialog(getContext(), this);
         }
 
         public Builder setOnClickListener(AccountSelectedAdapter.OnClickListener listener) {

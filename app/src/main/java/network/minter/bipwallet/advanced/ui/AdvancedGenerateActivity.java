@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.advanced.ui;
 
@@ -149,7 +149,7 @@ public class AdvancedGenerateActivity extends BaseMvpInjectActivity implements A
                 .setInputTypePassword()
                 .setDescription("We need your password to encrypt all private data")
                 .setHint("Password")
-                .addValidator(new RegexValidator(".{6,}", getString(R.string.input_signin_password_invalid)))
+                .addValidator(new RegexValidator(".{6,}", getString(R.string.input_password_invalid)))
                 .setSubmitListener(submitListener)
                 .create().show();
     }

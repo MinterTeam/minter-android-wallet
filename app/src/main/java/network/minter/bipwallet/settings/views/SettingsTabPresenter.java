@@ -43,10 +43,17 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.home.HomeScope;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
+import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
+import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
+import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.settings.SettingsTabModule;
@@ -54,9 +61,11 @@ import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
 import network.minter.profile.models.User;
+import network.minter.profile.repo.ProfileAuthRepository;
 import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
 /**
@@ -71,7 +80,9 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
     @Inject ProfileRepository profileRepo;
+    @Inject ProfileAuthRepository profileAuthRepo;
     @Inject Context context;
+    private String mSourceUsername = null;
 
     private MultiRowAdapter mMainAdapter, mAdditionalAdapter;
     private ChangeAvatarRow mChangeAvatarRow;
@@ -174,15 +185,100 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     private void onClickChangeEmail(View view, View sharedView, String value) {
-        getViewState().startEditField(SettingsFieldType.Email, "Email", "email", value);
+        startEditProfileField(SettingsFieldType.Email, "Email", "email", value);
     }
 
     private void onClickChangePhone(View view, View sharedView, String value) {
-        getViewState().startEditField(SettingsFieldType.Phone, "Mobile number", "phone", value);
+        startEditProfileField(SettingsFieldType.Phone, "Mobile number", "phone", value);
     }
 
     private void onClickChangeUsername(View view, View sharedView, String value) {
-        getViewState().startEditField(SettingsFieldType.Username, "Username", "username", value);
+        mSourceUsername = value;
+        startEditProfileField(SettingsFieldType.Username, "Username", "username", value);
+    }
+
+    private void onSubmitField(final WalletInputDialog dialog, final String fieldName, final String value) {
+        if (fieldName.equals("username") && !value.equals(mSourceUsername)) {
+            // check username is available
+            safeSubscribeIoToUi(rxCallMy(profileAuthRepo.checkUsernameAvailability(value.substring(1))))
+                    .onErrorResumeNext(convertToProfileErrorResult())
+                    .subscribe(res -> {
+                        if (!res.isSuccess() || !res.data.isAvailable) {
+                            dialog.setError("Username is unavailable");
+                        } else {
+                            submitProfile(dialog, fieldName, value);
+                        }
+                    }, Wallet.Rx.errorHandler(getViewState()));
+        } else {
+            submitProfile(dialog, fieldName, value);
+        }
+    }
+
+    /**
+     * @param dialog
+     * @param fieldName
+     * @param value
+     * @TODO refactoring
+     */
+    private void submitProfile(WalletInputDialog dialog, final String fieldName, final String value) {
+        final String toSave;
+        if (fieldName.equals("username") && value.substring(0, 1).equals("@")) {
+            toSave = value.substring(1);
+        } else {
+            toSave = value;
+        }
+        safeSubscribeIoToUi(rxCallMy(profileRepo.updateField(fieldName, toSave)))
+                .subscribe(res -> {
+                    if (!res.isSuccess()) {
+                        dialog.setError(res.getError().message);
+                        Timber.w(new ProfileResponseException(res.getError()));
+                        getViewState().showMessage(res.getError().message);
+                    } else {
+                        if (mMainSettingsRows != null && mMainSettingsRows.containsKey(fieldName)) {
+                            mMainSettingsRows.get(fieldName).setValue(() -> value);
+                            final User user = session.getUser();
+                            switch (fieldName) {
+                                case "username":
+                                    user.data.username = toSave;
+                                    break;
+                                case "email":
+                                    user.data.email = toSave;
+                                    break;
+                            }
+                            session.setUser(user);
+                        }
+                        dialog.dismiss();
+                        getViewState().showMessage("Profile updated");
+                    }
+                }, Wallet.Rx.errorHandler(getViewState()));
+    }
+
+    private void startEditProfileField(final SettingsFieldType type, final String label, final String fieldName, final String value) {
+        getViewState().startDialog(ctx -> {
+            final WalletInputDialog.Builder dialog = new WalletInputDialog.Builder(ctx, label);
+            switch (type) {
+                case Phone:
+                    dialog.setInputTypePhone();
+                    dialog.addValidator(new PhoneValidator());
+                    break;
+                case Email:
+                    dialog.setInputTypeEmail();
+                    dialog.addValidator(new EmailValidator());
+                    break;
+                case Username:
+                    dialog.setInputTypeUsername();
+                    dialog.addValidator(new MinterUsernameValidator(ctx.getString(R.string.input_username_invalid)));
+                    break;
+            }
+
+            dialog.setHint(label);
+            dialog.setValue(value);
+            dialog.setActionTitle(ctx.getString(R.string.btn_save));
+            dialog.setFieldName(fieldName);
+            dialog.setSubmitListener(SettingsTabPresenter.this::onSubmitField);
+
+            return dialog.create();
+        });
     }
 
     private void onClickChangeAvatar(View view) {

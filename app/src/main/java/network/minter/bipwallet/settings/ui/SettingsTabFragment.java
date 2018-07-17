@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.settings.ui;
 
@@ -55,8 +55,9 @@ import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.bipwallet.internal.system.BackPressedDelegate;
-import network.minter.bipwallet.internal.system.BackPressedListener;
+import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
+import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator;
 import network.minter.bipwallet.internal.views.list.NonScrollableLinearLayoutManager;
 import network.minter.bipwallet.settings.SettingsTabModule;
@@ -75,9 +76,8 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
 
     @Inject Provider<SettingsTabPresenter> presenterProvider;
     @InjectPresenter SettingsTabPresenter presenter;
-    @Inject BackPressedDelegate backPressDelegate;
 
-    private SettingsUpdateFieldDialog fieldFragment;
+    private WalletInputDialog mInputDialog;
 
     @Override
     public void onAttach(Context context) {
@@ -93,19 +93,7 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
         setHasOptionsMenu(true);
 
         getActivity().getMenuInflater().inflate(R.menu.menu_tab_settings, toolbar.getMenu());
-        toolbar.setOnMenuItemClickListener(SettingsTabFragment.this::onOptionsItemSelected);
-
-        backPressDelegate.addBackPressedListener(new BackPressedListener() {
-            @Override
-            public boolean onBackPressed() {
-                if (getChildFragmentManager().getBackStackEntryCount() > 0) {
-                    getChildFragmentManager().popBackStack();
-                    return false;
-                }
-
-                return true;
-            }
-        });
+        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         return view;
     }
@@ -130,16 +118,9 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     }
 
     @Override
-    public void startEditField(SettingsFieldType type, CharSequence label, String fieldName, String value) {
-
-        fieldFragment = SettingsUpdateFieldDialog.newInstance(type, label, fieldName, value);
-        fieldFragment.setOnSaveListener(presenter::onUpdateProfile);
-        fieldFragment.show(getChildFragmentManager(), SettingsUpdateFieldDialog.class.getName());
-    }
-
-    @Override
-    public void startChangePassword() {
-
+    public void onDestroy() {
+        super.onDestroy();
+        WalletDialog.dismissInstance(mInputDialog);
     }
 
     @Override
@@ -158,6 +139,19 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     @Override
     public void startPasswordChange() {
         startActivity(new Intent(getActivity(), PasswordChangeMigrationActivity.class));
+    }
+
+    @Override
+    public void showMessage(CharSequence message) {
+        new SnackbarBuilder(this)
+                .setMessage(message)
+                .setDurationShort()
+                .show();
+    }
+
+    @Override
+    public void startDialog(WalletDialog.DialogExecutor executor) {
+        mInputDialog = WalletDialog.switchDialogWithExecutor(this, mInputDialog, executor);
     }
 
     @Override

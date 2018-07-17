@@ -175,7 +175,7 @@ public class WalletTxConvertStartDialog extends WalletDialog {
 
             mToCoin = mToCoin.toUpperCase();
             mFromCoin = mFromCoin.toUpperCase();
-            return new WalletTxConvertStartDialog(mContext, this);
+            return new WalletTxConvertStartDialog(getContext(), this);
         }
     }
 }

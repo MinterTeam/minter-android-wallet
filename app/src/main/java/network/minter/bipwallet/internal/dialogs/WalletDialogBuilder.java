@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -29,24 +30,26 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import java.lang.ref.WeakReference;
+
 /**
  * MinterWallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class WalletDialogBuilder<D extends WalletDialog, B extends WalletDialogBuilder> {
-    protected final Context mContext;
+    protected final WeakReference<Context> mContext;
     protected CharSequence mTitle;
 
     protected CharSequence mPositiveTitle, mNegativeTitle, mNeutralTitle;
     protected Dialog.OnClickListener mPositiveListener, mNegativeListener, mNeutralListener;
 
     public WalletDialogBuilder(Context context) {
-        mContext = context;
+        mContext = new WeakReference<>(context);
     }
 
     public WalletDialogBuilder(Context context, CharSequence title) {
-        mContext = context;
+        this(context);
         setTitle(title);
     }
 
@@ -127,6 +130,10 @@ public abstract class WalletDialogBuilder<D extends WalletDialog, B extends Wall
         }
 
         return null;
+    }
+
+    protected Context getContext() {
+        return mContext.get();
     }
 
     protected Dialog.OnClickListener getActionListener(int whichBtn) {

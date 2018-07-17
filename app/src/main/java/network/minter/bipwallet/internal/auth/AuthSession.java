@@ -33,6 +33,7 @@ import com.annimon.stream.Stream;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.subjects.PublishSubject;
 import network.minter.core.internal.common.Lazy;
 import network.minter.core.internal.common.LazyMem;
 import network.minter.profile.models.User;
@@ -58,7 +59,9 @@ public class AuthSession {
     private User mUser;
     private Lazy<List<LogoutListener>> mLogoutListeners = LazyMem.memoize(ArrayList::new);
     private Lazy<List<LoginListener>> mLoginListeners = LazyMem.memoize(ArrayList::new);
+
     private SessionStorage mStorage;
+    private PublishSubject<User> mUserUpdateSubject = PublishSubject.create();
 
     public enum AuthType {
         None,
@@ -84,6 +87,10 @@ public class AuthSession {
      */
     public void setIsLoggedIn(boolean b) {
         mIsLoggedIn = b;
+    }
+
+    public PublishSubject<User> getUserUpdate() {
+        return mUserUpdateSubject;
     }
 
     /**
@@ -166,6 +173,7 @@ public class AuthSession {
     public void setUser(User user) {
         mUser = user;
         save();
+        mUserUpdateSubject.onNext(mUser);
     }
 
     /**

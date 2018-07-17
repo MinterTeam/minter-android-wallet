@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -111,6 +112,15 @@ public class PrefixEditText extends TextInputEditText {
     @SuppressLint("SetTextI18n")
     public void setValue(CharSequence text) {
         if (text == null) {
+            return;
+        }
+
+        if (text.length() == 1 && text.equals(prefix)) {
+            return;
+        }
+
+        if (text.length() > 1 && text.toString().substring(0, 1).equals(prefix)) {
+            super.setText(text.toString());
             return;
         }
 

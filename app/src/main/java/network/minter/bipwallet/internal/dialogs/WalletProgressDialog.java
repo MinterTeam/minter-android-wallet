@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -99,12 +100,12 @@ public class WalletProgressDialog extends WalletDialog {
         }
 
         public Builder setText(@StringRes int textRes) {
-            return setText(mContext.getResources().getString(textRes));
+            return setText(getContext().getResources().getString(textRes));
         }
 
         @Override
         public WalletProgressDialog create() {
-            return new WalletProgressDialog(mContext, this);
+            return new WalletProgressDialog(getContext(), this);
         }
     }
 }

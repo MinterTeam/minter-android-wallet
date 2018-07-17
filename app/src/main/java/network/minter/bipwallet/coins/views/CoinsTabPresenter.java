@@ -120,6 +120,10 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         super.onFirstViewAttach();
         mAdapter = new MultiRowAdapter();
         mTransactionsAdapter = new TransactionShortListAdapter(myAddresses);
+        session.getUserUpdate()
+                .subscribe(res -> {
+                    setUsername();
+                });
 
         mCoinsAdapter = new SimpleRecyclerAdapter.Builder<AccountItem, ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
@@ -132,11 +136,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
                 }).build();
 
-        if (session.getRole() == AuthSession.AuthType.Advanced) {
-            getViewState().hideAvatar();
-        } else {
-            getViewState().setUsername(String.format("@%s", session.getUser().data.username));
-        }
+        setUsername();
+
         getViewState().setOnAvatarClick(v -> getViewState().startTab(R.id.bottom_settings));
         getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
 
@@ -180,6 +181,14 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
         mAdapter.addRow(mTransactionsRow);
         mAdapter.addRow(mCoinsRow);
+    }
+
+    private void setUsername() {
+        if (session.getRole() == AuthSession.AuthType.Advanced) {
+            getViewState().hideAvatar();
+        } else {
+            getViewState().setUsername(String.format("@%s", session.getUser().data.username));
+        }
     }
 
     private void onClickConvertCoins(View view) {

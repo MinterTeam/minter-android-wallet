@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -192,7 +193,7 @@ public class SettingsUpdateFieldDialog extends MvpAppCompatDialogFragment implem
         switch (type) {
             case Username:
                 mGroup.addValidator(inputLayout, new RegexValidator("^@[a-zA-Z0-9_]{5,32}",
-                        getString(R.string.input_signin_username_invalid)));
+                        getString(R.string.input_username_invalid)));
                 break;
             case Email:
                 mGroup.addValidator(inputLayout, new EmailValidator("Invalid email"));

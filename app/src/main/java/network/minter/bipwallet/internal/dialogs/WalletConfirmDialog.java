@@ -104,7 +104,7 @@ public final class WalletConfirmDialog extends WalletDialog {
         @Override
         public WalletConfirmDialog create() {
             checkNotNull(mPositiveTitle, "At least, positive action title should be set");
-            return new WalletConfirmDialog(mContext, this);
+            return new WalletConfirmDialog(getContext(), this);
         }
 
         public Builder setText(CharSequence text) {

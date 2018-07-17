@@ -135,7 +135,7 @@ public final class WalletTxSendStartDialog extends WalletDialog {
         public WalletTxSendStartDialog create() {
             checkNotNull(mRecipientName, "Recipient name required");
             checkNotNull(mAmount, "Amount required");
-            return new WalletTxSendStartDialog(mContext, this);
+            return new WalletTxSendStartDialog(getContext(), this);
         }
 
         public Builder setCoin(String coin) {

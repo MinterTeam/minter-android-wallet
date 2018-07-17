@@ -78,6 +78,7 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
         mForResult = intent.getBooleanExtra(AdvancedGenerateActivity.EXTRA_FOR_RESULT, false);
     }
 
+    //TODO: refactoring
     @Override
     public void attachView(AdvancedModeModule.GenerateView view) {
         super.attachView(view);
@@ -100,7 +101,7 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
             MinterAddress address = repo.add(mMnemonicResult);
 
             if (mSaveOnServer) {
-                getViewState().askPassword((field, val) -> saveServerAddress(field, val, address));
+                getViewState().askPassword((dialog, field, val) -> saveServerAddress(field, val, address));
                 return;
             }
 

@@ -109,7 +109,7 @@ public class PasswordChangeMigrationActivity extends BaseMvpInjectActivity imple
         mInputGroup = new InputGroup();
         mInputGroup.addInput(layoutPasswordOld, layoutPasswordNew, layoutPasswordNewRepeat);
         mInputGroup.addValidator(layoutPasswordOld, new CustomValidator("Invalid password", (v) -> HashUtil.sha256Hex(v.toString()).equals(secretStorage.getEncryptionKey())));
-        mInputGroup.addValidator(layoutPasswordNew, new LengthValidator(getString(R.string.input_signin_password_invalid), 6));
+        mInputGroup.addValidator(layoutPasswordNew, new LengthValidator(getString(R.string.input_password_invalid), 6));
         mInputGroup.addValidator(layoutPasswordNewRepeat, new CompareValidator(getString(R.string.input_signin_password_not_match), layoutPasswordNew));
     }
 }

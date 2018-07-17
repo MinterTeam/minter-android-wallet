@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.auth.ui;
 
@@ -181,9 +181,9 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
         mInputGroup.addInput(phoneLayout);
 
         mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9_]{5,32}",
-                                                                    getString(R.string.input_signin_username_invalid)));
+                getString(R.string.input_username_invalid)));
         mInputGroup.addValidator(passwordLayout,
-                                 new LengthValidator(getString(R.string.input_signin_password_invalid), 6));
+                new LengthValidator(getString(R.string.input_password_invalid), 6));
         mInputGroup.addValidator(passwordRepeatLayout,
                                  new CompareValidator(getString(R.string.input_signin_password_not_match),
                                                       passwordLayout));
