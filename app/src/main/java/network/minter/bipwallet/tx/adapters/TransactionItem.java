@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -40,14 +41,15 @@ public interface TransactionItem {
     int ITEM_PROGRESS = -1;
     int ITEM_HEADER = 0;
     int TX_SEND = 1;
-    int TX_CONVERT_COIN = 2;
-    int TX_CREATE_COIN = 3;
-    int TX_DECLARE_CANDIDACY = 4;
-    int TX_DELEGATE = 5;
-    int TX_UNBOUND = 6;
-    int TX_REDEEM_CHECK = 7;
-    int TX_SET_CANDIDATE_ONLINE = 8;
-    int TX_SET_CANDIDATE_OFFLINE = 9;
+    int TX_SELL_COIN = 2;
+    int TX_BUY_COIN = 3;
+    int TX_CREATE_COIN = 4;
+    int TX_DECLARE_CANDIDACY = 5;
+    int TX_DELEGATE = 6;
+    int TX_UNBOUND = 7;
+    int TX_REDEEM_CHECK = 8;
+    int TX_SET_CANDIDATE_ONLINE = 9;
+    int TX_SET_CANDIDATE_OFFLINE = 10;
 
 
     @ListType
@@ -59,7 +61,8 @@ public interface TransactionItem {
             ITEM_PROGRESS,
             ITEM_HEADER,
             TX_SEND,
-            TX_CONVERT_COIN,
+            TX_SELL_COIN,
+            TX_BUY_COIN,
             TX_CREATE_COIN,
             TX_DECLARE_CANDIDACY,
             TX_DELEGATE,

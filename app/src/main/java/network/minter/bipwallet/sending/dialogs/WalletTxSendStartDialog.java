@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.sending.dialogs;
 
@@ -41,7 +41,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
-import network.minter.mintercore.MinterSDK;
+import network.minter.core.MinterSDK;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 

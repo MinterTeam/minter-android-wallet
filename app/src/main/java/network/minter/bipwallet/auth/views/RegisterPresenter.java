@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.auth.views;
 
@@ -46,12 +46,12 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.my.models.LoginData;
-import network.minter.my.models.ProfileRequestResult;
-import network.minter.my.models.RegisterData;
-import network.minter.my.repo.MyAuthRepository;
+import network.minter.profile.models.LoginData;
+import network.minter.profile.models.ProfileRequestResult;
+import network.minter.profile.models.RegisterData;
+import network.minter.profile.repo.ProfileAuthRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToMyErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
 /**
@@ -62,7 +62,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 @ActivityScope
 @InjectViewState
 public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView> {
-    @Inject MyAuthRepository authRepo;
+    @Inject ProfileAuthRepository authRepo;
     @Inject SecretStorage secretStorage;
     @Inject AuthSession session;
 
@@ -133,7 +133,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
         rxCallMy(authRepo.register(mRegisterData.preparePassword()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(convertToMyErrorResult())
+                .onErrorResumeNext(convertToProfileErrorResult())
                 .subscribe(userResult -> {
                     if(!userResult.isSuccess()) {
                         secretStorage.destroy();

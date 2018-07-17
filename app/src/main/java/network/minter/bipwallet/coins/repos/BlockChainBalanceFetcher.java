@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -43,9 +44,9 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.blockchainapi.models.Balance;
-import network.minter.blockchainapi.repo.BlockChainAccountRepository;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.blockchain.models.Balance;
+import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;

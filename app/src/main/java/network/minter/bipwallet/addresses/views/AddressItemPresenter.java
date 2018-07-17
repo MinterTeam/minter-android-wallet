@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -41,7 +42,7 @@ import network.minter.bipwallet.addresses.ui.AddressItemActivity;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.helpers.IntentHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.my.repo.MyAddressRepository;
+import network.minter.profile.repo.ProfileAddressRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
@@ -52,7 +53,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
  */
 @InjectViewState
 public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.AddressItemView> {
-    @Inject MyAddressRepository addressRepo;
+    @Inject ProfileAddressRepository addressRepo;
 
     private AddressItem mAddress;
 

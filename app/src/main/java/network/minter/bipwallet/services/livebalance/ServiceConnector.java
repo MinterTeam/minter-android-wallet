@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.services.livebalance;
 
@@ -42,15 +42,15 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ServiceConnector implements ServiceConnection {
-    private static BalanceUpdatedService service = null;
+    private static BalanceUpdateService service = null;
     private static ServiceConnector instance;
     private static boolean bound = false;
-    private static ReplaySubject<BalanceUpdatedService> serviceConnected = ReplaySubject.create(1);
+    private static ReplaySubject<BalanceUpdateService> serviceConnected = ReplaySubject.create(1);
 
     private ServiceConnector() {
     }
 
-    public static BalanceUpdatedService get() {
+    public static BalanceUpdateService get() {
         return service;
     }
 
@@ -64,7 +64,7 @@ public class ServiceConnector implements ServiceConnection {
         }
 
         if (!bound) {
-            Intent intent = new Intent(context, BalanceUpdatedService.class);
+            Intent intent = new Intent(context, BalanceUpdateService.class);
             context.startService(intent);
             context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
         }
@@ -79,13 +79,13 @@ public class ServiceConnector implements ServiceConnection {
                 Timber.i(e);
             }
 
-            context.stopService(new Intent(context, BalanceUpdatedService.class));
+            context.stopService(new Intent(context, BalanceUpdateService.class));
             service = null;
         }
         bound = false;
     }
 
-    public static Observable<BalanceUpdatedService> onConnected() {
+    public static Observable<BalanceUpdateService> onConnected() {
         if (service != null) {
             return Observable.just(service);
         }
@@ -96,7 +96,7 @@ public class ServiceConnector implements ServiceConnection {
     @Override
     public void onServiceConnected(ComponentName name, IBinder binder) {
         if (!bound) {
-            service = ((BalanceUpdatedService.LocalBinder) binder).getService();
+            service = ((BalanceUpdateService.LocalBinder) binder).getService();
             bound = true;
             serviceConnected.onNext(service);
             Timber.i("Service connected");

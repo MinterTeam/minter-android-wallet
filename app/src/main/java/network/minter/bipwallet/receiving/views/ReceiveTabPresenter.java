@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -45,7 +46,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.receiving.ReceiveTabModule;
 import network.minter.bipwallet.receiving.helpers.QRAddressGenerator;
 import network.minter.bipwallet.share.ShareManager;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
 
 import static android.support.v4.content.FileProvider.getUriForFile;

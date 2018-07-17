@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.advanced.repo;
 
@@ -43,8 +43,8 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
 import network.minter.bipwallet.internal.data.CachedEntity;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
  * MinterWallet. 2018

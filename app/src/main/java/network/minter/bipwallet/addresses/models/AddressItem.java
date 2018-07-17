@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -33,8 +34,8 @@ import org.parceler.Transient;
 import java.math.BigDecimal;
 
 import io.reactivex.Observable;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.my.models.MyAddressData;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.profile.models.ProfileAddressData;
 
 /**
  * MinterWallet. 2018
@@ -48,7 +49,7 @@ public class AddressItem {
     public boolean isServerSecured;
     public Balance balance;
     public boolean isMain;
-    public MyAddressData myAddressData = null;
+    public ProfileAddressData profileAddressData = null;
 
     public enum BalanceState {
         Loading,
@@ -56,8 +57,8 @@ public class AddressItem {
         Failed,
     }
 
-    public AddressItem(MyAddressData myMinterData) {
-        myAddressData = myMinterData;
+    public AddressItem(ProfileAddressData myMinterData) {
+        profileAddressData = myMinterData;
         id = myMinterData.id;
         address = myMinterData.address;
         isServerSecured = myMinterData.isServerSecured;

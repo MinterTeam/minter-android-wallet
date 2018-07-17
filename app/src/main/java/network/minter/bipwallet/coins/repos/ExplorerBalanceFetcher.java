@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.coins.repos;
 
@@ -44,9 +44,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.explorerapi.models.AddressData;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.AddressData;
+import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -55,12 +56,12 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.views.migration.MigrationException;
-import network.minter.mintercore.crypto.EncryptedString;
-import network.minter.mintercore.crypto.HashUtil;
-import network.minter.my.models.MyAddressData;
-import network.minter.my.models.PasswordChangeRequest;
-import network.minter.my.repo.MyAddressRepository;
-import network.minter.my.repo.MyProfileRepository;
+import network.minter.core.crypto.EncryptedString;
+import network.minter.core.crypto.HashUtil;
+import network.minter.profile.models.PasswordChangeRequest;
+import network.minter.profile.models.ProfileAddressData;
+import network.minter.profile.repo.ProfileAddressRepository;
+import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
@@ -76,8 +77,8 @@ import static network.minter.bipwallet.settings.views.migration.MigrationExcepti
 @InjectViewState
 public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsTabModule.PasswordChangeMigrationView> {
 
-    @Inject MyProfileRepository profileRepo;
-    @Inject MyAddressRepository addressRepo;
+    @Inject ProfileRepository profileRepo;
+    @Inject ProfileAddressRepository addressRepo;
     @Inject SecretStorage secretStorage;
 
     private String mNewPassword;
@@ -144,17 +145,17 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
                         resetProgressNonIndeterminate(res.data.size() * 2);
 
                         // sources
-                        final List<MyAddressData> addresses = new ArrayList<>(res.data);
+                        final List<ProfileAddressData> addresses = new ArrayList<>(res.data);
                         // targets
-                        final List<MyAddressData> reEncryptedData = new ArrayList<>(res.data.size());
+                        final List<ProfileAddressData> reEncryptedData = new ArrayList<>(res.data.size());
                         for (SecretData dataLocal : secretStorage.getSecrets().values()) {
                             if (dataLocal == null) {
                                 emitter.onError(new RuntimeException("Unable to get secret from local storage"));
                                 return;
                             }
 
-                            MyAddressData dataRemote = null;
-                            for (MyAddressData item : addresses) {
+                            ProfileAddressData dataRemote = null;
+                            for (ProfileAddressData item : addresses) {
                                 if (dataLocal.getMinterAddress().equals(item.address)) {
                                     dataRemote = item;
                                     break;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
   ~ @link https://github.com/edwardstock
@@ -23,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -65,7 +65,7 @@
 
         <TextView
             android:id="@+id/item_title_type"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
@@ -80,6 +80,25 @@
             />
 
         <TextView
+            android:id="@+id/item_amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_min"
+            android:fontFamily="@font/_ubuntu_medium"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/textColorGreen"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBottom_toTopOf="@id/item_subamount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toEndOf="@id/item_title_type"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias=".5"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="-200000000.102030405060708090"
+            />
+
+        <TextView
             android:id="@+id/item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -89,6 +108,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/item_title_separator"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toBottomOf="@id/item_title_type"
@@ -109,37 +129,17 @@
 
         <TextView
             android:id="@+id/item_title_second"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
             android:textSize="@dimen/text_size_default"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/item_title"
-            app:layout_constraintEnd_toStartOf="@id/item_amount"
+            app:layout_constraintEnd_toStartOf="@id/item_subamount"
             app:layout_constraintStart_toEndOf="@id/item_title_separator"
             app:layout_constraintTop_toTopOf="@id/item_title"
             tools:text="MCD"
-
-            />
-
-        <TextView
-            android:id="@+id/item_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_min"
-            android:fontFamily="@font/_ubuntu_medium"
-            android:textAlignment="viewEnd"
-            android:textColor="@color/textColorGreen"
-            android:textSize="@dimen/text_size_default"
-            app:layout_constraintBottom_toTopOf="@id/item_subamount"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toEndOf="@id/item_title"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias=".5"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="- 20"
             />
 
         <TextView

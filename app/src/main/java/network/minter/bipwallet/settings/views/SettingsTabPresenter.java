@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -52,8 +53,8 @@ import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
-import network.minter.my.models.User;
-import network.minter.my.repo.MyProfileRepository;
+import network.minter.profile.models.User;
+import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
@@ -69,7 +70,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     private final static int REQUEST_ATTACH_AVATAR = CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
-    @Inject MyProfileRepository profileRepo;
+    @Inject ProfileRepository profileRepo;
     @Inject Context context;
 
     private MultiRowAdapter mMainAdapter, mAdditionalAdapter;

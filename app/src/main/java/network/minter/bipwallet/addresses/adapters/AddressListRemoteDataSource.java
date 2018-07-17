@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -35,10 +36,10 @@ import java.util.List;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.my.models.MyAddressData;
-import network.minter.my.models.MyResult;
-import network.minter.my.repo.MyAddressRepository;
+import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.profile.models.ProfileAddressData;
+import network.minter.profile.models.ProfileResult;
+import network.minter.profile.repo.ProfileAddressRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
@@ -48,10 +49,10 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, AddressItem> {
-    private final MyAddressRepository mRepo;
+    private final ProfileAddressRepository mRepo;
     private final ExplorerAddressRepository mExplorerAddressRepo;
 
-    AddressListRemoteDataSource(MyAddressRepository myAddressRepository, ExplorerAddressRepository explorerAddressRepository) {
+    AddressListRemoteDataSource(ProfileAddressRepository myAddressRepository, ExplorerAddressRepository explorerAddressRepository) {
         mRepo = myAddressRepository;
         mExplorerAddressRepo = explorerAddressRepository;
     }
@@ -86,7 +87,7 @@ public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, Ad
                 });
     }
 
-    private Function<MyResult<List<MyAddressData>>, MyResult<List<AddressItem>>> mapMyItems() {
+    private Function<ProfileResult<List<ProfileAddressData>>, ProfileResult<List<AddressItem>>> mapMyItems() {
         return listMyResult -> {
             final List<AddressItem> items = Stream.of(listMyResult.data)
                     .map(AddressItem::new)
@@ -95,7 +96,7 @@ public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, Ad
                         return item;
                     })
                     .toList();
-            MyResult<List<AddressItem>> result = new MyResult<>();
+            ProfileResult<List<AddressItem>> result = new ProfileResult<>();
             result.meta = listMyResult.meta;
             result.error = listMyResult.error;
             result.data = items;

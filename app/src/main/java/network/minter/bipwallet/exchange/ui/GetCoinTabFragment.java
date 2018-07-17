@@ -23,43 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.exchange.ui;
 
-package network.minter.bipwallet.exchange.views;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.View;
 
-import com.arellomobile.mvp.InjectViewState;
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-import network.minter.bipwallet.exchange.ExchangeModule;
-import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.R;
+import network.minter.bipwallet.exchange.ExchangeModule.GetCoinTabView;
+import network.minter.bipwallet.exchange.views.GetCoinTabPresenter;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@InjectViewState
-public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.ConvertCoinView> {
-    private int mLastPage = 0;
+public class GetCoinTabFragment extends BaseCoinTabFragment implements GetCoinTabView {
 
-    @Inject
-    public ConvertCoinPresenter() {
+    @Inject Provider<GetCoinTabPresenter> presenterProvider;
+    @InjectPresenter GetCoinTabPresenter presenter;
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+    }
+
+    @ProvidePresenter
+    GetCoinTabPresenter providePresenter() {
+        return presenterProvider.get();
     }
 
     @Override
-    public void attachView(ExchangeModule.ConvertCoinView view) {
-        super.attachView(view);
-        getViewState().setCurrentPage(mLastPage);
+    protected int getLayout() {
+        return R.layout.fragment_coin_get;
     }
-
-    public void onTabSelected(int position) {
-        mLastPage = position;
-    }
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().setupTabs();
-    }
-
 }

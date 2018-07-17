@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.sending.views;
 
@@ -56,31 +56,31 @@ import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
-import network.minter.bipwallet.internal.exceptions.MyResponseException;
+import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.sending.dialogs.WalletTxSendWaitingDialog;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
-import network.minter.blockchainapi.models.BCResult;
-import network.minter.blockchainapi.models.operational.Transaction;
-import network.minter.blockchainapi.models.operational.TransactionSign;
-import network.minter.blockchainapi.models.operational.TxSendCoin;
-import network.minter.blockchainapi.repo.BlockChainAccountRepository;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.mintercore.MinterSDK;
-import network.minter.mintercore.crypto.BytesData;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.my.models.MyResult;
-import network.minter.my.repo.MyInfoRepository;
+import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.models.operational.Transaction;
+import network.minter.blockchain.models.operational.TransactionSign;
+import network.minter.blockchain.models.operational.TxSendCoin;
+import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.core.MinterSDK;
+import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.HistoryTransaction;
+import network.minter.profile.models.ProfileResult;
+import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToMyErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
-import static network.minter.mintercore.MinterSDK.PREFIX_TX;
+import static network.minter.core.MinterSDK.PREFIX_TX;
 
 /**
  * MinterWallet. 2018
@@ -94,7 +94,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
     @Inject BlockChainAccountRepository accountRepo;
-    @Inject MyInfoRepository infoRepo;
+    @Inject ProfileInfoRepository infoRepo;
     @Inject CacheManager cache;
     private AccountItem mFromAccount = null;
     private CharSequence mAmount = null;
@@ -179,7 +179,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().startDialog(ctx -> {
             rxCallMy(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
-                    .onErrorResumeNext(convertToMyErrorResult())
+                    .onErrorResumeNext(convertToProfileErrorResult())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(result -> {
@@ -193,7 +193,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             if (failOnNotFound) {
                                 mToAddress = null;
                                 onErrorSearchUser(result);
-                                Timber.d(new MyResponseException(result), "Unable to find address");
+                                Timber.d(new ProfileResponseException(result), "Unable to find address");
                             } else {
                                 getViewState().setRecipientError(null);
                                 startSendDialog();
@@ -271,7 +271,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         });
     }
 
-    private void onErrorSearchUser(MyResult<?> errorResult) {
+    private void onErrorSearchUser(ProfileResult<?> errorResult) {
         Timber.e(errorResult.getError().message, "Unable to find address");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, errorResult.getError().message)
                 .setText(String.format("Unable to find user address for user \"%s\"", mToName))

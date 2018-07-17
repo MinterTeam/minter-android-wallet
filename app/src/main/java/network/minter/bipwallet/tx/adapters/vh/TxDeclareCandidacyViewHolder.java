@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters.vh;
 
@@ -35,8 +35,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
-import network.minter.blockchainapi.models.operational.Transaction;
-import network.minter.explorerapi.models.HistoryTransaction;
+import network.minter.blockchain.models.operational.Transaction;
+import network.minter.core.MinterSDK;
+import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
@@ -60,8 +61,10 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
     @Override
     public void bind(TxItem item) {
         super.bind(item);
-        title.setText(item.getTx().hash.toShortString());
-        amount.setText("Declare Candidacy");
+
+        amount.setText(String.format("- %s", item.getTx().fee.toPlainString()));
+        subamount.setText(MinterSDK.DEFAULT_COIN);
+
         final HistoryTransaction.TxDeclareCandidacyResult data = item.getTx().getData();
         if (data.pubKey != null) {
             pubKey.setText(data.pubKey.toString());
@@ -71,8 +74,10 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
 
         if (data.address != null) {
             address.setText(data.address.toString());
+            title.setText(data.address.toShortString());
         } else {
             address.setText("<unknown>");
+            title.setText(item.getTx().hash.toShortString());
         }
 
         commission.setText(String.format("%s%%", firstNonNull(data.commission, new BigDecimal(0)).toPlainString()));

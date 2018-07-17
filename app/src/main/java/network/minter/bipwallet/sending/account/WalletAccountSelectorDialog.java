@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.sending.account;
 
@@ -42,7 +42,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
 
 /**
  * MinterWallet. 2018

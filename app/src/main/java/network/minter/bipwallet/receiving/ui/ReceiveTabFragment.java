@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -52,7 +53,7 @@ import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.receiving.ReceiveTabModule.ReceiveTabView;
 import network.minter.bipwallet.receiving.views.ReceiveTabPresenter;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
 
 /**
  * MinterWallet. 2018

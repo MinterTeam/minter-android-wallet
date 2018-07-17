@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.internal.views.widgets;
 
@@ -91,6 +91,11 @@ public class BipCircleImageView extends CircleImageView implements RemoteImageVi
     @Override
     public void setImageUrlFallback(String url, @DrawableRes int fallbackResId) {
         mRemoteDelegate.setImageUrlFallback(url, fallbackResId);
+    }
+
+    @Override
+    public void setImageUrlFallback(String url, String fallbackUrl) {
+        mRemoteDelegate.setImageUrlFallback(url, fallbackUrl);
     }
 
     @Override

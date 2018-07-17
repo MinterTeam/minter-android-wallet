@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.services.livebalance;
 
@@ -51,7 +51,7 @@ import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
+import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
@@ -61,7 +61,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class BalanceUpdatedService extends Service {
+public class BalanceUpdateService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
     @Inject CacheManager cache;
@@ -74,8 +74,8 @@ public class BalanceUpdatedService extends Service {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         AndroidInjection.inject(this);
+        super.onCreate();
     }
 
     @Override
@@ -120,8 +120,12 @@ public class BalanceUpdatedService extends Service {
         rxCallExp(addressRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
                 .subscribeOn(Schedulers.io())
                 .switchMap(res -> Observable.create((ObservableOnSubscribe<Centrifugo>) emitter -> {
+                    if (res == null || res.result == null || res.result.token == null) {
+                        return;
+                    }
+
                     final String uid = String.valueOf(session.getUser().getData().id);
-                    Centrifugo client = new Centrifugo.Builder("ws://92.53.87.98:8000/connection/websocket")
+                    Centrifugo client = new Centrifugo.Builder("wss://92.53.87.98:8000/connection/websocket")
                             .setReconnectConfig(new ReconnectConfig(10, 10, TimeUnit.SECONDS))
                             .setUser(new User(uid, res.result.token))
                             .setToken(new Token(res.result.token, String.valueOf(res.result.timestamp)))
@@ -166,8 +170,8 @@ public class BalanceUpdatedService extends Service {
     }
 
     public final class LocalBinder extends Binder {
-        public BalanceUpdatedService getService() {
-            return BalanceUpdatedService.this;
+        public BalanceUpdateService getService() {
+            return BalanceUpdateService.this;
         }
     }
 }

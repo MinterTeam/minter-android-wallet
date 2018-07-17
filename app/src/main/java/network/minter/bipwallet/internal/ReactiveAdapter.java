@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.internal;
 
@@ -37,12 +37,12 @@ import java.io.IOException;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
-import network.minter.blockchainapi.MinterBlockChainApi;
-import network.minter.blockchainapi.models.BCResult;
-import network.minter.explorerapi.MinterExplorerApi;
-import network.minter.explorerapi.models.ExpResult;
-import network.minter.my.MyMinterApi;
-import network.minter.my.models.MyResult;
+import network.minter.blockchain.MinterBlockChainApi;
+import network.minter.blockchain.models.BCResult;
+import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.models.ExpResult;
+import network.minter.profile.MinterProfileApi;
+import network.minter.profile.models.ProfileResult;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
@@ -77,8 +77,8 @@ public class ReactiveAdapter {
         }));
     }
 
-    public static <T> Function<? super Throwable, ? extends ObservableSource<? extends MyResult<T>>> convertToMyErrorResult() {
-        return (Function<Throwable, ObservableSource<? extends MyResult<T>>>) throwable
+    public static <T> Function<? super Throwable, ? extends ObservableSource<? extends ProfileResult<T>>> convertToProfileErrorResult() {
+        return (Function<Throwable, ObservableSource<? extends ProfileResult<T>>>) throwable
                 -> {
             if (!(throwable instanceof HttpException)) {
                 return Observable.error(throwable);
@@ -88,13 +88,13 @@ public class ReactiveAdapter {
         };
     }
 
-    public static <T> MyResult<T> createMyErrorResult(final String json) {
-        Gson gson = MyMinterApi.getInstance().getGsonBuilder().create();
-        return gson.fromJson(json, new TypeToken<MyResult<T>>() {
+    public static <T> ProfileResult<T> createMyErrorResult(final String json) {
+        Gson gson = MinterProfileApi.getInstance().getGsonBuilder().create();
+        return gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
         }.getType());
     }
 
-    public static <T> MyResult<T> createMyErrorResult(final Response<T> response) {
+    public static <T> ProfileResult<T> createMyErrorResult(final Response<T> response) {
         final String errorBodyString;
         try {
             // нельзя после этой строки пытаться вытащить body из ошибки,
@@ -109,7 +109,7 @@ public class ReactiveAdapter {
         return createMyErrorResult(errorBodyString);
     }
 
-    public static <T> MyResult<T> createMyErrorResult(final HttpException exception) {
+    public static <T> ProfileResult<T> createMyErrorResult(final HttpException exception) {
         final String errorBodyString;
         try {
             // нельзя после этой строки пытаться вытащить body из ошибки,
@@ -124,8 +124,8 @@ public class ReactiveAdapter {
         return createMyErrorResult(errorBodyString);
     }
 
-    public static <T> MyResult<T> createMyEmpty() {
-        return new MyResult<>();
+    public static <T> ProfileResult<T> createMyEmpty() {
+        return new ProfileResult<>();
     }
 
 

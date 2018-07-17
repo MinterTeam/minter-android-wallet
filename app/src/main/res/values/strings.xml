@@ -1,4 +1,4 @@
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
   ~ @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <resources>
     <!--constants-->
@@ -108,4 +108,6 @@
     <string name="notification_balance_update_name">Balance updates</string>
     <string name="notification_balance_list_tx_label">View transactions</string>
     <string name="notification_balance_update_description">Updating balance notifications</string>
+    <string name="tab_convert_spend">Spend</string>
+    <string name="tab_convert_get">Get</string>
 </resources>

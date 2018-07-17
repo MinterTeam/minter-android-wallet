@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -36,7 +37,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import network.minter.mintercore.crypto.EncryptedString;
+import network.minter.core.crypto.EncryptedString;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -39,7 +40,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.ui.SettingsUpdateFieldDialog;
-import network.minter.my.repo.MyProfileRepository;
+import network.minter.profile.repo.ProfileRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
@@ -52,7 +53,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 @InjectViewState
 public class SettingsUpdateFieldPresenter extends MvpBasePresenter<SettingsTabModule.SettingsUpdateFieldView> {
 
-    @Inject MyProfileRepository profileRepo;
+    @Inject ProfileRepository profileRepo;
     private CharSequence mLabel;
     private String mField;
     private String mValue;

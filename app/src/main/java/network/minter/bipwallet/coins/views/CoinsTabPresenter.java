@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.coins.views;
 
@@ -58,13 +58,13 @@ import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
-import network.minter.blockchainapi.repo.BlockChainAccountRepository;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.mintercore.internal.helpers.StringHelper;
-import network.minter.my.MyMinterApi;
-import network.minter.my.repo.MyInfoRepository;
+import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.internal.helpers.StringHelper;
+import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.profile.MinterProfileApi;
+import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
@@ -85,7 +85,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject BlockChainAccountRepository accountRepo;
     @Inject ExplorerAddressRepository addressRepo;
-    @Inject MyInfoRepository infoRepo;
+    @Inject ProfileInfoRepository infoRepo;
     private List<MinterAddress> myAddresses = new ArrayList<>();
     private MultiRowAdapter mAdapter;
     private TransactionShortListAdapter mTransactionsAdapter;
@@ -126,7 +126,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .setBinder((itemViewHolder, item, position) -> {
                     itemViewHolder.title.setText(item.coin.toUpperCase());
                     itemViewHolder.amount.setText(item.balance.toPlainString());
-                    itemViewHolder.avatar.setImageUrl(MyMinterApi.getCoinAvatarUrl(item.coin));
+                    itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
                     itemViewHolder.subname.setVisibility(View.GONE);
 
 

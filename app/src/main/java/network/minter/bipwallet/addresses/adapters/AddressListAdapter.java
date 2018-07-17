@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -156,7 +157,7 @@ public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressLis
 
 //    private int findByAddress(MinterAddress address) {
 //        int pos = 0;
-//        for (MyAddressData d : mItems) {
+//        for (ProfileAddressData d : mItems) {
 //            if (d.address.equals(address)) {
 //                return pos;
 //            }

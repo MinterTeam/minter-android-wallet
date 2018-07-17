@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -29,8 +30,8 @@ import android.arch.paging.DataSource;
 
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.my.repo.MyAddressRepository;
+import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.profile.repo.ProfileAddressRepository;
 
 /**
  * MinterWallet. 2018
@@ -39,10 +40,10 @@ import network.minter.my.repo.MyAddressRepository;
  */
 public class AddressListFactory extends DataSource.Factory<Integer, AddressItem> {
     private final ExplorerAddressRepository mExplorerAddressRepository;
-    private MyAddressRepository mMyAddressRepository;
+    private ProfileAddressRepository mMyAddressRepository;
     private SecretStorage mSecretStorage;
 
-    public AddressListFactory(MyAddressRepository addressRepository, ExplorerAddressRepository explorerAddressRepository) {
+    public AddressListFactory(ProfileAddressRepository addressRepository, ExplorerAddressRepository explorerAddressRepository) {
         this(explorerAddressRepository);
         mMyAddressRepository = addressRepository;
     }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.auth.views;
 
@@ -43,12 +43,12 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.my.models.LoginData;
-import network.minter.my.models.MyAddressData;
-import network.minter.my.repo.MyAddressRepository;
-import network.minter.my.repo.MyAuthRepository;
+import network.minter.profile.models.LoginData;
+import network.minter.profile.models.ProfileAddressData;
+import network.minter.profile.repo.ProfileAddressRepository;
+import network.minter.profile.repo.ProfileAuthRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToMyErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
 /**
@@ -59,10 +59,10 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 @ActivityScope
 @InjectViewState
 public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
-    @Inject MyAuthRepository authRepo;
+    @Inject ProfileAuthRepository authRepo;
     @Inject SecretStorage secretRepo;
     @Inject AuthSession session;
-    @Inject MyAddressRepository addressRepo;
+    @Inject ProfileAddressRepository addressRepo;
 
     private LoginData mLoginData = new LoginData();
     private boolean mValid = false;
@@ -108,7 +108,7 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
         rxCallMy(authRepo.login(mLoginData.preparePassword()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(convertToMyErrorResult())
+                .onErrorResumeNext(convertToProfileErrorResult())
                 .retryWhen(getErrorResolver())
                 .subscribe(userResult -> {
                     if (userResult.isSuccess()) {
@@ -128,13 +128,13 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
                     rxCallMy(addressRepo.getAddressesWithEncrypted())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
-                            .onErrorResumeNext(convertToMyErrorResult())
+                            .onErrorResumeNext(convertToProfileErrorResult())
                             .subscribe(addressResult -> {
                                 getViewState().hideProgress();
                                 getViewState().setEnableSubmit(true);
                                 secretRepo.setEncryptionKey(mLoginData.rawPassword);
                                 if (addressResult.isSuccess()) {
-                                    for (MyAddressData addressData : addressResult.data) {
+                                    for (ProfileAddressData addressData : addressResult.data) {
                                         if(addressData.encrypted != null) {
                                             secretRepo.add(addressData.encrypted.decrypt(secretRepo.getEncryptionKey()));
                                         }

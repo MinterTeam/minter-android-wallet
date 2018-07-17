@@ -38,10 +38,10 @@ import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.data.CachedEntity;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.explorerapi.repo.ExplorerTransactionRepository;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.mintercore.internal.api.ApiService;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.internal.api.ApiService;
+import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerTransactionRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 

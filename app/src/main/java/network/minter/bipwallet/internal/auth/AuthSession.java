@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -32,9 +33,9 @@ import com.annimon.stream.Stream;
 import java.util.ArrayList;
 import java.util.List;
 
-import network.minter.mintercore.internal.common.Lazy;
-import network.minter.mintercore.internal.common.LazyMem;
-import network.minter.my.models.User;
+import network.minter.core.internal.common.Lazy;
+import network.minter.core.internal.common.LazyMem;
+import network.minter.profile.models.User;
 
 import static network.minter.bipwallet.internal.auth.AuthSession.AuthType.None;
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
+  ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
   ~
   ~ The MIT License
   ~
@@ -64,7 +65,7 @@
 
         <TextView
             android:id="@+id/item_title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
@@ -79,7 +80,7 @@
 
         <TextView
             android:id="@+id/item_amount"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_min"
             android:fontFamily="@font/_ubuntu_medium"
@@ -93,7 +94,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias=".5"
             app:layout_constraintVertical_chainStyle="packed"
-            tools:text="+50.102030405060708090"
+            tools:text="+ 2000000000000.102030405060708090"
             />
 
         <TextView

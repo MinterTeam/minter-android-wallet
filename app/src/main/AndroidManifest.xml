@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
   ~ @link https://github.com/edwardstock
@@ -23,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
@@ -158,7 +158,7 @@
 
 
         <service
-            android:name=".services.livebalance.BalanceUpdatedService"
+            android:name=".services.livebalance.BalanceUpdateService"
             android:exported="false"
             android:screenOrientation="portrait"
             >

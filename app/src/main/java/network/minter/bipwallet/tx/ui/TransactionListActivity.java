@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.ui;
 
@@ -55,7 +55,7 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
-import network.minter.explorerapi.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerApi;
 
 /**
  * MinterWallet. 2018

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -22,28 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.exchange.ui;
 
-package network.minter.bipwallet.internal.exceptions;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.View;
 
-import network.minter.my.models.MyResult;
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import network.minter.bipwallet.R;
+import network.minter.bipwallet.exchange.ExchangeModule.SpendCoinTabView;
+import network.minter.bipwallet.exchange.views.SpendCoinTabPresenter;
 
 /**
- * Dogsy. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public final class MyResponseException extends RuntimeException {
-    private MyResult.Error mError;
+public class SpendCoinTabFragment extends BaseCoinTabFragment implements SpendCoinTabView {
 
-    public MyResponseException(MyResult.Error error) {
-        mError = error;
+    @Inject Provider<SpendCoinTabPresenter> presenterProvider;
+    @InjectPresenter SpendCoinTabPresenter presenter;
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
-    public MyResponseException(MyResult<?> result) {
-        this(result.getError());
+    @ProvidePresenter
+    SpendCoinTabPresenter providePresenter() {
+        return presenterProvider.get();
     }
 
-    public MyResult.Error getError() {
-        return mError;
+    @Override
+    protected int getLayout() {
+        return R.layout.fragment_coin_spend;
     }
 }

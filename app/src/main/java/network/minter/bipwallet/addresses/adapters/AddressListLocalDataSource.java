@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -38,7 +39,7 @@ import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
 import network.minter.bipwallet.internal.paging.ListDataSource;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
+import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
  * MinterWallet. 2018

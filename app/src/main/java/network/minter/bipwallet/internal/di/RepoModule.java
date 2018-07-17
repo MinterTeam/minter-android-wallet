@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -31,17 +32,17 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.blockchainapi.MinterBlockChainApi;
-import network.minter.blockchainapi.repo.BlockChainAccountRepository;
-import network.minter.blockchainapi.repo.BlockChainCoinRepository;
-import network.minter.explorerapi.MinterExplorerApi;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.explorerapi.repo.ExplorerTransactionRepository;
-import network.minter.my.MyMinterApi;
-import network.minter.my.repo.MyAddressRepository;
-import network.minter.my.repo.MyAuthRepository;
-import network.minter.my.repo.MyInfoRepository;
-import network.minter.my.repo.MyProfileRepository;
+import network.minter.blockchain.MinterBlockChainApi;
+import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.explorer.repo.ExplorerTransactionRepository;
+import network.minter.profile.MinterProfileApi;
+import network.minter.profile.repo.ProfileAddressRepository;
+import network.minter.profile.repo.ProfileAuthRepository;
+import network.minter.profile.repo.ProfileInfoRepository;
+import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
 /**
@@ -78,13 +79,13 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public MyAuthRepository provideAuthRepository(MyMinterApi api) {
+    public ProfileAuthRepository provideAuthRepository(MinterProfileApi api) {
         return api.auth();
     }
 
     @Provides
     @WalletApp
-    public MyAddressRepository provideAddressRepository(MyMinterApi api) {
+    public ProfileAddressRepository provideAddressRepository(MinterProfileApi api) {
         return api.address();
     }
 
@@ -96,19 +97,19 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public MyProfileRepository provideProfileRepository(MyMinterApi api) {
+    public ProfileRepository provideProfileRepository(MinterProfileApi api) {
         return api.profile();
     }
 
     @Provides
     @WalletApp
-    public MyMinterApi provideMyMinterApi(AuthSession session) {
-        MyMinterApi.getInstance().getApiService().setAuthHeaderName("Authorization");
-        MyMinterApi.getInstance().getApiService().setTokenGetter(() -> {
+    public MinterProfileApi provideMinterProfileApi(AuthSession session) {
+        MinterProfileApi.getInstance().getApiService().setAuthHeaderName("Authorization");
+        MinterProfileApi.getInstance().getApiService().setTokenGetter(() -> {
             Timber.d("Getting token for MyMinter: %s", "Bearer " + session.getAuthToken());
             return "Bearer " + session.getAuthToken();
         });
-        return MyMinterApi.getInstance();
+        return MinterProfileApi.getInstance();
     }
 
     @Provides
@@ -125,7 +126,7 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public MyInfoRepository provideInfoRepository(MyMinterApi api) {
+    public ProfileInfoRepository provideInfoRepository(MinterProfileApi api) {
         return api.info();
     }
 }

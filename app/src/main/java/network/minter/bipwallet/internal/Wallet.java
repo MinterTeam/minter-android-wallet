@@ -53,7 +53,7 @@ import network.minter.bipwallet.internal.di.WalletComponent;
 import network.minter.bipwallet.internal.di.WalletModule;
 import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ProgressView;
-import network.minter.mintercore.internal.exceptions.NetworkException;
+import network.minter.core.internal.exceptions.NetworkException;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;

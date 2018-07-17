@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -41,9 +42,9 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 import network.minter.bipwallet.tx.adapters.TransactionItem;
 import network.minter.bipwallet.tx.adapters.TransactionListAdapter;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.explorerapi.repo.ExplorerTransactionRepository;
-import network.minter.my.repo.MyInfoRepository;
+import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerTransactionRepository;
+import network.minter.profile.repo.ProfileInfoRepository;
 
 /**
  * MinterWallet. 2018
@@ -55,7 +56,7 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
 
     @Inject ExplorerTransactionRepository transactionRepo;
     @Inject SecretStorage secretRepo;
-    @Inject MyInfoRepository infoRepo;
+    @Inject ProfileInfoRepository infoRepo;
 
     private TransactionListAdapter mAdapter;
     private TransactionDataSource.Factory mSourceFactory;

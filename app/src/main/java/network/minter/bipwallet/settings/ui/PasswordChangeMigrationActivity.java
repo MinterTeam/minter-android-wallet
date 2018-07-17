@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -49,7 +50,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.CustomValidato
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.views.PasswordChangeMigrationPresenter;
-import network.minter.mintercore.crypto.HashUtil;
+import network.minter.core.crypto.HashUtil;
 
 /**
  * MinterWallet. 2018

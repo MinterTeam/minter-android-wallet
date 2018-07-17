@@ -23,43 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package network.minter.bipwallet.exchange.views;
 
 import com.arellomobile.mvp.InjectViewState;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
-import network.minter.bipwallet.exchange.ExchangeModule;
-import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.advanced.repo.AccountStorage;
+import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.exchange.ExchangeModule.SpendCoinTabView;
+import network.minter.bipwallet.internal.data.CachedRepository;
+import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.explorer.models.HistoryTransaction;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.ConvertCoinView> {
-    private int mLastPage = 0;
+public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView> {
 
     @Inject
-    public ConvertCoinPresenter() {
+    public SpendCoinTabPresenter(
+            SecretStorage secretStorage,
+            CachedRepository<UserAccount, AccountStorage> accountStorage,
+            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
+            BlockChainCoinRepository coinRepo,
+            BlockChainAccountRepository accountRepo
+    ) {
+        super(secretStorage, accountStorage, txRepo, coinRepo, accountRepo);
+
     }
 
     @Override
-    public void attachView(ExchangeModule.ConvertCoinView view) {
-        super.attachView(view);
-        getViewState().setCurrentPage(mLastPage);
+    protected boolean isAmountForGetting() {
+        return false;
     }
-
-    public void onTabSelected(int position) {
-        mLastPage = position;
-    }
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().setupTabs();
-    }
-
 }

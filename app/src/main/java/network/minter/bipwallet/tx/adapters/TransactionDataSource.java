@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters;
 
@@ -47,15 +47,15 @@ import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.helpers.DateHelper;
-import network.minter.explorerapi.models.ExpResult;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.explorerapi.repo.ExplorerTransactionRepository;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.my.models.AddressInfoResult;
-import network.minter.my.repo.MyInfoRepository;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.ExpResult;
+import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerTransactionRepository;
+import network.minter.profile.models.AddressInfoResult;
+import network.minter.profile.repo.ProfileInfoRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToMyErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
@@ -67,7 +67,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 public class TransactionDataSource extends PageKeyedDataSource<Integer, TransactionItem> {
 
     private ExplorerTransactionRepository mRepo;
-    private MyInfoRepository mInfoRepo;
+    private ProfileInfoRepository mInfoRepo;
     private List<MinterAddress> mAddressList;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private DateTime mLastDate;
@@ -79,14 +79,14 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         Failed
     }
 
-    public TransactionDataSource(ExplorerTransactionRepository repo, MyInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
+    public TransactionDataSource(ExplorerTransactionRepository repo, ProfileInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
         mRepo = repo;
         mInfoRepo = infoRepo;
         mAddressList = addresses;
         mLoadState = loadState;
     }
 
-    public static ObservableSource<ExpResult<List<HistoryTransaction>>> mapAddressesInfo(List<MinterAddress> myAddresses, MyInfoRepository infoRepo, ExpResult<List<HistoryTransaction>> items) {
+    public static ObservableSource<ExpResult<List<HistoryTransaction>>> mapAddressesInfo(List<MinterAddress> myAddresses, ProfileInfoRepository infoRepo, ExpResult<List<HistoryTransaction>> items) {
         if (items.result == null || items.result.isEmpty()) {
             return Observable.just(items);
         }
@@ -116,7 +116,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         }
 
         return rxCallMy(infoRepo.getAddressesWithUserInfo(toFetch))
-                .onErrorResumeNext(convertToMyErrorResult())
+                .onErrorResumeNext(convertToProfileErrorResult())
                 .map(listInfoResult -> {
                     if (listInfoResult.data.isEmpty()) {
                         return items;
@@ -132,7 +132,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 });
     }
 
-    public static ObservableSource<List<HistoryTransaction>> mapAddressesInfo(List<MinterAddress> addresses, MyInfoRepository infoRepo, List<HistoryTransaction> items) {
+    public static ObservableSource<List<HistoryTransaction>> mapAddressesInfo(List<MinterAddress> addresses, ProfileInfoRepository infoRepo, List<HistoryTransaction> items) {
         if (items == null || items.isEmpty()) {
             return Observable.just(Collections.emptyList());
         }
@@ -162,7 +162,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         }
 
         return rxCallMy(infoRepo.getAddressesWithUserInfo(toFetch))
-                .onErrorResumeNext(convertToMyErrorResult())
+                .onErrorResumeNext(convertToProfileErrorResult())
                 .map(listInfoResult -> {
                     if (listInfoResult.data.isEmpty()) {
                         return items;
@@ -271,10 +271,10 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     public static class Factory extends DataSource.Factory<Integer, TransactionItem> {
         private ExplorerTransactionRepository mRepo;
         private List<MinterAddress> mAddressList;
-        private MyInfoRepository mInfoRepo;
+        private ProfileInfoRepository mInfoRepo;
         private MutableLiveData<LoadState> mLoadState;
 
-        public Factory(ExplorerTransactionRepository repo, MyInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
+        public Factory(ExplorerTransactionRepository repo, ProfileInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
             mRepo = repo;
             mInfoRepo = infoRepo;
             mAddressList = addresses;

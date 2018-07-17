@@ -24,42 +24,28 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.exchange.views;
+package network.minter.bipwallet.internal.exceptions;
 
-import com.arellomobile.mvp.InjectViewState;
 
-import javax.inject.Inject;
-
-import network.minter.bipwallet.exchange.ExchangeModule;
-import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.profile.models.ProfileResult;
 
 /**
- * MinterWallet. 2018
+ * Dogsy. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@InjectViewState
-public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.ConvertCoinView> {
-    private int mLastPage = 0;
+public final class ProfileResponseException extends RuntimeException {
+    private ProfileResult.Error mError;
 
-    @Inject
-    public ConvertCoinPresenter() {
+    public ProfileResponseException(ProfileResult.Error error) {
+        mError = error;
     }
 
-    @Override
-    public void attachView(ExchangeModule.ConvertCoinView view) {
-        super.attachView(view);
-        getViewState().setCurrentPage(mLastPage);
+    public ProfileResponseException(ProfileResult<?> result) {
+        this(result.getError());
     }
 
-    public void onTabSelected(int position) {
-        mLastPage = position;
+    public ProfileResult.Error getError() {
+        return mError;
     }
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().setupTabs();
-    }
-
 }

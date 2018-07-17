@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link https://github.com/MinterTeam
+  ~ @link https://github.com/edwardstock
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    >
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--INCOMING COIN-->
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_incoming_coin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_input"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_input"
+            android:hint="You want to get"
+            app:hintEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:passwordToggleDrawable="@null"
+            >
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/input_incoming_coin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLength="10"
+                android:singleLine="true"
+                android:tag="income_coin"
+                android:textAllCaps="true"
+                tools:text="COINCOIAAAAA"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <!--AMOUNT-->
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_input"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_input"
+            android:hint="How much do you want to get?"
+            app:hintEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_incoming_coin"
+            app:passwordToggleDrawable="@null"
+            >
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/input_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:inputType="numberDecimal|textMultiLine"
+                android:maxLines="2"
+                android:paddingStart="4dp"
+                tools:text="1.102030405060708090102030405060708090"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/action_maximum"
+            style="@style/Wallet.Text.ButtonBorderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:padding="6dp"
+            android:text="Use max"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/layout_amount"
+            app:layout_constraintEnd_toEndOf="@id/layout_amount"
+            app:layout_constraintTop_toTopOf="@id/layout_amount"
+            app:layout_constraintVertical_bias="0"
+            />
+
+        <!--SOURCE COIN-->
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_outgoing_coin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_input"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_input"
+            android:hint="You want to spend"
+            app:hintEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_amount"
+            app:passwordToggleDrawable="@null"
+            >
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/input_outgoing_coin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:inputType="none"
+                android:maxLines="1"
+                android:paddingStart="4dp"
+                android:paddingEnd="24dp"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                tools:text="NIOCNIOCNIAAA"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/dropdown"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end"
+            app:layout_constraintBottom_toBottomOf="@id/layout_outgoing_coin"
+            app:layout_constraintEnd_toEndOf="@id/layout_outgoing_coin"
+            app:layout_constraintTop_toTopOf="@id/layout_outgoing_coin"
+            app:srcCompat="@drawable/ic_drop_down_grey"
+            />
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_calculation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_input"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_input"
+            android:hint="You will spend approximately"
+            app:hintEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_outgoing_coin"
+            app:passwordToggleDrawable="@null"
+            >
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/calculation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:editable="false"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:inputType="none"
+                android:maxLines="1"
+                android:paddingStart="4dp"
+                android:paddingEnd="24dp"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:textColor="@color/textColorGrey"
+                android:textIsSelectable="false"
+                tools:text="1.1020304050607080 CUP"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:background="@color/greySeparator"
+            app:layout_constraintTop_toBottomOf="@id/layout_calculation"
+            />
+
+        <Button
+            android:id="@+id/action"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:text="@string/btn_exchange"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/separator"
+            />
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

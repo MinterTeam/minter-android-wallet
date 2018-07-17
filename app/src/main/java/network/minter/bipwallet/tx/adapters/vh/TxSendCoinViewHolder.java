@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters.vh;
 
@@ -36,8 +36,8 @@ import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.HistoryTransaction;
 
 /**
  * minter-android-wallet. 2018

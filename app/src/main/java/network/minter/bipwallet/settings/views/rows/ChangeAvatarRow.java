@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.settings.views.rows;
 
@@ -39,7 +39,7 @@ import network.minter.bipwallet.internal.common.DeferredCall;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
-import network.minter.my.models.User;
+import network.minter.profile.models.User;
 
 /**
  * MinterWallet. 2018

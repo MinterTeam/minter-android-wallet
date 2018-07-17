@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -30,7 +31,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.widget.EditText;
 
-import network.minter.mintercore.internal.common.CallbackProvider;
+import network.minter.core.internal.common.CallbackProvider;
 
 /**
  * Dogsy. 2018

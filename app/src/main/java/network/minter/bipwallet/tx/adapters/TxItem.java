@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters;
 
@@ -43,8 +43,8 @@ import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSendCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSetCandidateOnlineOfflineViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
-import network.minter.explorerapi.models.HistoryTransaction;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.HistoryTransaction;
 
 /**
  * MinterWallet. 2018
@@ -115,7 +115,8 @@ public class TxItem implements TransactionItem {
                 view = inflater.inflate(R.layout.item_list_tx_send_coin_expandable, parent, false);
                 out = new TxSendCoinViewHolder(view);
                 break;
-            case TX_CONVERT_COIN:
+            case TX_SELL_COIN:
+            case TX_BUY_COIN:
                 view = inflater.inflate(R.layout.item_list_tx_convert_coin_expandable, parent, false);
                 out = new TxConvertCoinViewHolder(view);
                 break;

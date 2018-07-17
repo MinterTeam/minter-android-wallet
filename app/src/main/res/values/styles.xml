@@ -1,4 +1,4 @@
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
   ~ @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <resources>
     <!-- Base application theme. -->
@@ -104,6 +104,26 @@
         <item name="android:clickable">true</item>
         <item name="android:elevation">4dp</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
+    </style>
+
+    <style name="Wallet.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+    </style>
+
+    <style name="Wallet.Text">
+    </style>
+
+    <style name="Wallet.Text.ButtonBorderless">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
     </style>
 
     <style name="Wallet.Button.White" parent="Wallet.Button">
@@ -233,6 +253,12 @@
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">#BBB1D9</item>
+    </style>
+
+    <style name="Wallet.TabLayout.TabItem" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:fontFamily">@font/_ubuntu_bold</item>
     </style>
 
 

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -37,16 +38,16 @@ import java.util.Queue;
 
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.mintercore.bip39.HDKey;
-import network.minter.mintercore.bip39.MnemonicResult;
-import network.minter.mintercore.bip39.NativeBip39;
-import network.minter.mintercore.bip39.NativeHDKeyEncoder;
-import network.minter.mintercore.crypto.BytesData;
-import network.minter.mintercore.crypto.HashUtil;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.mintercore.crypto.PrivateKey;
-import network.minter.mintercore.crypto.PublicKey;
-import network.minter.mintercore.internal.helpers.StringHelper;
+import network.minter.core.bip39.HDKey;
+import network.minter.core.bip39.MnemonicResult;
+import network.minter.core.bip39.NativeBip39;
+import network.minter.core.bip39.NativeHDKeyEncoder;
+import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.HashUtil;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.PrivateKey;
+import network.minter.core.crypto.PublicKey;
+import network.minter.core.internal.helpers.StringHelper;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkArgument;
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;

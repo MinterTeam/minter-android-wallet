@@ -124,28 +124,28 @@ dependencies {
             "network.minter.android:minter-android-core-testnet:${minterSdkVersions}",
             "network.minter.android:minter-android-explorer-testnet:${minterSdkVersions}",
             "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersions}",
-            "network.minter.android:minter-android-myminter-testnet:${minterSdkVersions}"
+            "network.minter.android:minter-android-profile-testnet:${minterSdkVersions}"
     ])
 
     netTestNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core-testnet:${minterSdkVersions}",
             "network.minter.android:minter-android-explorer-testnet:${minterSdkVersions}",
             "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersions}",
-            "network.minter.android:minter-android-myminter-testnet:${minterSdkVersions}"
+            "network.minter.android:minter-android-profile-testnet:${minterSdkVersions}"
     ])
 
     netMainImplementation([
             "network.minter.android:minter-android-core:${minterSdkVersions}",
             "network.minter.android:minter-android-explorer:${minterSdkVersions}",
             "network.minter.android:minter-android-blockchain:${minterSdkVersions}",
-            "network.minter.android:minter-android-myminter:${minterSdkVersions}"
+            "network.minter.android:minter-android-profile:${minterSdkVersions}"
     ])
 
     netMainNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core:${minterSdkVersions}",
             "network.minter.android:minter-android-explorer:${minterSdkVersions}",
             "network.minter.android:minter-android-blockchain:${minterSdkVersions}",
-            "network.minter.android:minter-android-myminter:${minterSdkVersions}"
+            "network.minter.android:minter-android-profile:${minterSdkVersions}"
     ])
 
     // support

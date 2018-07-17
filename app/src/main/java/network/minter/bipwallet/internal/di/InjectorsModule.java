@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.internal.di;
 
@@ -42,11 +42,13 @@ import network.minter.bipwallet.auth.ui.SigninActivity;
 import network.minter.bipwallet.auth.ui.SplashFragment;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
+import network.minter.bipwallet.exchange.ui.GetCoinTabFragment;
+import network.minter.bipwallet.exchange.ui.SpendCoinTabFragment;
 import network.minter.bipwallet.external.ui.ExternalActivity;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.di.annotations.FragmentScope;
 import network.minter.bipwallet.internal.di.annotations.ServiceScope;
-import network.minter.bipwallet.services.livebalance.BalanceUpdatedService;
+import network.minter.bipwallet.services.livebalance.BalanceUpdateService;
 import network.minter.bipwallet.settings.ui.PasswordChangeMigrationActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 
@@ -103,12 +105,20 @@ public interface InjectorsModule {
     ConvertCoinActivity convertCoinActivityInjector();
 
     @ContributesAndroidInjector
+    @FragmentScope
+    GetCoinTabFragment getCoinTabFragmentInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    SpendCoinTabFragment spendCoinTabFragmentInjector();
+
+    @ContributesAndroidInjector
     @ActivityScope
     PasswordChangeMigrationActivity passwordChangeMigrationActivityInjector();
 
     @ContributesAndroidInjector
     @ServiceScope
-    BalanceUpdatedService balanceUpdateService();
+    BalanceUpdateService balanceUpdateService();
 
     @ContributesAndroidInjector
     @ActivityScope

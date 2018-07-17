@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,17 +26,19 @@
 
 package network.minter.bipwallet.exchange.ui;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -44,18 +47,9 @@ import javax.inject.Provider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
-import network.minter.bipwallet.auth.ui.InputGroup;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
-import network.minter.bipwallet.internal.dialogs.WalletDialog;
-import network.minter.bipwallet.internal.helpers.forms.validators.DecimalValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
-import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
-import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
-import network.minter.explorerapi.MinterExplorerApi;
-import timber.log.Timber;
 
 /**
  * MinterWallet. 2018
@@ -64,101 +58,42 @@ import timber.log.Timber;
  */
 public class ConvertCoinActivity extends BaseMvpInjectActivity implements ExchangeModule.ConvertCoinView {
 
+    private final static List<Class<? extends BaseCoinTabFragment>> sTabs = new ArrayList<Class<? extends BaseCoinTabFragment>>() {{
+        add(SpendCoinTabFragment.class);
+        add(GetCoinTabFragment.class);
+    }};
+
     @Inject Provider<ConvertCoinPresenter> presenterProvider;
     @InjectPresenter ConvertCoinPresenter presenter;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.input_incoming_coin) TextInputEditText inCoin;
-    @BindView(R.id.input_incoming_amount) TextInputEditText inAmount;
-    @BindView(R.id.input_outgoing_coin) TextInputEditText outCoin;
-    @BindView(R.id.input_outgoing_amount) TextInputEditText outAmount;
-    @BindView(R.id.action_maximum) Button actionMaximum;
-    @BindView(R.id.action_exchange) Button actionExchange;
-
-    private InputGroup mInputGroup;
+    @BindView(R.id.tabs) TabLayout tabs;
+    @BindView(R.id.pager) ViewPager tabsPager;
 
     @Override
-    public void setOnClickMaximum(View.OnClickListener listener) {
-        actionMaximum.setOnClickListener(listener);
+    public void setupTabs() {
+        tabsPager.setAdapter(createTabsAdapter());
+        tabsPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabs));
+        tabsPager.setOffscreenPageLimit(2);
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                tabsPager.setCurrentItem(tab.getPosition());
+                presenter.onTabSelected(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
     }
 
     @Override
-    public void setOnClickSubmit(View.OnClickListener listener) {
-        actionExchange.setOnClickListener(listener);
-    }
-
-    @Override
-    public void setOnClickSelectAccount(View.OnClickListener listener) {
-        outCoin.setOnClickListener(listener);
-    }
-
-    @Override
-    public void setMaximumTitle(CharSequence title) {
-        actionMaximum.setText(title);
-    }
-
-    @Override
-    public void setTextChangedListener(InputGroup.OnTextChangedListener listener) {
-        mInputGroup.addTextChangedListener(listener);
-    }
-
-    @Override
-    public void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
-        new WalletAccountSelectorDialog.Builder(this, "Select account")
-                .setItems(accounts)
-                .setOnClickListener(clickListener)
-                .create().show();
-    }
-
-    @Override
-    public void setOutAccountName(CharSequence accountName) {
-        outCoin.setText(accountName);
-    }
-
-    @Override
-    public void setError(String field, CharSequence message) {
-        mInputGroup.setError(field, message);
-    }
-
-    @Override
-    public void clearErrors() {
-        mInputGroup.clearErrors();
-    }
-
-    @Override
-    public void setSubmitEnabled(boolean enabled) {
-        actionExchange.setEnabled(enabled);
-    }
-
-    @Override
-    public void setMaximumEnabled(boolean enabled) {
-        actionMaximum.setEnabled(enabled);
-    }
-
-    @Override
-    public void setFormValidationListener(InputGroup.OnFormValidateListener listener) {
-        mInputGroup.addFormValidateListener(listener);
-    }
-
-    private WalletDialog mCurrentDialog;
-
-    @Override
-    public void setAmountSpending(String amount) {
-        outAmount.setText(amount);
-    }
-
-    @Override
-    public void setAmountGetting(String amount) {
-        inAmount.setText(amount);
-    }
-
-    @Override
-    public void startDialog(WalletDialog.DialogExecutor executor) {
-        mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor);
-    }
-
-    @Override
-    public void startExplorer(String txHash) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + txHash)));
+    public void setCurrentPage(int page) {
+        tabsPager.setCurrentItem(page);
     }
 
     @ProvidePresenter
@@ -173,19 +108,37 @@ public class ConvertCoinActivity extends BaseMvpInjectActivity implements Exchan
         ButterKnife.bind(this);
         setupToolbar(toolbar);
 
-        mInputGroup = new InputGroup();
-        mInputGroup.addInput(inCoin, inAmount);
-        mInputGroup.addInput(outAmount);
+        tabs.setTabGravity(TabLayout.GRAVITY_FILL);
+    }
 
-        mInputGroup.addValidator(inAmount, new DecimalValidator("Invalid number"));
-        mInputGroup.addValidator(outAmount, new DecimalValidator("Invalid number"));
-        mInputGroup.addValidator(inCoin, new RegexValidator("^[a-zA-Z]+$", "Invalid coin name"));
+    private FragmentStatePagerAdapter createTabsAdapter() {
+        return new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+            @Override
+            public int getCount() {
+                return 2;
+            }
 
-        mInputGroup.addFilter(inCoin, (source, start, end, dest, dstart, dend) -> {
-            Timber.d("Filter: source=%s, start=%d, end=%d, dest=%s, destStart=%d, destEnd=%d", source, start, end, dest, dstart, dend);
-            return source.toString().toUpperCase().replaceAll("[^A-Z]", "");
-        });
+            @Override
+            public Fragment getItem(int position) {
+                try {
+                    return sTabs.get(position).newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
+                return null;
+            }
 
+            @NonNull
+            @Override
+            public Object instantiateItem(ViewGroup container, int position) {
+                return super.instantiateItem(container, position);
+            }
+
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+                super.destroyItem(container, position, object);
+            }
+        };
     }
 }

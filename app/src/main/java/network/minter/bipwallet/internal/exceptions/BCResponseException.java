@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,7 +26,7 @@
 
 package network.minter.bipwallet.internal.exceptions;
 
-import network.minter.blockchainapi.models.BCResult;
+import network.minter.blockchain.models.BCResult;
 
 /**
  * Dogsy. 2018

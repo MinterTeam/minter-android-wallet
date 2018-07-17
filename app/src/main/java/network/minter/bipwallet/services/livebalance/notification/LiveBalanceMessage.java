@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,16 +22,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.services.livebalance.notification;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import network.minter.blockchainapi.models.operational.Transaction;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.my.MyMinterApi;
+import network.minter.blockchain.models.operational.Transaction;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.profile.MinterProfileApi;
 
 /**
  * minter-android-wallet. 2018
@@ -52,7 +52,7 @@ public class LiveBalanceMessage {
     }
 
     public String getCoinAvatar() {
-        return MyMinterApi.getCoinAvatarUrl(getCoin());
+        return MinterProfileApi.getCoinAvatarUrl(getCoin());
     }
 
     public BigDecimal getAmount() {

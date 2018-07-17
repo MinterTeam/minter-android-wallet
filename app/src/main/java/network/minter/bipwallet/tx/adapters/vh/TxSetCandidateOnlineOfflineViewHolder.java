@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters.vh;
 
@@ -33,7 +33,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
-import network.minter.explorerapi.models.HistoryTransaction;
+import network.minter.core.MinterSDK;
+import network.minter.explorer.models.HistoryTransaction;
 
 /**
  * minter-android-wallet. 2018
@@ -42,6 +43,7 @@ import network.minter.explorerapi.models.HistoryTransaction;
  */
 public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_pub_value) TextView pubKey;
+    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
     public TxSetCandidateOnlineOfflineViewHolder(View itemView) {
         super(itemView);
@@ -52,12 +54,16 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
     public void bind(TxItem item) {
         super.bind(item);
         final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = item.getTx().getData();
-        title.setText(item.getTx().hash.toShortString());
-        amount.setText(item.getTx().type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
+
+        amount.setText(String.format("- %s", item.getTx().fee.toPlainString()));
+        subamount.setText(MinterSDK.DEFAULT_COIN);
+        itemTitleType.setText(item.getTx().type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
         if (data.pubKey != null) {
             pubKey.setText(data.pubKey.toString());
+            title.setText(data.pubKey.toShortString());
         } else {
             pubKey.setText("<unknown>");
+            title.setText(item.getTx().hash.toShortString());
         }
     }
 }

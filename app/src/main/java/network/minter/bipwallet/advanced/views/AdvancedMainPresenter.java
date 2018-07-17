@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -38,10 +39,10 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.mintercore.bip39.NativeBip39;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.my.models.User;
-import network.minter.my.repo.MyAddressRepository;
+import network.minter.core.bip39.NativeBip39;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.profile.models.User;
+import network.minter.profile.repo.ProfileAddressRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
@@ -57,7 +58,7 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
 
     @Inject SecretStorage repo;
     @Inject AuthSession session;
-    @Inject MyAddressRepository addressRepo;
+    @Inject ProfileAddressRepository addressRepo;
     private String mPhrase;
     private boolean mForResult;
 

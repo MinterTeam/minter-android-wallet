@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -33,7 +34,7 @@ import com.arellomobile.mvp.MvpView;
 
 import dagger.Module;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
-import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.core.crypto.MinterAddress;
 
 /**
  * MinterWallet. 2018

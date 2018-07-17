@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -41,8 +42,8 @@ import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.explorerapi.repo.ExplorerAddressRepository;
-import network.minter.my.repo.MyAddressRepository;
+import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.profile.repo.ProfileAddressRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 
@@ -57,7 +58,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
     private final static int REQUEST_FOR_RESULT = 200;
     @Inject SecretStorage secretRepo;
     @Inject AuthSession session;
-    @Inject MyAddressRepository myAddressRepo;
+    @Inject ProfileAddressRepository myAddressRepo;
     @Inject ExplorerAddressRepository explorerAddressRepository;
     private AddressListAdapter mAdapter;
     private RxPagedListBuilder<Integer, AddressItem> mPageBuilder;
@@ -144,11 +145,11 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
     }
 
     private void onSetMain(boolean isMain, AddressItem addressItem) {
-        if (!addressItem.isServerSecured || addressItem.myAddressData == null) {
+        if (!addressItem.isServerSecured || addressItem.profileAddressData == null) {
             return;
         }
 
-        safeSubscribeIoToUi(rxCallMy(myAddressRepo.setAddressMain(isMain, addressItem.myAddressData)))
+        safeSubscribeIoToUi(rxCallMy(myAddressRepo.setAddressMain(isMain, addressItem.profileAddressData)))
                 .subscribe(res -> {
                     getViewState().scrollToPosition(0);
                     reload();

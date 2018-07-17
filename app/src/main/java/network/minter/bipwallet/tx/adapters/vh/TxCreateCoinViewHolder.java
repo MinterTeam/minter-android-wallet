@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters.vh;
 
@@ -35,7 +35,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
-import network.minter.explorerapi.models.HistoryTransaction;
+import network.minter.blockchain.models.operational.Transaction;
+import network.minter.core.MinterSDK;
+import network.minter.explorer.models.HistoryTransaction;
+import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
@@ -60,12 +63,20 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         final HistoryTransaction.TxCreateResult data = item.getTx().getData();
-        title.setText(item.getTx().hash.toShortString());
-        amount.setText(String.format("Create coin: %s", firstNonNull(data.getSymbol(), "<unknown>")));
+        final String coinSymbol = firstNonNull(data.getSymbol(), "<unknown>");
+        avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(coinSymbol), MinterProfileApi.getCoinAvatarUrl("MNT"));
+        title.setText(coinSymbol);
+        amount.setText(String.format("- %s", firstNonNull(item.getTx().fee, new BigDecimal(0)).toPlainString()));
+        subamount.setText(MinterSDK.DEFAULT_COIN);
         coinName.setText(firstNonNull(data.name, "<unknown>"));
-        coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));
-        initialAmount.setText(firstNonNull(data.initialAmount, new BigDecimal(0)).toPlainString());
-        initialReserve.setText(firstNonNull(data.initialReserve, new BigDecimal(0)).toPlainString());
+        this.coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));
+        initialAmount.setText(firstNonNull(data.initialAmount, new BigDecimal(0)).divide(Transaction.VALUE_MUL_DEC).toPlainString());
+        initialReserve.setText(firstNonNull(data.initialReserve, new BigDecimal(0)).divide(Transaction.VALUE_MUL_DEC).toPlainString());
         crr.setText(firstNonNull(data.constantReserveRatio, new BigDecimal(0)).toPlainString());
+    }
+
+    @Override
+    protected boolean autoSetAvatar() {
+        return false;
     }
 }

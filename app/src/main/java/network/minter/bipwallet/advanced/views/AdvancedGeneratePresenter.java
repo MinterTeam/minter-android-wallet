@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -40,11 +41,11 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.mintercore.bip39.MnemonicResult;
-import network.minter.mintercore.bip39.NativeBip39;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.my.models.User;
-import network.minter.my.repo.MyAddressRepository;
+import network.minter.core.bip39.MnemonicResult;
+import network.minter.core.bip39.NativeBip39;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.profile.models.User;
+import network.minter.profile.repo.ProfileAddressRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
 import static network.minter.bipwallet.internal.helpers.ContextHelper.copyToClipboard;
@@ -60,7 +61,7 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
     @Inject Context context;
     @Inject SecretStorage repo;
     @Inject AuthSession session;
-    @Inject MyAddressRepository addressRepo;
+    @Inject ProfileAddressRepository addressRepo;
 
     private SecureRandom mRandom = new SecureRandom();
     private MnemonicResult mMnemonicResult;

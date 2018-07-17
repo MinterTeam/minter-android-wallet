@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters.vh;
 
@@ -33,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
+import network.minter.core.MinterSDK;
 
 /**
  * minter-android-wallet. 2018
@@ -41,6 +42,7 @@ import network.minter.bipwallet.tx.adapters.TxItem;
  */
 public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_type_value) TextView txType;
+    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
     public TxUnhandledViewHolder(View itemView) {
         super(itemView);
@@ -51,10 +53,14 @@ public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         title.setText(item.getTx().hash.toShortString());
+        amount.setText(String.format("- %s", item.getTx().fee.toPlainString()));
+        subamount.setText(MinterSDK.DEFAULT_COIN);
         if (item.getTx().type != null) {
             txType.setText(item.getTx().type.name());
         } else {
             txType.setText("<unknown>");
         }
+
+        itemTitleType.setText(txType.getText());
     }
 }

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -29,7 +30,7 @@ import android.support.v7.util.DiffUtil;
 
 import java.util.List;
 
-import network.minter.explorerapi.models.HistoryTransaction;
+import network.minter.explorer.models.HistoryTransaction;
 
 /**
  * MinterWallet. 2018

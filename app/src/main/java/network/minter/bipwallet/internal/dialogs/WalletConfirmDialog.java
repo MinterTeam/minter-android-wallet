@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -40,8 +41,8 @@ import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.ReactiveAdapter;
 import network.minter.bipwallet.internal.helpers.ExceptionHelper;
-import network.minter.mintercore.internal.exceptions.NetworkException;
-import network.minter.my.models.MyResult;
+import network.minter.core.internal.exceptions.NetworkException;
+import network.minter.profile.models.ProfileResult;
 import retrofit2.HttpException;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
@@ -127,7 +128,7 @@ public final class WalletConfirmDialog extends WalletDialog {
                 }
                 try {
                     String out = ((HttpException) t).response().errorBody().string() + "\n";
-                    MyResult errorResult = ReactiveAdapter.createMyErrorResult(((HttpException) t));
+                    ProfileResult errorResult = ReactiveAdapter.createMyErrorResult(((HttpException) t));
                     out += errorResult.getError().message + "\n" + errorResult.getError().message + "\n" + ExceptionHelper.getStackTrace(t);
                     mText = out;
                 } catch (IOException e) {

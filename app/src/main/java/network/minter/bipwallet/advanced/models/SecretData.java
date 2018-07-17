@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -28,11 +29,11 @@ package network.minter.bipwallet.advanced.models;
 import java.io.Serializable;
 import java.util.UUID;
 
-import network.minter.mintercore.crypto.BytesData;
-import network.minter.mintercore.crypto.MinterAddress;
-import network.minter.mintercore.crypto.PrivateKey;
-import network.minter.mintercore.crypto.PublicKey;
-import network.minter.my.models.MyAddressData;
+import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.PrivateKey;
+import network.minter.core.crypto.PublicKey;
+import network.minter.profile.models.ProfileAddressData;
 
 /**
  * MinterWallet. 2018
@@ -76,8 +77,8 @@ public final class SecretData implements Serializable {
         return mMinterAddress;
     }
 
-    public MyAddressData toAddressData(boolean isMain, boolean isServerSecured, String encKey) {
-        return new MyAddressData(mMinterAddress, isMain, mSeedPhrase, isServerSecured, encKey);
+    public ProfileAddressData toAddressData(boolean isMain, boolean isServerSecured, String encKey) {
+        return new ProfileAddressData(mMinterAddress, isMain, mSeedPhrase, isServerSecured, encKey);
     }
 
     public void cleanup() {

@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -46,7 +47,29 @@ import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 @Module
 public class ExchangeModule {
 
+    public interface BaseCoinTabView extends MvpView {
+        void startDialog(WalletDialog.DialogExecutor executor);
+        void setOnClickMaximum(View.OnClickListener listener);
+        void setOnClickSubmit(View.OnClickListener listener);
+        void setTextChangedListener(InputGroup.OnTextChangedListener listener);
+        void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener);
+        void setOnClickSelectAccount(View.OnClickListener listener);
+        void setError(String field, CharSequence message);
+        void clearErrors();
+        void setSubmitEnabled(boolean enabled);
+        void setFormValidationListener(InputGroup.OnFormValidateListener listener);
+        void startExplorer(String s);
+        void finish();
+        void setCalculation(CharSequence calculation);
+        void setOutAccountName(CharSequence accountName);
+        void setMaximumEnabled(boolean enabled);
+        void setAmount(CharSequence amount);
+    }
+
     public interface ConvertCoinView extends MvpView, ErrorViewWithRetry {
+        void setupTabs();
+        void setCurrentPage(int page);
+        /*
         void setOnClickMaximum(View.OnClickListener listener);
         void setOnClickSubmit(View.OnClickListener listener);
         void setOnClickSelectAccount(View.OnClickListener listener);
@@ -64,5 +87,16 @@ public class ExchangeModule {
         void startDialog(WalletDialog.DialogExecutor executor);
         void startExplorer(String s);
         void finish();
+         */
     }
+
+    public interface GetCoinTabView extends BaseCoinTabView, ErrorViewWithRetry {
+
+    }
+
+    public interface SpendCoinTabView extends BaseCoinTabView, ErrorViewWithRetry {
+
+    }
+
+
 }
