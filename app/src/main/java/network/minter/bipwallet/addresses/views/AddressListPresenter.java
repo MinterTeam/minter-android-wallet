@@ -45,7 +45,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.profile.repo.ProfileAddressRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -67,7 +67,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
     @Inject
     public AddressListPresenter() {
         mAdapter = new AddressListAdapter();
-        mAdapter.setOnAddressClickListener((v, address) -> getViewState().startAddressItem(REQUEST_ADDRESS_ITEM, address));
+        mAdapter.setOnAddressClickListener((v, name, address) -> getViewState().startAddressItem(REQUEST_ADDRESS_ITEM, name, address));
         mAdapter.setOnSetMainListener(this::onSetMain);
     }
 
@@ -87,7 +87,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
             secretStorage.add(secretData);
             boolean isMain = Stream.of(mItems).filter(item -> item.isMain).count() == 0;
             safeSubscribeIoToUi(
-                    rxCallMy(myAddressRepo.addAddress(secretData.toAddressData(isMain, true, secretStorage.getEncryptionKey())))
+                    rxCallProfile(myAddressRepo.addAddress(secretData.toAddressData(isMain, true, secretStorage.getEncryptionKey())))
             ).subscribe(res -> {
                 reload();
                 getViewState().hideProgress();
@@ -149,7 +149,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
             return;
         }
 
-        safeSubscribeIoToUi(rxCallMy(myAddressRepo.setAddressMain(isMain, addressItem.profileAddressData)))
+        safeSubscribeIoToUi(rxCallProfile(myAddressRepo.setAddressMain(isMain, addressItem.profileAddressData)))
                 .subscribe(res -> {
                     getViewState().scrollToPosition(0);
                     reload();

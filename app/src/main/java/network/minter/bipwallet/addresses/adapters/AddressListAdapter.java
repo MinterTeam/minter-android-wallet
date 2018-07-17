@@ -107,7 +107,7 @@ public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressLis
         holder.address.setText(item.address.toString());
         holder.address.setOnClickListener(v -> {
             if (mAddressClickListener != null) {
-                mAddressClickListener.onClick(v, item);
+                mAddressClickListener.onClick(v, holder.addressTitle.getText().toString(), item);
             }
         });
         holder.actionCopy.setOnClickListener(v -> {
@@ -168,7 +168,7 @@ public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressLis
 //    }
 
     public interface OnAddressClickListener {
-        void onClick(View v, AddressItem address);
+        void onClick(View v, String addressName, AddressItem address);
     }
 
     public interface OnSetMainListener {

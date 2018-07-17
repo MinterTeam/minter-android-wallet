@@ -79,7 +79,7 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.core.MinterSDK.PREFIX_TX;
 
 /**
@@ -177,7 +177,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
         getViewState().startDialog(ctx -> {
-            rxCallMy(infoRepo.findAddressInfoByInput(searchBy))
+            rxCallProfile(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(convertToProfileErrorResult())
                     .subscribeOn(Schedulers.io())

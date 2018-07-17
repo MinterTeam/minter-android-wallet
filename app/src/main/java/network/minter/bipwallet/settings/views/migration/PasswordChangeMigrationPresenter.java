@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.settings.views;
+package network.minter.bipwallet.settings.views.migration;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -55,7 +55,6 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.settings.SettingsTabModule;
-import network.minter.bipwallet.settings.views.migration.MigrationException;
 import network.minter.core.crypto.EncryptedString;
 import network.minter.core.crypto.HashUtil;
 import network.minter.profile.models.PasswordChangeRequest;
@@ -64,7 +63,7 @@ import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_1_GET_REMOTE_ADDRESS_LIST;
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_2_RE_ENCRYPT_REMOTE_DATA;
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_3_UPDATE_ENCRYPTED_DATA_REMOTE;
@@ -128,7 +127,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
 
             mProgressDialog = new WeakReference<>(dialog);
 
-            rxCallMy(addressRepo.getAddresses())
+            rxCallProfile(addressRepo.getAddresses())
                     .subscribeOn(Schedulers.io())
                     .retryWhen(migrationStepFailed(STEP_1_GET_REMOTE_ADDRESS_LIST))
                     // comparing local and remote addresses and get id to update on server
@@ -180,7 +179,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
                     }))
                     .retryWhen(migrationStepFailed(STEP_2_RE_ENCRYPT_REMOTE_DATA))
                     // step 3 sending data to server
-                    .switchMap(request -> rxCallMy(profileRepo.changePassword(request)))
+                    .switchMap(request -> rxCallProfile(profileRepo.changePassword(request)))
                     .retryWhen(migrationStepFailed(STEP_3_UPDATE_ENCRYPTED_DATA_REMOTE))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(res -> {

@@ -49,7 +49,7 @@ import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileAuthRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -105,7 +105,7 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
         getViewState().clearErrors();
         getViewState().showProgress();
 
-        rxCallMy(authRepo.login(mLoginData.preparePassword()))
+        rxCallProfile(authRepo.login(mLoginData.preparePassword()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(convertToProfileErrorResult())
@@ -125,7 +125,7 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
                         return;
                     }
 
-                    rxCallMy(addressRepo.getAddressesWithEncrypted())
+                    rxCallProfile(addressRepo.getAddressesWithEncrypted())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
                             .onErrorResumeNext(convertToProfileErrorResult())

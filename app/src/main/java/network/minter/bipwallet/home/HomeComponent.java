@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -34,7 +35,6 @@ import network.minter.bipwallet.internal.di.WalletComponent;
 import network.minter.bipwallet.receiving.ui.ReceiveTabFragment;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.settings.ui.SettingsTabFragment;
-import network.minter.bipwallet.settings.ui.SettingsUpdateFieldDialog;
 
 /**
  * MinterWallet. 2018
@@ -52,7 +52,6 @@ public interface HomeComponent {
     void inject(SendTabFragment fragment);
     void inject(ReceiveTabFragment fragment);
     void inject(SettingsTabFragment fragment);
-    void inject(SettingsUpdateFieldDialog fragment);
 
     @HomeTabsClasses
     List<Class<? extends HomeTabFragment>> tabsClasses();

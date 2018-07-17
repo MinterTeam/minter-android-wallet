@@ -44,7 +44,7 @@ import network.minter.bipwallet.internal.helpers.IntentHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.profile.repo.ProfileAddressRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -65,6 +65,8 @@ public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.A
     public void handleExtras(Intent intent) {
         super.handleExtras(intent);
         mAddress = IntentHelper.getParcelExtraOrError(intent, AddressItemActivity.EXTRA_ADDRESS_DATA, "AddressItem required");
+        String name = intent.getStringExtra(AddressItemActivity.EXTRA_ADDRESS_NAME);
+        getViewState().setName(name);
 
         if (!mAddress.isServerSecured) {
             getViewState().hideActions();
@@ -93,7 +95,7 @@ public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.A
     private void onClickDeleteAddress(DialogInterface dialogInterface, int which) {
         getViewState().showProgress("Deleting in progress");
         if (mAddress.isServerSecured) {
-            rxCallMy(addressRepo.delete(mAddress.id))
+            rxCallProfile(addressRepo.delete(mAddress.id))
                     .observeOn(Schedulers.io())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {

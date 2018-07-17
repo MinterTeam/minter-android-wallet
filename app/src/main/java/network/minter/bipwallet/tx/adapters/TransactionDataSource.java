@@ -57,7 +57,7 @@ import network.minter.profile.repo.ProfileInfoRepository;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -115,7 +115,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             toFetchAddresses.get(add).add(tx);
         }
 
-        return rxCallMy(infoRepo.getAddressesWithUserInfo(toFetch))
+        return rxCallProfile(infoRepo.getAddressesWithUserInfo(toFetch))
                 .onErrorResumeNext(convertToProfileErrorResult())
                 .map(listInfoResult -> {
                     if (listInfoResult.data.isEmpty()) {
@@ -161,7 +161,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             toFetchAddresses.get(add).add(tx);
         }
 
-        return rxCallMy(infoRepo.getAddressesWithUserInfo(toFetch))
+        return rxCallProfile(infoRepo.getAddressesWithUserInfo(toFetch))
                 .onErrorResumeNext(convertToProfileErrorResult())
                 .map(listInfoResult -> {
                     if (listInfoResult.data.isEmpty()) {

@@ -44,7 +44,7 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAddressRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * minter-android-wallet. 2018
@@ -136,7 +136,7 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
     private boolean onPasswordConfirmed(String value, final MinterAddress address) {
         getViewState().showProgress(null, "Encrypting...");
         safeSubscribeIoToUi(
-                rxCallMy(addressRepo.addAddress(repo.getSecret(address).toAddressData(repo.getAddresses().isEmpty(), true, value)))
+                rxCallProfile(addressRepo.addAddress(repo.getSecret(address).toAddressData(repo.getAddresses().isEmpty(), true, value)))
         )
                 .retryWhen(getErrorResolver())
                 .subscribe(res -> {

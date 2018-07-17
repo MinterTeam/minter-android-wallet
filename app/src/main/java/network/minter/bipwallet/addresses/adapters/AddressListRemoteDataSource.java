@@ -41,7 +41,7 @@ import network.minter.profile.models.ProfileAddressData;
 import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileAddressRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -59,7 +59,7 @@ public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, Ad
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, AddressItem> callback) {
-        rxCallMy(mRepo.getAddresses(1))
+        rxCallProfile(mRepo.getAddresses(1))
                 .map(mapMyItems())
                 .subscribe(res -> {
                     callback.onResult(res.data, 0, res.getMeta().total, null, 2);
@@ -69,7 +69,7 @@ public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, Ad
 
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, AddressItem> callback) {
-        rxCallMy(mRepo.getAddresses(params.key))
+        rxCallProfile(mRepo.getAddresses(params.key))
                 .map(mapMyItems())
                 .subscribe(res -> {
                     callback.onResult(res.data, params.key == 1 ? null : params.key - 1);
@@ -79,7 +79,7 @@ public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, Ad
 
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, AddressItem> callback) {
-        rxCallMy(mRepo.getAddresses(params.key))
+        rxCallProfile(mRepo.getAddresses(params.key))
                 .map(mapMyItems())
                 .subscribe(res -> {
                     callback.onResult(res.data, params.key > res.getMeta().lastPage ? null : params.key + 1);

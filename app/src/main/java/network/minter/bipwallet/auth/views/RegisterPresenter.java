@@ -52,7 +52,7 @@ import network.minter.profile.models.RegisterData;
 import network.minter.profile.repo.ProfileAuthRepository;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -130,7 +130,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
             return;
         }
 
-        rxCallMy(authRepo.register(mRegisterData.preparePassword()))
+        rxCallProfile(authRepo.register(mRegisterData.preparePassword()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(convertToProfileErrorResult())
@@ -158,7 +158,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
                     loginData.username = mRegisterData.username;
                     loginData.password = mRegisterData.password;
 
-                    safeSubscribeIoToUi(rxCallMy(authRepo.login(loginData)))
+                    safeSubscribeIoToUi(rxCallProfile(authRepo.login(loginData)))
                             .subscribe(loginResult -> {
                                 getViewState().hideProgress();
                                 if(!loginResult.isSuccess()) {

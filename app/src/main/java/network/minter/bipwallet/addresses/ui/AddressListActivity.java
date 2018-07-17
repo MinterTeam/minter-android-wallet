@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -69,8 +70,8 @@ public class AddressListActivity extends BaseMvpInjectActivity implements Addres
     }
 
     @Override
-    public void startAddressItem(int requestCode, AddressItem address) {
-        new AddressItemActivity.Builder(this, address).start(requestCode);
+    public void startAddressItem(int requestCode, String name, AddressItem address) {
+        new AddressItemActivity.Builder(this, address).setName(name).start(requestCode);
     }
 
     @Override

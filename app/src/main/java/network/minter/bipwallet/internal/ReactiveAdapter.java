@@ -57,12 +57,12 @@ import timber.log.Timber;
 public class ReactiveAdapter {
 
     // MyMinter
-    public static <T> Observable<T> rxCallMy(Call<T> call) {
+    public static <T> Observable<T> rxCallProfile(Call<T> call) {
         return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
             @Override
             public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
                 if (response.body() == null) {
-                    emitter.onNext((T) createMyErrorResult(response));
+                    emitter.onNext((T) createProfileErrorResult(response));
                 } else {
                     emitter.onNext(response.body());
                 }
@@ -84,17 +84,17 @@ public class ReactiveAdapter {
                 return Observable.error(throwable);
             }
 
-            return Observable.just(createMyErrorResult(((HttpException) throwable)));
+            return Observable.just(createProfileErrorResult(((HttpException) throwable)));
         };
     }
 
-    public static <T> ProfileResult<T> createMyErrorResult(final String json) {
+    public static <T> ProfileResult<T> createProfileErrorResult(final String json) {
         Gson gson = MinterProfileApi.getInstance().getGsonBuilder().create();
         return gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
         }.getType());
     }
 
-    public static <T> ProfileResult<T> createMyErrorResult(final Response<T> response) {
+    public static <T> ProfileResult<T> createProfileErrorResult(final Response<T> response) {
         final String errorBodyString;
         try {
             // нельзя после этой строки пытаться вытащить body из ошибки,
@@ -103,13 +103,13 @@ public class ReactiveAdapter {
             errorBodyString = response.errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createMyEmpty();
+            return createProfileEmpty();
         }
 
-        return createMyErrorResult(errorBodyString);
+        return createProfileErrorResult(errorBodyString);
     }
 
-    public static <T> ProfileResult<T> createMyErrorResult(final HttpException exception) {
+    public static <T> ProfileResult<T> createProfileErrorResult(final HttpException exception) {
         final String errorBodyString;
         try {
             // нельзя после этой строки пытаться вытащить body из ошибки,
@@ -118,13 +118,13 @@ public class ReactiveAdapter {
             errorBodyString = ((HttpException) exception).response().errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createMyEmpty();
+            return createProfileEmpty();
         }
 
-        return createMyErrorResult(errorBodyString);
+        return createProfileErrorResult(errorBodyString);
     }
 
-    public static <T> ProfileResult<T> createMyEmpty() {
+    public static <T> ProfileResult<T> createProfileEmpty() {
         return new ProfileResult<>();
     }
 

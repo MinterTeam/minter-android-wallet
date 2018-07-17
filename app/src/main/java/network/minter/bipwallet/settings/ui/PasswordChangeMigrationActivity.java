@@ -49,7 +49,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.CompareValidat
 import network.minter.bipwallet.internal.helpers.forms.validators.CustomValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
 import network.minter.bipwallet.settings.SettingsTabModule;
-import network.minter.bipwallet.settings.views.PasswordChangeMigrationPresenter;
+import network.minter.bipwallet.settings.views.migration.PasswordChangeMigrationPresenter;
 import network.minter.core.crypto.HashUtil;
 
 /**

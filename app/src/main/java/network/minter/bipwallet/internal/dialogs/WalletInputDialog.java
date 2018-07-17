@@ -51,6 +51,7 @@ import network.minter.bipwallet.auth.ui.InputGroup;
 import network.minter.bipwallet.internal.common.CallbackProvider;
 import network.minter.bipwallet.internal.helpers.forms.validators.BaseValidator;
 import network.minter.bipwallet.internal.views.text.PrefixEditText;
+import network.minter.bipwallet.internal.views.widgets.ColoredProgressBar;
 import timber.log.Timber;
 
 /**
@@ -61,6 +62,8 @@ import timber.log.Timber;
 public class WalletInputDialog extends WalletDialog {
     @BindView(R.id.layout_input_stub) ViewStub inputStub;
     @BindView(R.id.input_description) TextView description;
+    @BindView(R.id.progress) ColoredProgressBar progress;
+    @BindView(R.id.input_root) View rootView;
     @BindView(R.id.action) Button action;
     private Builder mBuilder;
     private InputGroup mInputGroup;
@@ -88,6 +91,23 @@ public class WalletInputDialog extends WalletDialog {
         }
 
         mInputLayout.setError(message);
+    }
+
+    public void showProgress() {
+        rootView.setAlpha(.2F);
+        progress.setVisibility(View.VISIBLE);
+        action.setClickable(false);
+        mInputLayout.setClickable(false);
+        mInputLayout.getEditText().setClickable(false);
+
+    }
+
+    public void hideProgress() {
+        progress.setVisibility(View.GONE);
+        rootView.setAlpha(1F);
+        action.setClickable(true);
+        mInputLayout.setClickable(true);
+        mInputLayout.getEditText().setClickable(true);
     }
 
     @Override

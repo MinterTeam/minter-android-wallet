@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -63,11 +64,13 @@ import network.minter.bipwallet.internal.system.ActivityBuilder;
  */
 public class AddressItemActivity extends BaseMvpInjectActivity implements AddressManageModule.AddressItemView {
     public final static String EXTRA_ADDRESS_DATA = "EXTRA_ADDRESS_DATA";
+    public final static String EXTRA_ADDRESS_NAME = "EXTRA_ADDRESS_NAME";
 
     @Inject Provider<AddressItemPresenter> presenterProvider;
     @InjectPresenter AddressItemPresenter presenter;
 
     @BindView(R.id.address) TextView address;
+    @BindView(R.id.address_name) TextView addressName;
     @BindView(R.id.secured_value) TextView securedBy;
     @BindView(R.id.action_remove) Button actionDelete;
     @BindView(R.id.action_copy) View actionCopy;
@@ -148,6 +151,11 @@ public class AddressItemActivity extends BaseMvpInjectActivity implements Addres
         this.description.setText(description);
     }
 
+    @Override
+    public void setName(String name) {
+        addressName.setText(name);
+    }
+
     @ProvidePresenter
     AddressItemPresenter providePresenter() {
         return presenterProvider.get();
@@ -171,6 +179,7 @@ public class AddressItemActivity extends BaseMvpInjectActivity implements Addres
 
     public static final class Builder extends ActivityBuilder {
         private final AddressItem mData;
+        private String mName;
 
         public Builder(@NonNull Activity from, AddressItem data) {
             super(from);
@@ -187,10 +196,16 @@ public class AddressItemActivity extends BaseMvpInjectActivity implements Addres
             mData = data;
         }
 
+        public Builder setName(String name) {
+            mName = name;
+            return this;
+        }
+
         @Override
         protected void onBeforeStart(Intent intent) {
             super.onBeforeStart(intent);
             intent.putExtra(EXTRA_ADDRESS_DATA, Parcels.wrap(mData));
+            intent.putExtra(EXTRA_ADDRESS_NAME, mName);
         }
 
         @Override

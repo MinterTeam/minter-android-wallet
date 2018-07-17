@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -54,11 +55,12 @@ public class AddressManageModule {
         void setOnCopy(View.OnClickListener listener);
         void hideActions();
         void setDescription(CharSequence description);
+        void setName(String name);
     }
 
     public interface AddressListView extends MvpView, ProgressView {
         void setAdapter(RecyclerView.Adapter<?> adapter);
-        void startAddressItem(int requestCode, AddressItem address);
+        void startAddressItem(int requestCode, String name, AddressItem address);
         void startCreateAddress(int requestCode);
         void scrollToPosition(int position);
     }

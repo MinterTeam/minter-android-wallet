@@ -100,7 +100,6 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     public void attachView(CoinsTabModule.CoinsTabView view) {
         super.attachView(view);
         myAddresses = secretRepo.getAddresses();
-
         txRepo.update();
         accountStorage.update();
 
@@ -118,12 +117,10 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+        myAddresses = secretRepo.getAddresses();
         mAdapter = new MultiRowAdapter();
         mTransactionsAdapter = new TransactionShortListAdapter(myAddresses);
-        session.getUserUpdate()
-                .subscribe(res -> {
-                    setUsername();
-                });
+        session.getUserUpdate().doOnSubscribe(this::unsubscribeOnDestroy).subscribe(res -> setUsername());
 
         mCoinsAdapter = new SimpleRecyclerAdapter.Builder<AccountItem, ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)

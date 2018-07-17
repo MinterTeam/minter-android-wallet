@@ -66,7 +66,7 @@ import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallMy;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
@@ -96,7 +96,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     public void onUpdateProfile() {
-        safeSubscribeIoToUi(rxCallMy(profileRepo.getProfile()))
+        safeSubscribeIoToUi(rxCallProfile(profileRepo.getProfile()))
                 .subscribe(res -> {
                     if (res.isSuccess()) {
                         User u = session.getUser();
@@ -139,7 +139,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                     return;
                 }
 
-                safeSubscribeIoToUi(rxCallMy(profileRepo.updateAvatar(ImageHelper.getBase64FromBitmap(avatar, 400))))
+                safeSubscribeIoToUi(rxCallProfile(profileRepo.updateAvatar(ImageHelper.getBase64FromBitmap(avatar, 400))))
                         .subscribe(res -> {
                             mChangeAvatarRow.hideProgress();
                             if (res.isSuccess()) {
@@ -198,13 +198,15 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     private void onSubmitField(final WalletInputDialog dialog, final String fieldName, final String value) {
+        dialog.showProgress();
         if (fieldName.equals("username") && !value.equals(mSourceUsername)) {
             // check username is available
-            safeSubscribeIoToUi(rxCallMy(profileAuthRepo.checkUsernameAvailability(value.substring(1))))
+            safeSubscribeIoToUi(rxCallProfile(profileAuthRepo.checkUsernameAvailability(value.substring(1))))
                     .onErrorResumeNext(convertToProfileErrorResult())
                     .subscribe(res -> {
                         if (!res.isSuccess() || !res.data.isAvailable) {
                             dialog.setError("Username is unavailable");
+                            dialog.hideProgress();
                         } else {
                             submitProfile(dialog, fieldName, value);
                         }
@@ -221,14 +223,16 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
      * @TODO refactoring
      */
     private void submitProfile(WalletInputDialog dialog, final String fieldName, final String value) {
+        dialog.showProgress();
         final String toSave;
         if (fieldName.equals("username") && value.substring(0, 1).equals("@")) {
             toSave = value.substring(1);
         } else {
             toSave = value;
         }
-        safeSubscribeIoToUi(rxCallMy(profileRepo.updateField(fieldName, toSave)))
+        safeSubscribeIoToUi(rxCallProfile(profileRepo.updateField(fieldName, toSave)))
                 .subscribe(res -> {
+                    dialog.hideProgress();
                     if (!res.isSuccess()) {
                         dialog.setError(res.getError().message);
                         Timber.w(new ProfileResponseException(res.getError()));
