@@ -106,6 +106,7 @@ public class AuthSession {
 
         clear();
         mAuthToken = null;
+        mAuthType = null;
 
         Stream.of(mLogoutListeners.get())
                 .forEach(LogoutListener::onLogout);
@@ -143,6 +144,9 @@ public class AuthSession {
      * @see AuthType
      */
     public AuthType getRole() {
+        if (mAuthType == null) {
+            mAuthType = None;
+        }
         return mAuthType;
     }
 
@@ -153,6 +157,7 @@ public class AuthSession {
         if (mAuthToken == null) return;
         mStorage.remove(TOKEN_RESTORATION_KEY);
         mStorage.remove(USER_RESTORATION_KEY);
+        mStorage.remove(TYPE_RESTORATION_KEY);
     }
 
     public String getAuthToken() {
