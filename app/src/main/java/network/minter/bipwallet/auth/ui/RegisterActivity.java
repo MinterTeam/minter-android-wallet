@@ -53,6 +53,7 @@ import network.minter.bipwallet.auth.views.RegisterPresenter;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
+import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.CompareValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
@@ -187,6 +188,7 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
         mInputGroup.addValidator(passwordRepeatLayout,
                                  new CompareValidator(getString(R.string.input_signin_password_not_match),
                                                       passwordLayout));
+        mInputGroup.addValidateRelation(passwordLayout, passwordRepeatLayout);
         mInputGroup.addValidator(emailLayout, new EmailValidator("Invalid email", false));
         mInputGroup.addValidator(phoneLayout, new PhoneValidator("Invalid phone number", false));
 

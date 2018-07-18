@@ -83,7 +83,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
                 title.setText(data.to.toShortString());
             }
 
-            am = String.format("- %s", bdHuman(data.amount.add(txItem.getTx().fee)));
+            am = String.format("- %s", bdHuman(data.amount));
             amount.setText(am);
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  * @link https://github.com/edwardstock
@@ -22,9 +22,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
-package network.minter.bipwallet.auth.ui;
+package network.minter.bipwallet.internal.helpers.forms;
 
 import android.annotation.SuppressLint;
 import android.support.design.widget.TextInputLayout;
@@ -81,6 +81,7 @@ public class InputGroup {
         }
     };
     private Map<String, EditText> mInputNames = new HashMap<>();
+    private Map<EditText, EditText> mValidateRelations = new HashMap<>(2);
 
     public InputGroup addFormValidateListener(OnFormValidateListener listener) {
         mValidFormListeners.add(listener);
@@ -120,13 +121,23 @@ public class InputGroup {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!mTextWatchers.isEmpty()) {
-                    final boolean refValid[] = new boolean[]{false};
+                    final boolean refValid[] = new boolean[]{false, false};
+                    final boolean hasRelated[] = new boolean[]{false};
                     Stream.of(mTextWatchers).forEach(item -> {
+                        if (mValidateRelations.containsKey(input)) {
+                            hasRelated[0] = true;
+                            boolean secondValid = validate(mValidateRelations.get(input), true);
+                            item.onTextChanged(mValidateRelations.get(input), secondValid);
+                            refValid[1] = secondValid;
+                        }
                         boolean valid = validate(input, true);
                         item.onTextChanged(input, valid);
                         refValid[0] = valid;
                     });
                     mInternalTextListener.onTextChanged(input, refValid[0]);
+                    if (hasRelated[0]) {
+                        mInternalTextListener.onTextChanged(mValidateRelations.get(input), refValid[1]);
+                    }
                 } else {
                     final boolean valid = validate(input, true);
                     mInternalTextListener.onTextChanged(input, valid);
@@ -159,6 +170,12 @@ public class InputGroup {
 
     public InputGroup addValidator(TextInputLayout inputLayout, BaseValidator validator) {
         return addValidator(inputLayout.getEditText(), validator);
+    }
+
+    public InputGroup addValidator(TextInputLayout inputLayout, BaseValidator... validator) {
+        Stream.of(validator)
+                .forEach(item -> addValidator(inputLayout, item));
+        return this;
     }
 
     public InputGroup addFilter(TextInputLayout inputLayout, InputFilter filter) {
@@ -232,6 +249,34 @@ public class InputGroup {
         }
     }
 
+    /**
+     * Triggers {@link #validate(boolean)} when one of this inputs changed
+     * Example:
+     * inputPassword
+     * inputPasswordRepeat
+     * if inputPassword was changed, validator will triggered for both fields (instead of only for editing field (default behavior))
+     * and if inputPasswordRepeat was changed, validator will triggered for both fields
+     *
+     * @param f1 field 1 Order no matters
+     * @param f2 field 2
+     * @return
+     */
+    public InputGroup addValidateRelation(EditText f1, EditText f2) {
+        mValidateRelations.put(f1, f2);
+        mValidateRelations.put(f2, f1);
+        return this;
+    }
+
+    /**
+     * @param f1 field 1
+     * @param f2 field 2
+     * @return
+     * @see #addValidateRelation(EditText, EditText)
+     */
+    public InputGroup addValidateRelation(TextInputLayout f1, TextInputLayout f2) {
+        return addValidateRelation(f1.getEditText(), f2.getEditText());
+    }
+
     private boolean validate(EditText editText, boolean withError) {
         if (!mInputValidators.containsKey(editText)) {
             return true;
@@ -241,7 +286,6 @@ public class InputGroup {
         long cnt = Stream.of(mInputValidators.get(editText))
                 .filter(item -> {
                     boolean valid = item.validate(t);
-
                     if (withError) {
                         if (editText.getParent() != null && editText.getParent().getParent() instanceof TextInputLayout) {
                             final TextInputLayout lay = ((TextInputLayout) editText.getParent().getParent());
@@ -277,6 +321,4 @@ public class InputGroup {
     public interface OnTextChangedListener {
         void onTextChanged(EditText editText, boolean valid);
     }
-
-
 }

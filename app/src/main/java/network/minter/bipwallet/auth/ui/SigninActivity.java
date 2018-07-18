@@ -51,6 +51,7 @@ import network.minter.bipwallet.auth.views.SigninPresenter;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
+import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 

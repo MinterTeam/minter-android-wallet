@@ -34,8 +34,8 @@ import java.util.List;
 
 import dagger.Module;
 import network.minter.bipwallet.advanced.models.AccountItem;
-import network.minter.bipwallet.auth.ui.InputGroup;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 
