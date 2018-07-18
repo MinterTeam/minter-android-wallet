@@ -107,6 +107,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
                     }, t -> {
                         Wallet.Rx.errorHandler().accept(t);
                         mWaiter.countDown();
+                        emitter.onError(t);
                     });
         }
 

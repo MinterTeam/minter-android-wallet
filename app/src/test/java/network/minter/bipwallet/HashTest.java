@@ -29,7 +29,7 @@ package network.minter.bipwallet;
 import org.junit.Test;
 
 import network.minter.core.crypto.HashUtil;
-import network.minter.my.models.RegisterData;
+import network.minter.profile.models.RegisterData;
 
 import static org.junit.Assert.assertEquals;
 
