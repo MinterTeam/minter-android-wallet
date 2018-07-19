@@ -29,7 +29,6 @@
     <string name="user_local_settings_key">network_minter_settings</string>
 
     <!--common-->
-    <string name="app_name">Bip Wallet</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="dont_know">I don\'t know</string>
