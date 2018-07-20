@@ -65,6 +65,7 @@
                 android:singleLine="true"
                 android:tag="income_coin"
                 android:textAllCaps="true"
+                android:textSize="@dimen/text_size_default"
                 tools:text="COINCOIAAAAA"
                 />
         </android.support.design.widget.TextInputLayout>
@@ -93,6 +94,7 @@
                 android:inputType="numberDecimal|textMultiLine"
                 android:maxLines="2"
                 android:paddingStart="4dp"
+                android:textSize="@dimen/text_size_default"
                 tools:text="1.102030405060708090102030405060708090"
                 />
         </android.support.design.widget.TextInputLayout>
@@ -141,6 +143,7 @@
                 android:paddingEnd="24dp"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
+                android:textSize="@dimen/text_size_default"
                 tools:text="NIOCNIOCNIAAA"
                 />
         </android.support.design.widget.TextInputLayout>
@@ -189,6 +192,7 @@
                 android:singleLine="true"
                 android:textColor="@color/textColorGrey"
                 android:textIsSelectable="false"
+                android:textSize="@dimen/text_size_default"
                 tools:text="1.1020304050607080 CUP"
                 />
         </android.support.design.widget.TextInputLayout>

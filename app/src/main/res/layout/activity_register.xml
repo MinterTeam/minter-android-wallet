@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
   ~ @link https://github.com/edwardstock
@@ -23,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -33,6 +33,7 @@
     android:layout_height="match_parent"
     tools:context=".advanced.ui.AdvancedMainActivity"
     >
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="0dp"
@@ -100,9 +101,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="-3dp"
                     android:layout_marginEnd="-3dp"
+                    android:imeOptions="actionNext"
                     android:inputType="text"
                     android:text="\@"
-                    android:imeOptions="actionNext"
+                    android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -129,6 +131,7 @@
                     android:layout_marginEnd="-3dp"
                     android:inputType="text|textPassword"
                     android:tag="password"
+                    android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -154,6 +157,7 @@
                     android:layout_marginStart="-3dp"
                     android:layout_marginEnd="-3dp"
                     android:inputType="text|textPassword"
+                    android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -180,23 +184,24 @@
                     android:layout_marginEnd="-3dp"
                     android:inputType="text|textEmailAddress|textWebEmailAddress"
                     android:tag="email"
+                    android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:visibility="gone"
                 android:id="@+id/layout_input_phone"
                 android:layout_width="0dp"
-                app:passwordToggleDrawable="@null"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:hint="Mobile Number (Optional *)"
+                android:visibility="gone"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layout_input_email"
                 app:layout_goneMarginTop="0dp"
+                app:passwordToggleDrawable="@null"
                 >
 
                 <android.support.design.widget.TextInputEditText
@@ -226,10 +231,10 @@
                 android:id="@+id/error_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/errorColor"
-                android:visibility="gone"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:textAlignment="center"
+                android:textColor="@color/errorColor"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/action"

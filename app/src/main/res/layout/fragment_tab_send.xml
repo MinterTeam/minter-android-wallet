@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link https://github.com/MinterTeam
   ~ @link https://github.com/edwardstock
@@ -23,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -100,6 +100,7 @@
                     android:maxLines="1"
                     android:paddingEnd="24dp"
                     tools:text="BIP (124,1020304050607080900)"
+                    android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -144,6 +145,7 @@
                         android:paddingEnd="32dp"
                         android:tag="recipient"
                         tools:text="\@PavelDurov"
+                        android:textSize="@dimen/text_size_default"
                         />
                 </android.support.design.widget.TextInputLayout>
 
@@ -180,6 +182,7 @@
                     android:inputType="numberDecimal"
                     android:tag="amount"
                     tools:text="1.245"
+                    android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
 
