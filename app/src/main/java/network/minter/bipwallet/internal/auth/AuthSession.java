@@ -120,9 +120,11 @@ public class AuthSession {
      * @return true if has positive flag and auth token is not null
      */
     public boolean isLoggedIn(boolean tryRestore) {
-        boolean logged = mIsLoggedIn && mAuthToken != null;
-        if (!logged) {
-            restore();
+        if (tryRestore) {
+            boolean logged = mIsLoggedIn && mAuthToken != null;
+            if (!logged) {
+                restore();
+            }
         }
 
         return mIsLoggedIn && mAuthToken != null;
@@ -134,7 +136,7 @@ public class AuthSession {
      * @return true if has positive flag and auth token is not null
      */
     public boolean isLoggedIn() {
-        return mIsLoggedIn && mAuthToken != null;
+        return isLoggedIn(true);
     }
 
     /**
@@ -169,7 +171,7 @@ public class AuthSession {
     }
 
     public User getUser() {
-        if (mUser == null && isLoggedIn()) {
+        if (mUser == null) {
             restore();
         }
         return mUser;

@@ -133,7 +133,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
-        getViewState().setOnClickScanQR(this::onScanQR);
+        getViewState().setOnClickScanQR(this::onClickScanQR);
         accountStorage.update();
     }
 
@@ -152,7 +152,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
     }
 
-    private void onScanQR(View view) {
+    private void onClickScanQR(View view) {
         getViewState().startScanQRWithPermissions(REQUEST_CODE_QR_SCAN);
     }
 
@@ -214,7 +214,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .setAvatarUrl(mAvatar)
                     .setRecipientName(mToName)
                     .setCoin(mFromAccount.coin)
-                    .setPositiveAction("BIP!", this::onStartWaitingDialog)
+                    .setPositiveAction("BIP!", (d, w) -> onStartExecuteTransaction(true))
                     .setNegativeAction("Cancel", null)
                     .create();
             dialog.setCancelable(true);
@@ -222,6 +222,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         });
     }
 
+    /**
+     * Unused now, soon
+     *
+     * @param dialogInterface
+     * @param which
+     */
     private void onStartWaitingDialog(DialogInterface dialogInterface, int which) {
         getViewState().startDialog(ctx -> {
             final WalletTxSendWaitingDialog dialog = new WalletTxSendWaitingDialog.Builder(ctx, "Please wait")

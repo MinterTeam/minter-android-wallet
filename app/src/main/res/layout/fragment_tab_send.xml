@@ -220,9 +220,11 @@
                 android:layout_marginTop="@dimen/margin_edges"
                 android:background="@color/greySeparator"
                 app:layout_constraintTop_toBottomOf="@id/fee_value"
+                android:visibility="gone"
                 />
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/free_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -236,6 +238,7 @@
                 />
 
             <Switch
+                android:visibility="gone"
                 android:id="@+id/free_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

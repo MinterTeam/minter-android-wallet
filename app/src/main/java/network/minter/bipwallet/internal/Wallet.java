@@ -67,7 +67,8 @@ public class Wallet extends Application implements HasActivityInjector, HasServi
 
     public static final Locale LC_EN = Locale.US;
     public static final Locale LC_RU = new Locale("ru", "RU");
-    public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("dev") || BuildConfig.FLAVOR.equalsIgnoreCase("prod");
+    @SuppressWarnings("ConstantConditions")
+    public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("netTest") || BuildConfig.FLAVOR.equalsIgnoreCase("netMain");
     private static WalletComponent app;
 
     static {
