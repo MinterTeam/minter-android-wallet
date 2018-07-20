@@ -93,17 +93,17 @@ android {
     productFlavors {
         netMain {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
 
         netMainNoCrashlytics {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
 
         netTest {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'false'
+            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
 
         netTestNoCrashlytics {
