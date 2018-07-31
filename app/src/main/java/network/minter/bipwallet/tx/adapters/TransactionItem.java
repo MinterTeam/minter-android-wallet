@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -42,14 +42,15 @@ public interface TransactionItem {
     int ITEM_HEADER = 0;
     int TX_SEND = 1;
     int TX_SELL_COIN = 2;
-    int TX_BUY_COIN = 3;
-    int TX_CREATE_COIN = 4;
-    int TX_DECLARE_CANDIDACY = 5;
-    int TX_DELEGATE = 6;
-    int TX_UNBOUND = 7;
-    int TX_REDEEM_CHECK = 8;
-    int TX_SET_CANDIDATE_ONLINE = 9;
-    int TX_SET_CANDIDATE_OFFLINE = 10;
+    int TX_SELL_ALL_COINS = 3;
+    int TX_BUY_COIN = 4;
+    int TX_CREATE_COIN = 5;
+    int TX_DECLARE_CANDIDACY = 6;
+    int TX_DELEGATE = 7;
+    int TX_UNBOUND = 8;
+    int TX_REDEEM_CHECK = 9;
+    int TX_SET_CANDIDATE_ONLINE = 10;
+    int TX_SET_CANDIDATE_OFFLINE = 11;
 
 
     @ListType
@@ -63,6 +64,7 @@ public interface TransactionItem {
             TX_SEND,
             TX_SELL_COIN,
             TX_BUY_COIN,
+            TX_SELL_ALL_COINS,
             TX_CREATE_COIN,
             TX_DECLARE_CANDIDACY,
             TX_DELEGATE,

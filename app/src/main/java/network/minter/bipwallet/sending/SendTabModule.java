@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -49,6 +49,7 @@ public class SendTabModule {
 
     public interface SendView extends MvpView, ErrorViewWithRetry {
         void setOnClickAccountSelectedListener(View.OnClickListener listener);
+        void setOnClickMaximum(View.OnClickListener listener);
         void setOnTextChangedListener(InputGroup.OnTextChangedListener listener);
         void setFormValidationListener(InputGroup.OnFormValidateListener listener);
         void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener);
@@ -63,6 +64,10 @@ public class SendTabModule {
         void startScanQRWithPermissions(int requestCode);
         void setRecipient(CharSequence to);
         void setRecipientError(CharSequence error);
+        void setAmountError(CharSequence error);
+        void setError(CharSequence error);
+        void setAmount(CharSequence amount);
+        void setFee(CharSequence fee);
     }
 
     public static class TxData {

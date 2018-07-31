@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -74,7 +74,9 @@ public class RepoModule {
     @Provides
     @WalletApp
     public MinterExplorerApi provideMinterExplorerApi() {
-        return MinterExplorerApi.getInstance();
+        final MinterExplorerApi api = MinterExplorerApi.getInstance();
+        api.getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
+        return api;
     }
 
     @Provides
@@ -109,6 +111,7 @@ public class RepoModule {
             Timber.d("Getting token for MyMinter: %s", "Bearer " + session.getAuthToken());
             return "Bearer " + session.getAuthToken();
         });
+        MinterProfileApi.getInstance().getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
         return MinterProfileApi.getInstance();
     }
 

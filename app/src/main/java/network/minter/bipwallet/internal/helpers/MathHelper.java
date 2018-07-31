@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -26,14 +26,16 @@
 
 package network.minter.bipwallet.internal.helpers;
 
+import android.support.annotation.NonNull;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * Dogsy. 2017
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
@@ -85,34 +87,42 @@ public final class MathHelper {
         return input;
     }
 
-
     // BigDecimal
     public static boolean bdGT(BigDecimal from, double to) {
+        return bdGT(from, new BigDecimal(to));
+    }
+
+    public static boolean bdGT(BigDecimal from, BigDecimal to) {
         if (from == null) {
             return false;
         }
-        return from.compareTo(new BigDecimal(to)) > 0;
+        return from.compareTo(to) > 0;
     }
 
     public static boolean bdGTE(BigDecimal from, double to) {
+        return bdGTE(from, new BigDecimal(to));
+    }
+
+    public static boolean bdGTE(BigDecimal from, BigDecimal to) {
         if (from == null) {
             return false;
         }
-        return from.compareTo(new BigDecimal(to)) >= 0;
+        return from.compareTo(to) >= 0;
     }
 
     public static boolean bdLT(BigDecimal from, double to) {
+        return bdLT(from, new BigDecimal(to));
+    }
+
+    public static boolean bdLT(BigDecimal from, BigDecimal to) {
         if (from == null) {
             return false;
         }
-        return from.compareTo(new BigDecimal(to)) < 0;
+        return from.compareTo(to) < 0;
     }
 
     public static boolean bdLTE(BigDecimal from, double to) {
-        if (from == null) {
-            return false;
-        }
-        return from.compareTo(new BigDecimal(to)) <= 0;
+        return bdLTE(from, new BigDecimal(to));
     }
 
     public static boolean bdLTE(BigDecimal from, BigDecimal to) {
@@ -123,7 +133,21 @@ public final class MathHelper {
     }
 
     public static String bdHuman(BigDecimal source) {
-        return firstNonNull(source, new BigDecimal(0)).stripTrailingZeros().toPlainString();
+        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).stripTrailingZeros();
+        if (out.equals(new BigDecimal("0e-18"))) {
+            return "0";
+        }
+
+        return out.toPlainString();
+    }
+
+    public static String bdHuman(BigDecimal source, int precision) {
+        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
+        if (out.equals(new BigDecimal("0e-18"))) {
+            return "0";
+        }
+
+        return out.toPlainString();
     }
 
     // BigInteger
@@ -153,5 +177,39 @@ public final class MathHelper {
             return false;
         }
         return from.compareTo(new BigInteger(String.valueOf(to))) <= 0;
+    }
+
+    @NonNull
+    public static BigDecimal bigDecimalFromString(CharSequence text) {
+        if (text == null) {
+            return BigDecimal.ZERO;
+        }
+        String amountText = text
+                .toString()
+                .replaceAll("\\s", "")
+                .replaceAll("[,.]+", ".")
+                .replace(",", ".");
+
+
+        if (amountText.isEmpty()) {
+            amountText = "0";
+        }
+        if (amountText.equals(".")) {
+            amountText = "0";
+        } else if (amountText.substring(0, 1).equals(".")) {
+            amountText = "0" + amountText;
+        }
+        if (amountText.substring(amountText.length() - 1).equals(".")) {
+            amountText = amountText + "0";
+        }
+
+        BigDecimal out;
+        try {
+            out = new BigDecimal(amountText);
+        } catch (NumberFormatException e) {
+            out = BigDecimal.ZERO;
+        }
+
+        return out;
     }
 }

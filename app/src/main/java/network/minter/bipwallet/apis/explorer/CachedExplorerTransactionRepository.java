@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -47,7 +47,6 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CachedExplorerTransactionRepository extends ExplorerTransactionRepository implements CachedEntity<List<HistoryTransaction>> {
@@ -63,7 +62,7 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
 
     @Override
     public List<HistoryTransaction> initialData() {
-        return Collections.emptyList();
+        return mStorage.get(KEY_TRANSACTIONS, Collections.emptyList());
     }
 
     @Override
@@ -78,5 +77,10 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
     @Override
     public void onAfterUpdate(List<HistoryTransaction> result) {
         mStorage.put(KEY_TRANSACTIONS, result);
+    }
+
+    @Override
+    public void onClear() {
+        mStorage.delete(KEY_TRANSACTIONS);
     }
 }

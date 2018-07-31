@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -27,9 +27,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
-    ext.kotlin_version = '1.2.50'
-
     repositories {
         mavenLocal()
         google()
@@ -37,11 +34,10 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0-beta04'
+        classpath 'com.android.tools.build:gradle:3.3.0-alpha03'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 

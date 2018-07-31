@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -62,12 +62,12 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
         title.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         titleSecond.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
         avatar.setImageResource(R.drawable.img_avatar_exchange);
-        amount.setText(String.format("- %s", bdHuman(data.amount)));
+        amount.setText(String.format("- %s", bdHuman(data.amount, 4)));
         amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         subamount.setText(title.getText());
         coinFrom.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         coinTo.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
-        convertAmount.setText(bdHuman(data.amount));
+        convertAmount.setText(bdHuman(data.amount, 4));
     }
 
     @Override

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -48,7 +48,7 @@
             android:layout_marginStart="@dimen/margin_edges_input"
             android:layout_marginTop="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="You want to get"
+            android:hint="Coin you want"
             app:hintEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +78,7 @@
             android:layout_marginStart="@dimen/margin_edges_input"
             android:layout_marginTop="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="How much do you want to get?"
+            android:hint="Amount"
             app:hintEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,8 +91,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
                 android:inputType="numberDecimal|textMultiLine"
-                android:maxLines="2"
                 android:paddingStart="4dp"
                 android:textSize="@dimen/text_size_default"
                 tools:text="1.102030405060708090102030405060708090"
@@ -114,6 +114,31 @@
             app:layout_constraintVertical_bias="0"
             />
 
+        <View
+            android:id="@+id/iconifiedSeparator"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_edges_medium"
+            android:background="@color/greySeparator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_amount"
+            />
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:rotation="180"
+            app:layout_constraintBottom_toBottomOf="@id/iconifiedSeparator"
+            app:layout_constraintEnd_toEndOf="@id/iconifiedSeparator"
+            app:layout_constraintStart_toStartOf="@id/iconifiedSeparator"
+            app:layout_constraintTop_toTopOf="@id/iconifiedSeparator"
+            app:srcCompat="@drawable/ic_exchange_separator"
+            />
+
         <!--SOURCE COIN-->
         <android.support.design.widget.TextInputLayout
             android:id="@+id/layout_outgoing_coin"
@@ -122,11 +147,11 @@
             android:layout_marginStart="@dimen/margin_edges_input"
             android:layout_marginTop="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="You want to spend"
+            android:hint="Coin you have"
             app:hintEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_amount"
+            app:layout_constraintTop_toBottomOf="@id/iconifiedSeparator"
             app:passwordToggleDrawable="@null"
             >
 
@@ -159,51 +184,64 @@
             app:srcCompat="@drawable/ic_drop_down_grey"
             />
 
-
-        <android.support.design.widget.TextInputLayout
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/layout_calculation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_input"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="You will spend approximately"
-            app:hintEnabled="true"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges_medium"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:background="@drawable/shape_rounded_grey"
+            android:orientation="vertical"
+            android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_outgoing_coin"
-            app:passwordToggleDrawable="@null"
             >
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/calculation"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/calculation_title"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:editable="false"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="none"
-                android:maxLines="1"
-                android:paddingStart="4dp"
-                android:paddingEnd="24dp"
-                android:scrollHorizontally="true"
-                android:singleLine="true"
-                android:textColor="@color/textColorGrey"
-                android:textIsSelectable="false"
-                android:textSize="@dimen/text_size_default"
-                tools:text="1.1020304050607080 CUP"
+                android:fontFamily="@font/_ubuntu_medium"
+                android:text="You will pay approximately"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textSize="@dimen/text_size_11"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 />
-        </android.support.design.widget.TextInputLayout>
 
-        <View
-            android:id="@+id/separator"
+            <TextView
+                android:id="@+id/calculation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:fontFamily="@font/_ubuntu_medium"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_size_22"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/calculation_title"
+                tools:text="15.3304 BLTCOIN"
+
+                />
+        </android.support.constraint.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/rate_attention"
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:background="@color/greySeparator"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:text="The final amount depends on the exchange rate at the moment of transaction."
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_calculation"
+            android:layout_marginTop="@dimen/margin_edges"
             />
 
         <Button
@@ -216,7 +254,7 @@
             android:text="@string/btn_exchange"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/separator"
+            app:layout_constraintTop_toBottomOf="@id/rate_attention"
             />
 
     </android.support.constraint.ConstraintLayout>

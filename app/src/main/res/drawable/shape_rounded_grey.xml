@@ -24,40 +24,11 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-
-<ripple
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?android:colorControlHighlight">
-
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <selector>
-            <item android:state_enabled="false">
-                <shape android:shape="rectangle">
-                    <corners android:radius="@dimen/btn_border_radius"/>
-                    <solid android:color="@color/btn_disabled_transparent"/>
-                </shape>
-            </item>
-
-            <item android:state_focused="true">
-                <shape android:shape="rectangle">
-                    <corners android:radius="@dimen/btn_border_radius"/>
-                    <solid android:color="#6142C7"/>
-                </shape>
-            </item>
-
-            <item android:state_hovered="true">
-                <shape android:shape="rectangle">
-                    <corners android:radius="@dimen/btn_border_radius"/>
-                    <solid android:color="#6142C7"/>
-                </shape>
-            </item>
-
-            <item>
-                <shape android:shape="rectangle">
-                    <corners android:radius="@dimen/btn_border_radius"/>
-                    <solid android:color="@color/colorPrimary"/>
-                </shape>
-            </item>
-        </selector>
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp"/>
+            <solid android:color="@color/greyBackground"/>
+        </shape>
     </item>
-</ripple>
+</selector>

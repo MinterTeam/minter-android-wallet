@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -33,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Collections;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -90,8 +91,21 @@ public class ReactiveAdapter {
 
     public static <T> ProfileResult<T> createProfileErrorResult(final String json) {
         Gson gson = MinterProfileApi.getInstance().getGsonBuilder().create();
-        return gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
-        }.getType());
+
+        ProfileResult<T> out;
+        try {
+            out = gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
+            }.getType());
+        } catch (Exception e) {
+            out = new ProfileResult<>();
+            out.error = new ProfileResult.Error();
+            out.error.message = "Invalid response";
+            out.error.code = "500";
+            out.error.data = Collections.emptyMap();
+            out.data = null;
+        }
+
+        return out;
     }
 
     public static <T> ProfileResult<T> createProfileErrorResult(final Response<T> response) {
@@ -172,10 +186,29 @@ public class ReactiveAdapter {
         };
     }
 
+    public static <T> BCResult<T> createBcErrorResultMessage(final String errorMessage, BCResult.ResultCode code, int statusCode) {
+        BCResult<T> errorRes = new BCResult<>();
+        errorRes.message = errorMessage;
+        errorRes.statusCode = statusCode;
+        errorRes.code = code;
+        return errorRes;
+    }
+
     public static <T> BCResult<T> createBcErrorResult(final String json) {
         Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
-        return gson.fromJson(json, new TypeToken<BCResult<T>>() {
-        }.getType());
+
+        BCResult<T> out;
+        try {
+            out = gson.fromJson(json, new TypeToken<BCResult<T>>() {
+            }.getType());
+        } catch (Exception e) {
+            out = new BCResult<>();
+            out.code = BCResult.ResultCode.Unknown;
+            out.message = "Invalid response";
+            out.statusCode = 500;
+        }
+
+        return out;
     }
 
     public static <T> BCResult<T> createBcErrorResult(final Response<T> response) {
@@ -250,8 +283,15 @@ public class ReactiveAdapter {
 
     public static <T> ExpResult<T> createExpErrorResult(final String json) {
         Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
-        return gson.fromJson(json, new TypeToken<ExpResult<T>>() {
-        }.getType());
+        ExpResult<T> out;
+        try {
+            out = gson.fromJson(json, new TypeToken<ExpResult<T>>() {
+            }.getType());
+        } catch (Exception e) {
+            out = new ExpResult<>();
+        }
+
+        return out;
     }
 
     public static <T> ExpResult<T> createExpErrorResult(final Response<T> response) {

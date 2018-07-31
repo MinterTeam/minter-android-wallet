@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -67,6 +67,7 @@ import network.minter.profile.MinterProfileApi;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
 import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
 
@@ -126,7 +127,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
                 .setBinder((itemViewHolder, item, position) -> {
                     itemViewHolder.title.setText(item.coin.toUpperCase());
-                    itemViewHolder.amount.setText(item.balance.toPlainString());
+                    itemViewHolder.amount.setText(bdHuman(item.balance));
                     itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
                     itemViewHolder.subname.setVisibility(View.GONE);
 

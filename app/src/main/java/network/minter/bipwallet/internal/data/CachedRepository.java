@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.internal.data;
 
@@ -67,7 +67,7 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
     protected final static int NOTIFY_ONLY_ON_UPDATE = 1;
     private final Entity mEntity;
     ResultModel mData;
-    boolean mDataIsReady = false;
+    boolean mDataIsReady;
     Date mExpiredAt = null;
     Date mLastUpdateTime = null;
     private BehaviorSubject<MetaResult<ResultModel>> mMetaNotifier = BehaviorSubject.create();
@@ -76,12 +76,16 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
 
     public CachedRepository(Entity entity) {
         mEntity = entity;
+        mData = initialData();
+        expire();
+        mDataIsReady = false;
     }
 
     protected ResultModel initialData() {
         return mEntity.initialData();
     }
 
+    @SuppressWarnings("unchecked")
     public Class<Entity> getEntityClass() {
         return (Class<Entity>) mEntity.getClass();
     }
@@ -118,9 +122,12 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
      */
     public void clear() {
         Timber.d("Call clear on entity %s", mEntity.getClass().getName());
+        mEntity.onClear();
         mData = mEntity.initialData();
         mDataIsReady = false;
         expire();
+        mNotifier.onComplete();
+        mNotifier = BehaviorSubject.create();
     }
 
     /**

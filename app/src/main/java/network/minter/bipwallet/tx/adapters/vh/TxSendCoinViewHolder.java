@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -73,7 +73,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
             } else {
                 title.setText(data.from.toShortString());
             }
-            am = String.format("+ %s", data.amount.toPlainString());
+            am = String.format("+ %s", bdHuman(data.amount, 4));
             amount.setText(am);
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
         } else {
@@ -83,7 +83,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
                 title.setText(data.to.toShortString());
             }
 
-            am = String.format("- %s", bdHuman(data.amount));
+            am = String.format("- %s", bdHuman(data.amount, 4));
             amount.setText(am);
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         }

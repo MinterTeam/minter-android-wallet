@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -26,7 +26,6 @@
 
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
     id 'io.fabric'
 }
 
@@ -41,10 +40,6 @@ android {
         versionName "0.8.0-beta"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
     }
 
     lintOptions {
@@ -171,10 +166,9 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:android-integration:3.3.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'com.jakewharton.timber:timber:4.5.1'
-    implementation 'org.parceler:parceler-api:1.1.10'
-    annotationProcessor 'org.parceler:parceler:1.1.10'
+    implementation 'org.parceler:parceler-api:1.1.11'
+    annotationProcessor 'org.parceler:parceler:1.1.11'
     implementation "com.orhanobut:hawk:2.0.1"
     implementation 'com.annimon:stream:1.2.0'
     implementation 'net.danlew:android.joda:2.9.9.1'

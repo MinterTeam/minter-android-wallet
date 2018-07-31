@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -25,13 +25,19 @@
  */
 package network.minter.bipwallet.exchange.views;
 
+import android.support.annotation.CallSuper;
 import android.view.View;
 import android.widget.EditText;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
@@ -48,6 +54,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.models.ConvertTransactionData;
 import network.minter.bipwallet.exchange.ui.WalletTxConvertStartDialog;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
@@ -56,27 +63,26 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.BCResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.operational.OperationType;
+import network.minter.blockchain.models.CountableData;
+import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.models.operational.TxCoinBuy;
-import network.minter.blockchain.models.operational.TxCoinSell;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
-import network.minter.core.crypto.BytesData;
 import network.minter.explorer.models.HistoryTransaction;
 import timber.log.Timber;
 
+import static java.math.BigDecimal.ROUND_DOWN;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLTE;
 import static network.minter.blockchain.models.BCResult.ResultCode.CoinDoesNotExists;
-import static network.minter.core.MinterSDK.PREFIX_TX;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabView> extends MvpBasePresenter<V> {
@@ -91,6 +97,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private BigDecimal mSpendAmount = new BigDecimal(0);
     private BigDecimal mGetAmount = new BigDecimal(0);
     private BehaviorSubject<Boolean> mInputChange;
+    private String mGasCoin;
+    private List<AccountItem> mAccounts = new ArrayList<>(1);
+    private boolean mUseMax = false;
+    private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
 
     public BaseCoinTabPresenter(
             SecretStorage secretStorage,
@@ -113,6 +123,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         safeSubscribeIoToUi(mAccountStorage.observe())
                 .subscribe(res -> {
                     if (!res.isEmpty()) {
+                        mAccounts = res.getAccounts();
                         mAccount = res.getAccounts().get(0);
                         onAccountSelected(mAccount, true);
                     }
@@ -135,21 +146,46 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
     protected abstract boolean isAmountForGetting();
 
+    @CallSuper
+    protected void setCalculation(String calculation) {
+        getViewState().setCalculation(calculation);
+    }
+
+    private Optional<AccountItem> findAccountByCoin(String coin) {
+        return Stream.of(mAccounts)
+                .filter(item -> item.getCoin().equals(coin.toUpperCase()))
+                .findFirst();
+    }
+
     private void onClickSubmit(View view) {
         if (mAccount == null || mGetCoin == null || mGetAmount == null || mSpendAmount == null) {
             return;
         }
 
+        Timber.d("Use max: %b", mUseMax);
+
         getViewState().startDialog(ctx -> new WalletTxConvertStartDialog.Builder(ctx, "Convert coin")
-                .setAmount(mSpendAmount)
-                .setFromCoin(mAccount.coin)
+                .setAmount(isAmountForGetting() ? mGetAmount : mSpendAmount)
+                .setLabel(isAmountForGetting() ? "Buy" : "Spend")
+                .setAmountPostfix(isAmountForGetting() ? mGetCoin.toUpperCase() : mAccount.getCoin().toUpperCase())
+                .setFromCoin(mAccount.getCoin())
                 .setToCoin(mGetCoin)
-                .setPositiveAction("Convert!", (d, w) -> onStartExecuteTransaction())
+                .setPositiveAction("Convert!", (d, w) -> {
+                    final ConvertTransactionData txData = new ConvertTransactionData(
+                            mUseMax ? ConvertTransactionData.Type.SellAll : !isAmountForGetting() ? ConvertTransactionData.Type.Sell : ConvertTransactionData.Type.Buy,
+                            mGasCoin,
+                            mAccount.getCoin(),
+                            mGetCoin,
+                            isAmountForGetting() ? mGetAmount : mSpendAmount
+                    );
+
+                    onStartExecuteTransaction(txData);
+                })
                 .setNegativeAction("Cancel")
                 .create());
     }
 
-    private void onStartExecuteTransaction() {
+    private void onStartExecuteTransaction(final ConvertTransactionData txData) {
         getViewState().startDialog(ctx -> {
             WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
                     .setText("Please, wait few seconds")
@@ -159,36 +195,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
             safeSubscribeIoToUi(rxCallBc(mAccountRepo.getTransactionCount(mAccount.address)))
                     .onErrorResumeNext(convertToBcErrorResult())
-                    .switchMap((Function<BCResult<BigInteger>, ObservableSource<BCResult<BytesData>>>) cntRes -> {
+                    .switchMap((Function<BCResult<CountableData>, ObservableSource<BCResult<TransactionSendResult>>>) cntRes -> {
                         if (!cntRes.isSuccess()) {
                             return Observable.just(BCResult.copyError(cntRes));
                         }
-                        final BigInteger nonce = cntRes.result.add(new BigInteger("1"));
-
-
-                        final TransactionSign sign;
-                        if (isAmountForGetting()) {
-                            final Transaction<TxCoinBuy> tx = Transaction.newBuyCoinTransaction(nonce)
-                                    .setCoinToSell(mAccount.coin)
-                                    .setValueToBuy(mGetAmount)
-                                    .setCoinToBuy(mGetCoin)
-                                    .build();
-
-                            final SecretData data = mSecretStorage.getSecret(mAccount.address);
-                            sign = tx.sign(data.getPrivateKey());
-                            data.cleanup();
-                        } else {
-                            // mAccount.coin, mSpendAmount, mGetCoin
-                            final Transaction<TxCoinSell> tx = Transaction.newSellCoinTransaction(nonce)
-                                    .setCoinToSell(mAccount.coin)
-                                    .setValueToSell(mSpendAmount)
-                                    .setCoinToBuy(mGetCoin)
-                                    .build();
-
-                            final SecretData data = mSecretStorage.getSecret(mAccount.address);
-                            sign = tx.sign(data.getPrivateKey());
-                            data.cleanup();
-                        }
+                        final BigInteger nonce = cntRes.result.count.add(new BigInteger("1"));
+                        final Transaction tx = txData.build(nonce);
+                        final SecretData data = mSecretStorage.getSecret(mAccount.address);
+                        final TransactionSign sign = tx.sign(data.getPrivateKey());
+                        data.cleanup();
 
                         return safeSubscribeIoToUi(rxCallBc(mAccountRepo.sendTransaction(sign)))
                                 .onErrorResumeNext(convertToBcErrorResult());
@@ -200,7 +215,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         });
     }
 
-    private void onSuccessExecuteTransaction(BCResult<BytesData> result) {
+    private void onSuccessExecuteTransaction(BCResult<TransactionSendResult> result) {
         if (!result.isSuccess()) {
             onErrorExecuteTransaction(result);
             return;
@@ -211,7 +226,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Success!")
                 .setText("Coins successfully converted!")
                 .setPositiveAction("View transaction", (d, v) -> {
-                    getViewState().startExplorer(result.result.toHexString(PREFIX_TX));
+                    getViewState().startExplorer(result.result.txHash.toString());
                     getViewState().finish();
                     d.dismiss();
                 })
@@ -232,10 +247,11 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
     private void onClickMaximum(View view) {
         if (isAmountForGetting()) {
-            getViewState().setAmount(mAccount.balance.subtract(OperationType.BuyCoin.getFee()).toPlainString());
-        } else {
-            getViewState().setAmount(mAccount.balance.subtract(OperationType.SellCoin.getFee()).toPlainString());
+            return;
         }
+
+        getViewState().setAmount(bdHuman(mAccount.balance));
+        mUseMax = true;
     }
 
     private void onClickSelectAccount(View view) {
@@ -245,7 +261,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     }
 
     private void onInputChanged(EditText editText, boolean valid) {
-        final String text = editText.getText().toString();
+        String text = editText.getText().toString();
 
         switch (editText.getId()) {
             case R.id.input_incoming_coin:
@@ -253,22 +269,83 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 mInputChange.onNext(isAmountForGetting());
                 break;
             case R.id.input_amount:
-                final BigDecimal am;
-                if (!text.isEmpty()) {
-                    am = new BigDecimal(text);
-                } else {
-                    am = new BigDecimal(0);
+                String amountText = text
+                        .replaceAll("\\s", "")
+                        .replaceAll("[,.]+", ".")
+                        .replace(",", ".");
+                if (amountText.isEmpty()) {
+                    amountText = "0";
                 }
+                if (amountText.equals(".")) {
+                    amountText = "0";
+                } else if (amountText.substring(0, 1).equals(".")) {
+                    amountText = "0" + amountText;
+                }
+                if (amountText.substring(amountText.length() - 1).equals(".")) {
+                    amountText = amountText + "0";
+                }
+
+                Timber.d("Amount: %s", amountText);
+                final BigDecimal am = new BigDecimal(amountText);
 
                 if (isAmountForGetting()) {
                     mGetAmount = am;
                 } else {
+                    mUseMax = false;
                     mSpendAmount = am;
                 }
                 getViewState().setSubmitEnabled(am.compareTo(mAccount.balance) <= 0);
                 mInputChange.onNext(isAmountForGetting());
                 break;
         }
+    }
+
+    /**
+     * 1. Getting currency
+     * 2. Print to calculation "value + commission"
+     * 3. Write mSpendAmount = value
+     * 4.
+     * <pre>
+     * {@code
+     *      if(value < mAccount.getBalanceBase()) {
+     *        trigger error: not enough balance
+     *      } else {
+     *        enabling: submit action
+     *      }
+     * }
+     * </pre>
+     * <p>
+     * 5.
+     * <pre>
+     * {@code
+     * if(value+commission < mAccount.getBalanceBase()) {
+     *     nextAccount: find suitable account with second coin (example: current BIP, convert to: SUPERCOIN - find account for SUPERCOIN)
+     *     if(!nextAccount || nextAccount.getBalanceBase() < value+commission) {
+     *         trigger error: not enough balance
+     *     } else {
+     *         enabling: submit action
+     *     }
+     * }
+     * }
+     * </pre>
+     * @return true if found another account for gas coin: false otherwise
+     */
+    private boolean findSuitableAccountForCommission(BigDecimal amountWithCommission, String suitableCoin) {
+        Optional<AccountItem> probablySuitableAccount = findAccountByCoin(suitableCoin);
+        if (!probablySuitableAccount.isPresent() || bdGT(amountWithCommission, probablySuitableAccount.get().getBalanceBase())) {
+            getViewState().setError("income_coin", "Not enough balance");
+            mGasCoin = mAccount.getCoin();
+            return false;
+        }
+
+        mGasCoin = suitableCoin;
+        return true;
+    }
+
+    private boolean checkEnoughBalance(BigDecimal amount) {
+        boolean enoughBalance = bdLTE(amount, mAccount.getBalanceBase());
+        getViewState().setSubmitEnabled(enoughBalance);
+        return enoughBalance;
     }
 
     private void onAmountChangedInternal(Boolean incoming) {
@@ -278,7 +355,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         }
 
         if (incoming) {
-            rxCallBc(mCoinRepo.getCoinExchangeCurrencyToBuy(mAccount.coin, mGetAmount, mGetCoin))
+            // get
+            rxCallBc(mCoinRepo.getCoinExchangeCurrencyToBuy(mAccount.getCoin(), mGetAmount, mGetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcErrorResult())
@@ -287,22 +365,32 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         if (!res.isSuccess()) {
                             if (res.code == BCResult.ResultCode.EmptyResponse || res.statusCode == 404 || res.code == CoinDoesNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.message, "Coin does not exists"));
+                                mEnableUseMax.set(false);
                                 return;
                             }
                             Timber.w(new BCResponseException(res));
                             return;
                         }
+                        mEnableUseMax.set(true);
+                        mSpendAmount = res.result.getAmount();
                         getViewState().setError("income_coin", null);
-                        BigDecimal amount = new BigDecimal(res.result).divide(Transaction.VALUE_MUL_DEC);
-                        getViewState().setCalculation(amount.toPlainString());
-                        mSpendAmount = amount;
+                        setCalculation(String.format("%s %s", res.result.getAmountWithCommission().setScale(4, ROUND_DOWN).toPlainString(), mGetCoin));
 
-                        getViewState().setSubmitEnabled(bdLTE(mSpendAmount, mAccount.balance));
+                        if (!checkEnoughBalance(mSpendAmount)) {
+                            return;
+                        }
+
+                        if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mAccount.getCoin())) {
+                            findSuitableAccountForCommission(res.result.getAmountWithCommission(), mGetCoin);
+                        }
+
                     }, t -> {
-                        Timber.e(t, "Unable to get currency for in amount");
+                        Timber.e(t, "Unable to get currency");
+                        getViewState().setError("income_coin", "Unable to get currency");
                     });
         } else {
-            rxCallBc(mCoinRepo.getCoinExchangeCurrencyToSell(mAccount.coin, mSpendAmount, mGetCoin))
+            // spend
+            rxCallBc(mCoinRepo.getCoinExchangeCurrencyToSell(mAccount.getCoin(), mSpendAmount, mGetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcErrorResult())
@@ -312,19 +400,25 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                             //FIXME: check all possible codes
                             if (res.code == BCResult.ResultCode.EmptyResponse || res.statusCode == 404 || res.code == CoinDoesNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.message, "Coin does not exists"));
+                                mEnableUseMax.set(false);
                                 return;
                             }
                             Timber.w(new BCResponseException(res));
                             return;
                         }
+                        mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);
-                        BigDecimal amount = new BigDecimal(res.result).divide(Transaction.VALUE_MUL_DEC);
-                        Timber.d("%s %s = %s %s", mSpendAmount.toPlainString(), mAccount.coin, amount, mGetAmount);
-                        getViewState().setCalculation(amount.toPlainString());
-                        mGetAmount = amount;
-                        getViewState().setSubmitEnabled(bdLTE(mSpendAmount, mAccount.balance));
+                        setCalculation(String.format("%s %s", res.result.getAmount().setScale(4, ROUND_DOWN).toPlainString(), mGetCoin));
+                        mGetAmount = res.result.getAmount();
+                        if (!checkEnoughBalance(mGetAmount)) {
+                            return;
+                        }
+                        if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mAccount.getCoin())) {
+                            findSuitableAccountForCommission(res.result.getAmountWithCommission(), mGetCoin);
+                        }
                     }, t -> {
-                        Timber.e(t, "Unable to get currency for out amount");
+                        Timber.e(t, "Unable to get currency");
+                        getViewState().setError("income_coin", "Unable to get currency");
                     });
         }
     }
@@ -332,9 +426,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private void onAccountSelected(AccountItem accountItem, boolean initial) {
         if (accountItem == null) return;
 
+        mGasCoin = accountItem.getCoin();
         mAccount = accountItem;
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
-        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), accountItem.balance.toString()));
+        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), accountItem.balance.stripTrailingZeros().toPlainString()));
 
         if (!initial) {
             mInputChange.onNext(false);

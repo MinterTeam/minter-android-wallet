@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -47,7 +47,6 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class WalletTxConvertStartDialog extends WalletDialog {
@@ -58,6 +57,7 @@ public class WalletTxConvertStartDialog extends WalletDialog {
     @BindView(R.id.tx_to_coin_name) TextView toCoinName;
     @BindView(R.id.action_confirm) Button actionConfirm;
     @BindView(R.id.action_decline) Button actionDecline;
+    @BindView(R.id.dialog_amount_label) TextView amountLabel;
 
     private Builder mBuilder;
 
@@ -72,11 +72,19 @@ public class WalletTxConvertStartDialog extends WalletDialog {
         setContentView(R.layout.wallet_tx_convert_start_dialog);
         ButterKnife.bind(this);
         title.setText(mBuilder.getTitle());
-        amount.setText(mBuilder.mAmount);
+
+        if (mBuilder.mAmountPostfix != null && mBuilder.mAmountPostfix.length() > 0) {
+            amount.setText(String.format("%s %s", mBuilder.mAmount, mBuilder.mAmountPostfix));
+        } else {
+            amount.setText(mBuilder.mAmount);
+        }
         fromCoinAvatar.setImageUrlFallback(mBuilder.mFromCoinAvatar, R.drawable.img_avatar_default);
         toCoinAvatar.setImageUrlFallback(mBuilder.mToCoinAvatar, R.drawable.img_avatar_default);
         fromCoinName.setText(mBuilder.mFromCoin);
         toCoinName.setText(mBuilder.mToCoin);
+        if (mBuilder.mLabel != null && mBuilder.mLabel.length() > 0) {
+            amountLabel.setText(mBuilder.mLabel);
+        }
 
         actionConfirm.setText(mBuilder.getPositiveTitle());
         actionConfirm.setOnClickListener(v -> {
@@ -99,6 +107,8 @@ public class WalletTxConvertStartDialog extends WalletDialog {
         private String mFromCoin, mToCoin;
         private String mFromCoinAvatar, mToCoinAvatar;
         private String mAmount;
+        private CharSequence mLabel;
+        private CharSequence mAmountPostfix;
 
         public Builder(Context context) {
             super(context);
@@ -122,6 +132,11 @@ public class WalletTxConvertStartDialog extends WalletDialog {
 
         public Builder setPositiveAction(CharSequence title, OnClickListener listener) {
             return super.setAction(BUTTON_POSITIVE, title, listener);
+        }
+
+        public Builder setAmountPostfix(CharSequence postfix) {
+            mAmountPostfix = postfix;
+            return this;
         }
 
         public Builder setFromCoin(String fromCoin) {
@@ -176,6 +191,11 @@ public class WalletTxConvertStartDialog extends WalletDialog {
             mToCoin = mToCoin.toUpperCase();
             mFromCoin = mFromCoin.toUpperCase();
             return new WalletTxConvertStartDialog(getContext(), this);
+        }
+
+        public Builder setLabel(CharSequence label) {
+            mLabel = label;
+            return this;
         }
     }
 }

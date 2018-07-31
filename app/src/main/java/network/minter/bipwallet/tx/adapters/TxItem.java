@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -117,6 +117,7 @@ public class TxItem implements TransactionItem {
                 break;
             case TX_SELL_COIN:
             case TX_BUY_COIN:
+            case TX_SELL_ALL_COINS:
                 view = inflater.inflate(R.layout.item_list_tx_convert_coin_expandable, parent, false);
                 out = new TxConvertCoinViewHolder(view);
                 break;

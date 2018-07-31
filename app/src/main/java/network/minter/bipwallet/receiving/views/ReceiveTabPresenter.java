@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -78,6 +78,7 @@ public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.Recei
         }
         mAddress = secretStorage.getAddresses().get(0);
         getViewState().setAddress(mAddress);
+        getViewState().setOnClickAddress(this::onClickAddress);
 
         getViewState().showQRProgress();
         QRAddressGenerator.create(Wallet.app().display().dpToPx(200), mAddress.toString())
@@ -99,9 +100,12 @@ public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.Recei
         });
     }
 
+    private void onClickAddress(View view) {
+        ContextHelper.copyToClipboard(view.getContext(), mAddress.toString());
+    }
+
     private void onCopyQR(View view) {
         Uri qrPath = getUriForFile(app().context(), app().context().getApplicationContext().getPackageName() + ".file.provider", mOutFile);
-        ContextHelper.copyToClipboard(view.getContext(), mAddress.toString());
 
         final Intent intent = new ShareManager.IntentBuilder()
                 .setChooserTitle("Share address")

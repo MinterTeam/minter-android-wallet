@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -99,8 +99,8 @@
                     android:inputType="none"
                     android:maxLines="1"
                     android:paddingEnd="24dp"
-                    tools:text="BIP (124,1020304050607080900)"
                     android:textSize="@dimen/text_size_default"
+                    tools:text="BIP (124,1020304050607080900)"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -144,20 +144,24 @@
                         android:inputType="text|textMultiLine"
                         android:paddingEnd="32dp"
                         android:tag="recipient"
-                        tools:text="\@PavelDurov"
                         android:textSize="@dimen/text_size_default"
+                        tools:text="\@PavelDurov"
                         />
                 </android.support.design.widget.TextInputLayout>
-
-                <ImageView
-                    android:id="@+id/action_scan_qr"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|top"
-                    app:srcCompat="@drawable/ic_qr"
-                    android:layout_marginTop="4dp"
-                    />
             </FrameLayout>
+
+            <ImageView
+                android:id="@+id/action_scan_qr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:layout_marginTop="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingTop="7dp"
+                app:layout_constraintEnd_toEndOf="@id/row_recipient"
+                app:layout_constraintTop_toTopOf="@id/row_recipient"
+                app:srcCompat="@drawable/ic_qr"
+                />
 
 
             <android.support.design.widget.TextInputLayout
@@ -179,12 +183,29 @@
                     android:id="@+id/input_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
+                    android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
+                    android:inputType="numberDecimal|textMultiLine"
+                    android:paddingEnd="86dp"
                     android:tag="amount"
-                    tools:text="1.245"
                     android:textSize="@dimen/text_size_default"
+                    tools:text="1.102030405060708090102030405060708090"
                     />
             </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:id="@+id/action_maximum"
+                style="@style/Wallet.Text.ButtonBorderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="6dp"
+                android:text="Use max"
+                android:textSize="@dimen/text_size_default"
+                app:layout_constraintBottom_toBottomOf="@id/layout_input_amount"
+                app:layout_constraintEnd_toEndOf="@id/layout_input_amount"
+                app:layout_constraintTop_toTopOf="@id/layout_input_amount"
+                app:layout_constraintVertical_bias="0.1"
+                />
 
             <TextView
                 android:id="@+id/fee_label"
@@ -219,12 +240,11 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:background="@color/greySeparator"
-                app:layout_constraintTop_toBottomOf="@id/fee_value"
                 android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/fee_value"
                 />
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/free_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -233,18 +253,19 @@
                 android:text="@string/tx_send_free_hint"
                 android:textSize="@dimen/text_size_default"
                 android:textStyle="bold"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sep1"
                 />
 
             <Switch
-                android:visibility="gone"
                 android:id="@+id/free_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 android:checked="true"
                 android:fontFamily="@font/_ubuntu_medium"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/free_label"
                 app:layout_constraintTop_toTopOf="@id/free_label"
@@ -259,6 +280,22 @@
                 app:layout_constraintTop_toBottomOf="@id/free_value"
                 />
 
+            <TextView
+                android:id="@+id/text_error"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:textColor="@color/errorColor"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sep2"
+                tools:text="Some uncaught error"
+                tools:visibility="visible"
+                />
+
             <Button
                 android:id="@+id/action"
                 android:layout_width="0dp"
@@ -269,7 +306,7 @@
                 android:text="@string/btn_send"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sep2"
+                app:layout_constraintTop_toBottomOf="@id/text_error"
                 />
 
             <Space

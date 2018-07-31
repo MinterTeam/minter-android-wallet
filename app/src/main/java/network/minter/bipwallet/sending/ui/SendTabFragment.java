@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
@@ -61,6 +62,7 @@ import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.sending.SendTabModule;
@@ -76,7 +78,6 @@ import permissions.dispatcher.RuntimePermissions;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @RuntimePermissions
@@ -91,6 +92,9 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     @BindView(R.id.free_value) Switch freeValue;
     @BindView(R.id.action) Button actionSend;
     @BindView(R.id.action_scan_qr) View actionScanQR;
+    @BindView(R.id.action_maximum) View actionMaximum;
+    @BindView(R.id.text_error) TextView errorView;
+    @BindView(R.id.fee_value) TextView feeValue;
     private Unbinder mUnbinder;
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;
@@ -147,6 +151,11 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     @Override
     public void setOnClickAccountSelectedListener(View.OnClickListener listener) {
         coinInput.setOnClickListener(listener);
+    }
+
+    @Override
+    public void setOnClickMaximum(View.OnClickListener listener) {
+        actionMaximum.setOnClickListener(listener);
     }
 
     @Override
@@ -213,6 +222,27 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     @Override
     public void setRecipientError(CharSequence error) {
         mInputGroup.setError("recipient", error);
+    }
+
+    @Override
+    public void setAmountError(CharSequence error) {
+        mInputGroup.setError("amount", error);
+    }
+
+    @Override
+    public void setError(CharSequence error) {
+        ViewHelper.visible(errorView, error != null && error.length() > 0);
+        errorView.setText(error);
+    }
+
+    @Override
+    public void setAmount(CharSequence amount) {
+        amountInput.setText(amount);
+    }
+
+    @Override
+    public void setFee(CharSequence fee) {
+        feeValue.setText(fee);
     }
 
     @Override

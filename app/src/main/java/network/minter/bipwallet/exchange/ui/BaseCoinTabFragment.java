@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -33,13 +33,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +64,6 @@ import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class BaseCoinTabFragment extends BaseInjectFragment implements ExchangeModule.BaseCoinTabView {
@@ -70,7 +74,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     @BindView(R.id.layout_amount) TextInputLayout layoutAmount;
     @BindView(R.id.input_outgoing_coin) TextInputEditText inputOutgoingCoin;
     @BindView(R.id.layout_outgoing_coin) TextInputLayout layoutOutgoingCoin;
-    @BindView(R.id.calculation) TextInputEditText calculationView;
+    @BindView(R.id.calculation) TextView calculationView;
     @BindView(R.id.action) Button action;
     @BindView(R.id.action_maximum) View actionMaximum;
     private Unbinder mUnbinder;
@@ -98,6 +102,8 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
             Timber.d("Filter: source=%s, start=%d, end=%d, dest=%s, destStart=%d, destEnd=%d", source, start, end, dest, dstart, dend);
             return source.toString().toUpperCase().replaceAll("[^A-Z]", "");
         });
+
+        mInputGroup.addFilter(inputAmount, new DecimalDigitsInputFilter(18));
 
         calculationView.setInputType(InputType.TYPE_NULL);
     }
@@ -194,4 +200,23 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
     @LayoutRes
     abstract protected int getLayout();
+
+    static class DecimalDigitsInputFilter implements InputFilter {
+
+        Pattern mPattern;
+
+        public DecimalDigitsInputFilter(int digitsAfterZero) {
+            mPattern = Pattern.compile("[0-9]+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?");
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+            Matcher matcher = mPattern.matcher(dest);
+            if (!matcher.matches())
+                return "";
+            return null;
+        }
+
+    }
 }

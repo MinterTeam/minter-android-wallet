@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -64,13 +64,13 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         final HistoryTransaction.TxCreateResult data = item.getTx().getData();
-        final String coinSymbol = firstNonNull(data.getSymbol(), "<unknown>");
-        avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(coinSymbol), MinterProfileApi.getCoinAvatarUrl("MNT"));
-        title.setText(coinSymbol);
+        final String symbol = firstNonNull(data.getSymbol(), "<unknown>");
+        avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(symbol), MinterProfileApi.getCoinAvatarUrl("MNT"));
+        title.setText(symbol);
         amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
         coinName.setText(firstNonNull(data.name, "<unknown>"));
-        this.coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));
+        coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));
         initialAmount.setText(firstNonNull(data.initialAmount, new BigDecimal(0)).divide(Transaction.VALUE_MUL_DEC).toPlainString());
         initialReserve.setText(firstNonNull(data.initialReserve, new BigDecimal(0)).divide(Transaction.VALUE_MUL_DEC).toPlainString());
         crr.setText(firstNonNull(data.constantReserveRatio, new BigDecimal(0)).toPlainString());

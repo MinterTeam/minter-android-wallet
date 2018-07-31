@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -169,6 +169,11 @@ public class AccountStorage implements CachedEntity<UserAccount> {
     @Override
     public void onAfterUpdate(UserAccount result) {
         mStorage.put(KEY_BALANCE, result);
+    }
+
+    @Override
+    public void onClear() {
+        mStorage.delete(KEY_BALANCE);
     }
 
     @Override
