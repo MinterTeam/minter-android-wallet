@@ -75,6 +75,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     @BindView(R.id.input_outgoing_coin) TextInputEditText inputOutgoingCoin;
     @BindView(R.id.layout_outgoing_coin) TextInputLayout layoutOutgoingCoin;
     @BindView(R.id.calculation) TextView calculationView;
+    @BindView(R.id.layout_calculation) View calculationLayout;
     @BindView(R.id.action) Button action;
     @BindView(R.id.action_maximum) View actionMaximum;
     private Unbinder mUnbinder;
@@ -190,6 +191,9 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
     @Override
     public void setCalculation(CharSequence calculation) {
+        if (calculationLayout.getVisibility() == View.GONE) {
+            calculationLayout.setVisibility(View.VISIBLE);
+        }
         calculationView.setText(calculation);
     }
 
