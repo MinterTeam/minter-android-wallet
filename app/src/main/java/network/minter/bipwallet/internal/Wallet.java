@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -27,9 +27,9 @@
 package network.minter.bipwallet.internal;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.Service;
 import android.os.Build;
+import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
@@ -63,7 +63,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class Wallet extends Application implements HasActivityInjector, HasServiceInjector {
+public class Wallet extends MultiDexApplication implements HasActivityInjector, HasServiceInjector {
 
     public static final Locale LC_EN = Locale.US;
     public static final Locale LC_RU = new Locale("ru", "RU");

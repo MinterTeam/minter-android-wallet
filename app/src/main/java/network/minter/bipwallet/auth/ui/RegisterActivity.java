@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -60,6 +60,8 @@ import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidato
 import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
+
+import static android.support.v4.content.res.ResourcesCompat.getFont;
 
 /**
  * MinterWallet. 2018
@@ -173,6 +175,9 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
         setupToolbar(toolbar);
+
+        passwordLayout.setTypeface(getFont(this, R.font._ubuntu_regular));
+        passwordRepeatLayout.setTypeface(getFont(this, R.font._ubuntu_regular));
 
         mInputGroup = new InputGroup();
         mInputGroup.addInput(usernameLayout);

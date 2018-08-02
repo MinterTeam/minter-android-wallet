@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -51,6 +51,8 @@ import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidato
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.views.migration.PasswordChangeMigrationPresenter;
 import network.minter.core.crypto.HashUtil;
+
+import static android.support.v4.content.res.ResourcesCompat.getFont;
 
 /**
  * MinterWallet. 2018
@@ -106,6 +108,11 @@ public class PasswordChangeMigrationActivity extends BaseMvpInjectActivity imple
         setContentView(R.layout.activity_password_change_migration);
         ButterKnife.bind(this);
         setupToolbar(toolbar);
+
+        layoutPasswordOld.setTypeface(getFont(this, R.font._ubuntu_regular));
+        layoutPasswordNew.setTypeface(getFont(this, R.font._ubuntu_regular));
+        layoutPasswordNewRepeat.setTypeface(getFont(this, R.font._ubuntu_regular));
+
         mInputGroup = new InputGroup();
         mInputGroup.addInput(layoutPasswordOld, layoutPasswordNew, layoutPasswordNewRepeat);
         mInputGroup.addValidator(layoutPasswordOld, new CustomValidator("Invalid password", (v) -> HashUtil.sha256Hex(v.toString()).equals(secretStorage.getEncryptionKey())));

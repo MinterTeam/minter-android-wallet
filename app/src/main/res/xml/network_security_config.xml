@@ -25,23 +25,8 @@
   ~ THE SOFTWARE.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/btn_disabled_transparent"/>
-        </shape>
-    </item>
-    <item android:state_focused="true">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/colorPrimaryFocused"/>
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/white"/>
-        </shape>
-    </item>
-</selector>
+<network-security-config
+    >
+    <base-config cleartextTrafficPermitted="true">
+    </base-config>
+</network-security-config>

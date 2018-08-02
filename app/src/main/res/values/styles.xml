@@ -1,7 +1,7 @@
 <!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -47,8 +47,21 @@
         <item name="android:buttonStyle">@style/Wallet.Button</item>
         <item name="borderlessButtonStyle">@style/Wallet.Button</item>
         <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
-        <!--<item name="actionButtonStyle">@style/Wallet.Button</item>-->
-        <!--<item name="android:actionButtonStyle">@style/Wallet.Button</item>-->
+        <item name="editTextStyle">@style/Wallet.EditText</item>
+        <item name="android:editTextStyle">@style/Wallet.EditText</item>
+    </style>
+
+    <style name="Wallet.Hint" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/_ubuntu_regular</item>
+        <item name="android:textSize">@dimen/text_size_12</item>
+    </style>
+
+    <style name="Wallet.InputLayout" parent="Wallet">
+        <item name="colorControlNormal">@color/grey</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="android:fontFamily">@font/_ubuntu_regular</item>
     </style>
 
     <style name="Wallet.External" parent="Theme.AppCompat.Light.NoActionBar">
@@ -114,6 +127,10 @@
     </style>
 
     <style name="Wallet.Text">
+    </style>
+
+    <style name="Wallet.EditText" parent="@android:style/Widget.EditText">
+        <item name="android:fontFamily">@font/_ubuntu_regular</item>
     </style>
 
     <style name="Wallet.Text.ButtonBorderless">
@@ -262,4 +279,5 @@
     </style>
 
 
+    <color name="grey">#FF9E9E9E</color>
 </resources>

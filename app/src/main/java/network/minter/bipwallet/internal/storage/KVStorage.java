@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2018
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -45,7 +46,15 @@ public final class KVStorage implements Storage {
 
     @Override
     public <T> T get(String key) {
-        return Hawk.get(key);
+        try {
+            return Hawk.get(key);
+        } catch (Throwable t) {
+            try {
+                Hawk.delete(key);
+            } catch (Throwable ignore) {
+            }
+            return null;
+        }
     }
 
     public <T> Queue<T> getQueue(String key) {
@@ -57,7 +66,15 @@ public final class KVStorage implements Storage {
     }
 
     public <T> T get(String key, T defaultValue) {
-        return Hawk.get(key, defaultValue);
+        try {
+            return Hawk.get(key, defaultValue);
+        } catch (Throwable t) {
+            try {
+                Hawk.delete(key);
+            } catch (Throwable ignore) {
+            }
+            return defaultValue;
+        }
     }
 
     @Override

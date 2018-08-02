@@ -36,10 +36,11 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 6
+        versionCode 8
         versionName "1.0.0-alpha01"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
 
     lintOptions {
@@ -64,15 +65,13 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.config
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
         }
 
         debug {
             signingConfig signingConfigs.config
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
             testProguardFile 'proguard-test-rules.pro'
         }
@@ -162,6 +161,8 @@ dependencies {
     }
 
     // common
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.2.51'
     implementation 'com.budiyev.android:code-scanner:1.9.0'
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'com.google.zxing:android-core:3.3.0'
