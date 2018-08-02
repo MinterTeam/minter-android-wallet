@@ -162,7 +162,7 @@ public class SigninActivity extends BaseMvpInjectActivity implements AuthModule.
         mInputGroup = new InputGroup();
         mInputGroup.addInput(usernameLayout);
         mInputGroup.addInput(passwordLayout);
-        mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9_]{5,16}$", getString(R.string.input_username_invalid)));
+        mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9]{5,16}$", getString(R.string.input_username_invalid)));
         mInputGroup.addValidator(passwordLayout, new RegexValidator(".{6,}", getString(R.string.input_password_invalid)));
     }
 }

@@ -186,7 +186,7 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
         mInputGroup.addInput(emailLayout);
         mInputGroup.addInput(phoneLayout);
 
-        mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9_]{5,16}",
+        mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9]{5,16}",
                 getString(R.string.input_username_invalid)));
         mInputGroup.addValidator(passwordLayout,
                 new LengthValidator(getString(R.string.input_password_invalid), 6));
