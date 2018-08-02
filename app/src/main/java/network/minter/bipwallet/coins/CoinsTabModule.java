@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.coins;
 
@@ -55,6 +55,10 @@ public interface CoinsTabModule {
         void hideAvatar();
         void startConvertCoins();
         void startTab(int tab);
+
+        void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
+        void showRefreshProgress();
+        void hideRefreshProgress();
     }
 
     interface TransactionListView extends MvpView, ProgressView {

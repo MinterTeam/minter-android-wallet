@@ -73,7 +73,6 @@ import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddr
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
@@ -104,15 +103,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         txRepo.update();
         accountStorage.update();
 
+        getViewState().setOnRefreshListener(this::onRefresh);
         getViewState().setAdapter(mAdapter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAdapter.clear();
-        mTransactionsAdapter.clear();
-        mCoinsAdapter.clear();
     }
 
     @Override
@@ -160,6 +152,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                     getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
+                    getViewState().hideRefreshProgress();
                 });
 
         safeSubscribeIoToUi(
@@ -174,11 +167,25 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                     } else {
                         mTransactionsRow.setStatus(ListWithButtonRow.Status.Normal);
                     }
+                    getViewState().hideRefreshProgress();
                 });
 
 
         mAdapter.addRow(mTransactionsRow);
         mAdapter.addRow(mCoinsRow);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.clear();
+        mTransactionsAdapter.clear();
+        mCoinsAdapter.clear();
+    }
+
+    private void onRefresh() {
+        txRepo.update(true);
+        accountStorage.update(true);
     }
 
     private void setUsername() {
