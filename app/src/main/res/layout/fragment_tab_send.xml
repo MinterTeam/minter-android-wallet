@@ -137,15 +137,18 @@
                     app:passwordToggleDrawable="@null"
                     >
 
-                    <android.support.design.widget.TextInputEditText
+                    <AutoCompleteTextView
                         android:id="@+id/input_recipient"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="text|textMultiLine"
+                        android:completionThreshold="1"
+                        android:dropDownHeight="wrap_content"
+                        android:inputType="text|textMultiLine|textNoSuggestions"
                         android:paddingEnd="32dp"
                         android:tag="recipient"
                         android:textSize="@dimen/text_size_default"
                         tools:text="\@PavelDurov"
+
                         />
                 </android.support.design.widget.TextInputLayout>
             </FrameLayout>

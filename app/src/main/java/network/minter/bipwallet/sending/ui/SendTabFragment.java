@@ -40,6 +40,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -68,6 +69,8 @@ import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
+import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
+import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
 import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
@@ -86,7 +89,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     @InjectPresenter SendTabPresenter presenter;
     @BindView(R.id.input_coin) TextInputEditText coinInput;
     @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
-    @BindView(R.id.input_recipient) TextInputEditText recipientInput;
+    @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
     @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
     @BindView(R.id.input_amount) TextInputEditText amountInput;
     @BindView(R.id.free_value) Switch freeValue;
@@ -243,6 +246,20 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     @Override
     public void setFee(CharSequence fee) {
         feeValue.setText(fee);
+    }
+
+    @Override
+    public void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener) {
+        if (items.size() > 0) {
+            final RecipientListAdapter.OnItemClickListener cl = (item, position) -> {
+                listener.onClick(item, position);
+                recipientInput.dismissDropDown();
+            };
+
+            final RecipientListAdapter adapter = new RecipientListAdapter(getActivity(), items);
+            adapter.setOnItemClickListener(cl);
+            recipientInput.setAdapter(adapter);
+        }
     }
 
     @Override

@@ -32,6 +32,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
@@ -125,6 +126,12 @@ public class RepoModule {
     @WalletApp
     public BlockChainCoinRepository provideBlockChainCoinRepo() {
         return MinterBlockChainApi.getInstance().coin();
+    }
+
+    @Provides
+    @WalletApp
+    public RecipientAutocompleteStorage provideRecipientStorage(KVStorage storage) {
+        return new RecipientAutocompleteStorage(storage);
     }
 
     @Provides

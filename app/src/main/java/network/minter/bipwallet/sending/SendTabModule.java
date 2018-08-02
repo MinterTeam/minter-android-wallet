@@ -38,6 +38,8 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
+import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
+import network.minter.bipwallet.sending.models.RecipientItem;
 
 /**
  * MinterWallet. 2018
@@ -68,6 +70,7 @@ public class SendTabModule {
         void setError(CharSequence error);
         void setAmount(CharSequence amount);
         void setFee(CharSequence fee);
+        void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);
     }
 
     public static class TxData {

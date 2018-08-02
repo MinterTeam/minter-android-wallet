@@ -68,6 +68,8 @@ import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.sending.dialogs.WalletTxSendWaitingDialog;
+import network.minter.bipwallet.sending.models.RecipientItem;
+import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.CountableData;
@@ -110,6 +112,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject BlockChainCoinRepository coinRepo;
     @Inject ProfileInfoRepository infoRepo;
     @Inject CacheManager cache;
+    @Inject RecipientAutocompleteStorage recipientStorage;
     private AccountItem mFromAccount = null;
     private BigDecimal mAmount = null;
     private CharSequence mToAddress = null;
@@ -165,6 +168,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     }
                 });
 
+
+        setRecipientAutocomplete();
         getViewState().setSubmitEnabled(false);
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
 
@@ -173,6 +178,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribe(this::onAmountChanged));
+    }
+
+    private void setRecipientAutocomplete() {
+        recipientStorage.getItems()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> getViewState().setRecipientsAutocomplete(res, (item, position) -> getViewState().setRecipient(item.getName())));
     }
 
     private void checkEnoughBalance(BigDecimal amount) {
@@ -427,6 +439,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             onErrorExecuteTransaction(result);
             return;
         }
+
+        recipientStorage.add(new RecipientItem(mToAddress, mToName), this::setRecipientAutocomplete);
 
         accountStorage.update(true);
         txRepo.update(true);
