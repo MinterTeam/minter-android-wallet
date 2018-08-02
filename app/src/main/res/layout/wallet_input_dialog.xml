@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -119,7 +119,7 @@
                     />
                     -->
 
-                <Button
+                <network.minter.bipwallet.internal.views.widgets.WalletButton
                     android:id="@+id/action"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

@@ -50,7 +50,7 @@
         app:srcCompat="@drawable/img_logo_main"
         />
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_create_wallet"
         style="@style/Wallet.Button.White"
         android:layout_width="0dp"
@@ -64,7 +64,7 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_advanced_mode"
         style="@style/Wallet.Button.Blue.WhiteBorder"
         android:layout_width="0dp"
@@ -79,7 +79,7 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_signin"
         style="@style/Wallet.Button.Blue.WhiteBorder"
         android:layout_width="0dp"
@@ -93,7 +93,7 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_help"
         style="@style/Wallet.Button.Blue.WhiteBorder"
         android:layout_width="0dp"

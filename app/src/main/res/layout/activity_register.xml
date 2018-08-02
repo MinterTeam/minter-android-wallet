@@ -75,6 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/margin_edges"
+            android:paddingTop="@dimen/margin_edges_half"
             android:paddingEnd="@dimen/margin_edges"
             android:paddingBottom="@dimen/margin_edges"
             >
@@ -83,8 +84,8 @@
                 android:id="@+id/layout_input_username"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:hint="Choose \@username"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:hint="@string/input_register_label_username"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -111,8 +112,8 @@
                 android:id="@+id/layout_input_password"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:hint="Choose password"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:hint="@string/input_register_label_password"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -139,8 +140,8 @@
                 android:id="@+id/layout_input_password_repeat"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:hint="Confirm password"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:hint="@string/input_register_label_password_repeat"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -165,8 +166,8 @@
                 android:id="@+id/layout_input_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:hint="Email (Optional *)"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:hint="@string/input_register_label_email"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -184,8 +185,8 @@
                     android:layout_marginEnd="-3dp"
                     android:inputType="text|textEmailAddress|textWebEmailAddress"
                     android:tag="email"
-                    tools:text="a@b"
                     android:textSize="@dimen/text_size_default"
+                    tools:text="a@b"
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -194,7 +195,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
-                android:hint="Mobile Number (Optional *)"
+                android:hint="@string/input_register_label_phone"
                 android:visibility="gone"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
@@ -216,12 +217,12 @@
                     />
             </android.support.design.widget.TextInputLayout>
 
-            <Button
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges_large"
-                android:text="Create wallet"
+                android:text="@string/btn_create_wallet"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -242,14 +243,14 @@
                 />
 
             <TextView
-                android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:fontFamily="@font/ubuntu"
-                android:text="* Email and Mobile Number are optional but can be very handy if you forget your password"
+                android:text="@string/input_register_hint_email"
                 android:textSize="@dimen/text_size_14"
                 android:textStyle="normal"
+                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/error_text"

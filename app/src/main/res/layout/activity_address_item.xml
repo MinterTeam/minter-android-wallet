@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -124,7 +124,7 @@
                         tools:text="Mx86d167ffe6c81dd83a20e3731ed66dddaac42488"
                         />
 
-                    <Button
+                    <network.minter.bipwallet.internal.views.widgets.WalletButton
                         android:id="@+id/action_copy"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
@@ -200,7 +200,7 @@
                 app:layout_constraintTop_toBottomOf="@id/address_info"
                 />
 
-            <Button
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action_backup_seed"
                 style="@style/Wallet.Button.White"
                 android:layout_width="0dp"
@@ -214,7 +214,7 @@
                 app:layout_constraintTop_toBottomOf="@id/secured_description"
                 />
 
-            <Button
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action_download_utc"
                 style="@style/Wallet.Button.White"
                 android:layout_width="0dp"
@@ -229,7 +229,7 @@
                 app:layout_constraintTop_toBottomOf="@id/action_backup_seed"
                 />
 
-            <Button
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action_save_pk"
                 style="@style/Wallet.Button.White"
                 android:layout_width="0dp"
@@ -244,7 +244,7 @@
                 app:layout_constraintTop_toBottomOf="@id/action_download_utc"
                 />
 
-            <Button
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action_remove"
                 style="@style/Wallet.Button.GreyBg.BlueBorder"
                 android:layout_width="0dp"

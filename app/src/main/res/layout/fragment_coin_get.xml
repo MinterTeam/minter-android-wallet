@@ -48,7 +48,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges_input"
-            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges_medium"
             android:layout_marginEnd="@dimen/margin_edges_input"
             android:hint="Coin you want"
             app:hintEnabled="true"
@@ -78,7 +78,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges_input"
-            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges_medium"
             android:layout_marginEnd="@dimen/margin_edges_input"
             android:hint="Amount"
             app:hintEnabled="true"
@@ -147,7 +147,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges_input"
-            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges_medium"
             android:layout_marginEnd="@dimen/margin_edges_input"
             android:hint="Coin you have"
             app:hintEnabled="true"
@@ -248,7 +248,7 @@
             android:layout_marginTop="@dimen/margin_edges"
             />
 
-        <Button
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
             android:id="@+id/action"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

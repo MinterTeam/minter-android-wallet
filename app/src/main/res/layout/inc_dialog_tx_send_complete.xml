@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -23,7 +23,7 @@
   ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  -->
 
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -80,7 +80,7 @@
         />
 
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_view_tx"
         style="@style/Wallet.Button.White.BlueBorder"
         android:layout_width="0dp"
@@ -92,7 +92,7 @@
         app:layout_constraintTop_toBottomOf="@id/tx_recipient_name"
         />
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_close"
         style="@style/Wallet.Button.White.BlueBorder"
         android:layout_width="0dp"

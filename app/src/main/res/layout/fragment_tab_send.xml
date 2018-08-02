@@ -72,6 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="false"
+            android:paddingTop="@dimen/margin_edges_half"
             >
 
             <android.support.design.widget.TextInputLayout
@@ -79,7 +80,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 android:hint="@string/tx_send_coin_hint"
                 app:hintEnabled="true"
@@ -121,7 +122,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -172,7 +173,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 android:hint="@string/tx_send_amount_hint"
                 app:hintEnabled="true"
@@ -215,7 +216,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_medium"
                 android:text="@string/tx_send_fee_hint"
                 android:textSize="@dimen/text_size_default"
                 android:textStyle="bold"
@@ -299,7 +300,7 @@
                 tools:visibility="visible"
                 />
 
-            <Button
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
