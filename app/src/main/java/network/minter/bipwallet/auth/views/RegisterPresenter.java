@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -115,6 +115,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
             return;
         }
 
+        getViewState().setEnableSubmit(false);
         getViewState().hideKeyboard();
         getViewState().clearErrors();
         getViewState().showProgress();
@@ -127,6 +128,8 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
         } catch (Throwable t) {
             getViewState().onError(t);
             secretStorage.destroy();
+            getViewState().setEnableSubmit(true);
+            getViewState().hideProgress();
             return;
         }
 
@@ -137,6 +140,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
                 .subscribe(userResult -> {
                     if(!userResult.isSuccess()) {
                         secretStorage.destroy();
+                        getViewState().setEnableSubmit(true);
                         getViewState().hideProgress();
                         getViewState().setResultError(userResult.error.message);
                         getViewState().setInputErrors(userResult.getError().getData());
@@ -162,6 +166,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
                             .subscribe(loginResult -> {
                                 getViewState().hideProgress();
                                 if(!loginResult.isSuccess()) {
+                                    getViewState().setEnableSubmit(true);
                                     getViewState().setResultError(loginResult.error.message);
                                     getViewState().setInputErrors(loginResult.getError().getData());
                                     return;

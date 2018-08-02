@@ -82,10 +82,12 @@ public class SigninActivity extends BaseMvpInjectActivity implements AuthModule.
     @Override
     public void setOnSubmit(View.OnClickListener listener) {
         action.setOnClickListener(listener);
-
         usernameLayout.setNextFocusDownId(R.id.layout_input_password);
         passwordLayout.getEditText().setOnEditorActionListener((textView, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEND || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                listener.onClick(textView);
+                return true;
+            } else if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 listener.onClick(textView);
                 return true;
             }

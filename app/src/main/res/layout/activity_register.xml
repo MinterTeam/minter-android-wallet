@@ -127,6 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text|textPassword"
+                    android:imeOptions="actionNext"
                     android:tag="password"
                     android:textSize="@dimen/text_size_default"
                     tools:text="Ppaaa"
@@ -155,6 +156,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text|textPassword"
+                    android:imeOptions="actionNext"
                     android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>
@@ -169,6 +171,7 @@
                 android:hint="@string/input_register_label_email"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
+                android:imeOptions="actionSend"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layout_input_password_repeat"

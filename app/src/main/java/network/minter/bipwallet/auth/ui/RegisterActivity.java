@@ -89,8 +89,16 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
     @Override
     public void setOnSubmit(View.OnClickListener listener) {
         action.setOnClickListener(listener);
-        mInputGroup.setOnEditorActionListener((textView, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEND || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+
+        usernameLayout.getEditText().setNextFocusDownId(R.id.layout_input_password);
+        passwordLayout.getEditText().setNextFocusDownId(R.id.layout_input_password_repeat);
+        passwordRepeatLayout.getEditText().setNextFocusDownId(R.id.layout_input_email);
+
+        emailLayout.getEditText().setOnEditorActionListener((textView, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                listener.onClick(textView);
+                return true;
+            } else if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 listener.onClick(textView);
                 return true;
             }
