@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
-  ~ @link https://github.com/MinterTeam
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -32,6 +33,7 @@
     android:layout_height="wrap_content"
     android:minHeight="64dp"
     >
+
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
         android:id="@+id/item_avatar"
         android:layout_width="34dp"
@@ -66,21 +68,21 @@
 
     <TextView
         android:id="@+id/item_amount"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_min"
         android:fontFamily="@font/_ubuntu_medium"
+        android:textAlignment="viewEnd"
         android:textColor="@color/textColorGreen"
         android:textSize="@dimen/text_size_default"
         app:layout_constraintBottom_toTopOf="@id/item_subamount"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textAlignment="viewEnd"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@id/item_title"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias=".5"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="+50.102030405060708090"
+        tools:text="+500000.1020"
         />
 
     <TextView

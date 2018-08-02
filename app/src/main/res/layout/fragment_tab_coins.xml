@@ -58,6 +58,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
+                    android:id="@+id/bip_logo"
                     android:layout_width="35dp"
                     android:layout_height="24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -68,15 +69,19 @@
 
                 <TextView
                     android:id="@+id/username"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/margin_edges"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:textAlignment="viewEnd"
                     android:textColor="@color/textColorWhite"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/user_avatar"
+                    app:layout_constraintStart_toEndOf="@id/bip_logo"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="\@username"
+                    tools:text="\@superwalletverylonglonglonglongl"
                     />
 
                 <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
