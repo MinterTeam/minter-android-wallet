@@ -23,6 +23,7 @@
 -keep class butterknife.*
 -keepclasseswithmembernames class * { @butterknife.* <methods>; }
 -keepclasseswithmembernames class * { @butterknife.* <fields>; }
+-keep class * net.danlew.android.joda.** { *; }
 
 # Parceler library
 -keep interface org.parceler.Parcel
