@@ -19,7 +19,7 @@
 -keep class * extends android.support.v7.widget.RecyclerView$ViewHolder { *; }
 
 # Prevent obfuscation of types which use ButterKnife annotations since the simple name
-# is used to reflectively look up the generated ViewBinding.
+# is used to reflectively fixlook up the generated ViewBinding.
 -keep class butterknife.*
 -keepclasseswithmembernames class * { @butterknife.* <methods>; }
 -keepclasseswithmembernames class * { @butterknife.* <fields>; }
