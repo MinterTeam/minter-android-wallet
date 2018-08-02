@@ -57,8 +57,8 @@ import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.CompareValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 
 import static android.support.v4.content.res.ResourcesCompat.getFont;
@@ -186,16 +186,17 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
         mInputGroup.addInput(emailLayout);
         mInputGroup.addInput(phoneLayout);
 
-        mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9]{5,16}",
-                getString(R.string.input_username_invalid)));
-        mInputGroup.addValidator(passwordLayout,
-                new LengthValidator(getString(R.string.input_password_invalid), 6));
+        mInputGroup.addValidator(usernameLayout, new MinterUsernameValidator(getString(R.string.input_username_invalid)));
+        mInputGroup.addValidator(passwordLayout, new LengthValidator(getString(R.string.input_password_invalid), 6));
         mInputGroup.addValidator(passwordRepeatLayout,
                                  new CompareValidator(getString(R.string.input_signin_password_not_match),
                                                       passwordLayout));
         mInputGroup.addValidateRelation(passwordLayout, passwordRepeatLayout);
         mInputGroup.addValidator(emailLayout, new EmailValidator("Invalid email", false));
         mInputGroup.addValidator(phoneLayout, new PhoneValidator("Invalid phone number", false));
+
+
+        mInputGroup.addFilter(usernameLayout, (source, start, end, dest, dstart, dend) -> source.toString().toLowerCase());
 
     }
 }

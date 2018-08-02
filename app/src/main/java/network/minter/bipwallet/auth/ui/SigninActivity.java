@@ -52,6 +52,7 @@ import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 
@@ -162,7 +163,7 @@ public class SigninActivity extends BaseMvpInjectActivity implements AuthModule.
         mInputGroup = new InputGroup();
         mInputGroup.addInput(usernameLayout);
         mInputGroup.addInput(passwordLayout);
-        mInputGroup.addValidator(usernameLayout, new RegexValidator("^@[a-zA-Z0-9]{5,16}$", getString(R.string.input_username_invalid)));
+        mInputGroup.addValidator(usernameLayout, new MinterUsernameValidator(getString(R.string.input_username_invalid)));
         mInputGroup.addValidator(passwordLayout, new RegexValidator(".{6,}", getString(R.string.input_password_invalid)));
     }
 }

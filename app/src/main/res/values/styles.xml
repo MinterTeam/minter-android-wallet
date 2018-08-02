@@ -47,8 +47,6 @@
         <item name="android:buttonStyle">@style/Wallet.Button</item>
         <item name="borderlessButtonStyle">@style/Wallet.Button</item>
         <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
-        <item name="editTextStyle">@style/Wallet.EditText</item>
-        <item name="android:editTextStyle">@style/Wallet.EditText</item>
     </style>
 
     <style name="Wallet.Hint" parent="TextAppearance.AppCompat">
@@ -127,10 +125,6 @@
     </style>
 
     <style name="Wallet.Text">
-    </style>
-
-    <style name="Wallet.EditText" parent="@android:style/Widget.EditText">
-        <item name="android:fontFamily">@font/_ubuntu_regular</item>
     </style>
 
     <style name="Wallet.Text.ButtonBorderless">

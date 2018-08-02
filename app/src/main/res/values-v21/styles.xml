@@ -56,8 +56,5 @@
 
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
-
-        <item name="editTextStyle">@style/Wallet.EditText</item>
-        <item name="android:editTextStyle">@style/Wallet.EditText</item>
     </style>
 </resources>

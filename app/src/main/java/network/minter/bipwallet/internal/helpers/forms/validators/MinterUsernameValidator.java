@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class MinterUsernameValidator extends RegexValidator {
-    private final static Pattern PATTERN = Pattern.compile("^@[a-zA-Z0-9_]{5,32}$");
+    private final static Pattern PATTERN = Pattern.compile("^@[a-zA-Z0-9]{5,16}$");
 
     public MinterUsernameValidator() {
         super(PATTERN.pattern());
