@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -48,6 +48,8 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import timber.log.Timber;
+
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * MinterWallet. 2018
@@ -145,7 +147,7 @@ public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressLis
             });
         } else {
             Timber.d("Showing amount");
-            holder.balanceValue.setText(item.balance.getAmount().toPlainString());
+            holder.balanceValue.setText(bdHuman(item.balance.getAmount(), 4));
             holder.balanceValue.setVisibility(View.VISIBLE);
             holder.balanceProgress.setVisibility(View.GONE);
         }

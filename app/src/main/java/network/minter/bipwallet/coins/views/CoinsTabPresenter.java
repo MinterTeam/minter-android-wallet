@@ -33,6 +33,7 @@ import android.widget.TextView;
 import com.annimon.stream.Stream;
 import com.arellomobile.mvp.InjectViewState;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +120,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
                 .setBinder((itemViewHolder, item, position) -> {
                     itemViewHolder.title.setText(item.coin.toUpperCase());
-                    itemViewHolder.amount.setText(bdHuman(item.balance));
+                    itemViewHolder.amount.setText(bdHuman(item.balance, 4));
                     itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
                     itemViewHolder.subname.setVisibility(View.GONE);
 
@@ -148,7 +149,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .subscribe(res -> {
                     Timber.d("Update coins list");
                     mCoinsAdapter.dispatchChanges(AccountItem.DiffUtilImpl.class, res.getAccounts());
-                    final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(res.getTotalBalanceBase());
+
+                    final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(res.getTotalBalanceBase().setScale(4, RoundingMode.DOWN));
                     getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
