@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="62dp"
         android:paddingEnd="62dp"
-        android:transitionName="img_logo"
+        android:transitionName="@string/transaction_auth_logo"
         app:layout_constraintBottom_toTopOf="@id/action_create_wallet"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

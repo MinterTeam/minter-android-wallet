@@ -31,7 +31,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorControlHighlight">@color/colorHighlight</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorPrimary</item>
 
         <item name="android:textColorHint">#60000000</item>
         <item name="android:textColor">@color/textColorPrimary</item>
@@ -41,12 +41,18 @@
         <item name="android:fontFamily">@font/_ubuntu_regular</item>
 
         <item name="android:textStyle">normal</item>
-        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:colorBackground">@color/white</item>
 
         <item name="buttonStyle">@style/Wallet.Button</item>
         <item name="android:buttonStyle">@style/Wallet.Button</item>
         <item name="borderlessButtonStyle">@style/Wallet.Button</item>
         <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
+    </style>
+
+    <style name="Wallet.Hint" parent="TextAppearance.Design.Hint">
+        <item name="android:fontFamily">@font/_ubuntu_regular</item>
+        <item name="android:textSize">@dimen/text_size_12</item>
+        <item name="android:textColorHint">@color/text_color_hint</item>
     </style>
 
     <style name="Wallet.InputLayout" parent="Wallet">

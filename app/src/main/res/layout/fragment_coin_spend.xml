@@ -42,6 +42,7 @@
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:paddingTop="@dimen/margin_edges_half"
+        android:background="@color/white"
         >
 
 

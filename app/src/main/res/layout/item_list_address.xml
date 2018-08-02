@@ -130,16 +130,18 @@
 
             />
 
-        <ProgressBar
+        <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
             android:id="@+id/balance_progress"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:visibility="gone"
+            app:color="@color/colorPrimaryDark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintStart_toEndOf="@id/balance_label"
             app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible"
             />
     </android.support.constraint.ConstraintLayout>
 

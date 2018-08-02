@@ -25,33 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:minHeight="64dp"
-    >
-
-    <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        app:color="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toTopOf="@id/sep"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <View
-        android:id="@+id/sep"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@drawable/shape_bottom_separator"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-
-</android.support.constraint.ConstraintLayout>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/colorPrimary" android:state_focused="true"/>
+    <item android:color="@color/colorInactive2"/>
+</selector>

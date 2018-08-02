@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2018
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -29,6 +30,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +87,7 @@ public class SplashFragment extends BaseInjectFragment {
                     }
 
                     if(!session.isLoggedIn(true)) {
+                        ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
                         mAuthSwitchActivity.showAuth(logo);
                         return;
                     }

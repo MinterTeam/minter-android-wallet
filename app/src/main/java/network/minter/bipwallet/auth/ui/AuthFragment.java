@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.auth.ui;
 
@@ -30,10 +30,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
@@ -61,6 +63,7 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     @BindView(R.id.action_advanced_mode) Button actionAdvancedMode;
     @BindView(R.id.action_signin) Button actionSignin;
     @BindView(R.id.action_help) Button actionHelp;
+    @BindView(R.id.logo) ImageView logo;
 
     @Override
     public void setOnCreateWallet(View.OnClickListener listener) {
@@ -111,7 +114,10 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        postponeEnterTransition();
         View view = inflater.inflate(R.layout.fragment_auth, container, false);
+        ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
+        startPostponedEnterTransition();
         ButterKnife.bind(this, view);
 
         return view;

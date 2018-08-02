@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
-  ~ @link https://github.com/MinterTeam
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -36,7 +37,7 @@
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="@dimen/btn_border_radius"
     app:cardElevation="4dp"
-    app:cardPreventCornerOverlap="true"
+    app:cardPreventCornerOverlap="false"
     >
 
     <android.support.constraint.ConstraintLayout

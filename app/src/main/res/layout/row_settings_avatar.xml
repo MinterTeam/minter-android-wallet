@@ -53,11 +53,12 @@
         android:elevation="4dp"
         />
 
-    <ProgressBar
+    <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
         android:id="@+id/progress"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:visibility="gone"
+        app:color="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="@id/user_avatar"
         app:layout_constraintEnd_toEndOf="@id/user_avatar"
         app:layout_constraintStart_toStartOf="@id/user_avatar"

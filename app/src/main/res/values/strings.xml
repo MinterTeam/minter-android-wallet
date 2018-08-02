@@ -85,15 +85,15 @@
     <string name="btn_view_tx">View transaction</string>
     <string name="btn_close">Close</string>
     <string name="btn_explorer">Explorer</string>
-    <string name="title_tab_receiving">Receive coins</string>
+    <string name="title_tab_receiving">Receive Coins</string>
     <string name="btn_share_address">Share address</string>
     <string name="tab_receive_label_address">Your address</string>
-    <string name="title_convert_coins">Convert coins</string>
+    <string name="title_convert_coins">Convert Coins</string>
     <string name="title_address_list">My Addresses</string>
-    <string name="title_address_item">Manage address</string>
+    <string name="title_address_item">Manage Address</string>
     <string name="title_advanced_generate">Generate Address</string>
     <string name="title_advanced_main">Advanced Mode</string>
-    <string name="title_register">Create wallet</string>
+    <string name="title_register">Create Цallet</string>
     <string name="title_signin">Sign In</string>
     <string name="title_transaction_list">All Transactions</string>
     <string name="title_tab_settings">Settings</string>
@@ -116,4 +116,5 @@
     <string name="input_register_label_phone">Mobile Number (Optional *)</string>
     <string name="btn_create_wallet">Create wallet</string>
     <string name="input_register_hint_email">* Email is optional but can be very handy if you forget your password</string>
+    <string name="transaction_auth_logo">img_logo</string>
 </resources>
