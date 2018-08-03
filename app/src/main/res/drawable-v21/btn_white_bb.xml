@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
-  ~ @link https://github.com/MinterTeam
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -27,6 +28,15 @@
 <ripple
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="#80502EC2">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+            <corners android:radius="@dimen/btn_border_radius"/>
+            <stroke
+                android:width="2dp"
+                android:color="@color/colorPrimary"/>
+        </shape>
+    </item>
     <item>
         <selector xmlns:android="http://schemas.android.com/apk/res/android">
             <item android:state_enabled="false">
@@ -53,7 +63,7 @@
                         android:width="2dp"
                         android:color="@color/colorPrimary"/>
                     <corners android:radius="@dimen/btn_border_radius"/>
-                    <solid android:color="@color/white"/>
+                    <solid android:color="@color/transparent"/>
                 </shape>
             </item>
         </selector>

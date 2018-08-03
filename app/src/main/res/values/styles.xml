@@ -116,6 +116,7 @@
         <item name="android:clickable">true</item>
         <item name="android:elevation">4dp</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:stateListAnimator">@animator/btn_state_list_anim</item>
     </style>
 
     <style name="Wallet.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
@@ -143,7 +144,7 @@
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
-    <style name="Wallet.Button.Blue.WhiteBorder" parent="Widget.AppCompat.Button.Colored">
+    <style name="Wallet.Button.Transparent.WhiteBorder" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/text_size_14</item>
         <item name="android:padding">14dp</item>
@@ -152,12 +153,13 @@
         <item name="android:minWidth">@dimen/btn_min_width</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
-        <item name="android:elevation">4dp</item>
+        <item name="android:elevation">0dp</item>
         <item name="android:background">@drawable/btn_blue_wb</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
-    <style name="Wallet.Button.GreyBg.BlueBorder" parent="Widget.AppCompat.Button.Colored">
+    <style name="Wallet.Button.Transparent.BlueBorder" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/text_size_14</item>
         <item name="android:padding">14dp</item>
@@ -166,21 +168,7 @@
         <item name="android:minWidth">@dimen/btn_min_width</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
-        <item name="android:elevation">4dp</item>
-        <item name="android:background">@drawable/btn_grey_bg_bb</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
-    </style>
-
-    <style name="Wallet.Button.White.BlueBorder" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
-        <item name="android:padding">14dp</item>
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:minHeight">@dimen/btn_long_height</item>
-        <item name="android:minWidth">@dimen/btn_min_width</item>
-        <item name="android:focusable">true</item>
-        <item name="android:clickable">true</item>
-        <item name="android:elevation">4dp</item>
+        <item name="android:elevation">0dp</item>
         <item name="android:background">@drawable/btn_white_bb</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
     </style>

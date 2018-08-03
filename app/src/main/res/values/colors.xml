@@ -50,6 +50,7 @@
     <color name="greyBackground">#F0F0F0</color>
     <color name="bg_alert_dialog">#B2FFFFFF</color>
     <color name="btn_disabled">#929292</color>
+    <color name="btn_disabled2">#FFD4D4D4</color>
     <color name="btn_disabled_transparent">#80929292</color>
     <color name="colorInactive">#929292</color>
     <color name="colorInactive2">#60000000</color>

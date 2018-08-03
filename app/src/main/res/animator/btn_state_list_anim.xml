@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_enabled="true"
+        android:state_pressed="true">
+        <set>
+            <objectAnimator
+                android:duration="@integer/button_pressed_animation_duration"
+                android:propertyName="translationZ"
+                android:valueTo="@dimen/button_pressed_z_material"
+                android:valueType="floatType"/>
+            <objectAnimator
+                android:duration="0"
+                android:propertyName="elevation"
+                android:valueTo="@dimen/button_elevation_material"
+                android:valueType="floatType"/>
+        </set>
+    </item>
+    <!-- base state -->
+    <item android:state_enabled="true">
+        <set>
+            <objectAnimator
+                android:duration="@integer/button_pressed_animation_duration"
+                android:propertyName="translationZ"
+                android:startDelay="@integer/button_pressed_animation_delay"
+                android:valueTo="0"
+                android:valueType="floatType"/>
+            <objectAnimator
+                android:duration="0"
+                android:propertyName="elevation"
+                android:valueTo="@dimen/button_elevation_material"
+                android:valueType="floatType"/>
+        </set>
+    </item>
+    <item>
+        <set>
+            <objectAnimator
+                android:duration="0"
+                android:propertyName="translationZ"
+                android:valueTo="0"
+                android:valueType="floatType"/>
+            <objectAnimator
+                android:duration="0"
+                android:propertyName="elevation"
+                android:valueTo="0"
+                android:valueType="floatType"/>
+        </set>
+    </item>
+</selector>

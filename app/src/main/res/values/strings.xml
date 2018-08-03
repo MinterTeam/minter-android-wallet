@@ -41,8 +41,9 @@
     <string name="menu_item_send">Send</string>
     <string name="menu_item_receive">Receive</string>
     <string name="menu_item_settings">Settings</string>
-    <string name="tab_coins_title">My balance</string>
-    <string name="frag_coins_last_transactions_title">Latest transactions</string>
+    <string name="tab_coins_title">My Balance</string>
+    <string name="frag_coins_last_transactions_title">Latest Transactions</string>
+    <string name="frag_coins_my_coins_title">My Coins</string>
     <string name="input_signin_password">Your Password</string>
     <string name="input_signin_username">Your @username</string>
     <string name="input_username_invalid">Invalid username. Length: from 5 to 16 symbols. Only letters and digits can be used.</string>
@@ -93,7 +94,7 @@
     <string name="title_address_item">Manage Address</string>
     <string name="title_advanced_generate">Generate Address</string>
     <string name="title_advanced_main">Advanced Mode</string>
-    <string name="title_register">Create Цallet</string>
+    <string name="title_register">Create Wallet</string>
     <string name="title_signin">Sign In</string>
     <string name="title_transaction_list">All Transactions</string>
     <string name="title_tab_settings">Settings</string>

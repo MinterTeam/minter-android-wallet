@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
-  ~ @link https://github.com/MinterTeam
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -28,7 +29,7 @@
     <item android:state_enabled="false">
         <shape android:shape="rectangle">
             <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/btn_disabled_transparent"/>
+            <solid android:color="@color/btn_disabled2"/>
         </shape>
     </item>
     <item android:state_pressed="true">

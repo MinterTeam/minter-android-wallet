@@ -243,14 +243,14 @@
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action_remove"
-                style="@style/Wallet.Button.GreyBg.BlueBorder"
+                style="@style/Wallet.Button.Transparent.BlueBorder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_inset"
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="@dimen/margin_inset"
                 android:text="Remove address"
-                android:theme="@style/Wallet.Button.White.BlueBorder"
+                android:theme="@style/Wallet.Button.Transparent.BlueBorder"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/action_save_pk"

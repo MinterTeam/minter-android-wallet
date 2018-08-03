@@ -82,7 +82,7 @@
 
     <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_view_tx"
-        style="@style/Wallet.Button.White.BlueBorder"
+        style="@style/Wallet.Button.Transparent.BlueBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_medium"
@@ -94,7 +94,7 @@
 
     <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/action_close"
-        style="@style/Wallet.Button.White.BlueBorder"
+        style="@style/Wallet.Button.Transparent.BlueBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges"

@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.internal.views.widgets;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -39,6 +40,7 @@ import network.minter.bipwallet.internal.helpers.ViewHelper;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@SuppressLint("AppCompatCustomView")
 public class WalletButton extends Button {
     public WalletButton(Context context) {
         super(context);

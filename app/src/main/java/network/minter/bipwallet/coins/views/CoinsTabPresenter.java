@@ -51,6 +51,7 @@ import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepositor
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.utils.HistoryTransactionDiffUtil;
 import network.minter.bipwallet.coins.views.rows.ListWithButtonRow;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
@@ -132,13 +133,13 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         getViewState().setOnAvatarClick(v -> getViewState().startTab(R.id.bottom_settings));
         getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
 
-        mTransactionsRow = new ListWithButtonRow.Builder("Latest transactions")
+        mTransactionsRow = new ListWithButtonRow.Builder(Wallet.app().res().getString(R.string.frag_coins_last_transactions_title))
                 .setAction("All transactions", this::onClickStartTransactionList)
                 .setAdapter(mTransactionsAdapter)
                 .setEmptyTitle("You have no transactions")
                 .build();
 
-        mCoinsRow = new ListWithButtonRow.Builder("My Coins")
+        mCoinsRow = new ListWithButtonRow.Builder(Wallet.app().res().getString(R.string.frag_coins_my_coins_title))
                 .setAction("Convert", this::onClickConvertCoins)
                 .setAdapter(mCoinsAdapter)
                 .setEmptyTitle("You have no one address. Nothing to show.")

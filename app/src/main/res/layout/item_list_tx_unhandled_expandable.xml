@@ -230,7 +230,7 @@
 
         <network.minter.bipwallet.internal.views.widgets.WalletButton
             android:id="@+id/action"
-            style="@style/Wallet.Button.GreyBg.BlueBorder"
+            style="@style/Wallet.Button.Transparent.BlueBorder"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_edges"
