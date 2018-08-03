@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.tx.adapters.vh;
 
@@ -34,6 +34,8 @@ import android.widget.TextView;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -83,7 +85,7 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
         }
 
         final DateTime dt = new DateTime(item.getTx().timestamp);
-        dateValue.setText(dt.toString(DateTimeFormat.forPattern("EEEE, dd MMMM")));
+        dateValue.setText(dt.toString(DateTimeFormat.forPattern("EEEE, dd MMMM").withLocale(Locale.US)));
         timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ssZ")));
     }
 

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.Observable;
@@ -231,7 +232,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             return Wallet.app().res().getString(R.string.today);
         }
 
-        return mLastDate.toString(DateTimeFormat.forPattern("EEEE, dd MMMM"));
+        return mLastDate.toString(DateTimeFormat.forPattern("EEEE, dd MMMM").withLocale(Locale.US));
     }
 
     private DateTime dt(Date d) {

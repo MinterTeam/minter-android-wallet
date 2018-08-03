@@ -60,13 +60,11 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class Wallet extends MultiDexApplication implements HasActivityInjector, HasServiceInjector {
 
     public static final Locale LC_EN = Locale.US;
-    public static final Locale LC_RU = new Locale("ru", "RU");
     @SuppressWarnings("ConstantConditions")
     public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("netTest") || BuildConfig.FLAVOR.equalsIgnoreCase("netMain");
     private static WalletComponent app;
@@ -75,6 +73,7 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         }
+        Locale.setDefault(LC_EN);
     }
 
     @Inject
@@ -87,12 +86,18 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
      * <p>
      * Wallet.app().display().getWidth()
      * Wallet.app().res(); et cetera
-     *
      * @return WalletComponent
      * @see WalletComponent
      */
     public static WalletComponent app() {
         return app;
+    }
+
+    private static boolean isChinese() {
+        return Locale.getDefault() == Locale.CHINA ||
+                Locale.getDefault() == Locale.CHINESE ||
+                Locale.getDefault() == Locale.SIMPLIFIED_CHINESE ||
+                Locale.getDefault() == Locale.TRADITIONAL_CHINESE;
     }
 
     @Override
@@ -202,7 +207,6 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
 
         /**
          * Выведет человеческую ошибку и запишет ее в лог
-         *
          * @param message Если передать NULL то ошибка не выведется
          */
         public static Consumer<Throwable> errorHandler(final Object viewContext, final String message) {
