@@ -78,11 +78,7 @@
                 android:id="@+id/label_address"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
-                android:minHeight="52dp"
-                android:paddingStart="@dimen/margin_inset"
-                android:paddingEnd="@dimen/margin_inset"
-                android:paddingBottom="12dp"
+                style="@style/Wallet.ItemHeader"
                 android:text="@string/tab_receive_label_address"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -97,6 +93,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/label_address"
+                android:minHeight="90dp"
                 >
 
                 <TextView
@@ -108,9 +105,9 @@
                     android:fontFamily="@font/ubuntu_mono"
                     android:foreground="?attr/selectableItemBackground"
                     android:paddingStart="@dimen/margin_inset"
-                    android:paddingTop="@dimen/margin_edges"
+                    android:paddingTop="28dp"
                     android:paddingEnd="@dimen/margin_inset"
-                    android:paddingBottom="@dimen/margin_edges"
+                    android:paddingBottom="28dp"
                     android:textSize="@dimen/text_size_default"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"

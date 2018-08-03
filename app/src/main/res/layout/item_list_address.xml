@@ -37,12 +37,9 @@
 
     <TextView
         android:id="@+id/address_title"
+        style="@style/Wallet.ItemHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/margin_inset"
-        android:paddingTop="@dimen/margin_inset"
-        android:paddingEnd="@dimen/margin_inset"
-        android:paddingBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -94,13 +91,17 @@
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/balance_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:background="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:paddingStart="@dimen/margin_inset"
         android:paddingTop="@dimen/margin_edges"
-        android:paddingEnd="@dimen/margin_inset"
+        android:paddingEnd="@dimen/margin_edges"
         android:paddingBottom="@dimen/margin_edges"
         >
 
@@ -123,11 +124,10 @@
             android:fontFamily="@font/_ubuntu_medium"
             android:textSize="@dimen/text_size_default"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/balance_action_image"
             app:layout_constraintStart_toEndOf="@id/balance_label"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="12.00112233445566778899"
-
             />
 
         <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
@@ -137,12 +137,23 @@
             android:visibility="gone"
             app:color="@color/colorPrimaryDark"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/balance_action_image"
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintStart_toEndOf="@id/balance_label"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible"
             />
+
+        <ImageView
+            android:id="@+id/balance_action_image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_chevron_right_grey"
+            />
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout

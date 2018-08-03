@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -29,6 +29,7 @@ package network.minter.bipwallet.addresses.views;
 import android.arch.paging.PagedList;
 import android.arch.paging.RxPagedListBuilder;
 import android.content.Intent;
+import android.view.View;
 
 import com.arellomobile.mvp.InjectViewState;
 
@@ -69,6 +70,11 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
         mAdapter = new AddressListAdapter();
         mAdapter.setOnAddressClickListener((v, name, address) -> getViewState().startAddressItem(REQUEST_ADDRESS_ITEM, name, address));
         mAdapter.setOnSetMainListener(this::onSetMain);
+        mAdapter.setOnBalanceClickListener(this::onClickBalance);
+    }
+
+    private void onClickBalance(View view, AddressItem addressItem) {
+        getViewState().startTransactionsList();
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -63,6 +63,7 @@ public class AddressManageModule {
         void startAddressItem(int requestCode, String name, AddressItem address);
         void startCreateAddress(int requestCode);
         void scrollToPosition(int position);
+        void startTransactionsList();
     }
 
 }

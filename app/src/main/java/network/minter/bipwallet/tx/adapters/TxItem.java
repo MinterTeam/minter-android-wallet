@@ -45,10 +45,12 @@ import network.minter.bipwallet.tx.adapters.vh.TxSetCandidateOnlineOfflineViewHo
 import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.profile.MinterProfileApi;
+
+import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TxItem implements TransactionItem {
@@ -58,45 +60,8 @@ public class TxItem implements TransactionItem {
 
     public TxItem(HistoryTransaction tx) {
         mTx = tx;
-        mAvatar = tx.getAvatar();
+        mAvatar = firstNonNull(tx.getAvatar(), MinterProfileApi.getUserAvatarUrl(1));
         mUsername = tx.username;
-    }
-
-    public String getAvatar() {
-        if (mAvatar == null) {
-            return "https://my.beta.minter.network/api/v1/avatar/by/user/1";
-        }
-
-        return mAvatar;
-    }
-
-    public TxItem setAvatar(String avatar) {
-        mAvatar = avatar;
-        return this;
-    }
-
-    public String getUsername() {
-        return mUsername;
-    }
-
-    public TxItem setUsername(String username) {
-        mUsername = username;
-        return this;
-    }
-
-    @SuppressLint("WrongConstant")
-    @Override
-    public int getViewType() {
-        return mTx.type != null ? mTx.type.ordinal() + 1 : 0xFF;
-    }
-
-    public HistoryTransaction getTx() {
-        return mTx;
-    }
-
-    @Override
-    public boolean isSameOf(TransactionItem item) {
-        return item.getViewType() == TX_SEND && ((TxItem) item).getTx().hash.equals(mTx.hash);
     }
 
     public static RecyclerView.ViewHolder createViewHolder(final LayoutInflater inflater, final ViewGroup parent, @ListType int viewType) {
@@ -169,5 +134,42 @@ public class TxItem implements TransactionItem {
             final TxItem txItem = ((TxItem) data);
             ((TxUnhandledViewHolder) holder).bind(txItem);
         }
+    }
+
+    public String getAvatar() {
+        if (mAvatar == null) {
+            return "https://my.beta.minter.network/api/v1/avatar/by/user/1";
+        }
+
+        return mAvatar;
+    }
+
+    public TxItem setAvatar(String avatar) {
+        mAvatar = avatar;
+        return this;
+    }
+
+    public String getUsername() {
+        return mUsername;
+    }
+
+    public TxItem setUsername(String username) {
+        mUsername = username;
+        return this;
+    }
+
+    @SuppressLint("WrongConstant")
+    @Override
+    public int getViewType() {
+        return mTx.type != null ? mTx.type.ordinal() + 1 : 0xFF;
+    }
+
+    public HistoryTransaction getTx() {
+        return mTx;
+    }
+
+    @Override
+    public boolean isSameOf(TransactionItem item) {
+        return item.getViewType() == TX_SEND && ((TxItem) item).getTx().hash.equals(mTx.hash);
     }
 }
