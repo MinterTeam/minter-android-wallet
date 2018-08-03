@@ -101,6 +101,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:text="\@"
+                    android:tag="username"
                     android:textSize="@dimen/text_size_default"
                     />
             </android.support.design.widget.TextInputLayout>

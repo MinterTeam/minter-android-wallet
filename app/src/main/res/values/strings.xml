@@ -100,7 +100,7 @@
     <string name="btn_exchange">Exchange</string>
     <string name="title_change_password">Change Password</string>
     <string name="hint_change_password_new">New password</string>
-    <string name="hint_change_password_new_repeat">New password again</string>
+    <string name="hint_change_password_new_repeat">Repeat new password</string>
     <string name="btn_change_password">Change password</string>
     <string name="hint_change_password_old">Current password</string>
 

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.settings.views.migration;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
@@ -44,7 +42,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -70,7 +67,6 @@ import static network.minter.bipwallet.settings.views.migration.MigrationExcepti
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
@@ -82,7 +78,6 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
 
     private String mNewPassword;
     private WeakReference<WalletProgressDialog> mProgressDialog;
-    private int mProgress = 0;
     private SparseArray<PublishSubject<Object>> mRetryHandlers = new SparseArray<>(3);
 
     @Inject
@@ -138,11 +133,6 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
                         // setting raw password, it will be hashed to double sha256 inside PasswordChangeRequest
                         request.setRawPassword(mNewPassword);
 
-                        setProgress(0);
-                        mProgress = 1;
-                        // reset progress in dialog
-                        resetProgressNonIndeterminate(res.data.size() * 2);
-
                         // sources
                         final List<ProfileAddressData> addresses = new ArrayList<>(res.data);
                         // targets
@@ -168,9 +158,6 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
                             // re-encrypting data with new encryption key from new password
                             dataRemote.encrypted = new EncryptedString(dataLocal.getSeedPhrase(), encryptionKey);
                             reEncryptedData.add(dataRemote);
-
-                            setProgress(mProgress);
-                            mProgress++;
                         }
 
                         request.addEncrypted(reEncryptedData);
@@ -185,8 +172,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
                     .subscribe(res -> {
                         log(3, "Send data");
                         secretStorage.setEncryptionKey(mNewPassword);
-                        mProgress++;
-                        setProgress(mProgress);
+
                         onMigrationSuccess();
                     });
 
@@ -196,48 +182,15 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
     }
 
     private void onMigrationSuccess() {
-        callOnProgressDialog(d -> {
-            d.dismiss();
-            getViewState().startDialog(ctx2 -> new WalletConfirmDialog.Builder(ctx2, "Success!")
-                    .setText("Password successfully migrated!")
-                    .setPositiveAction("Ok", (d2, w2) -> {
-                        d2.dismiss();
-                        getViewState().finish();
-                    })
-                    .create());
-        });
+        getViewState().startDialog(ctx2 -> new WalletConfirmDialog.Builder(ctx2, "Success!")
+                .setText("Password successfully migrated!")
+                .setPositiveAction("Ok", (d2, w2) -> {
+                    d2.dismiss();
+                    getViewState().finish();
+                })
+                .create());
     }
 
-    private void setProgress(final int progress) {
-        callOnProgressDialog(d -> d.setProgress(progress));
-    }
-
-    private void callOnProgressDialog(Consumer<WalletProgressDialog> cb) {
-        new Handler(Looper.getMainLooper()).post(() -> {
-            if (mProgressDialog == null) {
-                return;
-            }
-
-            final WalletProgressDialog d = mProgressDialog.get();
-            if (d == null) {
-                return;
-            }
-
-            try {
-                cb.accept(d);
-            } catch (Exception e) {
-                Timber.e(e);
-            }
-        });
-    }
-
-    private void resetProgressNonIndeterminate(final int max) {
-        callOnProgressDialog(d -> {
-            d.setMax(max);
-            d.setIndeterminate(false);
-            d.setProgress(0);
-        });
-    }
 
     private void onError(Throwable throwable, final PublishSubject<Object> errorRetry) {
         Timber.w(throwable);

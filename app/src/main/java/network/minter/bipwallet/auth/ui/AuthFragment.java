@@ -116,9 +116,9 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
                              @Nullable Bundle savedInstanceState) {
         postponeEnterTransition();
         View view = inflater.inflate(R.layout.fragment_auth, container, false);
+        ButterKnife.bind(this, view);
         ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
         startPostponedEnterTransition();
-        ButterKnife.bind(this, view);
 
         return view;
     }

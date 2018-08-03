@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -165,7 +165,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             mChangeAvatarRow = new ChangeAvatarRow(() -> session.getUser().getData().getAvatar(), this::onClickChangeAvatar);
             mMainAdapter.addRow(mChangeAvatarRow);
 
-            mMainSettingsRows.put("username", new SettingsButtonRow("Username", () -> session.getUser().getData().username, this::onClickChangeUsername));
+            mMainSettingsRows.put("username", new SettingsButtonRow("Username", () -> "@" + session.getUser().getData().username, this::onClickChangeUsername));
             mMainSettingsRows.put("email", new SettingsButtonRow("Email", () -> session.getUser().getData().email, "Add", this::onClickChangeEmail));
             mMainSettingsRows.put("password", new SettingsButtonRow("Password", "Change", this::onClickChangePassword).setInactive(true));
             Stream.of(mMainSettingsRows.values()).forEach(item -> mMainAdapter.addRow(item));

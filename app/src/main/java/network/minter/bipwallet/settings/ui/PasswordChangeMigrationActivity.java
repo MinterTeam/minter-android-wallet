@@ -46,11 +46,9 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.CompareValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.CustomValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.views.migration.PasswordChangeMigrationPresenter;
-import network.minter.core.crypto.HashUtil;
 
 import static android.support.v4.content.res.ResourcesCompat.getFont;
 
@@ -64,7 +62,6 @@ public class PasswordChangeMigrationActivity extends BaseMvpInjectActivity imple
     @Inject Provider<PasswordChangeMigrationPresenter> presenterProvider;
     @InjectPresenter PasswordChangeMigrationPresenter presenter;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.layout_password_old) TextInputLayout layoutPasswordOld;
     @BindView(R.id.layout_password_new) TextInputLayout layoutPasswordNew;
     @BindView(R.id.layout_password_new_repeat) TextInputLayout layoutPasswordNewRepeat;
     @BindView(R.id.action) Button action;
@@ -109,13 +106,11 @@ public class PasswordChangeMigrationActivity extends BaseMvpInjectActivity imple
         ButterKnife.bind(this);
         setupToolbar(toolbar);
 
-        layoutPasswordOld.setTypeface(getFont(this, R.font._ubuntu_regular));
         layoutPasswordNew.setTypeface(getFont(this, R.font._ubuntu_regular));
         layoutPasswordNewRepeat.setTypeface(getFont(this, R.font._ubuntu_regular));
 
         mInputGroup = new InputGroup();
-        mInputGroup.addInput(layoutPasswordOld, layoutPasswordNew, layoutPasswordNewRepeat);
-        mInputGroup.addValidator(layoutPasswordOld, new CustomValidator("Invalid password", (v) -> HashUtil.sha256Hex(v.toString()).equals(secretStorage.getEncryptionKey())));
+        mInputGroup.addInput(layoutPasswordNew, layoutPasswordNewRepeat);
         mInputGroup.addValidator(layoutPasswordNew, new LengthValidator(getString(R.string.input_password_invalid), 6));
         mInputGroup.addValidator(layoutPasswordNewRepeat, new CompareValidator(getString(R.string.input_signin_password_not_match), layoutPasswordNew));
     }
