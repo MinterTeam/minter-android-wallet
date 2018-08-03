@@ -168,7 +168,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     }
                 });
 
-
         setRecipientAutocomplete();
         getViewState().setSubmitEnabled(false);
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
@@ -181,6 +180,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void setRecipientAutocomplete() {
+        if (true) {
+            // FIXME some cases working wrong, this task is low priority, cause just disable it
+            return;
+        }
         recipientStorage.getItems()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
