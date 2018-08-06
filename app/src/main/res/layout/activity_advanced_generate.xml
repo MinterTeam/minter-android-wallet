@@ -223,7 +223,7 @@
                     android:id="@+id/label_save_mnemonic"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="I've saved the phrase"
+                    android:text="I've saved the phrase!"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

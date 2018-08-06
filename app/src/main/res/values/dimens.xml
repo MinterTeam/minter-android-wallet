@@ -76,4 +76,8 @@
     <!-- Default inner padding within buttons -->
     <dimen name="button_padding_vertical_material">@dimen/control_padding_material</dimen>
     <dimen name="button_padding_horizontal_material">8dp</dimen>
+
+
+    <dimen name="text_size_tx_amount">@dimen/text_size_18</dimen>
+    <dimen name="text_size_tx_detail_value">@dimen/text_size_18</dimen>
 </resources>

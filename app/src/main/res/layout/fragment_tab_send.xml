@@ -99,6 +99,7 @@
                     android:focusableInTouchMode="false"
                     android:inputType="none"
                     android:maxLines="1"
+                    android:fontFamily="@font/_ubuntu_regular"
                     android:paddingEnd="24dp"
                     android:textSize="@dimen/text_size_default"
                     tools:text="BIP (124,1020304050607080900)"
