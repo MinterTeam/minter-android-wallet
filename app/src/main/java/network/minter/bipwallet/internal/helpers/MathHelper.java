@@ -133,20 +133,18 @@ public final class MathHelper {
     }
 
     public static String bdHuman(BigDecimal source) {
-        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).stripTrailingZeros();
-        if (out.equals(new BigDecimal("0e-18"))) {
+        if (source.equals(new BigDecimal("0e-18"))) {
             return "0";
         }
-
+        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).stripTrailingZeros();
         return out.toPlainString();
     }
 
     public static String bdHuman(BigDecimal source, int precision) {
-        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
-        if (out.equals(new BigDecimal("0e-18"))) {
+        if (source.equals(new BigDecimal("0e-18"))) {
             return "0";
         }
-
+        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
         return out.toPlainString();
     }
 
