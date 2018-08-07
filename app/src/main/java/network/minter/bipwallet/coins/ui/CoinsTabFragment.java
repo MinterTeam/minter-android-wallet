@@ -28,6 +28,7 @@ package network.minter.bipwallet.coins.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -58,6 +59,7 @@ import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
 /**
@@ -97,6 +99,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @Override
     public void hideRefreshProgress() {
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void startExplorer(String hash) {
+        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + hash)));
     }
 
     @Nullable

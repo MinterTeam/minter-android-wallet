@@ -59,6 +59,7 @@ public interface CoinsTabModule {
         void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
         void showRefreshProgress();
         void hideRefreshProgress();
+        void startExplorer(String hash);
     }
 
     interface TransactionListView extends MvpView, ProgressView {

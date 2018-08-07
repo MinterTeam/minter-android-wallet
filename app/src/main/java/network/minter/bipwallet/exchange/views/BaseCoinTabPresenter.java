@@ -333,7 +333,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private boolean findSuitableAccountForCommission(BigDecimal amountWithCommission, String suitableCoin) {
         Optional<AccountItem> probablySuitableAccount = findAccountByCoin(suitableCoin);
         if (!probablySuitableAccount.isPresent() || bdGT(amountWithCommission, probablySuitableAccount.get().getBalanceBase())) {
-            getViewState().setError("income_coin", "Not enough balance");
             mGasCoin = mAccount.getCoin();
             return false;
         }
@@ -381,7 +380,9 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         }
 
                         if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mAccount.getCoin())) {
-                            findSuitableAccountForCommission(res.result.getAmountWithCommission(), mGetCoin);
+                            if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mGetCoin)) {
+                                getViewState().setError("income_coin", "Not enough balance");
+                            }
                         }
 
                     }, t -> {
@@ -410,11 +411,13 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         getViewState().setError("income_coin", null);
                         setCalculation(String.format("%s %s", res.result.getAmount().setScale(4, ROUND_DOWN).toPlainString(), mGetCoin));
                         mGetAmount = res.result.getAmount();
-                        if (!checkEnoughBalance(mGetAmount)) {
+                        if (!checkEnoughBalance(mSpendAmount)) {
                             return;
                         }
-                        if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mAccount.getCoin())) {
-                            findSuitableAccountForCommission(res.result.getAmountWithCommission(), mGetCoin);
+                        if (!findSuitableAccountForCommission(mSpendAmount, mAccount.getCoin())) {
+                            if (!findSuitableAccountForCommission(mSpendAmount, mGetCoin)) {
+                                getViewState().setError("income_coin", "Not enough balance");
+                            }
                         }
                     }, t -> {
                         Timber.e(t, "Unable to get currency");
@@ -432,7 +435,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), accountItem.balance.stripTrailingZeros().toPlainString()));
 
         if (!initial) {
-            mInputChange.onNext(false);
+            mInputChange.onNext(isAmountForGetting());
         }
     }
 

@@ -85,8 +85,8 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
         }
 
         final DateTime dt = new DateTime(item.getTx().timestamp);
-        dateValue.setText(dt.toString(DateTimeFormat.forPattern("EEEE, dd MMMM").withLocale(Locale.US)));
-        timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ssZ")));
+        dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
+        timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
     }
 
     protected boolean autoSetAvatar() {

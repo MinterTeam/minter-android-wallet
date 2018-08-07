@@ -43,6 +43,7 @@ import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 
 /**
@@ -70,7 +71,14 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
         return rxCallExp(getInstantService().getTransactions(
                 Stream.of(mSecretStorage.getAddresses()).map(MinterAddress::toString).toList()
         ))
-                .map(res -> res.result)
+                .onErrorResumeNext(convertToExpErrorResult())
+                .map(res -> {
+                    if (res.result != null) {
+                        return res.result;
+                    }
+
+                    return Collections.<HistoryTransaction>emptyList();
+                })
                 .subscribeOn(Schedulers.io());
     }
 

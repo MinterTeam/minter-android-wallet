@@ -240,7 +240,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges"
-            android:text="The final amount depends on the exchange rate at the moment of transaction."
+            android:text="The final amount depends on the exchange rate at the moment of transaction."
             android:textAlignment="center"
             android:textSize="@dimen/text_size_14"
             app:layout_constraintEnd_toEndOf="parent"
@@ -260,6 +260,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rate_attention"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="@dimen/margin_edges"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/action"
             />
 
     </android.support.constraint.ConstraintLayout>

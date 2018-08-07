@@ -30,9 +30,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.arellomobile.mvp.InjectViewState;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,7 @@ import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.explorer.models.HistoryTransaction;
@@ -75,6 +78,7 @@ import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddr
 
 /**
  * MinterWallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
@@ -110,11 +114,20 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.clear();
+        mTransactionsAdapter.clear();
+        mCoinsAdapter.clear();
+    }
+
+    @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         myAddresses = secretRepo.getAddresses();
         mAdapter = new MultiRowAdapter();
         mTransactionsAdapter = new TransactionShortListAdapter(myAddresses);
+        mTransactionsAdapter.setOnExplorerOpenClickListener(this::onExplorerClick);
         session.getUserUpdate().doOnSubscribe(this::unsubscribeOnDestroy).subscribe(res -> setUsername());
 
         mCoinsAdapter = new SimpleRecyclerAdapter.Builder<AccountItem, ItemViewHolder>()
@@ -151,10 +164,22 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                     Timber.d("Update coins list");
                     mCoinsAdapter.dispatchChanges(AccountItem.DiffUtilImpl.class, res.getAccounts());
 
-                    final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(res.getTotalBalanceBase().setScale(4, RoundingMode.DOWN));
-                    getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
+                    Optional<AccountItem> defAccount = Stream.of(res.getAccounts())
+                            .filter(item -> item.getCoin().equals(MinterSDK.DEFAULT_COIN))
+                            .findFirst();
+
+                    if (!defAccount.isPresent()) {
+                        final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
+                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
+                    } else {
+                        final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
+                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
+                    }
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
+                    getViewState().hideRefreshProgress();
+                }, t -> {
+                    mCoinsRow.setStatus(ListWithButtonRow.Status.Error);
                     getViewState().hideRefreshProgress();
                 });
 
@@ -171,6 +196,9 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                         mTransactionsRow.setStatus(ListWithButtonRow.Status.Normal);
                     }
                     getViewState().hideRefreshProgress();
+                }, t -> {
+                    mTransactionsRow.setStatus(ListWithButtonRow.Status.Error);
+                    getViewState().hideRefreshProgress();
                 });
 
 
@@ -178,12 +206,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         mAdapter.addRow(mCoinsRow);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAdapter.clear();
-        mTransactionsAdapter.clear();
-        mCoinsAdapter.clear();
+    private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
+        getViewState().startExplorer(historyTransaction.hash.toString());
     }
 
     private void onRefresh() {

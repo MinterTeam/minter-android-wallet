@@ -273,7 +273,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .setAvatarUrl(mAvatar)
                     .setRecipientName(mToName)
                     .setCoin(mFromAccount.coin)
-                    .setPositiveAction("BIP!", (d, w) -> onStartExecuteTransaction(true))
+                    .setPositiveAction("Send", (d, w) -> onStartExecuteTransaction(true))
                     .setNegativeAction("Cancel", null)
                     .create();
             dialog.setCancelable(true);

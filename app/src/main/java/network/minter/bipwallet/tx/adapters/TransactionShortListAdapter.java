@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -27,9 +27,12 @@
 package network.minter.bipwallet.tx.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.transition.AutoTransition;
+import android.support.transition.TransitionManager;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.annimon.stream.Stream;
@@ -39,6 +42,7 @@ import java.util.List;
 
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher;
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate;
+import network.minter.bipwallet.tx.adapters.vh.ExpandableTxViewHolder;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
 
@@ -57,6 +61,9 @@ public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerVi
         mMyAddresses = myAddresses;
     }
 
+    private int mExpandedPosition = -1;
+    private TransactionListAdapter.OnExplorerOpenClickListener mOnExplorerOpenClickListener;
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -64,12 +71,52 @@ public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerVi
             mInflater = LayoutInflater.from(parent.getContext());
         }
 
-        return TxItem.createViewHolder(mInflater, parent, viewType);
+        final RecyclerView.ViewHolder out = TxItem.createViewHolder(mInflater, parent, viewType);
+
+        if (out instanceof ExpandableTxViewHolder) {
+            ((ExpandableTxViewHolder) out).setEnableExpanding(true);
+        }
+
+        return out;
+    }
+
+    public TxItem getItem(int position) {
+        return mItems.get(position);
+    }
+
+    public void setOnExplorerOpenClickListener(TransactionListAdapter.OnExplorerOpenClickListener listener) {
+        mOnExplorerOpenClickListener = listener;
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         TxItem.bindViewHolder(mMyAddresses, holder, mItems.get(position));
+
+        if (holder instanceof ExpandableTxViewHolder) {
+            final ExpandableTxViewHolder h = ((ExpandableTxViewHolder) holder);
+
+            if (h.isEnableExpanding()) {
+                final TxItem item = getItem(position);
+                h.action.setOnClickListener(v -> {
+                    if (mOnExplorerOpenClickListener != null) {
+                        mOnExplorerOpenClickListener.onClick(v, item.getTx());
+                    }
+                });
+
+                final boolean isExpanded = position == mExpandedPosition;
+                h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+                h.detailsLayout.setActivated(isExpanded);
+                h.itemView.setOnClickListener(v -> {
+                    int prevExp = mExpandedPosition;
+                    mExpandedPosition = isExpanded ? -1 : position;
+                    TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
+                    notifyItemChanged(holder.getAdapterPosition());
+                    notifyItemChanged(prevExp);
+                });
+            } else {
+                h.detailsLayout.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override

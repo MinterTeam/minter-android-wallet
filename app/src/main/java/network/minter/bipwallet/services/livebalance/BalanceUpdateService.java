@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -49,6 +49,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -125,7 +126,7 @@ public class BalanceUpdateService extends Service {
                     }
 
                     final String uid = String.valueOf(session.getUser().getData().id);
-                    Centrifugo client = new Centrifugo.Builder("wss://92.53.87.98:8000/connection/websocket")
+                    Centrifugo client = new Centrifugo.Builder("wss://rtm.explorer.minter.network/connection/websocket")
                             .setReconnectConfig(new ReconnectConfig(10, 10, TimeUnit.SECONDS))
                             .setUser(new User(uid, res.result.token))
                             .setToken(new Token(res.result.token, String.valueOf(res.result.timestamp)))
@@ -160,7 +161,7 @@ public class BalanceUpdateService extends Service {
                     emitter.onNext(client);
                     emitter.onComplete();
                 }))
-                .subscribe(res -> mClient = res);
+                .subscribe(res -> mClient = res, Wallet.Rx.errorHandler());
     }
 
     private void disconnect() {

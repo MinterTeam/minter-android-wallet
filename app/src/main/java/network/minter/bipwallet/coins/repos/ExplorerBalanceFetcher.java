@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -49,6 +49,7 @@ import network.minter.explorer.models.AddressData;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 
 /**
@@ -78,6 +79,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
         return rxCallExp(addressRepository.getAddressData(address))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .onErrorResumeNext(convertToExpErrorResult())
                 .map(item -> {
                     Timber.d("Balance is really loaded");
                     return item.result.getTotalBalance();
@@ -96,6 +98,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
 
         for (MinterAddress address : mAddresses) {
             rxCallExp(mAddressRepository.getAddressData(address))
+                    .onErrorResumeNext(convertToExpErrorResult())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
                         synchronized (mLock) {
