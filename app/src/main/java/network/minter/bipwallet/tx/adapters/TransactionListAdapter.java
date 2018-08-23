@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -39,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import network.minter.bipwallet.tx.adapters.vh.ExpandableTxViewHolder;
@@ -50,7 +51,6 @@ import static network.minter.bipwallet.tx.adapters.TransactionItem.ITEM_PROGRESS
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TransactionListAdapter extends PagedListAdapter<TransactionItem, RecyclerView.ViewHolder> {
@@ -71,6 +71,8 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     private OnExplorerOpenClickListener mOnExplorerOpenClickListener;
     private MutableLiveData<TransactionDataSource.LoadState> mLoadState;
     private boolean mEnableExpanding = true;
+    private HashMap<Integer, Boolean> mExpandedPositions = new HashMap<>();
+    private boolean mUseMultipleExpanded = true;
 
     public TransactionListAdapter(List<MinterAddress> addresses, boolean enableExpanding) {
         super(sDiffCallback);
@@ -116,6 +118,10 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
         mOnExplorerOpenClickListener = listener;
     }
 
+    public void setUseMultipleExpanded(boolean useMultipleExpanded) {
+        mUseMultipleExpanded = useMultipleExpanded;
+    }
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
@@ -132,16 +138,28 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
                     }
                 });
 
-                final boolean isExpanded = position == mExpandedPosition;
-                h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-                h.detailsLayout.setActivated(isExpanded);
-                h.itemView.setOnClickListener(v -> {
-                    int prevExp = mExpandedPosition;
-                    mExpandedPosition = isExpanded ? -1 : position;
-                    TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
-                    notifyItemChanged(holder.getAdapterPosition());
-                    notifyItemChanged(prevExp);
-                });
+                if (mUseMultipleExpanded) {
+                    final boolean isExpanded = mExpandedPositions.containsKey(position) && mExpandedPositions.get(position);
+                    h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+                    h.detailsLayout.setActivated(isExpanded);
+                    h.itemView.setOnClickListener(v -> {
+                        mExpandedPositions.put(position, !isExpanded);
+                        TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
+                        notifyItemChanged(holder.getAdapterPosition());
+                    });
+                } else {
+                    final boolean isExpanded = position == mExpandedPosition;
+                    h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+                    h.detailsLayout.setActivated(isExpanded);
+                    h.itemView.setOnClickListener(v -> {
+                        int prevExp = mExpandedPosition;
+                        mExpandedPosition = isExpanded ? -1 : position;
+                        TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
+                        notifyItemChanged(holder.getAdapterPosition());
+                        notifyItemChanged(prevExp);
+                    });
+                }
+
             } else {
                 h.detailsLayout.setVisibility(View.GONE);
             }
