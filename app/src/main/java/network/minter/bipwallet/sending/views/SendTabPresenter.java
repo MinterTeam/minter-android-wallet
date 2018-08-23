@@ -154,7 +154,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickScanQR(this::onClickScanQR);
         getViewState().setOnClickMaximum(this::onClickMaximum);
-        getViewState().setFee(bdHuman(OperationType.SendCoin.getFee()));
+        getViewState().setFee(String.format("%s %s", bdHuman(OperationType.SendCoin.getFee()), MinterSDK.DEFAULT_COIN.toUpperCase()));
         accountStorage.update();
     }
 
