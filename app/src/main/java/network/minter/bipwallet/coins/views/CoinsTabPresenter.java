@@ -196,6 +196,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                         mTransactionsRow.setStatus(ListWithButtonRow.Status.Normal);
                     }
                     getViewState().hideRefreshProgress();
+                    getViewState().scrollTop();
                 }, t -> {
                     mTransactionsRow.setStatus(ListWithButtonRow.Status.Error);
                     getViewState().hideRefreshProgress();

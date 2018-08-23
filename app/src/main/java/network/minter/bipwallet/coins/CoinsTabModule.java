@@ -60,6 +60,7 @@ public interface CoinsTabModule {
         void showRefreshProgress();
         void hideRefreshProgress();
         void startExplorer(String hash);
+        void scrollTop();
     }
 
     interface TransactionListView extends MvpView, ProgressView {

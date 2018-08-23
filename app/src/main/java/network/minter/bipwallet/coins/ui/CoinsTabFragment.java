@@ -106,6 +106,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
         getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + hash)));
     }
 
+    @Override
+    public void scrollTop() {
+        list.post(() -> list.scrollToPosition(0));
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
