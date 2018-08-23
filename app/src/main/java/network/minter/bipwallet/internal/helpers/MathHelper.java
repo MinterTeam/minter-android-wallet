@@ -148,6 +148,10 @@ public final class MathHelper {
         return out.toPlainString();
     }
 
+    public static boolean bdNull(BigDecimal source) {
+        return source.setScale(18).equals(new BigDecimal("0e-18"));
+    }
+
     // BigInteger
     public static boolean biGT(BigInteger from, long to) {
         if (from == null) {

@@ -40,6 +40,7 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
@@ -85,6 +86,11 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
 
             am = String.format("- %s", bdHuman(data.amount, 4));
             amount.setText(am);
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        }
+
+        if (bdNull(data.amount)) {
+            amount.setText("0");
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         }
 

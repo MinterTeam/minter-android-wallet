@@ -38,6 +38,7 @@ import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
@@ -62,8 +63,14 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
         title.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         titleSecond.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
         avatar.setImageResource(R.drawable.img_avatar_exchange);
-        amount.setText(String.format("- %s", bdHuman(data.amount, 4)));
-        amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        if (bdNull(data.amount)) {
+            amount.setText("0");
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        } else {
+            amount.setText(String.format("- %s", bdHuman(data.amount, 4)));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        }
+
         subamount.setText(title.getText());
         coinFrom.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         coinTo.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
