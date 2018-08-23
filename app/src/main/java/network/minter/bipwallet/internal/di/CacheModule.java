@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -37,12 +37,16 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.di.annotations.Cached;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.profile.MinterProfileApi;
+import network.minter.profile.models.User;
 
 /**
  * MinterWallet. 2018
@@ -73,12 +77,25 @@ public abstract class CacheModule {
         return new CachedRepository<>(new CachedExplorerTransactionRepository(storage, secretStorage, api.getApiService()));
     }
 
+    @Provides
+    @WalletApp
+    public static CachedRepository<User.Data, CachedMyProfileRepository> provideCachedProfileRepo(KVStorage storage, AuthSession session, MinterProfileApi api) {
+        return new CachedRepository<>(new CachedMyProfileRepository(api.getApiService(), storage, session))
+                .setTimeToLive(60);
+    }
+
     // Bindings for CacheManager
     @Binds
     @IntoSet
     @Cached
     @WalletApp
     public abstract CachedRepository provideExplorerRepoForCache(CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cache);
+
+    @Binds
+    @IntoSet
+    @Cached
+    @WalletApp
+    public abstract CachedRepository provideMyProfileRepoForCache(CachedRepository<User.Data, CachedMyProfileRepository> cache);
 
     @Binds
     @IntoSet

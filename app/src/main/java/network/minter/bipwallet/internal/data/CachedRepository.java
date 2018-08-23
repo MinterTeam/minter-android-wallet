@@ -48,7 +48,6 @@ import timber.log.Timber;
 
 /**
  * Wallet. 2017
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultModel>> {
@@ -73,16 +72,13 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
     private BehaviorSubject<MetaResult<ResultModel>> mMetaNotifier = BehaviorSubject.create();
     private BehaviorSubject<ResultModel> mNotifier = BehaviorSubject.create();
     private CompositeDisposable subscriptions = new CompositeDisposable();
+    private int mExpireTime = DEFAULT_EXPIRE_TIME;
 
     public CachedRepository(Entity entity) {
         mEntity = entity;
         mData = initialData();
         expire();
         mDataIsReady = false;
-    }
-
-    protected ResultModel initialData() {
-        return mEntity.initialData();
     }
 
     @SuppressWarnings("unchecked")
@@ -132,7 +128,6 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
 
     /**
      * Observer for update event
-     *
      * @return obserable with ResultModel
      * @see ResultModel
      * @see Observable
@@ -145,7 +140,6 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
 
     /**
      * Check data for expiration
-     *
      * @return true if data is expired
      */
     public boolean isExpired() {
@@ -174,13 +168,17 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
         mExpiredAt.setTime(mExpiredAt.getTime() + expireTime);
     }
 
+    public CachedRepository<ResultModel, Entity> setTimeToLive(int ttl) {
+        mExpireTime = ttl;
+        return this;
+    }
+
     /**
      * Returns seconds to object life (ttl)
-     *
      * @return integer seconds
      */
     public int getExpireTime() {
-        return DEFAULT_EXPIRE_TIME;
+        return mExpireTime;
     }
 
     /**
@@ -213,7 +211,6 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
 
     /**
      * Returns updatable data
-     *
      * @return null if not loaded
      */
     public ResultModel getData() {
@@ -222,7 +219,6 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
 
     /**
      * Setting data
-     *
      * @param data Any
      */
     @CallSuper
@@ -241,9 +237,8 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
 
     /**
      * Creates zip function and after update first value, returns current object value
-     *
      * @param first Any observable
-     * @param <T>   Any type
+     * @param <T> Any type
      * @return Observable
      */
     public <T> Observable<ResultModel> updateAfter(Observable<T> first) {
@@ -345,7 +340,6 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
      * Return subscriber that subscribes to all updates of this repository including some additional
      * information about data
      * Every time, consumer will call #update(), subscriber will notified about updating
-     *
      * @return ReplaySubject
      * @see MetaResult
      */
@@ -356,7 +350,6 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
     /**
      * Return subscriber that subscribes to all updates of this repository
      * Every time, consumer will call #update(), subscriber will notified about updating
-     *
      * @return BehaviorSubject
      */
     public BehaviorSubject<ResultModel> observe() {
@@ -371,6 +364,10 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
         mData = data;
         mDataIsReady = true;
         notifyOnSuccess(true);
+    }
+
+    protected ResultModel initialData() {
+        return mEntity.initialData();
     }
 
     protected void onExpired() {

@@ -48,6 +48,7 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.home.HomeScope;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
@@ -57,6 +58,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.settings.SettingsTabModule;
+import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
@@ -80,6 +82,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
     @Inject ProfileRepository profileRepo;
+    @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
     @Inject ProfileAuthRepository profileAuthRepo;
     @Inject Context context;
     private String mSourceUsername = null;
@@ -111,7 +114,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Override
     public void attachView(SettingsTabModule.SettingsTabView view) {
         super.attachView(view);
-
+        profileCachedRepo.update(profile -> mMainAdapter.notifyDataSetChanged());
         getViewState().setMainAdapter(mMainAdapter);
         getViewState().setAdditionalAdapter(mAdditionalAdapter);
     }
@@ -250,6 +253,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                                     break;
                             }
                             session.setUser(user);
+                            profileCachedRepo.update(true);
                         }
                         dialog.dismiss();
                         getViewState().showMessage("Profile updated");

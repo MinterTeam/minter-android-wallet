@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -181,6 +181,16 @@ public class AuthSession {
 
     public void setUser(User user) {
         mUser = user;
+        save();
+        mUserUpdateSubject.onNext(mUser);
+    }
+
+    public void setUser(User.Data userData) {
+        if (mUser == null) {
+            mUser = new User(getAuthToken());
+        }
+
+        mUser.data = userData;
         save();
         mUserUpdateSubject.onNext(mUser);
     }
