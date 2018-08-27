@@ -55,6 +55,7 @@ import network.minter.bipwallet.services.livebalance.notification.BalanceNotific
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -122,4 +123,5 @@ public interface WalletComponent {
     ProfileRepository profileRepo();
     BlockChainAccountRepository accountRepoBlockChain();
     BlockChainCoinRepository coinRepoBlockChain();
+    BlockChainTransactionRepository txRepoBlockChain();
 }

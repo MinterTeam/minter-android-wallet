@@ -144,6 +144,12 @@ public final class MathHelper {
         if (source.equals(new BigDecimal("0e-18"))) {
             return "0";
         }
+
+        if (precision > 0 && bdLT(source, new BigDecimal(1).movePointLeft(precision))) {
+            final char firstOverflowed = source.unscaledValue().toString(10).charAt(0);
+            return String.format("0.0…%c", firstOverflowed);
+        }
+
         final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
         return out.toPlainString();
     }

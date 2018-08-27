@@ -35,7 +35,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
-import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.profile.MinterProfileApi;
@@ -71,8 +70,8 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
         subamount.setText(MinterSDK.DEFAULT_COIN);
         coinName.setText(firstNonNull(data.name, "<unknown>"));
         coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));
-        initialAmount.setText(firstNonNull(data.initialAmount, new BigDecimal(0)).divide(Transaction.VALUE_MUL_DEC).toPlainString());
-        initialReserve.setText(firstNonNull(data.initialReserve, new BigDecimal(0)).divide(Transaction.VALUE_MUL_DEC).toPlainString());
+        initialAmount.setText(firstNonNull(data.initialAmount, new BigDecimal(0)).setScale(0, BigDecimal.ROUND_UP).toPlainString());
+        initialReserve.setText(firstNonNull(data.initialReserve, new BigDecimal(0)).setScale(0, BigDecimal.ROUND_UP).toPlainString());
         crr.setText(firstNonNull(data.constantReserveRatio, new BigDecimal(0)).toPlainString());
     }
 

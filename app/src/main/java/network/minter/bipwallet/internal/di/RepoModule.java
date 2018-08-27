@@ -36,6 +36,7 @@ import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
@@ -126,6 +127,12 @@ public class RepoModule {
     @WalletApp
     public BlockChainCoinRepository provideBlockChainCoinRepo() {
         return MinterBlockChainApi.getInstance().coin();
+    }
+
+    @Provides
+    @WalletApp
+    public BlockChainTransactionRepository provideBlockChainTxRepository() {
+        return MinterBlockChainApi.getInstance().transactions();
     }
 
     @Provides

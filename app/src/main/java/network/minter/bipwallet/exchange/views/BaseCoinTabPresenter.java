@@ -72,13 +72,12 @@ import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.explorer.models.HistoryTransaction;
 import timber.log.Timber;
 
-import static java.math.BigDecimal.ROUND_DOWN;
+import static network.minter.bipwallet.apis.blockchain.BCErrorHelper.normalizeBlockChainInsufficientFundsMessage;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdLTE;
 import static network.minter.blockchain.models.BCResult.ResultCode.CoinDoesNotExists;
 
 /**
@@ -240,7 +239,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private void onErrorExecuteTransaction(BCResult<?> errorResult) {
         Timber.e(errorResult.message, "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
-                .setText(errorResult.message)
+                .setText(normalizeBlockChainInsufficientFundsMessage(errorResult.message))
                 .setPositiveAction("Close")
                 .create());
     }
@@ -342,9 +341,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     }
 
     private boolean checkEnoughBalance(BigDecimal amount) {
-        boolean enoughBalance = bdLTE(amount, mAccount.getBalanceBase());
-        getViewState().setSubmitEnabled(enoughBalance);
-        return enoughBalance;
+//        boolean enoughBalance = bdLTE(amount, mAccount.getBalanceBase());
+//        getViewState().setSubmitEnabled(enoughBalance);
+//        return enoughBalance;
+        return true;
     }
 
     private void onAmountChangedInternal(Boolean incoming) {
@@ -373,7 +373,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         mEnableUseMax.set(true);
                         mSpendAmount = res.result.getAmount();
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", res.result.getAmountWithCommission().setScale(4, ROUND_DOWN).toPlainString(), mGetCoin));
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mAccount.getCoin()));
 
                         if (!checkEnoughBalance(mSpendAmount)) {
                             return;
@@ -409,7 +409,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         }
                         mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", res.result.getAmount().setScale(4, ROUND_DOWN).toPlainString(), mGetCoin));
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
                         mGetAmount = res.result.getAmount();
                         if (!checkEnoughBalance(mSpendAmount)) {
                             return;

@@ -73,13 +73,15 @@ import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.CountableData;
-import network.minter.blockchain.models.ExchangeBuyValue;
+import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.TransactionSendResult;
+import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
@@ -87,6 +89,7 @@ import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
+import static network.minter.bipwallet.apis.blockchain.BCErrorHelper.normalizeBlockChainInsufficientFundsMessage;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.createBcErrorResultMessage;
@@ -110,6 +113,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
     @Inject BlockChainAccountRepository accountRepo;
     @Inject BlockChainCoinRepository coinRepo;
+    @Inject BlockChainTransactionRepository bcTxRepo;
     @Inject ProfileInfoRepository infoRepo;
     @Inject CacheManager cache;
     @Inject RecipientAutocompleteStorage recipientStorage;
@@ -181,7 +185,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void setRecipientAutocomplete() {
         if (true) {
-            // FIXME some cases working wrong, this task is low priority, cause just disable it
+            // FIXME some cases working wrong, this task is low priority, so just disable it for now
             return;
         }
         recipientStorage.getItems()
@@ -310,44 +314,59 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .create();
             dialog.setCancelable(false);
 
-            dialog.setMax(3);
-
             // resolving default fee (in pips)
-            final Observable<BCResult<ExchangeBuyValue>> exchangeResolver;
+            Observable<BCResult<TransactionCommissionValue>> exchangeResolver;
             if (mFromAccount.coin.toUpperCase().equals(MinterSDK.DEFAULT_COIN)) {
                 Timber.tag("TX Send").d("Resolving default coin currency %s", MinterSDK.DEFAULT_COIN);
-                final BCResult<ExchangeBuyValue> val = new BCResult<>();
-                val.statusCode = 200;
-                val.code = BCResult.ResultCode.Success;
-                val.result = new ExchangeBuyValue();
-                val.result.willPay = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-                val.result.commission = BigInteger.ZERO;
+                final BCResult<TransactionCommissionValue> val = new BCResult<>();
+                val.result = new TransactionCommissionValue();
+                val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
                 exchangeResolver = Observable.just(val);
             } else {
                 Timber.tag("TX Send").d("Resolving custom coin currency %s", mFromAccount.getCoin());
                 // resolving fee currency for custom currency
-                exchangeResolver = rxCallBc(coinRepo.getCoinExchangeCurrencyToBuy(mFromAccount.getCoin(), OperationType.SendCoin.getFee(), MinterSDK.DEFAULT_COIN));
+                // creating tx
+                try {
+                    final Transaction preTx = new Transaction.Builder(new BigInteger("1"))
+                            .setGasCoin(mFromAccount.coin.toUpperCase())
+                            .sendCoin()
+                            .setCoin(mFromAccount.coin)
+                            .setTo(mToAddress)
+                            .setValue(mAmount)
+                            .build();
+
+                    final SecretData preData = secretStorage.getSecret(mFromAccount.address);
+                    final TransactionSign preSign = preTx.sign(preData.getPrivateKey());
+
+                    exchangeResolver = rxCallBc(bcTxRepo.getTransactionCommission(preSign));
+                } catch (OperationInvalidDataException e) {
+                    Timber.w(e);
+                    final BCResult<TransactionCommissionValue> val = new BCResult<>();
+                    val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+                    exchangeResolver = Observable.just(val);
+                }
             }
 
             // creating preparation result to send transaction
             Observable.combineLatest(
                     exchangeResolver.onErrorResumeNext(convertToBcErrorResult()),
                     rxCallBc(accountRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(convertToBcErrorResult()),
-                    new BiFunction<BCResult<ExchangeBuyValue>, BCResult<CountableData>, SendInitData>() {
+                    new BiFunction<BCResult<TransactionCommissionValue>, BCResult<CountableData>, SendInitData>() {
                         @Override
-                        public SendInitData apply(BCResult<ExchangeBuyValue> exchangeBuyValueBCResult, BCResult<CountableData> countableDataBCResult) {
-                            dialog.setIndeterminate(false);
-                            dialog.setProgress(1);
+                        public SendInitData apply(BCResult<TransactionCommissionValue> txCommissionValue, BCResult<CountableData> countableDataBCResult) {
+
                             // if some request failed, returning error result
-                            if (!exchangeBuyValueBCResult.isSuccess()) {
-                                return new SendInitData(BCResult.copyError(exchangeBuyValueBCResult));
+                            if (!txCommissionValue.isSuccess()) {
+                                return new SendInitData(BCResult.copyError(txCommissionValue));
                             } else if (!countableDataBCResult.isSuccess()) {
                                 return new SendInitData(BCResult.copyError(countableDataBCResult));
                             }
 
+                            Timber.d("SendInitData: tx commission: %s", txCommissionValue.result.getValue());
+
                             final SendInitData data = new SendInitData(
                                     countableDataBCResult.result.count.add(new BigInteger("1")),
-                                    exchangeBuyValueBCResult.result.getAmount()
+                                    txCommissionValue.result.getValue()
                             );
                             Timber.tag("TX Send").d("Resolved: coin %s currency=%s; nonce=%s", mFromAccount.getCoin(), data.commission, data.nonce);
 
@@ -356,7 +375,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         }
                     })
                     .switchMap((Function<SendInitData, ObservableSource<BCResult<TransactionSendResult>>>) cntRes -> {
-                        dialog.setProgress(2);
                         // if in previous request we've got error, returning it
                         if (!cntRes.isSuccess()) {
                             return Observable.just(BCResult.copyError(cntRes.errorResult));
@@ -418,7 +436,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .setText(throwable.getMessage())
                 .setPositiveAction("Close")
                 .create());
-
     }
 
     private void onErrorSearchUser(ProfileResult<?> errorResult) {
@@ -432,7 +449,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private void onErrorExecuteTransaction(BCResult<?> errorResult) {
         Timber.e(errorResult.message, "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
-                .setText(errorResult.message)
+                .setText(normalizeBlockChainInsufficientFundsMessage(errorResult.message))
                 .setPositiveAction("Close")
                 .create());
     }
