@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.services.livebalance.notification;
 
@@ -124,20 +124,5 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
 
                     mNotificationManager.notify(WALLET_BALANCE_ID, messageNotification);
                 });
-        /*
-        final Notification paymentNotification = new NotificationCompat.Builder(getApplication(), DOGSY_PAYMENT_CHANNEL)
-                .setContentTitle("Dogsy")
-                .setSmallIcon(R.drawable.ic_notif_payment)
-                .setColor(0xFF15BBDE)
-                .setContentTitle("Оплата комиссии")
-                .setContentText(message.text)
-                .setAutoCancel(true)
-                .setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle("Оплата комиссии").bigText(message.text))
-                .setGroup(message.getGroup())
-                .setContentIntent(createActionIntent(contentIntent))
-                .setVibrate(new long[]{0, 250, 250, 250})
-                .setLights(0xFF15BBDE, 3000, 3000)
-                .build();
-                */
     }
 }
