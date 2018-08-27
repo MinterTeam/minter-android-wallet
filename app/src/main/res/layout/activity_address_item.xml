@@ -157,7 +157,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/_ubuntu_regular"
-                        android:text="Secured by"
+                        android:text="@string/label_secured_by"
                         android:transitionName="secured_by_label"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/secured_value"

@@ -101,12 +101,14 @@
                     android:maxLines="1"
                     android:fontFamily="@font/_ubuntu_regular"
                     android:paddingEnd="24dp"
+                    android:paddingStart="4dp"
                     android:textSize="@dimen/text_size_default"
                     tools:text="BIP (124,1020304050607080900)"
                     />
             </android.support.design.widget.TextInputLayout>
 
             <ImageView
+                android:contentDescription="@string/cd_choose_account"
                 android:id="@+id/dropdown"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -147,15 +149,16 @@
                         android:dropDownHeight="wrap_content"
                         android:inputType="text|textMultiLine|textNoSuggestions"
                         android:paddingEnd="32dp"
+                        android:paddingStart="4dp"
                         android:tag="recipient"
                         android:textSize="@dimen/text_size_default"
                         tools:text="\@PavelDurov"
-
-                        />
+                        tools:ignore="LabelFor"/>
                 </android.support.design.widget.TextInputLayout>
             </FrameLayout>
 
             <ImageView
+                android:contentDescription="@string/cd_qr_scan"
                 android:id="@+id/action_scan_qr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -191,6 +194,7 @@
                     android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
                     android:inputType="numberDecimal|textMultiLine"
                     android:paddingEnd="86dp"
+                    android:paddingStart="4dp"
                     android:tag="amount"
                     android:textSize="@dimen/text_size_default"
                     tools:text="1.102030405060708090102030405060708090"
@@ -204,7 +208,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:padding="6dp"
-                android:text="Use max"
+                android:text="@string/btn_use_max"
                 android:textSize="@dimen/text_size_default"
                 app:layout_constraintBottom_toBottomOf="@id/layout_input_amount"
                 app:layout_constraintEnd_toEndOf="@id/layout_input_amount"

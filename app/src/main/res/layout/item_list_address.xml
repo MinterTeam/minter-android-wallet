@@ -111,7 +111,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_regular"
-            android:text="Balance"
+            android:text="@string/label_balance"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/balance_value"
             app:layout_constraintStart_toStartOf="parent"
@@ -146,6 +146,7 @@
             />
 
         <ImageView
+            android:contentDescription="@string/cd_open_transactions"
             android:id="@+id/balance_action_image"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -175,7 +176,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_regular"
-            android:text="Secured by"
+            android:text="@string/label_secured_by"
             android:transitionName="secured_by_label"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/secured_value"
@@ -215,7 +216,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_regular"
-            android:text="Set as main"
+            android:text="@string/label_set_as_main"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/default_switch"
             app:layout_constraintStart_toStartOf="parent"

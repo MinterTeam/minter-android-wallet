@@ -141,6 +141,7 @@
                 >
 
                 <ImageView
+                    android:contentDescription="@string/cd_qr_code"
                     android:id="@+id/qr"
                     android:layout_width="140dp"
                     android:layout_height="140dp"

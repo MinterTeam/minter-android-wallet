@@ -51,7 +51,7 @@
             android:layout_marginStart="@dimen/margin_edges_input"
             android:layout_marginTop="@dimen/margin_edges_medium"
             android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="Coin you want"
+            android:hint="@string/label_coin_you_want"
             app:hintEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +81,7 @@
             android:layout_marginStart="@dimen/margin_edges_input"
             android:layout_marginTop="@dimen/margin_edges_medium"
             android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="Amount"
+            android:hint="@string/label_amount"
             app:hintEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -97,6 +97,7 @@
                 android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
                 android:inputType="numberDecimal|textMultiLine"
                 android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 android:textSize="@dimen/text_size_default"
                 tools:text="1.102030405060708090102030405060708090"
                 />
@@ -109,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:padding="6dp"
-            android:text="Use max"
+            android:text="@string/btn_use_max"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/layout_amount"
             app:layout_constraintEnd_toEndOf="@id/layout_amount"
@@ -129,6 +130,7 @@
             />
 
         <ImageView
+            android:contentDescription="@string/empty"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="8dp"
@@ -150,7 +152,7 @@
             android:layout_marginStart="@dimen/margin_edges_input"
             android:layout_marginTop="@dimen/margin_edges_medium"
             android:layout_marginEnd="@dimen/margin_edges_input"
-            android:hint="Coin you have"
+            android:hint="@string/label_coin_you_have"
             app:hintEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -177,6 +179,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <ImageView
+            android:contentDescription="@string/empty"
             android:id="@+id/dropdown"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -209,7 +212,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/_ubuntu_medium"
-                android:text="You will pay approximately"
+                android:text="@string/label_you_will_pay_approximately"
                 android:textAlignment="center"
                 android:textAllCaps="true"
                 android:textSize="@dimen/text_size_11"
@@ -240,7 +243,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges"
-            android:text="The final amount depends on the exchange rate at the moment of transaction."
+            android:text="@string/attention_exchange_rate"
             android:textAlignment="center"
             android:textSize="@dimen/text_size_14"
             app:layout_constraintEnd_toEndOf="parent"

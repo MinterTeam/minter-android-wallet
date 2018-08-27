@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2018
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -41,7 +42,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -49,6 +49,7 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Px;
 import android.support.graphics.drawable.VectorDrawableCompat;
+import android.support.media.ExifInterface;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -557,6 +558,7 @@ public final class ImageHelper {
     }
 
     public Bitmap decodeFile(File f) {
+        //noinspection CatchMayIgnoreException,CatchMayIgnoreException
         try {
             //Decode image size
             BitmapFactory.Options o = new BitmapFactory.Options();

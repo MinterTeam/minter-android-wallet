@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2018
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -59,7 +60,6 @@ public interface MultiRowContract {
          * @see MultiRowAdapter
          * @see MultiRowContract.Row
          */
-        @Deprecated
         int getRowPosition();
 
         /**

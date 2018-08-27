@@ -80,7 +80,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/_ubuntu_bold"
-                android:text="Convert"
+                android:text="@string/tx_type_exchange"
                 android:textAlignment="center"
                 android:textSize="@dimen/text_size_14"
                 app:layout_constraintEnd_toEndOf="parent"

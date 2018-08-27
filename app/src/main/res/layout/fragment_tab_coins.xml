@@ -58,6 +58,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
+                    android:contentDescription="@string/cd_logo"
                     android:id="@+id/bip_logo"
                     android:layout_width="35dp"
                     android:layout_height="24dp"
@@ -141,6 +142,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/colorPrimaryDarker"
                     android:paddingStart="@dimen/margin_edges"
+                    android:paddingEnd="4dp"
                     android:paddingTop="@dimen/margin_edges_half"
                     app:layout_collapseMode="pin"
                     >
@@ -202,7 +204,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_edges_half"
                         android:textAllCaps="true"
-                        android:text="bips"
+                        tools:text="bips"
                         android:textColor="@color/textColorWhite"
                         android:textSize="@dimen/text_size_20"
                         android:textStyle="normal"

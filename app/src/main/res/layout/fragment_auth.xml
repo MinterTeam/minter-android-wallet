@@ -36,6 +36,7 @@
     >
 
     <ImageView
+        android:contentDescription="@string/cd_logo"
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +59,7 @@
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="@dimen/margin_edges"
-        android:text="Create wallet"
+        android:text="@string/btn_create_wallet"
         app:layout_constraintBottom_toTopOf="@id/action_advanced_mode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +74,7 @@
         android:layout_marginTop="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="@dimen/margin_edges"
-        android:text="Advanced mode"
+        android:text="@string/btn_advanced_mode"
         app:layout_constraintBottom_toTopOf="@id/action_signin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,7 +88,7 @@
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginTop="@dimen/margin_edges"
         android:layout_marginBottom="32dp"
-        android:text="Sign in"
+        android:text="@string/btn_sign_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/action_help"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,7 +103,7 @@
         android:layout_marginTop="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges_half"
         android:layout_marginBottom="32dp"
-        android:text="Help"
+        android:text="@string/btn_help"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/action_signin"

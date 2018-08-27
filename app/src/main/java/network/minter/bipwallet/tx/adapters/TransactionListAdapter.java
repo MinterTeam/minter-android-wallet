@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.tx.adapters;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
@@ -71,6 +72,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     private OnExplorerOpenClickListener mOnExplorerOpenClickListener;
     private MutableLiveData<TransactionDataSource.LoadState> mLoadState;
     private boolean mEnableExpanding = true;
+    @SuppressLint("UseSparseArrays")
     private HashMap<Integer, Boolean> mExpandedPositions = new HashMap<>();
     private boolean mUseMultipleExpanded = true;
 

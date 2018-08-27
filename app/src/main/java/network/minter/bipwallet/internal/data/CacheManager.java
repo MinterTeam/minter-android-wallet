@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.internal.data;
 
@@ -89,6 +89,7 @@ public class CacheManager {
 
         for (CachedRepository item : entities) {
             if (item == null) continue;
+            //noinspection unchecked
             add(item);
         }
 
@@ -123,6 +124,7 @@ public class CacheManager {
     }
 
     public <T extends CachedEntity> void defer(Class<T> clazz) {
+        //noinspection unchecked
         checkNotNull(get(clazz), String.format("Entity %s does not exists", clazz.getName())).expire();
     }
 

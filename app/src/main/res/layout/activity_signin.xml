@@ -101,7 +101,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:tag="username"
-                    android:text="\@"
+                    android:text="@string/at"
                     android:textSize="@dimen/text_size_default"
                     />
 

@@ -24,7 +24,7 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Wallet" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -96,7 +96,8 @@
         <item name="android:textColorPrimary">@color/textColorWhite</item>
         <item name="android:textColor">@color/textColorWhite</item>
         <item name="android:textColorSecondary">@color/textColorWhite</item>
-        <item name="android:colorControlNormal">@color/textColorWhite</item>
+        <item name="android:colorControlNormal" tools:targetApi="lollipop">@color/textColorWhite
+        </item>
         <item name="colorControlNormal">@color/textColorWhite</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -114,9 +115,10 @@
         <item name="android:background">@drawable/btn_blue</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
-        <item name="android:elevation">4dp</item>
+        <item name="android:elevation" tools:ignore="NewApi">4dp</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
-        <item name="android:stateListAnimator">@animator/btn_state_list_anim</item>
+        <item name="android:stateListAnimator" tools:ignore="NewApi">@animator/btn_state_list_anim
+        </item>
     </style>
 
     <style name="Wallet.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
@@ -153,10 +155,10 @@
         <item name="android:minWidth">@dimen/btn_min_width</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
-        <item name="android:elevation">0dp</item>
+        <item name="android:elevation" tools:targetApi="lollipop">0dp</item>
         <item name="android:background">@drawable/btn_blue_wb</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
-        <item name="android:stateListAnimator">@null</item>
+        <item name="android:stateListAnimator" tools:targetApi="lollipop">@null</item>
     </style>
 
     <style name="Wallet.Button.Transparent.BlueBorder" parent="Widget.AppCompat.Button.Colored">
@@ -168,7 +170,7 @@
         <item name="android:minWidth">@dimen/btn_min_width</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
-        <item name="android:elevation">0dp</item>
+        <item name="android:elevation" tools:ignore="NewApi">0dp</item>
         <item name="android:background">@drawable/btn_white_bb</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
     </style>
@@ -252,7 +254,7 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:statusBarColor">#BBB1D9</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">#BBB1D9</item>
     </style>
 
     <style name="Wallet.TabLayout.TabItem" parent="TextAppearance.Design.Tab">

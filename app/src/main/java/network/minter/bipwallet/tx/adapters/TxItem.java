@@ -64,6 +64,7 @@ public class TxItem implements TransactionItem {
         mUsername = tx.username;
     }
 
+    @SuppressLint("SwitchIntDef")
     public static RecyclerView.ViewHolder createViewHolder(final LayoutInflater inflater, final ViewGroup parent, @ListType int viewType) {
         View view;
         RecyclerView.ViewHolder out;

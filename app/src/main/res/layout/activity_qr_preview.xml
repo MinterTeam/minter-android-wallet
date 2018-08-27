@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
-  ~ @link https://github.com/MinterTeam
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -32,6 +33,7 @@
     >
 
     <ImageView
+        android:contentDescription="@string/cd_qr_code"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/iv"
         android:layout_width="match_parent"

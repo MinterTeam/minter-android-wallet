@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
                 android:fontFamily="@font/_ubuntu_regular"
-                android:text="Please wait"
+                android:text="@string/attention_please_wait"
                 android:textSize="@dimen/text_size_14"
                 app:layout_constraintBottom_toTopOf="@id/space"
                 app:layout_constraintEnd_toEndOf="parent"

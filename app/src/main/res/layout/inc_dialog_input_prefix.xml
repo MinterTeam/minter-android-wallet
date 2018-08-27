@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -42,7 +42,7 @@
         android:layout_marginStart="-3dp"
         android:layout_marginEnd="-3dp"
         android:inputType="text"
-        android:text="\@"
+        android:text="@string/at"
         android:textSize="@dimen/text_size_default"
         />
 </android.support.design.widget.TextInputLayout>

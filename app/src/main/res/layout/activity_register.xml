@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext"
                     android:inputType="text"
-                    android:text="\@"
+                    android:text="@string/at"
                     android:tag="username"
                     android:textSize="@dimen/text_size_default"
                     />

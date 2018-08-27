@@ -209,6 +209,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
         Pattern mPattern;
 
+        @SuppressWarnings("Annotator")
         public DecimalDigitsInputFilter(int digitsAfterZero) {
             mPattern = Pattern.compile("[0-9]+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?");
         }

@@ -60,6 +60,7 @@ public class ReactiveAdapter {
     // MyMinter
     public static <T> Observable<T> rxCallProfile(Call<T> call) {
         return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
+            @SuppressWarnings("unchecked")
             @Override
             public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
                 if (response.body() == null) {
@@ -147,6 +148,7 @@ public class ReactiveAdapter {
 
     public static <T> Observable<T> rxCallBc(Call<T> call) {
         return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
+            @SuppressWarnings("unchecked")
             @Override
             public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
                 if (response.body() == null) {
@@ -252,6 +254,7 @@ public class ReactiveAdapter {
 
     public static <T> Observable<T> rxCallExp(Call<T> call) {
         return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
+            @SuppressWarnings("unchecked")
             @Override
             public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
                 if (response.body() == null) {
