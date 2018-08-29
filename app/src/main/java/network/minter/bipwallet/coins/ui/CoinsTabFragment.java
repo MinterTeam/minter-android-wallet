@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.coins.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -160,10 +161,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
         username.setText(name);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void setBalance(long intPart, long fractionalPart, CharSequence coinName) {
+    public void setBalance(String intPart, String fractionalPart, CharSequence coinName) {
         balanceInt.setText(String.valueOf(intPart));
-        balanceFract.setText("." + String.valueOf(fractionalPart));
+        balanceFract.setText("." + fractionalPart);
         balanceCoinName.setText(coinName);
     }
 

@@ -48,7 +48,7 @@ public interface CoinsTabModule {
     interface CoinsTabView extends MvpView {
         void setAvatar(String url);
         void setUsername(CharSequence name);
-        void setBalance(long intPart, long fractionalPart, CharSequence coinName);
+        void setBalance(String intPart, String fractionalPart, CharSequence coinName);
         void setAdapter(RecyclerView.Adapter<?> adapter);
         void setOnAvatarClick(View.OnClickListener listener);
         void startTransactionList();

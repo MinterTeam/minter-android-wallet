@@ -204,11 +204,11 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                             .findFirst();
 
                     if (!defAccount.isPresent()) {
-                        final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
-                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
+                        final StringHelper.DecimalStringFraction num = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
+                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
                     } else {
-                        final StringHelper.DecimalFraction num = StringHelper.splitDecimalFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
-                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(num.intPart));
+                        final StringHelper.DecimalStringFraction num = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
+                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
                     }
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
