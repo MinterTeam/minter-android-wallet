@@ -373,7 +373,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         mEnableUseMax.set(true);
                         mSpendAmount = res.result.getAmount();
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mAccount.getCoin()));
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission(), 4), mAccount.getCoin()));
 
                         if (!checkEnoughBalance(mSpendAmount)) {
                             return;
@@ -409,7 +409,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         }
                         mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission(), 4), mGetCoin));
                         mGetAmount = res.result.getAmount();
                         if (!checkEnoughBalance(mSpendAmount)) {
                             return;
