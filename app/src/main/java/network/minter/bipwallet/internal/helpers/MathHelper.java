@@ -31,6 +31,9 @@ import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
@@ -137,7 +140,7 @@ public final class MathHelper {
             return "0";
         }
         final BigDecimal out = firstNonNull(source, new BigDecimal(0)).stripTrailingZeros();
-        return out.toPlainString();
+        return formatDecimalCurrency(out);
     }
 
     public static String bdHuman(BigDecimal source, int precision) {
@@ -151,7 +154,17 @@ public final class MathHelper {
         }
 
         final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
-        return out.toPlainString();
+        return formatDecimalCurrency(out);
+    }
+
+    private static String formatDecimalCurrency(BigDecimal in) {
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        DecimalFormatSymbols decimalFormatSymbols = ((DecimalFormat) nf).getDecimalFormatSymbols();
+        decimalFormatSymbols.setCurrencySymbol("");
+        ((DecimalFormat) nf).setDecimalFormatSymbols(decimalFormatSymbols);
+        nf.setMinimumFractionDigits(0);
+        nf.setMaximumFractionDigits(4);
+        return nf.format(in);
     }
 
     public static boolean bdNull(BigDecimal source) {
