@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.internal.views.widgets;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.DimenRes;
@@ -38,6 +39,7 @@ import java.lang.ref.WeakReference;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 import timber.log.Timber;
 
+import static android.content.Context.ACTIVITY_SERVICE;
 import static network.minter.bipwallet.internal.Wallet.app;
 
 /**
@@ -47,9 +49,12 @@ import static network.minter.bipwallet.internal.Wallet.app;
  */
 final class RemoteImageViewDelegate implements RemoteImageView {
     private final WeakReference<ImageView> mImage;
+    private boolean mIsLowRamDevice;
 
     RemoteImageViewDelegate(ImageView imageView) {
         mImage = new WeakReference<>(imageView);
+        final ActivityManager am = ((ActivityManager) getContext().getSystemService(ACTIVITY_SERVICE));
+        mIsLowRamDevice = am.isLowRamDevice();
     }
 
     @Override
@@ -61,13 +66,14 @@ final class RemoteImageViewDelegate implements RemoteImageView {
         setImageUrl(uri, getContext().getResources().getDimension(resId));
     }
 
-    public void setImageUrl(String url, @DimenRes int resId) {
-        setImageUrl(Uri.parse(url), resId);
+    public void setImageUrl(String url, @DimenRes int resizeResId) {
+        setImageUrl(Uri.parse(url), resizeResId);
     }
 
     public void setImageUrl(Uri uri, @Dp float size) {
+        float sizeLocal = mIsLowRamDevice ? size / 2 : size;
         app().image()
-                .loadResize(uri, size)
+                .loadResize(uri, sizeLocal)
                 .into(mImage.get());
     }
 

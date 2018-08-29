@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.coins.views;
 
+import android.content.ComponentCallbacks2;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -61,6 +62,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
+import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.core.MinterSDK;
@@ -69,6 +71,7 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.profile.MinterProfileApi;
+import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
@@ -78,7 +81,6 @@ import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddr
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
@@ -87,6 +89,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     @Inject CacheManager cache;
     @Inject AuthSession session;
     @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
+    @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
     @Inject SecretStorage secretRepo;
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject BlockChainAccountRepository accountRepo;
@@ -97,6 +100,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     private TransactionShortListAdapter mTransactionsAdapter;
     private SimpleRecyclerAdapter<AccountItem, ItemViewHolder> mCoinsAdapter;
     private ListWithButtonRow mTransactionsRow, mCoinsRow;
+    private boolean mUseAvatars = true;
+    private boolean mLowMemory = false;
 
     @Inject
     public CoinsTabPresenter() {
@@ -106,8 +111,10 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     public void attachView(CoinsTabModule.CoinsTabView view) {
         super.attachView(view);
         myAddresses = secretRepo.getAddresses();
-        txRepo.update();
-        accountStorage.update();
+        if (!mLowMemory) {
+            txRepo.update();
+            accountStorage.update();
+        }
 
         getViewState().setOnRefreshListener(this::onRefresh);
         getViewState().setAdapter(mAdapter);
@@ -122,8 +129,31 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     }
 
     @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
+            mUseAvatars = false;
+            if (mCoinsAdapter != null) {
+                mCoinsAdapter.notifyDataSetChanged();
+            }
+            mTransactionsAdapter.setUseAvatars(false);
+            mTransactionsAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+    @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+
+        profileCachedRepo.observe().subscribe(res -> {
+            setUsername();
+        });
+
         myAddresses = secretRepo.getAddresses();
         mAdapter = new MultiRowAdapter();
         mTransactionsAdapter = new TransactionShortListAdapter(myAddresses);
@@ -135,7 +165,12 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .setBinder((itemViewHolder, item, position) -> {
                     itemViewHolder.title.setText(item.coin.toUpperCase());
                     itemViewHolder.amount.setText(bdHuman(item.balance, 4));
-                    itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
+                    if (mUseAvatars) {
+                        itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
+                    } else {
+                        itemViewHolder.avatar.setImageDrawable(null);
+                    }
+
                     itemViewHolder.subname.setVisibility(View.GONE);
 
 
@@ -202,7 +237,6 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                     getViewState().hideRefreshProgress();
                 });
 
-
         mAdapter.addRow(mTransactionsRow);
         mAdapter.addRow(mCoinsRow);
     }
@@ -220,7 +254,11 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         if (session.getRole() == AuthSession.AuthType.Advanced) {
             getViewState().hideAvatar();
         } else {
-            getViewState().setUsername(String.format("@%s", session.getUser().data.username));
+            if (session.getUser().data.username == null) {
+                getViewState().setUsername("");
+            } else {
+                getViewState().setUsername(String.format("@%s", session.getUser().data.username));
+            }
         }
     }
 

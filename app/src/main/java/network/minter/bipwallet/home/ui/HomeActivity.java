@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,11 +22,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.home.ui;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
@@ -79,6 +80,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
     private SparseArray<WeakReference<HomeTabFragment>> mActiveTabs = new SparseArray<>();
     private List<BackPressedListener> mBackPressedListeners = new ArrayList<>(1);
+    private boolean mIsLowRamDevice = false;
 
     @Override
     public void setCurrentPage(int position) {
@@ -147,15 +149,11 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        HomeModule.create(this).inject(this);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        ButterKnife.bind(this);
-        presenter.handleExtras(getIntent());
-
-        setupTabAdapter();
-        setupBottomNavigation();
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (homePager.getOffscreenPageLimit() > 1) {
+            homePager.setOffscreenPageLimit(1);
+        }
     }
 
     @Override
@@ -163,6 +161,32 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
         super.onDestroy();
         HomeModule.destroy();
         Timber.d("Destroy");
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        for (int i = 0; i < mActiveTabs.size(); i++) {
+            if (mActiveTabs.get(i) != null && mActiveTabs.get(i).get() != null) {
+                mActiveTabs.get(i).get().onTrimMemory(level);
+            }
+        }
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        HomeModule.create(this).inject(this);
+        super.onCreate(savedInstanceState);
+        final ActivityManager am = ((ActivityManager) getSystemService(ACTIVITY_SERVICE));
+        mIsLowRamDevice = am.isLowRamDevice();
+
+        setContentView(R.layout.activity_home);
+        ButterKnife.bind(this);
+        presenter.handleExtras(getIntent());
+
+        setupTabAdapter();
+        setupBottomNavigation();
     }
 
     private void setupTabAdapter() {
@@ -217,7 +241,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
         };
 
 
-        homePager.setOffscreenPageLimit(4);
+        homePager.setOffscreenPageLimit(mIsLowRamDevice ? 1 : 4);
         homePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

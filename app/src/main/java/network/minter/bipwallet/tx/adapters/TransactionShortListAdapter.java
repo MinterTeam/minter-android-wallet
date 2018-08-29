@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher;
@@ -48,7 +49,6 @@ import network.minter.explorer.models.HistoryTransaction;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements DiffUtilDispatcherDelegate<HistoryTransaction> {
@@ -56,13 +56,13 @@ public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerVi
     private final List<MinterAddress> mMyAddresses;
     private List<TxItem> mItems = new ArrayList<>(0);
     private LayoutInflater mInflater;
+    private int mExpandedPosition = -1;
+    private TransactionListAdapter.OnExplorerOpenClickListener mOnExplorerOpenClickListener;
+    private HashMap<Integer, Boolean> mExpandedPositions = new HashMap<>();
 
     public TransactionShortListAdapter(List<MinterAddress> myAddresses) {
         mMyAddresses = myAddresses;
     }
-
-    private int mExpandedPosition = -1;
-    private TransactionListAdapter.OnExplorerOpenClickListener mOnExplorerOpenClickListener;
 
     @NonNull
     @Override
@@ -88,36 +88,7 @@ public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerVi
         mOnExplorerOpenClickListener = listener;
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        TxItem.bindViewHolder(mMyAddresses, holder, mItems.get(position));
-
-        if (holder instanceof ExpandableTxViewHolder) {
-            final ExpandableTxViewHolder h = ((ExpandableTxViewHolder) holder);
-
-            if (h.isEnableExpanding()) {
-                final TxItem item = getItem(position);
-                h.action.setOnClickListener(v -> {
-                    if (mOnExplorerOpenClickListener != null) {
-                        mOnExplorerOpenClickListener.onClick(v, item.getTx());
-                    }
-                });
-
-                final boolean isExpanded = position == mExpandedPosition;
-                h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-                h.detailsLayout.setActivated(isExpanded);
-                h.itemView.setOnClickListener(v -> {
-                    int prevExp = mExpandedPosition;
-                    mExpandedPosition = isExpanded ? -1 : position;
-                    TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
-                    notifyItemChanged(holder.getAdapterPosition());
-                    notifyItemChanged(prevExp);
-                });
-            } else {
-                h.detailsLayout.setVisibility(View.GONE);
-            }
-        }
-    }
+    private boolean mUseAvatars = true;
 
     @Override
     public int getItemViewType(int position) {
@@ -157,5 +128,39 @@ public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerVi
     public void clear() {
         mItems.clear();
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        TxItem.bindViewHolder(mMyAddresses, holder, mItems.get(position));
+
+        if (holder instanceof ExpandableTxViewHolder) {
+            final ExpandableTxViewHolder h = ((ExpandableTxViewHolder) holder);
+            h.setUserAvatars(mUseAvatars);
+
+            if (h.isEnableExpanding()) {
+                final TxItem item = getItem(position);
+                h.action.setOnClickListener(v -> {
+                    if (mOnExplorerOpenClickListener != null) {
+                        mOnExplorerOpenClickListener.onClick(v, item.getTx());
+                    }
+                });
+
+                final boolean isExpanded = mExpandedPositions.containsKey(position) && mExpandedPositions.get(position);
+                h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+                h.detailsLayout.setActivated(isExpanded);
+                h.itemView.setOnClickListener(v -> {
+                    mExpandedPositions.put(position, !isExpanded);
+                    TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
+                    notifyItemChanged(holder.getAdapterPosition());
+                });
+            } else {
+                h.detailsLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public void setUseAvatars(boolean useAvatars) {
+        mUseAvatars = useAvatars;
     }
 }

@@ -83,4 +83,8 @@ public abstract class HomeTabFragment extends BaseFragment implements ErrorView,
     public CharSequence getTitle() {
         return null;
     }
+
+    public void onTrimMemory(int level) {
+
+    }
 }

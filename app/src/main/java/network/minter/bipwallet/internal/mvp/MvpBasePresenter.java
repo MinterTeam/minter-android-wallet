@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -105,6 +105,12 @@ public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V
         if (!mSubscriptions.isDisposed()) {
             mSubscriptions.dispose();
         }
+    }
+
+    public void onTrimMemory(int level) {
+    }
+
+    public void onLowMemory() {
     }
 
     public void handleExtras(Intent intent) {

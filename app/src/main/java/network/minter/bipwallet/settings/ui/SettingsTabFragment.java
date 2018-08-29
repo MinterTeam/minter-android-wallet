@@ -85,6 +85,14 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
         super.onAttach(context);
     }
 
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (presenter != null) {
+            presenter.onLowMemory();
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

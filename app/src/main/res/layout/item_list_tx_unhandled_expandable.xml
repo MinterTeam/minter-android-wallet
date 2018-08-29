@@ -48,8 +48,8 @@
 
         <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
             android:id="@+id/item_avatar"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="@dimen/tx_item_avatar_size"
+            android:layout_height="@dimen/tx_item_avatar_size"
             android:layout_marginStart="@dimen/margin_min"
             android:background="@drawable/bg_image_round_shadow"
             android:elevation="4dp"

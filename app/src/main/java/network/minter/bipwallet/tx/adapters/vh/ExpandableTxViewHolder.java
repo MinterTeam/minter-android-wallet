@@ -45,7 +45,6 @@ import network.minter.bipwallet.tx.adapters.TxItem;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
@@ -59,6 +58,7 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.layout_details) ConstraintLayout detailsLayout;
 
     private boolean mEnableExpanding = true;
+    private boolean mUseAvatars = true;
 
     public ExpandableTxViewHolder(View itemView, boolean enableExpanding) {
         super(itemView);
@@ -80,13 +80,21 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(TxItem item) {
-        if (autoSetAvatar()) {
-            avatar.setImageUrl(item.getAvatar());
+        if (mUseAvatars) {
+            if (autoSetAvatar()) {
+                avatar.setImageUrl(item.getAvatar(), R.dimen.tx_item_avatar_size);
+            }
+        } else {
+            avatar.setImageDrawable(null);
         }
 
         final DateTime dt = new DateTime(item.getTx().timestamp);
         dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
         timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
+    }
+
+    public void setUserAvatars(boolean useAvatars) {
+        mUseAvatars = useAvatars;
     }
 
     protected boolean autoSetAvatar() {

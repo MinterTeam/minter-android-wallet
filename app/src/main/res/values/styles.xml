@@ -92,6 +92,14 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="Wallet.ErrorTextAppearance">
+        <item name="colorControlNormal">@color/grey</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="android:textColor">@color/errorColor</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="android:fontFamily">@font/_ubuntu_regular</item>
+    </style>
+
     <style name="Wallet.CropImage" parent="Theme.AppCompat.Light">
         <item name="android:textColorPrimary">@color/textColorWhite</item>
         <item name="android:textColor">@color/textColorWhite</item>

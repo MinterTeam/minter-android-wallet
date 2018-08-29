@@ -27,7 +27,6 @@
 package network.minter.bipwallet.settings.views;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
@@ -72,7 +71,6 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @HomeScope
@@ -84,13 +82,11 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Inject ProfileRepository profileRepo;
     @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
     @Inject ProfileAuthRepository profileAuthRepo;
-    @Inject Context context;
     private String mSourceUsername = null;
 
     private MultiRowAdapter mMainAdapter, mAdditionalAdapter;
     private ChangeAvatarRow mChangeAvatarRow;
     private Map<String, SettingsButtonRow> mMainSettingsRows = new LinkedHashMap<>();
-    private Map<String, SettingsButtonRow> mAdditionalSettingsRows = new LinkedHashMap<>();
 
     @Inject
     public SettingsTabPresenter() {
@@ -98,17 +94,9 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         mAdditionalAdapter = new MultiRowAdapter();
     }
 
-    public void onUpdateProfile() {
-        safeSubscribeIoToUi(rxCallProfile(profileRepo.getProfile()))
-                .subscribe(res -> {
-                    if (res.isSuccess()) {
-                        User u = session.getUser();
-                        u.data = res.data;
-                        session.setUser(u);
-                        mMainAdapter.notifyItemRangeChanged(0, mMainAdapter.getItemCount());
-                        mAdditionalAdapter.notifyItemRangeChanged(0, 1);
-                    }
-                });
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
     }
 
     @Override
@@ -131,7 +119,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                 avatar = result.getBitmap();
                 if (avatar == null) {
                     try {
-                        avatar = MediaStore.Images.Media.getBitmap(context.getContentResolver(), result.getUri());
+                        avatar = MediaStore.Images.Media.getBitmap(Wallet.app().context().getContentResolver(), result.getUri());
                     } catch (IOException e) {
                         Timber.w(e);
                     }

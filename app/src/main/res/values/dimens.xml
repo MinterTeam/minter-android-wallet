@@ -80,4 +80,5 @@
 
     <dimen name="text_size_tx_amount">@dimen/text_size_18</dimen>
     <dimen name="text_size_tx_detail_value">@dimen/text_size_18</dimen>
+    <dimen name="tx_item_avatar_size">34dp</dimen>
 </resources>

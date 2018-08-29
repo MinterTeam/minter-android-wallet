@@ -55,9 +55,6 @@ import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.MinterSDK;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.MinterExplorerApi;
-import network.minter.profile.MinterProfileApi;
-import okhttp3.Cache;
-import okhttp3.Request;
 import timber.log.Timber;
 
 /**
@@ -80,24 +77,10 @@ public class WalletModule {
                 .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
                 .build();
 
-        Cache httpCache = new Cache(context.getCacheDir(), 10 * 1024 * 1024/*10 mb*/);
-
         MinterSDK.initialize();
         MinterBlockChainApi.initialize(debug);
         MinterExplorerApi.initialize(debug);
-        MinterProfileApi.initialize(debug);
-        MinterProfileApi.getInstance().getApiService()
-                .setCache(httpCache)
-                .addHttpInterceptor(chain -> {
-                    if (chain.request().method().toLowerCase().equals("get")) {
-                        // varnish does'n want to receive content-type for GET requests
-                        final Request request = chain.request().newBuilder().removeHeader("content-type").removeHeader("Content-Type").build();
-                        return chain.proceed(request);
-                    }
 
-                    return chain.proceed(chain.request());
-
-                });
         JodaTimeAndroid.init(context);
     }
 

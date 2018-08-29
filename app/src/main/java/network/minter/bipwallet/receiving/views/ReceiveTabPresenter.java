@@ -76,8 +76,11 @@ public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.Recei
         getViewState().setAddress(mAddress);
         getViewState().setOnClickAddress(this::onClickAddress);
 
+        // 38% of screen is qr code image
+        float qrWidth = ((float) Wallet.app().display().getWidth()) * 0.388f;
+
         getViewState().showQRProgress();
-        QRAddressGenerator.create(Wallet.app().display().dpToPx(200), mAddress.toString())
+        QRAddressGenerator.create((int) qrWidth, mAddress.toString())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {

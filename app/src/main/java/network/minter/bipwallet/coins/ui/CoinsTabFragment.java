@@ -64,7 +64,6 @@ import timber.log.Timber;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.CoinsTabView {
@@ -127,12 +126,26 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     }
 
     @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        presenter.onTrimMemory(level);
+    }
+
+    @Override
     public void setAvatar(String url) {
         if (url == null) {
             return;
         }
 
         avatar.setImageUrl(url);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        presenter.onLowMemory();
+        avatar.setImageDrawable(null);
+        Timber.d("OnLowMemory");
     }
 
     @Override

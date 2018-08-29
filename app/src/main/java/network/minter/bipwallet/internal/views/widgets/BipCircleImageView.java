@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -28,6 +28,7 @@ package network.minter.bipwallet.internal.views.widgets;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 
@@ -64,13 +65,13 @@ public class BipCircleImageView extends CircleImageView implements RemoteImageVi
     }
 
     @Override
-    public void setImageUrl(Uri uri, int resId) {
-        mRemoteDelegate.setImageUrl(uri, resId);
+    public void setImageUrl(Uri uri, @DimenRes int resizeResId) {
+        mRemoteDelegate.setImageUrl(uri, resizeResId);
     }
 
     @Override
-    public void setImageUrl(String url, int resId) {
-        mRemoteDelegate.setImageUrl(url, resId);
+    public void setImageUrl(String url, @DimenRes int resizeResId) {
+        mRemoteDelegate.setImageUrl(url, resizeResId);
     }
 
     @Override

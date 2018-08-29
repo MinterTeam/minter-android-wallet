@@ -69,7 +69,8 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
     @Override
     public Observable<List<HistoryTransaction>> getUpdatableData() {
         return rxCallExp(getInstantService().getTransactions(
-                Stream.of(mSecretStorage.getAddresses()).map(MinterAddress::toString).toList()
+                Stream.of(mSecretStorage.getAddresses()).map(MinterAddress::toString).toList(),
+                1, 5
         ))
                 .onErrorResumeNext(convertToExpErrorResult())
                 .map(res -> {

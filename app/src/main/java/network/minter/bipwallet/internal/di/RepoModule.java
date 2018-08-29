@@ -45,11 +45,10 @@ import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileAuthRepository;
 import network.minter.profile.repo.ProfileInfoRepository;
 import network.minter.profile.repo.ProfileRepository;
-import timber.log.Timber;
+import okhttp3.Request;
 
 /**
- * Dogsy. 2017
- *
+ * minter-android-wallet. 2017
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Module
@@ -107,13 +106,21 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public MinterProfileApi provideMinterProfileApi(AuthSession session) {
-        MinterProfileApi.getInstance().getApiService().setAuthHeaderName("Authorization");
-        MinterProfileApi.getInstance().getApiService().setTokenGetter(() -> {
-            Timber.d("Getting token for MyMinter: %s", "Bearer " + session.getAuthToken());
-            return "Bearer " + session.getAuthToken();
-        });
+    public MinterProfileApi provideMinterProfileApi(AuthSession session, boolean debug) {
+        MinterProfileApi.initialize(session::getAuthToken, debug);
         MinterProfileApi.getInstance().getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
+        MinterProfileApi.getInstance().getApiService()
+                .addHttpInterceptor(chain -> {
+                    if (chain.request().method().toLowerCase().equals("get")) {
+                        // varnish does'n want to receive content-type for GET requests
+                        final Request request = chain.request().newBuilder().removeHeader("content-type").removeHeader("Content-Type").build();
+                        return chain.proceed(request);
+                    }
+
+                    return chain.proceed(chain.request());
+
+                });
+
         return MinterProfileApi.getInstance();
     }
 

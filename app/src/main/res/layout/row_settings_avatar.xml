@@ -32,6 +32,7 @@
     android:layout_height="90dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:animateLayoutChanges="true"
+    android:background="@color/white"
     >
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
