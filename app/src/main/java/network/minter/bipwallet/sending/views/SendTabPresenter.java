@@ -32,6 +32,8 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 import com.arellomobile.mvp.InjectViewState;
 
 import java.math.BigDecimal;
@@ -204,12 +206,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setSubmitEnabled(enough);
     }
 
-    private void onClickMaximum(View view) {
-        mEnableUseMax.set(true);
-        checkEnoughBalance(mFromAccount.getBalanceBase());
-        mAmount = mFromAccount.getBalance();
-        getViewState().setAmount(bdHuman(mFromAccount.getBalance()));
-    }
+    private String mGasCoin = MinterSDK.DEFAULT_COIN;
 
     private void onAmountChanged(BigDecimal amount) {
         mEnableUseMax.set(false);
@@ -307,12 +304,36 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         });
     }
 
+    private void onClickMaximum(View view) {
+        mEnableUseMax.set(true);
+        checkEnoughBalance(mFromAccount.getBalanceBase());
+        mAmount = mFromAccount.getBalance();
+        getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
+    }
+
+    private Optional<AccountItem> findAccountByCoin(String coin) {
+        return Stream.of(accountStorage.getData().getAccounts())
+                .filter(item -> item.getCoin().equals(coin.toUpperCase()))
+                .findFirst();
+    }
+
     private void onStartExecuteTransaction(boolean express) {
         getViewState().startDialog(ctx -> {
             final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Please wait")
                     .setText("Sending transaction...")
                     .create();
             dialog.setCancelable(false);
+
+            Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+            // if enough balance on MNT account, set gas coin MNT (BIP)
+            if (bdLTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee())) {
+                mGasCoin = mntAccount.get().getCoin();
+            }
+            // if sending account is not MNT (BIP), set sending account coin
+            else if (!mntAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN)) {
+                Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
+                mGasCoin = sendAccount.get().getCoin();
+            }
 
             // resolving default fee (in pips)
             Observable<BCResult<TransactionCommissionValue>> exchangeResolver;
@@ -328,7 +349,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 // creating tx
                 try {
                     final Transaction preTx = new Transaction.Builder(new BigInteger("1"))
-                            .setGasCoin(mFromAccount.coin.toUpperCase())
+                            .setGasCoin(mGasCoin)
                             .sendCoin()
                             .setCoin(mFromAccount.coin)
                             .setTo(mToAddress)
@@ -368,7 +389,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                     countableDataBCResult.result.count.add(new BigInteger("1")),
                                     txCommissionValue.result.getValue()
                             );
-                            Timber.tag("TX Send").d("Resolved: coin %s currency=%s; nonce=%s", mFromAccount.getCoin(), data.commission, data.nonce);
+                            Timber.tag("TX Send").d("Resolved: coin %s commission=%s; nonce=%s", mFromAccount.getCoin(), data.commission, data.nonce);
 
                             // creating preparation data
                             return data;
@@ -411,7 +432,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         );
                         // creating tx
                         final Transaction tx = new Transaction.Builder(cntRes.nonce)
-                                .setGasCoin(mFromAccount.coin.toUpperCase())
+                                .setGasCoin(mGasCoin)
                                 .sendCoin()
                                 .setCoin(mFromAccount.coin)
                                 .setTo(mToAddress)
@@ -496,7 +517,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onAccountSelected(AccountItem accountItem) {
         mFromAccount = accountItem;
-        getViewState().setAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), bdHuman(accountItem.getBalance())));
+        getViewState().setAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), bdHuman(accountItem.getBalance(), 4, true)));
     }
 
     private static final class SendInitData {

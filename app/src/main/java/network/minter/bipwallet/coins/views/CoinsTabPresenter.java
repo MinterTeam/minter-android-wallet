@@ -164,7 +164,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
                 .setBinder((itemViewHolder, item, position) -> {
                     itemViewHolder.title.setText(item.coin.toUpperCase());
-                    itemViewHolder.amount.setText(bdHuman(item.balance, 4));
+                    itemViewHolder.amount.setText(bdHuman(item.balance, 4, true));
                     if (mUseAvatars) {
                         itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
                     } else {

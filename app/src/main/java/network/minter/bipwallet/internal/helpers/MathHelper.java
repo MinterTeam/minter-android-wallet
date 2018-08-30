@@ -34,6 +34,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
@@ -136,16 +137,52 @@ public final class MathHelper {
     }
 
     public static String bdHuman(BigDecimal source) {
+        return bdHuman(source, true);
+    }
+
+    public static String bdHuman(BigDecimal source, boolean exactFractions) {
         if (source.equals(new BigDecimal("0e-18"))) {
             return "0";
         }
+
+        if (bdLT(source, new BigDecimal(1))) {
+            return formatDecimalCurrency(source.setScale(8, BigDecimal.ROUND_DOWN), 8, false);
+        }
+
         final BigDecimal out = firstNonNull(source, new BigDecimal(0)).stripTrailingZeros();
-        return formatDecimalCurrency(out);
+
+        return formatDecimalCurrency(out, 4, exactFractions);
     }
 
     public static String bdHuman(BigDecimal source, int precision) {
+        return bdHuman(source, precision, true);
+    }
+
+    public static String bdHuman8Less0(BigDecimal source, int precision) {
         if (source.equals(new BigDecimal("0e-18"))) {
             return "0";
+        }
+
+        if (bdLT(source, new BigDecimal(1))) {
+            return formatDecimalCurrency(source.setScale(8, BigDecimal.ROUND_DOWN), 8, false);
+        }
+
+        if (precision > 4 && bdLT(source, new BigDecimal(1).movePointLeft(precision))) {
+            final char firstOverflowed = source.unscaledValue().toString(10).charAt(0);
+            return String.format("0.0…%c", firstOverflowed);
+        }
+
+        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
+        return formatDecimalCurrency(out, precision, false);
+    }
+
+    public static String bdHuman(BigDecimal source, int precision, boolean exactFractions) {
+        if (source.equals(new BigDecimal("0e-18"))) {
+            return "0";
+        }
+
+        if (bdLT(source, new BigDecimal(1))) {
+            return formatDecimalCurrency(source.setScale(8, BigDecimal.ROUND_DOWN), 8, false);
         }
 
         if (precision > 0 && bdLT(source, new BigDecimal(1).movePointLeft(precision))) {
@@ -154,17 +191,24 @@ public final class MathHelper {
         }
 
         final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(precision, RoundingMode.DOWN).stripTrailingZeros();
-        return formatDecimalCurrency(out);
+        return formatDecimalCurrency(out, precision, exactFractions);
     }
 
-    private static String formatDecimalCurrency(BigDecimal in) {
-        NumberFormat nf = NumberFormat.getCurrencyInstance();
-        DecimalFormatSymbols decimalFormatSymbols = ((DecimalFormat) nf).getDecimalFormatSymbols();
-        decimalFormatSymbols.setCurrencySymbol("");
-        ((DecimalFormat) nf).setDecimalFormatSymbols(decimalFormatSymbols);
-        nf.setMinimumFractionDigits(0);
-        nf.setMaximumFractionDigits(4);
-        return nf.format(in);
+    private static String formatDecimalCurrency(BigDecimal in, int fractions, boolean exactFractions) {
+        DecimalFormat fmt = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+        DecimalFormatSymbols symbols = fmt.getDecimalFormatSymbols();
+        symbols.setGroupingSeparator(' ');
+        if (exactFractions) {
+            fmt.setMinimumFractionDigits(fractions);
+            fmt.setMaximumFractionDigits(fractions);
+        } else {
+            fmt.setMaximumFractionDigits(fractions);
+            fmt.setMinimumFractionDigits(0);
+        }
+
+        fmt.setDecimalFormatSymbols(symbols);
+
+        return fmt.format(in);
     }
 
     public static boolean bdNull(BigDecimal source) {

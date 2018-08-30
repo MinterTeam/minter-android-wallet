@@ -65,10 +65,12 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
+import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import timber.log.Timber;
 
@@ -76,7 +78,7 @@ import static network.minter.bipwallet.apis.blockchain.BCErrorHelper.normalizeBl
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.blockchain.models.BCResult.ResultCode.CoinDoesNotExists;
 
@@ -249,7 +251,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
-        getViewState().setAmount(bdHuman(mAccount.balance));
+        getViewState().setAmount(mAccount.balance.stripTrailingZeros().toPlainString());
         mUseMax = true;
     }
 
@@ -299,54 +301,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         }
     }
 
-    /**
-     * 1. Getting currency
-     * 2. Print to calculation "value + commission"
-     * 3. Write mSpendAmount = value
-     * 4.
-     * <pre>
-     * {@code
-     *      if(value < mAccount.getBalanceBase()) {
-     *        trigger error: not enough balance
-     *      } else {
-     *        enabling: submit action
-     *      }
-     * }
-     * </pre>
-     * <p>
-     * 5.
-     * <pre>
-     * {@code
-     * if(value+commission < mAccount.getBalanceBase()) {
-     *     nextAccount: find suitable account with second coin (example: current BIP, convert to: SUPERCOIN - find account for SUPERCOIN)
-     *     if(!nextAccount || nextAccount.getBalanceBase() < value+commission) {
-     *         trigger error: not enough balance
-     *     } else {
-     *         enabling: submit action
-     *     }
-     * }
-     * }
-     * </pre>
-     * @return true if found another account for gas coin: false otherwise
-     */
-    private boolean findSuitableAccountForCommission(BigDecimal amountWithCommission, String suitableCoin) {
-        Optional<AccountItem> probablySuitableAccount = findAccountByCoin(suitableCoin);
-        if (!probablySuitableAccount.isPresent() || bdGT(amountWithCommission, probablySuitableAccount.get().getBalanceBase())) {
-            mGasCoin = mAccount.getCoin();
-            return false;
-        }
-
-        mGasCoin = suitableCoin;
-        return true;
-    }
-
-    private boolean checkEnoughBalance(BigDecimal amount) {
-//        boolean enoughBalance = bdLTE(amount, mAccount.getBalanceBase());
-//        getViewState().setSubmitEnabled(enoughBalance);
-//        return enoughBalance;
-        return true;
-    }
-
     private void onAmountChangedInternal(Boolean incoming) {
         if (mGetCoin == null) {
             Timber.i("Can't exchange: coin is not set");
@@ -373,16 +327,23 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         mEnableUseMax.set(true);
                         mSpendAmount = res.result.getAmount();
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission(), 4), mAccount.getCoin()));
 
-                        if (!checkEnoughBalance(mSpendAmount)) {
-                            return;
-                        }
 
-                        if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mAccount.getCoin())) {
-                            if (!findSuitableAccountForCommission(res.result.getAmountWithCommission(), mGetCoin)) {
-                                getViewState().setError("income_coin", "Not enough balance");
-                            }
+                        final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+                        final Optional<AccountItem> getAccount = findAccountByCoin(mAccount.getCoin());
+                        if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
+                            Timber.d("Enough MNT to pay fee using MNT");
+                            mGasCoin = mntAccount.get().getCoin();
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mAccount.getCoin()));
+                        } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
+                            Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
+                            mGasCoin = getAccount.get().getCoin();
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission(), 4), mAccount.getCoin()));
+                        } else {
+                            Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
+                            mGasCoin = mntAccount.get().getCoin();
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mAccount.getCoin()));
+                            getViewState().setError("income_coin", "Not enough balance");
                         }
 
                     }, t -> {
@@ -409,16 +370,36 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         }
                         mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission(), 4), mGetCoin));
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
                         mGetAmount = res.result.getAmount();
-                        if (!checkEnoughBalance(mSpendAmount)) {
-                            return;
+
+
+                        final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+                        final Optional<AccountItem> getAccount = findAccountByCoin(mAccount.getCoin());
+                        if (bdGTE(mntAccount.get().getBalance(), OperationType.SellCoin.getFee())) {
+                            Timber.d("Enough MNT to pay fee using MNT");
+                            mGasCoin = mntAccount.get().getCoin();
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                        } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getCommission())) {
+                            Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
+                            mGasCoin = getAccount.get().getCoin();
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                        } else {
+                            Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
+                            mGasCoin = mntAccount.get().getCoin();
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                            getViewState().setError("income_coin", "Not enough balance");
                         }
-                        if (!findSuitableAccountForCommission(mSpendAmount, mAccount.getCoin())) {
-                            if (!findSuitableAccountForCommission(mSpendAmount, mGetCoin)) {
-                                getViewState().setError("income_coin", "Not enough balance");
-                            }
-                        }
+
+
+//                        if (!checkEnoughBalance(mSpendAmount)) {
+//                            return;
+//                        }
+//                        if (!findSuitableAccountForCommission(mSpendAmount, mAccount.getCoin())) {
+//                            if (!findSuitableAccountForCommission(mSpendAmount, mGetCoin)) {
+//                                getViewState().setError("income_coin", "Not enough balance");
+//                            }
+//                        }
                     }, t -> {
                         Timber.e(t, "Unable to get currency");
                         getViewState().setError("income_coin", "Unable to get currency");
@@ -432,7 +413,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mGasCoin = accountItem.getCoin();
         mAccount = accountItem;
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
-        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), accountItem.balance.stripTrailingZeros().toPlainString()));
+        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), bdHuman(accountItem.balance, 4, true)));
 
         if (!initial) {
             mInputChange.onNext(isAmountForGetting());
