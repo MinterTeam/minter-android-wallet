@@ -64,6 +64,7 @@ import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
+import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.sending.SendTabModule;
@@ -128,7 +129,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
         mInputGroup = new InputGroup();
         mInputGroup.addInput(recipientInput);
         mInputGroup.addInput(amountInput);
-        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d{0,})(\\.|\\,)?(\\d{1,18})$", "Invalid number"));
+        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number"));
         /* ideal case */
         mInputGroup.addValidator(recipientInput,
                 new RegexValidator(
@@ -137,13 +138,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
                         "Incorrect recipient format"
                 ));
 
-        /*
-        mInputGroup.addValidator(recipientInput,
-                new RegexValidator(
-                        // address only for now
-                        StringHelper.ADDRESS_PATTERN, "Incorrect recipient format"
-                ));
-                */
+        mInputGroup.addFilter(amountInput, new DecimalInputFilter(() -> amountInput));
 
         recipientLayout.clearFocus();
         amountLayout.clearFocus();

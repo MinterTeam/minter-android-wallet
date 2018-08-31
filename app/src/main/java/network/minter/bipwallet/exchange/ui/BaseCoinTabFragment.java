@@ -33,9 +33,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +41,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +50,7 @@ import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.DecimalValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
@@ -104,7 +101,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
             return source.toString().toUpperCase().replaceAll("[^A-Z]", "");
         });
 
-        mInputGroup.addFilter(inputAmount, new DecimalDigitsInputFilter(18));
+        mInputGroup.addFilter(inputAmount, new DecimalInputFilter(() -> inputAmount));
 
         calculationView.setInputType(InputType.TYPE_NULL);
     }
@@ -205,23 +202,5 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     @LayoutRes
     abstract protected int getLayout();
 
-    static class DecimalDigitsInputFilter implements InputFilter {
 
-        Pattern mPattern;
-
-        @SuppressWarnings("Annotator")
-        public DecimalDigitsInputFilter(int digitsAfterZero) {
-            mPattern = Pattern.compile("[0-9]+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?");
-        }
-
-        @Override
-        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-
-            Matcher matcher = mPattern.matcher(dest);
-            if (!matcher.matches())
-                return "";
-            return null;
-        }
-
-    }
 }
