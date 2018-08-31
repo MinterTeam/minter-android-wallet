@@ -126,7 +126,7 @@ public class BalanceUpdateService extends Service {
                     }
 
                     final String uid = String.valueOf(session.getUser().getData().id);
-                    Centrifugo client = new Centrifugo.Builder("wss://rtm.explorer.minter.network/connection/websocket")
+                    Centrifugo client = new Centrifugo.Builder("ws://rtm.explorer.minter.network/connection/websocket")
                             .setReconnectConfig(new ReconnectConfig(10, 10, TimeUnit.SECONDS))
                             .setUser(new User(uid, res.result.token))
                             .setToken(new Token(res.result.token, String.valueOf(res.result.timestamp)))

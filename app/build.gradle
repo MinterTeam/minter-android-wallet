@@ -182,7 +182,7 @@ dependencies {
         exclude module: "support-v13"
     }
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
-    implementation 'network.minter.android:centrifuge-android:0.37'
+    implementation 'network.minter.android:centrifuge-android:0.38'
 
     // Annotations and DI
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
