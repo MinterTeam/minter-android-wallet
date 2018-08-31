@@ -391,15 +391,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                             getViewState().setError("income_coin", "Not enough balance");
                         }
 
-
-//                        if (!checkEnoughBalance(mSpendAmount)) {
-//                            return;
-//                        }
-//                        if (!findSuitableAccountForCommission(mSpendAmount, mAccount.getCoin())) {
-//                            if (!findSuitableAccountForCommission(mSpendAmount, mGetCoin)) {
-//                                getViewState().setError("income_coin", "Not enough balance");
-//                            }
-//                        }
                     }, t -> {
                         Timber.e(t, "Unable to get currency");
                         getViewState().setError("income_coin", "Unable to get currency");

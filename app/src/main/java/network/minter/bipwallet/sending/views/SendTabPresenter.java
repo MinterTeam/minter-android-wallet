@@ -98,6 +98,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.createBcErrorRes
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLTE;
@@ -325,13 +326,16 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             dialog.setCancelable(false);
 
             Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+            Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
+
             // if enough balance on MNT account, set gas coin MNT (BIP)
-            if (bdLTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee())) {
+            if (bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee())) {
+                Timber.d("Enough balance in MNT to pay fee");
                 mGasCoin = mntAccount.get().getCoin();
             }
             // if sending account is not MNT (BIP), set sending account coin
-            else if (!mntAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN)) {
-                Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
+            else if (!sendAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN)) {
+                Timber.d("Not enough balance in MNT to pay fee, using " + mFromAccount.getCoin());
                 mGasCoin = sendAccount.get().getCoin();
             }
 
