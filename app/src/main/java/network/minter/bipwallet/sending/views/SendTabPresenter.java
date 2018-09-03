@@ -127,6 +127,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private String mAvatar = null;
     private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
     private BehaviorSubject<BigDecimal> mInputChange;
+    private String mGasCoin = MinterSDK.DEFAULT_COIN;
+
+    private enum SearchByType {
+        Address, Username, Email
+    }
 
     @Inject
     public SendTabPresenter() {
@@ -207,8 +212,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setSubmitEnabled(enough);
     }
 
-    private String mGasCoin = MinterSDK.DEFAULT_COIN;
-
     private void onAmountChanged(BigDecimal amount) {
         mEnableUseMax.set(false);
     }
@@ -234,10 +237,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         }
 
         resolveUserInfo(mToName.toString(), true);
-    }
-
-    private enum SearchByType {
-        Address, Username, Email
     }
 
     private SearchByType getSearchByType(String input) {
