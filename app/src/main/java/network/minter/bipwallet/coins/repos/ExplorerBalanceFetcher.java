@@ -75,14 +75,29 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
         return Observable.create(new ExplorerBalanceFetcher(addressRepository, addresses));
     }
 
-    public static Observable<BigDecimal> createSingle(ExplorerAddressRepository addressRepository, MinterAddress address) {
+    public static Observable<BigDecimal> createSingleTotalBalance(ExplorerAddressRepository addressRepository, MinterAddress address) {
+        return rxCallExp(addressRepository.getAddressData(address))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .onErrorResumeNext(convertToExpErrorResult())
+                .map(item -> item.result.getTotalBalance());
+    }
+
+    public static Observable<BigDecimal> createSingleCoinBalance(ExplorerAddressRepository addressRepository, MinterAddress address, String coin) {
         return rxCallExp(addressRepository.getAddressData(address))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(convertToExpErrorResult())
                 .map(item -> {
-                    Timber.d("Balance is really loaded");
-                    return item.result.getTotalBalance();
+                    BigDecimal out = new BigDecimal(0);
+                    for (Map.Entry<String, AddressData.CoinBalance> entry : item.result.coins.entrySet()) {
+                        if (entry.getValue().getCoin().toUpperCase().equals(coin.toUpperCase())) {
+                            out = entry.getValue().getAmount();
+                            break;
+                        }
+                    }
+
+                    return out;
                 });
     }
 

@@ -77,7 +77,7 @@ public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelected
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final AccountItem item = mItems.get(position);
         holder.avatar.setImageUrlFallback(item.getAvatar(), R.drawable.img_avatar_default);
-        holder.title.setText(String.format("%s (%s)", item.coin.toUpperCase(), bdHuman(item.balance, 4, true)));
+        holder.title.setText(String.format("%s (%s)", item.coin.toUpperCase(), bdHuman(item.balance)));
         holder.subtitle.setText(item.address.toShortString());
 
         holder.itemView.setOnClickListener(v -> {

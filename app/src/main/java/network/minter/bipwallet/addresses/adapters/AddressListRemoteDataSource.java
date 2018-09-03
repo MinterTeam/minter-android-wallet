@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -36,6 +36,7 @@ import java.util.List;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
+import network.minter.core.MinterSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.profile.models.ProfileAddressData;
 import network.minter.profile.models.ProfileResult;
@@ -92,7 +93,7 @@ public class AddressListRemoteDataSource extends PageKeyedDataSource<Integer, Ad
             final List<AddressItem> items = Stream.of(listMyResult.data)
                     .map(AddressItem::new)
                     .map(item -> {
-                        item.balance.setFetcher(ExplorerBalanceFetcher.createSingle(mExplorerAddressRepo, item.address));
+                        item.balance.setFetcher(ExplorerBalanceFetcher.createSingleCoinBalance(mExplorerAddressRepo, item.address, MinterSDK.DEFAULT_COIN));
                         return item;
                     })
                     .toList();

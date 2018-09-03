@@ -334,15 +334,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
                             Timber.d("Enough MNT to pay fee using MNT");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mAccount.getCoin()));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
                         } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
                             Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
                             mGasCoin = getAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission(), 4), mAccount.getCoin()));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission()), mAccount.getCoin()));
                         } else {
                             Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mAccount.getCoin()));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
                             getViewState().setError("income_coin", "Not enough balance");
                         }
 
@@ -370,7 +370,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         }
                         mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                         mGetAmount = res.result.getAmount();
 
 
@@ -379,15 +379,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.SellCoin.getFee())) {
                             Timber.d("Enough MNT to pay fee using MNT");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                         } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getCommission())) {
                             Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
                             mGasCoin = getAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                         } else {
                             Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount(), 4), mGetCoin));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                             getViewState().setError("income_coin", "Not enough balance");
                         }
 
@@ -404,7 +404,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mGasCoin = accountItem.getCoin();
         mAccount = accountItem;
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
-        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), bdHuman(accountItem.balance, 4, true)));
+        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), bdHuman(accountItem.balance)));
 
         if (!initial) {
             mInputChange.onNext(isAmountForGetting());

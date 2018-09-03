@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -69,7 +69,7 @@ public class AddressListLocalDataSource extends ListDataSource<AddressItem> {
                 mItems = new ArrayList<>();
                 for (Map.Entry<String, SecretData> entry : mRepo.getSecrets().entrySet()) {
                     AddressItem item = new AddressItem(entry.getValue().getId(), entry.getValue().getMinterAddress());
-                    item.balance.setFetcher(ExplorerBalanceFetcher.createSingle(mAddressRepo, entry.getValue().getMinterAddress()));
+                    item.balance.setFetcher(ExplorerBalanceFetcher.createSingleTotalBalance(mAddressRepo, entry.getValue().getMinterAddress()));
                     mItems.add(item);
                 }
 

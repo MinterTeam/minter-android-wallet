@@ -47,13 +47,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
+import network.minter.core.MinterSDK;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressListAdapter.ViewHolder> {
@@ -158,7 +158,7 @@ public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressLis
             });
         } else {
             Timber.d("Showing amount");
-            holder.balanceValue.setText(bdHuman(item.balance.getAmount(), 4));
+            holder.balanceValue.setText(bdHuman(item.balance.getAmount()) + " " + MinterSDK.DEFAULT_COIN);
             holder.balanceValue.setVisibility(View.VISIBLE);
             holder.balanceProgress.setVisibility(View.GONE);
         }

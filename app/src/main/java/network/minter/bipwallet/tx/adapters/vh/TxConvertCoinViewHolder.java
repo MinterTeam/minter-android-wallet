@@ -67,14 +67,14 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
             amount.setText("0");
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
         } else {
-            amount.setText(String.format("+ %s", bdHuman(data.valueToBuy, 4)));
+            amount.setText(String.format("+ %s", bdHuman(data.valueToBuy)));
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
         }
 
         subamount.setText(data.getCoinToBuy());
         coinFrom.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         coinTo.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
-        convertAmount.setText(bdHuman(data.valueToBuy, 4));
+        convertAmount.setText(bdHuman(data.valueToBuy));
     }
 
     @Override

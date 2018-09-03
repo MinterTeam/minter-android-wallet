@@ -521,7 +521,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onAccountSelected(AccountItem accountItem) {
         mFromAccount = accountItem;
-        getViewState().setAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), bdHuman(accountItem.getBalance(), 4, true)));
+        getViewState().setAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), bdHuman(accountItem.getBalance())));
     }
 
     private static final class SendInitData {
