@@ -64,8 +64,8 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
         titleSecond.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
         avatar.setImageResource(R.drawable.img_avatar_exchange);
         if (bdNull(data.valueToBuy)) {
-            amount.setText("0");
-            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+            amount.setText(bdHuman(data.valueToBuy));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         } else {
             amount.setText(String.format("+ %s", bdHuman(data.valueToBuy)));
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));

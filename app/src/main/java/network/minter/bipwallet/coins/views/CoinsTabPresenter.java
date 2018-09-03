@@ -26,7 +26,6 @@
 
 package network.minter.bipwallet.coins.views;
 
-import android.content.ComponentCallbacks2;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -126,24 +125,6 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         mAdapter.clear();
         mTransactionsAdapter.clear();
         mCoinsAdapter.clear();
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
-            mUseAvatars = false;
-            if (mCoinsAdapter != null) {
-                mCoinsAdapter.notifyDataSetChanged();
-            }
-            mTransactionsAdapter.setUseAvatars(false);
-            mTransactionsAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
     }
 
     @Override

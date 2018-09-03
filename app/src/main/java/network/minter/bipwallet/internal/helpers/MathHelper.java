@@ -137,20 +137,21 @@ public final class MathHelper {
     }
 
     public static String bdHuman(BigDecimal source) {
-        if (source.equals(new BigDecimal("0e-18"))) {
-            return "0";
+        BigDecimal num = firstNonNull(source, new BigDecimal(0));
+
+        if (bdNull(num)) {
+            return formatDecimalCurrency(num, 4, true);
         }
 
-        if (bdLT(source, new BigDecimal(1))) {
-            if (source.stripTrailingZeros().scale() <= 4) {
-                return formatDecimalCurrency(firstNonNull(source, new BigDecimal(0)).setScale(4, BigDecimal.ROUND_DOWN), 4, true);
+        if (bdLT(num, new BigDecimal(1))) {
+            if (num.stripTrailingZeros().scale() <= 4) {
+                return formatDecimalCurrency(num.setScale(4, BigDecimal.ROUND_DOWN), 4, true);
             }
 
-            return formatDecimalCurrency(firstNonNull(source, new BigDecimal(0)).setScale(8, BigDecimal.ROUND_UP), 8, false);
-
+            return formatDecimalCurrency(num.setScale(8, BigDecimal.ROUND_UP), 8, false);
         }
 
-        final BigDecimal out = firstNonNull(source, new BigDecimal(0)).setScale(4, RoundingMode.DOWN);
+        final BigDecimal out = num.setScale(4, RoundingMode.DOWN);
         return formatDecimalCurrency(out, 4, true);
     }
 

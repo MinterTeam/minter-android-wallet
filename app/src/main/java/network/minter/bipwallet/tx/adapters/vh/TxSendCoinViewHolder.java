@@ -90,7 +90,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
         }
 
         if (bdNull(data.amount)) {
-            amount.setText("0");
+            amount.setText(bdHuman(data.amount));
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         }
 
