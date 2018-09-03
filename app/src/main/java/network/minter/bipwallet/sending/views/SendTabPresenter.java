@@ -236,6 +236,23 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         resolveUserInfo(mToName.toString(), true);
     }
 
+    private enum SearchByType {
+        Address, Username, Email
+    }
+
+    private SearchByType getSearchByType(String input) {
+        if (input.substring(0, 2).equals(MinterSDK.PREFIX_ADDRESS) && input.length() == 42) {
+            // searching data by address
+            return SearchByType.Address;
+        } else if (input.substring(0, 1).equals("@")) {
+            // searching data by username
+            return SearchByType.Username;
+        } else {
+            // searching by email
+            return SearchByType.Email;
+        }
+    }
+
     private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
         getViewState().startDialog(ctx -> {
             rxCallProfile(infoRepo.findAddressInfoByInput(searchBy))
@@ -247,7 +264,19 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         if (result.isSuccess()) {
                             mAvatar = result.data.user.getAvatar().getUrl();
                             mToAddress = result.data.address.toString();
-                            mToName = String.format("@%s", result.data.user.username);
+                            final SearchByType nameType = getSearchByType(searchBy);
+                            switch (nameType) {
+                                case Email:
+                                    mToName = result.data.user.email;
+                                    break;
+                                case Username:
+                                    mToName = String.format("@%s", result.data.user.username);
+                                    break;
+                                case Address:
+                                    mToName = result.data.address.toString();
+                                    break;
+                            }
+//                            mToName = String.format("@%s", result.data.user.username);
                             getViewState().setRecipientError(null);
                             startSendDialog();
                         } else {
