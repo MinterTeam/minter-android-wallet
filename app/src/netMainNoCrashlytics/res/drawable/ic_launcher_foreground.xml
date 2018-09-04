@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (C) by MinterTeam. 2018
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="108dp"
+        android:height="108dp"
+        android:viewportWidth="680.43475"
+        android:viewportHeight="680.43475">
+    <group
+        android:translateX="212.21739"
+        android:translateY="183.71739">
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M163.206,188.84C163.672,183.695 164.138,179.018 164.138,174.808C164.138,153.293 154.346,145.809 138.492,145.809C129.166,145.809 117.508,151.89 109.115,157.97L96.991,240.758C104.452,242.161 110.514,242.629 116.576,242.629C145.02,242.629 157.61,223.92 163.206,188.84ZM132.446,0C131.472,6.022 130.54,11.756 129.65,17.203C122.032,63.853 117.518,89.416 116.109,93.892L117.508,94.359C137.093,81.263 156.678,74.247 179.06,74.247C226.623,74.247 256,99.504 256,155.631C256,248.709 199.577,312.32 99.789,312.32C70.412,312.32 37.77,310.917 0,304.836C18.45,179.523 32.287,85.538 41.512,22.882L43.18,11.55L132.446,0Z"
+            android:strokeWidth="1"
+            android:strokeColor="#00000000"/>
+    </group>
+</vector>
