@@ -183,7 +183,7 @@
                 android:id="@+id/input_incoming_coin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="text|textNoSuggestions"
                 android:maxLength="10"
                 android:singleLine="true"
                 android:tag="income_coin"
