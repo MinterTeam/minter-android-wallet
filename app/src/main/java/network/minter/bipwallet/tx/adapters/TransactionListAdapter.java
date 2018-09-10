@@ -147,6 +147,9 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
                     h.detailsLayout.setActivated(isExpanded);
                     h.itemView.setOnClickListener(v -> {
                         mExpandedPositions.put(position, !isExpanded);
+                        if (!isExpanded && mOnExpandDetailsListener != null) {
+                            mOnExpandDetailsListener.onExpand(v, item != null ? item.getTx() : null);
+                        }
                         TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
                         notifyItemChanged(holder.getAdapterPosition());
                     });
