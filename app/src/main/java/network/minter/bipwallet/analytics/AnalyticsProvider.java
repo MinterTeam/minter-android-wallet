@@ -24,51 +24,21 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.exchange.views;
+package network.minter.bipwallet.analytics;
 
-import com.arellomobile.mvp.InjectViewState;
+import android.os.Bundle;
 
-import javax.inject.Inject;
-
-import network.minter.bipwallet.analytics.AppEvent;
-import network.minter.bipwallet.exchange.ExchangeModule;
-import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import java.util.Map;
 
 /**
- * MinterWallet. 2018
- *
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@InjectViewState
-public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.ConvertCoinView> {
-    private int mLastPage = 0;
 
-    @Inject
-    public ConvertCoinPresenter() {
-    }
+public interface AnalyticsProvider {
 
-    @Override
-    public void attachView(ExchangeModule.ConvertCoinView view) {
-        super.attachView(view);
-        getViewState().setCurrentPage(mLastPage);
-    }
-
-    public void onTabSelected(int position) {
-        mLastPage = position;
-        switch (position) {
-            case 0:
-                getAnalytics().send(AppEvent.ConvertSpendScreen);
-                break;
-            case 1:
-                getAnalytics().send(AppEvent.ConvertGetScreen);
-                break;
-        }
-    }
-
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        getViewState().setupTabs();
-    }
-
+    void send(final AppEvent event);
+    void send(final AppEvent event, final Map<String, Object> params);
+    void send(final AppEvent event, final Bundle bundle);
+    void send(final AppEvent event, final Integer itemId);
 }

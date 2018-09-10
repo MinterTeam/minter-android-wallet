@@ -29,6 +29,7 @@ package network.minter.bipwallet.addresses.views;
 import android.arch.paging.PagedList;
 import android.arch.paging.RxPagedListBuilder;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.arellomobile.mvp.InjectViewState;
@@ -41,6 +42,8 @@ import network.minter.bipwallet.addresses.adapters.AddressListAdapter;
 import network.minter.bipwallet.addresses.adapters.AddressListFactory;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -54,7 +57,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.AddressListView> {
+public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.AddressListView> implements HasAnalyticsEvent {
     private final static int REQUEST_ADDRESS_ITEM = 100;
     private final static int REQUEST_FOR_RESULT = 200;
     @Inject SecretStorage secretRepo;
@@ -71,6 +74,12 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
         mAdapter.setOnAddressClickListener((v, name, address) -> getViewState().startAddressItem(REQUEST_ADDRESS_ITEM, name, address));
         mAdapter.setOnSetMainListener(this::onSetMain);
         mAdapter.setOnBalanceClickListener(this::onClickBalance);
+    }
+
+    @NonNull
+    @Override
+    public AppEvent getAnalyticsEvent() {
+        return AppEvent.AddressesScreen;
     }
 
     private void onClickBalance(View view, AddressItem addressItem) {

@@ -28,11 +28,13 @@ package network.minter.bipwallet.internal.mvp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.v4.util.Pair;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpPresenter;
 import com.arellomobile.mvp.MvpView;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -44,12 +46,19 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import network.minter.bipwallet.analytics.AnalyticsManager;
+import network.minter.bipwallet.analytics.AppEvent;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEventWithBundle;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEventWithId;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEventWithParams;
+import network.minter.bipwallet.analytics.base.HasAnalyticsMultipleEvents;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.core.internal.exceptions.NetworkException;
 import timber.log.Timber;
 
 /**
  * Stars. 2017
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V> {
@@ -87,6 +96,7 @@ public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V
 
         if (!mIsInitialized) {
             mIsInitialized = true;
+            handleAnalytics();
         }
 
         super.attachView(view);
@@ -123,6 +133,9 @@ public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
     }
 
+    protected AnalyticsManager getAnalytics() {
+        return Wallet.app().analytics();
+    }
 
     protected void doOnErrorResolve() {
         if (getViewState() instanceof ProgressView) {
@@ -147,7 +160,7 @@ public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V
                             exceptionMessage = ((NetworkException) t).getUserMessage();
                         }
                         ((ErrorViewWithRetry) getViewState()).onErrorWithRetry(String.format("%s", exceptionMessage),
-                                                                               retryOnClick());
+                                retryOnClick());
                     });
         }
     }
@@ -184,5 +197,29 @@ public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V
                     .toObservable()
                     .doOnSubscribe(this::unsubscribeOnDestroy);
         });
+    }
+
+    private void handleAnalytics() {
+        final AnalyticsManager analytics = getAnalytics();
+        if (this instanceof HasAnalyticsEvent) {
+            analytics.send(((HasAnalyticsEvent) this).getAnalyticsEvent());
+        }
+        if (this instanceof HasAnalyticsEventWithId) {
+            final Pair<AppEvent, Integer> eventWithId = ((HasAnalyticsEventWithId) this).getAnalyticsEventWithId();
+            analytics.send(eventWithId.first, eventWithId.second);
+        }
+        if (this instanceof HasAnalyticsEventWithBundle) {
+            final Pair<AppEvent, Bundle> eventWithId = ((HasAnalyticsEventWithBundle) this).getAnalyticsEventWithBundle();
+            analytics.send(eventWithId.first, eventWithId.second);
+        }
+        if (this instanceof HasAnalyticsEventWithParams) {
+            final Pair<AppEvent, Map<String, Object>> eventWithId = ((HasAnalyticsEventWithParams) this).getAnalyticsEventWithParams();
+            analytics.send(eventWithId.first, eventWithId.second);
+        }
+        if (this instanceof HasAnalyticsMultipleEvents) {
+            for (AppEvent event : ((HasAnalyticsMultipleEvents) this).getAnalyticsEvents()) {
+                analytics.send(event);
+            }
+        }
     }
 }

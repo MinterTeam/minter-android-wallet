@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.helpers.TextHelper;
@@ -102,6 +103,7 @@ public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.Recei
     }
 
     private void onCopyQR(View view) {
+        getAnalytics().send(AppEvent.ReceiveShareButton);
 //        Uri qrPath = getUriForFile(app().context(), app().context().getApplicationContext().getPackageName() + ".file.provider", mOutFile);
 
         final Intent intent = new ShareManager.IntentBuilder()

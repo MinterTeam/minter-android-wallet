@@ -1,7 +1,7 @@
-/*******************************************************************************
+/*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.home.views;
 
@@ -40,6 +40,7 @@ import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.HomeTabsClasses;
@@ -52,14 +53,13 @@ import static network.minter.bipwallet.internal.Wallet.app;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
 public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
 
 
-    private final HashMap<Integer, Integer> mClientBottomIdPositionMap = new HashMap<Integer, Integer>() {{
+    private final HashMap<Integer, Integer> mBottomIdPositionMap = new HashMap<Integer, Integer>() {{
         put(R.id.bottom_coins, 0);
         put(R.id.bottom_send, 1);
         put(R.id.bottom_receive, 2);
@@ -92,10 +92,24 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
 
     public void onPageSelected(int position) {
         mLastPosition = position;
+        switch (position) {
+            case R.id.bottom_coins:
+                getAnalytics().send(AppEvent.CoinsScreen);
+                break;
+            case R.id.bottom_receive:
+                getAnalytics().send(AppEvent.ReceiveScreen);
+                break;
+            case R.id.bottom_send:
+                getAnalytics().send(AppEvent.SendScreen);
+                break;
+            case R.id.bottom_settings:
+                getAnalytics().send(AppEvent.SettingsScreen);
+                break;
+        }
     }
 
     public int getBottomIdByPosition(int position) {
-        for (Map.Entry<Integer, Integer> item : mClientBottomIdPositionMap.entrySet()) {
+        for (Map.Entry<Integer, Integer> item : mBottomIdPositionMap.entrySet()) {
             if (item.getValue() == position) {
                 return item.getKey();
             }
@@ -121,7 +135,7 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
     }
 
     public int getBottomPositionById(int itemId) {
-        return mClientBottomIdPositionMap.get(itemId);
+        return mBottomIdPositionMap.get(itemId);
     }
 
     @Override

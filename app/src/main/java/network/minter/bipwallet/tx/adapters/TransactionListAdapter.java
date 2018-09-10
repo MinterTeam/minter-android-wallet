@@ -75,6 +75,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     @SuppressLint("UseSparseArrays")
     private HashMap<Integer, Boolean> mExpandedPositions = new HashMap<>();
     private boolean mUseMultipleExpanded = true;
+    private OnExpandDetailsListener mOnExpandDetailsListener;
 
     public TransactionListAdapter(List<MinterAddress> addresses, boolean enableExpanding) {
         super(sDiffCallback);
@@ -154,6 +155,9 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
                     h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
                     h.detailsLayout.setActivated(isExpanded);
                     h.itemView.setOnClickListener(v -> {
+                        if (!isExpanded && mOnExpandDetailsListener != null) {
+                            mOnExpandDetailsListener.onExpand(v, item != null ? item.getTx() : null);
+                        }
                         int prevExp = mExpandedPosition;
                         mExpandedPosition = isExpanded ? -1 : position;
                         TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
@@ -172,8 +176,16 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
         mLoadState = loadState;
     }
 
+    public void setOnExpandDetailsListener(OnExpandDetailsListener listener) {
+        mOnExpandDetailsListener = listener;
+    }
+
     private boolean hasProgressRow() {
         return mLoadState != null && mLoadState.getValue() != TransactionDataSource.LoadState.Loaded;
+    }
+
+    public interface OnExpandDetailsListener {
+        void onExpand(View view, HistoryTransaction tx);
     }
 
     public interface OnExplorerOpenClickListener {

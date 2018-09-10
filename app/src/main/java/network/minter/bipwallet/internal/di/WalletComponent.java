@@ -40,6 +40,7 @@ import dagger.Component;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AnalyticsManager;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
@@ -79,6 +80,7 @@ import network.minter.profile.repo.ProfileRepository;
         InjectorsModule.class,
         CacheModule.class,
         NotificationModule.class,
+        AnalyticsModule.class,
 })
 @WalletApp
 public interface WalletComponent {
@@ -104,6 +106,7 @@ public interface WalletComponent {
     SharedPreferences prefs();
     GsonBuilder gsonBuilder();
     CacheManager cache();
+    AnalyticsManager analytics();
 
     // notification
     BalanceNotificationManager balanceNotifications();

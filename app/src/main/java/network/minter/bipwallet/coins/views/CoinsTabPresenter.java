@@ -49,6 +49,7 @@ import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.utils.HistoryTransactionDiffUtil;
@@ -159,7 +160,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
         setUsername();
 
-        getViewState().setOnAvatarClick(v -> getViewState().startTab(R.id.bottom_settings));
+        getViewState().setOnAvatarClick(this::onAvatarClick);
         getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
 
         mTransactionsRow = new ListWithButtonRow.Builder(Wallet.app().res().getString(R.string.frag_coins_last_transactions_title))
@@ -220,6 +221,11 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
         mAdapter.addRow(mTransactionsRow);
         mAdapter.addRow(mCoinsRow);
+    }
+
+    private void onAvatarClick(View view) {
+        getAnalytics().send(AppEvent.CoinsUsernameButton);
+        getViewState().startTab(R.id.bottom_settings);
     }
 
     private void onExplorerClick(View view, HistoryTransaction historyTransaction) {

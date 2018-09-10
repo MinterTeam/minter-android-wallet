@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -39,6 +39,7 @@ import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.addresses.AddressManageModule;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.addresses.ui.AddressItemActivity;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.helpers.IntentHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
@@ -85,6 +86,7 @@ public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.A
     }
 
     private void onClickCopy(View v) {
+        getAnalytics().send(AppEvent.AddressesCopyButton);
         ContextHelper.copyToClipboard(v.getContext(), mAddress.toString());
     }
 

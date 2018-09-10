@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.settings.views.migration;
 
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
@@ -48,6 +49,8 @@ import io.reactivex.subjects.PublishSubject;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
@@ -70,7 +73,7 @@ import static network.minter.bipwallet.settings.views.migration.MigrationExcepti
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsTabModule.PasswordChangeMigrationView> {
+public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsTabModule.PasswordChangeMigrationView> implements HasAnalyticsEvent {
 
     @Inject ProfileRepository profileRepo;
     @Inject ProfileAddressRepository addressRepo;
@@ -90,6 +93,12 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
     @Override
     public void attachView(SettingsTabModule.PasswordChangeMigrationView view) {
         super.attachView(view);
+    }
+
+    @NonNull
+    @Override
+    public AppEvent getAnalyticsEvent() {
+        return AppEvent.PasswordEditScreen;
     }
 
     @Override

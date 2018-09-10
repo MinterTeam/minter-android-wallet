@@ -52,6 +52,7 @@ import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.models.ConvertTransactionData;
@@ -180,6 +181,12 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
+        if (isAmountForGetting()) {
+            getAnalytics().send(AppEvent.ConvertGetExchangeButton);
+        } else {
+            getAnalytics().send(AppEvent.ConvertSpendExchangeButton);
+        }
+
         Timber.d("Use max: %b", mUseMax);
 
         getViewState().startDialog(ctx -> new WalletTxConvertStartDialog.Builder(ctx, "Convert coin")
@@ -270,6 +277,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
         getViewState().setAmount(mAccount.balance.stripTrailingZeros().toPlainString());
         mUseMax = true;
+
+        getAnalytics().send(AppEvent.ConvertSpendUseMaxButton);
     }
 
     private void onClickSelectAccount(View view) {

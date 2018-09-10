@@ -44,6 +44,7 @@ import javax.inject.Inject;
 
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.home.HomeScope;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
@@ -146,6 +147,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     public void onLogout() {
+        getAnalytics().send(AppEvent.SettingsLogoutButton);
         getViewState().startLogin();
     }
 
@@ -260,10 +262,12 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                 case Email:
                     dialog.setInputTypeEmail();
                     dialog.addValidator(new EmailValidator());
+                    getAnalytics().send(AppEvent.EmailEditScreen);
                     break;
                 case Username:
                     dialog.setInputTypeUsername();
                     dialog.addValidator(new MinterUsernameValidator(ctx.getString(R.string.input_username_invalid)));
+                    getAnalytics().send(AppEvent.UsernameEditScreen);
                     break;
             }
 
@@ -278,6 +282,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     private void onClickChangeAvatar(View view) {
+        getAnalytics().send(AppEvent.SettingsChangeUserpicButton);
         getViewState().startAvatarChooser();
     }
 

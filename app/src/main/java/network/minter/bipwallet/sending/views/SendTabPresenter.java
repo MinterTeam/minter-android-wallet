@@ -58,6 +58,7 @@ import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CacheManager;
@@ -217,10 +218,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onClickScanQR(View view) {
+        getAnalytics().send(AppEvent.SendCoinsQRButton);
+
         getViewState().startScanQRWithPermissions(REQUEST_CODE_QR_SCAN);
     }
 
     private void onSubmit(View view) {
+        getAnalytics().send(AppEvent.SendCoinsSendButton);
         //TODO check this hell
         if (mToName == null) {
             getViewState().setRecipientError("Invalid recipient");
@@ -299,13 +303,20 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void startSendDialog() {
         getViewState().startDialog(ctx -> {
+            getAnalytics().send(AppEvent.SendCoinPopupScreen);
             final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, "You're sending")
                     .setAmount(mAmount)
                     .setAvatarUrl(mAvatar)
                     .setRecipientName(mToName)
                     .setCoin(mFromAccount.coin)
-                    .setPositiveAction("Send", (d, w) -> onStartExecuteTransaction(true))
-                    .setNegativeAction("Cancel", null)
+                    .setPositiveAction("Send", (d, w) -> {
+                        onStartExecuteTransaction(true);
+                        getAnalytics().send(AppEvent.SendCoinPopupSendButton);
+                        d.dismiss();
+                    })
+                    .setNegativeAction("Cancel", (d, w) -> {
+                        getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
+                    })
                     .create();
             dialog.setCancelable(true);
             return dialog;
@@ -339,6 +350,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         checkEnoughBalance(mFromAccount.getBalanceBase());
         mAmount = mFromAccount.getBalance();
         getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
+
+        getAnalytics().send(AppEvent.SendCoinsUseMaxButton);
     }
 
     private Optional<AccountItem> findAccountByCoin(String coin) {
@@ -518,15 +531,23 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
         accountStorage.update(true);
         txRepo.update(true);
-        getViewState().startDialog(ctx -> new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
-                .setRecipientName(mToName)
-                .setAvatar(mAvatar)
-                .setPositiveAction("View transaction", (d, v) -> {
-                    getViewState().startExplorer(result.result.txHash.toString());
-                    d.dismiss();
-                })
-                .setNegativeAction("Close", null)
-                .create());
+        getViewState().startDialog(ctx -> {
+            getAnalytics().send(AppEvent.SentCoinPopupScreen);
+
+            return new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
+                    .setRecipientName(mToName)
+                    .setAvatar(mAvatar)
+                    .setPositiveAction("View transaction", (d, v) -> {
+                        getViewState().startExplorer(result.result.txHash.toString());
+                        d.dismiss();
+                        getAnalytics().send(AppEvent.SentCoinPopupViewTransactionButton);
+                    })
+                    .setNegativeAction("Close", (d, w) -> {
+                        d.dismiss();
+                        getAnalytics().send(AppEvent.SentCoinPopupCloseButton);
+                    })
+                    .create();
+        });
 
         getViewState().clearInputs();
     }
@@ -545,6 +566,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onClickAccountSelector(View view) {
+        getAnalytics().send(AppEvent.SendCoinsChooseCoinButton);
         getViewState().startAccountSelector(accountStorage.getData().getAccounts(), this::onAccountSelected);
     }
 

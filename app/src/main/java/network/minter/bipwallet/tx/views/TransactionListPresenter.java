@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -29,6 +29,7 @@ package network.minter.bipwallet.tx.views;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.PagedList;
 import android.arch.paging.RxPagedListBuilder;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.arellomobile.mvp.InjectViewState;
@@ -37,6 +38,8 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.analytics.AppEvent;
+import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
@@ -48,11 +51,10 @@ import network.minter.profile.repo.ProfileInfoRepository;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.TransactionListView> {
+public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.TransactionListView> implements HasAnalyticsEvent {
 
     @Inject ExplorerTransactionRepository transactionRepo;
     @Inject SecretStorage secretRepo;
@@ -81,12 +83,19 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
         mLastPosition = position;
     }
 
+    @NonNull
+    @Override
+    public AppEvent getAnalyticsEvent() {
+        return AppEvent.TransactionsScreen;
+    }
+
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         mAdapter = new TransactionListAdapter(secretRepo.getAddresses());
 
         mAdapter.setOnExplorerOpenClickListener(this::onExplorerClick);
+        mAdapter.setOnExpandDetailsListener(this::onExpandTx);
         mLoadState = new MutableLiveData<>();
         getViewState().syncProgress(mLoadState);
         mAdapter.setLoadState(mLoadState);
@@ -101,6 +110,10 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
         refresh();
 
         unsubscribeOnDestroy(mListDisposable);
+    }
+
+    private void onExpandTx(View view, HistoryTransaction tx) {
+        getAnalytics().send(AppEvent.TransactionDetailsButton);
     }
 
     private void onRefresh() {
@@ -120,5 +133,6 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
 
     private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
         getViewState().startExplorer(historyTransaction.hash.toString());
+        getAnalytics().send(AppEvent.TransactionExplorerButton);
     }
 }
