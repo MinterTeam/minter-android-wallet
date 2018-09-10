@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.exchange.ui;
+package network.minter.bipwallet.exchange.ui.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -44,6 +44,7 @@ import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -173,13 +174,9 @@ public class WalletTxConvertStartDialog extends WalletDialog {
             return this;
         }
 
-        public Builder setAmount(String amount) {
-            mAmount = amount;
-            return this;
-        }
-
         public Builder setAmount(BigDecimal amount) {
-            return setAmount(amount.toPlainString());
+            mAmount = bdHuman(amount);
+            return this;
         }
 
         @Override

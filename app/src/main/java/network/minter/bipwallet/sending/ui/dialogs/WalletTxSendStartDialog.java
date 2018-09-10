@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.sending.dialogs;
+package network.minter.bipwallet.sending.ui.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -44,6 +44,7 @@ import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.core.MinterSDK;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * MinterWallet. 2018
@@ -71,7 +72,7 @@ public final class WalletTxSendStartDialog extends WalletDialog {
         setContentView(R.layout.wallet_tx_send_start_dialog);
         ButterKnife.bind(this);
         title.setText(mBuilder.getTitle());
-        amount.setText(String.format("%s %s", mBuilder.mAmount.toString(), mBuilder.mCoin));
+        amount.setText(String.format("%s %s", bdHuman(mBuilder.mAmount), mBuilder.mCoin));
         if (mBuilder.mAvatarUrl != null) {
             avatar.setImageUrl(mBuilder.mAvatarUrl);
         }

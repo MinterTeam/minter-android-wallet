@@ -55,7 +55,7 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.models.ConvertTransactionData;
-import network.minter.bipwallet.exchange.ui.WalletTxConvertStartDialog;
+import network.minter.bipwallet.exchange.ui.dialogs.WalletTxConvertStartDialog;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
