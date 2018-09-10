@@ -36,8 +36,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 21
-        versionName "1.0.0"
+        versionCode 22
+        versionName "1.1.0-beta"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

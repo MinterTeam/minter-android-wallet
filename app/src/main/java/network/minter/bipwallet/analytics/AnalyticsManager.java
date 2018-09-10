@@ -53,7 +53,11 @@ public class AnalyticsManager implements AnalyticsProvider {
     public void send(AppEvent event) {
         for (AnalyticsProvider provider : mProviders) {
             if (provider == null) continue;
-            provider.send(event);
+            try {
+                provider.send(event);
+            } catch (Throwable t) {
+                Timber.w(t, "Unable to send event: %s", event.getValue());
+            }
         }
     }
 
@@ -61,7 +65,11 @@ public class AnalyticsManager implements AnalyticsProvider {
     public void send(AppEvent event, Map<String, Object> params) {
         for (AnalyticsProvider provider : mProviders) {
             if (provider == null) continue;
-            provider.send(event, params);
+            try {
+                provider.send(event, params);
+            } catch (Throwable t) {
+                Timber.w("Unable to send event: %s", event.getValue());
+            }
         }
     }
 
@@ -69,7 +77,11 @@ public class AnalyticsManager implements AnalyticsProvider {
     public void send(AppEvent event, Bundle bundle) {
         for (AnalyticsProvider provider : mProviders) {
             if (provider == null) continue;
-            provider.send(event, bundle);
+            try {
+                provider.send(event, bundle);
+            } catch (Throwable t) {
+                Timber.w("Unable to send event: %s", event.getValue());
+            }
         }
     }
 
@@ -77,7 +89,11 @@ public class AnalyticsManager implements AnalyticsProvider {
     public void send(final AppEvent event, final Integer itemId) {
         for (AnalyticsProvider provider : mProviders) {
             if (provider == null) continue;
-            provider.send(event, itemId);
+            try {
+                provider.send(event, itemId);
+            } catch (Throwable t) {
+                Timber.w("Unable to send event: %s", event.getValue());
+            }
         }
     }
 }
