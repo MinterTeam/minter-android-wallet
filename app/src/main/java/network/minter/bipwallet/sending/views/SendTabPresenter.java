@@ -221,11 +221,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onSubmit(View view) {
+        //TODO check this hell
         if (mToName == null) {
             getViewState().setRecipientError("Invalid recipient");
             return;
         }
-        if (mToAddress != null) {
+        if (mToAddress != null && mToName == null) {
             resolveUserInfo(mToAddress.toString(), false);
             return;
         }
