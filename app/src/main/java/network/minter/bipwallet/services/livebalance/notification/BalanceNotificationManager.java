@@ -45,6 +45,7 @@ import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -101,7 +102,7 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
                 .subscribeOn(Schedulers.io())
                 .subscribe(result -> {
 
-                    final String text = String.format("%s: %s", message.getCoin(), message.getAmount().toPlainString());
+                    final String text = String.format("%s: %s", message.getCoin(), bdHuman(message.getAmount()));
 
                     NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
                     style.addLine(text).setSummaryText(message.getAddress().toShortString());
