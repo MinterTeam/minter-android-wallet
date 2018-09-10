@@ -37,6 +37,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -48,6 +49,7 @@ import butterknife.Unbinder;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.adapters.CoinsListAdapter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
@@ -57,6 +59,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
 import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.models.CoinItem;
 import timber.log.Timber;
 
 /**
@@ -65,8 +68,8 @@ import timber.log.Timber;
  */
 public abstract class BaseCoinTabFragment extends BaseInjectFragment implements ExchangeModule.BaseCoinTabView {
 
-    @BindView(R.id.input_incoming_coin) TextInputEditText inputIncomingCoin;
-    @BindView(R.id.layout_incoming_coin) TextInputLayout layoutIncomingCoin;
+    @BindView(R.id.input_incoming_coin) AutoCompleteTextView inputIncomingCoin;
+    //    @BindView(R.id.layout_incoming_coin) TextInputLayout layoutIncomingCoin;
     @BindView(R.id.input_amount) TextInputEditText inputAmount;
     @BindView(R.id.layout_amount) TextInputLayout layoutAmount;
     @BindView(R.id.input_outgoing_coin) TextInputEditText inputOutgoingCoin;
@@ -94,11 +97,11 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
         mInputGroup.addInput(inputIncomingCoin, inputAmount);
 
         mInputGroup.addValidator(inputAmount, new DecimalValidator("Invalid number"));
-        mInputGroup.addValidator(inputIncomingCoin, new RegexValidator("^[a-zA-Z]+$", "Invalid coin name"));
+        mInputGroup.addValidator(inputIncomingCoin, new RegexValidator("^[a-zA-Z0-9]+$", "Invalid coin name"));
 
         mInputGroup.addFilter(inputIncomingCoin, (source, start, end, dest, dstart, dend) -> {
             Timber.d("Filter: source=%s, start=%d, end=%d, dest=%s, destStart=%d, destEnd=%d", source, start, end, dest, dstart, dend);
-            return source.toString().toUpperCase().replaceAll("[^A-Z]", "");
+            return source.toString().toUpperCase().replaceAll("[^A-Z0-9]", "");
         });
 
         mInputGroup.addFilter(inputAmount, new DecimalInputFilter(() -> inputAmount));
@@ -119,6 +122,25 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     @Override
     public void setAmount(CharSequence amount) {
         inputAmount.setText(amount);
+    }
+
+    @Override
+    public void setCoinsAutocomplete(List<CoinItem> items, CoinsListAdapter.OnItemClickListener listener) {
+        if (items.size() > 0) {
+            final CoinsListAdapter.OnItemClickListener cl = (item, position) -> {
+                listener.onClick(item, position);
+                inputIncomingCoin.dismissDropDown();
+            };
+
+            final CoinsListAdapter adapter = new CoinsListAdapter(getActivity(), items);
+            adapter.setOnItemClickListener(cl);
+            inputIncomingCoin.setAdapter(adapter);
+        }
+    }
+
+    @Override
+    public void setIncomingCoin(String symbol) {
+        inputIncomingCoin.setText(symbol);
     }
 
     @Override

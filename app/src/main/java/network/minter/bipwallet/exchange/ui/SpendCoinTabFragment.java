@@ -61,6 +61,6 @@ public class SpendCoinTabFragment extends BaseCoinTabFragment implements SpendCo
 
     @Override
     protected int getLayout() {
-        return R.layout.fragment_coin_spend;
+        return R.layout.fragment_coin_exchange_spend;
     }
 }

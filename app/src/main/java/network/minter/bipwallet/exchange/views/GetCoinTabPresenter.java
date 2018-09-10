@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -40,6 +40,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerCoinsRepository;
 
 /**
  * minter-android-wallet. 2018
@@ -50,15 +51,8 @@ import network.minter.explorer.models.HistoryTransaction;
 public class GetCoinTabPresenter extends BaseCoinTabPresenter<GetCoinTabView> {
 
     @Inject
-    public GetCoinTabPresenter(
-            SecretStorage secretStorage,
-            CachedRepository<UserAccount, AccountStorage> accountStorage,
-            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            BlockChainCoinRepository coinRepo,
-            BlockChainAccountRepository accountRepo
-    ) {
-        super(secretStorage, accountStorage, txRepo, coinRepo, accountRepo);
-
+    public GetCoinTabPresenter(SecretStorage secretStorage, CachedRepository<UserAccount, AccountStorage> accountStorage, CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo, BlockChainCoinRepository coinRepo, BlockChainAccountRepository accountRepo, ExplorerCoinsRepository explorerCoinsRepository) {
+        super(secretStorage, accountStorage, txRepo, coinRepo, accountRepo, explorerCoinsRepository);
     }
 
     @Override

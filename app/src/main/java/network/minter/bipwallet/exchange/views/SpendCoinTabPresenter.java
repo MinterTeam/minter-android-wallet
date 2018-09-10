@@ -40,6 +40,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerCoinsRepository;
 
 /**
  * minter-android-wallet. 2018
@@ -49,15 +50,8 @@ import network.minter.explorer.models.HistoryTransaction;
 public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView> {
 
     @Inject
-    public SpendCoinTabPresenter(
-            SecretStorage secretStorage,
-            CachedRepository<UserAccount, AccountStorage> accountStorage,
-            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            BlockChainCoinRepository coinRepo,
-            BlockChainAccountRepository accountRepo
-    ) {
-        super(secretStorage, accountStorage, txRepo, coinRepo, accountRepo);
-
+    public SpendCoinTabPresenter(SecretStorage secretStorage, CachedRepository<UserAccount, AccountStorage> accountStorage, CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo, BlockChainCoinRepository coinRepo, BlockChainAccountRepository accountRepo, ExplorerCoinsRepository explorerCoinsRepository) {
+        super(secretStorage, accountStorage, txRepo, coinRepo, accountRepo, explorerCoinsRepository);
     }
 
     @Override

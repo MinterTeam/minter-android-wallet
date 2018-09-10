@@ -59,6 +59,7 @@ import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAddressRepository;
@@ -119,6 +120,7 @@ public interface WalletComponent {
     ProfileInfoRepository infoRepo();
     ProfileAddressRepository addressMyRepo();
     ExplorerAddressRepository addressExplorerRepo();
+    ExplorerCoinsRepository explorerCoinsRepo();
 
     ProfileRepository profileRepo();
     BlockChainAccountRepository accountRepoBlockChain();

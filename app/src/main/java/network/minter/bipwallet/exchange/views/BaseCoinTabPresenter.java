@@ -72,11 +72,13 @@ import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerCoinsRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.blockchain.BCErrorHelper.normalizeBlockChainInsufficientFundsMessage;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -92,6 +94,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;
     protected final BlockChainCoinRepository mCoinRepo;
     protected final BlockChainAccountRepository mAccountRepo;
+    protected final ExplorerCoinsRepository mExplorerCoinsRepo;
 
     private AccountItem mAccount;
     private String mGetCoin = null;
@@ -108,13 +111,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             CachedRepository<UserAccount, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
             BlockChainCoinRepository coinRepo,
-            BlockChainAccountRepository accountRepo
+            BlockChainAccountRepository accountRepo,
+            ExplorerCoinsRepository explorerCoinsRepository
     ) {
         mSecretStorage = secretStorage;
         mAccountStorage = accountStorage;
         mAccountRepo = accountRepo;
         mTxRepo = txRepo;
         mCoinRepo = coinRepo;
+        mExplorerCoinsRepo = explorerCoinsRepository;
     }
 
     @Override
@@ -136,13 +141,25 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribe(this::onAmountChangedInternal));
 
-
         getViewState().setSubmitEnabled(false);
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
         getViewState().setTextChangedListener(this::onInputChanged);
         getViewState().setOnClickSelectAccount(this::onClickSelectAccount);
         getViewState().setOnClickMaximum(this::onClickMaximum);
         getViewState().setOnClickSubmit(this::onClickSubmit);
+
+        setCoinsAutocomplete();
+    }
+
+    private void setCoinsAutocomplete() {
+        rxCallExp(mExplorerCoinsRepo.getAll())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (res.result != null) {
+                        getViewState().setCoinsAutocomplete(res.result, (item, position) -> getViewState().setIncomingCoin(item.symbol));
+                    }
+                }, Wallet.Rx.errorHandler(getViewState()));
     }
 
     protected abstract boolean isAmountForGetting();

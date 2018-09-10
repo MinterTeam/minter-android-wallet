@@ -59,17 +59,18 @@
             app:passwordToggleDrawable="@null"
             >
 
-            <android.support.design.widget.TextInputEditText
+            <AutoCompleteTextView
                 android:id="@+id/input_incoming_coin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text|textNoSuggestions"
+                android:dropDownHeight="wrap_content"
                 android:maxLength="10"
                 android:singleLine="true"
                 android:tag="income_coin"
                 android:textAllCaps="true"
                 android:textSize="@dimen/text_size_default"
                 tools:text="COINCOIAAAAA"
+                android:inputType="textVisiblePassword|textNoSuggestions"
                 />
         </android.support.design.widget.TextInputLayout>
 

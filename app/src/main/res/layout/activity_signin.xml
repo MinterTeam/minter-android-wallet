@@ -99,7 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext"
-                    android:inputType="text|textNoSuggestions"
+                    android:inputType="textVisiblePassword|textNoSuggestions"
                     android:tag="username"
                     android:text="@string/at"
                     android:textSize="@dimen/text_size_default"

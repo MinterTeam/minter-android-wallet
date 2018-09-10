@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -34,10 +34,12 @@ import java.util.List;
 
 import dagger.Module;
 import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.exchange.adapters.CoinsListAdapter;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
+import network.minter.explorer.models.CoinItem;
 
 /**
  * MinterWallet. 2018
@@ -64,6 +66,8 @@ public class ExchangeModule {
         void setOutAccountName(CharSequence accountName);
         void setMaximumEnabled(boolean enabled);
         void setAmount(CharSequence amount);
+        void setCoinsAutocomplete(List<CoinItem> items, CoinsListAdapter.OnItemClickListener listener);
+        void setIncomingCoin(String symbol);
     }
 
     public interface ConvertCoinView extends MvpView, ErrorViewWithRetry {
