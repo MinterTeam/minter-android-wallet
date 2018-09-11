@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.explorer.models.HistoryTransaction;
 
@@ -42,17 +43,15 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
+public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_pub_value) TextView pubKey;
-    public @BindView(R.id.detail_address_value) TextView address;
-    public @BindView(R.id.detail_commission_value) TextView commission;
     public @BindView(R.id.detail_coin_value) TextView coin;
     public @BindView(R.id.detail_stake_value) TextView stake;
+    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
-    public TxDeclareCandidacyViewHolder(View itemView) {
+    public TxDelegateUnboundViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
     }
@@ -60,29 +59,42 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
     @Override
     public void bind(TxItem item) {
         super.bind(item);
-        final HistoryTransaction.TxDeclareCandidacyResult data = item.getTx().getData();
 
-        amount.setText(String.format("- %s", bdHuman(firstNonNull(data.stake, new BigDecimal(0)))));
-        subamount.setText(data.getCoin());
+        if (item.getTx().getData() instanceof HistoryTransaction.TxDelegateResult) {
+            final HistoryTransaction.TxDelegateResult data = item.getTx().getData();
 
+            amount.setText(String.format("- %s", bdHuman(data.getStake())));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+            subamount.setText(data.coin);
+            coin.setText(data.getCoin());
+            stake.setText(bdHuman(firstNonNull(data.getStake(), new BigDecimal(0))));
 
-        if (data.pubKey != null) {
-            pubKey.setText(data.pubKey.toString());
+            itemTitleType.setText("Delegate");
+            if (data.publicKey != null) {
+                pubKey.setText(data.publicKey.toString());
+                title.setText(data.publicKey.toShortString());
+            } else {
+                pubKey.setText("<unknown>");
+                title.setText(item.getTx().hash.toShortString());
+            }
         } else {
-            pubKey.setText("<unknown>");
-        }
+            final HistoryTransaction.TxUnboundResult data = item.getTx().getData();
 
-        if (data.address != null) {
-            address.setText(data.address.toString());
-            title.setText(data.address.toShortString());
-        } else {
-            address.setText("<unknown>");
-            title.setText(item.getTx().hash.toShortString());
-        }
+            amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+            subamount.setText(data.coin);
+            coin.setText(data.getCoin());
+            stake.setText(bdHuman(firstNonNull(data.getStake(), new BigDecimal(0))));
 
-        commission.setText(String.format("%s%%", firstNonNull(data.commission, new BigDecimal(0)).toPlainString()));
-        coin.setText(data.getCoin());
-        stake.setText(bdHuman(firstNonNull(data.stake, new BigDecimal(0))));
+            itemTitleType.setText("Unbound");
+            if (data.publicKey != null) {
+                pubKey.setText(data.publicKey.toString());
+                title.setText(data.publicKey.toShortString());
+            } else {
+                pubKey.setText("<unknown>");
+                title.setText(item.getTx().hash.toShortString());
+            }
+        }
 
     }
 }

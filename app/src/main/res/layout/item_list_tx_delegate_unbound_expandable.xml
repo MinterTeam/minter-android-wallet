@@ -69,7 +69,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
-            android:text="@string/tx_type_create_coin"
             android:fontFamily="@font/_ubuntu_medium"
             android:textColor="@color/textColorGrey"
             android:textSize="@dimen/text_size_11"
@@ -78,6 +77,7 @@
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Delegate"
             />
 
         <TextView
@@ -87,7 +87,7 @@
             android:layout_marginEnd="@dimen/margin_min"
             android:fontFamily="@font/_ubuntu_medium"
             android:textAlignment="viewEnd"
-            android:textColor="@color/textColorPrimary"
+            android:textColor="@color/textColorGreen"
             android:textSize="@dimen/text_size_tx_amount"
             app:layout_constraintBottom_toTopOf="@id/item_subamount"
             app:layout_constraintEnd_toEndOf="parent"
@@ -105,8 +105,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
-            android:textSize="@dimen/text_size_default"
             android:fontFamily="@font/_ubuntu_bold"
+            android:textSize="@dimen/text_size_default"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/item_title_separator"
             app:layout_constraintHorizontal_bias="0"
@@ -155,12 +155,13 @@
         tools:visibility="visible"
         >
 
-        <!--ADDRESS-->
+        <!--Validator PUBLIC KEY-->
         <TextView
-            android:id="@+id/detail_type_label"
+            android:id="@+id/detail_pub_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/label_transaction_type"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:text="@string/label_validator_public_key"
             android:textSize="@dimen/text_size_12"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -168,17 +169,65 @@
             />
 
         <TextView
-            android:id="@+id/detail_type_value"
+            android:id="@+id/detail_pub_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_mono_bold"
             android:textSize="@dimen/text_size_tx_detail_value"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_type_label"
-            tools:text="Delegate"
+            app:layout_constraintTop_toBottomOf="@id/detail_pub_label"
+            tools:text="Mpbb7970b2db1948277726372887018e4aceb744cd20c525b5b78aeee4b43aeb1a"
             />
 
+
+        <!--COIN AND STAKE-->
+        <TextView
+            android:id="@+id/detail_coin_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:text="@string/label_coin"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_pub_value"
+            app:layout_constraintWidth_percent=".5"
+            />
+
+        <TextView
+            android:id="@+id/detail_coin_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_ubuntu_mono_bold"
+            android:textSize="@dimen/text_size_tx_detail_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_coin_label"
+            app:layout_constraintWidth_percent=".5"
+            tools:text="ANDCOIN"
+            />
+
+        <TextView
+            android:id="@+id/detail_stake_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:text="@string/label_stake"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintStart_toEndOf="@id/detail_coin_label"
+            app:layout_constraintTop_toBottomOf="@id/detail_pub_value"
+            />
+
+        <TextView
+            android:id="@+id/detail_stake_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_ubuntu_mono_bold"
+            android:textSize="@dimen/text_size_tx_detail_value"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/detail_coin_value"
+            app:layout_constraintTop_toBottomOf="@id/detail_stake_label"
+            tools:text="10"
+            />
 
         <!--DATE AND TIME-->
         <TextView
@@ -189,7 +238,7 @@
             android:text="@string/label_date"
             android:textSize="@dimen/text_size_12"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_type_value"
+            app:layout_constraintTop_toBottomOf="@id/detail_stake_value"
             app:layout_constraintWidth_percent=".5"
             />
 
@@ -213,7 +262,7 @@
             android:text="@string/label_time"
             android:textSize="@dimen/text_size_12"
             app:layout_constraintStart_toEndOf="@id/detail_date_label"
-            app:layout_constraintTop_toBottomOf="@id/detail_type_value"
+            app:layout_constraintTop_toBottomOf="@id/detail_stake_value"
             app:layout_constraintWidth_percent=".5"
             />
 

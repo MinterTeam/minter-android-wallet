@@ -70,9 +70,9 @@
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
             android:text="@string/tx_type_declare_candidacy"
+            android:fontFamily="@font/_ubuntu_medium"
             android:textColor="@color/textColorGrey"
             android:textSize="@dimen/text_size_11"
-            android:fontFamily="@font/_ubuntu_medium"
             app:layout_constraintBottom_toTopOf="@id/item_title"
             app:layout_constraintEnd_toStartOf="@id/item_amount"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
@@ -87,7 +87,7 @@
             android:layout_marginEnd="@dimen/margin_min"
             android:fontFamily="@font/_ubuntu_medium"
             android:textAlignment="viewEnd"
-            android:textColor="@color/textColorGreen"
+            android:textColor="@color/textColorPrimary"
             android:textSize="@dimen/text_size_tx_amount"
             app:layout_constraintBottom_toTopOf="@id/item_subamount"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,19 +101,19 @@
 
         <TextView
             android:id="@+id/item_title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
             android:textSize="@dimen/text_size_default"
             android:fontFamily="@font/_ubuntu_bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/item_amount"
+            app:layout_constraintEnd_toStartOf="@id/item_title_separator"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toBottomOf="@id/item_title_type"
-            tools:text="Mtfe6001...61eE99"
+            tools:text="BIP"
             />
 
         <TextView

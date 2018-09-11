@@ -109,10 +109,10 @@ android {
 
 ext {
     nav_version = "1.0.0-alpha01"
-    minterExplorerSDK = "0.1.2"
+    minterExplorerSDK = "0.1.3"
     minterProfileSDK = "0.1.1"
     minterBlockchainSDK = "0.1.1"
-    minterCoreSDK = "0.1.1"
+    minterCoreSDK = "0.1.2"
 }
 
 dependencies {

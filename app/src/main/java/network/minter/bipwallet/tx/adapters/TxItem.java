@@ -38,6 +38,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.vh.TxConvertCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxCreateCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxDeclareCandidacyViewHolder;
+import network.minter.bipwallet.tx.adapters.vh.TxDelegateUnboundViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxHeaderViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSendCoinViewHolder;
@@ -64,7 +65,7 @@ public class TxItem implements TransactionItem {
         mUsername = tx.username;
     }
 
-    @SuppressLint("SwitchIntDef")
+
     public static RecyclerView.ViewHolder createViewHolder(final LayoutInflater inflater, final ViewGroup parent, @ListType int viewType) {
         View view;
         RecyclerView.ViewHolder out;
@@ -100,6 +101,11 @@ public class TxItem implements TransactionItem {
                 view = inflater.inflate(R.layout.item_list_tx_set_candidate_on_off_expandable, parent, false);
                 out = new TxSetCandidateOnlineOfflineViewHolder(view);
                 break;
+            case TX_DELEGATE:
+            case TX_UNBOUND:
+                view = inflater.inflate(R.layout.item_list_tx_delegate_unbound_expandable, parent, false);
+                out = new TxDelegateUnboundViewHolder(view);
+                break;
 
             default:
                 view = inflater.inflate(R.layout.item_list_tx_unhandled_expandable, parent, false);
@@ -131,6 +137,9 @@ public class TxItem implements TransactionItem {
         } else if (holder instanceof TxSetCandidateOnlineOfflineViewHolder) {
             final TxItem txItem = ((TxItem) data);
             ((TxSetCandidateOnlineOfflineViewHolder) holder).bind(txItem);
+        } else if (holder instanceof TxDelegateUnboundViewHolder) {
+            final TxItem txItem = ((TxItem) data);
+            ((TxDelegateUnboundViewHolder) holder).bind(txItem);
         } else {
             final TxItem txItem = ((TxItem) data);
             ((TxUnhandledViewHolder) holder).bind(txItem);
