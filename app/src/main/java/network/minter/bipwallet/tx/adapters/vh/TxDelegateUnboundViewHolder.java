@@ -80,7 +80,7 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
         } else {
             final HistoryTransaction.TxUnboundResult data = item.getTx().getData();
 
-            amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+            amount.setText(String.format("- %s", bdHuman(data.getStake())));
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
             subamount.setText(data.coin);
             coin.setText(data.getCoin());
