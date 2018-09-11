@@ -140,7 +140,7 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
                 .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
                 .setOutputCompressQuality(100)
                 .setCropShape(CropImageView.CropShape.OVAL)
-                .setActivityMenuIconColor(getResources().getColor(R.color.textColorPrimary))
+                .setActivityMenuIconColor(getResources().getColor(R.color.white))
                 .start(getActivity());
     }
 

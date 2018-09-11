@@ -57,4 +57,5 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
     </style>
+
 </resources>

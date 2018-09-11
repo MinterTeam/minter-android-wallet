@@ -35,6 +35,11 @@
     <string name="today">Today</string>
     <string name="please_wait">Please, wait</string>
 
+    <!--crop-->
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_right">Rotate</string>
+    <string name="crop_image_menu_crop">Save</string>
+
     <string name="advanced_generate_seed_description">Save this seed phrase in case you plan to use this address in the future.</string>
     <string name="advanced_action_generate">Generate Address</string>
     <string name="menu_item_coins">Coins</string>

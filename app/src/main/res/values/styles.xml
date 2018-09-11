@@ -87,6 +87,7 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
+
     <style name="Wallet.Progress.White" parent="Wallet">
         <item name="colorAccent">@android:color/white</item>
         <item name="android:background">@android:color/transparent</item>
@@ -101,6 +102,8 @@
     </style>
 
     <style name="Wallet.CropImage" parent="Theme.AppCompat.Light">
+        <item name="titleTextColor">@color/textColorWhite</item>
+        <item name="actionMenuTextColor">@color/textColorWhite</item>
         <item name="android:textColorPrimary">@color/textColorWhite</item>
         <item name="android:textColor">@color/textColorWhite</item>
         <item name="android:textColorSecondary">@color/textColorWhite</item>
@@ -108,10 +111,14 @@
         </item>
         <item name="colorControlNormal">@color/textColorWhite</item>
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimary" tools:targetApi="lollipop">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorPrimaryDark" tools:targetApi="lollipop">@color/colorPrimaryDark
+        </item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="actionMenuTextColor">@color/textColorWhite</item>
+        <item name="android:colorAccent" tools:targetApi="lollipop">@color/colorAccent</item>
     </style>
+
 
     <style name="Wallet.Button" parent="Widget.AppCompat.Button.Borderless.Colored">
         <item name="android:textStyle">bold</item>
