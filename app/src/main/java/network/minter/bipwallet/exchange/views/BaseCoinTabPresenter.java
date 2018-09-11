@@ -83,6 +83,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 import static network.minter.blockchain.models.BCResult.ResultCode.CoinDoesNotExists;
 
 /**
@@ -143,13 +144,26 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .subscribe(this::onAmountChangedInternal));
 
         getViewState().setSubmitEnabled(false);
-        getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
+        getViewState().setFormValidationListener(valid -> {
+            getViewState().setSubmitEnabled(valid && checkZero(isAmountForGetting() ? mGetAmount : mSpendAmount));
+        });
         getViewState().setTextChangedListener(this::onInputChanged);
         getViewState().setOnClickSelectAccount(this::onClickSelectAccount);
         getViewState().setOnClickMaximum(this::onClickMaximum);
         getViewState().setOnClickSubmit(this::onClickSubmit);
 
         setCoinsAutocomplete();
+    }
+
+    private boolean checkZero(BigDecimal amount) {
+        boolean valid = amount == null || !bdNull(amount);
+        if (!valid) {
+            getViewState().setError("amount", "Amount must be greater than 0");
+        } else {
+            getViewState().setError("amount", null);
+        }
+
+        return valid;
     }
 
     private void setCoinsAutocomplete() {

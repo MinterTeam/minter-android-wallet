@@ -103,6 +103,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLTE;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString;
 
 /**
@@ -174,22 +175,20 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        safeSubscribeIoToUi(accountStorage.observe())
-                .subscribe(res -> {
-                    if (!res.isEmpty()) {
-                        onAccountSelected(res.getAccounts().get(0));
-                    }
-                });
-
-        setRecipientAutocomplete();
-        getViewState().setSubmitEnabled(false);
-        getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid));
+        safeSubscribeIoToUi(accountStorage.observe()).subscribe(res -> {
+            if (!res.isEmpty()) {
+                onAccountSelected(res.getAccounts().get(0));
+            }
+        });
 
         mInputChange = BehaviorSubject.create();
         unsubscribeOnDestroy(mInputChange
                 .toFlowable(BackpressureStrategy.LATEST)
-                .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribe(this::onAmountChanged));
+
+        setRecipientAutocomplete();
+        getViewState().setSubmitEnabled(false);
+        getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid && checkZero(mAmount)));
     }
 
     private void setRecipientAutocomplete() {
@@ -213,7 +212,19 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setSubmitEnabled(enough);
     }
 
+    private boolean checkZero(BigDecimal amount) {
+        boolean valid = amount == null || !bdNull(amount);
+        if (!valid) {
+            getViewState().setAmountError("Amount must be greater than 0");
+        } else {
+            getViewState().setAmountError(null);
+        }
+
+        return valid;
+    }
+
     private void onAmountChanged(BigDecimal amount) {
+        checkZero(amount);
         mEnableUseMax.set(false);
     }
 
@@ -280,7 +291,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                     mToName = result.data.address.toString();
                                     break;
                             }
-//                            mToName = String.format("@%s", result.data.user.username);
+
                             getViewState().setRecipientError(null);
                             startSendDialog();
                         } else {
