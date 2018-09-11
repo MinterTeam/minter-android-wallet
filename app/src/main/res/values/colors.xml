@@ -39,7 +39,7 @@
     <color name="textColorSecondary">#000000</color>
     <color name="textColorWhite">@color/white</color>
     <color name="textColorGreen">#35B65C</color>
-    <color name="errorColor">#C83A3A</color>
+    <color name="errorColor">#F4511E</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
