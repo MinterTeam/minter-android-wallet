@@ -316,6 +316,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     })
                     .setNegativeAction("Cancel", (d, w) -> {
                         getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
+                        d.dismiss();
                     })
                     .create();
             dialog.setCancelable(true);
