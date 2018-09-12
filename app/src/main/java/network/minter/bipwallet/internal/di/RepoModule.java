@@ -40,6 +40,7 @@ import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.ExplorerSettingsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.repo.ProfileAddressRepository;
@@ -129,6 +130,12 @@ public class RepoModule {
     @WalletApp
     public ExplorerCoinsRepository provideExplorerCoinsRepo(MinterExplorerApi api) {
         return api.coins();
+    }
+
+    @Provides
+    @WalletApp
+    public ExplorerSettingsRepository provideExplorerSettingsRepo(MinterExplorerApi api) {
+        return api.settings();
     }
 
     @Provides

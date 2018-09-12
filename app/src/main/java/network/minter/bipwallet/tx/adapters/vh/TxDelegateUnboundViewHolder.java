@@ -40,6 +40,7 @@ import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
@@ -60,41 +61,39 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
 
-        if (item.getTx().getData() instanceof HistoryTransaction.TxDelegateResult) {
-            final HistoryTransaction.TxDelegateResult data = item.getTx().getData();
 
-            amount.setText(String.format("- %s", bdHuman(data.getStake())));
+        final HistoryTransaction.TxDelegateUnbondResult data = item.getTx().getData();
+
+        if (item.getTx().getType() == HistoryTransaction.Type.Delegate) {
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
-            subamount.setText(data.coin);
-            coin.setText(data.getCoin());
-            stake.setText(bdHuman(firstNonNull(data.getStake(), new BigDecimal(0))));
-
-            itemTitleType.setText("Delegate");
-            if (data.publicKey != null) {
-                pubKey.setText(data.publicKey.toString());
-                title.setText(data.publicKey.toShortString());
+            if (bdNull(data.getStake())) {
+                amount.setText(String.format("%s", bdHuman(data.getStake())));
             } else {
-                pubKey.setText("<unknown>");
-                title.setText(item.getTx().hash.toShortString());
+                amount.setText(String.format("- %s", bdHuman(data.getStake())));
             }
         } else {
-            final HistoryTransaction.TxUnboundResult data = item.getTx().getData();
-
-            amount.setText(String.format("- %s", bdHuman(data.getStake())));
-            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
-            subamount.setText(data.coin);
-            coin.setText(data.getCoin());
-            stake.setText(bdHuman(firstNonNull(data.getStake(), new BigDecimal(0))));
-
-            itemTitleType.setText("Unbound");
-            if (data.publicKey != null) {
-                pubKey.setText(data.publicKey.toString());
-                title.setText(data.publicKey.toShortString());
+            if (bdNull(data.getStake())) {
+                amount.setText(String.format("%s", bdHuman(data.getStake())));
             } else {
-                pubKey.setText("<unknown>");
-                title.setText(item.getTx().hash.toShortString());
+                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+                amount.setText(String.format("+ %s", bdHuman(data.getStake())));
             }
         }
+
+
+        subamount.setText(data.coin);
+        coin.setText(data.getCoin());
+        stake.setText(bdHuman(firstNonNull(data.getStake(), new BigDecimal(0))));
+
+        itemTitleType.setText(item.getTx().getType().name());
+        if (data.getPublicKey() != null) {
+            pubKey.setText(data.getPublicKey().toString());
+            title.setText(data.getPublicKey().toShortString());
+        } else {
+            pubKey.setText("<unknown>");
+            title.setText(item.getTx().hash.toShortString());
+        }
+
 
     }
 }

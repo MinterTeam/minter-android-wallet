@@ -52,7 +52,7 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
-import network.minter.explorer.repo.ExplorerAddressRepository;
+import network.minter.explorer.repo.ExplorerSettingsRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
@@ -67,7 +67,7 @@ public class BalanceUpdateService extends Service {
     private final IBinder mBinder = new LocalBinder();
     @Inject CacheManager cache;
     @Inject SecretStorage secretStorage;
-    @Inject ExplorerAddressRepository addressRepo;
+    @Inject ExplorerSettingsRepository settingsRepo;
     @Inject AuthSession session;
 
     private Centrifugo mClient = null;
@@ -118,7 +118,7 @@ public class BalanceUpdateService extends Service {
     }
 
     private void connect() {
-        rxCallExp(addressRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
+        rxCallExp(settingsRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
                 .subscribeOn(Schedulers.io())
                 .switchMap(res -> Observable.create((ObservableOnSubscribe<Centrifugo>) emitter -> {
                     if (res == null || res.result == null || res.result.token == null) {

@@ -72,7 +72,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
             if (txItem.getUsername() != null) {
                 title.setText(String.format("@%s", txItem.getUsername()));
             } else {
-                title.setText(data.from.toShortString());
+                title.setText(item.getFrom().toShortString());
             }
             am = String.format("+ %s", bdHuman(data.amount));
             amount.setText(am);
@@ -94,7 +94,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         }
 
-        fromValue.setText(data.from.toString());
+        fromValue.setText(item.getFrom().toString());
         toValue.setText(data.to.toString());
         subamount.setText(data.getCoin());
         coinValue.setText(data.getCoin());

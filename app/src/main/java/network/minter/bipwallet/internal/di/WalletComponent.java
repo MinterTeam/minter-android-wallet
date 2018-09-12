@@ -61,6 +61,7 @@ import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.ExplorerSettingsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAddressRepository;
@@ -112,20 +113,24 @@ public interface WalletComponent {
     BalanceNotificationManager balanceNotifications();
 
     // repositories
+    // local
     SecretStorage secretStorage();
     AccountStorage accountStorage();
     RecipientAutocompleteStorage recipientStorage();
     CachedRepository<UserAccount, AccountStorage> accountStorageCache();
-    ExplorerTransactionRepository explorerTransactionsRepo();
     CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> explorerTransactionsRepoCache();
     CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo();
+    // profile
     ProfileAuthRepository authRepo();
     ProfileInfoRepository infoRepo();
     ProfileAddressRepository addressMyRepo();
+    ProfileRepository profileRepo();
+    // explorer
+    ExplorerTransactionRepository explorerTransactionsRepo();
     ExplorerAddressRepository addressExplorerRepo();
     ExplorerCoinsRepository explorerCoinsRepo();
-
-    ProfileRepository profileRepo();
+    ExplorerSettingsRepository explorerSettingsRepo();
+    // blockchain
     BlockChainAccountRepository accountRepoBlockChain();
     BlockChainCoinRepository coinRepoBlockChain();
     BlockChainTransactionRepository txRepoBlockChain();

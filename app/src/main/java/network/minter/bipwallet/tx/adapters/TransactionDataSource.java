@@ -101,9 +101,9 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             }
 
             if (tx.isIncoming(myAddresses)) {
-                add = tx.<HistoryTransaction.TxSendCoinResult>getData().from;
+                add = tx.getFrom();
             } else {
-                add = tx.<HistoryTransaction.TxSendCoinResult>getData().to;
+                add = tx.<HistoryTransaction.TxSendCoinResult>getData().getTo();
             }
 
             if (add != null && !toFetch.contains(add)) {
@@ -147,7 +147,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             }
 
             if (tx.isIncoming(addresses)) {
-                add = tx.<HistoryTransaction.TxSendCoinResult>getData().from;
+                add = tx.getFrom();
             } else {
                 add = tx.<HistoryTransaction.TxSendCoinResult>getData().to;
             }

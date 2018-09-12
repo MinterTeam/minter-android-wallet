@@ -66,8 +66,8 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
         subamount.setText(data.getCoin());
 
 
-        if (data.pubKey != null) {
-            pubKey.setText(data.pubKey.toString());
+        if (data.getPublicKey() != null) {
+            pubKey.setText(data.getPublicKey().toString());
         } else {
             pubKey.setText("<unknown>");
         }

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -37,6 +37,7 @@ import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
@@ -57,12 +58,17 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
         super.bind(item);
         final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = item.getTx().getData();
 
-        amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+        if (bdNull(item.getTx().getFee())) {
+            amount.setText(String.format("%s", bdHuman(item.getTx().fee)));
+        } else {
+            amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+        }
+
         subamount.setText(MinterSDK.DEFAULT_COIN);
         itemTitleType.setText(item.getTx().type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
-        if (data.pubKey != null) {
-            pubKey.setText(data.pubKey.toString());
-            title.setText(data.pubKey.toShortString());
+        if (data.getPublicKey() != null) {
+            pubKey.setText(data.getPublicKey().toString());
+            title.setText(data.getPublicKey().toShortString());
         } else {
             pubKey.setText("<unknown>");
             title.setText(item.getTx().hash.toShortString());
