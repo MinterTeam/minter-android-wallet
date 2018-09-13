@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2018
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -25,8 +26,8 @@
 
 package network.minter.bipwallet.data;
 
+import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.InstrumentationTestCase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,13 +38,18 @@ import java.util.Queue;
 import network.minter.bipwallet.internal.TestWallet;
 import network.minter.bipwallet.internal.storage.KVStorage;
 
+import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * MinterWallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @RunWith(AndroidJUnit4.class)
-public class KVStorageQueueSaveTest extends InstrumentationTestCase {
+@SmallTest
+public class KVStorageQueueSaveTest {
     @Test
     public void testOrderPreserves() {
         Queue<QueuedObj> data = new LinkedList<>();

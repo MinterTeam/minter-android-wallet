@@ -187,6 +187,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
         setupTabAdapter();
         setupBottomNavigation();
+        Timber.d("HOME ACTIVITY CREATED");
     }
 
     private void setupTabAdapter() {

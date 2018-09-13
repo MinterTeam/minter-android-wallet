@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2018
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -29,6 +30,10 @@ import android.app.Application;
 import android.content.Context;
 import android.support.test.runner.AndroidJUnitRunner;
 
+import com.squareup.rx2.idler.Rx2Idler;
+
+import io.reactivex.plugins.RxJavaPlugins;
+
 /**
  * MinterWallet. 2018
  *
@@ -39,5 +44,15 @@ public class WalletTestRunner extends AndroidJUnitRunner {
     @Override
     public Application newApplication(ClassLoader cl, String className, Context context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         return super.newApplication(cl, TestWallet.class.getName(), context);
+    }
+
+    @Override
+    public void onStart() {
+        RxJavaPlugins.setInitComputationSchedulerHandler(
+                Rx2Idler.create("RxJava 2.x Computation Scheduler")
+        );
+        RxJavaPlugins.setInitIoSchedulerHandler(
+                Rx2Idler.create("RxJava 2.x IO Scheduler"));
+        super.onStart();
     }
 }

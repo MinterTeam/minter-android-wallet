@@ -43,6 +43,10 @@ android {
         multiDexEnabled true
     }
 
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+
     lintOptions {
         disable 'CheckResult', 'DefaultLocale'
         abortOnError false
@@ -163,6 +167,8 @@ dependencies {
         transitive = true
     }
 
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+
     // yandex
     implementation 'com.yandex.android:mobmetricalib:3.1.0'
     implementation 'com.android.installreferrer:installreferrer:1.0'
@@ -243,15 +249,17 @@ dependencies {
     implementation 'ru.bullyboo.animation:text_counter:1.0.2'
 
     // testing
+//    useLibrary 'android.test.base'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation "com.android.support:support-annotations:${minterLibSupport}"
-    testImplementation "com.android.support:support-annotations:${minterLibSupport}"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    testImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    testImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
+    androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.0'
 
 }
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'com.google.gms.google-services'
