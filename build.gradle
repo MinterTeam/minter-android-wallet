@@ -50,7 +50,7 @@ allprojects {
         maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url 'https://clojars.org/repo/' }
         maven { url 'https://jitpack.io' }
-        maven { url "https://maven.edwardstock.com/artifactory/libs-release-local" }
+//        maven { url "https://maven.edwardstock.com/artifactory/libs-release-local" }
         maven { url "https://repo1.maven.org/maven2/com/google/zxing/" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/'}
         maven { url 'https://maven.fabric.io/public' }

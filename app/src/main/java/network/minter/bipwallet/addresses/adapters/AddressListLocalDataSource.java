@@ -32,13 +32,12 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
 import network.minter.bipwallet.internal.paging.ListDataSource;
+import network.minter.core.MinterSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
@@ -48,11 +47,11 @@ import network.minter.explorer.repo.ExplorerAddressRepository;
  */
 public class AddressListLocalDataSource extends ListDataSource<AddressItem> {
     private final SecretStorage mRepo;
-    private final ExplorerAddressRepository mAddressRepo;
+	private final ExplorerAddressRepository mExplorerAddressRepo;
     private List<AddressItem> mItems;
 
     AddressListLocalDataSource(SecretStorage secretStorage, ExplorerAddressRepository explorerAddressRepository) {
-        mAddressRepo = explorerAddressRepository;
+	    mExplorerAddressRepo = explorerAddressRepository;
         mRepo = secretStorage;
     }
 
@@ -63,19 +62,16 @@ public class AddressListLocalDataSource extends ListDataSource<AddressItem> {
 
     @Override
     protected Observable<List<AddressItem>> getData() {
-        return Observable.create(new ObservableOnSubscribe<List<AddressItem>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<AddressItem>> emitter) {
-                mItems = new ArrayList<>();
-                for (Map.Entry<String, SecretData> entry : mRepo.getSecrets().entrySet()) {
-                    AddressItem item = new AddressItem(entry.getValue().getId(), entry.getValue().getMinterAddress());
-                    item.balance.setFetcher(ExplorerBalanceFetcher.createSingleTotalBalance(mAddressRepo, entry.getValue().getMinterAddress()));
-                    mItems.add(item);
-                }
+	    return Observable.create(emitter -> {
+		    mItems = new ArrayList<>();
+		    for (Map.Entry<String, SecretData> entry : mRepo.getSecrets().entrySet()) {
+			    AddressItem item = new AddressItem(entry.getValue().getId(), entry.getValue().getMinterAddress());
+			    item.balance.setFetcher(ExplorerBalanceFetcher.createSingleCoinBalance(mExplorerAddressRepo, item.address, MinterSDK.DEFAULT_COIN));
+			    mItems.add(item);
+		    }
 
-                emitter.onNext(mItems);
-                emitter.onComplete();
-            }
+		    emitter.onNext(mItems);
+		    emitter.onComplete();
         });
     }
 }
