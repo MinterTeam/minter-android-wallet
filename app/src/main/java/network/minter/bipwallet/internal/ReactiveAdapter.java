@@ -51,7 +51,7 @@ import retrofit2.Response;
 import timber.log.Timber;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

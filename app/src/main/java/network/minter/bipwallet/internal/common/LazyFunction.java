@@ -29,7 +29,7 @@ package network.minter.bipwallet.internal.common;
 import android.support.annotation.Nullable;
 
 /**
- * Dogsy. 2017
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

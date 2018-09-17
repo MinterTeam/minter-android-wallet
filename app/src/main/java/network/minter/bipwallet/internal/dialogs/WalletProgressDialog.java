@@ -40,7 +40,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.common.DeferredCall;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

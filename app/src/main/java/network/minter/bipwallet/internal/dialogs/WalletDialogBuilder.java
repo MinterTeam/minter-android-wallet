@@ -33,7 +33,7 @@ import android.content.DialogInterface;
 import java.lang.ref.WeakReference;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

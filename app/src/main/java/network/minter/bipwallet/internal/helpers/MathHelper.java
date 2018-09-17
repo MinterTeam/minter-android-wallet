@@ -39,7 +39,7 @@ import java.util.Locale;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
- * Dogsy. 2017
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 

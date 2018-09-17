@@ -53,7 +53,7 @@ import network.minter.bipwallet.settings.views.migration.PasswordChangeMigration
 import static android.support.v4.content.res.ResourcesCompat.getFont;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

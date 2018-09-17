@@ -69,7 +69,7 @@ import static network.minter.bipwallet.settings.views.migration.MigrationExcepti
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_3_UPDATE_ENCRYPTED_DATA_REMOTE;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState

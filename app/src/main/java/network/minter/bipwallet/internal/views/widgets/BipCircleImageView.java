@@ -37,7 +37,7 @@ import network.minter.bipwallet.internal.common.annotations.Dp;
 
 
 /**
- * Wallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

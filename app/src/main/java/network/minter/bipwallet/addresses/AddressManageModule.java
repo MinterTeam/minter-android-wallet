@@ -37,7 +37,7 @@ import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.internal.mvp.ProgressView;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

@@ -36,7 +36,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
@@ -52,7 +51,7 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.Wallet.app;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
@@ -84,10 +83,8 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (BuildConfig.ENABLE_LIVE_BALANCE) {
-            ServiceConnector.release(app().context());
-            Timber.d("Disconnecting service");
-        }
+        ServiceConnector.release(app().context());
+        Timber.d("Disconnecting service");
     }
 
     public void onPageSelected(int position) {
@@ -141,14 +138,12 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        if (BuildConfig.ENABLE_LIVE_BALANCE) {
-            ServiceConnector.bind(app().context());
-            ServiceConnector.onConnected()
-                    .subscribe(res -> res.setOnMessageListener(message -> {
-                        accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message.getData()));
-                        app().explorerTransactionsRepoCache().update(true);
-                        Timber.d("WS ON MESSAGE[%s]: %s", message.getChannel(), message.getData());
-                    }));
-        }
+        ServiceConnector.bind(app().context());
+        ServiceConnector.onConnected()
+                .subscribe(res -> res.setOnMessageListener(message -> {
+                    accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message.getData()));
+                    app().explorerTransactionsRepoCache().update(true);
+                    Timber.d("WS ON MESSAGE[%s]: %s", message.getChannel(), message.getData());
+                }));
     }
 }

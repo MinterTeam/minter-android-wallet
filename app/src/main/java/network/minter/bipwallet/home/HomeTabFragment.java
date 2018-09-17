@@ -36,7 +36,7 @@ import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.internal.views.SnackbarBuilder;
 
 /**
- * Dogsy. 2017
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 

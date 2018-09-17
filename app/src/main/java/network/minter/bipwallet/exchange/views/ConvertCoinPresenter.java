@@ -35,7 +35,7 @@ import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

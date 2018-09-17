@@ -29,6 +29,10 @@ plugins {
     id 'io.fabric'
 }
 
+ext {
+    hasMinterCert = hasProperty("minter_key_store_file")
+}
+
 android {
     compileSdkVersion minterMaxSdk
     buildToolsVersion minterBuildTools
@@ -57,24 +61,30 @@ android {
         additionalParameters "--no-version-vectors"
     }
 
+
     signingConfigs {
-        config {
-            keyAlias getProperty("minter_key_alias")
-            keyPassword getProperty("minter_key_password")
-            storeFile file(getProperty("minter_key_store_file"))
-            storePassword getProperty("minter_key_store_password")
+        if (hasMinterCert) {
+            config {
+                keyAlias getProperty("minter_key_alias")
+                keyPassword getProperty("minter_key_password")
+                storeFile file(getProperty("minter_key_store_file"))
+                storePassword getProperty("minter_key_store_password")
+            }
         }
+
+        dummy {}
     }
+
 
     buildTypes {
         release {
-            signingConfig signingConfigs.config
+            signingConfig hasMinterCert ? signingConfigs.config : signingConfigs.dummy
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
         }
 
         debug {
-            signingConfig signingConfigs.config
+            signingConfig hasMinterCert ? signingConfigs.config : signingConfigs.dummy
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
             testProguardFile 'proguard-test-rules.pro'
@@ -91,22 +101,18 @@ android {
     productFlavors {
         netMain {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
 
         netMainNoCrashlytics {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
 
         netTest {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
 
         netTestNoCrashlytics {
             dimension "env"
-            buildConfigField "boolean", "ENABLE_LIVE_BALANCE", 'true'
         }
     }
 }

@@ -43,7 +43,7 @@ import static android.content.Context.ACTIVITY_SERVICE;
 import static network.minter.bipwallet.internal.Wallet.app;
 
 /**
- * Wallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

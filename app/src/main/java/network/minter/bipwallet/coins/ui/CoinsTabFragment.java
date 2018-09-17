@@ -64,7 +64,7 @@ import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.CoinsTabView {

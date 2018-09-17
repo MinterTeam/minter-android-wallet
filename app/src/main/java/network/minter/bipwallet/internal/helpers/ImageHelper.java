@@ -75,7 +75,7 @@ import network.minter.bipwallet.internal.helpers.data.Vec2;
 import timber.log.Timber;
 
 /**
- * Dogsy. 2017
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -44,7 +44,6 @@ import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepositor
 import network.minter.bipwallet.data.KVStorageQueueSaveTest;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.auth.SessionStorage;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.helpers.DisplayHelper;
@@ -62,7 +61,7 @@ import network.minter.profile.repo.ProfileInfoRepository;
 import network.minter.profile.repo.ProfileRepository;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
@@ -85,7 +84,6 @@ public interface TestWalletComponent {
 
     ApiService.Builder apiBuilder();
     AuthSession session();
-    SessionStorage sessionStorage();
     KVStorage storage();
 
     @Named("uuid")

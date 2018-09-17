@@ -29,7 +29,7 @@ package network.minter.bipwallet.internal.data;
 import io.reactivex.Observable;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

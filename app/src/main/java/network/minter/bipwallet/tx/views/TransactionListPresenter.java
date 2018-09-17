@@ -50,7 +50,7 @@ import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.repo.ProfileInfoRepository;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState

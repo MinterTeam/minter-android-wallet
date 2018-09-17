@@ -51,7 +51,7 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 
 /**
- * MinterWallet. 2017
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  *

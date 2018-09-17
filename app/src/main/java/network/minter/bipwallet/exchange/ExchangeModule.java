@@ -42,7 +42,7 @@ import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.explorer.models.CoinItem;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

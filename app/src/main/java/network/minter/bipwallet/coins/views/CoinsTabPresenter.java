@@ -80,7 +80,7 @@ import static network.minter.bipwallet.internal.helpers.Plurals.bips;
 import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState

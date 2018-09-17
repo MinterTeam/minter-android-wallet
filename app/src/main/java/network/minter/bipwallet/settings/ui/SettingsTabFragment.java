@@ -64,7 +64,7 @@ import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

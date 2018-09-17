@@ -43,7 +43,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
 
 
 /**
- * Dogsy. 2017
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @SuppressLint("Registered")

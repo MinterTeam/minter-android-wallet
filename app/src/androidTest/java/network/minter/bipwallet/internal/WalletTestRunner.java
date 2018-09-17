@@ -35,7 +35,7 @@ import com.squareup.rx2.idler.Rx2Idler;
 import io.reactivex.plugins.RxJavaPlugins;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

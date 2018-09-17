@@ -52,7 +52,7 @@ import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

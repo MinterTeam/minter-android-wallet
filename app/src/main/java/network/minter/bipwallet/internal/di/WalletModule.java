@@ -48,7 +48,6 @@ import io.fabric.sdk.android.Fabric;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.auth.SessionStorage;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.blockchain.MinterBlockChainApi;
@@ -58,7 +57,7 @@ import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
@@ -158,13 +157,6 @@ public class WalletModule {
         Converters.registerAll(gsonBuilder);
 
         return gsonBuilder;
-    }
-
-
-    @Provides
-    @WalletApp
-    public SessionStorage provideSessionStorage(Context context, GsonBuilder gsonBuilder) {
-        return new SessionStorage(context, gsonBuilder);
     }
 
     @Provides

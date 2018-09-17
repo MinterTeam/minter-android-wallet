@@ -47,7 +47,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
 /**
- * Wallet. 2017
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultModel>> {

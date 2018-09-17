@@ -43,7 +43,7 @@ import static network.minter.bipwallet.internal.auth.AuthSession.AuthType.None;
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 
 /**
- * Dogsy. 2017
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

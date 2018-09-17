@@ -51,7 +51,7 @@ import static network.minter.bipwallet.tx.adapters.TransactionItem.ITEM_PROGRESS
 
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TransactionListAdapter extends PagedListAdapter<TransactionItem, RecyclerView.ViewHolder> {

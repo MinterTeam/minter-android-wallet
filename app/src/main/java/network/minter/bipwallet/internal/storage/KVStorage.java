@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

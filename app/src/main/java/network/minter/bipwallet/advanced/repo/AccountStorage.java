@@ -47,7 +47,7 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

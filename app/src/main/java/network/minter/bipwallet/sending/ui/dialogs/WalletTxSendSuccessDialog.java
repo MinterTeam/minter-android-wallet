@@ -40,7 +40,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

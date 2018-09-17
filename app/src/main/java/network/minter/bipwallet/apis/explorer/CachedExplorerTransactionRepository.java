@@ -47,7 +47,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErro
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CachedExplorerTransactionRepository extends ExplorerTransactionRepository implements CachedEntity<List<HistoryTransaction>> {

@@ -38,7 +38,7 @@ import network.minter.bipwallet.internal.mvp.ProgressView;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

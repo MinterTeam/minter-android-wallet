@@ -42,7 +42,7 @@ import butterknife.BindView;
 import network.minter.bipwallet.R;
 
 /**
- * MinterWallet. 2018
+ * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
