@@ -8,6 +8,12 @@ Featured on Telegram’s official blog, Minter has put a lot of effort into desi
 
 Tired of having to memorize those long strings of symbols they call blockchain addresses? Quit that! With BIP wallet, you can transfer funds to an e-mail address and even a username. What’s more, it takes only five seconds for a transaction to be completed.
 
+## Download
+
+Latest version always available at [Google Play](https://play.google.com/store/apps/details?id=network.minter.bipwallet),
+
+or from latest [**release tag**](https://github.com/MinterTeam/minter-android-wallet/releases/latest)
+
 
 ## Documentation
 
