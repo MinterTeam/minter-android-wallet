@@ -36,8 +36,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 27
-        versionName "1.1.0"
+        versionCode 28
+        versionName "1.1.1-beta"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -109,9 +109,9 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.2.1"
-    minterProfileSDK = "0.1.2"
-    minterBlockchainSDK = "0.1.2"
+    minterExplorerSDK = "0.2.2"
+    minterProfileSDK = "0.1.3"
+    minterBlockchainSDK = "0.1.3"
     minterCoreSDK = "0.1.3"
 }
 
@@ -124,6 +124,13 @@ dependencies {
             "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
     ])
 
+    netMainImplementation([
+            "network.minter.android:minter-android-core:${minterCoreSDK}",
+            "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
+            "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
+            "network.minter.android:minter-android-profile:${minterProfileSDK}"
+    ])
+
     netTestNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
@@ -131,12 +138,7 @@ dependencies {
             "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
     ])
 
-    netMainImplementation([
-            "network.minter.android:minter-android-core:${minterCoreSDK}",
-            "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
-            "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile:${minterProfileSDK}"
-    ])
+
 
     netMainNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
