@@ -69,8 +69,9 @@ public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.A
         String name = intent.getStringExtra(AddressItemActivity.EXTRA_ADDRESS_NAME);
         getViewState().setName(name);
 
+        getViewState().hideActions();
+        getViewState().setDescription("");
         if (!mAddress.isServerSecured) {
-            getViewState().hideActions();
             getViewState().setDescription("This address is secured by You");
         }
     }
