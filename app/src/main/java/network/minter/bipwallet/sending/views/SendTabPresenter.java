@@ -140,6 +140,18 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     @Override
+    public void attachView(SendTabModule.SendView view) {
+        super.attachView(view);
+        getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
+        getViewState().setOnTextChangedListener(this::onInputTextChanged);
+        getViewState().setOnSubmit(this::onSubmit);
+        getViewState().setOnClickScanQR(this::onClickScanQR);
+        getViewState().setOnClickMaximum(this::onClickMaximum);
+        getViewState().setFee(String.format("%s %s", bdHuman(OperationType.SendCoin.getFee()), MinterSDK.DEFAULT_COIN.toUpperCase()));
+        accountStorage.update();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK) {
@@ -158,18 +170,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 }
             }
         }
-    }
-
-    @Override
-    public void attachView(SendTabModule.SendView view) {
-        super.attachView(view);
-        getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
-        getViewState().setOnTextChangedListener(this::onInputTextChanged);
-        getViewState().setOnSubmit(this::onSubmit);
-        getViewState().setOnClickScanQR(this::onClickScanQR);
-        getViewState().setOnClickMaximum(this::onClickMaximum);
-        getViewState().setFee(String.format("%s %s", bdHuman(OperationType.SendCoin.getFee()), MinterSDK.DEFAULT_COIN.toUpperCase()));
-        accountStorage.update();
     }
 
     @Override
@@ -382,27 +382,26 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
             Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
 
+            // default coin for pay fee - MNT (base coin)
+            final BCResult<TransactionCommissionValue> val = new BCResult<>();
+            val.result = new TransactionCommissionValue();
+            val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+            Observable<BCResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
+
+            final boolean enoughBaseCoinForCommission = bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee());
+
             // if enough balance on MNT account, set gas coin MNT (BIP)
-            if (bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee())) {
+            if (enoughBaseCoinForCommission) {
                 Timber.d("Enough balance in MNT to pay fee");
+                Timber.tag("TX Send").d("Resolving base coin commission %s", MinterSDK.DEFAULT_COIN);
                 mGasCoin = mntAccount.get().getCoin();
             }
-            // if sending account is not MNT (BIP), set sending account coin
-            else if (!sendAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN)) {
+            // if sending account is not MNT (BIP), set gas coin CUSTOM
+            else if (!sendAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN) && !enoughBaseCoinForCommission) {
                 Timber.d("Not enough balance in MNT to pay fee, using " + mFromAccount.getCoin());
                 mGasCoin = sendAccount.get().getCoin();
-            }
-
-            // resolving default fee (in pips)
-            Observable<BCResult<TransactionCommissionValue>> exchangeResolver;
-            if (mFromAccount.coin.toUpperCase().equals(MinterSDK.DEFAULT_COIN)) {
-                Timber.tag("TX Send").d("Resolving default coin currency %s", MinterSDK.DEFAULT_COIN);
-                final BCResult<TransactionCommissionValue> val = new BCResult<>();
-                val.result = new TransactionCommissionValue();
-                val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-                exchangeResolver = Observable.just(val);
-            } else {
-                Timber.tag("TX Send").d("Resolving custom coin currency %s", mFromAccount.getCoin());
+                // otherwise getting
+                Timber.tag("TX Send").d("Resolving custom coin commission %s", mFromAccount.getCoin());
                 // resolving fee currency for custom currency
                 // creating tx
                 try {
@@ -420,9 +419,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     exchangeResolver = rxCallBc(bcTxRepo.getTransactionCommission(preSign));
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
-                    final BCResult<TransactionCommissionValue> val = new BCResult<>();
+                    final BCResult<TransactionCommissionValue> commissionValue = new BCResult<>();
                     val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-                    exchangeResolver = Observable.just(val);
+                    exchangeResolver = Observable.just(commissionValue);
                 }
             }
 
@@ -460,6 +459,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         }
 
                         final BigDecimal amountToSend;
+
+                        // don't calc fee if enough balance in base coin and we are sending not a base coin (MNT or BIP)
+                        if (enoughBaseCoinForCommission && !mFromAccount.getCoin().equals(MinterSDK.DEFAULT_COIN)) {
+                            cntRes.commission = new BigDecimal(0);
+                        }
+
                         // if balance enough to send required sum + fee, do nothing
                         if (bdLTE(mAmount.add(cntRes.commission), mFromAccount.getBalance())) {
                             Timber.tag("TX Send").d("Don't change sending amount - balance enough to send");
