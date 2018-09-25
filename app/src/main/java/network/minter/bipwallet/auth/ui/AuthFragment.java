@@ -50,10 +50,10 @@ import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.AuthModule;
 import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
+import network.minter.bipwallet.internal.helpers.IntentHelper;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthView {
@@ -102,12 +102,9 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
 
     @Override
     public void startHelp() {
-
-    }
-
-    @ProvidePresenter
-    AuthPresenter providePresenter() {
-        return authPresenterProvider.get();
+        getActivity().startActivity(
+                IntentHelper.newUrl("https://help.minter.network")
+        );
     }
 
     @Nullable
@@ -127,5 +124,10 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+    }
+
+    @ProvidePresenter
+    AuthPresenter providePresenter() {
+        return authPresenterProvider.get();
     }
 }
