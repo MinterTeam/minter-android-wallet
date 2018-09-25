@@ -61,10 +61,10 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
 
-
         final HistoryTransaction.TxDelegateUnbondResult data = item.getTx().getData();
 
         if (item.getTx().getType() == HistoryTransaction.Type.Delegate) {
+            avatar.setImageResource(R.drawable.img_avatar_delegate);
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
             if (bdNull(data.getStake())) {
                 amount.setText(String.format("%s", bdHuman(data.getStake())));
@@ -72,6 +72,7 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
                 amount.setText(String.format("- %s", bdHuman(data.getStake())));
             }
         } else {
+            avatar.setImageResource(R.drawable.img_avatar_unbond);
             if (bdNull(data.getStake())) {
                 amount.setText(String.format("%s", bdHuman(data.getStake())));
             } else {
@@ -79,7 +80,6 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
                 amount.setText(String.format("+ %s", bdHuman(data.getStake())));
             }
         }
-
 
         subamount.setText(data.coin);
         coin.setText(data.getCoin());
@@ -93,7 +93,10 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
             pubKey.setText("<unknown>");
             title.setText(item.getTx().hash.toShortString());
         }
+    }
 
-
+    @Override
+    protected boolean autoSetAvatar() {
+        return false;
     }
 }

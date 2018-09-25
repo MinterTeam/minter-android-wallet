@@ -117,10 +117,10 @@
             />
 
         <ImageView
-            android:contentDescription="@string/empty"
             android:id="@+id/item_title_separator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/empty"
             app:layout_constraintBottom_toBottomOf="@id/item_title"
             app:layout_constraintEnd_toStartOf="@id/item_title_second"
             app:layout_constraintStart_toEndOf="@id/item_title"
@@ -151,6 +151,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="@dimen/margin_min"
             android:fontFamily="@font/_ubuntu_medium"
+            android:gravity="end"
+            android:textAlignment="viewEnd"
             android:textColor="@color/textColorGrey"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"

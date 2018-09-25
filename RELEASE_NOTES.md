@@ -1,5 +1,15 @@
 # Release Notes
 
+## 1.1.1
+- added icons for delegate and unbond transactions
+- minor UI fixes
+- fix adding fee to approximate convert sum
+- removed email from registering activity
+- hidden unavailable (for now) buttons from address management
+- help link
+- cleanup project
+- added a few layouts for tablets
+
 ## 1.1.0
 
 - added coin autocompletion

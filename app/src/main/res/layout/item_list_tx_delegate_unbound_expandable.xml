@@ -123,6 +123,8 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="@dimen/margin_min"
             android:fontFamily="@font/_ubuntu_medium"
+            android:gravity="end"
+            android:textAlignment="viewEnd"
             android:textColor="@color/textColorGrey"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -64,29 +64,40 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
         final HistoryTransaction item = txItem.getTx();
         final HistoryTransaction.TxSendCoinResult data = item.getData();
 
-        final String am;
+
 
         final boolean isIncoming = item.isIncoming(myAddresses);
+        final boolean isSelfSending = item.from.equals(data.to);
 
-        if (isIncoming) {
+        if (isSelfSending) {
             if (txItem.getUsername() != null) {
                 title.setText(String.format("@%s", txItem.getUsername()));
             } else {
                 title.setText(item.getFrom().toShortString());
             }
-            am = String.format("+ %s", bdHuman(data.amount));
-            amount.setText(am);
-            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
-        } else {
-            if (txItem.getUsername() != null) {
-                title.setText(String.format("@%s", txItem.getUsername()));
-            } else {
-                title.setText(data.to.toShortString());
-            }
 
-            am = String.format("- %s", bdHuman(data.amount));
-            amount.setText(am);
+            amount.setText(bdHuman(data.amount));
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        } else {
+            if (isIncoming) {
+                if (txItem.getUsername() != null) {
+                    title.setText(String.format("@%s", txItem.getUsername()));
+                } else {
+                    title.setText(item.getFrom().toShortString());
+                }
+
+                amount.setText(String.format("+ %s", bdHuman(data.amount)));
+                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+            } else {
+                if (txItem.getUsername() != null) {
+                    title.setText(String.format("@%s", txItem.getUsername()));
+                } else {
+                    title.setText(data.to.toShortString());
+                }
+
+                amount.setText(String.format("- %s", bdHuman(data.amount)));
+                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+            }
         }
 
         if (bdNull(data.amount)) {

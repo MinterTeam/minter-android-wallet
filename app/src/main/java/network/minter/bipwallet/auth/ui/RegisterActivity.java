@@ -55,10 +55,8 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.CompareValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 
 import static android.support.v4.content.res.ResourcesCompat.getFont;
@@ -74,7 +72,6 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
     @BindView(R.id.layout_input_username) TextInputLayout usernameLayout;
     @BindView(R.id.layout_input_password) TextInputLayout passwordLayout;
     @BindView(R.id.layout_input_password_repeat) TextInputLayout passwordRepeatLayout;
-    @BindView(R.id.layout_input_email) TextInputLayout emailLayout;
     @BindView(R.id.layout_input_phone) TextInputLayout phoneLayout;
     @BindView(R.id.action) Button action;
     @BindView(R.id.toolbar) ToolbarProgress toolbar;
@@ -92,9 +89,8 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
 
         usernameLayout.getEditText().setNextFocusDownId(R.id.layout_input_password);
         passwordLayout.getEditText().setNextFocusDownId(R.id.layout_input_password_repeat);
-        passwordRepeatLayout.getEditText().setNextFocusDownId(R.id.layout_input_email);
 
-        emailLayout.getEditText().setOnEditorActionListener((textView, actionId, event) -> {
+        passwordRepeatLayout.getEditText().setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 listener.onClick(textView);
                 return true;
@@ -153,7 +149,6 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
     @Override
     public void startConfirmation(Uri endpoint) {
         startActivity(new Intent(Intent.ACTION_VIEW, endpoint));
-//        startActivityClearTop(this, AuthActivity.class);
         finish();
     }
 
@@ -191,7 +186,6 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
         mInputGroup.addInput(usernameLayout);
         mInputGroup.addInput(passwordLayout);
         mInputGroup.addInput(passwordRepeatLayout);
-        mInputGroup.addInput(emailLayout);
         mInputGroup.addInput(phoneLayout);
 
         mInputGroup.addValidator(usernameLayout, new MinterUsernameValidator(getString(R.string.input_username_invalid)));
@@ -200,8 +194,6 @@ public class RegisterActivity extends BaseMvpInjectActivity implements AuthModul
                                  new CompareValidator(getString(R.string.input_signin_password_not_match),
                                                       passwordLayout));
         mInputGroup.addValidateRelation(passwordLayout, passwordRepeatLayout);
-        mInputGroup.addValidator(emailLayout, new EmailValidator("Invalid email", false));
-        mInputGroup.addValidator(phoneLayout, new PhoneValidator("Invalid phone number", false));
 
 
         mInputGroup.addFilter(usernameLayout, (source, start, end, dest, dstart, dend) -> source.toString().toLowerCase());

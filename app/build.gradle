@@ -36,8 +36,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 28
-        versionName "1.1.1-beta"
+        versionCode 35
+        versionName "1.1.1"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -109,22 +109,15 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.2.0"
-    minterProfileSDK = "0.1.1"
-    minterBlockchainSDK = "0.1.1"
-    minterCoreSDK = "0.1.2"
+    minterExplorerSDK = "0.2.2"
+    minterProfileSDK = "0.1.3"
+    minterBlockchainSDK = "0.1.4"
+    minterCoreSDK = "0.1.3"
 }
 
 dependencies {
 
     netTestImplementation([
-            "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
-            "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
-            "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
-    ])
-
-    netTestNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
@@ -137,6 +130,15 @@ dependencies {
             "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
             "network.minter.android:minter-android-profile:${minterProfileSDK}"
     ])
+
+    netTestNoCrashlyticsImplementation([
+            "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
+            "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
+            "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
+            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
+    ])
+
+
 
     netMainNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",

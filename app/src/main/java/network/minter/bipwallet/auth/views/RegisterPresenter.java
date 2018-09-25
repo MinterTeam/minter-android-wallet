@@ -93,9 +93,6 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
                     case R.id.inputPasswordRepeat:
                         mRegisterData.rawPassword = val;
                         break;
-                    case R.id.inputEmail:
-                        mRegisterData.email = val;
-                        break;
                     case R.id.input_phone:
                         mRegisterData.phone = val;
                         break;

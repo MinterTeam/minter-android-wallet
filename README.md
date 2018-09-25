@@ -12,7 +12,9 @@ Tired of having to memorize those long strings of symbols they call blockchain a
 
 Latest version always available at [Google Play](https://play.google.com/store/apps/details?id=network.minter.bipwallet),
 
-or from latest [**release tag**](https://github.com/MinterTeam/minter-android-wallet/releases/latest)
+or from latest tag:
+
+[![**release tag**](https://img.shields.io/github/release/MinterTeam/minter-android-wallet.svg)](https://github.com/MinterTeam/minter-android-wallet/releases/latest)
 
 
 ## Documentation
