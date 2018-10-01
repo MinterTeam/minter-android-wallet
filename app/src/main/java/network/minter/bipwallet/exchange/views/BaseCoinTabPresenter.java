@@ -77,7 +77,6 @@ import network.minter.explorer.repo.ExplorerCoinsRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
@@ -238,7 +237,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         final TransactionSign sign = tx.sign(data.getPrivateKey());
                         data.cleanup();
 
-                        return safeSubscribeIoToUi(rxCallBc(mTxRepo.getEntity().sendTransaction(sign)))
+                        return safeSubscribeIoToUi(rxCallBcExp(mTxRepo.getEntity().sendTransaction(sign)))
                                 .onErrorResumeNext(convertToBcExpErrorResult());
 
                     }).subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
