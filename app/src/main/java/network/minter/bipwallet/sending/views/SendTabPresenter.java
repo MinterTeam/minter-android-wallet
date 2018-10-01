@@ -48,6 +48,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -82,21 +83,22 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.repo.BlockChainAccountRepository;
-import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.blockchain.BCErrorHelper.normalizeBlockChainInsufficientFundsMessage;
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.createBcErrorResultMessage;
+import static network.minter.bipwallet.internal.ReactiveAdapter.createBcExpErrorResultMessage;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
@@ -115,9 +117,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private static final int REQUEST_CODE_QR_SCAN = 101;
     @Inject SecretStorage secretStorage;
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
-    @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
-    @Inject BlockChainAccountRepository accountRepo;
-    @Inject BlockChainCoinRepository coinRepo;
+    @Inject
+    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cachedTxRepo;
+    @Inject ExplorerCoinsRepository coinRepo;
     @Inject BlockChainTransactionRepository bcTxRepo;
     @Inject ProfileInfoRepository infoRepo;
     @Inject CacheManager cache;
@@ -130,6 +132,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
     private BehaviorSubject<BigDecimal> mInputChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
+    private AccountItem mLastAccount = null;
 
     private enum SearchByType {
         Address, Username, Email
@@ -177,7 +180,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         super.onFirstViewAttach();
         safeSubscribeIoToUi(accountStorage.observe()).subscribe(res -> {
             if (!res.isEmpty()) {
-                onAccountSelected(res.getAccounts().get(0));
+                if (mLastAccount != null) {
+                    onAccountSelected(res.findAccountByCoin(mLastAccount.getCoin()).orElse(res.getAccounts().get(0)));
+                } else {
+                    onAccountSelected(res.getAccounts().get(0));
+                }
             }
         });
 
@@ -295,6 +302,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             getViewState().setRecipientError(null);
                             startSendDialog();
                         } else {
+                            mAvatar = MinterProfileApi.getUserAvatarUrl(1);
                             if (failOnNotFound) {
                                 mToAddress = null;
                                 onErrorSearchUser(result);
@@ -383,10 +391,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
 
             // default coin for pay fee - MNT (base coin)
-            final BCResult<TransactionCommissionValue> val = new BCResult<>();
+            final BCExplorerResult<TransactionCommissionValue> val = new BCExplorerResult<>();
             val.result = new TransactionCommissionValue();
             val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-            Observable<BCResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
+            Observable<BCExplorerResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
 
             final boolean enoughBaseCoinForCommission = bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee());
 
@@ -416,28 +424,28 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
                     final TransactionSign preSign = preTx.sign(preData.getPrivateKey());
 
-                    exchangeResolver = rxCallBc(bcTxRepo.getTransactionCommission(preSign));
+                    exchangeResolver = rxCallBcExp(cachedTxRepo.getEntity().getTransactionCommission(preSign));
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
-                    final BCResult<TransactionCommissionValue> commissionValue = new BCResult<>();
+                    final BCExplorerResult<TransactionCommissionValue> commissionValue = new BCExplorerResult<>();
                     val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
                     exchangeResolver = Observable.just(commissionValue);
                 }
             }
 
             // creating preparation result to send transaction
-            Observable.combineLatest(
-                    exchangeResolver.onErrorResumeNext(convertToBcErrorResult()),
-                    rxCallBc(accountRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(convertToBcErrorResult()),
-                    new BiFunction<BCResult<TransactionCommissionValue>, BCResult<CountableData>, SendInitData>() {
+            Disposable d = Observable.combineLatest(
+                    exchangeResolver.onErrorResumeNext(convertToBcExpErrorResult()),
+                    rxCallBcExp(cachedTxRepo.getEntity().getTransactionCount(mFromAccount.address)).onErrorResumeNext(convertToBcExpErrorResult()),
+                    new BiFunction<BCExplorerResult<TransactionCommissionValue>, BCExplorerResult<CountableData>, SendInitData>() {
                         @Override
-                        public SendInitData apply(BCResult<TransactionCommissionValue> txCommissionValue, BCResult<CountableData> countableDataBCResult) {
+                        public SendInitData apply(BCExplorerResult<TransactionCommissionValue> txCommissionValue, BCExplorerResult<CountableData> countableDataBCResult) {
 
                             // if some request failed, returning error result
                             if (!txCommissionValue.isSuccess()) {
-                                return new SendInitData(BCResult.copyError(txCommissionValue));
+                                return new SendInitData(BCExplorerResult.copyError(txCommissionValue));
                             } else if (!countableDataBCResult.isSuccess()) {
-                                return new SendInitData(BCResult.copyError(countableDataBCResult));
+                                return new SendInitData(BCExplorerResult.copyError(countableDataBCResult));
                             }
 
                             Timber.d("SendInitData: tx commission: %s", txCommissionValue.result.getValue());
@@ -452,10 +460,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             return data;
                         }
                     })
-                    .switchMap((Function<SendInitData, ObservableSource<BCResult<TransactionSendResult>>>) cntRes -> {
+                    .switchMap((Function<SendInitData, ObservableSource<BCExplorerResult<TransactionSendResult>>>) cntRes -> {
                         // if in previous request we've got error, returning it
                         if (!cntRes.isSuccess()) {
-                            return Observable.just(BCResult.copyError(cntRes.errorResult));
+                            return Observable.just(BCExplorerResult.copyError(cntRes.errorResult));
                         }
 
                         final BigDecimal amountToSend;
@@ -479,7 +487,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         // if after subtracting fee from sending sum has become less than account balance at all, returning error with message "insufficient funds"
                         if (bdLT(amountToSend, 0)) {
                             final BigDecimal diff = mAmount.subtract(mFromAccount.getBalance());
-                            BCResult<TransactionSendResult> errorRes = createBcErrorResultMessage(
+                            BCExplorerResult<TransactionSendResult> errorRes = createBcExpErrorResultMessage(
                                     String.format("Insufficient funds: need %s %s", diff.toPlainString(), mFromAccount.coin.toUpperCase()),
                                     BCResult.ResultCode.InsufficientFundsB,
                                     400
@@ -505,10 +513,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         final SecretData data = secretStorage.getSecret(mFromAccount.address);
                         final TransactionSign sign = tx.sign(data.getPrivateKey());
 
-                        return safeSubscribeIoToUi(rxCallBc(accountRepo.sendTransaction(sign)))
-                                .onErrorResumeNext(convertToBcErrorResult());
+                        return safeSubscribeIoToUi(rxCallBc(cachedTxRepo.getEntity().sendTransaction(sign)))
+                                .onErrorResumeNext(convertToBcExpErrorResult());
 
                     }).subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);
+            unsubscribeOnDestroy(d);
 
             return dialog;
         });
@@ -530,15 +539,15 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .create());
     }
 
-    private void onErrorExecuteTransaction(BCResult<?> errorResult) {
-        Timber.e(errorResult.message, "Unable to send transaction");
+    private void onErrorExecuteTransaction(BCExplorerResult<?> errorResult) {
+        Timber.e(errorResult.getMessage(), "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
-                .setText(normalizeBlockChainInsufficientFundsMessage(errorResult.message))
+                .setText((errorResult.getMessage()))
                 .setPositiveAction("Close")
                 .create());
     }
 
-    private void onSuccessExecuteTransaction(final BCResult<TransactionSendResult> result) {
+    private void onSuccessExecuteTransaction(final BCExplorerResult<TransactionSendResult> result) {
         if (!result.isSuccess()) {
             onErrorExecuteTransaction(result);
             return;
@@ -547,13 +556,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         recipientStorage.add(new RecipientItem(mToAddress, mToName), this::setRecipientAutocomplete);
 
         accountStorage.update(true);
-        txRepo.update(true);
+        cachedTxRepo.update(true);
         getViewState().startDialog(ctx -> {
             getAnalytics().send(AppEvent.SentCoinPopupScreen);
 
             return new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
                     .setRecipientName(mToName)
-                    .setAvatar(mAvatar)
+                    .setAvatarUrl(mAvatar)
                     .setPositiveAction("View transaction", (d, v) -> {
                         getViewState().startExplorer(result.result.txHash.toString());
                         d.dismiss();
@@ -589,20 +598,22 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onAccountSelected(AccountItem accountItem) {
         mFromAccount = accountItem;
+        mLastAccount = accountItem;
         getViewState().setAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), bdHuman(accountItem.getBalance())));
+
     }
 
     private static final class SendInitData {
         BigInteger nonce;
         BigDecimal commission;
-        BCResult<?> errorResult;
+        BCExplorerResult<?> errorResult;
 
         SendInitData(BigInteger nonce, BigDecimal commission) {
             this.nonce = nonce;
             this.commission = commission;
         }
 
-        SendInitData(BCResult<?> err) {
+        SendInitData(BCExplorerResult<?> err) {
             errorResult = err;
         }
 

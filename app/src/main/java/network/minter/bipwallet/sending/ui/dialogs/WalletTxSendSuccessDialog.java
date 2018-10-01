@@ -105,7 +105,7 @@ public class WalletTxSendSuccessDialog extends WalletDialog {
             return this;
         }
 
-        public Builder setAvatar(String avatarUrl) {
+        public Builder setAvatarUrl(String avatarUrl) {
             mAvatarUrl = avatarUrl;
             return this;
         }
