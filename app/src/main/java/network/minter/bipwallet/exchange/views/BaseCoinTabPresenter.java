@@ -64,7 +64,6 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationType;
@@ -83,7 +82,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
-import static network.minter.blockchain.models.BCResult.ResultCode.CoinDoesNotExists;
+import static network.minter.blockchain.models.BCResult.ResultCode.CoinNotExists;
 
 /**
  * minter-android-wallet. 2018
@@ -351,12 +350,12 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
                             Timber.w(new BCExplorerResponseException(res));
-                            if (res.getErrorCode() == BCResult.ResultCode.EmptyResponse || res.statusCode == 404 || res.getErrorCode() == CoinDoesNotExists) {
+                            if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
                                 mEnableUseMax.set(false);
                                 return;
                             } else {
-                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Unknown error"));
+                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
                                 mEnableUseMax.set(false);
                                 return;
                             }
@@ -396,14 +395,16 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
-                            //FIXME: check all possible codes
-                            if (res.getErrorCode() == BCResult.ResultCode.EmptyResponse || res.statusCode == 404 || res.getErrorCode() == CoinDoesNotExists) {
+                            Timber.w(new BCExplorerResponseException(res));
+                            if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
                                 mEnableUseMax.set(false);
                                 return;
+                            } else {
+                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
+                                mEnableUseMax.set(false);
+                                return;
                             }
-                            Timber.w(new BCExplorerResponseException(res));
-                            return;
                         }
                         mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);

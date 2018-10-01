@@ -36,8 +36,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 36
-        versionName "1.1.2-beta01"
+        versionCode 38
+        versionName "1.1.2-beta03"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -70,13 +70,13 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.config
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
         }
 
         debug {
             signingConfig signingConfigs.config
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
             testProguardFile 'proguard-test-rules.pro'
         }
@@ -110,8 +110,8 @@ android {
 
 ext {
     minterExplorerSDK = "0.2.3"
-    minterProfileSDK = "0.1.3"
-    minterBlockchainSDK = "0.1.4"
+    minterProfileSDK = "0.1.4"
+    minterBlockchainSDK = "0.2.0"
     minterCoreSDK = "0.1.3"
 }
 

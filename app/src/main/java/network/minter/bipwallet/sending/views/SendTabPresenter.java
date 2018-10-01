@@ -302,7 +302,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             getViewState().setRecipientError(null);
                             startSendDialog();
                         } else {
-                            mAvatar = MinterProfileApi.getUserAvatarUrl(1);
+                            if (mToAddress != null) {
+                                mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(mToAddress.toString());
+                            } else {
+                                mAvatar = MinterProfileApi.getUserAvatarUrl(1);
+                            }
+
                             if (failOnNotFound) {
                                 mToAddress = null;
                                 onErrorSearchUser(result);
@@ -489,7 +494,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             final BigDecimal diff = mAmount.subtract(mFromAccount.getBalance());
                             BCExplorerResult<TransactionSendResult> errorRes = createBcExpErrorResultMessage(
                                     String.format("Insufficient funds: need %s %s", diff.toPlainString(), mFromAccount.coin.toUpperCase()),
-                                    BCResult.ResultCode.InsufficientFundsB,
+                                    BCResult.ResultCode.InsufficientFunds,
                                     400
                             );
                             return Observable.just(errorRes);

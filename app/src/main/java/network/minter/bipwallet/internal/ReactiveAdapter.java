@@ -174,7 +174,7 @@ public class ReactiveAdapter {
             if (throwable instanceof IOException && throwable.getCause() instanceof EOFException) {
                 // blockchain api sometimes instead of 404 gives empty response, just handle it as 404
                 final BCResult<T> errResult = new BCResult<>();
-                errResult.code = BCResult.ResultCode.EmptyResponse;
+                errResult.code = null;
                 errResult.message = "Not found";
                 errResult.result = null;
                 errResult.statusCode = 404;
@@ -206,7 +206,7 @@ public class ReactiveAdapter {
             }.getType());
         } catch (Exception e) {
             out = new BCResult<>();
-            out.code = BCResult.ResultCode.Unknown;
+            out.code = null;
             out.message = "Invalid response";
             out.statusCode = 500;
         }
@@ -283,7 +283,7 @@ public class ReactiveAdapter {
                 // blockchain api sometimes instead of 404 gives empty response, just handle it as 404
                 final BCExplorerResult<T> errResult = new BCExplorerResult<>();
                 errResult.error = new BCExplorerResult.ErrorResult();
-                errResult.error.code = BCResult.ResultCode.EmptyResponse;
+                errResult.error.code = null;
                 errResult.error.message = "Not found";
                 errResult.result = null;
                 errResult.statusCode = 404;
@@ -317,7 +317,7 @@ public class ReactiveAdapter {
         } catch (Exception e) {
             out = new BCExplorerResult<>();
             out.error = new BCExplorerResult.ErrorResult();
-            out.error.code = BCResult.ResultCode.Unknown;
+            out.error.code = null;
             out.error.message = "Invalid response";
             out.statusCode = 500;
         }

@@ -61,7 +61,12 @@ public class TxItem implements TransactionItem {
 
     public TxItem(HistoryTransaction tx) {
         mTx = tx;
-        mAvatar = firstNonNull(tx.getAvatar(), MinterProfileApi.getUserAvatarUrl(1));
+        if (tx.getAvatar() == null && tx.data instanceof HistoryTransaction.TxSendCoinResult) {
+            mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.<HistoryTransaction.TxSendCoinResult>getData().to);
+        } else {
+            mAvatar = firstNonNull(tx.getAvatar(), MinterProfileApi.getUserAvatarUrl(1));
+        }
+
         mUsername = tx.username;
     }
 
