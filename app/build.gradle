@@ -30,8 +30,8 @@ plugins {
 }
 
 android {
-    compileSdkVersion minterMaxSdk
-    buildToolsVersion minterBuildTools
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
@@ -77,14 +77,14 @@ android {
         debug {
             signingConfig signingConfigs.config
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro', 'proguard-release-rules.pro'
             testProguardFile 'proguard-test-rules.pro'
         }
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     flavorDimensions "env"
@@ -109,37 +109,31 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.2.3"
-    minterProfileSDK = "0.1.4"
-    minterBlockchainSDK = "0.2.0"
-    minterCoreSDK = "0.1.3"
+    minterExplorerSDK = "0.2.4"
+    minterProfileSDK = "0.2.0"
+    minterBlockchainSDK = "0.3.0"
+    minterCoreSDK = "0.2.0"
 }
 
 dependencies {
-
     netTestImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
             "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
     ])
-
     netMainImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
             "network.minter.android:minter-android-profile:${minterProfileSDK}"
     ])
-
     netTestNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
             "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
     ])
-
-
-
     netMainNoCrashlyticsImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
@@ -155,12 +149,12 @@ dependencies {
     implementation "com.android.support:support-v13:${minterLibSupport}"
     implementation "com.android.support:design:${minterLibSupport}"
     implementation "com.android.support:support-vector-drawable:${minterLibSupport}"
+    implementation "com.android.support:exifinterface:${minterLibSupport}"
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
     // android arch
-    implementation "android.arch.paging:runtime:1.0.1"
-    implementation "android.arch.paging:rxjava2:1.0.1"
-
+    implementation 'android.arch.paging:runtime:1.0.1'
+    implementation 'android.arch.paging:rxjava2:1.0.1'
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
         transitive = true
     }
@@ -175,17 +169,17 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:android-integration:3.3.0'
-    implementation 'com.jakewharton.timber:timber:4.5.1'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'org.parceler:parceler-api:1.1.11'
     annotationProcessor 'org.parceler:parceler:1.1.11'
-    implementation "com.orhanobut:hawk:2.0.1"
+    implementation 'com.orhanobut:hawk:2.0.1'
     implementation 'com.annimon:stream:1.2.0'
     implementation 'net.danlew:android.joda:2.9.9.1'
     implementation('com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.6.0') {
         exclude group: 'joda-time'
         exclude group: 'com.google.code.gson'
     }
-    implementation("com.github.hotchemi:permissionsdispatcher:3.3.1") {
+    implementation('com.github.hotchemi:permissionsdispatcher:3.3.1') {
         // if you don't use android.app.Fragment you can exclude support for them
         exclude module: "support-v13"
     }
@@ -200,12 +194,16 @@ dependencies {
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP ignore 1.5.5 - not working with inner class interfaces, waiting for 1.5.6
+
     //noinspection GradleDependency
     implementation 'com.arello-mobile:moxy:1.5.3'
+
     //noinspection GradleDependency
     implementation 'com.arello-mobile:moxy-android:1.5.3'
+
     //noinspection GradleDependency
     implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
+
     //noinspection GradleDependency
     annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
 
@@ -224,13 +222,16 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.2'
     implementation 'com.makeramen:roundedimageview:2.3.0'
+
     // don't update to 2.2.0 - some issues when using elevation
+
     //noinspection GradleDependency
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     annotationProcessor 'io.sweers.barber:barber-compiler:1.3.1'
     implementation 'io.sweers.barber:barber-api:1.3.1'
+
     //noinspection GradleDynamicVersion,GradleDependency
     implementation 'network.minter.android:android-image-cropper:2.7.1'
     implementation 'com.redmadrobot:inputmask:3.4.4'
@@ -243,7 +244,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.0'
-
 }
 repositories {
     mavenCentral()

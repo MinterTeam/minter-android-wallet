@@ -97,7 +97,6 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.createBcExpErrorResultMessage;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
@@ -371,6 +370,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onClickMaximum(View view) {
+        if (mFromAccount == null) {
+            getViewState().setError("Account didn't loaded yet...");
+            return;
+        }
         mEnableUseMax.set(true);
         checkEnoughBalance(mFromAccount.getBalanceBase());
         mAmount = mFromAccount.getBalance();
@@ -516,9 +519,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                 .build();
 
                         final SecretData data = secretStorage.getSecret(mFromAccount.address);
-                        final TransactionSign sign = tx.sign(data.getPrivateKey());
+                        final TransactionSign sign = tx.signSingle(data.getPrivateKey());
 
-                        return safeSubscribeIoToUi(rxCallBc(cachedTxRepo.getEntity().sendTransaction(sign)))
+                        return safeSubscribeIoToUi(rxCallBcExp(cachedTxRepo.getEntity().sendTransaction(sign)))
                                 .onErrorResumeNext(convertToBcExpErrorResult());
 
                     }).subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);

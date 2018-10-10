@@ -76,9 +76,12 @@ public class WalletModule {
                 .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
                 .build();
 
+        Timber.uprootAll();
+
         MinterSDK.initialize();
         MinterBlockChainApi.initialize(debug);
         MinterExplorerApi.initialize(debug);
+        MinterExplorerApi.getInstance().setNetworkId(MinterExplorerApi.NET_ID_TESTNET_WITH_MULTISIG);
 
         JodaTimeAndroid.init(context);
     }
