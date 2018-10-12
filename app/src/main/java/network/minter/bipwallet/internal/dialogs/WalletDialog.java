@@ -54,7 +54,7 @@ public abstract class WalletDialog extends Dialog {
         super(context, R.style.Wallet_Dialog);
     }
 
-    public static void dismissInstance(WalletInputDialog inputDialog) {
+    public static void dismissInstance(WalletDialog inputDialog) {
         if (inputDialog == null) return;
         inputDialog.dismiss();
     }

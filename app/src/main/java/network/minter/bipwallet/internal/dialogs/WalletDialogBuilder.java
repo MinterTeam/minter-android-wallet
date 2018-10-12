@@ -102,6 +102,9 @@ public abstract class WalletDialogBuilder<D extends WalletDialog, B extends Wall
 
     @SuppressWarnings("unchecked")
     protected B setAction(int whichBtn, CharSequence title, Dialog.OnClickListener listener) {
+        if (listener == null) {
+            listener = (d, w) -> d.dismiss();
+        }
         switch (whichBtn) {
             case DialogInterface.BUTTON_POSITIVE:
                 mPositiveTitle = title;

@@ -39,9 +39,13 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
@@ -49,7 +53,9 @@ import network.minter.bipwallet.home.HomeScope;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CachedRepository;
+import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
+import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
@@ -59,6 +65,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.settings.repo.MinterBotRepository;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
@@ -88,6 +95,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     private MultiRowAdapter mMainAdapter, mAdditionalAdapter;
     private ChangeAvatarRow mChangeAvatarRow;
     private Map<String, SettingsButtonRow> mMainSettingsRows = new LinkedHashMap<>();
+    private MinterBotRepository mBotRepo = new MinterBotRepository();
 
     @Inject
     public SettingsTabPresenter() {
@@ -106,6 +114,21 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         profileCachedRepo.update(profile -> mMainAdapter.notifyDataSetChanged());
         getViewState().setMainAdapter(mMainAdapter);
         getViewState().setAdditionalAdapter(mAdditionalAdapter);
+        //noinspection ConstantConditions
+        if (BuildConfig.FLAVOR.equals("netTest") || BuildConfig.FLAVOR.equals("netTestNoCrashlytics")) {
+            getViewState().showFreeCoinsButton(true);
+            getViewState().setOnFreeCoinsClickListener(v -> {
+                getViewState().startDialog(exec -> new WalletConfirmDialog.Builder(exec, "Get free coins")
+                        .setText("Are you wanna get FREE 100 MNT?")
+                        .setPositiveAction("Sure!", (d, w) -> {
+                            d.dismiss();
+                            onRequestFreeCoins();
+                        })
+                        .setNegativeAction("Nope")
+                        .create());
+            });
+        }
+
     }
 
     @Override
@@ -167,6 +190,45 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         } else {
             mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", this::onClickAddresses).setInactive(true));
         }
+    }
+
+    private void onRequestFreeCoins() {
+        getViewState().startDialog(ctx -> {
+
+            unsubscribeOnDestroy(
+                    mBotRepo.requestFreeCoins(secretStorage.getAddresses().get(0))
+                            .delay(500, TimeUnit.MILLISECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::onRequestFreeCoinsSuccess, t -> onRequestFreeCoinsError(t.getMessage()))
+            );
+
+            return new WalletProgressDialog.Builder(ctx, "Get free coins")
+                    .setText("In progress...")
+                    .create();
+        });
+    }
+
+    private void onRequestFreeCoinsError(String message) {
+        getViewState().startDialog(ctx -> {
+            return new WalletConfirmDialog.Builder(ctx, "Can't get free coins")
+                    .setText(String.format("Our apologies, but we can't send to you free coins: %s", message))
+                    .setPositiveAction("Close")
+                    .create();
+        });
+    }
+
+    private void onRequestFreeCoinsSuccess(MinterBotRepository.MinterBotResult result) {
+        if (!result.isOk()) {
+            onRequestFreeCoinsError(result.getError());
+            return;
+        }
+        getViewState().startDialog(ctx -> {
+            return new WalletConfirmDialog.Builder(ctx, "Get free coins")
+                    .setText("We sent to you 100 MNT")
+                    .setPositiveAction("OK")
+                    .create();
+        });
     }
 
     private void onClickAddresses(View view, View sharedView, String value) {

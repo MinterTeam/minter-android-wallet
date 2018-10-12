@@ -38,6 +38,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
@@ -56,7 +57,6 @@ import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
-import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
 import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator;
 import network.minter.bipwallet.internal.views.list.NonScrollableLinearLayoutManager;
@@ -73,11 +73,12 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.list_main) RecyclerView listMain;
     @BindView(R.id.list_additional) RecyclerView listAdditional;
+    @BindView(R.id.free_get) Button freeGet;
 
     @Inject Provider<SettingsTabPresenter> presenterProvider;
     @InjectPresenter SettingsTabPresenter presenter;
 
-    private WalletInputDialog mInputDialog;
+    private WalletDialog mDialog;
 
     @Override
     public void onAttach(Context context) {
@@ -128,7 +129,7 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     @Override
     public void onDestroy() {
         super.onDestroy();
-        WalletDialog.dismissInstance(mInputDialog);
+        WalletDialog.dismissInstance(mDialog);
     }
 
     @Override
@@ -159,7 +160,7 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
 
     @Override
     public void startDialog(WalletDialog.DialogExecutor executor) {
-        mInputDialog = WalletDialog.switchDialogWithExecutor(this, mInputDialog, executor);
+        mDialog = WalletDialog.switchDialogWithExecutor(this, mDialog, executor);
     }
 
     @Override
@@ -185,6 +186,16 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     public void onCreate(@Nullable Bundle savedInstanceState) {
         HomeModule.getComponent().inject(this);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void setOnFreeCoinsClickListener(View.OnClickListener listener) {
+        freeGet.setOnClickListener(listener);
+    }
+
+    @Override
+    public void showFreeCoinsButton(boolean show) {
+        freeGet.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
