@@ -31,6 +31,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:id="@+id/exchange_root"
     >
 
     <android.support.constraint.ConstraintLayout
@@ -40,7 +41,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
+
         android:paddingTop="@dimen/margin_edges_half"
         android:background="@color/white"
         >
@@ -210,6 +211,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_incoming_coin"
+            app:layout_constraintBottom_toTopOf="@id/rate_attention"
             >
 
             <TextView
@@ -229,16 +231,17 @@
             <TextView
                 android:id="@+id/calculation"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/margin_edges_half"
                 android:fontFamily="@font/_ubuntu_medium"
                 android:textAlignment="center"
                 android:textSize="@dimen/text_size_22"
+                android:ellipsize="none"
+                android:maxLines="100"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/calculation_title"
-                tools:text="15.3304 BLTCOIN"
-
+                tools:text="1 000 288 859 454 671 683 189 102 649 595 518 589 437 586 374 105 388 329 571 031 220 769 944 178 978 247 137 569 836 967 570 972 662 549 939 674 191 668 790 939 167 959 399 268 002 355 388 000 949 308 312 784 846 611 858 588 290 828.3882 MNT"
                 />
         </android.support.constraint.ConstraintLayout>
 
@@ -251,6 +254,8 @@
             android:layout_marginEnd="@dimen/margin_edges"
             android:text="@string/attention_exchange_rate"
             android:textAlignment="center"
+            android:ellipsize="none"
+            android:singleLine="false"
             android:textSize="@dimen/text_size_14"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
