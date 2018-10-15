@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.2.0
+- Updated for new Test Net
+- Added "Get FREE coins" button to replace Minter Bip Wallet telegram bot
+- Minor fixes
+
 ## 1.1.1
 - added icons for delegate and unbond transactions
 - minor UI fixes

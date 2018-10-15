@@ -243,7 +243,7 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
         }
     }
 
-    public class CrashlyticsTree extends Timber.Tree {
+    public static final class CrashlyticsTree extends Timber.Tree {
         private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
         private static final String CRASHLYTICS_KEY_TAG = "tag";
         private static final String CRASHLYTICS_KEY_MESSAGE = "message";
