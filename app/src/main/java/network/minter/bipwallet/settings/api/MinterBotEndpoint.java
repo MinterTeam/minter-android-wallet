@@ -23,41 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.exchange.views;
 
-import com.arellomobile.mvp.InjectViewState;
+package network.minter.bipwallet.settings.api;
 
-import java.util.List;
+import java.util.Map;
 
-import javax.inject.Inject;
-
-import network.minter.bipwallet.advanced.models.UserAccount;
-import network.minter.bipwallet.advanced.repo.AccountStorage;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
-import network.minter.bipwallet.exchange.ExchangeModule.GetCoinTabView;
-import network.minter.bipwallet.internal.data.CachedRepository;
-import network.minter.explorer.models.HistoryTransaction;
-import network.minter.explorer.repo.ExplorerCoinsRepository;
+import io.reactivex.Observable;
+import network.minter.bipwallet.settings.repo.MinterBotRepository;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 
 /**
  * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@InjectViewState
-public class GetCoinTabPresenter extends BaseCoinTabPresenter<GetCoinTabView> {
+public interface MinterBotEndpoint {
 
-    @Inject
-    public GetCoinTabPresenter(
-            SecretStorage secretStorage,
-            CachedRepository<UserAccount, AccountStorage> accountStorage,
-            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            ExplorerCoinsRepository explorerCoinsRepository) {
-        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository);
-    }
-
-    @Override
-    protected boolean isAmountForGetting() {
-        return true;
-    }
+    @POST("coins/send")
+    Observable<MinterBotRepository.MinterBotResult> requestFreeCoins(@Body Map<String, String> data);
 }

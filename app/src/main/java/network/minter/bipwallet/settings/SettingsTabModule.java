@@ -67,6 +67,8 @@ public interface SettingsTabModule {
     }
 
     interface SettingsTabView extends MvpView {
+        void setOnFreeCoinsClickListener(View.OnClickListener listener);
+        void showFreeCoinsButton(boolean show);
         void startLogin();
         void setMainAdapter(RecyclerView.Adapter<?> mainAdapter);
         void setAdditionalAdapter(RecyclerView.Adapter<?> additionalAdapter);

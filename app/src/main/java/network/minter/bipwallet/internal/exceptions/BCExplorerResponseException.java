@@ -23,41 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.exchange.views;
 
-import com.arellomobile.mvp.InjectViewState;
+package network.minter.bipwallet.internal.exceptions;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-import network.minter.bipwallet.advanced.models.UserAccount;
-import network.minter.bipwallet.advanced.repo.AccountStorage;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
-import network.minter.bipwallet.exchange.ExchangeModule.GetCoinTabView;
-import network.minter.bipwallet.internal.data.CachedRepository;
-import network.minter.explorer.models.HistoryTransaction;
-import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.models.BCExplorerResult;
 
 /**
- * minter-android-wallet. 2018
+ * Dogsy. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@InjectViewState
-public class GetCoinTabPresenter extends BaseCoinTabPresenter<GetCoinTabView> {
+public final class BCExplorerResponseException extends RuntimeException {
+    private BCExplorerResult mError;
 
-    @Inject
-    public GetCoinTabPresenter(
-            SecretStorage secretStorage,
-            CachedRepository<UserAccount, AccountStorage> accountStorage,
-            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            ExplorerCoinsRepository explorerCoinsRepository) {
-        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository);
+    public BCExplorerResponseException(BCExplorerResult error) {
+        mError = error;
     }
 
-    @Override
-    protected boolean isAmountForGetting() {
-        return true;
+    public BCExplorerResult getError() {
+        return mError;
     }
 }

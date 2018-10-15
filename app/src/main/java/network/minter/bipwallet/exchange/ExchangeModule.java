@@ -62,7 +62,7 @@ public class ExchangeModule {
         void setFormValidationListener(InputGroup.OnFormValidateListener listener);
         void startExplorer(String s);
         void finish();
-        void setCalculation(CharSequence calculation);
+        void setCalculation(String calculation);
         void setOutAccountName(CharSequence accountName);
         void setMaximumEnabled(boolean enabled);
         void setAmount(CharSequence amount);

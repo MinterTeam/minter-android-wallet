@@ -26,6 +26,9 @@
 
 package network.minter.bipwallet.advanced.models;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
+
 import org.parceler.Parcel;
 
 import java.io.Serializable;
@@ -117,6 +120,12 @@ public class UserAccount implements Serializable, Cloneable {
             mTotalBalanceUsd = new BigDecimal(0);
         }
         return mTotalBalanceUsd;
+    }
+
+    public Optional<AccountItem> findAccountByCoin(String coin) {
+        return Stream.of(getAccounts())
+                .filter(item -> item.getCoin().equals(coin))
+                .findFirst();
     }
 
     public List<AccountItem> getAccounts() {

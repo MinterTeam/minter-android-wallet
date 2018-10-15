@@ -42,6 +42,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -209,10 +211,36 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     }
 
     @Override
-    public void setCalculation(CharSequence calculation) {
+    public void setCalculation(String calculation) {
         if (calculationLayout.getVisibility() == View.GONE) {
             calculationLayout.setVisibility(View.VISIBLE);
         }
+        calculationView.setMaxLines(100);
+        calculationView.setSingleLine(false);
+
+        if (calculation.length() > 64) {
+            final Matcher m = Pattern.compile("\\s+").matcher(calculation);
+            int cnt = 0;
+            while (m.find()) {
+                cnt++;
+            }
+
+            int idx = (cnt * 3) - 1;
+            if (cnt >= 64) {
+                String toConcat;
+                do {
+                    toConcat = calculation.substring(0, ++idx);
+                } while (toConcat.charAt(toConcat.length() - 1) != ' ');
+                toConcat += "THE MATRIX HAS YOU ";
+                toConcat += calculation.substring(idx);
+                calculationView.setText(toConcat);
+                return;
+                //1 000 288 859 454 671 683 189 102 649 595 518 589 437 586 374 105 388 329 571 031 220 769 944 178 978 247 137 569 836 967 570 972 662 549 939 674 191 668 790 939 167 959 399 268 002 355 388 000 949 308 312 784 846 611 858 588 290 828.3882 MNT
+            }
+        }
+
+
+
         calculationView.setText(calculation);
     }
 

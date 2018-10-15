@@ -43,6 +43,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
@@ -61,30 +62,27 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
-import network.minter.bipwallet.internal.exceptions.BCResponseException;
+import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.repo.BlockChainAccountRepository;
-import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.blockchain.BCErrorHelper.normalizeBlockChainInsufficientFundsMessage;
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
+import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
-import static network.minter.blockchain.models.BCResult.ResultCode.CoinDoesNotExists;
+import static network.minter.blockchain.models.BCResult.ResultCode.CoinNotExists;
 
 /**
  * minter-android-wallet. 2018
@@ -94,8 +92,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final SecretStorage mSecretStorage;
     protected final CachedRepository<UserAccount, AccountStorage> mAccountStorage;
     protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;
-    protected final BlockChainCoinRepository mCoinRepo;
-    protected final BlockChainAccountRepository mAccountRepo;
     protected final ExplorerCoinsRepository mExplorerCoinsRepo;
 
     private AccountItem mAccount;
@@ -112,15 +108,11 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            BlockChainCoinRepository coinRepo,
-            BlockChainAccountRepository accountRepo,
             ExplorerCoinsRepository explorerCoinsRepository
     ) {
         mSecretStorage = secretStorage;
         mAccountStorage = accountStorage;
-        mAccountRepo = accountRepo;
         mTxRepo = txRepo;
-        mCoinRepo = coinRepo;
         mExplorerCoinsRepo = explorerCoinsRepository;
     }
 
@@ -155,6 +147,13 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         setCoinsAutocomplete();
     }
 
+    protected abstract boolean isAmountForGetting();
+
+    @CallSuper
+    protected void setCalculation(String calculation) {
+        getViewState().setCalculation(calculation);
+    }
+
     private boolean checkZero(BigDecimal amount) {
         boolean valid = amount == null || !bdNull(amount);
         if (!valid) {
@@ -175,13 +174,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         getViewState().setCoinsAutocomplete(res.result, (item, position) -> getViewState().setIncomingCoin(item.symbol));
                     }
                 }, Wallet.Rx.errorHandler(getViewState()));
-    }
-
-    protected abstract boolean isAmountForGetting();
-
-    @CallSuper
-    protected void setCalculation(String calculation) {
-        getViewState().setCalculation(calculation);
     }
 
     private Optional<AccountItem> findAccountByCoin(String coin) {
@@ -232,11 +224,11 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
             dialog.setCancelable(false);
 
-            safeSubscribeIoToUi(rxCallBc(mAccountRepo.getTransactionCount(mAccount.address)))
-                    .onErrorResumeNext(convertToBcErrorResult())
-                    .switchMap((Function<BCResult<CountableData>, ObservableSource<BCResult<TransactionSendResult>>>) cntRes -> {
+            safeSubscribeIoToUi(rxCallBcExp(mTxRepo.getEntity().getTransactionCount(mAccount.address)))
+                    .onErrorResumeNext(convertToBcExpErrorResult())
+                    .switchMap((Function<BCExplorerResult<CountableData>, ObservableSource<BCExplorerResult<TransactionSendResult>>>) cntRes -> {
                         if (!cntRes.isSuccess()) {
-                            return Observable.just(BCResult.copyError(cntRes));
+                            return Observable.just(BCExplorerResult.copyError(cntRes));
                         }
                         final BigInteger nonce = cntRes.result.count.add(new BigInteger("1"));
                         final Transaction tx = txData.build(nonce);
@@ -244,8 +236,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         final TransactionSign sign = tx.sign(data.getPrivateKey());
                         data.cleanup();
 
-                        return safeSubscribeIoToUi(rxCallBc(mAccountRepo.sendTransaction(sign)))
-                                .onErrorResumeNext(convertToBcErrorResult());
+                        return safeSubscribeIoToUi(rxCallBcExp(mTxRepo.getEntity().sendTransaction(sign)))
+                                .onErrorResumeNext(convertToBcExpErrorResult());
 
                     }).subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
 
@@ -254,7 +246,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         });
     }
 
-    private void onSuccessExecuteTransaction(BCResult<TransactionSendResult> result) {
+    private void onSuccessExecuteTransaction(BCExplorerResult<TransactionSendResult> result) {
         if (!result.isSuccess()) {
             onErrorExecuteTransaction(result);
             return;
@@ -276,10 +268,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .create());
     }
 
-    private void onErrorExecuteTransaction(BCResult<?> errorResult) {
-        Timber.e(errorResult.message, "Unable to send transaction");
+    private void onErrorExecuteTransaction(BCExplorerResult<?> errorResult) {
+        Timber.e(errorResult.getMessage(), "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
-                .setText(normalizeBlockChainInsufficientFundsMessage(errorResult.message))
+                .setText((errorResult.getMessage()))
                 .setPositiveAction("Close")
                 .create());
     }
@@ -347,22 +339,26 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
+        Disposable d;
         if (incoming) {
             // get
-            rxCallBc(mCoinRepo.getCoinExchangeCurrencyToBuy(mAccount.getCoin(), mGetAmount, mGetCoin))
+            d = rxCallBcExp(mExplorerCoinsRepo.getCoinExchangeCurrencyToBuy(mAccount.getCoin(), mGetAmount, mGetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(convertToBcErrorResult())
+                    .onErrorResumeNext(convertToBcExpErrorResult())
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
-                            if (res.code == BCResult.ResultCode.EmptyResponse || res.statusCode == 404 || res.code == CoinDoesNotExists) {
-                                getViewState().setError("income_coin", firstNonNull(res.message, "Coin does not exists"));
+                            Timber.w(new BCExplorerResponseException(res));
+                            if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
+                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
+                                mEnableUseMax.set(false);
+                                return;
+                            } else {
+                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
                                 mEnableUseMax.set(false);
                                 return;
                             }
-                            Timber.w(new BCResponseException(res));
-                            return;
                         }
                         mEnableUseMax.set(true);
                         mSpendAmount = res.result.getAmount();
@@ -392,21 +388,23 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     });
         } else {
             // spend
-            rxCallBc(mCoinRepo.getCoinExchangeCurrencyToSell(mAccount.getCoin(), mSpendAmount, mGetCoin))
+            d = rxCallBcExp(mExplorerCoinsRepo.getCoinExchangeCurrencyToSell(mAccount.getCoin(), mSpendAmount, mGetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(convertToBcErrorResult())
+                    .onErrorResumeNext(convertToBcExpErrorResult())
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
-                            //FIXME: check all possible codes
-                            if (res.code == BCResult.ResultCode.EmptyResponse || res.statusCode == 404 || res.code == CoinDoesNotExists) {
-                                getViewState().setError("income_coin", firstNonNull(res.message, "Coin does not exists"));
+                            Timber.w(new BCExplorerResponseException(res));
+                            if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
+                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
+                                mEnableUseMax.set(false);
+                                return;
+                            } else {
+                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
                                 mEnableUseMax.set(false);
                                 return;
                             }
-                            Timber.w(new BCResponseException(res));
-                            return;
                         }
                         mEnableUseMax.set(true);
                         getViewState().setError("income_coin", null);
@@ -436,6 +434,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         getViewState().setError("income_coin", "Unable to get currency");
                     });
         }
+
+        unsubscribeOnDestroy(d);
     }
 
     private void onAccountSelected(AccountItem accountItem, boolean initial) {

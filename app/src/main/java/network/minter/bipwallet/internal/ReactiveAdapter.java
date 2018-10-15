@@ -41,6 +41,7 @@ import io.reactivex.functions.Function;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.models.BCResult;
 import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.ExpResult;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.ProfileResult;
@@ -173,7 +174,7 @@ public class ReactiveAdapter {
             if (throwable instanceof IOException && throwable.getCause() instanceof EOFException) {
                 // blockchain api sometimes instead of 404 gives empty response, just handle it as 404
                 final BCResult<T> errResult = new BCResult<>();
-                errResult.code = BCResult.ResultCode.EmptyResponse;
+                errResult.code = null;
                 errResult.message = "Not found";
                 errResult.result = null;
                 errResult.statusCode = 404;
@@ -205,7 +206,7 @@ public class ReactiveAdapter {
             }.getType());
         } catch (Exception e) {
             out = new BCResult<>();
-            out.code = BCResult.ResultCode.Unknown;
+            out.code = null;
             out.message = "Invalid response";
             out.statusCode = 500;
         }
@@ -251,6 +252,118 @@ public class ReactiveAdapter {
 
 
     // Explorer
+
+    // -- blockchain proxy - methods those used BCExplorerResult
+
+    public static <T> Observable<T> rxCallBcExp(Call<T> call) {
+        return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
+                if (response.body() == null) {
+                    emitter.onNext((T) createBcExpErrorResult(response));
+                } else {
+                    emitter.onNext(response.body());
+                }
+
+                emitter.onComplete();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<T> call1, @NonNull Throwable t) {
+                emitter.onError(t);
+            }
+        }));
+    }
+
+    public static <T> Function<? super Throwable, ? extends ObservableSource<? extends BCExplorerResult<T>>> convertToBcExpErrorResult() {
+        return (Function<Throwable, ObservableSource<? extends BCExplorerResult<T>>>) throwable
+                -> {
+            if (throwable instanceof IOException && throwable.getCause() instanceof EOFException) {
+                // blockchain api sometimes instead of 404 gives empty response, just handle it as 404
+                final BCExplorerResult<T> errResult = new BCExplorerResult<>();
+                errResult.error = new BCExplorerResult.ErrorResult();
+                errResult.error.code = null;
+                errResult.error.message = "Not found";
+                errResult.result = null;
+                errResult.statusCode = 404;
+                return Observable.just(errResult);
+            }
+
+            if (!(throwable instanceof HttpException)) {
+                return Observable.error(throwable);
+            }
+
+            return Observable.just(createBcExpErrorResult(((HttpException) throwable)));
+        };
+    }
+
+    public static <T> BCExplorerResult<T> createBcExpErrorResultMessage(final String errorMessage, BCResult.ResultCode code, int statusCode) {
+        BCExplorerResult<T> errorRes = new BCExplorerResult<>();
+        errorRes.error = new BCExplorerResult.ErrorResult();
+        errorRes.error.message = errorMessage;
+        errorRes.statusCode = statusCode;
+        errorRes.error.code = code;
+        return errorRes;
+    }
+
+    public static <T> BCExplorerResult<T> createBcExpErrorResult(final String json) {
+        Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
+
+        BCExplorerResult<T> out;
+        try {
+            out = gson.fromJson(json, new TypeToken<BCExplorerResult<T>>() {
+            }.getType());
+        } catch (Exception e) {
+            out = new BCExplorerResult<>();
+            out.error = new BCExplorerResult.ErrorResult();
+            out.error.code = null;
+            out.error.message = "Invalid response";
+            out.statusCode = 500;
+        }
+
+        return out;
+    }
+
+    public static <T> BCExplorerResult<T> createBcExpErrorResult(final Response<T> response) {
+        final String errorBodyString;
+        try {
+            // нельзя после этой строки пытаться вытащить body из ошибки,
+            // потому что retrofit по какой-то причине не хранит у себя это значение
+            // а держит в буффере до момента первого доступа
+            errorBodyString = response.errorBody().string();
+        } catch (IOException e) {
+            Timber.e(e, "Unable to resolve http exception response");
+            return createBcExpEmpty();
+        }
+
+        final BCExplorerResult<T> out = createBcExpErrorResult(errorBodyString);
+        out.statusCode = response.code();
+        return out;
+    }
+
+    public static <T> BCExplorerResult<T> createBcExpErrorResult(final HttpException exception) {
+        final String errorBodyString;
+        try {
+            // нельзя после этой строки пытаться вытащить body из ошибки,
+            // потому что retrofit по какой-то причине не хранит у себя это значение
+            // а держит в буффере до момента первого доступа
+            errorBodyString = ((HttpException) exception).response().errorBody().string();
+        } catch (IOException e) {
+            Timber.e(e, "Unable to resolve http exception response");
+            return createBcExpEmpty();
+        }
+
+        return createBcExpErrorResult(errorBodyString);
+    }
+
+    public static <T> BCExplorerResult<T> createBcExpEmpty() {
+        BCExplorerResult<T> out = new BCExplorerResult<>();
+        out.error = new BCExplorerResult.ErrorResult();
+        return out;
+    }
+
+    // normal explorer methods
 
     public static <T> Observable<T> rxCallExp(Call<T> call) {
         return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
