@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.2.1
+- Fix crash on Meizu devices
+- Minor fixes
+
 ## 1.2.0
 - Updated for new Test Net
 - Added "Get FREE coins" button to replace Minter Bip Wallet telegram bot
