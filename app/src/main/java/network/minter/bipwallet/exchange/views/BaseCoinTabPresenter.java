@@ -327,7 +327,9 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     mUseMax = false;
                     mSpendAmount = am;
                 }
-                getViewState().setSubmitEnabled(am.compareTo(mAccount.balance) <= 0);
+
+                getViewState().setSubmitEnabled(mAccount != null && am.compareTo(mAccount.balance) <= 0);
+
                 mInputChange.onNext(isAmountForGetting());
                 break;
         }
