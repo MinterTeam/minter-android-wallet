@@ -27,6 +27,8 @@
 package network.minter.bipwallet.exchange.adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,7 +128,7 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
                     Timber.d("Add filter item (items: %d)", results.count);
                     clear();
                     for (CoinItem c : filteredList) {
-                        add(c);
+                        new Handler(Looper.getMainLooper()).post(() -> add(c));
                     }
                     notifyDataSetChanged();
                 }
