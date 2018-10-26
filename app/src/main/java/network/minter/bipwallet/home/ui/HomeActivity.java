@@ -84,7 +84,9 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
     @Override
     public void setCurrentPage(int position) {
-        homePager.setCurrentItem(position);
+        runOnUiThread(() -> {
+            homePager.setCurrentItem(position);
+        });
     }
 
     @Override
@@ -277,7 +279,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
 
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
-            homePager.setCurrentItem(presenter.getBottomPositionById(item.getItemId()));
+            runOnUiThread(() -> homePager.setCurrentItem(presenter.getBottomPositionById(item.getItemId())));
             return true;
         });
     }
