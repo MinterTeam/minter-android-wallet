@@ -164,9 +164,13 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @SuppressLint("SetTextI18n")
     @Override
     public void setBalance(String intPart, String fractionalPart, CharSequence coinName) {
-        balanceInt.setText(String.valueOf(intPart));
-        balanceFract.setText("." + fractionalPart);
-        balanceCoinName.setText(coinName);
+        runOnUiThread(() -> {
+            if (balanceInt != null) {
+                balanceInt.setText(String.valueOf(intPart));
+                balanceFract.setText("." + fractionalPart);
+                balanceCoinName.setText(coinName);
+            }
+        });
     }
 
     @Override
