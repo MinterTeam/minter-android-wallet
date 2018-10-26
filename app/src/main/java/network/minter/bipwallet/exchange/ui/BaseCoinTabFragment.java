@@ -31,8 +31,8 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,10 +71,9 @@ import timber.log.Timber;
 public abstract class BaseCoinTabFragment extends BaseInjectFragment implements ExchangeModule.BaseCoinTabView {
 
     @BindView(R.id.input_incoming_coin) AutoCompleteTextView inputIncomingCoin;
-    //    @BindView(R.id.layout_incoming_coin) TextInputLayout layoutIncomingCoin;
-    @BindView(R.id.input_amount) TextInputEditText inputAmount;
+    @BindView(R.id.input_amount) AppCompatEditText inputAmount;
     @BindView(R.id.layout_amount) TextInputLayout layoutAmount;
-    @BindView(R.id.input_outgoing_coin) TextInputEditText inputOutgoingCoin;
+    @BindView(R.id.input_outgoing_coin) AppCompatEditText inputOutgoingCoin;
     @BindView(R.id.layout_outgoing_coin) TextInputLayout layoutOutgoingCoin;
     @BindView(R.id.calculation) TextView calculationView;
     @BindView(R.id.layout_calculation) View calculationLayout;

@@ -28,7 +28,7 @@ package network.minter.bipwallet.internal.views.text;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.design.widget.TextInputEditText;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -38,7 +38,7 @@ import android.util.AttributeSet;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class PrefixEditText extends TextInputEditText {
+public class PrefixEditText extends AppCompatEditText {
     private String prefix = this.getText().toString().trim();
     private String fix;
 

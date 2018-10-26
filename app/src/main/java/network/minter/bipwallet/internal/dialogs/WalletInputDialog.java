@@ -31,8 +31,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewStub;
@@ -123,7 +123,7 @@ public class WalletInputDialog extends WalletDialog {
             inputStub.setLayoutResource(R.layout.inc_dialog_input_simple);
         }
         mInputLayout = (TextInputLayout) inputStub.inflate();
-        final TextInputEditText input = (TextInputEditText) mInputLayout.getEditText();
+        final AppCompatEditText input = (AppCompatEditText) mInputLayout.getEditText();
         assert input != null;
 
         if (input instanceof PrefixEditText) {

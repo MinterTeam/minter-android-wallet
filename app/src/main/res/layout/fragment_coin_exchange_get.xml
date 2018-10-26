@@ -91,7 +91,7 @@
             app:passwordToggleDrawable="@null"
             >
 
-            <android.support.design.widget.TextInputEditText
+            <android.support.v7.widget.AppCompatEditText
                 android:id="@+id/input_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -163,7 +163,7 @@
             app:passwordToggleDrawable="@null"
             >
 
-            <android.support.design.widget.TextInputEditText
+            <android.support.v7.widget.AppCompatEditText
                 android:id="@+id/input_outgoing_coin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

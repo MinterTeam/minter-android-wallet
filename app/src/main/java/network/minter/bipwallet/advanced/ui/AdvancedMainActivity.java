@@ -31,8 +31,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
 import android.text.TextWatcher;
 import android.view.View;
@@ -67,7 +67,7 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements Advan
 
     @BindView(R.id.action_generate) Button actionGenerate;
     @BindView(R.id.action_activate) Button actionActivate;
-    @BindView(R.id.input_seed) TextInputEditText seedInput;
+    @BindView(R.id.input_seed) AppCompatEditText seedInput;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Inject Provider<AdvancedMainPresenter> presenterProvider;
