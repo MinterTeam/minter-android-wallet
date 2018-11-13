@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.2.2
+- UX sounds
+- updated SDK
+
 ## 1.2.1
 - Fix crash on Meizu devices
 - Minor fixes
