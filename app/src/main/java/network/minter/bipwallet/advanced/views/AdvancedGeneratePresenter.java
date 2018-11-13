@@ -39,6 +39,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.AdvancedModeModule;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.core.bip39.MnemonicResult;
@@ -97,7 +98,7 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
         getViewState().setOnSwitchedConfirm((buttonView, isChecked) -> getViewState().setEnableLaunch(isChecked));
 
         getViewState().setOnActionClick(v -> {
-
+            Wallet.app().sounds().play(R.raw.click_pop_zap);
             MinterAddress address = repo.add(mMnemonicResult);
 
             if (mSaveOnServer) {

@@ -37,6 +37,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,7 @@ import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
@@ -81,6 +83,8 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @BindView(R.id.list) RecyclerView list;
     @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     private Unbinder mUnbinder;
+    private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
+    private GestureDetector mGestureDetector;
 
     @Override
     public void onAttach(Context context) {
@@ -90,7 +94,9 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
 
     @Override
     public void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
-        soundManager.playRefresh(swipeRefreshLayout, listener);
+        swipeRefreshLayout.setOnRefreshListener(listener);
+        mSwipeRefreshHacker.setOnRefreshStartListener(this::onStartRefresh);
+        mSwipeRefreshHacker.hack(swipeRefreshLayout);
     }
 
     @Override
@@ -113,6 +119,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
         list.post(() -> list.scrollToPosition(0));
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -211,5 +218,13 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @ProvidePresenter
     CoinsTabPresenter providePresenter() {
         return presenterProvider.get();
+    }
+
+    private void onStartRefresh() {
+        Wallet.app().sounds().play(R.raw.refresh_pop_down);
+    }
+
+    private void onSwipeRefreshDown() {
+
     }
 }

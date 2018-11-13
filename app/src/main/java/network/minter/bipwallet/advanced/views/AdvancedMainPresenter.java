@@ -35,11 +35,9 @@ import com.arellomobile.mvp.InjectViewState;
 
 import javax.inject.Inject;
 
-import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.AdvancedModeModule;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
-import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.core.bip39.NativeBip39;
@@ -122,7 +120,6 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
     }
 
     private void onStartGenerate(View view) {
-        Wallet.app().sounds().play(R.raw.click_pop_zap);
         if (mForResult) {
             getViewState().startGenerate(REQUEST_GENERATE);
         } else {
