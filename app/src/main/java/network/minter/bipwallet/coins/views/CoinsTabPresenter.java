@@ -170,7 +170,10 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                 .build();
 
         mCoinsRow = new ListWithButtonRow.Builder(Wallet.app().res().getString(R.string.frag_coins_my_coins_title))
-                .setAction("Convert", this::onClickConvertCoins)
+                .setAction("Convert", v -> {
+                    Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
+                    onClickConvertCoins(v);
+                })
                 .setAdapter(mCoinsAdapter)
                 .setEmptyTitle("You have no one address. Nothing to show.")
                 .build();

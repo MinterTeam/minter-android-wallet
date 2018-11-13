@@ -28,6 +28,7 @@ package network.minter.bipwallet.settings.views;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.view.View;
@@ -58,6 +59,7 @@ import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
+import network.minter.bipwallet.internal.helpers.PrefKeys;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator;
@@ -69,6 +71,7 @@ import network.minter.bipwallet.settings.repo.MinterBotRepository;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
+import network.minter.bipwallet.settings.views.rows.SettingsSwitchRow;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAuthRepository;
 import network.minter.profile.repo.ProfileRepository;
@@ -90,6 +93,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Inject ProfileRepository profileRepo;
     @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
     @Inject ProfileAuthRepository profileAuthRepo;
+    @Inject SharedPreferences prefs;
     private String mSourceUsername = null;
 
     private MultiRowAdapter mMainAdapter, mAdditionalAdapter;
@@ -118,6 +122,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         if (BuildConfig.FLAVOR.equals("netTest") || BuildConfig.FLAVOR.equals("netTestNoCrashlytics")) {
             getViewState().showFreeCoinsButton(true);
             getViewState().setOnFreeCoinsClickListener(v -> {
+                Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
                 getViewState().startDialog(exec -> new WalletConfirmDialog.Builder(exec, "Get free coins")
                         .setText("Are you wanna get FREE 100 MNT?")
                         .setPositiveAction("Sure!", (d, w) -> {
@@ -187,9 +192,16 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             Stream.of(mMainSettingsRows.values()).forEach(item -> mMainAdapter.addRow(item));
 
             mAdditionalAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", this::onClickAddresses).setInactive(true));
+            mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
         } else {
             mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", this::onClickAddresses).setInactive(true));
+            mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
         }
+    }
+
+    private void onSwitchSounds(View view, Boolean isChecked) {
+        Wallet.app().sounds().play(R.raw.click_pop_zap);
+        prefs.edit().putBoolean(PrefKeys.ENABLE_SOUNDS, isChecked).apply();
     }
 
     private void onRequestFreeCoins() {
@@ -253,6 +265,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     private void onSubmitField(final WalletInputDialog dialog, final String fieldName, final String value) {
+        Wallet.app().sounds().play(R.raw.click_pop_zap);
         dialog.showProgress();
         if (fieldName.equals("username") && !value.equals(mSourceUsername)) {
             // check username is available

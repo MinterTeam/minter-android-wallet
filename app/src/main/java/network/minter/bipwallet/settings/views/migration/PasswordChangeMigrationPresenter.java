@@ -51,6 +51,7 @@ import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
@@ -121,6 +122,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
     }
 
     private void onSubmit(View view) {
+        Wallet.app().sounds().play(R.raw.click_pop_zap);
         getViewState().startDialog(ctx -> {
             WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Changing password")
                     .setText("Please wait, we are changing password and re-encrypting all your secret data. \n\nDO NOT close app while this process does not finished. It may corrupt encrypted data!")

@@ -58,6 +58,7 @@ import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
+import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import network.minter.explorer.MinterExplorerApi;
@@ -70,6 +71,7 @@ import timber.log.Timber;
 public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.CoinsTabView {
 
     @Inject Provider<CoinsTabPresenter> presenterProvider;
+    @Inject SoundManager soundManager;
     @InjectPresenter CoinsTabPresenter presenter;
     @BindView(R.id.user_avatar) BipCircleImageView avatar;
     @BindView(R.id.username) TextView username;
@@ -88,7 +90,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
 
     @Override
     public void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
-        swipeRefreshLayout.setOnRefreshListener(listener);
+        soundManager.playRefresh(swipeRefreshLayout, listener);
     }
 
     @Override
@@ -177,7 +179,6 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     public void setAdapter(RecyclerView.Adapter<?> adapter) {
         list.setLayoutManager(new LinearLayoutManager(getActivity()));
         list.setAdapter(adapter);
-//        list.setNestedScrollingEnabled(false);
     }
 
     @Override

@@ -333,11 +333,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .setRecipientName(mToName)
                     .setCoin(mFromAccount.coin)
                     .setPositiveAction("Send", (d, w) -> {
+                        Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
                         onStartExecuteTransaction(true);
                         getAnalytics().send(AppEvent.SendCoinPopupSendButton);
                         d.dismiss();
                     })
                     .setNegativeAction("Cancel", (d, w) -> {
+                        Wallet.app().sounds().play(R.raw.cancel_pop_hi);
                         getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
                         d.dismiss();
                     })
@@ -572,6 +574,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .setRecipientName(mToName)
                     .setAvatarUrl(mAvatar)
                     .setPositiveAction("View transaction", (d, v) -> {
+                        Wallet.app().sounds().play(R.raw.click_pop_zap);
                         getViewState().startExplorer(result.result.txHash.toString());
                         d.dismiss();
                         getAnalytics().send(AppEvent.SentCoinPopupViewTransactionButton);

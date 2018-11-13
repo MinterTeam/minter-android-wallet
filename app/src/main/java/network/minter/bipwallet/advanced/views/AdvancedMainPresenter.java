@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -29,14 +29,17 @@ package network.minter.bipwallet.advanced.views;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 
 import com.arellomobile.mvp.InjectViewState;
 
 import javax.inject.Inject;
 
+import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.AdvancedModeModule;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.core.bip39.NativeBip39;
@@ -115,10 +118,15 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
             }
         });
 
+        getViewState().setOnGenerate(this::onStartGenerate);
+    }
+
+    private void onStartGenerate(View view) {
+        Wallet.app().sounds().play(R.raw.click_pop_zap);
         if (mForResult) {
-            getViewState().setOnGenerate(v -> getViewState().startGenerate(REQUEST_GENERATE));
+            getViewState().startGenerate(REQUEST_GENERATE);
         } else {
-            getViewState().setOnGenerate(v -> getViewState().startGenerate());
+            getViewState().startGenerate();
         }
     }
 

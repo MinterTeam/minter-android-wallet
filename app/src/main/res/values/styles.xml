@@ -47,6 +47,7 @@
         <item name="android:buttonStyle">@style/Wallet.Button</item>
         <item name="borderlessButtonStyle">@style/Wallet.Button</item>
         <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
+        <item name="android:soundEffectsEnabled">false</item>
     </style>
 
     <style name="Wallet.Hint" parent="TextAppearance.Design.Hint">
@@ -121,6 +122,7 @@
 
 
     <style name="Wallet.Button" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:soundEffectsEnabled">false</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/text_size_14</item>
         <item name="android:padding">14dp</item>

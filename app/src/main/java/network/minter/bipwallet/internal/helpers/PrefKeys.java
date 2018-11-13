@@ -24,48 +24,12 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.internal.di;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import dagger.Module;
-import dagger.Provides;
-import network.minter.bipwallet.internal.helpers.DisplayHelper;
-import network.minter.bipwallet.internal.helpers.ImageHelper;
-import network.minter.bipwallet.internal.helpers.NetworkHelper;
-import network.minter.bipwallet.internal.helpers.PrefKeys;
-import network.minter.bipwallet.internal.helpers.SoundManager;
+package network.minter.bipwallet.internal.helpers;
 
 /**
  * minter-android-wallet. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@Module
-public class HelpersModule {
-
-    @Provides
-    @WalletApp
-    public DisplayHelper provideDisplayHelper(Context context) {
-        return new DisplayHelper(context);
-    }
-
-    @Provides
-    @WalletApp
-    public NetworkHelper provideNetworkHelper(Context context) {
-        return new NetworkHelper(context);
-    }
-
-    @Provides
-    @WalletApp
-    public ImageHelper provideImageHelper(Context context, DisplayHelper displayHelper) {
-        return new ImageHelper(context, displayHelper);
-    }
-
-    @Provides
-    @WalletApp
-    public SoundManager provideSoundManager(Context context, SharedPreferences prefs) {
-        return new SoundManager(() -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), context);
-    }
+public final class PrefKeys {
+    public static final String ENABLE_SOUNDS = "pref_enable_sounds";
 }

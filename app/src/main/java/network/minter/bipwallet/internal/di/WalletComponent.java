@@ -49,6 +49,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
+import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
@@ -106,6 +107,7 @@ public interface WalletComponent {
     GsonBuilder gsonBuilder();
     CacheManager cache();
     AnalyticsManager analytics();
+    SoundManager sounds();
 
     // notification
     BalanceNotificationManager balanceNotifications();
