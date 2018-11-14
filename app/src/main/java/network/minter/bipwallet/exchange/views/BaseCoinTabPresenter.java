@@ -372,7 +372,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
                             Timber.d("Enough MNT to pay fee using MNT");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission()), mAccount.getCoin()));
+                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
                         } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
                             Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
                             mGasCoin = getAccount.get().getCoin();
