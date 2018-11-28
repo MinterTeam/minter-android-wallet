@@ -25,7 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.design.widget.CoordinatorLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -37,13 +37,14 @@
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:elevation="10dp"
         app:layout_collapseMode="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         >
 
         <android.support.v7.widget.Toolbar
@@ -61,50 +62,71 @@
             />
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
         >
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list_main"
-            android:layout_width="0dp"
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:itemCount="4"
-            tools:listitem="@layout/item_list_settings"
-            />
+            >
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list_additional"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_edges"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/list_main"
-            tools:itemCount="2"
-            tools:listitem="@layout/item_list_settings"
-            />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_main"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:itemCount="4"
+                tools:listitem="@layout/item_list_settings"
+                />
 
-        <Button
-            android:id="@+id/free_get"
-            style="@style/Wallet.Button.Transparent.BlueBorder"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:layout_marginEnd="@dimen/margin_edges"
-            android:text="Get 100 MNT for FREE!"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/list_additional"
-            tools:visibility="visible"
-            />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_additional"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_main"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_list_settings"
+                />
 
-    </android.support.constraint.ConstraintLayout>
+            <Button
+                android:id="@+id/free_get"
+                style="@style/Wallet.Button.Transparent.BlueBorder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="Get 100 MNT for FREE!"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_additional"
+                tools:visibility="visible"
+                />
 
-</android.support.design.widget.CoordinatorLayout>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/free_get"
+
+                />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>
