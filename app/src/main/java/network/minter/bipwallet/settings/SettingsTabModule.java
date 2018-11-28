@@ -27,7 +27,6 @@
 package network.minter.bipwallet.settings;
 
 import android.support.v7.widget.RecyclerView;
-import android.text.TextWatcher;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
@@ -36,7 +35,6 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
-import network.minter.bipwallet.settings.ui.SettingsFieldType;
 
 /**
  * minter-android-wallet. 2018
@@ -44,7 +42,7 @@ import network.minter.bipwallet.settings.ui.SettingsFieldType;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public interface SettingsTabModule {
-
+    @StateStrategyType(OneExecutionStateStrategy.class)
     interface PasswordChangeMigrationView extends MvpView {
         void setTextChangedListener(InputGroup.OnTextChangedListener listener);
         void setFormValidateListener(InputGroup.OnFormValidateListener listener);
@@ -52,18 +50,6 @@ public interface SettingsTabModule {
         void startDialog(WalletDialog.DialogExecutor executor);
         void setEnableSubmit(boolean enable);
         void finish();
-    }
-
-    @StateStrategyType(OneExecutionStateStrategy.class)
-    interface SettingsUpdateFieldView extends MvpView {
-        void setOnTextChangedListener(TextWatcher watcher);
-        void setLabel(CharSequence label);
-        void setValue(String value);
-        void setOnSubmit(View.OnClickListener listener);
-        void configureInput(SettingsFieldType type, InputGroup.OnTextChangedListener textChangedListener);
-        void setEnableSubmit(boolean valid);
-        void dismiss();
-        void callOnSaveListener();
     }
 
     @StateStrategyType(OneExecutionStateStrategy.class)

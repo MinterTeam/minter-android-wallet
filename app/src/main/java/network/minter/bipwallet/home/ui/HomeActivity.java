@@ -84,7 +84,11 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     @Override
     public void setCurrentPage(int position) {
         runOnUiThread(() -> {
-            homePager.setCurrentItem(position);
+            try {
+                homePager.setCurrentItem(position);
+            } catch (IllegalStateException e) {
+                Timber.w(e, "Unable to set current item");
+            }
         });
     }
 
@@ -137,9 +141,9 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-//        if (homePager.getOffscreenPageLimit() > 1) {
-//            homePager.setOffscreenPageLimit(1);
-//        }
+        if (homePager.getOffscreenPageLimit() > 1) {
+            homePager.setOffscreenPageLimit(1);
+        }
     }
 
     @Override

@@ -31,6 +31,8 @@ import android.graphics.Bitmap;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import dagger.Module;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
@@ -43,7 +45,7 @@ import network.minter.core.crypto.MinterAddress;
  */
 @Module
 public class ReceiveTabModule {
-
+    @StateStrategyType(OneExecutionStateStrategy.class)
     public interface ReceiveTabView extends MvpView, ErrorViewWithRetry {
         void setQRCode(Bitmap bmp);
         void setAddress(MinterAddress address);

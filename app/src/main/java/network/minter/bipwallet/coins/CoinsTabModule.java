@@ -32,6 +32,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import dagger.Module;
 import network.minter.bipwallet.internal.mvp.ProgressView;
@@ -45,6 +47,7 @@ import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 @Module
 public interface CoinsTabModule {
 
+    @StateStrategyType(OneExecutionStateStrategy.class)
     interface CoinsTabView extends MvpView {
         void setAvatar(String url);
         void setUsername(CharSequence name);

@@ -29,6 +29,8 @@ package network.minter.bipwallet.sending;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 
@@ -48,7 +50,7 @@ import network.minter.bipwallet.sending.models.RecipientItem;
  */
 @Module
 public class SendTabModule {
-
+    @StateStrategyType(OneExecutionStateStrategy.class)
     public interface SendView extends MvpView, ErrorViewWithRetry {
         void setOnClickAccountSelectedListener(View.OnClickListener listener);
         void setOnClickMaximum(View.OnClickListener listener);

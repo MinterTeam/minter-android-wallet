@@ -30,20 +30,25 @@ import com.google.gson.JsonDeserializer;
 
 import org.parceler.Parcel;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.settings.api.MinterBotEndpoint;
+import network.minter.core.crypto.HashUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import timber.log.Timber;
@@ -55,6 +60,8 @@ import timber.log.Timber;
 public class MinterBotRepository extends DataRepository<MinterBotEndpoint> implements DataRepository.Configurator {
     public MinterBotRepository() {
         super(new ApiService.Builder("https://minter-bot-wallet.dl-dev.ru/api/")
+                .setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY)
+                .setDebug(true)
                 .setRetrofitClientConfig(b -> {
                     b.addCallAdapterFactory(RxJava2CallAdapterFactory.create());
                 })
@@ -62,8 +69,10 @@ public class MinterBotRepository extends DataRepository<MinterBotEndpoint> imple
     }
 
     public Observable<MinterBotResult> requestFreeCoins(MinterAddress address) {
+
         return getInstantService().requestFreeCoins(new HashMap<String, String>() {{
             put("address", address.toString());
+            put("signature", makeSignature(address));
         }})
                 .onErrorResumeNext(new Function<Throwable, ObservableSource<MinterBotResult>>() {
                     @Override
@@ -88,6 +97,12 @@ public class MinterBotRepository extends DataRepository<MinterBotEndpoint> imple
                         return Observable.just(errResult);
                     }
                 });
+    }
+
+    private String makeSignature(MinterAddress address) {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        Calendar calendar = Calendar.getInstance(timeZone);
+        return HashUtil.sha256Hex(String.format("%s%s%02d", address, BuildConfig.MINTER_BOT_SECRET, calendar.get(Calendar.HOUR_OF_DAY)));
     }
 
     @Override

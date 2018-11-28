@@ -84,6 +84,12 @@ public abstract class MvpBasePresenter<V extends MvpView> extends MvpPresenter<V
         mRetried = true;
     }
 
+    public void onSaveInstanceState(Bundle outState) {
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    }
+
     public View.OnClickListener retryOnClick() {
         return v -> retry();
     }

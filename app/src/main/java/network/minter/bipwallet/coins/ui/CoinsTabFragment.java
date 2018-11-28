@@ -115,6 +115,12 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        presenter.onRestoreInstanceState(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void scrollTop() {
         list.post(() -> list.scrollToPosition(0));
     }
@@ -126,6 +132,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_coins, container, false);
         mUnbinder = ButterKnife.bind(this, view);
+        presenter.onRestoreInstanceState(savedInstanceState);
         return view;
     }
 
@@ -133,6 +140,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     public void onCreate(@Nullable Bundle savedInstanceState) {
         HomeModule.getComponent().inject(this);
         super.onCreate(savedInstanceState);
+        presenter.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -180,6 +188,12 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
                 balanceCoinName.setText(coinName);
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        presenter.onSaveInstanceState(outState);
     }
 
     @Override

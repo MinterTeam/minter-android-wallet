@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.coins.views;
 
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -33,6 +34,9 @@ import android.widget.TextView;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.arellomobile.mvp.InjectViewState;
+
+import org.parceler.Parcel;
+import org.parceler.Parcels;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -88,6 +92,7 @@ import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddr
 @InjectViewState
 public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabView> {
 
+    private final BalanceCurrentState mBalanceCurrentState = new BalanceCurrentState();
     @Inject CacheManager cache;
     @Inject AuthSession session;
     @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
@@ -118,14 +123,37 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
             accountStorage.update();
         }
 
-        SettingsTabPresenter.AVATAR_CHANGE_SUBJECT
-                .doOnSubscribe(this::unsubscribeOnDestroy)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(res -> getViewState().setAvatar(res.getUrl()), Timber::w);
+        unsubscribeOnDestroy(
+                SettingsTabPresenter.AVATAR_CHANGE_SUBJECT
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(res -> {
+                            if (res.getUrl() != null) {
+                                getViewState().setAvatar(res.getUrl());
+                            }
+                        }, Timber::w)
+        );
 
         getViewState().setOnRefreshListener(this::onRefresh);
         getViewState().setAdapter(mAdapter);
+
+        if (session.getUser() != null && session.getUser().getData() != null && session.getUser().getData().getAvatar() != null) {
+            getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
+        }
+
+        mBalanceCurrentState.applyTo(getViewState());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mBalanceCurrentState.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mBalanceCurrentState.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -169,7 +197,6 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         setUsername();
 
         getViewState().setOnAvatarClick(this::onAvatarClick);
-        getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
 
         mTransactionsRow = new ListWithButtonRow.Builder(Wallet.app().res().getString(R.string.frag_coins_last_transactions_title))
                 .setAction("All transactions", this::onClickStartTransactionList)
@@ -198,11 +225,13 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
                     if (!defAccount.isPresent()) {
                         final StringHelper.DecimalStringFraction num = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
-                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
+                        mBalanceCurrentState.set(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
                     } else {
                         final StringHelper.DecimalStringFraction num = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
-                        getViewState().setBalance(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
+                        mBalanceCurrentState.set(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
                     }
+
+                    mBalanceCurrentState.applyTo(getViewState());
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
                     getViewState().hideRefreshProgress();
@@ -276,6 +305,37 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
         }
 
         return false;
+    }
+
+    @Parcel
+    final static class BalanceCurrentState {
+        private final static String sStateBalance = "BalanceCurrentState::CURRENT";
+        String mIntPart = "0";
+        String mFractPart = "0000";
+        String mBips = bips(0L);
+
+        void set(String intPart, String fractPart, String bips) {
+            mIntPart = intPart;
+            mFractPart = fractPart;
+            mBips = bips;
+        }
+
+        void applyTo(CoinsTabModule.CoinsTabView view) {
+            view.setBalance(mIntPart, mFractPart, mBips);
+        }
+
+        void onSaveInstanceState(Bundle outState) {
+            outState.putParcelable(sStateBalance, Parcels.wrap(this));
+        }
+
+        void onRestoreInstanceState(Bundle savedInstanceState) {
+            if (savedInstanceState != null && savedInstanceState.containsKey(sStateBalance)) {
+                final BalanceCurrentState saved = Parcels.unwrap(savedInstanceState.getParcelable(sStateBalance));
+                if (saved != null) {
+                    set(saved.mIntPart, saved.mFractPart, saved.mBips);
+                }
+            }
+        }
     }
 
     public final static class ItemViewHolder extends RecyclerView.ViewHolder {
