@@ -66,6 +66,7 @@ public interface SettingsTabModule {
         void callOnSaveListener();
     }
 
+    @StateStrategyType(OneExecutionStateStrategy.class)
     interface SettingsTabView extends MvpView {
         void setOnFreeCoinsClickListener(View.OnClickListener listener);
         void showFreeCoinsButton(boolean show);
