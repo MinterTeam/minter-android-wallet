@@ -88,7 +88,7 @@ public class WalletModule {
         mEnableExternalLog = enableExternalLog;
         initCrashlytics();
         Hawk.init(mContext)
-                .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
+//                .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
                 .build();
 
         initCoreSdk(context);

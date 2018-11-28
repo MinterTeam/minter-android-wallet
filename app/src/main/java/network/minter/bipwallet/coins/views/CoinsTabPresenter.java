@@ -43,6 +43,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
@@ -63,6 +64,7 @@ import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.core.MinterSDK;
@@ -115,6 +117,12 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
             txRepo.update();
             accountStorage.update();
         }
+
+        SettingsTabPresenter.AVATAR_CHANGE_SUBJECT
+                .doOnSubscribe(this::unsubscribeOnDestroy)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> getViewState().setAvatar(res.getUrl()), Timber::w);
 
         getViewState().setOnRefreshListener(this::onRefresh);
         getViewState().setAdapter(mAdapter);

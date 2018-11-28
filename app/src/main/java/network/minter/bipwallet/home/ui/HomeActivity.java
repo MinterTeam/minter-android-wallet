@@ -37,16 +37,16 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -66,7 +66,6 @@ import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView, BackPressedDelegate {
@@ -78,7 +77,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     @BindView(R.id.navigation_bottom) BottomNavigationViewEx bottomNavigation;
     @BindView(R.id.home_pager) ViewPager homePager;
 
-    private SparseArray<WeakReference<HomeTabFragment>> mActiveTabs = new SparseArray<>();
+    private Map<Integer, HomeTabFragment> mActiveTabs = new WeakHashMap<>();
     private List<BackPressedListener> mBackPressedListeners = new ArrayList<>(1);
     private boolean mIsLowRamDevice = false;
 
@@ -135,6 +134,27 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
         setCurrentPage(pos);
     }
 
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+//        if (homePager.getOffscreenPageLimit() > 1) {
+//            homePager.setOffscreenPageLimit(1);
+//        }
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        for (int i = 0; i < mActiveTabs.size(); i++) {
+            if (mActiveTabs.get(i) != null && mActiveTabs.get(i) != null) {
+                final HomeTabFragment f = mActiveTabs.get(i);
+                if (f != null) {
+                    f.onTrimMemory(level);
+                }
+            }
+        }
+    }
+
     @ProvidePresenter
     HomePresenter providePresenter() {
         return presenterProvider.get();
@@ -142,20 +162,19 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        for (int i = 0; i < mActiveTabs.size(); i++) {
-            if (mActiveTabs.get(i) != null && mActiveTabs.get(i).get() != null) {
-                mActiveTabs.get(i).get().onActivityResult(requestCode, resultCode, data);
+        for (Map.Entry<Integer, HomeTabFragment> entry : mActiveTabs.entrySet()) {
+            if (entry.getValue() != null) {
+                final HomeTabFragment f = entry.getValue();
+                if (f != null) {
+                    Timber.d("%s.onActivityResult", f.getClass());
+                    f.onActivityResult(requestCode, resultCode, data);
+                }
+
+            } else {
+                Timber.d("Fragment %d is null", entry.getKey());
             }
         }
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        if (homePager.getOffscreenPageLimit() > 1) {
-            homePager.setOffscreenPageLimit(1);
-        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -163,17 +182,6 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
         super.onDestroy();
         HomeModule.destroy();
         Timber.d("Destroy");
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        for (int i = 0; i < mActiveTabs.size(); i++) {
-            if (mActiveTabs.get(i) != null && mActiveTabs.get(i).get() != null) {
-                mActiveTabs.get(i).get().onTrimMemory(level);
-            }
-        }
-
     }
 
     @Override
@@ -200,41 +208,36 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
                 HomeTabFragment fragment = null;
                 try {
                     fragment = tabsClasses.get(position).newInstance();
-                    if (fragment == null) {
-                        throw new NullPointerException("Wtf?");
-                    }
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
+                if (fragment == null) {
+                    throw new NullPointerException("Wtf?");
+                }
 
-                if (fragment != null && getIntent() != null && getIntent().getExtras() != null) {
+                if (getIntent() != null && getIntent().getExtras() != null) {
                     fragment.setArguments(getIntent().getExtras());
                 }
-                mActiveTabs.put(position, new WeakReference<>(fragment));
-
-                if (homePager.getCurrentItem() == position && fragment != null) {
-                    //                    fragment.createToolbarMenuOptions(toolbar.getMenu());
-                    //                    fragment.onTabSelected();
-                    //                    toolbar.setTitle(fragment.getTitle());
-                }
+                mActiveTabs.put(position, fragment);
 
                 return fragment;
             }
 
             @NonNull
             @Override
-            public Object instantiateItem(ViewGroup container, int position) {
+            public Object instantiateItem(@NonNull ViewGroup container, int position) {
                 HomeTabFragment fragment = (HomeTabFragment) super.instantiateItem(container, position);
                 Timber.d("Instantiate item %s by position: %d", fragment.getClass().getSimpleName(), position);
 
-                mActiveTabs.put(position, new WeakReference<>(fragment));
+                mActiveTabs.put(position, fragment);
                 return fragment;
             }
 
             @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
+            public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
                 super.destroyItem(container, position, object);
-                mActiveTabs.delete(position);
+                mActiveTabs.remove(position);
+                Timber.d("Destroy item %s by position: %d", object.getClass().getSimpleName(), position);
             }
 
             @Override
@@ -242,7 +245,6 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
                 return tabsClasses.size();
             }
         };
-
 
         homePager.setOffscreenPageLimit(mIsLowRamDevice ? 1 : 4);
         homePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -252,13 +254,12 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
             @Override
             public void onPageSelected(int position) {
-                //                toolbar.getMenu().clear();
                 presenter.onPageSelected(position);
-                if (mActiveTabs.get(position) != null && mActiveTabs.get(position).get() != null) {
-                    //                    mActiveTabs.get(position).get().createToolbarMenuOptions(toolbar.getMenu());
-                    mActiveTabs.get(position).get().onTabSelected();
-
-                    //                    toolbar.setTitle(mActiveTabs.get(position).get().getTitle());
+                if (mActiveTabs.get(position) != null && mActiveTabs.get(position) != null) {
+                    final HomeTabFragment f = mActiveTabs.get(position);
+                    if (f != null) {
+                        f.onTabSelected();
+                    }
                 }
 
                 bottomNavigation.setSelectedItemId(presenter.getBottomIdByPosition(position));
@@ -272,8 +273,8 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     }
 
     private void setupBottomNavigation() {
-        bottomNavigation.enableShiftingMode(false);
-        bottomNavigation.enableItemShiftingMode(false);
+        bottomNavigation.setLabelVisibilityMode(1);
+        bottomNavigation.setItemHorizontalTranslationEnabled(false);
         bottomNavigation.enableAnimation(true);
         bottomNavigation.setTextVisibility(true);
 

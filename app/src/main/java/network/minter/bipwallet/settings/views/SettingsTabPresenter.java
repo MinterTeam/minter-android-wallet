@@ -46,6 +46,7 @@ import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
@@ -88,6 +89,7 @@ import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 @InjectViewState
 public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.SettingsTabView> {
     private final static int REQUEST_ATTACH_AVATAR = CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
+    public static PublishSubject<User.Avatar> AVATAR_CHANGE_SUBJECT = PublishSubject.create();
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
     @Inject ProfileRepository profileRepo;
@@ -159,17 +161,21 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                     return;
                 }
 
-                safeSubscribeIoToUi(rxCallProfile(profileRepo.updateAvatar(ImageHelper.getBase64FromBitmap(avatar, 400))))
-                        .subscribe(res -> {
-                            mChangeAvatarRow.hideProgress();
-                            if (res.isSuccess()) {
-                                final User user = session.getUser();
-                                user.getData().avatar = res.data;
-                                session.setUser(user);
-                                mChangeAvatarRow.setAvatar(() -> session.getUser().getData().getAvatar());
-                                mMainAdapter.notifyItemChanged(0);
-                            }
-                        }, t -> mChangeAvatarRow.hideProgress());
+                unsubscribeOnDestroy(
+                        safeSubscribeIoToUi(
+                                rxCallProfile(profileRepo.updateAvatar(ImageHelper.getBase64FromBitmap(avatar, 400))))
+                                .subscribe(res -> {
+                                    mChangeAvatarRow.hideProgress();
+                                    if (res.isSuccess()) {
+                                        final User user = session.getUser();
+                                        user.getData().avatar = res.data;
+                                        session.setUser(user);
+                                        mChangeAvatarRow.setAvatar(() -> session.getUser().getData().getAvatar());
+                                        mMainAdapter.notifyItemChanged(0);
+                                        AVATAR_CHANGE_SUBJECT.onNext(session.getUser().getData().getAvatar());
+                                    }
+                                }, t -> mChangeAvatarRow.hideProgress())
+                );
             }
         }
     }
@@ -186,15 +192,15 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             mChangeAvatarRow = new ChangeAvatarRow(() -> session.getUser().getData().getAvatar(), this::onClickChangeAvatar);
             mMainAdapter.addRow(mChangeAvatarRow);
 
-            mMainSettingsRows.put("username", new SettingsButtonRow("Username", () -> "@" + session.getUser().getData().username, this::onClickChangeUsername));
-            mMainSettingsRows.put("email", new SettingsButtonRow("Email", () -> session.getUser().getData().email, "Add", this::onClickChangeEmail));
-            mMainSettingsRows.put("password", new SettingsButtonRow("Password", "Change", this::onClickChangePassword).setInactive(true));
+            mMainSettingsRows.put("username", new SettingsButtonRow("Username", () -> "@" + session.getUser().getData().username, (view3, sharedView3, value3) -> onClickChangeUsername(value3)));
+            mMainSettingsRows.put("email", new SettingsButtonRow("Email", () -> session.getUser().getData().email, "Add", (view2, sharedView2, value2) -> onClickChangeEmail(value2)));
+            mMainSettingsRows.put("password", new SettingsButtonRow("Password", "Change", (view1, sharedView1, value1) -> onClickChangePassword()).setInactive(true));
             Stream.of(mMainSettingsRows.values()).forEach(item -> mMainAdapter.addRow(item));
 
-            mAdditionalAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", this::onClickAddresses).setInactive(true));
+            mAdditionalAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
         } else {
-            mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", this::onClickAddresses).setInactive(true));
+            mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
         }
     }
@@ -227,12 +233,10 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     private void onRequestFreeCoinsError(String message) {
-        getViewState().startDialog(ctx -> {
-            return new WalletConfirmDialog.Builder(ctx, "Can't get free coins")
-                    .setText(String.format("Our apologies, but we can't send to you free coins: %s", message))
-                    .setPositiveAction("Close")
-                    .create();
-        });
+        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Can't get free coins")
+                .setText(String.format("Our apologies, but we can't send to you free coins: %s", message))
+                .setPositiveAction("Close")
+                .create());
     }
 
     private void onRequestFreeCoinsSuccess(MinterBotRepository.MinterBotResult result) {
@@ -240,31 +244,29 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             onRequestFreeCoinsError(result.getError());
             return;
         }
-        getViewState().startDialog(ctx -> {
-            return new WalletConfirmDialog.Builder(ctx, "Get free coins")
-                    .setText("We sent to you 100 MNT")
-                    .setPositiveAction("OK")
-                    .create();
-        });
+        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Get free coins")
+                .setText("We sent to you 100 MNT")
+                .setPositiveAction("OK")
+                .create());
     }
 
-    private void onClickAddresses(View view, View sharedView, String value) {
+    private void onClickAddresses() {
         getViewState().startAddressList();
     }
 
-    private void onClickChangePassword(View view, View sharedView, String value) {
+    private void onClickChangePassword() {
         getViewState().startPasswordChange();
     }
 
-    private void onClickChangeEmail(View view, View sharedView, String value) {
+    private void onClickChangeEmail(String value) {
         startEditProfileField(SettingsFieldType.Email, "Email", "email", value);
     }
 
-    private void onClickChangePhone(View view, View sharedView, String value) {
+    private void onClickChangePhone(String value) {
         startEditProfileField(SettingsFieldType.Phone, "Mobile number", "phone", value);
     }
 
-    private void onClickChangeUsername(View view, View sharedView, String value) {
+    private void onClickChangeUsername(String value) {
         mSourceUsername = value;
         startEditProfileField(SettingsFieldType.Username, "Username", "username", value);
     }
@@ -274,26 +276,28 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         dialog.showProgress();
         if (fieldName.equals("username") && !value.equals(mSourceUsername)) {
             // check username is available
-            safeSubscribeIoToUi(rxCallProfile(profileAuthRepo.checkUsernameAvailability(value.substring(1))))
-                    .onErrorResumeNext(convertToProfileErrorResult())
-                    .subscribe(res -> {
-                        if (!res.isSuccess() || !res.data.isAvailable) {
-                            dialog.setError("Username is unavailable");
-                            dialog.hideProgress();
-                        } else {
-                            submitProfile(dialog, fieldName, value);
-                        }
-                    }, Wallet.Rx.errorHandler(getViewState()));
+            unsubscribeOnDestroy(
+                    safeSubscribeIoToUi(rxCallProfile(profileAuthRepo.checkUsernameAvailability(value.substring(1))))
+                            .onErrorResumeNext(convertToProfileErrorResult())
+                            .subscribe(res -> {
+                                if (!res.isSuccess() || !res.data.isAvailable) {
+                                    dialog.setError("Username is unavailable");
+                                    dialog.hideProgress();
+                                } else {
+                                    submitProfile(dialog, fieldName, value);
+                                }
+                            }, Wallet.Rx.errorHandler(getViewState()))
+            );
         } else {
             submitProfile(dialog, fieldName, value);
         }
     }
 
     /**
+     *
      * @param dialog
      * @param fieldName
      * @param value
-     * @TODO refactoring
      */
     private void submitProfile(WalletInputDialog dialog, final String fieldName, final String value) {
         dialog.showProgress();
@@ -303,32 +307,35 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         } else {
             toSave = value;
         }
-        safeSubscribeIoToUi(rxCallProfile(profileRepo.updateField(fieldName, toSave)))
-                .subscribe(res -> {
-                    dialog.hideProgress();
-                    if (!res.isSuccess()) {
-                        dialog.setError(res.getError().message);
-                        Timber.w(new ProfileResponseException(res.getError()));
-                        getViewState().showMessage(res.getError().message);
-                    } else {
-                        if (mMainSettingsRows != null && mMainSettingsRows.containsKey(fieldName)) {
-                            mMainSettingsRows.get(fieldName).setValue(() -> value);
-                            final User user = session.getUser();
-                            switch (fieldName) {
-                                case "username":
-                                    user.data.username = toSave;
-                                    break;
-                                case "email":
-                                    user.data.email = toSave;
-                                    break;
+
+        unsubscribeOnDestroy(
+                safeSubscribeIoToUi(rxCallProfile(profileRepo.updateField(fieldName, toSave)))
+                        .subscribe(res -> {
+                            dialog.hideProgress();
+                            if (!res.isSuccess()) {
+                                dialog.setError(res.getError().message);
+                                Timber.w(new ProfileResponseException(res.getError()));
+                                getViewState().showMessage(res.getError().message);
+                            } else {
+                                if (mMainSettingsRows != null && mMainSettingsRows.containsKey(fieldName)) {
+                                    mMainSettingsRows.get(fieldName).setValue(() -> value);
+                                    final User user = session.getUser();
+                                    switch (fieldName) {
+                                        case "username":
+                                            user.data.username = toSave;
+                                            break;
+                                        case "email":
+                                            user.data.email = toSave;
+                                            break;
+                                    }
+                                    session.setUser(user);
+                                    profileCachedRepo.update(true);
+                                }
+                                dialog.dismiss();
+                                getViewState().showMessage("Profile updated");
                             }
-                            session.setUser(user);
-                            profileCachedRepo.update(true);
-                        }
-                        dialog.dismiss();
-                        getViewState().showMessage("Profile updated");
-                    }
-                }, Wallet.Rx.errorHandler(getViewState()));
+                        }, Wallet.Rx.errorHandler(getViewState()))
+        );
     }
 
     private void startEditProfileField(final SettingsFieldType type, final String label, final String fieldName, final String value) {
