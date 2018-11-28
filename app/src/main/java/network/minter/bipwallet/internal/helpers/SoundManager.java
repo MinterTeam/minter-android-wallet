@@ -116,7 +116,7 @@ public final class SoundManager {
         });
     }
 
-    private void loadAll() {
+    public void loadAll() {
         if (mInit) {
             return;
         }
@@ -129,7 +129,11 @@ public final class SoundManager {
         mInit = true;
     }
 
-    private void releaseAll() {
+    public void releaseAll() {
+        if (!mInit) {
+            return;
+        }
+
         if (mPool != null) {
             mPool.release();
             mPool = null;

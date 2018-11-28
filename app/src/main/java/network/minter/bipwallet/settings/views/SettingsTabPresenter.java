@@ -202,6 +202,11 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     private void onSwitchSounds(View view, Boolean isChecked) {
         Wallet.app().sounds().play(R.raw.click_pop_zap);
         prefs.edit().putBoolean(PrefKeys.ENABLE_SOUNDS, isChecked).apply();
+        if (isChecked) {
+            Wallet.app().sounds().loadAll();
+        } else {
+            Wallet.app().sounds().releaseAll();
+        }
     }
 
     private void onRequestFreeCoins() {
