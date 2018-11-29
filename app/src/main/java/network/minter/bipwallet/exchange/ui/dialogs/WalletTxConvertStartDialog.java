@@ -142,7 +142,12 @@ public class WalletTxConvertStartDialog extends WalletDialog {
 
         public Builder setFromCoin(String fromCoin) {
             mFromCoin = fromCoin;
-            setFromCoinAvatar(MinterProfileApi.getCoinAvatarUrl(fromCoin));
+            if (fromCoin == null || fromCoin.length() < 3 || fromCoin.length() > 10) {
+                setFromCoinAvatar(null);
+            } else {
+                setFromCoinAvatar(MinterProfileApi.getCoinAvatarUrl(fromCoin));
+            }
+
             return this;
         }
 
@@ -154,7 +159,12 @@ public class WalletTxConvertStartDialog extends WalletDialog {
 
         public Builder setToCoin(String toCoin) {
             mToCoin = toCoin;
-            setToCoinAvatar(MinterProfileApi.getCoinAvatarUrl(toCoin));
+            if (toCoin == null || toCoin.length() < 3 || toCoin.length() > 10) {
+                setToCoinAvatar(null);
+            } else {
+                setToCoinAvatar(MinterProfileApi.getCoinAvatarUrl(toCoin));
+            }
+
             return this;
         }
 

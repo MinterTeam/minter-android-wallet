@@ -103,7 +103,7 @@ final class RemoteImageViewDelegate implements RemoteImageView {
 
     @Override
     public void setImageUrlFallback(String url, int fallbackResId) {
-        if (url == null) {
+        if (url == null || url.isEmpty()) {
             mImage.get().setImageResource(fallbackResId);
             return;
         }
@@ -113,7 +113,7 @@ final class RemoteImageViewDelegate implements RemoteImageView {
 
     @Override
     public void setImageUrlFallback(String url, String fallbackUrl) {
-        if (url == null) {
+        if (url == null || url.isEmpty()) {
             setImageUrl(fallbackUrl);
             return;
         }
