@@ -224,8 +224,11 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
             dialog.setCancelable(false);
 
-            safeSubscribeIoToUi(rxCallBcExp(mTxRepo.getEntity().getTransactionCount(mAccount.address)))
-                    .onErrorResumeNext(convertToBcExpErrorResult())
+            safeSubscribeIoToUi(
+                    rxCallBcExp(mTxRepo.getEntity().getTransactionCount(mAccount.address))
+                            .onErrorResumeNext(convertToBcExpErrorResult())
+            )
+                    .doOnSubscribe(this::unsubscribeOnDestroy)
                     .switchMap((Function<BCExplorerResult<CountableData>, ObservableSource<BCExplorerResult<TransactionSendResult>>>) cntRes -> {
                         if (!cntRes.isSuccess()) {
                             return Observable.just(BCExplorerResult.copyError(cntRes));
@@ -233,13 +236,18 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         final BigInteger nonce = cntRes.result.count.add(new BigInteger("1"));
                         final Transaction tx = txData.build(nonce);
                         final SecretData data = mSecretStorage.getSecret(mAccount.address);
-                        final TransactionSign sign = tx.sign(data.getPrivateKey());
+                        final TransactionSign sign = tx.signSingle(data.getPrivateKey());
                         data.cleanup();
 
-                        return safeSubscribeIoToUi(rxCallBcExp(mTxRepo.getEntity().sendTransaction(sign)))
-                                .onErrorResumeNext(convertToBcExpErrorResult());
+                        return safeSubscribeIoToUi(
+                                rxCallBcExp(mTxRepo.getEntity().sendTransaction(sign))
+                                        .onErrorResumeNext(convertToBcExpErrorResult())
+                        );
 
-                    }).subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
+                    })
+                    .doOnSubscribe(this::unsubscribeOnDestroy)
+                    .onErrorResumeNext(convertToBcExpErrorResult())
+                    .subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
 
 
             return dialog;
@@ -351,7 +359,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
-                            Timber.w(new BCExplorerResponseException(res));
+                            Timber.i(new BCExplorerResponseException(res));
                             if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
                                 mEnableUseMax.set(false);

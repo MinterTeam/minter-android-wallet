@@ -32,11 +32,20 @@ import network.minter.explorer.models.BCExplorerResult;
  * Dogsy. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public final class BCExplorerResponseException extends RuntimeException {
+public final class BCExplorerResponseException extends Exception {
     private BCExplorerResult mError;
 
     public BCExplorerResponseException(BCExplorerResult error) {
         mError = error;
+    }
+
+    @Override
+    public String getMessage() {
+        if (mError != null && mError.getMessage() != null && !mError.getMessage().isEmpty()) {
+            return mError.getMessage();
+        }
+
+        return super.getMessage();
     }
 
     public BCExplorerResult getError() {

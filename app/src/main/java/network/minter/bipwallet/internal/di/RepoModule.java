@@ -79,6 +79,7 @@ public class RepoModule {
     public MinterExplorerApi provideMinterExplorerApi() {
         final MinterExplorerApi api = MinterExplorerApi.getInstance();
         api.getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
+        api.getApiService().setConnectionTimeout(60).setReadTimeout(60);
         return api;
     }
 

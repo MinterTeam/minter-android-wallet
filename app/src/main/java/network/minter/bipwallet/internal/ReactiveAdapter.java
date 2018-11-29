@@ -33,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 
 import io.reactivex.Observable;
@@ -287,6 +288,14 @@ public class ReactiveAdapter {
                 errResult.error.message = "Not found";
                 errResult.result = null;
                 errResult.statusCode = 404;
+                return Observable.just(errResult);
+            } else if (throwable instanceof SocketTimeoutException) {
+                final BCExplorerResult<T> errResult = new BCExplorerResult<>();
+                errResult.error = new BCExplorerResult.ErrorResult();
+                errResult.error.code = null;
+                errResult.error.message = "Can't send transaction. Connection timed out. Please, try again later.";
+                errResult.result = null;
+                errResult.statusCode = 503;
                 return Observable.just(errResult);
             }
 
