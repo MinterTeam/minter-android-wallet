@@ -42,27 +42,31 @@ import network.minter.bipwallet.internal.helpers.forms.InputGroup;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public interface SettingsTabModule {
-    @StateStrategyType(OneExecutionStateStrategy.class)
     interface PasswordChangeMigrationView extends MvpView {
         void setTextChangedListener(InputGroup.OnTextChangedListener listener);
         void setFormValidateListener(InputGroup.OnFormValidateListener listener);
         void setOnClickSubmit(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startDialog(WalletDialog.DialogExecutor executor);
         void setEnableSubmit(boolean enable);
         void finish();
     }
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
     interface SettingsTabView extends MvpView {
         void setOnFreeCoinsClickListener(View.OnClickListener listener);
         void showFreeCoinsButton(boolean show);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startLogin();
         void setMainAdapter(RecyclerView.Adapter<?> mainAdapter);
         void setAdditionalAdapter(RecyclerView.Adapter<?> additionalAdapter);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startAddressList();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startAvatarChooser();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startPasswordChange();
         void showMessage(CharSequence message);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startDialog(WalletDialog.DialogExecutor executor);
     }
 }

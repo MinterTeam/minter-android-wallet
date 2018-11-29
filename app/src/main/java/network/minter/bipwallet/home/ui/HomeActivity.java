@@ -192,11 +192,14 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     protected void onCreate(Bundle savedInstanceState) {
         HomeModule.create(this).inject(this);
         super.onCreate(savedInstanceState);
-        final ActivityManager am = ((ActivityManager) getSystemService(ACTIVITY_SERVICE));
-        mIsLowRamDevice = am.isLowRamDevice();
-
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+
+        final ActivityManager am = ((ActivityManager) getSystemService(ACTIVITY_SERVICE));
+        if (am != null) {
+            mIsLowRamDevice = am.isLowRamDevice();
+        }
+
         presenter.handleExtras(getIntent());
 
         setupTabAdapter();

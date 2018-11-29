@@ -30,6 +30,8 @@ import android.net.Uri;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 import java.util.Map;
@@ -52,9 +54,13 @@ public class AuthModule {
         void setOnAdvancedMode(View.OnClickListener listener);
         void setOnSignin(View.OnClickListener listener);
         void setOnHelp(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startAdvancedMode();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startRegister();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startSignIn();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startHelp();
     }
 
@@ -63,12 +69,14 @@ public class AuthModule {
         void setOnSubmit(View.OnClickListener listener);
         void setOnFormValidateListener(InputGroup.OnFormValidateListener listener);
         void setEnableSubmit(boolean enable);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startHome();
         void validate(boolean withError);
         void setInputError(String fieldName, String message);
         void setResultError(CharSequence error);
         void clearErrors();
         void setInputErrors(Map<String, List<String>> data);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startConfirmation(Uri endpoint);
         void hideKeyboard();
     }
@@ -78,6 +86,7 @@ public class AuthModule {
         void setOnSubmit(View.OnClickListener listener);
         void setOnFormValidateListener(InputGroup.OnFormValidateListener listener);
         void setEnableSubmit(boolean enable);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startHome();
         void setResultError(CharSequence error);
         void setInputError(String fieldName, String message);

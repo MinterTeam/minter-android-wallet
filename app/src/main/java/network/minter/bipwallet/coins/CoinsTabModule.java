@@ -47,21 +47,23 @@ import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 @Module
 public interface CoinsTabModule {
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
     interface CoinsTabView extends MvpView {
         void setAvatar(String url);
         void setUsername(CharSequence name);
         void setBalance(String intPart, String fractionalPart, CharSequence coinName);
         void setAdapter(RecyclerView.Adapter<?> adapter);
         void setOnAvatarClick(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startTransactionList();
         void hideAvatar();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startConvertCoins();
         void startTab(int tab);
 
         void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
         void showRefreshProgress();
         void hideRefreshProgress();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startExplorer(String hash);
         void scrollTop();
     }
@@ -72,6 +74,7 @@ public interface CoinsTabModule {
         void showRefreshProgress();
         void hideRefreshProgress();
         void scrollTo(int pos);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startExplorer(String hash);
         void syncProgress(MutableLiveData<TransactionDataSource.LoadState> loadState);
     }

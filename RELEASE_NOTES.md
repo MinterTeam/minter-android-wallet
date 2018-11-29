@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.2.3
+ - Fixed sounds
+ - Updated SDK
+
+
 ## 1.2.2
 - UX sounds
 - updated SDK

@@ -31,8 +31,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.support.annotation.RawRes;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,62 +56,19 @@ public final class SoundManager {
         mEnabled = enabled;
         mPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
         mSoundMap = new HashMap<>(4);
-        if (mEnabled.get()) {
-            loadAll();
-        }
+        loadAll();
     }
 
     @SuppressWarnings("ConstantConditions")
     public void play(final @RawRes int soundId) {
         if (!mEnabled.get()) {
-            releaseAll();
             return;
-        } else {
-            loadAll();
         }
-
         if (!mSoundMap.containsKey(soundId)) {
             mSoundMap.put(soundId, mPool.load(mContext, soundId, 1));
         }
 
         mPool.play(mSoundMap.get(soundId), 1, 1, 0, 0, 1);
-    }
-
-    public void playClick(View button, View.OnClickListener listenerDelegate) {
-        button.setOnClickListener(v -> {
-            play(R.raw.click_pop_zap);
-
-            if (listenerDelegate != null) {
-                listenerDelegate.onClick(v);
-            }
-        });
-    }
-
-    public void playBip(View button, View.OnClickListener listenerDelegate) {
-        button.setOnClickListener(v -> {
-            play(R.raw.bip_beep_digi_octave);
-            if (listenerDelegate != null) {
-                listenerDelegate.onClick(v);
-            }
-        });
-    }
-
-    public void playRefresh(SwipeRefreshLayout swipeRefreshLayout, SwipeRefreshLayout.OnRefreshListener listenerDelegate) {
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            play(R.raw.refresh_pop_down);
-            if (listenerDelegate != null) {
-                listenerDelegate.onRefresh();
-            }
-        });
-    }
-
-    public void playCancel(View button, View.OnClickListener listenerDelegate) {
-        button.setOnClickListener(v -> {
-            play(R.raw.cancel_pop_hi);
-            if (listenerDelegate != null) {
-                listenerDelegate.onClick(v);
-            }
-        });
     }
 
     public void loadAll() {

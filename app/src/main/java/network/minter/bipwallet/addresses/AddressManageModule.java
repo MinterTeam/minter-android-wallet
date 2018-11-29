@@ -31,6 +31,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import dagger.Module;
 import network.minter.bipwallet.addresses.models.AddressItem;
@@ -48,6 +50,7 @@ public class AddressManageModule {
         void setAddress(String addressName);
         void setSecuredBy(String securedByVal);
         void setOnClickDelete(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startRemoveDialog(CharSequence attention, CharSequence description, String yes, String no, Dialog.OnClickListener onYesListener);
         void finishWithResult(int resultCode);
         void showProgress(CharSequence text);
@@ -60,9 +63,12 @@ public class AddressManageModule {
 
     public interface AddressListView extends MvpView, ProgressView {
         void setAdapter(RecyclerView.Adapter<?> adapter);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startAddressItem(int requestCode, String name, AddressItem address);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startCreateAddress(int requestCode);
         void scrollToPosition(int position);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startTransactionsList();
     }
 

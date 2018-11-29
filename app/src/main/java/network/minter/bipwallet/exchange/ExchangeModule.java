@@ -29,6 +29,8 @@ package network.minter.bipwallet.exchange;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 
@@ -50,16 +52,19 @@ import network.minter.explorer.models.CoinItem;
 public class ExchangeModule {
 
     public interface BaseCoinTabView extends MvpView {
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startDialog(WalletDialog.DialogExecutor executor);
         void setOnClickMaximum(View.OnClickListener listener);
         void setOnClickSubmit(View.OnClickListener listener);
         void setTextChangedListener(InputGroup.OnTextChangedListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener);
         void setOnClickSelectAccount(View.OnClickListener listener);
         void setError(String field, CharSequence message);
         void clearErrors();
         void setSubmitEnabled(boolean enabled);
         void setFormValidationListener(InputGroup.OnFormValidateListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startExplorer(String s);
         void finish();
         void setCalculation(String calculation);
@@ -73,25 +78,6 @@ public class ExchangeModule {
     public interface ConvertCoinView extends MvpView, ErrorViewWithRetry {
         void setupTabs();
         void setCurrentPage(int page);
-        /*
-        void setOnClickMaximum(View.OnClickListener listener);
-        void setOnClickSubmit(View.OnClickListener listener);
-        void setOnClickSelectAccount(View.OnClickListener listener);
-        void setMaximumTitle(CharSequence title);
-        void setTextChangedListener(InputGroup.OnTextChangedListener listener);
-        void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener);
-        void setOutAccountName(CharSequence accountName);
-        void setError(String field, CharSequence message);
-        void clearErrors();
-        void setSubmitEnabled(boolean enabled);
-        void setMaximumEnabled(boolean enabled);
-        void setFormValidationListener(InputGroup.OnFormValidateListener listener);
-        void setAmountSpending(String amount);
-        void setAmountGetting(String amount);
-        void startDialog(WalletDialog.DialogExecutor executor);
-        void startExplorer(String s);
-        void finish();
-         */
     }
 
     public interface GetCoinTabView extends BaseCoinTabView, ErrorViewWithRetry {

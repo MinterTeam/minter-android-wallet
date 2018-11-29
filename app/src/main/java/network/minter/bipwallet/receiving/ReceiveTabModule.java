@@ -45,15 +45,16 @@ import network.minter.core.crypto.MinterAddress;
  */
 @Module
 public class ReceiveTabModule {
-    @StateStrategyType(OneExecutionStateStrategy.class)
     public interface ReceiveTabView extends MvpView, ErrorViewWithRetry {
         void setQRCode(Bitmap bmp);
         void setAddress(MinterAddress address);
         void setOnActionShareQR(View.OnClickListener listener);
         void setOnActionQR(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startQRPreview(View shared, String filePath);
         void showQRProgress();
         void hideQRProgress();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startShare(Intent intent);
         void setOnClickAddress(View.OnClickListener listener);
     }

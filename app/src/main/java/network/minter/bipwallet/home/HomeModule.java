@@ -30,6 +30,8 @@ import android.app.FragmentManager;
 import android.arch.lifecycle.LifecycleOwner;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -141,6 +143,7 @@ public class HomeModule {
 
     public interface HomeView extends MvpView, ErrorView, ErrorViewWithRetry, ProgressView {
         void setCurrentPage(int position);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startUrl(String url);
     }
 

@@ -31,6 +31,8 @@ import android.view.View;
 import android.widget.Switch;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import dagger.Module;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
@@ -54,6 +56,7 @@ public class AdvancedModeModule {
         void setMnemonic(CharSequence phrase);
         void setEnableLaunch(boolean enable);
         void setEnableCopy(boolean enable);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startHome();
         void setEnableSecureVariants(boolean enable, AdvancedMainActivity.OnSelectSecureVariant onSelect);
         void askPassword(WalletInputDialog.OnSubmitListener submitListener);
@@ -65,12 +68,15 @@ public class AdvancedModeModule {
         void setOnGenerate(View.OnClickListener listener);
         void setMnemonicTextChangedListener(TextWatcher textWatcher);
         void setOnActivateMnemonic(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startGenerate();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startGenerate(int requestCode);
         void setError(CharSequence errorMessage);
         void setTitle(CharSequence title);
         void askPassword(WalletInputDialog.OnSubmitListener submitListener);
         void finishSuccess();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startHome();
     }
 }

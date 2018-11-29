@@ -50,21 +50,25 @@ import network.minter.bipwallet.sending.models.RecipientItem;
  */
 @Module
 public class SendTabModule {
-    @StateStrategyType(OneExecutionStateStrategy.class)
     public interface SendView extends MvpView, ErrorViewWithRetry {
         void setOnClickAccountSelectedListener(View.OnClickListener listener);
         void setOnClickMaximum(View.OnClickListener listener);
         void setOnTextChangedListener(InputGroup.OnTextChangedListener listener);
         void setFormValidationListener(InputGroup.OnFormValidateListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener);
         void setAccountName(CharSequence accountName);
         void setOnSubmit(View.OnClickListener listener);
         void setSubmitEnabled(boolean enabled);
         void clearInputs();
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startDialog(WalletDialog.DialogExecutor executor);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startExplorer(String txHash);
         void setOnClickScanQR(View.OnClickListener listener);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startScanQR(int requestCode);
+        @StateStrategyType(OneExecutionStateStrategy.class)
         void startScanQRWithPermissions(int requestCode);
         void setRecipient(CharSequence to);
         void setRecipientError(CharSequence error);
