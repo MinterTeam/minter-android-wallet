@@ -122,6 +122,7 @@
                 android:paddingEnd="86dp"
                 android:textSize="@dimen/text_size_default"
                 tools:text="1.102030405060708090102030405060708090"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 />
         </android.support.design.widget.TextInputLayout>
 

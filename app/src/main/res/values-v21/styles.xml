@@ -51,8 +51,8 @@
 
         <item name="buttonStyle">@style/Wallet.Button</item>
         <item name="android:buttonStyle">@style/Wallet.Button</item>
-        <item name="borderlessButtonStyle">@style/Wallet.Button</item>
-        <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
+        <!--<item name="borderlessButtonStyle">@style/Wallet.Button</item>-->
+        <!--<item name="android:borderlessButtonStyle">@style/Wallet.Button</item>-->
 
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>

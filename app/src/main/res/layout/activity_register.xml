@@ -121,6 +121,7 @@
                 app:layout_constraintTop_toBottomOf="@id/layout_input_username"
                 app:layout_goneMarginTop="0dp"
                 app:passwordToggleDrawable="@null"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
                 <android.support.v7.widget.AppCompatEditText
@@ -150,6 +151,7 @@
                 app:layout_constraintTop_toBottomOf="@id/layout_input_password"
                 app:layout_goneMarginTop="0dp"
                 app:passwordToggleDrawable="@null"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
                 <android.support.v7.widget.AppCompatEditText
@@ -180,6 +182,7 @@
                 app:layout_constraintTop_toBottomOf="@id/layout_input_password_repeat"
                 app:layout_goneMarginTop="0dp"
                 app:passwordToggleDrawable="@null"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
                 <android.support.v7.widget.AppCompatEditText
@@ -209,6 +212,7 @@
                 app:layout_constraintTop_toBottomOf="@id/layout_input_email"
                 app:layout_goneMarginTop="0dp"
                 app:passwordToggleDrawable="@null"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
                 <android.support.v7.widget.AppCompatEditText

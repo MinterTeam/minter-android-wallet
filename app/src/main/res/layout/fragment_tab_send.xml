@@ -75,6 +75,7 @@
             android:paddingTop="@dimen/margin_edges_half"
             >
 
+            <!--ACCOUNT-->
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/row_coin"
                 android:layout_width="0dp"
@@ -83,12 +84,12 @@
                 android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 android:hint="@string/tx_send_coin_hint"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:passwordToggleDrawable="@null"
-                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
                 <android.support.v7.widget.AppCompatEditText
@@ -98,28 +99,28 @@
                     android:ellipsize="end"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-                    android:inputType="none"
                     android:fontFamily="@font/_ubuntu_regular"
-                    android:paddingEnd="24dp"
+                    android:inputType="none"
                     android:paddingStart="4dp"
+                    android:paddingEnd="24dp"
                     android:textSize="@dimen/text_size_default"
                     tools:text="MINTERBIG (12400000000000.1020304050607080900)"
                     />
             </android.support.design.widget.TextInputLayout>
 
             <ImageView
-                android:contentDescription="@string/cd_choose_account"
                 android:id="@+id/dropdown"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="end"
+                android:contentDescription="@string/cd_choose_account"
                 app:layout_constraintBottom_toBottomOf="@id/row_coin"
                 app:layout_constraintEnd_toEndOf="@id/row_coin"
                 app:layout_constraintTop_toTopOf="@id/row_coin"
                 app:srcCompat="@drawable/ic_drop_down_grey"
                 />
 
-
+            <!--RECIPIENT-->
             <FrameLayout
                 android:id="@+id/row_recipient"
                 android:layout_width="0dp"
@@ -137,9 +138,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/tx_send_recipient_hint"
+                    app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                     app:hintEnabled="true"
                     app:passwordToggleDrawable="@null"
-                    app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                     >
 
                     <AutoCompleteTextView
@@ -149,30 +150,30 @@
                         android:completionThreshold="1"
                         android:dropDownHeight="wrap_content"
                         android:inputType="text|textMultiLine|textNoSuggestions"
-                        android:paddingEnd="32dp"
                         android:paddingStart="4dp"
+                        android:paddingEnd="32dp"
                         android:tag="recipient"
                         android:textSize="@dimen/text_size_default"
-                        tools:text="\@PavelDurov"
-                        tools:ignore="LabelFor"/>
+                        tools:ignore="LabelFor"
+                        tools:text="\@PavelDurov"/>
                 </android.support.design.widget.TextInputLayout>
             </FrameLayout>
 
             <ImageView
-                android:contentDescription="@string/cd_qr_scan"
                 android:id="@+id/action_scan_qr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
                 android:layout_marginTop="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_qr_scan"
                 android:paddingTop="7dp"
                 app:layout_constraintEnd_toEndOf="@id/row_recipient"
                 app:layout_constraintTop_toTopOf="@id/row_recipient"
                 app:srcCompat="@drawable/ic_qr"
                 />
 
-
+            <!--AMOUNT-->
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/layout_input_amount"
                 android:layout_width="0dp"
@@ -180,7 +181,7 @@
                 android:layout_marginStart="@dimen/margin_edges_input"
                 android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_input"
-                android:hint="@string/tx_send_amount_hint"
+                android:hint="@string/label_amount"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -194,9 +195,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
-                    android:inputType="numberDecimal|textMultiLine"
-                    android:paddingEnd="86dp"
+                    android:ellipsize="end"
+                    android:inputType="textMultiLine|numberDecimal"
                     android:paddingStart="4dp"
+                    android:paddingEnd="86dp"
                     android:tag="amount"
                     android:textSize="@dimen/text_size_default"
                     tools:text="1.102030405060708090102030405060708090"
@@ -218,23 +220,35 @@
                 app:layout_constraintVertical_bias="0.1"
                 />
 
+            <!--LABELS-->
+            <View
+                android:id="@+id/label_guide"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_input_amount"
+                />
+
             <TextView
                 android:id="@+id/fee_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:layout_marginTop="@dimen/margin_edges_half"
                 android:text="@string/tx_send_fee_hint"
                 android:textSize="@dimen/text_size_default"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_amount"
+                app:layout_constraintTop_toBottomOf="@id/label_guide"
                 />
 
             <TextView
                 android:id="@+id/fee_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_half"
                 android:layout_marginEnd="@dimen/margin_edges"
                 android:fontFamily="@font/_ubuntu_medium"
                 android:text="@string/tx_send_fee_value"
@@ -242,44 +256,7 @@
                 android:textSize="@dimen/text_size_default"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/fee_label"
-                app:layout_constraintTop_toTopOf="@id/fee_label"
-                />
-
-            <View
-                android:id="@+id/sep1"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:background="@color/greySeparator"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/fee_value"
-                />
-
-            <TextView
-                android:id="@+id/free_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:text="@string/tx_send_free_hint"
-                android:textSize="@dimen/text_size_default"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sep1"
-                />
-
-            <Switch
-                android:id="@+id/free_value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                android:checked="true"
-                android:fontFamily="@font/_ubuntu_medium"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/free_label"
-                app:layout_constraintTop_toTopOf="@id/free_label"
+                app:layout_constraintTop_toBottomOf="@id/label_guide"
                 />
 
             <View
@@ -288,7 +265,9 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="@dimen/margin_edges_input"
                 android:background="@color/greySeparator"
-                app:layout_constraintTop_toBottomOf="@id/free_value"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fee_label"
                 />
 
             <TextView

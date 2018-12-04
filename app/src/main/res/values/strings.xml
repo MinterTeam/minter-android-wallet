@@ -33,7 +33,7 @@
     <string name="no">No</string>
     <string name="dont_know">I don\'t know</string>
     <string name="today">Today</string>
-    <string name="please_wait">Please, wait</string>
+    <string name="please_wait">Please wait</string>
 
     <!--crop-->
     <string name="crop_image_activity_title"></string>
@@ -172,4 +172,10 @@
     <string name="label_transaction_type">Transaction type</string>
     <string name="menu_btn_add_address">Add address</string>
     <string name="attention_please_wait">Please, wait</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_express_tx">Express transaction</string>
+    <string name="tx_send_in_progress">Sending transaction...</string>
+    <string name="error">Error</string>
+    <string name="tx_send_overall_title">You\'re sending</string>
+    <string name="tx_address_searching">Searching address</string>
 </resources>

@@ -45,8 +45,8 @@
 
         <item name="buttonStyle">@style/Wallet.Button</item>
         <item name="android:buttonStyle">@style/Wallet.Button</item>
-        <item name="borderlessButtonStyle">@style/Wallet.Button</item>
-        <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
+        <!--<item name="borderlessButtonStyle">@style/Wallet.Button</item>-->
+        <!--<item name="android:borderlessButtonStyle">@style/Wallet.Button</item>-->
         <item name="android:soundEffectsEnabled">false</item>
     </style>
 
@@ -98,6 +98,7 @@
         <item name="colorControlNormal">@color/grey</item>
         <item name="colorControlActivated">@color/colorPrimary</item>
         <item name="android:textColor">@color/errorColor</item>
+        <item name="android:textSize">@dimen/text_size_12</item>
         <item name="android:textColorHint">@color/grey</item>
         <item name="android:fontFamily">@font/_ubuntu_regular</item>
     </style>
