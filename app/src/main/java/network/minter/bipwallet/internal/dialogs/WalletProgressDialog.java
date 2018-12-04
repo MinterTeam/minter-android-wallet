@@ -101,6 +101,10 @@ public class WalletProgressDialog extends WalletDialog {
     public static final class Builder extends WalletDialogBuilder<WalletProgressDialog, Builder> {
         private CharSequence mText;
 
+        public Builder(Context context, @StringRes int title) {
+            super(context, title);
+        }
+
         public Builder(Context context, CharSequence title) {
             super(context, title);
         }

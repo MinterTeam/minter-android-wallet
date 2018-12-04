@@ -30,6 +30,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -101,6 +102,9 @@ public final class WalletTxSendStartDialog extends WalletDialog {
         private CharSequence mRecipientName;
         private String mCoin = MinterSDK.DEFAULT_COIN;
 
+        public Builder(Context context, @StringRes int title) {
+            super(context, title);
+        }
 
         public Builder(Context context, CharSequence title) {
             super(context, title);
@@ -129,13 +133,21 @@ public final class WalletTxSendStartDialog extends WalletDialog {
             return super.setAction(BUTTON_NEGATIVE, title, listener);
         }
 
+        public WalletTxSendStartDialog.Builder setNegativeAction(@StringRes int titleRes, Dialog.OnClickListener listener) {
+            return super.setAction(BUTTON_NEGATIVE, titleRes, listener);
+        }
+
+        public WalletTxSendStartDialog.Builder setPositiveAction(@StringRes int titleRes, OnClickListener listener) {
+            return super.setAction(BUTTON_POSITIVE, titleRes, listener);
+        }
+
         public WalletTxSendStartDialog.Builder setPositiveAction(CharSequence title, OnClickListener listener) {
             return super.setAction(BUTTON_POSITIVE, title, listener);
         }
 
         public WalletTxSendStartDialog create() {
             checkNotNull(mRecipientName, "Recipient name required");
-            checkNotNull(mAmount, "Amount required");
+            checkNotNull(mAmount, "Amount can't be empty");
             return new WalletTxSendStartDialog(getContext(), this);
         }
 

@@ -56,6 +56,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
+import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -90,6 +91,7 @@ public final class ImageHelper {
         mDisplay = displayHelper;
 
         mPicasso = new Picasso.Builder(context)
+                .downloader(new OkHttp3Downloader(context))
                 .listener((picasso, uri, exception) -> Timber.w(exception, "Unable to load image %s", uri.toString()))
                 .indicatorsEnabled(false)
                 .build();

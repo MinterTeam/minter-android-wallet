@@ -30,6 +30,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -97,6 +98,10 @@ public final class WalletConfirmDialog extends WalletDialog {
     public static final class Builder extends WalletDialogBuilder<WalletConfirmDialog, WalletConfirmDialog.Builder> {
         private CharSequence mText;
 
+        public Builder(Context context, @StringRes int title) {
+            super(context, title);
+        }
+
         public Builder(Context context, CharSequence title) {
             super(context, title);
         }
@@ -154,16 +159,32 @@ public final class WalletConfirmDialog extends WalletDialog {
             return this;
         }
 
+        public Builder setPositiveAction(@StringRes int titleRes) {
+            return setPositiveAction(titleRes, null);
+        }
+
         public Builder setPositiveAction(CharSequence title) {
             return setPositiveAction(title, null);
+        }
+
+        public Builder setNegativeAction(@StringRes int titleRes) {
+            return setNegativeAction(titleRes, null);
         }
 
         public Builder setNegativeAction(CharSequence title) {
             return setNegativeAction(title, null);
         }
 
+        public Builder setNegativeAction(@StringRes int titleRes, Dialog.OnClickListener listener) {
+            return super.setAction(BUTTON_NEGATIVE, mContext.get().getResources().getString(titleRes), listener);
+        }
+
         public Builder setNegativeAction(CharSequence title, Dialog.OnClickListener listener) {
             return super.setAction(BUTTON_NEGATIVE, title, listener);
+        }
+
+        public Builder setPositiveAction(@StringRes int titleRes, OnClickListener listener) {
+            return setPositiveAction(mContext.get().getResources().getString(titleRes), listener);
         }
 
         public Builder setPositiveAction(CharSequence title, OnClickListener listener) {

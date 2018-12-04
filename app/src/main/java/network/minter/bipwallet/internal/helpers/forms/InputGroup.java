@@ -206,8 +206,10 @@ public class InputGroup {
         for (Map.Entry<String, EditText> entry : mInputNames.entrySet()) {
             if (entry.getValue().getParent() != null && entry.getValue().getParent().getParent() instanceof TextInputLayout) {
                 final TextInputLayout tl = ((TextInputLayout) entry.getValue().getParent().getParent());
-                tl.setError(null);
-                tl.setErrorEnabled(false);
+                tl.post(() -> {
+                    tl.setErrorEnabled(false);
+                    tl.setError(null);
+                });
             } else {
                 entry.getValue().setError(null);
             }
@@ -227,10 +229,18 @@ public class InputGroup {
         if (mInputNames.get(fieldName).getParent() != null && mInputNames.get(
                 fieldName).getParent().getParent() instanceof TextInputLayout) {
             final TextInputLayout tl = ((TextInputLayout) mInputNames.get(fieldName).getParent().getParent());
-            tl.setError(message);
-            tl.setErrorEnabled(message != null && message.length() > 0);
+
+            tl.post(() -> {
+                tl.setErrorEnabled(message != null && message.length() > 0);
+                tl.setError(message);
+            });
+
         } else {
-            mInputNames.get(fieldName).setError((message == null || message.length() == 0) ? null : message);
+            final EditText in = mInputNames.get(fieldName);
+            if (in != null) {
+                in.post(() -> in.setError((message == null || message.length() == 0) ? null : message));
+            }
+
         }
     }
 
@@ -287,19 +297,23 @@ public class InputGroup {
                     if (withError) {
                         if (editText.getParent() != null && editText.getParent().getParent() instanceof TextInputLayout) {
                             final TextInputLayout lay = ((TextInputLayout) editText.getParent().getParent());
-                            if (!valid) {
-                                lay.setErrorEnabled(true);
-                                lay.setError(item.getErrorMessage());
-                            } else {
-                                lay.setError(null);
-                                lay.setErrorEnabled(false);
-                            }
+                            lay.post(() -> {
+                                if (!valid) {
+                                    lay.setErrorEnabled(true);
+                                    lay.setError(item.getErrorMessage());
+                                } else {
+                                    lay.setError(null);
+                                    lay.setErrorEnabled(false);
+                                }
+                            });
                         } else {
-                            if (!valid) {
-                                editText.setError(item.getErrorMessage());
-                            } else {
-                                editText.setError(null);
-                            }
+                            editText.post(() -> {
+                                if (!valid) {
+                                    editText.setError(item.getErrorMessage());
+                                } else {
+                                    editText.setError(null);
+                                }
+                            });
                         }
                     }
 

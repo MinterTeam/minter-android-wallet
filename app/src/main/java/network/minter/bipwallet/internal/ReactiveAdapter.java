@@ -31,14 +31,16 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.Collections;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
+import network.minter.bipwallet.apis.dummies.BCExplorerResultErrorMapped;
+import network.minter.bipwallet.apis.dummies.BCResultErrorMapped;
+import network.minter.bipwallet.apis.dummies.ExpResultErrorMapped;
+import network.minter.bipwallet.apis.dummies.ProfileResultErrorMapped;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.models.BCResult;
 import network.minter.explorer.MinterExplorerApi;
@@ -54,7 +56,6 @@ import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ReactiveAdapter {
@@ -84,11 +85,17 @@ public class ReactiveAdapter {
     public static <T> Function<? super Throwable, ? extends ObservableSource<? extends ProfileResult<T>>> convertToProfileErrorResult() {
         return (Function<Throwable, ObservableSource<? extends ProfileResult<T>>>) throwable
                 -> {
-            if (!(throwable instanceof HttpException)) {
-                return Observable.error(throwable);
+
+            final ProfileResultErrorMapped<T> errResult = new ProfileResultErrorMapped<>();
+            if (errResult.mapError(throwable)) {
+                return Observable.just(errResult);
             }
 
-            return Observable.just(createProfileErrorResult(((HttpException) throwable)));
+            if (throwable instanceof HttpException) {
+                return Observable.just(createProfileErrorResult(((HttpException) throwable)));
+            }
+
+            return Observable.error(throwable);
         };
     }
 
@@ -172,21 +179,17 @@ public class ReactiveAdapter {
     public static <T> Function<? super Throwable, ? extends ObservableSource<? extends BCResult<T>>> convertToBcErrorResult() {
         return (Function<Throwable, ObservableSource<? extends BCResult<T>>>) throwable
                 -> {
-            if (throwable instanceof IOException && throwable.getCause() instanceof EOFException) {
-                // blockchain api sometimes instead of 404 gives empty response, just handle it as 404
-                final BCResult<T> errResult = new BCResult<>();
-                errResult.code = null;
-                errResult.message = "Not found";
-                errResult.result = null;
-                errResult.statusCode = 404;
+
+            final BCResultErrorMapped<T> errResult = new BCResultErrorMapped<>();
+            if (errResult.mapError(throwable)) {
                 return Observable.just(errResult);
             }
 
-            if (!(throwable instanceof HttpException)) {
-                return Observable.error(throwable);
+            if (throwable instanceof HttpException) {
+                return Observable.just(createBcErrorResult(((HttpException) throwable)));
             }
 
-            return Observable.just(createBcErrorResult(((HttpException) throwable)));
+            return Observable.error(throwable);
         };
     }
 
@@ -280,30 +283,16 @@ public class ReactiveAdapter {
     public static <T> Function<? super Throwable, ? extends ObservableSource<? extends BCExplorerResult<T>>> convertToBcExpErrorResult() {
         return (Function<Throwable, ObservableSource<? extends BCExplorerResult<T>>>) throwable
                 -> {
-            if (throwable instanceof IOException && throwable.getCause() instanceof EOFException) {
-                // blockchain api sometimes instead of 404 gives empty response, just handle it as 404
-                final BCExplorerResult<T> errResult = new BCExplorerResult<>();
-                errResult.error = new BCExplorerResult.ErrorResult();
-                errResult.error.code = null;
-                errResult.error.message = "Not found";
-                errResult.result = null;
-                errResult.statusCode = 404;
-                return Observable.just(errResult);
-            } else if (throwable instanceof SocketTimeoutException) {
-                final BCExplorerResult<T> errResult = new BCExplorerResult<>();
-                errResult.error = new BCExplorerResult.ErrorResult();
-                errResult.error.code = null;
-                errResult.error.message = "Can't send transaction. Connection timed out. Please, try again later.";
-                errResult.result = null;
-                errResult.statusCode = 503;
+            final BCExplorerResultErrorMapped<T> errResult = new BCExplorerResultErrorMapped<>();
+            if (errResult.mapError(throwable)) {
                 return Observable.just(errResult);
             }
 
-            if (!(throwable instanceof HttpException)) {
-                return Observable.error(throwable);
+            if (throwable instanceof HttpException) {
+                return Observable.just(createBcExpErrorResult(((HttpException) throwable)));
             }
 
-            return Observable.just(createBcExpErrorResult(((HttpException) throwable)));
+            return Observable.error(throwable);
         };
     }
 
@@ -398,11 +387,17 @@ public class ReactiveAdapter {
     public static <T> Function<? super Throwable, ? extends ObservableSource<? extends ExpResult<T>>> convertToExpErrorResult() {
         return (Function<Throwable, ObservableSource<? extends ExpResult<T>>>) throwable
                 -> {
-            if (!(throwable instanceof HttpException)) {
-                return Observable.error(throwable);
+
+            if (throwable instanceof HttpException) {
+                return Observable.just(createExpErrorResult(((HttpException) throwable)));
             }
 
-            return Observable.just(createExpErrorResult(((HttpException) throwable)));
+            ExpResultErrorMapped<T> errResult = new ExpResultErrorMapped<>();
+            if (errResult.mapError(throwable)) {
+                return Observable.just(errResult);
+            }
+
+            return Observable.error(throwable);
         };
     }
 

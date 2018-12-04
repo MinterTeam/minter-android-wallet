@@ -165,6 +165,9 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         return rxCallProfile(infoRepo.getAddressesWithUserInfo(toFetch))
                 .onErrorResumeNext(convertToProfileErrorResult())
                 .map(listInfoResult -> {
+                    if (listInfoResult.data == null) {
+                        listInfoResult.data = Collections.emptyList();
+                    }
                     if (listInfoResult.data.isEmpty()) {
                         return items;
                     }

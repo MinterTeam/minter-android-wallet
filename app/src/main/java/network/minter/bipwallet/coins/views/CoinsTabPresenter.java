@@ -184,7 +184,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                     itemViewHolder.title.setText(item.coin.toUpperCase());
                     itemViewHolder.amount.setText(bdHuman(item.balance));
                     if (mUseAvatars) {
-                        itemViewHolder.avatar.setImageUrl(MinterProfileApi.getCoinAvatarUrl(item.coin));
+                        itemViewHolder.avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(item.coin), R.drawable.img_avatar_default);
                     } else {
                         itemViewHolder.avatar.setImageDrawable(null);
                     }

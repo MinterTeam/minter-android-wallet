@@ -47,9 +47,9 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.explorer.repo.ExplorerSettingsRepository;
@@ -69,6 +69,7 @@ public class BalanceUpdateService extends Service {
     @Inject SecretStorage secretStorage;
     @Inject ExplorerSettingsRepository settingsRepo;
     @Inject AuthSession session;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     private Centrifugo mClient = null;
     private DataMessageListener mListener;
@@ -89,6 +90,7 @@ public class BalanceUpdateService extends Service {
     public void onDestroy() {
         super.onDestroy();
         disconnect();
+        mCompositeDisposable.clear();
     }
 
     @Override
@@ -120,6 +122,7 @@ public class BalanceUpdateService extends Service {
     private void connect() {
         rxCallExp(settingsRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
                 .subscribeOn(Schedulers.io())
+                .doOnSubscribe(d -> mCompositeDisposable.add(d))
                 .switchMap(res -> Observable.create((ObservableOnSubscribe<Centrifugo>) emitter -> {
                     if (res == null || res.result == null || res.result.token == null) {
                         return;
@@ -161,7 +164,7 @@ public class BalanceUpdateService extends Service {
                     emitter.onNext(client);
                     emitter.onComplete();
                 }))
-                .subscribe(res -> mClient = res, Wallet.Rx.errorHandler());
+                .subscribe(res -> mClient = res, Timber::w);
     }
 
     private void disconnect() {

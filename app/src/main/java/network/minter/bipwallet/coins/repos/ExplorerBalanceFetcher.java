@@ -43,7 +43,6 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.AccountItem;
-import network.minter.bipwallet.internal.Wallet;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.AddressData;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -117,13 +116,15 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
                         synchronized (mLock) {
+                            if (res.result == null) {
+                                res.result = new AddressData();
+                            }
                             res.result.fillDefaultsOnEmpty();
                             mRawBalances.put(address, res.result);
                         }
 
                         mWaiter.countDown();
                     }, t -> {
-                        Wallet.Rx.errorHandler().accept(t);
                         mWaiter.countDown();
                         emitter.onError(t);
                     });

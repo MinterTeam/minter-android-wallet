@@ -177,15 +177,20 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        safeSubscribeIoToUi(accountStorage.observe()).subscribe(res -> {
-            if (!res.isEmpty()) {
-                if (mLastAccount != null) {
-                    onAccountSelected(res.findAccountByCoin(mLastAccount.getCoin()).orElse(res.getAccounts().get(0)));
-                } else {
-                    onAccountSelected(res.getAccounts().get(0));
-                }
-            }
-        });
+        accountStorage.observe()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (!res.isEmpty()) {
+                        if (mLastAccount != null) {
+                            onAccountSelected(res.findAccountByCoin(mLastAccount.getCoin()).orElse(res.getAccounts().get(0)));
+                        } else {
+                            onAccountSelected(res.getAccounts().get(0));
+                        }
+                    }
+                }, t -> {
+                    getViewState().onError(t);
+                });
 
         mInputChange = BehaviorSubject.create();
         unsubscribeOnDestroy(mInputChange
@@ -316,9 +321,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                 startSendDialog();
                             }
                         }
-                    }, Wallet.Rx.errorHandler());
+                    }, Wallet.Rx.errorHandler(getViewState()));
 
-            return new WalletProgressDialog.Builder(ctx, "Searching address")
+            return new WalletProgressDialog.Builder(ctx, R.string.tx_address_searching)
                     .setText(String.format("Please, wait, we are searching address for user \"%s\"", searchBy))
                     .create();
         });
@@ -326,26 +331,35 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void startSendDialog() {
         getViewState().startDialog(ctx -> {
-            getAnalytics().send(AppEvent.SendCoinPopupScreen);
-            final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, "You're sending")
-                    .setAmount(mAmount)
-                    .setAvatarUrl(mAvatar)
-                    .setRecipientName(mToName)
-                    .setCoin(mFromAccount.coin)
-                    .setPositiveAction("Send", (d, w) -> {
-                        Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
-                        onStartExecuteTransaction(true);
-                        getAnalytics().send(AppEvent.SendCoinPopupSendButton);
-                        d.dismiss();
-                    })
-                    .setNegativeAction("Cancel", (d, w) -> {
-                        Wallet.app().sounds().play(R.raw.cancel_pop_hi);
-                        getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
-                        d.dismiss();
-                    })
-                    .create();
-            dialog.setCancelable(true);
-            return dialog;
+            try {
+                getAnalytics().send(AppEvent.SendCoinPopupScreen);
+                mAmount = null;
+                final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
+                        .setAmount(mAmount)
+                        .setAvatarUrl(mAvatar)
+                        .setRecipientName(mToName)
+                        .setCoin(mFromAccount.coin)
+                        .setPositiveAction(R.string.btn_send, (d, w) -> {
+                            Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
+                            onStartExecuteTransaction(true);
+                            getAnalytics().send(AppEvent.SendCoinPopupSendButton);
+                            d.dismiss();
+                        })
+                        .setNegativeAction(R.string.btn_cancel, (d, w) -> {
+                            Wallet.app().sounds().play(R.raw.cancel_pop_hi);
+                            getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
+                            d.dismiss();
+                        })
+                        .create();
+                dialog.setCancelable(true);
+                return dialog;
+            } catch (NullPointerException badState) {
+                return new WalletConfirmDialog.Builder(ctx, R.string.error)
+                        .setText(badState.getMessage())
+                        .setPositiveAction(R.string.btn_close)
+                        .create();
+            }
+
         });
     }
 
@@ -356,13 +370,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
      */
     private void onStartWaitingDialog(DialogInterface dialogInterface, int which) {
         getViewState().startDialog(ctx -> {
-            final WalletTxSendWaitingDialog dialog = new WalletTxSendWaitingDialog.Builder(ctx, "Please wait")
+            final WalletTxSendWaitingDialog dialog = new WalletTxSendWaitingDialog.Builder(ctx, R.string.please_wait)
                     .setCountdownSeconds(10, (tick, isEnd) -> {
                         if (isEnd) {
                             onStartExecuteTransaction(false);
                         }
                     })
-                    .setPositiveAction("Express transaction", (d, v) -> {
+                    .setPositiveAction(R.string.btn_express_tx, (d, v) -> {
                         onStartExecuteTransaction(true);
                     })
                     .create();
@@ -392,8 +406,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onStartExecuteTransaction(boolean express) {
         getViewState().startDialog(ctx -> {
-            final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Please wait")
-                    .setText("Sending transaction...")
+            final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, R.string.please_wait)
+                    .setText(R.string.tx_send_in_progress)
                     .create();
             dialog.setCancelable(false);
 
@@ -434,7 +448,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
                     final TransactionSign preSign = preTx.sign(preData.getPrivateKey());
 
-                    exchangeResolver = rxCallBcExp(cachedTxRepo.getEntity().getTransactionCommission(preSign));
+                    exchangeResolver = rxCallBcExp(cachedTxRepo.getEntity().getTransactionCommission(preSign)).onErrorResumeNext(convertToBcExpErrorResult());
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
                     final BCExplorerResult<TransactionCommissionValue> commissionValue = new BCExplorerResult<>();
@@ -445,7 +459,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
             // creating preparation result to send transaction
             Disposable d = Observable.combineLatest(
-                    exchangeResolver.onErrorResumeNext(convertToBcExpErrorResult()),
+                    exchangeResolver,
                     rxCallBcExp(cachedTxRepo.getEntity().getTransactionCount(mFromAccount.address)).onErrorResumeNext(convertToBcExpErrorResult()),
                     new BiFunction<BCExplorerResult<TransactionCommissionValue>, BCExplorerResult<CountableData>, SendInitData>() {
                         @Override
@@ -523,8 +537,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         final SecretData data = secretStorage.getSecret(mFromAccount.address);
                         final TransactionSign sign = tx.signSingle(data.getPrivateKey());
 
-                        return safeSubscribeIoToUi(rxCallBcExp(cachedTxRepo.getEntity().sendTransaction(sign)))
-                                .onErrorResumeNext(convertToBcExpErrorResult());
+                        return safeSubscribeIoToUi(
+                                rxCallBcExp(cachedTxRepo.getEntity().sendTransaction(sign))
+                                        .onErrorResumeNext(convertToBcExpErrorResult())
+                        );
 
                     }).subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);
             unsubscribeOnDestroy(d);
@@ -543,8 +559,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onErrorSearchUser(ProfileResult<?> errorResult) {
         Timber.e(errorResult.getError().message, "Unable to find address");
-        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, errorResult.getError().message)
-                .setText(String.format("Unable to find user address for user \"%s\"", mToName))
+        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Error")
+                .setText(String.format("Unable to find user address for user \"%s\": %s", mToName, errorResult.getError().message))
                 .setPositiveAction("Close")
                 .create());
     }

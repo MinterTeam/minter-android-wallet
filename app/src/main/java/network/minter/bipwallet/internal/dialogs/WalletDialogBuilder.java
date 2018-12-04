@@ -29,6 +29,7 @@ package network.minter.bipwallet.internal.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.StringRes;
 
 import java.lang.ref.WeakReference;
 
@@ -48,6 +49,11 @@ public abstract class WalletDialogBuilder<D extends WalletDialog, B extends Wall
         mContext = new WeakReference<>(context);
     }
 
+    public WalletDialogBuilder(Context context, @StringRes int title) {
+        this(context);
+        setTitle(title);
+    }
+
     public WalletDialogBuilder(Context context, CharSequence title) {
         this(context);
         setTitle(title);
@@ -55,6 +61,10 @@ public abstract class WalletDialogBuilder<D extends WalletDialog, B extends Wall
 
     public CharSequence getTitle() {
         return mTitle;
+    }
+
+    public WalletDialogBuilder setTitle(@StringRes int title) {
+        return setTitle(mContext.get().getResources().getString(title));
     }
 
     public WalletDialogBuilder setTitle(CharSequence title) {
@@ -98,6 +108,11 @@ public abstract class WalletDialogBuilder<D extends WalletDialog, B extends Wall
 
     public Dialog.OnClickListener getNeutralListener() {
         return mNeutralListener;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected B setAction(int whichBtn, @StringRes int titleRes, Dialog.OnClickListener listener) {
+        return setAction(whichBtn, mContext.get().getResources().getString(titleRes), listener);
     }
 
     @SuppressWarnings("unchecked")

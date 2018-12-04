@@ -48,6 +48,7 @@ import network.minter.core.crypto.HashUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
+import network.minter.core.internal.exceptions.NetworkException;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -77,32 +78,32 @@ public class MinterBotRepository extends DataRepository<MinterBotEndpoint> imple
                 .onErrorResumeNext(new Function<Throwable, ObservableSource<MinterBotResult>>() {
                     @Override
                     public ObservableSource<MinterBotResult> apply(Throwable throwable) {
-                        if (!(throwable instanceof HttpException)) {
-                            return Observable.error(throwable);
+                        if (throwable instanceof HttpException) {
+                            MinterBotResult errResult;
+                            try {
+                                final String errorBodyString = ((HttpException) throwable).response().errorBody().string();
+                                errResult = Wallet.app().gsonBuilder().create().fromJson(errorBodyString, MinterBotResult.class);
+                            } catch (Throwable e) {
+                                Timber.w(e, "Unable to resolve http exception response");
+                                errResult = new MinterBotResult();
+                                errResult.data = throwable.getMessage();
+                            }
+                            return Observable.just(errResult);
                         }
 
-                        MinterBotResult errResult;
-                        try {
-                            // нельзя после этой строки пытаться вытащить body из ошибки,
-                            // потому что retrofit по какой-то причине не хранит у себя это значение
-                            // а держит в буффере до момента первого доступа
-                            final String errorBodyString = ((HttpException) throwable).response().errorBody().string();
-                            errResult = Wallet.app().gsonBuilder().create().fromJson(errorBodyString, MinterBotResult.class);
-                        } catch (Throwable e) {
-                            Timber.e(e, "Unable to resolve http exception response");
+                        Throwable e = NetworkException.convertIfNetworking(throwable);
+                        if (e instanceof NetworkException) {
+                            NetworkException ne = ((NetworkException) e);
+                            MinterBotResult errResult;
                             errResult = new MinterBotResult();
-                            errResult.data = throwable.getMessage();
+                            errResult.data = ne.getUserMessage();
+
+                            return Observable.just(errResult);
                         }
 
-                        return Observable.just(errResult);
+                        return Observable.error(throwable);
                     }
                 });
-    }
-
-    private String makeSignature(MinterAddress address) {
-        TimeZone timeZone = TimeZone.getTimeZone("UTC");
-        Calendar calendar = Calendar.getInstance(timeZone);
-        return HashUtil.sha256Hex(String.format("%s%s%02d", address, BuildConfig.MINTER_BOT_SECRET, calendar.get(Calendar.HOUR_OF_DAY)));
     }
 
     @Override
@@ -122,13 +123,19 @@ public class MinterBotRepository extends DataRepository<MinterBotEndpoint> imple
         return MinterBotEndpoint.class;
     }
 
+    private String makeSignature(MinterAddress address) {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        Calendar calendar = Calendar.getInstance(timeZone);
+        return HashUtil.sha256Hex(String.format("%s%s%02d", address, BuildConfig.MINTER_BOT_SECRET, calendar.get(Calendar.HOUR_OF_DAY)));
+    }
+
     @Parcel
     public static final class MinterBotResult {
         public String data;
         public Map<String, List<String>> errors;
 
         public boolean isOk() {
-            return data == null || errors == null || errors.isEmpty();
+            return data == null && (errors == null || errors.isEmpty());
         }
 
         public String getError() {

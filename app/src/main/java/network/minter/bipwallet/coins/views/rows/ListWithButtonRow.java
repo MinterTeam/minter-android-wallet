@@ -155,6 +155,7 @@ public class ListWithButtonRow implements MultiRowContract.Row<ListWithButtonRow
                 viewHolder.emptyTitle.setVisibility(View.VISIBLE);
                 viewHolder.emptyTitle.setText(mError == null ? "Unexpected error" : mError);
                 viewHolder.progress.setVisibility(View.GONE);
+                break;
             case Normal:
                 viewHolder.list.setVisibility(View.VISIBLE);
                 viewHolder.action.setVisibility(View.VISIBLE);

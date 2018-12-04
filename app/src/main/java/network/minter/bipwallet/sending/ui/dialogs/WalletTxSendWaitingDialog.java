@@ -29,6 +29,7 @@ package network.minter.bipwallet.sending.ui.dialogs;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -115,8 +116,16 @@ public class WalletTxSendWaitingDialog extends WalletDialog implements TickHandl
         private OnCountdownListener mCountdownListener;
         private CharSequence mFee; //todo ?
 
+        public Builder(Context context, @StringRes int title) {
+            super(context, title);
+        }
+
         public Builder(Context context, CharSequence title) {
             super(context, title);
+        }
+
+        public Builder setPositiveAction(@StringRes int title, OnClickListener listener) {
+            return super.setAction(BUTTON_POSITIVE, title, listener);
         }
 
         public Builder setPositiveAction(CharSequence title, OnClickListener listener) {
