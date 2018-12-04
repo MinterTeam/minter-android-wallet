@@ -42,7 +42,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -93,7 +92,6 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
     @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
     @BindView(R.id.input_amount) AppCompatEditText amountInput;
-    @BindView(R.id.free_value) Switch freeValue;
     @BindView(R.id.action) Button actionSend;
     @BindView(R.id.action_scan_qr) View actionScanQR;
     @BindView(R.id.action_maximum) View actionMaximum;
@@ -129,7 +127,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
         mInputGroup = new InputGroup();
         mInputGroup.addInput(recipientInput);
         mInputGroup.addInput(amountInput);
-        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number"));
+        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", false));
         /* ideal case */
         mInputGroup.addValidator(recipientInput,
                 new RegexValidator(
