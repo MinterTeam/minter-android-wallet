@@ -85,17 +85,20 @@ public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.Recei
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
+                    if (res.bitmap == null) {
+                        Timber.e("Unable to create QR: Unknown reason.");
+                        return;
+                    }
                     Timber.d("Bitmap size: %s", TextHelper.humanReadableBytes((res.bitmap.getWidth() * res.bitmap.getHeight()) * 8, true));
                     mOutFile = res.file;
                     getViewState().hideQRProgress();
                     getViewState().setQRCode(res.bitmap);
                     getViewState().setOnActionShareQR(ReceiveTabPresenter.this::onCopyQR);
+                    getViewState().setOnActionQR(v -> getViewState().startQRPreview(v, mOutFile.toString()));
                 }, t -> {
                     getViewState().onError(t);
                     getViewState().hideQRProgress();
                 });
-
-        getViewState().setOnActionQR(v -> getViewState().startQRPreview(v, mOutFile.toString()));
     }
 
     private void onClickAddress(View view) {
