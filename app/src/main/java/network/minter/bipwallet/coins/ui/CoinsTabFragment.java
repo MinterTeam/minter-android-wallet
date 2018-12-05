@@ -29,6 +29,7 @@ package network.minter.bipwallet.coins.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -52,6 +53,7 @@ import javax.inject.Provider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.views.CoinsTabPresenter;
@@ -60,6 +62,7 @@ import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
@@ -75,6 +78,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @Inject Provider<CoinsTabPresenter> presenterProvider;
     @Inject SoundManager soundManager;
     @InjectPresenter CoinsTabPresenter presenter;
+    @BindView(R.id.bip_logo) View logo;
     @BindView(R.id.user_avatar) BipCircleImageView avatar;
     @BindView(R.id.username) TextView username;
     @BindView(R.id.balance_int) TextView balanceInt;
@@ -126,6 +130,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     }
 
     @SuppressLint("ClickableViewAccessibility")
+    @SuppressWarnings("StringBufferReplaceableByString")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -133,6 +138,25 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
         View view = inflater.inflate(R.layout.fragment_tab_coins, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         presenter.onRestoreInstanceState(savedInstanceState);
+
+        if (BuildConfig.DEBUG) {
+            logo.setOnLongClickListener(v -> {
+                final StringBuilder sb = new StringBuilder();
+                sb.append("    Env: ").append(BuildConfig.FLAVOR).append("\n");
+                sb.append("  Build: ").append(BuildConfig.VERSION_CODE).append("\n");
+                sb.append("Version: ").append(BuildConfig.VERSION_NAME).append("\n");
+                sb.append("  URole: ").append(Wallet.app().session().getRole().name()).append("\n");
+
+                new WalletConfirmDialog.Builder(getActivity(), "About")
+                        .setText(sb.toString())
+                        .setTextTypeface(Typeface.MONOSPACE)
+                        .setTextIsSelectable(true)
+                        .setPositiveAction("OK")
+                        .create()
+                        .show();
+                return false;
+            });
+        }
         return view;
     }
 

@@ -28,6 +28,7 @@ package network.minter.bipwallet.internal.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -72,6 +73,10 @@ public final class WalletConfirmDialog extends WalletDialog {
         ButterKnife.bind(this);
         title.setText(mBuilder.mTitle);
         text.setText(mBuilder.mText);
+        text.setTextIsSelectable(mBuilder.mTextIsSelectable);
+        if (mBuilder.mTypeface != null) {
+            text.setTypeface(mBuilder.mTypeface);
+        }
         actionConfirm.setText(mBuilder.getPositiveTitle());
         actionConfirm.setOnClickListener(v -> {
             if (mBuilder.hasPositiveListener()) {
@@ -97,6 +102,8 @@ public final class WalletConfirmDialog extends WalletDialog {
 
     public static final class Builder extends WalletDialogBuilder<WalletConfirmDialog, WalletConfirmDialog.Builder> {
         private CharSequence mText;
+        private boolean mTextIsSelectable = false;
+        private Typeface mTypeface;
 
         public Builder(Context context, @StringRes int title) {
             super(context, title);
@@ -119,6 +126,11 @@ public final class WalletConfirmDialog extends WalletDialog {
 
         public Builder setText(String text, Object... args) {
             mText = String.format(text, args);
+            return this;
+        }
+
+        public Builder setTextIsSelectable(boolean isSelectable) {
+            mTextIsSelectable = isSelectable;
             return this;
         }
 
@@ -189,6 +201,11 @@ public final class WalletConfirmDialog extends WalletDialog {
 
         public Builder setPositiveAction(CharSequence title, OnClickListener listener) {
             return super.setAction(BUTTON_POSITIVE, title, listener);
+        }
+
+        public Builder setTextTypeface(Typeface typeface) {
+            mTypeface = typeface;
+            return this;
         }
     }
 
