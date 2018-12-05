@@ -94,7 +94,6 @@ public class WalletModule {
         initCoreSdk(context);
         MinterBlockChainApi.initialize(debug);
         MinterExplorerApi.initialize(debug);
-        MinterExplorerApi.getInstance().setNetworkId(MinterExplorerApi.NET_ID_TESTNET_WITH_MULTISIG);
 
         Timber.uprootAll();
 
