@@ -32,7 +32,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -104,16 +103,16 @@ public class ReactiveAdapter {
 
         ProfileResult<T> out;
         try {
-            out = gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
-            }.getType());
+            if (json == null || json.isEmpty()) {
+                out = createProfileEmpty(code, message);
+            } else {
+                out = gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
+                }.getType());
+            }
+
         } catch (Exception e) {
             Timber.e(e, "Unable to parse profile error: %s", json);
-            out = new ProfileResult<>();
-            out.error = new ProfileResult.Error();
-            out.error.message = String.format("%d %s", message);
-            out.error.code = String.valueOf(code);
-            out.error.data = Collections.emptyMap();
-            out.data = null;
+            out = createProfileEmpty(code, message);
         }
 
         return out;
@@ -211,14 +210,16 @@ public class ReactiveAdapter {
 
         BCResult<T> out;
         try {
-            out = gson.fromJson(json, new TypeToken<BCResult<T>>() {
-            }.getType());
+            if (json == null || json.isEmpty()) {
+                out = createBcEmpty(code, message);
+            } else {
+                out = gson.fromJson(json, new TypeToken<BCResult<T>>() {
+                }.getType());
+            }
+
         } catch (Exception e) {
             Timber.e(e, "Unable to parse blockchain error: %s", json);
-            out = new BCResult<>();
-            out.code = null;
-            out.message = String.format("%d %s", code, message);
-            out.statusCode = code;
+            out = createBcEmpty(code, message);
         }
 
         return out;
@@ -319,15 +320,15 @@ public class ReactiveAdapter {
 
         BCExplorerResult<T> out;
         try {
-            out = gson.fromJson(json, new TypeToken<BCExplorerResult<T>>() {
-            }.getType());
+            if (json == null || json.isEmpty()) {
+                out = createBcExpEmpty(code, message);
+            } else {
+                out = gson.fromJson(json, new TypeToken<BCExplorerResult<T>>() {
+                }.getType());
+            }
         } catch (Exception e) {
             Timber.e(e, "Unable to parse explorer (blockchain) error: %s", json);
-            out = new BCExplorerResult<>();
-            out.error = new BCExplorerResult.ErrorResult();
-            out.error.code = null;
-            out.error.message = String.format("Bad response: %d %s", code, message);
-            out.statusCode = 500;
+            out = createBcExpEmpty(code, message);
         }
 
         return out;
@@ -419,14 +420,18 @@ public class ReactiveAdapter {
         };
     }
 
-    public static <T> ExpResult<T> createExpErrorResult(final String json) {
+    public static <T> ExpResult<T> createExpErrorResult(final String json, int code, String message) {
         Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
         ExpResult<T> out;
         try {
-            out = gson.fromJson(json, new TypeToken<ExpResult<T>>() {
-            }.getType());
+            if (json == null || json.isEmpty()) {
+                out = createExpEmpty(code, message);
+            } else {
+                out = gson.fromJson(json, new TypeToken<ExpResult<T>>() {
+                }.getType());
+            }
         } catch (Exception e) {
-            out = new ExpResult<>();
+            out = createExpEmpty(code, message);
         }
 
         return out;
@@ -441,10 +446,10 @@ public class ReactiveAdapter {
             errorBodyString = response.errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createExpEmpty();
+            return createExpEmpty(response.code(), response.message());
         }
 
-        return createExpErrorResult(errorBodyString);
+        return createExpErrorResult(errorBodyString, response.code(), response.message());
     }
 
     public static <T> ExpResult<T> createExpErrorResult(final HttpException exception) {
@@ -456,13 +461,16 @@ public class ReactiveAdapter {
             errorBodyString = ((HttpException) exception).response().errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createExpEmpty();
+            return createExpEmpty(exception.code(), exception.message());
         }
 
-        return createExpErrorResult(errorBodyString);
+        return createExpErrorResult(errorBodyString, exception.code(), exception.message());
     }
 
-    public static <T> ExpResult<T> createExpEmpty() {
-        return new ExpResult<>();
+    public static <T> ExpResult<T> createExpEmpty(int code, String message) {
+        ExpResult<T> out = new ExpResult<>();
+        out.code = code;
+        out.error = message;
+        return out;
     }
 }
