@@ -107,6 +107,7 @@ public class ReactiveAdapter {
             out = gson.fromJson(json, new TypeToken<ProfileResult<T>>() {
             }.getType());
         } catch (Exception e) {
+            Timber.e(e, "Unable to parse profile error: %s", json);
             out = new ProfileResult<>();
             out.error = new ProfileResult.Error();
             out.error.message = "Invalid response";
@@ -209,6 +210,7 @@ public class ReactiveAdapter {
             out = gson.fromJson(json, new TypeToken<BCResult<T>>() {
             }.getType());
         } catch (Exception e) {
+            Timber.e(e, "Unable to parse blockchain error: %s", json);
             out = new BCResult<>();
             out.code = null;
             out.message = "Invalid response";
@@ -313,6 +315,7 @@ public class ReactiveAdapter {
             out = gson.fromJson(json, new TypeToken<BCExplorerResult<T>>() {
             }.getType());
         } catch (Exception e) {
+            Timber.e(e, "Unable to parse explorer (blockchain) error: %s", json);
             out = new BCExplorerResult<>();
             out.error = new BCExplorerResult.ErrorResult();
             out.error.code = null;
