@@ -99,7 +99,7 @@ public class ReactiveAdapter {
         };
     }
 
-    public static <T> ProfileResult<T> createProfileErrorResult(final String json) {
+    public static <T> ProfileResult<T> createProfileErrorResult(final String json, int code, String message) {
         Gson gson = MinterProfileApi.getInstance().getGsonBuilder().create();
 
         ProfileResult<T> out;
@@ -110,8 +110,8 @@ public class ReactiveAdapter {
             Timber.e(e, "Unable to parse profile error: %s", json);
             out = new ProfileResult<>();
             out.error = new ProfileResult.Error();
-            out.error.message = "Invalid response";
-            out.error.code = "500";
+            out.error.message = String.format("%d %s", message);
+            out.error.code = String.valueOf(code);
             out.error.data = Collections.emptyMap();
             out.data = null;
         }
@@ -128,10 +128,10 @@ public class ReactiveAdapter {
             errorBodyString = response.errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createProfileEmpty();
+            return createProfileEmpty(response.code(), response.message());
         }
 
-        return createProfileErrorResult(errorBodyString);
+        return createProfileErrorResult(errorBodyString, response.code(), response.message());
     }
 
     public static <T> ProfileResult<T> createProfileErrorResult(final HttpException exception) {
@@ -143,14 +143,18 @@ public class ReactiveAdapter {
             errorBodyString = ((HttpException) exception).response().errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createProfileEmpty();
+            return createProfileEmpty(exception.code(), exception.message());
         }
 
-        return createProfileErrorResult(errorBodyString);
+        return createProfileErrorResult(errorBodyString, exception.code(), exception.message());
     }
 
-    public static <T> ProfileResult<T> createProfileEmpty() {
-        return new ProfileResult<>();
+    public static <T> ProfileResult<T> createProfileEmpty(int code, String message) {
+        ProfileResult<T> out = new ProfileResult<>();
+        out.error = new ProfileResult.Error();
+        out.error.code = String.valueOf(code);
+        out.error.message = String.format("%d %s", code, message);
+        return out;
     }
 
 
@@ -202,7 +206,7 @@ public class ReactiveAdapter {
         return errorRes;
     }
 
-    public static <T> BCResult<T> createBcErrorResult(final String json) {
+    public static <T> BCResult<T> createBcErrorResult(final String json, int code, String message) {
         Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
 
         BCResult<T> out;
@@ -213,8 +217,8 @@ public class ReactiveAdapter {
             Timber.e(e, "Unable to parse blockchain error: %s", json);
             out = new BCResult<>();
             out.code = null;
-            out.message = "Invalid response";
-            out.statusCode = 500;
+            out.message = String.format("%d %s", code, message);
+            out.statusCode = code;
         }
 
         return out;
@@ -229,10 +233,10 @@ public class ReactiveAdapter {
             errorBodyString = response.errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createBcEmpty();
+            return createBcEmpty(response.code(), response.message());
         }
 
-        final BCResult<T> out = createBcErrorResult(errorBodyString);
+        final BCResult<T> out = createBcErrorResult(errorBodyString, response.code(), response.message());
         out.statusCode = response.code();
         return out;
     }
@@ -246,14 +250,17 @@ public class ReactiveAdapter {
             errorBodyString = ((HttpException) exception).response().errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createBcEmpty();
+            return createBcEmpty(exception.code(), exception.message());
         }
 
-        return createBcErrorResult(errorBodyString);
+        return createBcErrorResult(errorBodyString, exception.code(), exception.message());
     }
 
-    public static <T> BCResult<T> createBcEmpty() {
-        return new BCResult<>();
+    public static <T> BCResult<T> createBcEmpty(int code, String message) {
+        BCResult<T> out = new BCResult<>();
+        out.statusCode = code;
+        out.message = String.format("%d %s", code, message);
+        return out;
     }
 
 
@@ -307,7 +314,7 @@ public class ReactiveAdapter {
         return errorRes;
     }
 
-    public static <T> BCExplorerResult<T> createBcExpErrorResult(final String json) {
+    public static <T> BCExplorerResult<T> createBcExpErrorResult(final String json, int code, String message) {
         Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
 
         BCExplorerResult<T> out;
@@ -319,7 +326,7 @@ public class ReactiveAdapter {
             out = new BCExplorerResult<>();
             out.error = new BCExplorerResult.ErrorResult();
             out.error.code = null;
-            out.error.message = "Invalid response";
+            out.error.message = String.format("Bad response: %d %s", code, message);
             out.statusCode = 500;
         }
 
@@ -335,10 +342,10 @@ public class ReactiveAdapter {
             errorBodyString = response.errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createBcExpEmpty();
+            return createBcExpEmpty(response.code(), response.message());
         }
 
-        final BCExplorerResult<T> out = createBcExpErrorResult(errorBodyString);
+        final BCExplorerResult<T> out = createBcExpErrorResult(errorBodyString, response.code(), response.message());
         out.statusCode = response.code();
         return out;
     }
@@ -352,10 +359,18 @@ public class ReactiveAdapter {
             errorBodyString = ((HttpException) exception).response().errorBody().string();
         } catch (IOException e) {
             Timber.e(e, "Unable to resolve http exception response");
-            return createBcExpEmpty();
+            return createBcExpEmpty(exception.code(), exception.message());
         }
 
-        return createBcExpErrorResult(errorBodyString);
+        return createBcExpErrorResult(errorBodyString, exception.code(), exception.message());
+    }
+
+    public static <T> BCExplorerResult<T> createBcExpEmpty(int code, String message) {
+        BCExplorerResult<T> out = new BCExplorerResult<>();
+        out.error = new BCExplorerResult.ErrorResult();
+        out.error.code = null;
+        out.error.message = String.format("%d %s", code, message);
+        return out;
     }
 
     public static <T> BCExplorerResult<T> createBcExpEmpty() {
