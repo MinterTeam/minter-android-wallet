@@ -333,7 +333,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().startDialog(ctx -> {
             try {
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
-                mAmount = null;
                 final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)
                         .setAvatarUrl(mAvatar)
