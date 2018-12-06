@@ -3,6 +3,7 @@
 ## 1.2.3
  - Fixed sounds
  - Updated SDK
+ - Fixed issues
 
 
 ## 1.2.2
