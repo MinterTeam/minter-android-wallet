@@ -182,39 +182,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .findFirst();
     }
 
-    private void onClickSubmit(View view) {
-        if (mAccount == null || mGetCoin == null || mGetAmount == null || mSpendAmount == null) {
-            return;
-        }
-
-        if (isAmountForGetting()) {
-            getAnalytics().send(AppEvent.ConvertGetExchangeButton);
-        } else {
-            getAnalytics().send(AppEvent.ConvertSpendExchangeButton);
-        }
-
-        Timber.d("Use max: %b", mUseMax);
-
-        getViewState().startDialog(ctx -> new WalletTxConvertStartDialog.Builder(ctx, "Convert coin")
-                .setAmount(isAmountForGetting() ? mGetAmount : mSpendAmount)
-                .setLabel(isAmountForGetting() ? "Buy" : "Spend")
-                .setAmountPostfix(isAmountForGetting() ? mGetCoin.toUpperCase() : mAccount.getCoin().toUpperCase())
-                .setFromCoin(mAccount.getCoin())
-                .setToCoin(mGetCoin)
-                .setPositiveAction("Convert!", (d, w) -> {
-                    final ConvertTransactionData txData = new ConvertTransactionData(
-                            mUseMax ? ConvertTransactionData.Type.SellAll : !isAmountForGetting() ? ConvertTransactionData.Type.Sell : ConvertTransactionData.Type.Buy,
-                            mGasCoin,
-                            mAccount.getCoin(),
-                            mGetCoin,
-                            isAmountForGetting() ? mGetAmount : mSpendAmount
-                    );
-
-                    onStartExecuteTransaction(txData);
-                })
-                .setNegativeAction("Cancel")
-                .create());
-    }
+    private BigDecimal mEstimate;
 
     private void onStartExecuteTransaction(final ConvertTransactionData txData) {
         getViewState().startDialog(ctx -> {
@@ -343,6 +311,41 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         }
     }
 
+    private void onClickSubmit(View view) {
+        if (mAccount == null || mGetCoin == null || mGetAmount == null || mSpendAmount == null) {
+            return;
+        }
+
+        if (isAmountForGetting()) {
+            getAnalytics().send(AppEvent.ConvertGetExchangeButton);
+        } else {
+            getAnalytics().send(AppEvent.ConvertSpendExchangeButton);
+        }
+
+        Timber.d("Use max: %b", mUseMax);
+
+        getViewState().startDialog(ctx -> new WalletTxConvertStartDialog.Builder(ctx, "Convert coin")
+                .setAmount(isAmountForGetting() ? mGetAmount : mSpendAmount)
+                .setLabel(isAmountForGetting() ? "Buy" : "Spend")
+                .setAmountPostfix(isAmountForGetting() ? mGetCoin.toUpperCase() : mAccount.getCoin().toUpperCase())
+                .setFromCoin(mAccount.getCoin())
+                .setToCoin(mGetCoin)
+                .setPositiveAction("Convert!", (d, w) -> {
+                    final ConvertTransactionData txData = new ConvertTransactionData(
+                            mUseMax ? ConvertTransactionData.Type.SellAll : !isAmountForGetting() ? ConvertTransactionData.Type.Sell : ConvertTransactionData.Type.Buy,
+                            mGasCoin,
+                            mAccount.getCoin(),
+                            mGetCoin,
+                            isAmountForGetting() ? mGetAmount : mSpendAmount,
+                            mEstimate
+                    );
+
+                    onStartExecuteTransaction(txData);
+                })
+                .setNegativeAction("Cancel")
+                .create());
+    }
+
     private void onAmountChangedInternal(Boolean incoming) {
         if (mGetCoin == null) {
             Timber.i("Can't exchange: coin is not set");
@@ -380,14 +383,17 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
                             Timber.d("Enough MNT to pay fee using MNT");
                             mGasCoin = mntAccount.get().getCoin();
+                            mEstimate = res.result.getAmount();
                             setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
                         } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
                             Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
                             mGasCoin = getAccount.get().getCoin();
+                            mEstimate = res.result.getAmountWithCommission();
                             setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission()), mAccount.getCoin()));
                         } else {
                             Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
                             mGasCoin = mntAccount.get().getCoin();
+                            mEstimate = res.result.getAmount();
                             setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
                             getViewState().setError("income_coin", "Not enough balance");
                         }
@@ -424,20 +430,22 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
                         final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
                         final Optional<AccountItem> getAccount = findAccountByCoin(mAccount.getCoin());
+
+                        mEstimate = res.result.getAmount();
+
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.SellCoin.getFee())) {
                             Timber.d("Enough MNT to pay fee using MNT");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                         } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getCommission())) {
                             Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
                             mGasCoin = getAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                         } else {
                             Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
                             mGasCoin = mntAccount.get().getCoin();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
                             getViewState().setError("income_coin", "Not enough balance");
                         }
+
+                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
 
                     }, t -> {
                         Timber.e(t, "Unable to get currency");

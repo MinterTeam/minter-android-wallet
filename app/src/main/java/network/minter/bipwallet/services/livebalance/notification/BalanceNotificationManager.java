@@ -73,7 +73,7 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
         try {
             message = mGsonBuilder.create().fromJson(json, LiveBalanceMessage.class);
         } catch (Throwable t) {
-            Timber.e(t, "Unable to decode live balance message");
+            Timber.e(t, "Unable to decode live balance message: %s", json);
             return;
         }
 

@@ -32,34 +32,29 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.centrifugal.centrifuge.android.Centrifugo;
-import com.centrifugal.centrifuge.android.config.ReconnectConfig;
-import com.centrifugal.centrifuge.android.credentials.Token;
-import com.centrifugal.centrifuge.android.credentials.User;
-import com.centrifugal.centrifuge.android.listener.ConnectionListener;
-import com.centrifugal.centrifuge.android.listener.DataMessageListener;
-import com.centrifugal.centrifuge.android.subscription.SubscriptionRequest;
-
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 
+import centrifuge.Centrifuge;
+import centrifuge.Client;
+import centrifuge.ConnectEvent;
+import centrifuge.ConnectHandler;
+import centrifuge.ErrorEvent;
+import centrifuge.ErrorHandler;
+import centrifuge.MessageEvent;
+import centrifuge.MessageHandler;
+import centrifuge.PublishEvent;
+import centrifuge.PublishHandler;
+import centrifuge.Subscription;
 import dagger.android.AndroidInjection;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.explorer.repo.ExplorerSettingsRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
-
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BalanceUpdateService extends Service {
@@ -70,9 +65,27 @@ public class BalanceUpdateService extends Service {
     @Inject ExplorerSettingsRepository settingsRepo;
     @Inject AuthSession session;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private OnMessageListener mOnMessageListener;
+    private final PublishHandler mListener = new PublishHandler() {
+        @Override
+        public void onPublish(Subscription subscription, PublishEvent publishEvent) {
+            Timber.d("OnPublish: sub=%s, ev=%s", subscription.channel(), publishEvent.toString());
+            if (mOnMessageListener != null) {
+                mOnMessageListener.onMessage(new String(publishEvent.getData()), subscription.channel());
+            }
+        }
+    };
+    private Client mClient = null;
 
-    private Centrifugo mClient = null;
-    private DataMessageListener mListener;
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        try {
+            disconnect();
+        } catch (Exception e) {
+            Timber.w(e);
+        }
+    }
 
     @Override
     public void onCreate() {
@@ -81,26 +94,39 @@ public class BalanceUpdateService extends Service {
     }
 
     @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        disconnect();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        disconnect();
+        try {
+            disconnect();
+        } catch (Exception e) {
+            Timber.w(e);
+        }
         mCompositeDisposable.clear();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        disconnect();
+        try {
+            disconnect();
+        } catch (Exception e) {
+            Timber.w(e);
+        }
         return super.onUnbind(intent);
     }
 
-    public void setOnMessageListener(DataMessageListener listener) {
-        mListener = listener;
+    public void setOnMessageListener(OnMessageListener listener) {
+        mOnMessageListener = listener;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        try {
+            connect();
+        } catch (Exception e) {
+            Timber.w(e);
+        }
+        return mBinder;
     }
 
     @Override
@@ -108,69 +134,54 @@ public class BalanceUpdateService extends Service {
         return START_STICKY;
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        connect();
-        return mBinder;
-    }
-
-    public Centrifugo getClient() {
+    public Client getClient() {
         return mClient;
     }
 
     private void connect() {
-        rxCallExp(settingsRepo.getBalanceChannel(secretStorage.getAddresses(), String.valueOf(session.getUser().getData().id)))
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> mCompositeDisposable.add(d))
-                .switchMap(res -> Observable.create((ObservableOnSubscribe<Centrifugo>) emitter -> {
-                    if (res == null || res.result == null || res.result.token == null) {
-                        return;
-                    }
+        try {
+            mClient = Centrifuge.new_("wss://rtm.explorer.minter.network/connection/websocket", Centrifuge.defaultConfig());
+            mClient.onConnect(new ConnectHandler() {
+                @Override
+                public void onConnect(Client client, ConnectEvent connectEvent) {
+                    Timber.d("Connected");
+                }
+            });
 
-                    final String uid = String.valueOf(session.getUser().getData().id);
-                    Centrifugo client = new Centrifugo.Builder("ws://rtm.explorer.minter.network/connection/websocket")
-                            .setReconnectConfig(new ReconnectConfig(10, 10, TimeUnit.SECONDS))
-                            .setUser(new User(uid, res.result.token))
-                            .setToken(new Token(res.result.token, String.valueOf(res.result.timestamp)))
-                            .build();
+            mClient.onError(new ErrorHandler() {
+                @Override
+                public void onError(Client client, ErrorEvent errorEvent) {
+                    Timber.d("OnError[%d]: %s", errorEvent.incRefnum(), errorEvent.getMessage());
+                }
+            });
 
-                    client.setConnectionListener(new ConnectionListener() {
-                        @Override
-                        public void onWebSocketOpen() {
-                            Timber.d("Opened connection");
-                        }
+            mClient.onMessage(new MessageHandler() {
+                @Override
+                public void onMessage(Client p0, MessageEvent p1) {
+                    Timber.d("OnMessage: event=%s", p1.toString());
+                }
+            });
+            mClient.connect();
 
-                        @Override
-                        public void onConnected() {
-                            Timber.d("Connected");
-                        }
-
-                        @Override
-                        public void onDisconnected(int code, String reason, boolean remote) {
-                            Timber.d("Disconnected[%d]: %s (by remote:%b)", code, reason, remote);
-                        }
-                    });
-
-                    try {
-                        client.setDataMessageListener(mListener);
-                        client.connect();
-                        client.subscribe(new SubscriptionRequest(res.result.channel, res.result.token));
-                    } catch (Throwable t) {
-                        emitter.onError(t);
-                        return;
-                    }
-
-                    emitter.onNext(client);
-                    emitter.onComplete();
-                }))
-                .subscribe(res -> mClient = res, Timber::w);
+            Subscription sub = mClient.newSubscription(secretStorage.getAddresses().get(0).toString());
+            sub.onPublish(mListener);
+            sub.subscribe();
+        } catch (Throwable t) {
+            Timber.w(t, "Unable to connect with RTM");
+        }
     }
 
     private void disconnect() {
         if (mClient == null) return;
-        mClient.disconnect();
-        mClient = null;
+        try {
+            mClient.disconnect();
+            mClient = null;
+        } catch (Exception e) {
+        }
+    }
+
+    public interface OnMessageListener {
+        void onMessage(String message, String channel);
     }
 
     public final class LocalBinder extends Binder {

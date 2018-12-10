@@ -121,3 +121,7 @@
 
 -keepattributes *Annotation*
 
+# Centrifuge
+-keep class centrifuge.** { *; }
+-keep class go.** { *; }
+

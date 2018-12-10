@@ -39,8 +39,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 54
-        versionName "1.2.3-dev09"
+        versionCode 56
+        versionName "1.2.4"
         testInstrumentationRunner "network.minter.bipwallet.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -117,9 +117,9 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.2.6"
+    minterExplorerSDK = "0.2.7"
     minterProfileSDK = "0.2.1"
-    minterBlockchainSDK = "0.3.1"
+    minterBlockchainSDK = "0.4.0"
     minterCoreSDK = "0.2.1"
 }
 
@@ -192,7 +192,7 @@ dependencies {
         exclude module: "support-v13"
     }
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
-    implementation 'network.minter.android:centrifuge-android:0.38'
+    implementation project(':centrifuge')
 
     // Annotations and DI
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
@@ -220,7 +220,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
     // networking
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'

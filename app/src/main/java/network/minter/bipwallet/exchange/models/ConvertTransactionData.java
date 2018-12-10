@@ -42,6 +42,7 @@ public final class ConvertTransactionData {
     private final String mSellCoin;
     private final String mBuyCoin;
     private final BigDecimal mAmount;
+    private final BigDecimal mEstimate;
 
     public enum Type {
         Sell,
@@ -49,12 +50,13 @@ public final class ConvertTransactionData {
         Buy,
     }
 
-    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount) {
+    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount, BigDecimal estimate) {
         mType = type;
         mGasCoin = gasCoin;
         mSellCoin = sellCoin;
         mBuyCoin = buyCoin;
         mAmount = amount;
+        mEstimate = estimate;
     }
 
     public Transaction build(BigInteger nonce) throws OperationInvalidDataException {
@@ -67,6 +69,7 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setValueToSell(mAmount)
                     .setCoinToBuy(mBuyCoin)
+                    .setMinValueToBuy(mEstimate.multiply(new BigDecimal(0.9d)))
                     .build();
         } else if (mType == Type.Buy) {
             tx = new Transaction.Builder(nonce)
@@ -75,6 +78,7 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setValueToBuy(mAmount)
                     .setCoinToBuy(mBuyCoin)
+                    .setMaxValueToSell(mEstimate.multiply(new BigDecimal(1.1d)))
                     .build();
         } else {
             tx = new Transaction.Builder(nonce)
@@ -82,6 +86,7 @@ public final class ConvertTransactionData {
                     .sellAllCoins()
                     .setCoinToSell(mSellCoin)
                     .setCoinToBuy(mBuyCoin)
+                    .setMinValueToBuy(mEstimate.multiply(new BigDecimal(0.9d)))
                     .build();
         }
 

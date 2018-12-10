@@ -1,8 +1,13 @@
 # Release Notes
 
+## 1.2.4
+ - Updated blockchain SDK (min/max values to buy/sell)
+ - New Centrifuge client
+
 ## 1.2.3
  - Fixed sounds
  - Updated SDK
+ - Fixed issues
 
 
 ## 1.2.2

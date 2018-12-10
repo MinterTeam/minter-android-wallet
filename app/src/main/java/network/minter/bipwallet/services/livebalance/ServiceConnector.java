@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -63,26 +63,36 @@ public class ServiceConnector implements ServiceConnection {
             instance = new ServiceConnector();
         }
 
-        if (!bound) {
-            Intent intent = new Intent(context, BalanceUpdateService.class);
-            context.startService(intent);
-            context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
+        try {
+            if (!bound) {
+                Intent intent = new Intent(context, BalanceUpdateService.class);
+                context.startService(intent);
+                context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
+            }
+        } catch (Throwable t) {
+            Timber.w(t, "Unble to bind");
         }
+
+
     }
 
 
     public static void release(Context context) {
-        if (bound && instance != null && service != null) {
-            try {
-                context.unbindService(instance);
-            } catch (Throwable e) {
-                Timber.i(e);
-            }
+        try {
+            if (bound && instance != null && service != null) {
+                try {
+                    context.unbindService(instance);
+                } catch (Throwable e) {
+                    Timber.i(e);
+                }
 
-            context.stopService(new Intent(context, BalanceUpdateService.class));
-            service = null;
+                context.stopService(new Intent(context, BalanceUpdateService.class));
+                service = null;
+            }
+            bound = false;
+        } catch (Throwable t) {
+            Timber.w(t, "Unable to release");
         }
-        bound = false;
     }
 
     public static Observable<BalanceUpdateService> onConnected() {

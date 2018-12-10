@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -27,9 +27,7 @@
 package network.minter.bipwallet.services.livebalance.notification;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
-import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.MinterProfileApi;
 
@@ -41,7 +39,7 @@ import network.minter.profile.MinterProfileApi;
 public class LiveBalanceMessage {
     public MinterAddress address;
     public String coin;
-    public BigInteger amount;
+    public BigDecimal amount;
 
     public MinterAddress getAddress() {
         return address;
@@ -56,10 +54,6 @@ public class LiveBalanceMessage {
     }
 
     public BigDecimal getAmount() {
-        return new BigDecimal(amount).divide(Transaction.VALUE_MUL_DEC);
-    }
-
-    public BigInteger getAmountBigInteger() {
         return amount;
     }
 }
