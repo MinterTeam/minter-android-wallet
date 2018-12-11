@@ -223,7 +223,10 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                             .delay(500, TimeUnit.MILLISECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(this::onRequestFreeCoinsSuccess, t -> onRequestFreeCoinsError(t.getMessage()))
+                            .subscribe(this::onRequestFreeCoinsSuccess, t -> {
+                                Timber.w(t);
+                                onRequestFreeCoinsError(t.getMessage());
+                            })
             );
 
             return new WalletProgressDialog.Builder(ctx, "Get free coins")

@@ -362,12 +362,12 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
-                            Timber.i(new BCExplorerResponseException(res));
                             if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
                                 mEnableUseMax.set(false);
                                 return;
                             } else {
+                                Timber.w(new BCExplorerResponseException(res));
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
                                 mEnableUseMax.set(false);
                                 return;
@@ -411,12 +411,12 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
-                            Timber.w(new BCExplorerResponseException(res));
                             if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
                                 mEnableUseMax.set(false);
                                 return;
                             } else {
+                                Timber.w(new BCExplorerResponseException(res));
                                 getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
                                 mEnableUseMax.set(false);
                                 return;
