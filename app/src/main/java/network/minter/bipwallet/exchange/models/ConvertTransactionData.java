@@ -32,6 +32,8 @@ import java.math.BigInteger;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
@@ -69,7 +71,7 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setValueToSell(mAmount)
                     .setCoinToBuy(mBuyCoin)
-                    .setMinValueToBuy(mEstimate.multiply(new BigDecimal(0.9d)))
+                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
                     .build();
         } else if (mType == Type.Buy) {
             tx = new Transaction.Builder(nonce)
@@ -78,7 +80,7 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setValueToBuy(mAmount)
                     .setCoinToBuy(mBuyCoin)
-                    .setMaxValueToSell(mEstimate.multiply(new BigDecimal(1.1d)))
+                    .setMaxValueToSell(getEstimate().multiply(new BigDecimal(1.1d)))
                     .build();
         } else {
             tx = new Transaction.Builder(nonce)
@@ -86,10 +88,14 @@ public final class ConvertTransactionData {
                     .sellAllCoins()
                     .setCoinToSell(mSellCoin)
                     .setCoinToBuy(mBuyCoin)
-                    .setMinValueToBuy(mEstimate.multiply(new BigDecimal(0.9d)))
+                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
                     .build();
         }
 
         return tx;
+    }
+
+    private BigDecimal getEstimate() {
+        return firstNonNull(mEstimate, new BigDecimal(0));
     }
 }
