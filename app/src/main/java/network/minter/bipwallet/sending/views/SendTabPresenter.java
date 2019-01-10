@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -267,7 +267,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private SearchByType getSearchByType(String input) {
-        if (input.substring(0, 2).equals(MinterSDK.PREFIX_ADDRESS) && input.length() == 42) {
+        if (MinterAddress.testString(input)) {
             // searching data by address
             return SearchByType.Address;
         } else if (input.substring(0, 1).equals("@")) {
@@ -330,8 +330,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void startSendDialog() {
+        getViewState().setConfirmIdlingState(false);
         getViewState().startDialog(ctx -> {
             try {
+                getViewState().setConfirmIdlingState(true);
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
                 final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)
@@ -404,6 +406,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onStartExecuteTransaction(boolean express) {
+        getViewState().setCompleteIdlingState(false);
+
         getViewState().startDialog(ctx -> {
             final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, R.string.please_wait)
                     .setText(R.string.tx_send_in_progress)
@@ -518,10 +522,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             return Observable.just(errorRes);
                         }
 
-                        Timber.tag("TX Send").d("Send data: gasCoin=%s, coin=%s, to=%s, amount=%s",
+                        Timber.tag("TX Send").d("Send data: gasCoin=%s, coin=%s, to=%s, from=%s, amount=%s",
                                 mFromAccount.getCoin(),
                                 mFromAccount.getCoin(),
                                 mToAddress,
+                                mFromAccount.getAddress().toString(),
                                 amountToSend
                         );
                         // creating tx
@@ -541,11 +546,18 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                         .onErrorResumeNext(convertToBcExpErrorResult())
                         );
 
-                    }).subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);
+                    })
+                    .doFinally(this::onExecuteComplete)
+                    .subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);
             unsubscribeOnDestroy(d);
 
             return dialog;
         });
+    }
+
+    private void onExecuteComplete() {
+        getViewState().setConfirmIdlingState(true);
+        getViewState().setCompleteIdlingState(true);
     }
 
     private void onFailedExecuteTransaction(final Throwable throwable) {

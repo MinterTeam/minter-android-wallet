@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,6 +34,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -80,6 +81,11 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
     private Map<Integer, HomeTabFragment> mActiveTabs = new WeakHashMap<>();
     private List<BackPressedListener> mBackPressedListeners = new ArrayList<>(1);
     private boolean mIsLowRamDevice = false;
+
+    @VisibleForTesting
+    public final Map<Integer, HomeTabFragment> getActiveTabs() {
+        return mActiveTabs;
+    }
 
     @Override
     public void setCurrentPage(int position) {

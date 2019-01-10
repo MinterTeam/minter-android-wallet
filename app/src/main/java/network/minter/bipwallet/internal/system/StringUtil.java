@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,35 +24,43 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.internal;
+package network.minter.bipwallet.internal.system;
 
-import android.app.Application;
 import android.content.Context;
-import android.support.test.runner.AndroidJUnitRunner;
-
-import com.squareup.rx2.idler.Rx2Idler;
-
-import io.reactivex.plugins.RxJavaPlugins;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.view.View;
 
 /**
- * minter-android-wallet. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-wallet. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class WalletTestRunner extends AndroidJUnitRunner {
+public final class StringUtil {
 
-    @Override
-    public Application newApplication(ClassLoader cl, String className, Context context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        return super.newApplication(cl, TestWallet.class.getName(), context);
+    public static boolean safeCompare(View context, CharSequence a, @StringRes int b) {
+        return safeCompare(a, context.getResources().getString(b));
     }
 
-    @Override
-    public void onStart() {
-        RxJavaPlugins.setInitComputationSchedulerHandler(
-                Rx2Idler.create("RxJava 2.x Computation Scheduler")
-        );
-        RxJavaPlugins.setInitIoSchedulerHandler(
-                Rx2Idler.create("RxJava 2.x IO Scheduler"));
-        super.onStart();
+    public static boolean safeCompare(View context, @StringRes int a, CharSequence b) {
+        return safeCompare(context.getResources().getString(a), b);
+    }
+
+    public static boolean safeCompare(@NonNull Context context, @StringRes int a, CharSequence b) {
+        return safeCompare(context.getResources().getString(a), b);
+    }
+
+    public static boolean safeCompare(@Nullable CharSequence a, @Nullable CharSequence b) {
+        if (a == null && b == null) {
+            return true;
+        } else if (a != null && b == null) {
+            return false;
+        } else if (a == null && b != null) {
+            return false;
+        } else if (a.length() != b.length()) {
+            return false;
+        }
+
+        return a.toString().equals(b.toString());
     }
 }

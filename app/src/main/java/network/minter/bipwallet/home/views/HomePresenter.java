@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -56,7 +56,6 @@ import static network.minter.bipwallet.internal.Wallet.app;
  */
 @InjectViewState
 public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
-
 
     private final HashMap<Integer, Integer> mBottomIdPositionMap = new HashMap<Integer, Integer>() {{
         put(R.id.bottom_coins, 0);

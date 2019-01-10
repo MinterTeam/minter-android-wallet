@@ -3,15 +3,15 @@
 
 -keepattributes *Annotation*
 
--dontnote junit.framework.**
--dontnote junit.runner.**
-
--dontwarn android.test.**
--dontwarn android.support.test.**
--dontwarn org.junit.**
--dontwarn org.hamcrest.**
--dontwarn com.squareup.javawriter.JavaWriter
+-keep class org.hamcrest.** {*;}
+-keep class junit.framework.** {*;}
+-keep class junit.runner.** {*;}
+-keep class org.junit.** { *; }
+-keep class org.mockito.** {*;}
+-keep class android.test.** {*;}
+-keep class android.support.test.** {*;}
+-keep class com.squareup.javawriter.JavaWriter {*;}
 -keep class io.reactivex.plugins.RxJavaPlugins { *; }
 -keep class io.reactivex.disposables.CompositeDisposable { *; }
-# Uncomment this if you use Mockito
-#-dontwarn org.mockito.**
+-keep class network.minter.bipwallet.* { *; }
+-keep class android.support.test.** { *; }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.data;
+package network.minter.bipwallet.tests.data;
 
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -35,8 +35,8 @@ import org.junit.runner.RunWith;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import network.minter.bipwallet.internal.TestWallet;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.tests.internal.TestWallet;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;

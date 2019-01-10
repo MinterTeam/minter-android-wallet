@@ -23,31 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.internal.helpers.forms.validators;
 
-import java.util.regex.Pattern;
+package network.minter.bipwallet.tests.internal;
+
+import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.di.HelpersModule;
+import network.minter.bipwallet.internal.di.RepoModule;
+import network.minter.bipwallet.tests.internal.di.DaggerTestWalletComponent;
+import network.minter.bipwallet.tests.internal.di.TestWalletModule;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class MinterUsernameValidator extends RegexValidator {
-    public final static Pattern PATTERN = Pattern.compile("^@[a-zA-Z0-9]{5,16}$");
+public class TestWallet extends Wallet {
 
-    public MinterUsernameValidator() {
-        super(PATTERN.pattern());
+    static {
+        sEnableInject = false;
     }
 
-    public MinterUsernameValidator(boolean required) {
-        super(PATTERN.pattern(), required);
-    }
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-    public MinterUsernameValidator(CharSequence errorMessage) {
-        super(PATTERN, errorMessage);
-    }
+        app = DaggerTestWalletComponent.builder()
+                .testWalletModule(new TestWalletModule(this))
+                .helpersModule(new HelpersModule())
+                .repoModule(new RepoModule())
+                .build();
 
-    public MinterUsernameValidator(CharSequence errorMessage, boolean required) {
-        super(PATTERN, errorMessage, required);
+        app.inject(this);
     }
 }
+

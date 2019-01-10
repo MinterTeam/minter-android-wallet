@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,7 +34,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0-rc02'
+        classpath 'com.android.tools.build:gradle:3.3.0-rc03'
         classpath 'io.fabric.tools:gradle:1.25.4'
         classpath 'com.google.gms:google-services:4.2.0'
     }

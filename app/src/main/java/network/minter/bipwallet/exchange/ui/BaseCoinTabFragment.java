@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -172,7 +172,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
     @Override
     public void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
-        new WalletAccountSelectorDialog.Builder(getActivity(), "Select account")
+        new WalletAccountSelectorDialog.Builder(getActivity(), R.string.title_select_account)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
                 .create().show();

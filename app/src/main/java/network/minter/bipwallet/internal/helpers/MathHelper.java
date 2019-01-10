@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -136,6 +136,10 @@ public final class MathHelper {
         return from.compareTo(to) <= 0;
     }
 
+    public static String bdHuman(double source) {
+        return bdHuman(new BigDecimal(source));
+    }
+
     public static String bdHuman(BigDecimal source) {
         BigDecimal num = firstNonNull(source, new BigDecimal(0));
 
@@ -153,6 +157,23 @@ public final class MathHelper {
 
         final BigDecimal out = num.setScale(4, RoundingMode.DOWN);
         return formatDecimalCurrency(out, 4, true);
+    }
+
+    public static boolean bdEQ(double a, BigDecimal b) {
+        return bdEQ(new BigDecimal(a), b);
+    }
+
+    public static boolean bdEQ(double a, double b) {
+        return bdEQ(new BigDecimal(a), new BigDecimal(b));
+    }
+
+    public static boolean bdEQ(BigDecimal a, double b) {
+        return bdEQ(a, new BigDecimal(b));
+    }
+
+    public static boolean bdEQ(BigDecimal a, BigDecimal b) {
+        if (a == null) return false;
+        return a.compareTo(b) == 0;
     }
 
     private static String formatDecimalCurrency(BigDecimal in, int fractions, boolean exactFractions) {
@@ -173,7 +194,13 @@ public final class MathHelper {
     }
 
     public static boolean bdNull(BigDecimal source) {
-        return source.setScale(18).equals(new BigDecimal("0e-18"));
+        BigDecimal test;
+        if (source.scale() > 18) {
+            test = source.setScale(18, BigDecimal.ROUND_UP);
+        } else {
+            test = source;
+        }
+        return test.setScale(18).equals(new BigDecimal("0e-18"));
     }
 
     // BigInteger

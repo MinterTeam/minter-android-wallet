@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.Patterns;
@@ -65,13 +66,16 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
+import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
+import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
@@ -101,6 +105,32 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;
 
+    @VisibleForTesting
+    private CallbackIdlingResource mConfirmDialogIdling, mCompleteDialogIdling;
+
+    @VisibleForTesting
+    public final void registerIdlings(CallbackIdlingResource confirmIdling, CallbackIdlingResource completeIdling) {
+        mConfirmDialogIdling = confirmIdling;
+        mCompleteDialogIdling = completeIdling;
+    }
+
+    @VisibleForTesting
+    @Override
+    public void setConfirmIdlingState(boolean b) {
+        if (mConfirmDialogIdling != null) {
+            mConfirmDialogIdling.setIdleState(b);
+        }
+
+    }
+
+    @VisibleForTesting
+    @Override
+    public void setCompleteIdlingState(boolean b) {
+        if (mCompleteDialogIdling != null) {
+            mCompleteDialogIdling.setIdleState(b);
+        }
+    }
+
     @Override
     public void onAttach(Context context) {
         HomeModule.getComponent().inject(this);
@@ -129,10 +159,11 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
         mInputGroup.addInput(amountInput);
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", false));
         /* ideal case */
+
         mInputGroup.addValidator(recipientInput,
                 new RegexValidator(
                         // address or username with @ at begin or email
-                        String.format("(((0|M|m)x)?([a-fA-F0-9]{40}))|(@[a-zA-Z0-9_]{5,32})|%s", Patterns.EMAIL_ADDRESS),
+                        String.format("%s|%s|%s", MinterAddress.ADDRESS_PATTERN, MinterUsernameValidator.PATTERN, Patterns.EMAIL_ADDRESS),
                         "Incorrect recipient format"
                 ));
 

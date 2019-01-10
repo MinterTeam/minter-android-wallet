@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.ui.actions;
+package network.minter.bipwallet.tests.ui.actions;
 
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,18 +24,43 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.internal;
+package network.minter.bipwallet.tests.internal;
+
+import android.app.Application;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.test.runner.AndroidJUnitRunner;
+
+import com.squareup.rx2.idler.Rx2Idler;
+
+import io.reactivex.plugins.RxJavaPlugins;
 
 /**
  * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TestWallet extends Wallet {
+public class WalletTestRunner extends AndroidJUnitRunner {
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public Application newApplication(ClassLoader cl, String className, Context context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+        return super.newApplication(cl, TestWallet.class.getName(), context);
+    }
+
+    @Override
+    public void onCreate(Bundle arguments) {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());
+        super.onCreate(arguments);
+    }
+
+    @Override
+    public void onStart() {
+        RxJavaPlugins.setInitComputationSchedulerHandler(
+                Rx2Idler.create("RxJava 2.x Computation Scheduler")
+        );
+        RxJavaPlugins.setInitIoSchedulerHandler(
+                Rx2Idler.create("RxJava 2.x IO Scheduler"));
+        super.onStart();
     }
 }
-

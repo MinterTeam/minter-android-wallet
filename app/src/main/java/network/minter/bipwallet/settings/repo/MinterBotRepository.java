@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -60,7 +60,7 @@ import timber.log.Timber;
  */
 public class MinterBotRepository extends DataRepository<MinterBotEndpoint> implements DataRepository.Configurator {
     public MinterBotRepository() {
-        super(new ApiService.Builder("https://minter-bot-wallet.dl-dev.ru/api/")
+        super(new ApiService.Builder("https://testnet.tgbot.minter.network/api/")
                 .setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY)
                 .setDebug(true)
                 .setRetrofitClientConfig(b -> {

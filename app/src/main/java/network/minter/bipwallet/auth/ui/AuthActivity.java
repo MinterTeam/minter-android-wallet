@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,6 +27,7 @@
 package network.minter.bipwallet.auth.ui;
 
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.transition.ChangeBounds;
 import android.support.transition.ChangeClipBounds;
 import android.support.transition.Slide;
@@ -37,11 +38,14 @@ import android.view.View;
 
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
 
 public class AuthActivity extends BaseMvpInjectActivity implements SplashFragment.AuthSwitchActivity {
     private SplashFragment mSplashFragment;
     private AuthFragment mAuthFragment;
+    private CallbackIdlingResource mAuthWait;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showAuth(View sharedView) {
         TransitionSet sharedSet = new TransitionSet();
@@ -65,6 +69,15 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
                 .addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView))
                 .replace(R.id.container_auth, mAuthFragment)
                 .commit();
+
+        if (mAuthWait != null) {
+            mAuthWait.setIdleState(true);
+        }
+    }
+
+    @VisibleForTesting
+    public void registerIdling(CallbackIdlingResource authWaitIdlingRes) {
+        mAuthWait = authWaitIdlingRes;
     }
 
     @Override
@@ -73,6 +86,9 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
         setContentView(R.layout.activity_auth);
         mSplashFragment = new SplashFragment();
         mAuthFragment = new AuthFragment();
+        if (mAuthWait != null) {
+            mAuthWait.setIdleState(false);
+        }
 
         getSupportFragmentManager()
                 .beginTransaction()
