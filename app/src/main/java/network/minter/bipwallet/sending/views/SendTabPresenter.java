@@ -280,6 +280,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
+        getViewState().setConfirmIdlingState(false);
         getViewState().startDialog(ctx -> {
             rxCallProfile(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
@@ -331,9 +332,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void startSendDialog() {
         getViewState().setConfirmIdlingState(false);
+        Timber.d("Confirm dialog: wait for IDLE");
         getViewState().startDialog(ctx -> {
             try {
                 getViewState().setConfirmIdlingState(true);
+                Timber.d("Confirm dialog: IDLING");
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
                 final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)

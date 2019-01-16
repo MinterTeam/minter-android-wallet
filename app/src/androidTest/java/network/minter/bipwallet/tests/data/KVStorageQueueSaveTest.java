@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.tests.data;
 
+import android.support.annotation.NonNull;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -55,10 +56,10 @@ public class KVStorageQueueSaveTest {
         Queue<QueuedObj> data = new LinkedList<>();
         data.add(new QueuedObj(1, "A"));
         data.add(new QueuedObj(2, "B"));
-        data.add(new QueuedObj(1, "C"));
-        data.add(new QueuedObj(3, "D"));
-        data.add(new QueuedObj(1, "E"));
-        data.add(new QueuedObj(4, "F"));
+        data.add(new QueuedObj(3, "C"));
+        data.add(new QueuedObj(4, "D"));
+        data.add(new QueuedObj(5, "E"));
+        data.add(new QueuedObj(6, "F"));
 
         final KVStorage storage = TestWallet.app().storage();
         storage.putQueue("test_queue", data);
@@ -88,6 +89,12 @@ public class KVStorageQueueSaveTest {
         QueuedObj(int id, String name) {
             this.id = id;
             this.name = name;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return String.format("id=%d, n=%s", id, name);
         }
     }
 }

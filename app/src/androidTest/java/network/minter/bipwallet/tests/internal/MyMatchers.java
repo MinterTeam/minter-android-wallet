@@ -92,7 +92,7 @@ public final class MyMatchers {
         };
     }
 
-    public static Matcher<View> withInputLayoutHint(@StringRes int expectedErrorTextRes) {
+    public static Matcher<View> withInputLayoutHint(@StringRes int expectedHintTextRes) {
         return new TypeSafeMatcher<View>() {
 
             @Override
@@ -104,17 +104,17 @@ public final class MyMatchers {
 
                 CharSequence inputHint = inputLayout.getHint();
                 Timber.d("Input hint: %s", inputHint);
-                return StringUtil.safeCompare(inputLayout, inputHint, expectedErrorTextRes);
+                return StringUtil.safeCompare(inputLayout, inputHint, expectedHintTextRes);
             }
 
             @Override
             public void describeTo(Description description) {
-                description.appendText(String.format("Input hint is: '%s'", Wallet.app().res().getString(expectedErrorTextRes)));
+                description.appendText(String.format("Input hint is: '%s'", Wallet.app().res().getString(expectedHintTextRes)));
             }
         };
     }
 
-    public static Matcher<View> withInputLayoutHint(final String expectedErrorText) {
+    public static Matcher<View> withInputLayoutHint(final String expectedHintText) {
         return new TypeSafeMatcher<View>() {
 
             @Override
@@ -126,12 +126,12 @@ public final class MyMatchers {
 
                 CharSequence inputHint = inputLayout.getHint();
                 Timber.d("Input hint: %s", inputHint);
-                return StringUtil.safeCompare(inputHint, expectedErrorText);
+                return StringUtil.safeCompare(inputHint, expectedHintText);
             }
 
             @Override
             public void describeTo(Description description) {
-                description.appendText(String.format("Input hint is: '%s'", expectedErrorText));
+                description.appendText(String.format("Input hint is: '%s'", expectedHintText));
             }
         };
     }

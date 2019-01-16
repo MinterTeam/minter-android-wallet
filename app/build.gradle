@@ -27,10 +27,24 @@
 plugins {
     id 'com.android.application'
     id 'io.fabric'
+//    id 'firebase.test.lab'
 }
+
+//apply plugin: 'firebase.test.lab'
 
 Properties localProps = new Properties()
 localProps.load(project.rootProject.file('local.properties').newDataInputStream())
+
+//firebaseTestLab {
+//    keyFile = file(getProperty('minter_firebase_keypath'))
+//    googleProjectId = "bip-wallet"
+//    devices {
+//        nexusEmulator {
+//            deviceIds = ["hammerhead"]
+//            androidApiLevels = [23]
+//        }
+//    }
+//}
 
 android {
     compileSdkVersion 28
@@ -85,6 +99,7 @@ android {
         }
 
         debug {
+            testCoverageEnabled = true
             signingConfig signingConfigs.config
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro', 'proguard-release-rules.pro'
@@ -124,9 +139,9 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.2.7"
+    minterExplorerSDK = "0.2.8"
     minterProfileSDK = "0.2.1"
-    minterBlockchainSDK = "0.4.0"
+    minterBlockchainSDK = "0.5.0"
     minterCoreSDK = "0.2.2"
 }
 
@@ -257,11 +272,12 @@ dependencies {
     testImplementation "org.mockito:mockito-core:2.23.4"
     androidTestImplementation 'org.mockito:mockito-android:2.23.4'
     androidTestImplementation 'com.squareup.retrofit2:retrofit-mock:2.5.0'
+    androidTestImplementation 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
 //    androidTest
     androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
-    androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.0'
+    androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
 
     androidTestAnnotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     androidTestAnnotationProcessor 'com.google.dagger:dagger-android-processor:2.16'

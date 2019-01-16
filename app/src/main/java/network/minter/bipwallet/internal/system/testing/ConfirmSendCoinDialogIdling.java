@@ -26,54 +26,14 @@
 
 package network.minter.bipwallet.internal.system.testing;
 
-import android.support.annotation.Nullable;
-import android.support.test.espresso.IdlingResource;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import timber.log.Timber;
-
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class CallbackIdlingResource implements IdlingResource {
-
-    private volatile static AtomicInteger sInc = new AtomicInteger(-1);
-    @Nullable private volatile ResourceCallback mCallback;
-    // Idleness is controlled with this boolean.
-    private AtomicBoolean mIsIdleNow = new AtomicBoolean(true);
-
-    public CallbackIdlingResource() {
-        sInc.incrementAndGet();
-    }
+public class ConfirmSendCoinDialogIdling extends CallbackIdlingResource {
 
     @Override
     public String getName() {
-        return this.getClass().getName() + "_" + String.valueOf(sInc.get());
-    }
-
-    @Override
-    public boolean isIdleNow() {
-        return mIsIdleNow.get();
-    }
-
-    @Override
-    public void registerIdleTransitionCallback(ResourceCallback callback) {
-        mCallback = callback;
-    }
-
-    /**
-     * Sets the new idle state, if isIdleNow is true, it pings the {@link ResourceCallback}.
-     * @param isIdleNow false if there are pending operations, true if idle.
-     */
-    @SuppressWarnings("ConstantConditions")
-    public void setIdleState(boolean isIdleNow) {
-        Timber.d("Set idle state %s: %b", this.getClass().getName(), isIdleNow);
-        mIsIdleNow.set(isIdleNow);
-        if (isIdleNow && mCallback != null) {
-            mCallback.onTransitionToIdle();
-        }
+        return ConfirmSendCoinDialogIdling.class.getName();
     }
 }

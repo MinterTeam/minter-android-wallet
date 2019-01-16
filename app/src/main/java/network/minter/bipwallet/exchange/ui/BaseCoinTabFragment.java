@@ -146,6 +146,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
     @Override
     public void onDestroyView() {
+        WalletDialog.releaseDialog(mCurrentDialog);
         super.onDestroyView();
         mUnbinder.unbind();
     }

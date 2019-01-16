@@ -145,6 +145,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
 
     @Override
     public void onDestroyView() {
+        WalletDialog.releaseDialog(mCurrentDialog);
         super.onDestroyView();
         mUnbinder.unbind();
     }

@@ -296,6 +296,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
                 Timber.d("Amount: %s", amountText);
                 final BigDecimal am = new BigDecimal(amountText);
+                checkZero(am);
 
                 if (isAmountForGetting()) {
                     mGetAmount = am;

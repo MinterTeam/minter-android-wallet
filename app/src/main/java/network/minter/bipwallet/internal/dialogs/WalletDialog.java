@@ -43,7 +43,6 @@ import network.minter.bipwallet.R;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class WalletDialog extends Dialog {
@@ -57,6 +56,25 @@ public abstract class WalletDialog extends Dialog {
     public static void dismissInstance(WalletDialog inputDialog) {
         if (inputDialog == null) return;
         inputDialog.dismiss();
+    }
+
+    public static <T extends WalletDialog> T switchDialogWithExecutor(Fragment fragment, T dialog, DialogExecutor executor) {
+        return switchDialogWithExecutor(fragment.getActivity(), dialog, executor);
+    }
+
+    public static <T extends WalletDialog> void releaseDialog(T dialog) {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+    }
+
+    public static <T extends WalletDialog> T switchDialogWithExecutor(Activity activity, T dialog, DialogExecutor executor) {
+        releaseDialog(dialog);
+
+        //noinspection unchecked
+        T newDialog = (T) executor.run(activity);
+        newDialog.show();
+        return newDialog;
     }
 
     @Override
@@ -78,21 +96,6 @@ public abstract class WalletDialog extends Dialog {
     @Override
     protected void onStart() {
         super.onStart();
-    }
-
-    public static <T extends WalletDialog> T switchDialogWithExecutor(Fragment fragment, T dialog, DialogExecutor executor) {
-        return switchDialogWithExecutor(fragment.getActivity(), dialog, executor);
-    }
-
-    public static <T extends WalletDialog> T switchDialogWithExecutor(Activity activity, T dialog, DialogExecutor executor) {
-        if (dialog != null && dialog.isShowing()) {
-            dialog.dismiss();
-        }
-
-        //noinspection unchecked
-        dialog = (T) executor.run(activity);
-        dialog.show();
-        return dialog;
     }
 
     public interface DialogExecutor {

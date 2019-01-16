@@ -94,11 +94,11 @@ public abstract class BaseUiTest {
     }
 
     protected void waitForBalance(BigDecimal balance) {
-        waitForBalance(10, balance);
+        waitForBalance(120, balance);
     }
 
     protected void waitForBalance(double balance) {
-        waitForBalance(10, new BigDecimal(balance));
+        waitForBalance(120, new BigDecimal(balance));
     }
 
     protected void waitForBalanceUpdate() {
@@ -134,11 +134,11 @@ public abstract class BaseUiTest {
     }
 
     protected void waitForBalanceGT(BigDecimal balance) {
-        waitForBalanceGT(10, balance);
+        waitForBalanceGT(120, balance);
     }
 
     protected void waitForBalanceGT(double balance) {
-        waitForBalanceGT(10, new BigDecimal(balance));
+        waitForBalanceGT(120, new BigDecimal(balance));
     }
 
     protected void waitForBalanceGT(int seconds, BigDecimal balance) {
@@ -158,11 +158,11 @@ public abstract class BaseUiTest {
     }
 
     protected void waitForBalanceLTE(double balance) {
-        waitForBalanceLTE(10, new BigDecimal(balance));
+        waitForBalanceLTE(120, new BigDecimal(balance));
     }
 
     protected void waitForBalanceLTE(BigDecimal balance) {
-        waitForBalanceLTE(10, balance);
+        waitForBalanceLTE(120, balance);
     }
 
     protected void waitForBalanceLTE(int seconds, BigDecimal balance) {
@@ -182,11 +182,11 @@ public abstract class BaseUiTest {
     }
 
     protected void waitForBalanceLT(double balance) {
-        waitForBalanceLT(10, new BigDecimal(balance));
+        waitForBalanceLT(120, new BigDecimal(balance));
     }
 
     protected void waitForBalanceLT(BigDecimal balance) {
-        waitForBalanceLT(10, balance);
+        waitForBalanceLT(120, balance);
     }
 
     protected void waitForBalanceLT(int seconds, BigDecimal balance) {
@@ -206,11 +206,11 @@ public abstract class BaseUiTest {
     }
 
     protected void waitForBalanceGTE(double balance) {
-        waitForBalanceGTE(10, new BigDecimal(balance));
+        waitForBalanceGTE(120, new BigDecimal(balance));
     }
 
     protected void waitForBalanceGTE(BigDecimal balance) {
-        waitForBalanceGTE(10, balance);
+        waitForBalanceGTE(120, balance);
     }
 
     protected void waitForBalanceGTE(int seconds, BigDecimal balance) {
@@ -230,7 +230,7 @@ public abstract class BaseUiTest {
     }
 
     protected void waitForBalanceMoreThanZero() {
-        waitForBalanceMoreThanZero(10);
+        waitForBalanceMoreThanZero(120);
     }
 
     protected void waitForBalanceMoreThanZero(int seconds) {
