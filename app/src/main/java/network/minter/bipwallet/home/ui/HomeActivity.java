@@ -63,6 +63,7 @@ import network.minter.bipwallet.internal.BaseMvpActivity;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.internal.system.BackPressedDelegate;
 import network.minter.bipwallet.internal.system.BackPressedListener;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import timber.log.Timber;
 
 /**
@@ -73,6 +74,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeModule.HomeView
 
     @Inject Provider<HomePresenter> presenterProvider;
     @InjectPresenter HomePresenter presenter;
+    @Inject IdlingManager idlingManager;
     @Inject @HomeTabsClasses List<Class<? extends HomeTabFragment>> tabsClasses;
 
     @BindView(R.id.navigation_bottom) BottomNavigationViewEx bottomNavigation;

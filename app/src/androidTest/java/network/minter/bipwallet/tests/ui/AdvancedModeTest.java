@@ -46,6 +46,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
+import network.minter.bipwallet.tests.internal.TestWallet;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -57,7 +58,6 @@ import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.times;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -81,26 +81,26 @@ public class AdvancedModeTest {
     @Before
     public void setUp() {
         Intents.init();
-        mActivityTestRule.getActivity().registerIdling(mAuthWaitIdlingRes);
+        TestWallet.app().storage().deleteAll();
+        TestWallet.app().secretStorage().destroy();
+
+
+        mAuthWaitIdlingRes.setIdleState(false);
         IdlingRegistry.getInstance().register(mAuthWaitIdlingRes);
+        mActivityTestRule.getActivity().getAuthFragment().registerIdling(mAuthWaitIdlingRes);
     }
 
     @After
     public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(mAuthWaitIdlingRes);
         Intents.release();
-        if (mAuthWaitIdlingRes != null) {
-            IdlingRegistry.getInstance().unregister(mAuthWaitIdlingRes);
-        }
     }
 
     @Test
-    public void advancedAuthTest() {
-
+    public void advancedAuthTest() throws Throwable {
         // STEP 1 - creating new mnemonic
         // wait for fragments
-//        waitSeconds(5);
-        ViewInteraction advanceModeButton = onView(
-                allOf(withId(R.id.action_advanced_mode), withText(R.string.btn_advanced_mode), isDisplayed()));
+        ViewInteraction advanceModeButton = onView(withId(R.id.action_advanced_mode));
         // click on advanced mode
         advanceModeButton.perform(click());
 
@@ -123,10 +123,12 @@ public class AdvancedModeTest {
 
         ViewInteraction appCompatTextView = onView(allOf(withId(R.id.action_copy), withText(R.string.btn_copy)));
         appCompatTextView.perform(scrollTo(), click());
+        final ClipboardManager[] clipboardManager = new ClipboardManager[1];
+        mActivityTestRule.runOnUiThread(() -> {
+            clipboardManager[0] = ((ClipboardManager) mActivityTestRule.getActivity().getSystemService(Context.CLIPBOARD_SERVICE));
+        });
 
-
-        ClipboardManager clipboardManager = ((ClipboardManager) mActivityTestRule.getActivity().getSystemService(Context.CLIPBOARD_SERVICE));
-        ClipData copiedMnemonic = clipboardManager.getPrimaryClip();
+        ClipData copiedMnemonic = clipboardManager[0].getPrimaryClip();
         assertNotNull("ClipData is null!", copiedMnemonic);
         CharSequence copiedMnemonicText = copiedMnemonic.getItemAt(0).getText();
         assertNotNull("Copied mnemonic is null", copiedMnemonicText);

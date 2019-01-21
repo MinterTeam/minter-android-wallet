@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -103,7 +103,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
             boolean isMain = Stream.of(mItems).filter(item -> item.isMain).count() == 0;
             safeSubscribeIoToUi(
                     rxCallProfile(myAddressRepo.addAddress(secretData.toAddressData(isMain, true, secretStorage.getEncryptionKey())))
-            ).subscribe(res -> {
+            ).calculate(res -> {
                 reload();
                 getViewState().hideProgress();
 //                mAdapter.clear();

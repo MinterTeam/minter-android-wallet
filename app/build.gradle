@@ -53,8 +53,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 59
-        versionName "1.2.6"
+        versionCode 60
+        versionName "1.2.7"
         testInstrumentationRunner "network.minter.bipwallet.tests.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -141,7 +141,7 @@ android {
 ext {
     minterExplorerSDK = "0.2.8"
     minterProfileSDK = "0.2.1"
-    minterBlockchainSDK = "0.5.0"
+    minterBlockchainSDK = "0.5.1"
     minterCoreSDK = "0.2.2"
 }
 
@@ -269,6 +269,7 @@ dependencies {
     // testing
     implementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'junit:junit:4.12'
     testImplementation "org.mockito:mockito-core:2.23.4"
     androidTestImplementation 'org.mockito:mockito-android:2.23.4'
     androidTestImplementation 'com.squareup.retrofit2:retrofit-mock:2.5.0'

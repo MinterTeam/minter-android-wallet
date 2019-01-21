@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -35,6 +35,7 @@ import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.explorer.MinterExplorerApi;
@@ -155,6 +156,12 @@ public class RepoModule {
     @WalletApp
     public BlockChainTransactionRepository provideBlockChainTxRepository() {
         return MinterBlockChainApi.getInstance().transactions();
+    }
+
+    @Provides
+    @WalletApp
+    public BlockChainBlockRepository provideBlockChainBlockRepository() {
+        return MinterBlockChainApi.getInstance().block();
     }
 
     @Provides

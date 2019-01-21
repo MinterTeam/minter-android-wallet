@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.internal.system.testing;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.test.espresso.IdlingResource;
 
@@ -34,6 +35,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import timber.log.Timber;
 
+import static network.minter.core.internal.common.Preconditions.firstNonNull;
+
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
@@ -41,17 +44,23 @@ import timber.log.Timber;
 public class CallbackIdlingResource implements IdlingResource {
 
     private volatile static AtomicInteger sInc = new AtomicInteger(-1);
+    private final String mName;
     @Nullable private volatile ResourceCallback mCallback;
     // Idleness is controlled with this boolean.
     private AtomicBoolean mIsIdleNow = new AtomicBoolean(true);
 
     public CallbackIdlingResource() {
         sInc.incrementAndGet();
+        mName = null;
+    }
+
+    public CallbackIdlingResource(@NonNull String name) {
+        mName = name;
     }
 
     @Override
     public String getName() {
-        return this.getClass().getName() + "_" + String.valueOf(sInc.get());
+        return firstNonNull(mName, this.getClass().getName() + "_" + String.valueOf(sInc.get()));
     }
 
     @Override

@@ -68,10 +68,12 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
+import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendWaitingDialog;
@@ -123,6 +125,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject ProfileInfoRepository infoRepo;
     @Inject CacheManager cache;
     @Inject RecipientAutocompleteStorage recipientStorage;
+    @Inject IdlingManager idlingManager;
     private AccountItem mFromAccount = null;
     private BigDecimal mAmount = null;
     private CharSequence mToAddress = null;
@@ -280,7 +283,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
-        getViewState().setConfirmIdlingState(false);
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
         getViewState().startDialog(ctx -> {
             rxCallProfile(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
@@ -331,11 +334,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void startSendDialog() {
-        getViewState().setConfirmIdlingState(false);
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
         Timber.d("Confirm dialog: wait for IDLE");
         getViewState().startDialog(ctx -> {
             try {
-                getViewState().setConfirmIdlingState(true);
+                idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, false);
                 Timber.d("Confirm dialog: IDLING");
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
                 final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
@@ -409,7 +412,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onStartExecuteTransaction(boolean express) {
-        getViewState().setCompleteIdlingState(false);
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_COMPLETE_DIALOG, true);
 
         getViewState().startDialog(ctx -> {
             final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, R.string.please_wait)
@@ -559,8 +562,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onExecuteComplete() {
-        getViewState().setConfirmIdlingState(true);
-        getViewState().setCompleteIdlingState(true);
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, false);
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_COMPLETE_DIALOG, false);
     }
 
     private void onFailedExecuteTransaction(final Throwable throwable) {

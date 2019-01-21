@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,6 +37,8 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.exchange.ExchangeModule.SpendCoinTabView;
 import network.minter.bipwallet.internal.data.CachedRepository;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 
@@ -52,8 +54,10 @@ public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            ExplorerCoinsRepository explorerCoinsRepository) {
-        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository);
+            ExplorerCoinsRepository explorerCoinsRepository,
+            IdlingManager idlingManager,
+            BlockChainBlockRepository blockRepo) {
+        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, blockRepo);
     }
 
     @Override

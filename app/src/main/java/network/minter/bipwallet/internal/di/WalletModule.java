@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -62,6 +62,7 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.UnzipUtil;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.MinterSDK;
 import network.minter.core.bip39.NativeBip39;
@@ -201,6 +202,12 @@ public class WalletModule {
                 .apply();
 
         return uuid;
+    }
+
+    @Provides
+    @WalletApp
+    public IdlingManager provideIdlingManager() {
+        return new IdlingManager(false);
     }
 
     @Provides

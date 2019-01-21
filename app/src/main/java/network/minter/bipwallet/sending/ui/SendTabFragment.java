@@ -34,7 +34,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.Patterns;
@@ -68,7 +67,7 @@ import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
-import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
@@ -89,6 +88,10 @@ import permissions.dispatcher.RuntimePermissions;
  */
 @RuntimePermissions
 public class SendTabFragment extends HomeTabFragment implements SendTabModule.SendView {
+    public final static String IDLE_SEND_CONFIRM_DIALOG = "IDLE_SEND_CONFIRM_DIALOG";
+    public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
+
+    @Inject IdlingManager idlingManager;
     @Inject Provider<SendTabPresenter> presenterProvider;
     @InjectPresenter SendTabPresenter presenter;
     @BindView(R.id.input_coin) AppCompatEditText coinInput;
@@ -105,42 +108,18 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;
 
-    @VisibleForTesting
-    private CallbackIdlingResource mConfirmDialogIdling, mCompleteDialogIdling;
-
-    @VisibleForTesting
-    public final void registerIdlings(CallbackIdlingResource confirmIdling, CallbackIdlingResource completeIdling) {
-        mConfirmDialogIdling = confirmIdling;
-        mCompleteDialogIdling = completeIdling;
-    }
-
-    @VisibleForTesting
-    @Override
-    public void setConfirmIdlingState(boolean b) {
-        if (mConfirmDialogIdling != null) {
-            mConfirmDialogIdling.setIdleState(b);
-        }
-
-    }
-
-    @VisibleForTesting
-    @Override
-    public void setCompleteIdlingState(boolean b) {
-        if (mCompleteDialogIdling != null) {
-            mCompleteDialogIdling.setIdleState(b);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         HomeModule.getComponent().inject(this);
         super.onAttach(context);
+        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         HomeModule.getComponent().inject(this);
         super.onCreate(savedInstanceState);
+        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG);
     }
 
     @Override

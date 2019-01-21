@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +52,7 @@ import network.minter.bipwallet.auth.AuthModule;
 import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.helpers.IntentHelper;
+import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
 
 /**
  * minter-android-wallet. 2018
@@ -64,6 +66,12 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     @BindView(R.id.action_signin) Button actionSignin;
     @BindView(R.id.action_help) Button actionHelp;
     @BindView(R.id.logo) ImageView logo;
+    private CallbackIdlingResource mAuthWait;
+
+    @VisibleForTesting
+    public void registerIdling(CallbackIdlingResource authWaitIdlingRes) {
+        mAuthWait = authWaitIdlingRes;
+    }
 
     @Override
     public void setOnCreateWallet(View.OnClickListener listener) {
@@ -116,6 +124,10 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
         ButterKnife.bind(this, view);
         ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
         startPostponedEnterTransition();
+
+        if (mAuthWait != null) {
+            mAuthWait.setIdleState(true);
+        }
 
         return view;
     }

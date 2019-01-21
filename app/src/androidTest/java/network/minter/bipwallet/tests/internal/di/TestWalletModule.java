@@ -36,6 +36,7 @@ import com.google.gson.GsonBuilder;
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
@@ -51,6 +52,7 @@ import network.minter.bipwallet.internal.di.WalletApp;
 import network.minter.bipwallet.internal.di.WalletModule;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.MinterExplorerApi;
@@ -60,6 +62,7 @@ import timber.log.Timber;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
+@SuppressWarnings("unchecked")
 @Module
 public class TestWalletModule {
     private final static Map<String, Object> sMockStorage = new HashMap<>();
@@ -94,6 +97,12 @@ public class TestWalletModule {
                 .apply();
 
         return uuid;
+    }
+
+    @Provides
+    @WalletApp
+    public IdlingManager provideIdlingManager() {
+        return new IdlingManager(true);
     }
 
     @Provides
@@ -173,7 +182,9 @@ public class TestWalletModule {
 
             @Override
             public synchronized <T> boolean putQueue(String key, Queue<T> queue) {
-                return put(key, queue);
+                // fix mutability, as we don't serialize in test case
+                final Queue<T> copy = new LinkedList<>(queue);
+                return put(key, copy);
             }
 
             @Override

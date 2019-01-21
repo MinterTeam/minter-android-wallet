@@ -26,7 +26,6 @@
 
 package network.minter.bipwallet.sending;
 
-import android.support.annotation.VisibleForTesting;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
@@ -78,11 +77,6 @@ public class SendTabModule {
         void setAmount(CharSequence amount);
         void setFee(CharSequence fee);
         void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);
-
-        @VisibleForTesting
-        void setConfirmIdlingState(boolean b);
-        @VisibleForTesting
-        void setCompleteIdlingState(boolean b);
     }
 
     public static class TxData {

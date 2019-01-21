@@ -26,9 +26,7 @@
 
 package network.minter.bipwallet.tests.ui;
 
-import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.intent.Intents;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -47,8 +45,6 @@ import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
-import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.settings.repo.MinterBotRepository;
 import network.minter.bipwallet.tests.internal.TestWallet;
 import network.minter.blockchain.models.operational.OperationType;
@@ -112,13 +108,15 @@ public class SendCoinsTabTest extends BaseUiTest {
         mActivityTestRule.launchActivity(null);
 
         Timber.d("Secret storage by address %s: %s", mAddress, TestWallet.app().secretStorage().getSecret(mAddress) != null ? "true" : "false");
-        Intents.init();
+
+        TestWallet.app().idlingManager().register();
     }
 
     @After
     public void tearDown() {
+        Timber.d("UnRegister idlings!");
+        TestWallet.app().idlingManager().unregister();
         super.tearDown();
-        Intents.release();
         mActivityTestRule.finishActivity();
     }
 
@@ -130,19 +128,9 @@ public class SendCoinsTabTest extends BaseUiTest {
         waitForBalance(100);
         // wait while balance isn't update
         waitForBalanceUpdate();
-
+        //explorer_test_api_url - https://tst.explorer.minter.network/ - http://159.89.107.246:3000
 
         BigDecimal amountToSend = new BigDecimal(10000);
-
-        // register idlings
-        SendTabFragment fragment = ((SendTabFragment) mActivityTestRule.getActivity().getActiveTabs().get(1));
-        CallbackIdlingResource confirmIdling = new CallbackIdlingResource();
-        CallbackIdlingResource completeIdling = new CallbackIdlingResource();
-
-        IdlingRegistry.getInstance().register(confirmIdling);
-        IdlingRegistry.getInstance().register(completeIdling);
-
-        fragment.registerIdlings(confirmIdling, completeIdling);
 
         SecretData sd = SecretStorage.generateAddress();
         final String address = sd.getMinterAddress().toString();
@@ -172,6 +160,7 @@ public class SendCoinsTabTest extends BaseUiTest {
 
         ViewInteraction confirm = onView(allOf(withId(R.id.action_confirm), withText(R.string.btn_send)));
         confirm.perform(click());
+//        completeIdling.setIdleState(false);
 
         onView(allOf(isDescendantOfA(withId(android.R.id.content)), withId(R.id.title)))
                 .check(matches(
@@ -189,10 +178,6 @@ public class SendCoinsTabTest extends BaseUiTest {
         // close dialog to prevent leaking
         onView(allOf(withText("Close"), withId(R.id.action_confirm))).perform(click());
 
-
-        IdlingRegistry.getInstance().unregister(confirmIdling);
-        IdlingRegistry.getInstance().unregister(completeIdling);
-
         // as before
         waitForBalance(100);
     }
@@ -203,16 +188,6 @@ public class SendCoinsTabTest extends BaseUiTest {
 
         waitForBalance(100d);
         waitForBalanceUpdate();
-
-        // register idlings
-        SendTabFragment fragment = ((SendTabFragment) mActivityTestRule.getActivity().getActiveTabs().get(1));
-        CallbackIdlingResource confirmIdling = new CallbackIdlingResource();
-        CallbackIdlingResource completeIdling = new CallbackIdlingResource();
-
-        IdlingRegistry.getInstance().register(confirmIdling);
-        IdlingRegistry.getInstance().register(completeIdling);
-
-        fragment.registerIdlings(confirmIdling, completeIdling);
 
         SecretData sd = SecretStorage.generateAddress();
         final String address = sd.getMinterAddress().toString();
@@ -252,16 +227,13 @@ public class SendCoinsTabTest extends BaseUiTest {
         // close dialog to prevent leaking
         onView(allOf(withText("Close"), withId(R.id.action_close))).perform(click());
 
-        IdlingRegistry.getInstance().unregister(confirmIdling);
-        IdlingRegistry.getInstance().unregister(completeIdling);
-
         // 100 - 1 - 0.01 fee  - 98.99
         waitForBalance(new BigDecimal(99).subtract(OperationType.SendCoin.getFee()));
 
     }
 
     @Test
-    public void testAccountSelector() {
+    public void testInputs() {
         selectTab(1);
 
         waitForBalance(100d);

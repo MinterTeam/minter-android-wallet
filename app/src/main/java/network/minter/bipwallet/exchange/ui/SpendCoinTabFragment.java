@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,6 +28,7 @@ package network.minter.bipwallet.exchange.ui;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.View;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -39,6 +40,7 @@ import javax.inject.Provider;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.exchange.ExchangeModule.SpendCoinTabView;
 import network.minter.bipwallet.exchange.views.SpendCoinTabPresenter;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 
 /**
  * minter-android-wallet. 2018
@@ -46,12 +48,25 @@ import network.minter.bipwallet.exchange.views.SpendCoinTabPresenter;
  */
 public class SpendCoinTabFragment extends BaseCoinTabFragment implements SpendCoinTabView {
 
+    public static final String IDLE_SPEND_COIN_CONFIRM_DIALOG = "IDLE_SPEND_COIN_CONFIRM_DIALOG";
+    public static final String IDLE_SPEND_COIN_COMPLETE_DIALOG = "IDLE_SPEND_COIN_COMPLETE_DIALOG";
+
     @Inject Provider<SpendCoinTabPresenter> presenterProvider;
     @InjectPresenter SpendCoinTabPresenter presenter;
+    @Inject IdlingManager idlingManager;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @VisibleForTesting
+    @Override
+    public void prepareIdlingResources() {
+        super.prepareIdlingResources();
+        idlingManager.add(IDLE_SPEND_COIN_CONFIRM_DIALOG,
+                IDLE_SPEND_COIN_COMPLETE_DIALOG,
+                IDLE_WAIT_ESTIMATE);
     }
 
     @ProvidePresenter
