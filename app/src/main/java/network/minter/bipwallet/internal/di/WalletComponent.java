@@ -56,6 +56,7 @@ import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.internal.api.ApiService;
@@ -135,6 +136,7 @@ public interface WalletComponent {
     BlockChainAccountRepository accountRepoBlockChain();
     BlockChainCoinRepository coinRepoBlockChain();
     BlockChainTransactionRepository txRepoBlockChain();
+    BlockChainBlockRepository bcBlockRepo();
 
     // test
     IdlingManager idlingManager();

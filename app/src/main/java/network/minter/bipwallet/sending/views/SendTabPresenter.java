@@ -85,6 +85,7 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
@@ -99,6 +100,7 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.createBcExpErrorResultMessage;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
@@ -123,6 +125,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject ExplorerCoinsRepository coinRepo;
     @Inject BlockChainTransactionRepository bcTxRepo;
     @Inject ProfileInfoRepository infoRepo;
+    @Inject BlockChainBlockRepository blockRepo;
     @Inject CacheManager cache;
     @Inject RecipientAutocompleteStorage recipientStorage;
     @Inject IdlingManager idlingManager;
@@ -134,6 +137,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
     private BehaviorSubject<BigDecimal> mInputChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
+    private BigInteger mGasPrice = new BigInteger("1");
     private AccountItem mLastAccount = null;
 
     private enum SearchByType {
@@ -147,6 +151,17 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Override
     public void attachView(SendTabModule.SendView view) {
         super.attachView(view);
+
+        rxCallBc(blockRepo.getMinGasPrice())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(res -> {
+                    if (res.isOk()) {
+                        mGasPrice = res.result;
+                        Timber.d("Min Gas price: %s", mGasPrice.toString());
+                    }
+                }, Timber::w);
+
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
@@ -448,6 +463,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 try {
                     final Transaction preTx = new Transaction.Builder(new BigInteger("1"))
                             .setGasCoin(mGasCoin)
+                            .setGasPrice(mGasPrice)
                             .sendCoin()
                             .setCoin(mFromAccount.coin)
                             .setTo(mToAddress)
@@ -455,7 +471,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             .build();
 
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
-                    final TransactionSign preSign = preTx.sign(preData.getPrivateKey());
+                    final TransactionSign preSign = preTx.signSingle(preData.getPrivateKey());
 
                     exchangeResolver = rxCallBcExp(cachedTxRepo.getEntity().getTransactionCommission(preSign)).onErrorResumeNext(convertToBcExpErrorResult());
                 } catch (OperationInvalidDataException e) {

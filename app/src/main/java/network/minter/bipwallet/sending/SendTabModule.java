@@ -78,8 +78,4 @@ public class SendTabModule {
         void setFee(CharSequence fee);
         void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);
     }
-
-    public static class TxData {
-
-    }
 }

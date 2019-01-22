@@ -37,7 +37,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
@@ -103,7 +102,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private String mGasCoin;
     private List<AccountItem> mAccounts = new ArrayList<>(1);
     private boolean mUseMax = false;
-    private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
     private BigInteger mGasPrice = new BigInteger("1");
 
     public BaseCoinTabPresenter(
@@ -157,17 +155,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     public void attachView(V view) {
         super.attachView(view);
 
-        if (false) {
             rxCallBc(mBlockRepo.getMinGasPrice())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
                         if (res.isOk()) {
                             mGasPrice = res.result;
+                            Timber.d("Min Gas price: %s", mGasPrice.toString());
                         }
                     }, Timber::w);
-        }
-
     }
 
     protected abstract boolean isAmountForGetting();
