@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -47,7 +47,7 @@ public class BCExplorerResultErrorMapped<Result> extends BCExplorerResult<Result
         }
         NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
         error = new BCExplorerResult.ErrorResult();
-        error.code = null;
+        error.code = -1;
         error.message = e.getUserMessage();
         result = null;
         statusCode = e.getStatusCode();

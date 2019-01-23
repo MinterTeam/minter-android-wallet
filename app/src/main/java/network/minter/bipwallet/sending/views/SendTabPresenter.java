@@ -533,14 +533,28 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             Timber.tag("TX Send").d("Subtracting sending amount (-%s): balance not enough to send", cntRes.commission);
                         }
 
+
                         // if after subtracting fee from sending sum has become less than account balance at all, returning error with message "insufficient funds"
                         if (bdLT(amountToSend, 0)) {
-                            final BigDecimal diff = mAmount.subtract(mFromAccount.getBalance());
-                            BCExplorerResult<TransactionSendResult> errorRes = createBcExpErrorResultMessage(
-                                    String.format("Insufficient funds: need %s %s", diff.toPlainString(), mFromAccount.coin.toUpperCase()),
-                                    BCResult.ResultCode.InsufficientFunds,
-                                    400
-                            );
+                            BCExplorerResult<TransactionSendResult> errorRes;
+                            final BigDecimal balanceMustBe = cntRes.commission.add(mAmount);
+                            if (bdLT(mAmount, mFromAccount.getBalance())) {
+                                final BigDecimal notEnough = cntRes.commission.subtract(mFromAccount.getBalance().subtract(mAmount));
+                                Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(notEnough));
+                                errorRes = createBcExpErrorResultMessage(
+                                        String.format("Insufficient funds: not enough %s %s, wanted: %s %s", bdHuman(notEnough), mFromAccount.getCoin(), bdHuman(balanceMustBe), mFromAccount.getCoin()),
+                                        BCResult.ResultCode.InsufficientFunds.getValue(),
+                                        400
+                                );
+                            } else {
+                                Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(balanceMustBe));
+                                errorRes = createBcExpErrorResultMessage(
+                                        String.format("Insufficient funds: wanted %s %s", bdHuman(balanceMustBe), mFromAccount.getCoin()),
+                                        BCResult.ResultCode.InsufficientFunds.getValue(),
+                                        400
+                                );
+                            }
+
                             return Observable.just(errorRes);
                         }
 
