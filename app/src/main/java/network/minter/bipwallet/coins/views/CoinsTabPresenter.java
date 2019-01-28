@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -223,13 +223,14 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                             .filter(item -> item.getCoin().equals(MinterSDK.DEFAULT_COIN))
                             .findFirst();
 
+                    final StringHelper.DecimalStringFraction num;
                     if (!defAccount.isPresent()) {
-                        final StringHelper.DecimalStringFraction num = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
-                        mBalanceCurrentState.set(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
+                        num = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
                     } else {
-                        final StringHelper.DecimalStringFraction num = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
-                        mBalanceCurrentState.set(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
+                        num = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
                     }
+
+                    mBalanceCurrentState.set(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
 
                     mBalanceCurrentState.applyTo(getViewState());
 

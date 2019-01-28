@@ -1,5 +1,16 @@
 # Release Notes
 
+## 1.2.7
+ - Updated SDK
+ - Written basic UI tests
+ - Fixed minor UI issues
+ 
+## 1.2.6 
+ - (!) unreleased
+
+## 1.2.5
+ - Fixed error while getting free coins
+
 ## 1.2.4
  - Updated blockchain SDK (min/max values to buy/sell)
  - New Centrifuge client
