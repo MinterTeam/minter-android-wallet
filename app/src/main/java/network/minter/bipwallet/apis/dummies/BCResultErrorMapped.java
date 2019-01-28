@@ -48,9 +48,10 @@ public class BCResultErrorMapped<Result> extends BCResult<Result> implements Res
 
         NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
         result = null;
-        code = null;
-        message = e.getUserMessage();
         statusCode = e.getStatusCode();
+        error = new ErrorResult();
+        error.code = ResultCode.UnknownError.getValue();
+        error.data = e.getUserMessage();
 
         return true;
     }

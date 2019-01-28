@@ -28,6 +28,7 @@ package network.minter.bipwallet.exchange.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -68,6 +69,11 @@ public class ConvertCoinActivity extends BaseMvpInjectActivity implements Exchan
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tabs) TabLayout tabs;
     @BindView(R.id.pager) ViewPager tabsPager;
+
+    @VisibleForTesting
+    public final BaseCoinTabFragment getTab(int position) {
+        return (BaseCoinTabFragment) (((FragmentStatePagerAdapter) tabsPager.getAdapter()).getItem(position));
+    }
 
     @Override
     public void setupTabs() {
@@ -131,12 +137,12 @@ public class ConvertCoinActivity extends BaseMvpInjectActivity implements Exchan
 
             @NonNull
             @Override
-            public Object instantiateItem(ViewGroup container, int position) {
+            public Object instantiateItem(@NonNull ViewGroup container, int position) {
                 return super.instantiateItem(container, position);
             }
 
             @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
+            public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
                 super.destroyItem(container, position, object);
             }
         };

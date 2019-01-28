@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,6 +27,7 @@
 package network.minter.bipwallet.auth.ui;
 
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.transition.ChangeBounds;
 import android.support.transition.ChangeClipBounds;
 import android.support.transition.Slide;
@@ -42,6 +43,7 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
     private SplashFragment mSplashFragment;
     private AuthFragment mAuthFragment;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showAuth(View sharedView) {
         TransitionSet sharedSet = new TransitionSet();
@@ -65,6 +67,11 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
                 .addSharedElement(sharedView, ViewCompat.getTransitionName(sharedView))
                 .replace(R.id.container_auth, mAuthFragment)
                 .commit();
+    }
+
+    @VisibleForTesting
+    public final AuthFragment getAuthFragment() {
+        return mAuthFragment;
     }
 
     @Override

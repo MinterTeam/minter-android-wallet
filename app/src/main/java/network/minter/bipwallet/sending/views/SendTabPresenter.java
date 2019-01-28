@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -68,10 +68,12 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
+import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendWaitingDialog;
@@ -83,6 +85,7 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
@@ -97,6 +100,7 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.createBcExpErrorResultMessage;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
@@ -121,8 +125,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject ExplorerCoinsRepository coinRepo;
     @Inject BlockChainTransactionRepository bcTxRepo;
     @Inject ProfileInfoRepository infoRepo;
+    @Inject BlockChainBlockRepository blockRepo;
     @Inject CacheManager cache;
     @Inject RecipientAutocompleteStorage recipientStorage;
+    @Inject IdlingManager idlingManager;
     private AccountItem mFromAccount = null;
     private BigDecimal mAmount = null;
     private CharSequence mToAddress = null;
@@ -131,6 +137,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
     private BehaviorSubject<BigDecimal> mInputChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
+    private BigInteger mGasPrice = new BigInteger("1");
     private AccountItem mLastAccount = null;
 
     private enum SearchByType {
@@ -144,6 +151,17 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Override
     public void attachView(SendTabModule.SendView view) {
         super.attachView(view);
+
+        rxCallBc(blockRepo.getMinGasPrice())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(res -> {
+                    if (res.isOk()) {
+                        mGasPrice = res.result;
+                        Timber.d("Min Gas price: %s", mGasPrice.toString());
+                    }
+                }, Timber::w);
+
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
@@ -267,7 +285,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private SearchByType getSearchByType(String input) {
-        if (input.substring(0, 2).equals(MinterSDK.PREFIX_ADDRESS) && input.length() == 42) {
+        if (MinterAddress.testString(input)) {
             // searching data by address
             return SearchByType.Address;
         } else if (input.substring(0, 1).equals("@")) {
@@ -280,6 +298,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
         getViewState().startDialog(ctx -> {
             rxCallProfile(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
@@ -330,8 +349,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void startSendDialog() {
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
+        Timber.d("Confirm dialog: wait for IDLE");
         getViewState().startDialog(ctx -> {
             try {
+                idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, false);
+                Timber.d("Confirm dialog: IDLING");
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
                 final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)
@@ -404,6 +427,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onStartExecuteTransaction(boolean express) {
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_COMPLETE_DIALOG, true);
+
         getViewState().startDialog(ctx -> {
             final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, R.string.please_wait)
                     .setText(R.string.tx_send_in_progress)
@@ -438,6 +463,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 try {
                     final Transaction preTx = new Transaction.Builder(new BigInteger("1"))
                             .setGasCoin(mGasCoin)
+                            .setGasPrice(mGasPrice)
                             .sendCoin()
                             .setCoin(mFromAccount.coin)
                             .setTo(mToAddress)
@@ -445,7 +471,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             .build();
 
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
-                    final TransactionSign preSign = preTx.sign(preData.getPrivateKey());
+                    final TransactionSign preSign = preTx.signSingle(preData.getPrivateKey());
 
                     exchangeResolver = rxCallBcExp(cachedTxRepo.getEntity().getTransactionCommission(preSign)).onErrorResumeNext(convertToBcExpErrorResult());
                 } catch (OperationInvalidDataException e) {
@@ -507,21 +533,36 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             Timber.tag("TX Send").d("Subtracting sending amount (-%s): balance not enough to send", cntRes.commission);
                         }
 
+
                         // if after subtracting fee from sending sum has become less than account balance at all, returning error with message "insufficient funds"
                         if (bdLT(amountToSend, 0)) {
-                            final BigDecimal diff = mAmount.subtract(mFromAccount.getBalance());
-                            BCExplorerResult<TransactionSendResult> errorRes = createBcExpErrorResultMessage(
-                                    String.format("Insufficient funds: need %s %s", diff.toPlainString(), mFromAccount.coin.toUpperCase()),
-                                    BCResult.ResultCode.InsufficientFunds,
-                                    400
-                            );
+                            BCExplorerResult<TransactionSendResult> errorRes;
+                            final BigDecimal balanceMustBe = cntRes.commission.add(mAmount);
+                            if (bdLT(mAmount, mFromAccount.getBalance())) {
+                                final BigDecimal notEnough = cntRes.commission.subtract(mFromAccount.getBalance().subtract(mAmount));
+                                Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(notEnough));
+                                errorRes = createBcExpErrorResultMessage(
+                                        String.format("Insufficient funds: not enough %s %s, wanted: %s %s", bdHuman(notEnough), mFromAccount.getCoin(), bdHuman(balanceMustBe), mFromAccount.getCoin()),
+                                        BCResult.ResultCode.InsufficientFunds.getValue(),
+                                        400
+                                );
+                            } else {
+                                Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(balanceMustBe));
+                                errorRes = createBcExpErrorResultMessage(
+                                        String.format("Insufficient funds: wanted %s %s", bdHuman(balanceMustBe), mFromAccount.getCoin()),
+                                        BCResult.ResultCode.InsufficientFunds.getValue(),
+                                        400
+                                );
+                            }
+
                             return Observable.just(errorRes);
                         }
 
-                        Timber.tag("TX Send").d("Send data: gasCoin=%s, coin=%s, to=%s, amount=%s",
+                        Timber.tag("TX Send").d("Send data: gasCoin=%s, coin=%s, to=%s, from=%s, amount=%s",
                                 mFromAccount.getCoin(),
                                 mFromAccount.getCoin(),
                                 mToAddress,
+                                mFromAccount.getAddress().toString(),
                                 amountToSend
                         );
                         // creating tx
@@ -541,11 +582,18 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                         .onErrorResumeNext(convertToBcExpErrorResult())
                         );
 
-                    }).subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);
+                    })
+                    .doFinally(this::onExecuteComplete)
+                    .subscribe(this::onSuccessExecuteTransaction, this::onFailedExecuteTransaction);
             unsubscribeOnDestroy(d);
 
             return dialog;
         });
+    }
+
+    private void onExecuteComplete() {
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, false);
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_COMPLETE_DIALOG, false);
     }
 
     private void onFailedExecuteTransaction(final Throwable throwable) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,18 +24,16 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.internal;
+package network.minter.bipwallet.internal.system.testing;
 
 /**
- * minter-android-wallet. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-wallet. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class TestWallet extends Wallet {
+public class ConfirmSendCoinDialogIdling extends CallbackIdlingResource {
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public String getName() {
+        return ConfirmSendCoinDialogIdling.class.getName();
     }
 }
-

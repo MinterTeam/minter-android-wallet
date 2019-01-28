@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -67,7 +67,8 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     public static final Locale LC_EN = Locale.US;
     @SuppressWarnings("ConstantConditions")
     public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("netTest") || BuildConfig.FLAVOR.equalsIgnoreCase("netMain");
-    private static WalletComponent app;
+    protected static WalletComponent app;
+    protected static boolean sEnableInject = true;
 
     static {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -117,13 +118,15 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
         Locale.setDefault(LC_EN);
 
 
-        app = DaggerWalletComponent.builder()
-                .walletModule(new WalletModule(this, BuildConfig.DEBUG, ENABLE_CRASHLYTICS))
-                .helpersModule(new HelpersModule())
-                .repoModule(new RepoModule())
-                .build();
+        if (sEnableInject) {
+            app = DaggerWalletComponent.builder()
+                    .walletModule(new WalletModule(this, BuildConfig.DEBUG, ENABLE_CRASHLYTICS))
+                    .helpersModule(new HelpersModule())
+                    .repoModule(new RepoModule())
+                    .build();
 
-        app.inject(this);
+            app.inject(this);
+        }
     }
 
     @Override

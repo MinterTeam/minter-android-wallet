@@ -24,33 +24,35 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
+package network.minter.bipwallet.tests.internal;
 
-import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.models.BCExplorerResult;
-import retrofit2.HttpException;
+import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.di.HelpersModule;
+import network.minter.bipwallet.internal.di.RepoModule;
+import network.minter.bipwallet.tests.internal.di.DaggerTestWalletComponent;
+import network.minter.bipwallet.tests.internal.di.TestWalletModule;
 
 /**
  * minter-android-wallet. 2018
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class BCExplorerResultErrorMapped<Result> extends BCExplorerResult<Result> implements ResultErrorMapper {
-    @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
-        }
+public class TestWallet extends Wallet {
 
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        error = new BCExplorerResult.ErrorResult();
-        error.code = -1;
-        error.message = e.getUserMessage();
-        result = null;
-        statusCode = e.getStatusCode();
-        return true;
+    static {
+        sEnableInject = false;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        app = DaggerTestWalletComponent.builder()
+                .testWalletModule(new TestWalletModule(this))
+                .helpersModule(new HelpersModule())
+                .repoModule(new RepoModule())
+                .build();
+
+        app.inject(this);
     }
 }
+

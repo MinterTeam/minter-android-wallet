@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,6 +29,7 @@ package network.minter.bipwallet.internal;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.View;
 
 import dagger.android.support.AndroidSupportInjection;
@@ -38,7 +39,6 @@ import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
@@ -51,6 +51,7 @@ public abstract class BaseInjectFragment extends BaseFragment implements ErrorVi
         }
 
         super.onCreate(savedInstanceState);
+        prepareIdlingResources();
     }
 
     @Override
@@ -59,6 +60,11 @@ public abstract class BaseInjectFragment extends BaseFragment implements ErrorVi
             AndroidSupportInjection.inject(this);
         }
         super.onAttach(context);
+        prepareIdlingResources();
+    }
+
+    @VisibleForTesting
+    public void prepareIdlingResources() {
     }
 
     @Override

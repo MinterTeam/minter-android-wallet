@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,25 +24,29 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.ui;
+package network.minter.bipwallet.tests.ui;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
+import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
+import network.minter.bipwallet.tests.internal.TestWallet;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -54,35 +58,49 @@ import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.times;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertNotNull;
-import static network.minter.bipwallet.ui.actions.BottomNavigationExAction.selectCurrentItem;
+import static network.minter.bipwallet.tests.ui.actions.BottomNavigationExAction.selectCurrentItem;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 
 @LargeTest
-@RunWith(AndroidJUnit4.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AdvancedModeTest {
+
+    private CallbackIdlingResource mAuthWaitIdlingRes = new CallbackIdlingResource();
 
     @Rule
     public ActivityTestRule<AuthActivity> mActivityTestRule = new ActivityTestRule<>(AuthActivity.class);
 
+    public AdvancedModeTest() {
+    }
+
     @Before
     public void setUp() {
         Intents.init();
+        TestWallet.app().storage().deleteAll();
+        TestWallet.app().secretStorage().destroy();
+
+
+        mAuthWaitIdlingRes.setIdleState(false);
+        IdlingRegistry.getInstance().register(mAuthWaitIdlingRes);
+        mActivityTestRule.getActivity().getAuthFragment().registerIdling(mAuthWaitIdlingRes);
+    }
+
+    @After
+    public void unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(mAuthWaitIdlingRes);
+        Intents.release();
     }
 
     @Test
-    public void advancedAuthTest() {
-
+    public void advancedAuthTest() throws Throwable {
         // STEP 1 - creating new mnemonic
         // wait for fragments
-        waitSeconds(3);
-        ViewInteraction advanceModeButton = onView(
-                allOf(withId(R.id.action_advanced_mode), withText("Advanced mode"), isDisplayed()));
+        ViewInteraction advanceModeButton = onView(withId(R.id.action_advanced_mode));
         // click on advanced mode
         advanceModeButton.perform(click());
 
@@ -91,7 +109,7 @@ public class AdvancedModeTest {
         // paste to seed invalid text
         seedInput.perform(replaceText("WTF"), closeSoftKeyboard());
 
-        ViewInteraction advancedActivateButton = onView(allOf(withId(R.id.action_activate), withText("Activate")));
+        ViewInteraction advancedActivateButton = onView(allOf(withId(R.id.action_activate), withText(R.string.btn_activate)));
 
         // try to login with invalid seed
         advancedActivateButton.perform(click());
@@ -99,16 +117,18 @@ public class AdvancedModeTest {
         // check invalid seed error
         seedInput.check(matches(hasErrorText("Phrase is not valid")));
 
-        ViewInteraction generateMnemonicButton = onView(allOf(withId(R.id.action_generate), withText("Generate Address")));
+        ViewInteraction generateMnemonicButton = onView(allOf(withId(R.id.action_generate), withText(R.string.btn_generate_address)));
         // click on generate new seed
         generateMnemonicButton.perform(click());
 
-        ViewInteraction appCompatTextView = onView(allOf(withId(R.id.action_copy), withText("Copy")));
+        ViewInteraction appCompatTextView = onView(allOf(withId(R.id.action_copy), withText(R.string.btn_copy)));
         appCompatTextView.perform(scrollTo(), click());
+        final ClipboardManager[] clipboardManager = new ClipboardManager[1];
+        mActivityTestRule.runOnUiThread(() -> {
+            clipboardManager[0] = ((ClipboardManager) mActivityTestRule.getActivity().getSystemService(Context.CLIPBOARD_SERVICE));
+        });
 
-
-        ClipboardManager clipboardManager = ((ClipboardManager) mActivityTestRule.getActivity().getSystemService(Context.CLIPBOARD_SERVICE));
-        ClipData copiedMnemonic = clipboardManager.getPrimaryClip();
+        ClipData copiedMnemonic = clipboardManager[0].getPrimaryClip();
         assertNotNull("ClipData is null!", copiedMnemonic);
         CharSequence copiedMnemonicText = copiedMnemonic.getItemAt(0).getText();
         assertNotNull("Copied mnemonic is null", copiedMnemonicText);
@@ -117,7 +137,7 @@ public class AdvancedModeTest {
         mnemonicTextView.check(matches(withText(copiedMnemonicText.toString())));
 
 
-        ViewInteraction launchWalletButton = onView(allOf(withId(R.id.action), withText("Launch the wallet")));
+        ViewInteraction launchWalletButton = onView(allOf(withId(R.id.action), withText(R.string.btn_launch_wallet)));
         launchWalletButton.check(matches(not(isEnabled())));
 
         ViewInteraction switchEnableLaunching = onView(allOf(withId(R.id.switch_save_mnemonic)));

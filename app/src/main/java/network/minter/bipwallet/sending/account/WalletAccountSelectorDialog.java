@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,6 +29,7 @@ package network.minter.bipwallet.sending.account;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -90,6 +91,10 @@ public class WalletAccountSelectorDialog extends WalletDialog {
 
         public Builder(Context context, CharSequence title) {
             super(context, title);
+        }
+
+        public Builder(Context context, @StringRes int titleRes) {
+            super(context, titleRes);
         }
 
         @Override

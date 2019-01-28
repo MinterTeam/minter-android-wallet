@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -77,9 +77,5 @@ public class SendTabModule {
         void setAmount(CharSequence amount);
         void setFee(CharSequence fee);
         void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);
-    }
-
-    public static class TxData {
-
     }
 }

@@ -24,33 +24,16 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
-
-import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.models.BCExplorerResult;
-import retrofit2.HttpException;
+package network.minter.bipwallet.internal.system.testing;
 
 /**
- * minter-android-wallet. 2018
+ * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BCExplorerResultErrorMapped<Result> extends BCExplorerResult<Result> implements ResultErrorMapper {
-    @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
-        }
+public class CompleteSendCoinDialogIdling extends CallbackIdlingResource {
 
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        error = new BCExplorerResult.ErrorResult();
-        error.code = -1;
-        error.message = e.getUserMessage();
-        result = null;
-        statusCode = e.getStatusCode();
-        return true;
+    @Override
+    public String getName() {
+        return CompleteSendCoinDialogIdling.class.getName();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -45,6 +45,7 @@ public final class ConvertTransactionData {
     private final String mBuyCoin;
     private final BigDecimal mAmount;
     private final BigDecimal mEstimate;
+    private final BigInteger mGasPrice;
 
     public enum Type {
         Sell,
@@ -52,13 +53,14 @@ public final class ConvertTransactionData {
         Buy,
     }
 
-    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount, BigDecimal estimate) {
+    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount, BigDecimal estimate, BigInteger gasPrice) {
         mType = type;
         mGasCoin = gasCoin;
         mSellCoin = sellCoin;
         mBuyCoin = buyCoin;
         mAmount = amount;
         mEstimate = estimate;
+        mGasPrice = gasPrice;
     }
 
     public Transaction build(BigInteger nonce) throws OperationInvalidDataException {
@@ -67,6 +69,7 @@ public final class ConvertTransactionData {
         if (mType == Type.Sell) {
             tx = new Transaction.Builder(nonce)
                     .setGasCoin(mGasCoin)
+                    .setGasPrice(mGasPrice)
                     .sellCoin()
                     .setCoinToSell(mSellCoin)
                     .setValueToSell(mAmount)
@@ -76,6 +79,7 @@ public final class ConvertTransactionData {
         } else if (mType == Type.Buy) {
             tx = new Transaction.Builder(nonce)
                     .setGasCoin(mGasCoin)
+                    .setGasPrice(mGasPrice)
                     .buyCoin()
                     .setCoinToSell(mSellCoin)
                     .setValueToBuy(mAmount)
@@ -85,6 +89,7 @@ public final class ConvertTransactionData {
         } else {
             tx = new Transaction.Builder(nonce)
                     .setGasCoin(mGasCoin)
+                    .setGasPrice(mGasPrice)
                     .sellAllCoins()
                     .setCoinToSell(mSellCoin)
                     .setCoinToBuy(mBuyCoin)

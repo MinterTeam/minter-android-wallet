@@ -24,33 +24,51 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
+package network.minter.bipwallet.tests.internal.di;
 
-import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.models.BCExplorerResult;
-import retrofit2.HttpException;
+import java.util.Collections;
+import java.util.Set;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.multibindings.IntoSet;
+import network.minter.bipwallet.BuildConfig;
+import network.minter.bipwallet.analytics.AnalyticsManager;
+import network.minter.bipwallet.analytics.AnalyticsProvider;
+import network.minter.bipwallet.analytics.providers.DummyProvider;
+import network.minter.bipwallet.internal.di.WalletApp;
+import network.minter.bipwallet.internal.di.annotations.AnalyticsProviders;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BCExplorerResultErrorMapped<Result> extends BCExplorerResult<Result> implements ResultErrorMapper {
-    @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
+@Module
+public class TestAnalyticsModule {
+    @Provides
+    @IntoSet
+    @AnalyticsProviders
+    @WalletApp
+    public AnalyticsProvider provideFabricAnalytics() {
+        return new DummyProvider();
+    }
+
+    @Provides
+    @IntoSet
+    @AnalyticsProviders
+    @WalletApp
+    public AnalyticsProvider provideAppMetricaAnalytics() {
+        return new DummyProvider();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Provides
+    @WalletApp
+    public AnalyticsManager provideAnalyticsManager(@AnalyticsProviders Set<AnalyticsProvider> providerSet) {
+        if (BuildConfig.FLAVOR.equalsIgnoreCase("netTest") || BuildConfig.FLAVOR.equalsIgnoreCase("netMain")) {
+            return new AnalyticsManager(providerSet);
         }
 
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        error = new BCExplorerResult.ErrorResult();
-        error.code = -1;
-        error.message = e.getUserMessage();
-        result = null;
-        statusCode = e.getStatusCode();
-        return true;
+        return new AnalyticsManager(Collections.emptySet());
     }
 }

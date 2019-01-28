@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -69,6 +69,7 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class BaseCoinTabFragment extends BaseInjectFragment implements ExchangeModule.BaseCoinTabView {
+    public static final String IDLE_WAIT_ESTIMATE = "IDLE_WAIT_ESTIMATE";
 
     @BindView(R.id.input_incoming_coin) AutoCompleteTextView inputIncomingCoin;
     @BindView(R.id.input_amount) AppCompatEditText inputAmount;
@@ -146,6 +147,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
     @Override
     public void onDestroyView() {
+        WalletDialog.releaseDialog(mCurrentDialog);
         super.onDestroyView();
         mUnbinder.unbind();
     }
@@ -172,7 +174,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
 
     @Override
     public void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
-        new WalletAccountSelectorDialog.Builder(getActivity(), "Select account")
+        new WalletAccountSelectorDialog.Builder(getActivity(), R.string.title_select_account)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
                 .create().show();

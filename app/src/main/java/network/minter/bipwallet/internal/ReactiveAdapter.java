@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -199,9 +199,10 @@ public class ReactiveAdapter {
 
     public static <T> BCResult<T> createBcErrorResultMessage(final String errorMessage, BCResult.ResultCode code, int statusCode) {
         BCResult<T> errorRes = new BCResult<>();
-        errorRes.message = errorMessage;
+        errorRes.error = new BCResult.ErrorResult();
+        errorRes.error.data = errorMessage;
+        errorRes.error.code = code.getValue();
         errorRes.statusCode = statusCode;
-        errorRes.code = code;
         return errorRes;
     }
 
@@ -260,7 +261,8 @@ public class ReactiveAdapter {
     public static <T> BCResult<T> createBcEmpty(int code, String message) {
         BCResult<T> out = new BCResult<>();
         out.statusCode = code;
-        out.message = String.format("%d %s", code, message);
+        out.error = new BCResult.ErrorResult();
+        out.error.message = String.format("%d %s", code, message);
         return out;
     }
 
@@ -306,7 +308,7 @@ public class ReactiveAdapter {
         };
     }
 
-    public static <T> BCExplorerResult<T> createBcExpErrorResultMessage(final String errorMessage, BCResult.ResultCode code, int statusCode) {
+    public static <T> BCExplorerResult<T> createBcExpErrorResultMessage(final String errorMessage, int code, int statusCode) {
         BCExplorerResult<T> errorRes = new BCExplorerResult<>();
         errorRes.error = new BCExplorerResult.ErrorResult();
         errorRes.error.message = errorMessage;
@@ -327,7 +329,7 @@ public class ReactiveAdapter {
                 }.getType());
             }
         } catch (Exception e) {
-            Timber.e(e, "Unable to parse explorer (blockchain) error: %s", json);
+            Timber.w(e, "Unable to parse explorer (blockchain) error: %s", json);
             out = createBcExpEmpty(code, message);
         }
 
@@ -369,8 +371,8 @@ public class ReactiveAdapter {
     public static <T> BCExplorerResult<T> createBcExpEmpty(int code, String message) {
         BCExplorerResult<T> out = new BCExplorerResult<>();
         out.error = new BCExplorerResult.ErrorResult();
-        out.error.code = null;
-        out.error.message = String.format("%d %s", code, message);
+        out.error.code = BCResult.ResultCode.UnknownError.getValue();
+        out.error.message = String.format("%d (%s) %s", code, out.getErrorCode().name(), message);
         return out;
     }
 

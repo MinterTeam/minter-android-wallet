@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,13 +37,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
@@ -55,34 +53,34 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.exchange.ExchangeCalculator;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.models.ConvertTransactionData;
+import network.minter.bipwallet.exchange.ui.BaseCoinTabFragment;
 import network.minter.bipwallet.exchange.ui.dialogs.WalletTxConvertStartDialog;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
-import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.core.MinterSDK;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
-import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
-import static network.minter.blockchain.models.BCResult.ResultCode.CoinNotExists;
 
 /**
  * minter-android-wallet. 2018
@@ -93,6 +91,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final CachedRepository<UserAccount, AccountStorage> mAccountStorage;
     protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;
     protected final ExplorerCoinsRepository mExplorerCoinsRepo;
+    protected final IdlingManager mIdlingManager;
+    protected final BlockChainBlockRepository mBlockRepo;
 
     private AccountItem mAccount;
     private String mGetCoin = null;
@@ -102,18 +102,22 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private String mGasCoin;
     private List<AccountItem> mAccounts = new ArrayList<>(1);
     private boolean mUseMax = false;
-    private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
+    private BigInteger mGasPrice = new BigInteger("1");
 
     public BaseCoinTabPresenter(
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
-            ExplorerCoinsRepository explorerCoinsRepository
+            ExplorerCoinsRepository explorerCoinsRepository,
+            IdlingManager idlingManager,
+            BlockChainBlockRepository blockRepo
     ) {
         mSecretStorage = secretStorage;
         mAccountStorage = accountStorage;
         mTxRepo = txRepo;
         mExplorerCoinsRepo = explorerCoinsRepository;
+        mIdlingManager = idlingManager;
+        mBlockRepo = blockRepo;
     }
 
     @Override
@@ -145,6 +149,21 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         getViewState().setOnClickSubmit(this::onClickSubmit);
 
         setCoinsAutocomplete();
+    }
+
+    @Override
+    public void attachView(V view) {
+        super.attachView(view);
+
+            rxCallBc(mBlockRepo.getMinGasPrice())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(res -> {
+                        if (res.isOk()) {
+                            mGasPrice = res.result;
+                            Timber.d("Min Gas price: %s", mGasPrice.toString());
+                        }
+                    }, Timber::w);
     }
 
     protected abstract boolean isAmountForGetting();
@@ -272,6 +291,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private void onInputChanged(EditText editText, boolean valid) {
         String text = editText.getText().toString();
 
+        Timber.d("Input changed: %s", editText.getText());
+        mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_ESTIMATE, true);
         switch (editText.getId()) {
             case R.id.input_incoming_coin:
                 mGetCoin = text;
@@ -296,6 +317,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
                 Timber.d("Amount: %s", amountText);
                 final BigDecimal am = new BigDecimal(amountText);
+                checkZero(am);
 
                 if (isAmountForGetting()) {
                     mGetAmount = am;
@@ -337,7 +359,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                             mAccount.getCoin(),
                             mGetCoin,
                             isAmountForGetting() ? mGetAmount : mSpendAmount,
-                            mEstimate
+                            mEstimate,
+                            mGasPrice
                     );
 
                     onStartExecuteTransaction(txData);
@@ -346,114 +369,53 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .create());
     }
 
+    private void onAmountChangedInternalComplete() {
+        mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_ESTIMATE, false);
+    }
+
+    /**
+     * @param incoming
+     * @TODO Decompose!
+     */
     private void onAmountChangedInternal(Boolean incoming) {
+        Timber.d("OnAmountChangedInternal");
         if (mGetCoin == null) {
             Timber.i("Can't exchange: coin is not set");
+            onAmountChangedInternalComplete();
             return;
         }
 
-        Disposable d;
-        if (incoming) {
-            // get
-            d = rxCallBcExp(mExplorerCoinsRepo.getCoinExchangeCurrencyToBuy(mAccount.getCoin(), mGetAmount, mGetCoin))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(convertToBcExpErrorResult())
-                    .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .subscribe(res -> {
-                        if (!res.isSuccess()) {
-                            if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
-                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
-                                mEnableUseMax.set(false);
-                                return;
-                            } else {
-                                Timber.w(new BCExplorerResponseException(res));
-                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
-                                mEnableUseMax.set(false);
-                                return;
-                            }
-                        }
-                        mEnableUseMax.set(true);
-                        mSpendAmount = res.result.getAmount();
-                        getViewState().setError("income_coin", null);
+        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo)
+                .setAccount(() -> mAccounts, () -> mAccount)
+                .setGetAmount(() -> mGetAmount)
+                .setSpendAmount(() -> mSpendAmount)
+                .setGetCoin(() -> mGetCoin)
+                .doOnSubscribe(this::unsubscribeOnDestroy)
+                .setOnCompleteListener(this::onAmountChangedInternalComplete)
+                .build();
 
-
-                        final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-                        final Optional<AccountItem> getAccount = findAccountByCoin(mAccount.getCoin());
-                        if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
-                            Timber.d("Enough MNT to pay fee using MNT");
-                            mGasCoin = mntAccount.get().getCoin();
-                            mEstimate = res.result.getAmount();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
-                        } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
-                            Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
-                            mGasCoin = getAccount.get().getCoin();
-                            mEstimate = res.result.getAmountWithCommission();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmountWithCommission()), mAccount.getCoin()));
-                        } else {
-                            Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
-                            mGasCoin = mntAccount.get().getCoin();
-                            mEstimate = res.result.getAmount();
-                            setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mAccount.getCoin()));
-                            getViewState().setError("income_coin", "Not enough balance");
-                        }
-
-                    }, t -> {
-                        Timber.e(t, "Unable to get currency");
-                        getViewState().setError("income_coin", "Unable to get currency");
-                    });
+        OperationType opType;
+        if (mUseMax) {
+            opType = OperationType.SellAllCoins;
+        } else if (!isAmountForGetting()) {
+            opType = OperationType.SellCoin;
         } else {
-            // spend
-            d = rxCallBcExp(mExplorerCoinsRepo.getCoinExchangeCurrencyToSell(mAccount.getCoin(), mSpendAmount, mGetCoin))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(convertToBcExpErrorResult())
-                    .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .subscribe(res -> {
-                        if (!res.isSuccess()) {
-                            if (res.getErrorCode() == null || res.statusCode == 404 || res.getErrorCode() == CoinNotExists) {
-                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), "Coin does not exists"));
-                                mEnableUseMax.set(false);
-                                return;
-                            } else {
-                                Timber.w(new BCExplorerResponseException(res));
-                                getViewState().setError("income_coin", firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
-                                mEnableUseMax.set(false);
-                                return;
-                            }
-                        }
-                        mEnableUseMax.set(true);
-                        getViewState().setError("income_coin", null);
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
-                        mGetAmount = res.result.getAmount();
-
-
-                        final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-                        final Optional<AccountItem> getAccount = findAccountByCoin(mAccount.getCoin());
-
-                        mEstimate = res.result.getAmount();
-
-                        if (bdGTE(mntAccount.get().getBalance(), OperationType.SellCoin.getFee())) {
-                            Timber.d("Enough MNT to pay fee using MNT");
-                            mGasCoin = mntAccount.get().getCoin();
-                        } else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getCommission())) {
-                            Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
-                            mGasCoin = getAccount.get().getCoin();
-                        } else {
-                            Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
-                            mGasCoin = mntAccount.get().getCoin();
-                            getViewState().setError("income_coin", "Not enough balance");
-                        }
-
-                        setCalculation(String.format("%s %s", bdHuman(res.result.getAmount()), mGetCoin));
-
-                    }, t -> {
-                        Timber.e(t, "Unable to get currency");
-                        getViewState().setError("income_coin", "Unable to get currency");
-                    });
+            opType = OperationType.BuyCoin;
         }
 
-        unsubscribeOnDestroy(d);
+        calculator.calculate(opType, res -> {
+            mEstimate = res.getEstimate();
+            mGasCoin = res.getGasCoin();
+            if (incoming) {
+                mSpendAmount = res.getAmount();
+            } else {
+                mGetAmount = res.getAmount();
+            }
+            getViewState().setCalculation(res.getCalculation());
+
+        }, err -> {
+            getViewState().setError("income_coin", err);
+        });
     }
 
     private void onAccountSelected(AccountItem accountItem, boolean initial) {

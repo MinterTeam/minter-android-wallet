@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -65,13 +65,16 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
+import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
+import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
@@ -85,6 +88,10 @@ import permissions.dispatcher.RuntimePermissions;
  */
 @RuntimePermissions
 public class SendTabFragment extends HomeTabFragment implements SendTabModule.SendView {
+    public final static String IDLE_SEND_CONFIRM_DIALOG = "IDLE_SEND_CONFIRM_DIALOG";
+    public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
+
+    @Inject IdlingManager idlingManager;
     @Inject Provider<SendTabPresenter> presenterProvider;
     @InjectPresenter SendTabPresenter presenter;
     @BindView(R.id.input_coin) AppCompatEditText coinInput;
@@ -105,16 +112,19 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     public void onAttach(Context context) {
         HomeModule.getComponent().inject(this);
         super.onAttach(context);
+        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         HomeModule.getComponent().inject(this);
         super.onCreate(savedInstanceState);
+        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG);
     }
 
     @Override
     public void onDestroyView() {
+        WalletDialog.releaseDialog(mCurrentDialog);
         super.onDestroyView();
         mUnbinder.unbind();
     }
@@ -129,10 +139,11 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
         mInputGroup.addInput(amountInput);
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", false));
         /* ideal case */
+
         mInputGroup.addValidator(recipientInput,
                 new RegexValidator(
                         // address or username with @ at begin or email
-                        String.format("(((0|M|m)x)?([a-fA-F0-9]{40}))|(@[a-zA-Z0-9_]{5,32})|%s", Patterns.EMAIL_ADDRESS),
+                        String.format("%s|%s|%s", MinterAddress.ADDRESS_PATTERN, MinterUsernameValidator.PATTERN, Patterns.EMAIL_ADDRESS),
                         "Incorrect recipient format"
                 ));
 
