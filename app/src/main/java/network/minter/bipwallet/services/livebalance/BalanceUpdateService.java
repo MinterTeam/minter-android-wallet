@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,7 +50,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
-import network.minter.explorer.repo.ExplorerSettingsRepository;
 import timber.log.Timber;
 
 /**
@@ -62,7 +61,6 @@ public class BalanceUpdateService extends Service {
     private final IBinder mBinder = new LocalBinder();
     @Inject CacheManager cache;
     @Inject SecretStorage secretStorage;
-    @Inject ExplorerSettingsRepository settingsRepo;
     @Inject AuthSession session;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private OnMessageListener mOnMessageListener;

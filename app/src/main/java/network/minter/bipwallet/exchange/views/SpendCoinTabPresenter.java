@@ -38,9 +38,13 @@ import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepositor
 import network.minter.bipwallet.exchange.ExchangeModule.SpendCoinTabView;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
+import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.repo.BlockChainBlockRepository;
+import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -63,5 +67,11 @@ public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView
     @Override
     protected boolean isAmountForGetting() {
         return false;
+    }
+
+    @Override
+    protected void onFirstViewAttach() {
+        super.onFirstViewAttach();
+        getViewState().setFee(String.format("%s %s", bdHuman(OperationType.SellCoin.getFee()), MinterSDK.DEFAULT_COIN.toUpperCase()));
     }
 }

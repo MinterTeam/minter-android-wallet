@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2019
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -210,7 +210,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_outgoing_coin"
-            app:layout_constraintBottom_toTopOf="@id/rate_attention"
+            app:layout_constraintBottom_toTopOf="@id/label_guide"
             tools:visibility="visible"
             >
 
@@ -251,6 +251,55 @@
                 />
         </android.support.constraint.ConstraintLayout>
 
+        <View
+            android:id="@+id/label_guide"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin_edges"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_calculation"
+            />
+
+        <TextView
+            android:id="@+id/fee_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:text="@string/tx_send_fee_hint"
+            android:textSize="@dimen/text_size_default"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/label_guide"
+            />
+
+        <TextView
+            android:id="@+id/fee_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:fontFamily="@font/_ubuntu_medium"
+            android:text="@string/tx_send_fee_value"
+            android:textAlignment="textEnd"
+            android:textSize="@dimen/text_size_default"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/fee_label"
+            app:layout_constraintTop_toBottomOf="@id/label_guide"
+            />
+
+        <View
+            android:id="@+id/sep2"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_edges_input"
+            android:background="@color/greySeparator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fee_value"
+            />
+
         <TextView
             android:id="@+id/rate_attention"
             android:layout_width="0dp"
@@ -263,7 +312,7 @@
             android:textSize="@dimen/text_size_14"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_calculation"
+            app:layout_constraintTop_toBottomOf="@id/sep2"
             />
 
         <network.minter.bipwallet.internal.views.widgets.WalletButton

@@ -80,6 +80,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     @BindView(R.id.layout_calculation) View calculationLayout;
     @BindView(R.id.action) Button action;
     @BindView(R.id.action_maximum) View actionMaximum;
+    @BindView(R.id.fee_value) TextView feeValue;
     private Unbinder mUnbinder;
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog;
@@ -90,6 +91,11 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
         View view = inflater.inflate(getLayout(), container, false);
         mUnbinder = ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void setFee(CharSequence commission) {
+        feeValue.setText(commission);
     }
 
     @Override

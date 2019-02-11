@@ -98,6 +98,7 @@ public class ExchangeCalculator {
 
 
                         out.mAmount = res.result.getAmount();
+                        out.mCommission = res.result.getCommission();
                         errFunc.accept(null);
 
 
@@ -156,6 +157,7 @@ public class ExchangeCalculator {
 
                         out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), targetCoin);
                         out.mAmount = res.result.getAmount();
+                        out.mCommission = res.result.getCommission();
 
 
                         final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
@@ -248,9 +250,14 @@ public class ExchangeCalculator {
         private BigDecimal mEstimate;
         private BigDecimal mAmount;
         private String mCalculation;
+        private BigDecimal mCommission;
 
         public BigDecimal getAmount() {
             return mAmount;
+        }
+
+        public BigDecimal getCommission() {
+            return mCommission;
         }
 
         public BigDecimal getEstimate() {

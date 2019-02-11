@@ -1,5 +1,8 @@
 # Release Notes
 
+## 1.2.8
+ - Showing commission for exchanging transactions
+
 ## 1.2.7
  - Updated SDK
  - Written basic UI tests

@@ -70,6 +70,7 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.repo.BlockChainBlockRepository;
+import network.minter.core.MinterSDK;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
@@ -411,6 +412,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             } else {
                 mGetAmount = res.getAmount();
             }
+
+            getViewState().setFee(String.format("%s %s", bdHuman(res.getCommission()), MinterSDK.DEFAULT_COIN.toUpperCase()));
             getViewState().setCalculation(res.getCalculation());
 
         }, err -> {
