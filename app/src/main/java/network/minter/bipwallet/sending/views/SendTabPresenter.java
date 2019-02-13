@@ -152,22 +152,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     public void attachView(SendTabModule.SendView view) {
         super.attachView(view);
 
-        rxCallBc(blockRepo.getMinGasPrice())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(res -> {
-                    if (res.isOk()) {
-                        mGasPrice = res.result;
-                        Timber.d("Min Gas price: %s", mGasPrice.toString());
-                    }
-                }, Timber::w);
-
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickScanQR(this::onClickScanQR);
         getViewState().setOnClickMaximum(this::onClickMaximum);
-        getViewState().setFee(String.format("%s %s", bdHuman(OperationType.SendCoin.getFee()), MinterSDK.DEFAULT_COIN.toUpperCase()));
+        setFee();
         accountStorage.update();
     }
 
@@ -220,6 +210,22 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid && checkZero(mAmount)));
     }
 
+    private void setFee() {
+        rxCallBc(blockRepo.getMinGasPrice())
+                .subscribeOn(Schedulers.io())
+                .toFlowable(BackpressureStrategy.LATEST)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (res.isOk()) {
+                        mGasPrice = res.result;
+                        Timber.d("Min Gas price: %s", mGasPrice.toString());
+                        final BigDecimal fee = OperationType.SendCoin.getFee().multiply(new BigDecimal(mGasPrice));
+                        getViewState().setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN.toUpperCase()));
+                    }
+                }, Timber::w);
+    }
+
     private void setRecipientAutocomplete() {
         if (true) {
             // FIXME some cases working wrong, this task is low priority, so just disable it for now
@@ -255,6 +261,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private void onAmountChanged(BigDecimal amount) {
         checkZero(amount);
         mEnableUseMax.set(false);
+        setFee();
     }
 
     private void onClickScanQR(View view) {

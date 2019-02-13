@@ -31,22 +31,30 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
+import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.models.ExchangeSellValue;
 import network.minter.blockchain.models.operational.OperationType;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
@@ -73,19 +81,30 @@ public class ExchangeCalculator {
         final String sourceCoin = mBuilder.mAccount.get().getCoin();
         final String targetCoin = mBuilder.mGetCoin.get();
 
-
         if (opType == OperationType.BuyCoin) {
             // get
-            rxCallBcExp(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
+            Observable.combineLatest(
+                    rxCallBcExp(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin)),
+                    rxCallBc(mBuilder.mBlockRepo.getMinGasPrice()),
+                    (exResult, minGasResult) -> {
+                        if (!exResult.isSuccess())
+                            return exResult;
+
+                        exResult.result.commission = exResult.result.commission.multiply(minGasResult.result);
+                        Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
+                        return exResult;
+                    }
+            )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcExpErrorResult())
                     .doOnSubscribe(mBuilder.mDisposableConsumer)
-                    .doFinally(mBuilder.mOnCompleteListener)
+                    .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
+                    }))
                     .subscribe(res -> {
                         if (!res.isSuccess()) {
                             if (res.statusCode == 404 || res.statusCode == 400 || res.getErrorCode() == CoinNotExists) {
-                                errFunc.accept(firstNonNull(res.getMessage(), "Coin does not exists"));
+                                errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
                                 Timber.w(new BCExplorerResponseException(res));
@@ -94,13 +113,12 @@ public class ExchangeCalculator {
                             }
                         }
 
-                        CalculationResult out = new CalculationResult();
+                        final CalculationResult out = new CalculationResult();
 
 
                         out.mAmount = res.result.getAmount();
                         out.mCommission = res.result.getCommission();
                         errFunc.accept(null);
-
 
                         final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
                         final Optional<AccountItem> getAccount = findAccountByCoin(sourceCoin);
@@ -126,24 +144,39 @@ public class ExchangeCalculator {
                             out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), sourceCoin);
                             errFunc.accept("Not enough balance");
                         }
-                        onResult.accept(out);
 
+                        onResult.accept(out);
                     }, t -> {
                         Timber.e(t, "Unable to get currency");
                         errFunc.accept("Unable to get currency");
                     });
         } else {
             // spend
-            rxCallBcExp(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
+            Observable.combineLatest(
+                    rxCallBcExp(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin)),
+                    rxCallBc(mBuilder.mBlockRepo.getMinGasPrice()),
+                    new BiFunction<BCExplorerResult<ExchangeSellValue>, BCResult<BigInteger>, BCExplorerResult<ExchangeSellValue>>() {
+                        @Override
+                        public BCExplorerResult<ExchangeSellValue> apply(BCExplorerResult<ExchangeSellValue> exResult, BCResult<BigInteger> minGasResult) {
+                            if (!exResult.isSuccess())
+                                return exResult;
+                            exResult.result.commission = exResult.result.commission.multiply(minGasResult.result);
+                            Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
+                            return exResult;
+                        }
+                    }
+            )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcExpErrorResult())
                     .doOnSubscribe(mBuilder.mDisposableConsumer)
-                    .doFinally(mBuilder.mOnCompleteListener)
+                    .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
+                    }))
                     .subscribe(res -> {
+                        final BCExplorerResult<ExchangeSellValue> sv = res;
                         if (!res.isSuccess()) {
                             if (res.statusCode == 404 || res.statusCode == 400 || res.getErrorCode() == CoinNotExists) {
-                                errFunc.accept(firstNonNull(res.getMessage(), "Coin does not exists"));
+                                errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
                                 Timber.w(new BCExplorerResponseException(res));
@@ -181,7 +214,6 @@ public class ExchangeCalculator {
                         }
 
                         onResult.accept(out);
-
                     }, t -> {
                         Timber.e(t, "Unable to get currency");
                         errFunc.accept("Unable to get currency");
@@ -197,6 +229,7 @@ public class ExchangeCalculator {
 
     public static final class Builder {
         private final ExplorerCoinsRepository mCoinsRepo;
+        private final BlockChainBlockRepository mBlockRepo;
         private Action mOnCompleteListener;
         private Consumer<? super Disposable> mDisposableConsumer;
         private Lazy<List<AccountItem>> mAccounts;
@@ -204,8 +237,9 @@ public class ExchangeCalculator {
         private Lazy<BigDecimal> mGetAmount, mSpendAmount;
         private Lazy<String> mGetCoin;
 
-        public Builder(ExplorerCoinsRepository repo) {
+        public Builder(ExplorerCoinsRepository repo, BlockChainBlockRepository blockRepo) {
             mCoinsRepo = repo;
+            mBlockRepo = blockRepo;
         }
 
         public Builder setAccount(Lazy<List<AccountItem>> accounts, Lazy<AccountItem> account) {
@@ -251,6 +285,7 @@ public class ExchangeCalculator {
         private BigDecimal mAmount;
         private String mCalculation;
         private BigDecimal mCommission;
+        private BigInteger mGasPrice = new BigInteger("1");
 
         public BigDecimal getAmount() {
             return mAmount;

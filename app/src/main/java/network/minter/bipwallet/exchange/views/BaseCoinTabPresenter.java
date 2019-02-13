@@ -386,13 +386,13 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
-        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo)
+        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo, mBlockRepo)
                 .setAccount(() -> mAccounts, () -> mAccount)
                 .setGetAmount(() -> mGetAmount)
                 .setSpendAmount(() -> mSpendAmount)
                 .setGetCoin(() -> mGetCoin)
                 .doOnSubscribe(this::unsubscribeOnDestroy)
-                .setOnCompleteListener(this::onAmountChangedInternalComplete)
+//                .setOnCompleteListener(this::onAmountChangedInternalComplete)
                 .build();
 
         OperationType opType;
@@ -415,9 +415,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
             getViewState().setFee(String.format("%s %s", bdHuman(res.getCommission()), MinterSDK.DEFAULT_COIN.toUpperCase()));
             getViewState().setCalculation(res.getCalculation());
-
+            onAmountChangedInternalComplete();
         }, err -> {
             getViewState().setError("income_coin", err);
+            onAmountChangedInternalComplete();
         });
     }
 

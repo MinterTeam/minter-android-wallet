@@ -50,7 +50,6 @@ import network.minter.profile.models.User;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Module
