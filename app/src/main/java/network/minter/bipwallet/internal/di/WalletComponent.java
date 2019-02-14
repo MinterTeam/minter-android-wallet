@@ -63,8 +63,8 @@ import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
-import network.minter.explorer.repo.ExplorerSettingsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
+import network.minter.explorer.repo.GateGasRepository;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileAuthRepository;
@@ -73,7 +73,6 @@ import network.minter.profile.repo.ProfileRepository;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Component(modules = {
@@ -131,7 +130,7 @@ public interface WalletComponent {
     ExplorerTransactionRepository explorerTransactionsRepo();
     ExplorerAddressRepository addressExplorerRepo();
     ExplorerCoinsRepository explorerCoinsRepo();
-    ExplorerSettingsRepository explorerSettingsRepo();
+    GateGasRepository gasRepo();
     // blockchain
     BlockChainAccountRepository accountRepoBlockChain();
     BlockChainCoinRepository coinRepoBlockChain();

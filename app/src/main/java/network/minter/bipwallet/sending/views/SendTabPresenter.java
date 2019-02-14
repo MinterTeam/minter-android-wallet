@@ -85,13 +85,13 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateGasRepository;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
@@ -100,8 +100,8 @@ import timber.log.Timber;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.createBcExpErrorResultMessage;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallGate;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
@@ -125,7 +125,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject ExplorerCoinsRepository coinRepo;
     @Inject BlockChainTransactionRepository bcTxRepo;
     @Inject ProfileInfoRepository infoRepo;
-    @Inject BlockChainBlockRepository blockRepo;
+    @Inject GateGasRepository gasRepo;
     @Inject CacheManager cache;
     @Inject RecipientAutocompleteStorage recipientStorage;
     @Inject IdlingManager idlingManager;
@@ -211,14 +211,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void setFee() {
-        rxCallBc(blockRepo.getMinGasPrice())
+        rxCallGate(gasRepo.getMinGas())
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
                     if (res.isOk()) {
-                        mGasPrice = res.result;
+                        mGasPrice = res.data.gas;
                         Timber.d("Min Gas price: %s", mGasPrice.toString());
                         final BigDecimal fee = OperationType.SendCoin.getFee().multiply(new BigDecimal(mGasPrice));
                         getViewState().setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN.toUpperCase()));

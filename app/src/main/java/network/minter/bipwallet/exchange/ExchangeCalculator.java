@@ -38,24 +38,23 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
-import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.ExchangeSellValue;
 import network.minter.blockchain.models.operational.OperationType;
-import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateGasRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
+import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallGate;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -85,12 +84,12 @@ public class ExchangeCalculator {
             // get
             Observable.combineLatest(
                     rxCallBcExp(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin)),
-                    rxCallBc(mBuilder.mBlockRepo.getMinGasPrice()),
+                    rxCallBc(mBuilder.mGasRepo.getMinGas()),
                     (exResult, minGasResult) -> {
-                        if (!exResult.isSuccess())
+                        if (!exResult.isOk() || !minGasResult.isOk())
                             return exResult;
 
-                        exResult.result.commission = exResult.result.commission.multiply(minGasResult.result);
+                        exResult.result.commission = exResult.result.commission.multiply(minGasResult.data.gas);
                         Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
                         return exResult;
                     }
@@ -154,17 +153,15 @@ public class ExchangeCalculator {
             // spend
             Observable.combineLatest(
                     rxCallBcExp(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin)),
-                    rxCallBc(mBuilder.mBlockRepo.getMinGasPrice()),
-                    new BiFunction<BCExplorerResult<ExchangeSellValue>, BCResult<BigInteger>, BCExplorerResult<ExchangeSellValue>>() {
-                        @Override
-                        public BCExplorerResult<ExchangeSellValue> apply(BCExplorerResult<ExchangeSellValue> exResult, BCResult<BigInteger> minGasResult) {
-                            if (!exResult.isSuccess())
-                                return exResult;
-                            exResult.result.commission = exResult.result.commission.multiply(minGasResult.result);
-                            Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
+                    rxCallGate(mBuilder.mGasRepo.getMinGas()),
+                    (exResult, minGasResult) -> {
+                        if (!exResult.isOk() || !minGasResult.isOk())
                             return exResult;
-                        }
+                        exResult.result.commission = exResult.result.commission.multiply(minGasResult.data.gas);
+                        Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
+                        return exResult;
                     }
+
             )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -229,7 +226,7 @@ public class ExchangeCalculator {
 
     public static final class Builder {
         private final ExplorerCoinsRepository mCoinsRepo;
-        private final BlockChainBlockRepository mBlockRepo;
+        private final GateGasRepository mGasRepo;
         private Action mOnCompleteListener;
         private Consumer<? super Disposable> mDisposableConsumer;
         private Lazy<List<AccountItem>> mAccounts;
@@ -237,9 +234,9 @@ public class ExchangeCalculator {
         private Lazy<BigDecimal> mGetAmount, mSpendAmount;
         private Lazy<String> mGetCoin;
 
-        public Builder(ExplorerCoinsRepository repo, BlockChainBlockRepository blockRepo) {
+        public Builder(ExplorerCoinsRepository repo, GateGasRepository gasRepo) {
             mCoinsRepo = repo;
-            mBlockRepo = blockRepo;
+            mGasRepo = gasRepo;
         }
 
         public Builder setAccount(Lazy<List<AccountItem>> accounts, Lazy<AccountItem> account) {

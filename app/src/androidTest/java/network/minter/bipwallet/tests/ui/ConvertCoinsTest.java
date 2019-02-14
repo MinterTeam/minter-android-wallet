@@ -114,7 +114,7 @@ public class ConvertCoinsTest extends BaseUiTest {
                 .blockingFirst();
 
         if (coins.error != null) {
-            throw new RuntimeException(coins.error);
+            throw new RuntimeException(coins.error.getMessage());
         }
 
         Optional<CoinItem> coin = Stream.of(coins.result)

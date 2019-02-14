@@ -114,6 +114,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro', 'proguard-release-rules.pro'
+            testCoverageEnabled false
         }
 
         debugTest {
@@ -156,7 +157,7 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.2.9"
+    minterExplorerSDK = "0.3.1"
     minterProfileSDK = "0.2.1"
     minterBlockchainSDK = "0.5.2"
     minterCoreSDK = "0.2.2"
@@ -217,8 +218,8 @@ dependencies {
     implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:android-integration:3.3.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'org.parceler:parceler-api:1.1.11'
-    annotationProcessor 'org.parceler:parceler:1.1.11'
+    implementation 'org.parceler:parceler-api:1.1.12'
+    annotationProcessor 'org.parceler:parceler:1.1.12'
     implementation 'com.orhanobut:hawk:2.0.1'
     implementation 'com.annimon:stream:1.2.0'
     implementation 'net.danlew:android.joda:2.9.9.1'

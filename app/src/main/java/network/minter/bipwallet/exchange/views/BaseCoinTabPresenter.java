@@ -69,11 +69,11 @@ import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateGasRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
@@ -93,7 +93,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;
     protected final ExplorerCoinsRepository mExplorerCoinsRepo;
     protected final IdlingManager mIdlingManager;
-    protected final BlockChainBlockRepository mBlockRepo;
+    protected final GateGasRepository mGasRepo;
 
     private AccountItem mAccount;
     private String mGetCoin = null;
@@ -111,14 +111,14 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
-            BlockChainBlockRepository blockRepo
+            GateGasRepository gasRepo
     ) {
         mSecretStorage = secretStorage;
         mAccountStorage = accountStorage;
         mTxRepo = txRepo;
         mExplorerCoinsRepo = explorerCoinsRepository;
         mIdlingManager = idlingManager;
-        mBlockRepo = blockRepo;
+        mGasRepo = gasRepo;
     }
 
     @Override
@@ -156,12 +156,12 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     public void attachView(V view) {
         super.attachView(view);
 
-            rxCallBc(mBlockRepo.getMinGasPrice())
+        rxCallBc(mGasRepo.getMinGas())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
                         if (res.isOk()) {
-                            mGasPrice = res.result;
+                            mGasPrice = res.data.gas;
                             Timber.d("Min Gas price: %s", mGasPrice.toString());
                         }
                     }, Timber::w);
@@ -386,7 +386,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
-        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo, mBlockRepo)
+        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo, mGasRepo)
                 .setAccount(() -> mAccounts, () -> mAccount)
                 .setGetAmount(() -> mGetAmount)
                 .setSpendAmount(() -> mSpendAmount)

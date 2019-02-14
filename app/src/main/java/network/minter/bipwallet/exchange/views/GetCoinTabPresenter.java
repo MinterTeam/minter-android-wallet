@@ -39,10 +39,10 @@ import network.minter.bipwallet.exchange.ExchangeModule.GetCoinTabView;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.models.operational.OperationType;
-import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateGasRepository;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
@@ -60,8 +60,8 @@ public class GetCoinTabPresenter extends BaseCoinTabPresenter<GetCoinTabView> {
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
-            BlockChainBlockRepository blockRepo) {
-        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, blockRepo);
+            GateGasRepository gasRepo) {
+        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, gasRepo);
     }
 
     @Override

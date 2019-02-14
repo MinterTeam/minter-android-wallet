@@ -39,12 +39,14 @@ import io.reactivex.functions.Function;
 import network.minter.bipwallet.apis.dummies.BCExplorerResultErrorMapped;
 import network.minter.bipwallet.apis.dummies.BCResultErrorMapped;
 import network.minter.bipwallet.apis.dummies.ExpResultErrorMapped;
+import network.minter.bipwallet.apis.dummies.GateResultErrorMapped;
 import network.minter.bipwallet.apis.dummies.ProfileResultErrorMapped;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.models.BCResult;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.ExpResult;
+import network.minter.explorer.models.GateResult;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.ProfileResult;
 import retrofit2.Call;
@@ -472,7 +474,103 @@ public class ReactiveAdapter {
     public static <T> ExpResult<T> createExpEmpty(int code, String message) {
         ExpResult<T> out = new ExpResult<>();
         out.code = code;
-        out.error = message;
+        out.error = new BCExplorerResult.ErrorResult();
+        out.error.message = message;
+        out.error.code = -1;
+        return out;
+    }
+
+    // gate
+    public static <T> Observable<T> rxCallGate(Call<T> call) {
+        return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
+                if (response.body() == null) {
+                    emitter.onNext((T) createGateErrorResult(response));
+                } else {
+                    emitter.onNext(response.body());
+                }
+
+                emitter.onComplete();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<T> call1, @NonNull Throwable t) {
+                emitter.onError(t);
+            }
+        }));
+    }
+
+    public static <T> Function<? super Throwable, ? extends ObservableSource<? extends GateResult<T>>> convertToGateErrorResult() {
+        return (Function<Throwable, ObservableSource<? extends GateResult<T>>>) throwable
+                -> {
+
+            if (throwable instanceof HttpException) {
+                return Observable.just(createGateErrorResult(((HttpException) throwable)));
+            }
+
+            GateResultErrorMapped<T> errResult = new GateResultErrorMapped<>();
+            if (errResult.mapError(throwable)) {
+                return Observable.just(errResult);
+            }
+
+            return Observable.error(throwable);
+        };
+    }
+
+    public static <T> GateResult<T> createGateErrorResult(final String json, int code, String message) {
+        Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
+        GateResult<T> out;
+        try {
+            if (json == null || json.isEmpty()) {
+                out = createGateEmpty(code, message);
+            } else {
+                out = gson.fromJson(json, new TypeToken<GateResult<T>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            out = createGateEmpty(code, message);
+        }
+
+        return out;
+    }
+
+    public static <T> GateResult<T> createGateErrorResult(final Response<T> response) {
+        final String errorBodyString;
+        try {
+            // нельзя после этой строки пытаться вытащить body из ошибки,
+            // потому что retrofit по какой-то причине не хранит у себя это значение
+            // а держит в буффере до момента первого доступа
+            errorBodyString = response.errorBody().string();
+        } catch (IOException e) {
+            Timber.e(e, "Unable to resolve http exception response");
+            return createGateEmpty(response.code(), response.message());
+        }
+
+        return createGateErrorResult(errorBodyString, response.code(), response.message());
+    }
+
+    public static <T> GateResult<T> createGateErrorResult(final HttpException exception) {
+        final String errorBodyString;
+        try {
+            // нельзя после этой строки пытаться вытащить body из ошибки,
+            // потому что retrofit по какой-то причине не хранит у себя это значение
+            // а держит в буффере до момента первого доступа
+            errorBodyString = ((HttpException) exception).response().errorBody().string();
+        } catch (IOException e) {
+            Timber.e(e, "Unable to resolve http exception response");
+            return createGateEmpty(exception.code(), exception.message());
+        }
+
+        return createGateErrorResult(errorBodyString, exception.code(), exception.message());
+    }
+
+    public static <T> GateResult<T> createGateEmpty(int code, String message) {
+        GateResult<T> out = new GateResult<>();
+        out.error = new GateResult.ErrorResult();
+        out.error.message = message;
+        out.error.statusCode = code;
         return out;
     }
 }

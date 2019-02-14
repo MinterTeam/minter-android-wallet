@@ -72,7 +72,7 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
         coinSymbol.setText(firstNonNull(data.getSymbol(), "<unknown>"));
         initialAmount.setText(firstNonNull(data.initialAmount, new BigDecimal(0)).setScale(0, BigDecimal.ROUND_UP).toPlainString());
         initialReserve.setText(firstNonNull(data.initialReserve, new BigDecimal(0)).setScale(0, BigDecimal.ROUND_UP).toPlainString());
-        crr.setText(firstNonNull(data.constantReserveRatio, new BigDecimal(0)).toPlainString());
+        crr.setText(String.valueOf(data.constantReserveRatio));
     }
 
     @Override

@@ -80,7 +80,7 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
             title.setText(item.getTx().hash.toShortString());
         }
 
-        commission.setText(String.format("%s%%", firstNonNull(data.commission, new BigDecimal(0)).toPlainString()));
+        commission.setText(String.format("%d%%", data.commission));
         coin.setText(data.getCoin());
         stake.setText(bdHuman(firstNonNull(data.stake, new BigDecimal(0))));
 
