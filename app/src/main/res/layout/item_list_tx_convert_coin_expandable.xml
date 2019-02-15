@@ -73,7 +73,7 @@
             android:text="@string/tx_type_exchange"
             android:textColor="@color/textColorGrey"
             android:textSize="@dimen/text_size_11"
-            app:layout_constraintBottom_toTopOf="@id/item_title"
+            app:layout_constraintBottom_toTopOf="@id/exchange_title"
             app:layout_constraintEnd_toStartOf="@id/item_amount"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toTopOf="parent"
@@ -99,50 +99,64 @@
             tools:text="-200000000.1020"
             />
 
-        <TextView
-            android:id="@+id/item_title"
-            android:layout_width="wrap_content"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/exchange_title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_min"
             android:layout_marginEnd="@dimen/margin_min"
-            android:fontFamily="@font/_ubuntu_bold"
-            android:textSize="@dimen/text_size_default"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/item_title_separator"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toStartOf="@id/item_subamount"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toBottomOf="@id/item_title_type"
-            tools:text="BIP"
-            />
+            >
 
-        <ImageView
-            android:id="@+id/item_title_separator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/empty"
-            app:layout_constraintBottom_toBottomOf="@id/item_title"
-            app:layout_constraintEnd_toStartOf="@id/item_title_second"
-            app:layout_constraintStart_toEndOf="@id/item_title"
-            app:layout_constraintTop_toTopOf="@id/item_title"
-            app:layout_constraintVertical_bias=".7"
-            app:srcCompat="@drawable/ic_text_arrow_right"
-            />
+            <TextView
+                android:id="@+id/item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/_ubuntu_bold"
+                android:textSize="@dimen/text_size_default"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/item_title_separator"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="BIPTHEREUM"
+                />
 
-        <TextView
-            android:id="@+id/item_title_second"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_min"
-            android:layout_marginEnd="@dimen/margin_min"
-            android:fontFamily="@font/_ubuntu_bold"
-            android:textSize="@dimen/text_size_default"
-            app:layout_constraintBottom_toBottomOf="@id/item_title"
-            app:layout_constraintEnd_toStartOf="@id/item_subamount"
-            app:layout_constraintStart_toEndOf="@id/item_title_separator"
-            app:layout_constraintTop_toTopOf="@id/item_title"
-            tools:text="MCD"
-            />
+            <ImageView
+                android:id="@+id/item_title_separator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/empty"
+                app:layout_constraintBottom_toBottomOf="@id/item_title"
+                app:layout_constraintEnd_toStartOf="@id/item_title_second"
+                app:layout_constraintStart_toEndOf="@id/item_title"
+                app:layout_constraintTop_toTopOf="@id/item_title"
+                app:layout_constraintVertical_bias=".7"
+                app:srcCompat="@drawable/ic_text_arrow_right"
+                />
+
+            <TextView
+                android:id="@+id/item_title_second"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_min"
+                android:layout_marginEnd="@dimen/margin_min"
+                android:ellipsize="end"
+                android:fontFamily="@font/_ubuntu_bold"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_default"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/item_title_separator"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="BIPTHEREUM"
+                />
+        </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/item_subamount"
@@ -158,7 +172,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/item_amount"
-            tools:text="BIP"
+            tools:text="BIPTHEREUM"
             />
     </android.support.constraint.ConstraintLayout>
 
@@ -168,6 +182,8 @@
         android:layout_height="1dp"
         android:background="@drawable/shape_bottom_separator"
         app:layout_constraintTop_toBottomOf="@id/layout_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         />
 
     <android.support.constraint.ConstraintLayout
