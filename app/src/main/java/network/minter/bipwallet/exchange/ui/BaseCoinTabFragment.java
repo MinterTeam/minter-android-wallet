@@ -70,6 +70,7 @@ import timber.log.Timber;
  */
 public abstract class BaseCoinTabFragment extends BaseInjectFragment implements ExchangeModule.BaseCoinTabView {
     public static final String IDLE_WAIT_ESTIMATE = "IDLE_WAIT_ESTIMATE";
+    public static final String IDLE_WAIT_GAS = "IDLE_WAIT_GAS";
 
     @BindView(R.id.input_incoming_coin) AutoCompleteTextView inputIncomingCoin;
     @BindView(R.id.input_amount) AppCompatEditText inputAmount;

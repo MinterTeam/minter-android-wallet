@@ -157,7 +157,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickScanQR(this::onClickScanQR);
         getViewState().setOnClickMaximum(this::onClickMaximum);
-        setFee();
+        loadAndSetFee();
         accountStorage.update();
     }
 
@@ -210,7 +210,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setFormValidationListener(valid -> getViewState().setSubmitEnabled(valid && checkZero(mAmount)));
     }
 
-    private void setFee() {
+    private void loadAndSetFee() {
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_WAIT_GAS, true);
         rxCallGate(gasRepo.getMinGas())
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
@@ -222,8 +223,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         Timber.d("Min Gas price: %s", mGasPrice.toString());
                         final BigDecimal fee = OperationType.SendCoin.getFee().multiply(new BigDecimal(mGasPrice));
                         getViewState().setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN.toUpperCase()));
+                        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_WAIT_GAS, false);
                     }
-                }, Timber::w);
+                }, e -> {
+                    idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_WAIT_GAS, false);
+                    Timber.w(e);
+                });
     }
 
     private void setRecipientAutocomplete() {
@@ -261,7 +266,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private void onAmountChanged(BigDecimal amount) {
         checkZero(amount);
         mEnableUseMax.set(false);
-        setFee();
+        loadAndSetFee();
     }
 
     private void onClickScanQR(View view) {

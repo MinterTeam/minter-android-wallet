@@ -156,15 +156,28 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     public void attachView(V view) {
         super.attachView(view);
 
+        loadAndSetFee();
+    }
+
+    private void loadAndSetFee() {
+        mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_GAS, true);
         rxCallBc(mGasRepo.getMinGas())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(res -> {
-                        if (res.isOk()) {
-                            mGasPrice = res.data.gas;
-                            Timber.d("Min Gas price: %s", mGasPrice.toString());
-                        }
-                    }, Timber::w);
+                .subscribeOn(Schedulers.io())
+                .toFlowable(BackpressureStrategy.LATEST)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (res.isOk()) {
+                        mGasPrice = res.data.gas;
+                        Timber.d("Min Gas price: %s", mGasPrice.toString());
+                        getViewState().setFee(String.format("%s %s", bdHuman(getOperationType().getFee().multiply(new BigDecimal(mGasPrice))), MinterSDK.DEFAULT_COIN.toUpperCase()));
+
+                        mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_GAS, false);
+                    }
+                }, e -> {
+                    mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_GAS, false);
+                    Timber.w(e);
+                });
     }
 
     protected abstract boolean isAmountForGetting();
@@ -293,6 +306,9 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         String text = editText.getText().toString();
 
         Timber.d("Input changed: %s", editText.getText());
+
+        loadAndSetFee();
+
         mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_ESTIMATE, true);
         switch (editText.getId()) {
             case R.id.input_incoming_coin:
@@ -374,27 +390,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_ESTIMATE, false);
     }
 
-    /**
-     * @param incoming
-     * @TODO Decompose!
-     */
-    private void onAmountChangedInternal(Boolean incoming) {
-        Timber.d("OnAmountChangedInternal");
-        if (mGetCoin == null) {
-            Timber.i("Can't exchange: coin is not set");
-            onAmountChangedInternalComplete();
-            return;
-        }
-
-        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo, mGasRepo)
-                .setAccount(() -> mAccounts, () -> mAccount)
-                .setGetAmount(() -> mGetAmount)
-                .setSpendAmount(() -> mSpendAmount)
-                .setGetCoin(() -> mGetCoin)
-                .doOnSubscribe(this::unsubscribeOnDestroy)
-//                .setOnCompleteListener(this::onAmountChangedInternalComplete)
-                .build();
-
+    private OperationType getOperationType() {
         OperationType opType;
         if (mUseMax) {
             opType = OperationType.SellAllCoins;
@@ -404,7 +400,29 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             opType = OperationType.BuyCoin;
         }
 
-        calculator.calculate(opType, res -> {
+        return opType;
+    }
+
+    /**
+     * @param incoming
+     */
+    private void onAmountChangedInternal(Boolean incoming) {
+        Timber.d("OnAmountChangedInternal");
+        if (mGetCoin == null) {
+            Timber.i("Can't exchange: coin is not set");
+            onAmountChangedInternalComplete();
+            return;
+        }
+
+        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo)
+                .setAccount(() -> mAccounts, () -> mAccount)
+                .setGetAmount(() -> mGetAmount)
+                .setSpendAmount(() -> mSpendAmount)
+                .setGetCoin(() -> mGetCoin)
+                .doOnSubscribe(this::unsubscribeOnDestroy)
+                .build();
+
+        calculator.calculate(getOperationType(), res -> {
             mEstimate = res.getEstimate();
             mGasCoin = res.getGasCoin();
             if (incoming) {
@@ -413,7 +431,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 mGetAmount = res.getAmount();
             }
 
-            getViewState().setFee(String.format("%s %s", bdHuman(res.getCommission()), MinterSDK.DEFAULT_COIN.toUpperCase()));
             getViewState().setCalculation(res.getCalculation());
             onAmountChangedInternalComplete();
         }, err -> {

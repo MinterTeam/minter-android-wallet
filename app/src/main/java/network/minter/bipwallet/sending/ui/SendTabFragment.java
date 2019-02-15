@@ -90,6 +90,7 @@ import permissions.dispatcher.RuntimePermissions;
 public class SendTabFragment extends HomeTabFragment implements SendTabModule.SendView {
     public final static String IDLE_SEND_CONFIRM_DIALOG = "IDLE_SEND_CONFIRM_DIALOG";
     public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
+    public final static String IDLE_SEND_WAIT_GAS = "IDLE_SEND_WAIT_GAS";
 
     @Inject IdlingManager idlingManager;
     @Inject Provider<SendTabPresenter> presenterProvider;
@@ -112,14 +113,14 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     public void onAttach(Context context) {
         HomeModule.getComponent().inject(this);
         super.onAttach(context);
-        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG);
+        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG, IDLE_SEND_WAIT_GAS);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         HomeModule.getComponent().inject(this);
         super.onCreate(savedInstanceState);
-        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG);
+        idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG, IDLE_SEND_WAIT_GAS);
     }
 
     @Override

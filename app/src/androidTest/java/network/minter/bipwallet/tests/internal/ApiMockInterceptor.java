@@ -26,6 +26,8 @@
 
 package network.minter.bipwallet.tests.internal;
 
+import android.content.Context;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -35,10 +37,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.minter.core.internal.log.Mint;
+import network.minter.core.internal.log.StdLogger;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Protocol;
@@ -56,6 +63,10 @@ public class ApiMockInterceptor implements Interceptor {
     private final String mPrefix;
     private Map<String, String> mOverrides = new HashMap<>();
 
+    static {
+        Mint.brew(new StdLogger());
+    }
+
     public ApiMockInterceptor() {
         this("");
     }
@@ -64,10 +75,8 @@ public class ApiMockInterceptor implements Interceptor {
         mPrefix = prefix;
     }
 
-    public ApiMockInterceptor override(String url, String filename) {
-        mOverrides.put(url, filename);
-        return this;
-    }
+    private boolean mUnitTest = true;
+    private WeakReference<Context> mContext;
 
     @Override
     public final okhttp3.Response intercept(Chain chain) throws IOException {
@@ -96,6 +105,17 @@ public class ApiMockInterceptor implements Interceptor {
         return new String(data);
     }
 
+    public ApiMockInterceptor(String prefix, Context context) {
+        mPrefix = prefix;
+        mUnitTest = false;
+        mContext = new WeakReference<>(context);
+    }
+
+    public ApiMockInterceptor override(String url, String filename) {
+        mOverrides.put(mPrefix + "/" + url, filename);
+        return this;
+    }
+
     private String readMockResponse(Request request) throws IOException {
         String fileName = mPrefix;
         fileName += request.url().encodedPath();
@@ -106,35 +126,89 @@ public class ApiMockInterceptor implements Interceptor {
 
         if (mOverrides.containsKey(fileName)) {
             fileName = mPrefix + mOverrides.get(fileName);
+        } else {
+            System.out.println(String.format("Not found override for %s", fileName));
         }
 
-        File file = new File(BASE_PATH + fileName + ".json");
-        if (!file.exists()) {
-            file = new File(BASE_PATH + fileName + "/default.json");
-        }
-
-        if (!file.exists()) {
-            file = new File(BASE_PATH + fileName + "requests.json");
-            if (file.exists()) {
-                final String doc = readFile(file);
-                List<RequestDoc> reqs = new GsonBuilder().create().fromJson(doc, new TypeToken<List<RequestDoc>>() {
-                }.getType());
-                for (RequestDoc item : reqs) {
-                    if (item.equals(request.url().encodedQuery())) {
-                        return item.response.toString();
-                    }
-                }
-
+        if (mUnitTest) {
+            File file = new File(BASE_PATH + fileName + ".json");
+            if (!file.exists()) {
+                file = new File(BASE_PATH + fileName + "/default.json");
             }
+
+            if (!file.exists()) {
+                file = new File(BASE_PATH + fileName + "requests.json");
+                if (file.exists()) {
+                    final String doc = readFile(file);
+                    List<RequestDoc> reqs = new GsonBuilder().create().fromJson(doc, new TypeToken<List<RequestDoc>>() {
+                    }.getType());
+                    for (RequestDoc item : reqs) {
+                        if (item.equals(request.url().encodedQuery())) {
+                            return item.response.toString();
+                        }
+                    }
+
+                }
+            }
+
+
+            if (!file.exists()) {
+                File errorFile = new File(BASE_PATH + "not_found.json");
+                throw new FileNotFoundException(String.format(readFile(errorFile), String.format("Mock response for request %s/%s not found: file name: assets:%s", request.url().encodedPath(), firstNonNull(request.url().encodedQuery(), ""), fileName)));
+            }
+
+            return readFile(file);
+        } else {
+            InputStream is = tryReadAsset(fileName);
+
+            if (is == null) {
+                is = tryReadAsset(fileName + "requests.json");
+            }
+
+            if (is == null) {
+                is = tryReadAsset("not_found.json");
+
+                if (is != null) {
+                    throw new FileNotFoundException(
+                            String.format(
+                                    readStream(is),
+                                    String.format("Mock response for request %s/%s not found: file name: %s", request.url().encodedPath(), firstNonNull(request.url().encodedQuery(), ""), fileName),
+                                    String.format("Mock response for request %s/%s not found: file name: %s", request.url().encodedPath(), firstNonNull(request.url().encodedQuery(), ""), fileName)
+                            )
+                    );
+                } else {
+                    throw new FileNotFoundException(String.format("{\"error:{\"message\":\"%s\"}\", \"log\":\"%s\"}",
+                            String.format("Mock response for request %s/%s not found: file name: %s", request.url().encodedPath(), firstNonNull(request.url().encodedQuery(), ""), fileName),
+                            String.format("Mock response for request %s/%s not found: file name: %s", request.url().encodedPath(), firstNonNull(request.url().encodedQuery(), ""), fileName)
+                    ));
+                }
+            }
+
+            return readStream(is);
+        }
+    }
+
+    private String readStream(InputStream is) throws IOException {
+        try {
+            int sz = is.available();
+            byte[] buffer = new byte[sz];
+            is.read(buffer, 0, sz);
+
+            return new String(buffer, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    private InputStream tryReadAsset(String fileName) {
+        InputStream is;
+        try {
+            is = mContext.get().getResources().getAssets().open(fileName + ".json");
+        } catch (IOException e) {
+            is = getClass().getClassLoader().getResourceAsStream("assets" + File.separator + fileName + ".json");
         }
 
-
-        if (!file.exists()) {
-            File errorFile = new File(BASE_PATH + "not_found.json");
-            throw new FileNotFoundException(String.format(readFile(errorFile), String.format("Mock response for request %s/%s not found: file name: %s", request.url().encodedPath(), firstNonNull(request.url().encodedQuery(), ""), fileName)));
-        }
-
-        return readFile(file);
+        return is;
     }
 
     private final static class RequestDoc {

@@ -31,10 +31,8 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
@@ -43,18 +41,13 @@ import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
-import network.minter.blockchain.models.ExchangeSellValue;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.core.MinterSDK;
-import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
-import network.minter.explorer.repo.GateGasRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
 import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallGate;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -82,18 +75,7 @@ public class ExchangeCalculator {
 
         if (opType == OperationType.BuyCoin) {
             // get
-            Observable.combineLatest(
-                    rxCallBcExp(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin)),
-                    rxCallBc(mBuilder.mGasRepo.getMinGas()),
-                    (exResult, minGasResult) -> {
-                        if (!exResult.isOk() || !minGasResult.isOk())
-                            return exResult;
-
-                        exResult.result.commission = exResult.result.commission.multiply(minGasResult.data.gas);
-                        Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
-                        return exResult;
-                    }
-            )
+            rxCallBcExp(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcExpErrorResult())
@@ -151,18 +133,7 @@ public class ExchangeCalculator {
                     });
         } else {
             // spend
-            Observable.combineLatest(
-                    rxCallBcExp(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin)),
-                    rxCallGate(mBuilder.mGasRepo.getMinGas()),
-                    (exResult, minGasResult) -> {
-                        if (!exResult.isOk() || !minGasResult.isOk())
-                            return exResult;
-                        exResult.result.commission = exResult.result.commission.multiply(minGasResult.data.gas);
-                        Timber.d("Commission: %s", bdHuman(exResult.result.getCommission()));
-                        return exResult;
-                    }
-
-            )
+            rxCallBcExp(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(convertToBcExpErrorResult())
@@ -170,8 +141,7 @@ public class ExchangeCalculator {
                     .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
                     }))
                     .subscribe(res -> {
-                        final BCExplorerResult<ExchangeSellValue> sv = res;
-                        if (!res.isSuccess()) {
+                        if (!res.isOk()) {
                             if (res.statusCode == 404 || res.statusCode == 400 || res.getErrorCode() == CoinNotExists) {
                                 errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
@@ -226,7 +196,6 @@ public class ExchangeCalculator {
 
     public static final class Builder {
         private final ExplorerCoinsRepository mCoinsRepo;
-        private final GateGasRepository mGasRepo;
         private Action mOnCompleteListener;
         private Consumer<? super Disposable> mDisposableConsumer;
         private Lazy<List<AccountItem>> mAccounts;
@@ -234,9 +203,8 @@ public class ExchangeCalculator {
         private Lazy<BigDecimal> mGetAmount, mSpendAmount;
         private Lazy<String> mGetCoin;
 
-        public Builder(ExplorerCoinsRepository repo, GateGasRepository gasRepo) {
+        public Builder(ExplorerCoinsRepository repo) {
             mCoinsRepo = repo;
-            mGasRepo = gasRepo;
         }
 
         public Builder setAccount(Lazy<List<AccountItem>> accounts, Lazy<AccountItem> account) {
@@ -282,7 +250,6 @@ public class ExchangeCalculator {
         private BigDecimal mAmount;
         private String mCalculation;
         private BigDecimal mCommission;
-        private BigInteger mGasPrice = new BigInteger("1");
 
         public BigDecimal getAmount() {
             return mAmount;

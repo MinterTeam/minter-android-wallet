@@ -66,7 +66,9 @@ public class SpendCoinTabFragment extends BaseCoinTabFragment implements SpendCo
         super.prepareIdlingResources();
         idlingManager.add(IDLE_SPEND_COIN_CONFIRM_DIALOG,
                 IDLE_SPEND_COIN_COMPLETE_DIALOG,
-                IDLE_WAIT_ESTIMATE);
+                IDLE_WAIT_ESTIMATE,
+                IDLE_WAIT_GAS
+        );
     }
 
     @ProvidePresenter

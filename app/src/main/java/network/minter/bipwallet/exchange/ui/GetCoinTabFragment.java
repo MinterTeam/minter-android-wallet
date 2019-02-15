@@ -67,7 +67,8 @@ public class GetCoinTabFragment extends BaseCoinTabFragment implements GetCoinTa
         super.prepareIdlingResources();
         idlingManager.add(IDLE_GET_COIN_CONFIRM_DIALOG,
                 IDLE_GET_COIN_COMPLETE_DIALOG,
-                IDLE_WAIT_ESTIMATE);
+                IDLE_WAIT_ESTIMATE,
+                IDLE_WAIT_GAS);
     }
 
     @ProvidePresenter

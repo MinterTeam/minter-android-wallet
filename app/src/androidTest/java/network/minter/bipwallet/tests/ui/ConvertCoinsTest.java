@@ -56,14 +56,17 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.settings.repo.MinterBotRepository;
+import network.minter.bipwallet.tests.internal.ApiMockInterceptor;
 import network.minter.bipwallet.tests.internal.TestWallet;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Coin;
 import network.minter.blockchain.models.ExchangeBuyValue;
 import network.minter.blockchain.models.ExchangeSellValue;
+import network.minter.blockchain.models.operational.OperationType;
 import network.minter.core.MinterSDK;
 import network.minter.core.bip39.MnemonicResult;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.CoinItem;
 import network.minter.explorer.models.ExpResult;
@@ -101,7 +104,6 @@ public class ConvertCoinsTest extends BaseUiTest {
 
     @Rule
     public ActivityTestRule<ConvertCoinActivity> mActivityTestRule = new ActivityTestRule<>(ConvertCoinActivity.class, true, false);
-
     private ExplorerCoinsRepository mCoinsRepo;
     private Coin mExchangeCoin;
     private MinterAddress mAddress;
@@ -210,6 +212,58 @@ public class ConvertCoinsTest extends BaseUiTest {
 //
 //        // wait while balance isn't update
 //        waitForBalanceUpdate();
+    }
+
+    @Test
+    public void testSpendCommission() throws Throwable {
+        ApiMockInterceptor gateMock = new ApiMockInterceptor("gate", mActivityTestRule.getActivity());
+        try {
+            MinterExplorerApi.getInstance().getGateApiService().addHttpInterceptor(gateMock);
+
+            final int tabPos = 0;
+            // spend coins
+            mActivityTestRule.runOnUiThread(() -> {
+                mActivityTestRule.getActivity().setCurrentPage(tabPos);
+            });
+
+            ViewInteraction amountInput = onView(allOf(withId(R.id.input_amount), inViewPager(tabPos, R.id.pager)));
+            ViewInteraction coinInput = onView(allOf(withId(R.id.input_incoming_coin), inViewPager(tabPos, R.id.pager)));
+            ViewInteraction feeValue = onView(allOf(withId(R.id.fee_value), inViewPager(tabPos, R.id.pager)));
+
+            feeValue.check(matches(withText(
+                    String.format("%s %s", bdHuman(OperationType.SellCoin.getFee().multiply(new BigDecimal("1"))), MinterSDK.DEFAULT_COIN))
+            ));
+
+            // 2
+            gateMock.override("api/v1/min-gas", "/v1/min-gas/min_gas_price_2");
+            amountInput.perform(replaceText("2"));
+
+            feeValue.check(matches(withText(
+                    String.format("%s %s", bdHuman(OperationType.SellCoin.getFee().multiply(new BigDecimal("2"))), MinterSDK.DEFAULT_COIN))
+            ));
+
+            // 1
+            gateMock.override("api/v1/min-gas", "/v1/min-gas/min_gas_price_1");
+            amountInput.perform(replaceText("2"));
+
+            feeValue.check(matches(withText(
+                    String.format("%s %s", bdHuman(OperationType.SellCoin.getFee().multiply(new BigDecimal("1"))), MinterSDK.DEFAULT_COIN))
+            ));
+
+            // 4
+            gateMock.override("api/v1/min-gas", "/v1/min-gas/min_gas_price_4");
+            coinInput.perform(replaceText("AAA"));
+
+            feeValue.check(matches(withText(
+                    String.format("%s %s", bdHuman(OperationType.SellCoin.getFee().multiply(new BigDecimal("4"))), MinterSDK.DEFAULT_COIN))
+            ));
+        } finally {
+            MinterExplorerApi.getInstance().getGateApiService().removeHttpInterceptor(gateMock);
+        }
+    }
+
+    public void testGetCommission() {
+
     }
 
     @Test
