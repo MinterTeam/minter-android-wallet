@@ -117,7 +117,6 @@ public class AdvancedGenerateActivity extends BaseMvpInjectActivity implements A
 
     /**
      * @param enable
-     * @TODO less hardcode
      */
     @Override
     public void setEnableSecureVariants(boolean enable, AdvancedMainActivity.OnSelectSecureVariant onSelect) {
@@ -129,9 +128,9 @@ public class AdvancedGenerateActivity extends BaseMvpInjectActivity implements A
                 menu.inflate(R.menu.menu_secured_select);
                 menu.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.securedBy_you) {
-                        securedByValue.setText("You");
+                        securedByValue.setText(R.string.secured_by_value__you);
                     } else if (item.getItemId() == R.id.securedBy_bip) {
-                        securedByValue.setText("Bip Wallet");
+                        securedByValue.setText(R.string.secured_by_value__minter);
                     }
                     onSelect.onSelectVariant(item.getItemId());
                     return true;

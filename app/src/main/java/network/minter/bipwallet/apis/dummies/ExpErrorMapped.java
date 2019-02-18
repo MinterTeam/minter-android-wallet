@@ -34,7 +34,7 @@ import retrofit2.HttpException;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class ExpResultErrorMapped<Result> extends ExpResult<Result> implements ResultErrorMapper {
+public class ExpErrorMapped<Result> extends ExpResult<Result> implements ResultErrorMapper {
     public int statusCode;
     public String errorMessage;
 

@@ -49,7 +49,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.profile.repo.ProfileAddressRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 
 /**
  * minter-android-wallet. 2018
@@ -102,7 +102,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
             secretStorage.add(secretData);
             boolean isMain = Stream.of(mItems).filter(item -> item.isMain).count() == 0;
             safeSubscribeIoToUi(
-                    rxCallProfile(myAddressRepo.addAddress(secretData.toAddressData(isMain, true, secretStorage.getEncryptionKey())))
+                    rxProfile(myAddressRepo.addAddress(secretData.toAddressData(isMain, true, secretStorage.getEncryptionKey())))
             ).calculate(res -> {
                 reload();
                 getViewState().hideProgress();
@@ -164,7 +164,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
             return;
         }
 
-        safeSubscribeIoToUi(rxCallProfile(myAddressRepo.setAddressMain(isMain, addressItem.profileAddressData)))
+        safeSubscribeIoToUi(rxProfile(myAddressRepo.setAddressMain(isMain, addressItem.profileAddressData)))
                 .subscribe(res -> {
                     getViewState().scrollToPosition(0);
                     reload();

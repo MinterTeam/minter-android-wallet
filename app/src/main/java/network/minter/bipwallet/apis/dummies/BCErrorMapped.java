@@ -26,16 +26,15 @@
 
 package network.minter.bipwallet.apis.dummies;
 
+import network.minter.blockchain.models.BCResult;
 import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.profile.models.ProfileResult;
 import retrofit2.HttpException;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class ProfileResultErrorMapped<T> extends ProfileResult<T> implements ResultErrorMapper {
-
+public class BCErrorMapped<Result> extends BCResult<Result> implements ResultErrorMapper {
     @Override
     public boolean mapError(Throwable throwable) {
         if (throwable instanceof HttpException) {
@@ -46,11 +45,13 @@ public class ProfileResultErrorMapped<T> extends ProfileResult<T> implements Res
         if (!NetworkException.isNetworkError(throwable)) {
             return false;
         }
+
         NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        error = new ProfileResult.Error();
-        error.code = e.getCode().name();
-        error.message = e.getUserMessage();
-        data = null;
+        result = null;
+        statusCode = e.getStatusCode();
+        error = new ErrorResult();
+        error.code = ResultCode.UnknownError.getValue();
+        error.data = e.getUserMessage();
 
         return true;
     }

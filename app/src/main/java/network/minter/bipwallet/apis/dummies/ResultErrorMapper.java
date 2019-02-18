@@ -31,5 +31,10 @@ package network.minter.bipwallet.apis.dummies;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public interface ResultErrorMapper {
+    /**
+     * Map throwable to base result object of specific api
+     * @param throwable any error
+     * @return Return true if error was handled, false if not
+     */
     boolean mapError(Throwable throwable);
 }

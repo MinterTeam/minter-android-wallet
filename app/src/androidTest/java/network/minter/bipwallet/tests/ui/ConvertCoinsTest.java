@@ -85,8 +85,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxBc;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxExp;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.tests.internal.MyMatchers.withInputLayoutError;
 import static network.minter.bipwallet.tests.internal.MyMatchers.withInputLayoutHint;
@@ -110,7 +110,7 @@ public class ConvertCoinsTest extends BaseUiTest {
 
     public ConvertCoinsTest() {
         mCoinsRepo = TestWallet.app().explorerCoinsRepo();
-        ExpResult<List<CoinItem>> coins = rxCallExp(mCoinsRepo.getAll())
+        ExpResult<List<CoinItem>> coins = rxExp(mCoinsRepo.getAll())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .blockingFirst();
@@ -131,7 +131,7 @@ public class ConvertCoinsTest extends BaseUiTest {
             throw new RuntimeException("Unable to find coin other than default minter's coin: " + MinterSDK.DEFAULT_COIN);
         }
 
-        BCResult<Coin> coinInfo = rxCallBc(TestWallet.app().coinRepoBlockChain().getCoinInfo(coin.get().symbol)).blockingFirst();
+        BCResult<Coin> coinInfo = rxBc(TestWallet.app().coinRepoBlockChain().getCoinInfo(coin.get().symbol)).blockingFirst();
 
         if (!coinInfo.isOk()) {
             throw new RuntimeException(coinInfo.error.getMessage());
@@ -215,7 +215,7 @@ public class ConvertCoinsTest extends BaseUiTest {
     }
 
     @Test
-    public void testSpendCommission() throws Throwable {
+    public void testSpendCommission() {
         ApiMockInterceptor gateMock = new ApiMockInterceptor("gate", mActivityTestRule.getActivity());
         try {
             MinterExplorerApi.getInstance().getGateApiService().addHttpInterceptor(gateMock);

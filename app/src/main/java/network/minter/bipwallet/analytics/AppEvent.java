@@ -34,11 +34,6 @@ import org.parceler.Parcel;
  */
 @Parcel
 public enum AppEvent {
-    /* @TODO dummy stub
-    ExampleEvent("EventToSend");
-    // or
-    ExampleEvent;
-    */
     //Screens
     CoinsScreen,
     SendScreen,

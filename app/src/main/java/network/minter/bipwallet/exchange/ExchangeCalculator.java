@@ -46,8 +46,8 @@ import network.minter.core.MinterSDK;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -75,10 +75,10 @@ public class ExchangeCalculator {
 
         if (opType == OperationType.BuyCoin) {
             // get
-            rxCallBcExp(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
+            rxExpGate(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(convertToBcExpErrorResult())
+                    .onErrorResumeNext(toExpGateError())
                     .doOnSubscribe(mBuilder.mDisposableConsumer)
                     .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
                     }))
@@ -133,10 +133,10 @@ public class ExchangeCalculator {
                     });
         } else {
             // spend
-            rxCallBcExp(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
+            rxExpGate(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(convertToBcExpErrorResult())
+                    .onErrorResumeNext(toExpGateError())
                     .doOnSubscribe(mBuilder.mDisposableConsumer)
                     .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
                     }))

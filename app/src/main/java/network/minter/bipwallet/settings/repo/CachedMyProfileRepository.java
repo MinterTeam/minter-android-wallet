@@ -36,8 +36,8 @@ import network.minter.core.internal.api.ApiService;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 
 /**
  * minter-android-wallet. 2018
@@ -61,8 +61,8 @@ public class CachedMyProfileRepository extends ProfileRepository implements Cach
 
     @Override
     public Observable<User.Data> getUpdatableData() {
-        return rxCallProfile(getProfile())
-                .onErrorResumeNext(convertToProfileErrorResult())
+        return rxProfile(getProfile())
+                .onErrorResumeNext(toProfileError())
                 .map(item -> {
                     if (item.isSuccess()) {
                         return item.data;

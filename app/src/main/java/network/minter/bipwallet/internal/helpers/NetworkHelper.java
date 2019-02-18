@@ -32,7 +32,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.telephony.TelephonyManager;
 
 import java.io.IOException;
 
@@ -75,36 +74,6 @@ public class NetworkHelper {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io());
     }
-
-    public boolean checkCarrierName(final String name) {
-        ConnectivityManager cm =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) {
-            return false;
-        }
-
-        //@TODO проверять разрешение
-        @SuppressLint("MissingPermission") NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        TelephonyManager manager = (TelephonyManager) mContext
-                .getSystemService(Context.TELEPHONY_SERVICE);
-        if (manager == null) {
-            return false;
-        }
-        String carrierName = manager.getNetworkOperatorName();
-        boolean isWiFi = false;
-        if (activeNetwork != null) {
-            isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-        }
-
-        if (carrierName.equalsIgnoreCase(name)) {
-            return !isConnected || isWiFi;
-        }
-
-        return false;
-    }
-
 
     public Observable<Bitmap> downloadImage(String url) {
         return downloadFile(url)

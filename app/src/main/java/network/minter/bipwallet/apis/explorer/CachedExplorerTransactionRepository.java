@@ -43,8 +43,8 @@ import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
 
 /**
  * minter-android-wallet. 2018
@@ -68,11 +68,11 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
 
     @Override
     public Observable<List<HistoryTransaction>> getUpdatableData() {
-        return rxCallExp(getInstantService().getTransactions(
+        return rxExp(getInstantService().getTransactions(
                 Stream.of(mSecretStorage.getAddresses()).map(MinterAddress::toString).toList(),
                 1, 5
         ))
-                .onErrorResumeNext(convertToExpErrorResult())
+                .onErrorResumeNext(toExpError())
                 .map(res -> {
                     if (res.result != null) {
                         return res.result;

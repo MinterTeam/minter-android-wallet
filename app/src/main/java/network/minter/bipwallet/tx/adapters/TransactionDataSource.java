@@ -55,14 +55,13 @@ import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.models.AddressInfoResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TransactionDataSource extends PageKeyedDataSource<Integer, TransactionItem> {
@@ -116,8 +115,8 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             toFetchAddresses.get(add).add(tx);
         }
 
-        return rxCallProfile(infoRepo.getAddressesWithUserInfo(toFetch))
-                .onErrorResumeNext(convertToProfileErrorResult())
+        return rxProfile(infoRepo.getAddressesWithUserInfo(toFetch))
+                .onErrorResumeNext(toProfileError())
                 .map(listInfoResult -> {
                     if (listInfoResult.data.isEmpty()) {
                         return items;
@@ -162,8 +161,8 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             toFetchAddresses.get(add).add(tx);
         }
 
-        return rxCallProfile(infoRepo.getAddressesWithUserInfo(toFetch))
-                .onErrorResumeNext(convertToProfileErrorResult())
+        return rxProfile(infoRepo.getAddressesWithUserInfo(toFetch))
+                .onErrorResumeNext(toProfileError())
                 .map(listInfoResult -> {
                     if (listInfoResult.data == null) {
                         listInfoResult.data = Collections.emptyList();
@@ -185,8 +184,8 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, TransactionItem> callback) {
         mLoadState.postValue(LoadState.Loading);
-        rxCallExp(mRepo.getTransactions(mAddressList, 1))
-                .onErrorResumeNext(convertToExpErrorResult())
+        rxExp(mRepo.getTransactions(mAddressList, 1))
+                .onErrorResumeNext(toExpError())
                 .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
                 .map(this::groupByDate)
                 .doOnSubscribe(d -> mDisposables.add(d))
@@ -199,8 +198,8 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, TransactionItem> callback) {
         mLoadState.postValue(LoadState.Loading);
-        rxCallExp(mRepo.getTransactions(mAddressList, params.key))
-                .onErrorResumeNext(convertToExpErrorResult())
+        rxExp(mRepo.getTransactions(mAddressList, params.key))
+                .onErrorResumeNext(toExpError())
                 .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
                 .map(this::groupByDate)
                 .doOnSubscribe(d -> mDisposables.add(d))
@@ -213,8 +212,8 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, TransactionItem> callback) {
         mLoadState.postValue(LoadState.Loading);
-        rxCallExp(mRepo.getTransactions(mAddressList, params.key))
-                .onErrorResumeNext(convertToExpErrorResult())
+        rxExp(mRepo.getTransactions(mAddressList, params.key))
+                .onErrorResumeNext(toExpError())
                 .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
                 .map(this::groupByDate)
                 .doOnSubscribe(d -> mDisposables.add(d))

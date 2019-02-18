@@ -78,6 +78,10 @@
     <string name="tx_send_waiting_dialog_description">Coins will be received in</string>
     <string name="tx_send_success_dialog_description">Coins are received by</string>
 
+    <!--Advanced "secured by" popup menu values-->
+    <string name="secured_by_value__you">You</string>
+    <string name="secured_by_value__minter">BIP Wallet</string>
+
 
     <!--buttons-->
     <string name="btn_continue">Continue</string>

@@ -45,7 +45,7 @@ import network.minter.bipwallet.internal.helpers.IntentHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.profile.repo.ProfileAddressRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 
 /**
  * minter-android-wallet. 2018
@@ -98,7 +98,7 @@ public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.A
     private void onClickDeleteAddress(DialogInterface dialogInterface, int which) {
         getViewState().showProgress("Deleting in progress");
         if (mAddress.isServerSecured) {
-            rxCallProfile(addressRepo.delete(mAddress.id))
+            rxProfile(addressRepo.delete(mAddress.id))
                     .observeOn(Schedulers.io())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {

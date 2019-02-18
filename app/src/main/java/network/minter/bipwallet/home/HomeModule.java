@@ -79,18 +79,9 @@ public class HomeModule {
     }
 
     public static HomeComponent create(HomeActivity rootView) {
-        //@TODO обеспечить выживаемость, пока что некоторые моменты ломаются
-        //        if(component != null) {
-        //            return component;
-        //        }
-
         component = DaggerHomeComponent.builder()
                 .walletComponent(Wallet.app())
                 .homeModule(new HomeModule(rootView))
-                //                .chatTabModule(new ChatTabModule())
-                //                .sitterTabModule(new SitterTabModule())
-                //                .dogsTabModule(new DogsTabModule())
-                //                .calendarTabModule(new CalendarTabModule())
                 .build();
 
         return component;

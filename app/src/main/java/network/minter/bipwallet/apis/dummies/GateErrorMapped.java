@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2018
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,14 +27,17 @@
 package network.minter.bipwallet.apis.dummies;
 
 import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.models.BCExplorerResult;
+import network.minter.explorer.models.GateResult;
 import retrofit2.HttpException;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BCExplorerResultErrorMapped<Result> extends BCExplorerResult<Result> implements ResultErrorMapper {
+public class GateErrorMapped<Result> extends GateResult<Result> implements ResultErrorMapper {
+    public int statusCode;
+    public String errorMessage;
+
     @Override
     public boolean mapError(Throwable throwable) {
         if (throwable instanceof HttpException) {
@@ -45,12 +48,15 @@ public class BCExplorerResultErrorMapped<Result> extends BCExplorerResult<Result
         if (!NetworkException.isNetworkError(throwable)) {
             return false;
         }
+
         NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        error = new BCExplorerResult.ErrorResult();
-        error.code = -1;
+        data = null;
+        error = new ErrorResult();
+        error.statusCode = e.getStatusCode();
         error.message = e.getUserMessage();
-        result = null;
         statusCode = e.getStatusCode();
+        errorMessage = e.getUserMessage();
+
         return true;
     }
 }

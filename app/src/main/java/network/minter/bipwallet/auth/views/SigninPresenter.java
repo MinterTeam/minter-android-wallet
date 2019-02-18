@@ -48,8 +48,8 @@ import network.minter.profile.models.ProfileAddressData;
 import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileAuthRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 
 /**
  * minter-android-wallet. 2018
@@ -105,10 +105,10 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
         getViewState().clearErrors();
         getViewState().showProgress();
 
-        rxCallProfile(authRepo.login(mLoginData.preparePassword()))
+        rxProfile(authRepo.login(mLoginData.preparePassword()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(convertToProfileErrorResult())
+                .onErrorResumeNext(toProfileError())
                 .retryWhen(getErrorResolver())
                 .subscribe(userResult -> {
                     if (userResult.isSuccess()) {
@@ -125,10 +125,10 @@ public class SigninPresenter extends MvpBasePresenter<AuthModule.SigninView> {
                         return;
                     }
 
-                    rxCallProfile(addressRepo.getAddressesWithEncrypted())
+                    rxProfile(addressRepo.getAddressesWithEncrypted())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
-                            .onErrorResumeNext(convertToProfileErrorResult())
+                            .onErrorResumeNext(toProfileError())
                             .subscribe(addressResult -> {
                                 getViewState().hideProgress();
                                 getViewState().setEnableSubmit(true);

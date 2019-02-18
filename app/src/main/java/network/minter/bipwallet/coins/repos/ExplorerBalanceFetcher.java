@@ -48,8 +48,8 @@ import network.minter.explorer.models.AddressData;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
 
 /**
  * minter-android-wallet. 2018
@@ -74,18 +74,18 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
     }
 
     public static Observable<BigDecimal> createSingleTotalBalance(ExplorerAddressRepository addressRepository, MinterAddress address) {
-        return rxCallExp(addressRepository.getAddressData(address))
+        return rxExp(addressRepository.getAddressData(address))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(convertToBcExpErrorResult())
+                .onErrorResumeNext(toExpGateError())
                 .map(item -> item.result.getTotalBalance());
     }
 
     public static Observable<BigDecimal> createSingleCoinBalance(ExplorerAddressRepository addressRepository, MinterAddress address, String coin) {
-        return rxCallExp(addressRepository.getAddressData(address))
+        return rxExp(addressRepository.getAddressData(address))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(convertToBcExpErrorResult())
+                .onErrorResumeNext(toExpGateError())
                 .map(item -> {
                     BigDecimal out = new BigDecimal(0);
                     for (Map.Entry<String, AddressData.CoinBalance> entry : item.result.coins.entrySet()) {
@@ -110,8 +110,8 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
         }
 
         for (MinterAddress address : mAddresses) {
-            rxCallExp(mAddressRepository.getAddressData(address))
-                    .onErrorResumeNext(convertToBcExpErrorResult())
+            rxExp(mAddressRepository.getAddressData(address))
+                    .onErrorResumeNext(toExpGateError())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
                         synchronized (mLock) {

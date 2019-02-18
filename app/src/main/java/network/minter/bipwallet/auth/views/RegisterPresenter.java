@@ -47,12 +47,11 @@ import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.profile.models.LoginData;
-import network.minter.profile.models.ProfileRequestResult;
 import network.minter.profile.models.RegisterData;
 import network.minter.profile.repo.ProfileAuthRepository;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 
 /**
  * minter-android-wallet. 2018
@@ -130,10 +129,10 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
             return;
         }
 
-        rxCallProfile(authRepo.register(mRegisterData.preparePassword()))
+        rxProfile(authRepo.register(mRegisterData.preparePassword()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(convertToProfileErrorResult())
+                .onErrorResumeNext(toProfileError())
                 .subscribe(userResult -> {
                     if(!userResult.isSuccess()) {
                         secretStorage.destroy();
@@ -146,20 +145,11 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
 
                     secretStorage.add(secretData);
 
-                    if(userResult.data.confirmations != null && !userResult.data.confirmations.isEmpty()) {
-                        ProfileRequestResult.Confirmation confirmation = userResult.data.confirmations.get(0);
-//                        if(confirmation.type != null) {
-                        // @TODO
-//                            getViewState().startConfirmation(confirmation.endpoint);
-//                            return;
-//                        }
-                    }
-
                     final LoginData loginData = new LoginData();
                     loginData.username = mRegisterData.username;
                     loginData.password = mRegisterData.password;
 
-                    safeSubscribeIoToUi(rxCallProfile(authRepo.login(loginData)))
+                    safeSubscribeIoToUi(rxProfile(authRepo.login(loginData)))
                             .subscribe(loginResult -> {
                                 getViewState().hideProgress();
                                 if(!loginResult.isSuccess()) {

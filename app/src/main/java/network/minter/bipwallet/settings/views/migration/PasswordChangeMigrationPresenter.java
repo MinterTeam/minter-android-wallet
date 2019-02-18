@@ -64,7 +64,7 @@ import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_1_GET_REMOTE_ADDRESS_LIST;
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_2_RE_ENCRYPT_REMOTE_DATA;
 import static network.minter.bipwallet.settings.views.migration.MigrationException.STEP_3_UPDATE_ENCRYPTED_DATA_REMOTE;
@@ -133,7 +133,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
 
             mProgressDialog = new WeakReference<>(dialog);
 
-            rxCallProfile(addressRepo.getAddresses())
+            rxProfile(addressRepo.getAddresses())
                     .subscribeOn(Schedulers.io())
                     .retryWhen(migrationStepFailed(STEP_1_GET_REMOTE_ADDRESS_LIST))
                     // comparing local and remote addresses and get id to update on server
@@ -177,7 +177,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
                     }))
                     .retryWhen(migrationStepFailed(STEP_2_RE_ENCRYPT_REMOTE_DATA))
                     // step 3 sending data to server
-                    .switchMap(request -> rxCallProfile(profileRepo.changePassword(request)))
+                    .switchMap(request -> rxProfile(profileRepo.changePassword(request)))
                     .retryWhen(migrationStepFailed(STEP_3_UPDATE_ENCRYPTED_DATA_REMOTE))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(res -> {

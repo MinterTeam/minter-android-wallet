@@ -97,12 +97,12 @@ import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToProfileErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.createBcExpErrorResultMessage;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallGate;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.createExpGateErrorPlain;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
+import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -212,7 +212,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void loadAndSetFee() {
         idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_WAIT_GAS, true);
-        rxCallGate(gasRepo.getMinGas())
+        rxGate(gasRepo.getMinGas())
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -312,9 +312,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
         idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
         getViewState().startDialog(ctx -> {
-            rxCallProfile(infoRepo.findAddressInfoByInput(searchBy))
+            rxProfile(infoRepo.findAddressInfoByInput(searchBy))
                     .delay(150, TimeUnit.MILLISECONDS)
-                    .onErrorResumeNext(convertToProfileErrorResult())
+                    .onErrorResumeNext(toProfileError())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(result -> {
@@ -485,7 +485,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
                     final TransactionSign preSign = preTx.signSingle(preData.getPrivateKey());
 
-                    exchangeResolver = rxCallBcExp(cachedTxRepo.getEntity().getTransactionCommission(preSign)).onErrorResumeNext(convertToBcExpErrorResult());
+                    exchangeResolver = rxExpGate(cachedTxRepo.getEntity().getTransactionCommission(preSign)).onErrorResumeNext(toExpGateError());
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
                     final BCExplorerResult<TransactionCommissionValue> commissionValue = new BCExplorerResult<>();
@@ -497,7 +497,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             // creating preparation result to send transaction
             Disposable d = Observable.combineLatest(
                     exchangeResolver,
-                    rxCallBcExp(cachedTxRepo.getEntity().getTransactionCount(mFromAccount.address)).onErrorResumeNext(convertToBcExpErrorResult()),
+                    rxExpGate(cachedTxRepo.getEntity().getTransactionCount(mFromAccount.address)).onErrorResumeNext(toExpGateError()),
                     new BiFunction<BCExplorerResult<TransactionCommissionValue>, BCExplorerResult<CountableData>, SendInitData>() {
                         @Override
                         public SendInitData apply(BCExplorerResult<TransactionCommissionValue> txCommissionValue, BCExplorerResult<CountableData> countableDataBCResult) {
@@ -553,14 +553,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             if (bdLT(mAmount, mFromAccount.getBalance())) {
                                 final BigDecimal notEnough = cntRes.commission.subtract(mFromAccount.getBalance().subtract(mAmount));
                                 Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(notEnough));
-                                errorRes = createBcExpErrorResultMessage(
+                                errorRes = createExpGateErrorPlain(
                                         String.format("Insufficient funds: not enough %s %s, wanted: %s %s", bdHuman(notEnough), mFromAccount.getCoin(), bdHuman(balanceMustBe), mFromAccount.getCoin()),
                                         BCResult.ResultCode.InsufficientFunds.getValue(),
                                         400
                                 );
                             } else {
                                 Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(balanceMustBe));
-                                errorRes = createBcExpErrorResultMessage(
+                                errorRes = createExpGateErrorPlain(
                                         String.format("Insufficient funds: wanted %s %s", bdHuman(balanceMustBe), mFromAccount.getCoin()),
                                         BCResult.ResultCode.InsufficientFunds.getValue(),
                                         400
@@ -590,8 +590,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         final TransactionSign sign = tx.signSingle(data.getPrivateKey());
 
                         return safeSubscribeIoToUi(
-                                rxCallBcExp(cachedTxRepo.getEntity().sendTransaction(sign))
-                                        .onErrorResumeNext(convertToBcExpErrorResult())
+                                rxExpGate(cachedTxRepo.getEntity().sendTransaction(sign))
+                                        .onErrorResumeNext(toExpGateError())
                         );
 
                     })

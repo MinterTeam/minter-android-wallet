@@ -41,7 +41,7 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.ReactiveAdapter;
+import network.minter.bipwallet.apis.reactive.ReactiveMyMinter;
 import network.minter.bipwallet.internal.helpers.ExceptionHelper;
 import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.profile.models.ProfileResult;
@@ -145,7 +145,7 @@ public final class WalletConfirmDialog extends WalletDialog {
                 }
                 try {
                     String out = ((HttpException) t).response().errorBody().string() + "\n";
-                    ProfileResult errorResult = ReactiveAdapter.createProfileErrorResult(((HttpException) t));
+                    ProfileResult errorResult = ReactiveMyMinter.createProfileError(((HttpException) t));
                     out += errorResult.getError().message + "\n" + errorResult.getError().message + "\n" + ExceptionHelper.getStackTrace(t);
                     mText = out;
                 } catch (IOException e) {

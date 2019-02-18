@@ -76,10 +76,11 @@ import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.internal.ReactiveAdapter.convertToBcExpErrorResult;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBc;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallBcExp;
-import static network.minter.bipwallet.internal.ReactiveAdapter.rxCallExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveBlockchain.rxBc;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.createExpGateErrorPlain;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
@@ -104,6 +105,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     private List<AccountItem> mAccounts = new ArrayList<>(1);
     private boolean mUseMax = false;
     private BigInteger mGasPrice = new BigInteger("1");
+    private BigDecimal mEstimate;
 
     public BaseCoinTabPresenter(
             SecretStorage secretStorage,
@@ -119,6 +121,13 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mExplorerCoinsRepo = explorerCoinsRepository;
         mIdlingManager = idlingManager;
         mGasRepo = gasRepo;
+    }
+
+    @Override
+    public void attachView(V view) {
+        super.attachView(view);
+
+        loadAndSetFee();
     }
 
     @Override
@@ -152,16 +161,16 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         setCoinsAutocomplete();
     }
 
-    @Override
-    public void attachView(V view) {
-        super.attachView(view);
+    protected abstract boolean isAmountForGetting();
 
-        loadAndSetFee();
+    @CallSuper
+    protected void setCalculation(String calculation) {
+        getViewState().setCalculation(calculation);
     }
 
     private void loadAndSetFee() {
         mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_GAS, true);
-        rxCallBc(mGasRepo.getMinGas())
+        rxBc(mGasRepo.getMinGas())
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -180,13 +189,6 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 });
     }
 
-    protected abstract boolean isAmountForGetting();
-
-    @CallSuper
-    protected void setCalculation(String calculation) {
-        getViewState().setCalculation(calculation);
-    }
-
     private boolean checkZero(BigDecimal amount) {
         boolean valid = amount == null || !bdNull(amount);
         if (!valid) {
@@ -199,7 +201,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     }
 
     private void setCoinsAutocomplete() {
-        rxCallExp(mExplorerCoinsRepo.getAll())
+        rxExp(mExplorerCoinsRepo.getAll())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
@@ -215,19 +217,17 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .findFirst();
     }
 
-    private BigDecimal mEstimate;
-
     private void onStartExecuteTransaction(final ConvertTransactionData txData) {
         getViewState().startDialog(ctx -> {
             WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
-                    .setText("Please, wait few seconds")
+                    .setText("Please, wait a few seconds")
                     .create();
 
             dialog.setCancelable(false);
 
             safeSubscribeIoToUi(
-                    rxCallBcExp(mTxRepo.getEntity().getTransactionCount(mAccount.address))
-                            .onErrorResumeNext(convertToBcExpErrorResult())
+                    rxExpGate(mTxRepo.getEntity().getTransactionCount(mAccount.address))
+                            .onErrorResumeNext(toExpGateError())
             )
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .switchMap((Function<BCExplorerResult<CountableData>, ObservableSource<BCExplorerResult<TransactionSendResult>>>) cntRes -> {
@@ -241,14 +241,16 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         data.cleanup();
 
                         return safeSubscribeIoToUi(
-                                rxCallBcExp(mTxRepo.getEntity().sendTransaction(sign))
-                                        .onErrorResumeNext(convertToBcExpErrorResult())
+                                rxExpGate(mTxRepo.getEntity().sendTransaction(sign))
+                                        .onErrorResumeNext(toExpGateError())
                         );
 
                     })
                     .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .onErrorResumeNext(convertToBcExpErrorResult())
-                    .subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, Wallet.Rx.errorHandler(getViewState()));
+                    .onErrorResumeNext(toExpGateError())
+                    .subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, t -> {
+                        onErrorExecuteTransaction(createExpGateErrorPlain(t));
+                    });
 
 
             return dialog;
