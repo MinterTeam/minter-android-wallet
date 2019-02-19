@@ -2,6 +2,9 @@
 
 ## 1.2.8
  - Showing commission for exchanging transactions
+ - Updated SDK
+ - Fixed some issues
+ - Fixed some UI issues
 
 ## 1.2.7
  - Updated SDK
