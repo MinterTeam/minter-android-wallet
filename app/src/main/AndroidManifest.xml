@@ -167,7 +167,7 @@
 
 
         <service
-            android:name=".services.livebalance.BalanceUpdateService"
+            android:name=".services.livebalance.LiveBalanceService"
             android:exported="false"
             android:screenOrientation="portrait"
             >

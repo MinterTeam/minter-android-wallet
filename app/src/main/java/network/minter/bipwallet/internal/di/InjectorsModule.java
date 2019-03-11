@@ -48,7 +48,7 @@ import network.minter.bipwallet.external.ui.ExternalActivity;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.di.annotations.FragmentScope;
 import network.minter.bipwallet.internal.di.annotations.ServiceScope;
-import network.minter.bipwallet.services.livebalance.BalanceUpdateService;
+import network.minter.bipwallet.services.livebalance.LiveBalanceService;
 import network.minter.bipwallet.settings.ui.PasswordChangeMigrationActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 
@@ -118,7 +118,7 @@ public interface InjectorsModule {
 
     @ContributesAndroidInjector
     @ServiceScope
-    BalanceUpdateService balanceUpdateService();
+    LiveBalanceService balanceUpdateService();
 
     @ContributesAndroidInjector
     @ActivityScope

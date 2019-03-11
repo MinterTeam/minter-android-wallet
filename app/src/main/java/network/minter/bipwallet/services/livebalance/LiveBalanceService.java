@@ -56,7 +56,7 @@ import timber.log.Timber;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class BalanceUpdateService extends Service {
+public class LiveBalanceService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
     @Inject CacheManager cache;
@@ -138,7 +138,7 @@ public class BalanceUpdateService extends Service {
 
     private void connect() {
         try {
-            mClient = Centrifuge.new_("wss://rtm.explorer.minter.network/connection/websocket", Centrifuge.defaultConfig());
+            mClient = Centrifuge.new_("wss://explorer-rtm.testnet.minter.network/connection/websocket", Centrifuge.defaultConfig());
             mClient.onConnect(new ConnectHandler() {
                 @Override
                 public void onConnect(Client client, ConnectEvent connectEvent) {
@@ -183,8 +183,8 @@ public class BalanceUpdateService extends Service {
     }
 
     public final class LocalBinder extends Binder {
-        public BalanceUpdateService getService() {
-            return BalanceUpdateService.this;
+        public LiveBalanceService getService() {
+            return LiveBalanceService.this;
         }
     }
 }
