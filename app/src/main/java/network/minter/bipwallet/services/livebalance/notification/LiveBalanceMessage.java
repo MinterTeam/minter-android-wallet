@@ -26,8 +26,12 @@
 
 package network.minter.bipwallet.services.livebalance.notification;
 
-import java.math.BigDecimal;
+import com.google.gson.annotations.SerializedName;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.MinterProfileApi;
 
@@ -37,9 +41,12 @@ import network.minter.profile.MinterProfileApi;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class LiveBalanceMessage {
+    //    @SerializedName("Address")
     public MinterAddress address;
+    //    @SerializedName("Coin")
     public String coin;
-    public BigDecimal amount;
+    @SerializedName("value")
+    public BigInteger amount;
 
     public MinterAddress getAddress() {
         return address;
@@ -54,6 +61,6 @@ public class LiveBalanceMessage {
     }
 
     public BigDecimal getAmount() {
-        return amount;
+        return new BigDecimal(amount).divide(Transaction.VALUE_MUL_DEC);
     }
 }

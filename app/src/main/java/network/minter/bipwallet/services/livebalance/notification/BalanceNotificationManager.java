@@ -39,8 +39,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.external.ui.ExternalActivity;
+import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.notifications.BaseNotificationManager;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import timber.log.Timber;
 
@@ -60,15 +62,23 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
     private final GsonBuilder mGsonBuilder;
     private final NetworkHelper mNetwork;
     private final Context mContext;
+    private final Lazy<Boolean> mEnabledNotifications;
 
-    public BalanceNotificationManager(Context context, GsonBuilder gsonBuilder, NetworkHelper network) {
+    public BalanceNotificationManager(Context context, GsonBuilder gsonBuilder, NetworkHelper network, SettingsManager prefs) {
         mContext = context;
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mGsonBuilder = gsonBuilder;
         mNetwork = network;
+        mEnabledNotifications = () -> prefs.getBool(SettingsManager.EnableLiveNotifications);
     }
 
     public void showBalanceUpdate(String json) {
+        if (!mEnabledNotifications.get()) {
+            return;
+        }
+
+        Timber.d("Balance update message: %s", json);
+
         LiveBalanceMessage message;
         try {
             message = mGsonBuilder.create().fromJson(json, LiveBalanceMessage.class);

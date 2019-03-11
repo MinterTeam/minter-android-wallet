@@ -60,6 +60,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.helpers.DateHelper;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.UnzipUtil;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -268,6 +269,12 @@ public class WalletModule {
         return context
                 .getSharedPreferences(context.getString(R.string.user_local_settings_key),
                         Context.MODE_PRIVATE);
+    }
+
+    @Provides
+    @WalletApp
+    public SettingsManager provideSettingsManager(SharedPreferences prefs) {
+        return new SettingsManager(prefs);
     }
 
     private void initCrashlytics() {

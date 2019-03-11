@@ -50,6 +50,7 @@ import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.SoundManager;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
@@ -107,6 +108,7 @@ public interface WalletComponent {
     NetworkHelper network();
     ImageHelper image();
     SharedPreferences prefs();
+    SettingsManager settings();
     GsonBuilder gsonBuilder();
     CacheManager cache();
     AnalyticsManager analytics();

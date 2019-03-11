@@ -31,12 +31,12 @@ import android.content.Context;
 import dagger.Module;
 import dagger.Provides;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
 import network.minter.explorer.MinterExplorerApi;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Module
@@ -44,7 +44,7 @@ public class NotificationModule {
 
     @Provides
     @WalletApp
-    public BalanceNotificationManager provideBalanceNotificationManager(Context context, MinterExplorerApi api, NetworkHelper networkHelper) {
-        return new BalanceNotificationManager(context, api.getGsonBuilder(), networkHelper);
+    public BalanceNotificationManager provideBalanceNotificationManager(Context context, MinterExplorerApi api, NetworkHelper networkHelper, SettingsManager settingsManager) {
+        return new BalanceNotificationManager(context, api.getGsonBuilder(), networkHelper, settingsManager);
     }
 }
