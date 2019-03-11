@@ -11,6 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.apis.dummies.GateErrorMapped;
+import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.GateResult;
 import retrofit2.Call;
@@ -31,7 +32,7 @@ public final class ReactiveGate {
             @Override
             public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
                 if (response.body() == null) {
-                    emitter.onNext((T) createGateErrorResult(response));
+                    emitter.onNext((T) createGateError(response));
                 } else {
                     emitter.onNext(response.body());
                 }
@@ -46,12 +47,12 @@ public final class ReactiveGate {
         }));
     }
 
-    public static <T> Function<? super Throwable, ? extends ObservableSource<? extends GateResult<T>>> convertToGateErrorResult() {
+    public static <T> Function<? super Throwable, ? extends ObservableSource<? extends GateResult<T>>> toGateError() {
         return (Function<Throwable, ObservableSource<? extends GateResult<T>>>) throwable
                 -> {
 
             if (throwable instanceof HttpException) {
-                return Observable.just(createGateErrorResult(((HttpException) throwable)));
+                return Observable.just(createGateError(((HttpException) throwable)));
             }
 
             GateErrorMapped<T> errResult = new GateErrorMapped<>();
@@ -63,7 +64,7 @@ public final class ReactiveGate {
         };
     }
 
-    public static <T> GateResult<T> createGateErrorResult(final String json, int code, String message) {
+    public static <T> GateResult<T> createGateError(final String json, int code, String message) {
         Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
         GateResult<T> out;
         try {
@@ -80,7 +81,7 @@ public final class ReactiveGate {
         return out;
     }
 
-    public static <T> GateResult<T> createGateErrorResult(final Response<T> response) {
+    public static <T> GateResult<T> createGateError(final Response<T> response) {
         final String errorBodyString;
         try {
             // нельзя после этой строки пытаться вытащить body из ошибки,
@@ -92,10 +93,10 @@ public final class ReactiveGate {
             return createGateEmpty(response.code(), response.message());
         }
 
-        return createGateErrorResult(errorBodyString, response.code(), response.message());
+        return createGateError(errorBodyString, response.code(), response.message());
     }
 
-    public static <T> GateResult<T> createGateErrorResult(final HttpException exception) {
+    public static <T> GateResult<T> createGateError(final HttpException exception) {
         final String errorBodyString;
         try {
             // нельзя после этой строки пытаться вытащить body из ошибки,
@@ -107,14 +108,34 @@ public final class ReactiveGate {
             return createGateEmpty(exception.code(), exception.message());
         }
 
-        return createGateErrorResult(errorBodyString, exception.code(), exception.message());
+        return createGateError(errorBodyString, exception.code(), exception.message());
     }
 
     public static <T> GateResult<T> createGateEmpty(int code, String message) {
         GateResult<T> out = new GateResult<>();
         out.error = new GateResult.ErrorResult();
         out.error.message = message;
-        out.error.statusCode = code;
+        out.error.code = code;
+        out.statusCode = code;
         return out;
+    }
+
+    public static <T> GateResult<T> createGateErrorPlain(Throwable t) {
+        final Throwable e = NetworkException.convertIfNetworking(t);
+        if (e instanceof NetworkException) {
+            return createGateErrorPlain(((NetworkException) e).getUserMessage(), -1, ((NetworkException) e).getStatusCode());
+        }
+
+        return createGateErrorPlain(t.getMessage(), -1, -1);
+
+    }
+
+    public static <T> GateResult<T> createGateErrorPlain(final String errorMessage, int code, int statusCode) {
+        GateResult<T> errorRes = new GateResult<>();
+        errorRes.error = new GateResult.ErrorResult();
+        errorRes.error.message = errorMessage;
+        errorRes.error.code = code;
+        errorRes.statusCode = statusCode;
+        return errorRes;
     }
 }

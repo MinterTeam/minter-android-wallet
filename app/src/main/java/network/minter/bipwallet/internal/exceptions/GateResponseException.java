@@ -24,39 +24,31 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
+package network.minter.bipwallet.internal.exceptions;
 
-import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.explorer.models.GateResult;
-import retrofit2.HttpException;
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * Dogsy. 2018
+ * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class GateErrorMapped<Result> extends GateResult<Result> implements ResultErrorMapper {
-    public int statusCode;
-    public String errorMessage;
+public final class GateResponseException extends Exception {
+    private GateResult mError;
+
+    public GateResponseException(GateResult error) {
+        mError = error;
+    }
 
     @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
+    public String getMessage() {
+        if (mError != null && mError.getMessage() != null && !mError.getMessage().isEmpty()) {
+            return mError.getMessage();
         }
 
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
+        return super.getMessage();
+    }
 
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        result = null;
-        error = new ErrorResult();
-        error.code = statusCode;
-        error.message = e.getUserMessage();
-        statusCode = e.getStatusCode();
-        errorMessage = e.getUserMessage();
-
-        return true;
+    public GateResult getError() {
+        return mError;
     }
 }

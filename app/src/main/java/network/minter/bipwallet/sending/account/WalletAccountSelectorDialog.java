@@ -107,13 +107,13 @@ public class WalletAccountSelectorDialog extends WalletDialog {
             return this;
         }
 
-        public Builder addItem(String avatar, String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd, BigDecimal balanceBase) {
-            mItems.add(new AccountItem(avatar, coin, address, balance, balanceUsd, balanceBase));
+        public Builder addItem(String avatar, String coin, MinterAddress address, BigDecimal balance) {
+            mItems.add(new AccountItem(avatar, coin, address, balance));
             return this;
         }
 
-        public Builder addItem(String coin, MinterAddress address, BigDecimal balance, BigDecimal balanceUsd, BigDecimal balanceBase) {
-            mItems.add(new AccountItem(coin, address, balance, balanceUsd, balanceBase));
+        public Builder addItem(String coin, MinterAddress address, BigDecimal balance) {
+            mItems.add(new AccountItem(coin, address, balance));
             return this;
         }
 

@@ -42,7 +42,9 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
+import network.minter.explorer.repo.GateTransactionRepository;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
@@ -60,8 +62,10 @@ public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
-            GateGasRepository gasRepo) {
-        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, gasRepo);
+            GateGasRepository gasRepo,
+            GateEstimateRepository estimateRepository,
+            GateTransactionRepository gateTransactionRepository) {
+        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, gasRepo, estimateRepository, gateTransactionRepository);
     }
 
     @Override

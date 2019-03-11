@@ -64,23 +64,26 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
-import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
-import network.minter.explorer.models.BCExplorerResult;
+import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.TxCount;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
+import network.minter.explorer.repo.GateTransactionRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.reactive.ReactiveBlockchain.rxBc;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.createExpGateErrorPlain;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
@@ -93,8 +96,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final CachedRepository<UserAccount, AccountStorage> mAccountStorage;
     protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;
     protected final ExplorerCoinsRepository mExplorerCoinsRepo;
+    protected final GateEstimateRepository mEstimateRepository;
     protected final IdlingManager mIdlingManager;
     protected final GateGasRepository mGasRepo;
+    protected final GateTransactionRepository mGateTxRepo;
 
     private AccountItem mAccount;
     private String mGetCoin = null;
@@ -113,7 +118,9 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
-            GateGasRepository gasRepo
+            GateGasRepository gasRepo,
+            GateEstimateRepository estimateRepository,
+            GateTransactionRepository gateTxRepo
     ) {
         mSecretStorage = secretStorage;
         mAccountStorage = accountStorage;
@@ -121,6 +128,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mExplorerCoinsRepo = explorerCoinsRepository;
         mIdlingManager = idlingManager;
         mGasRepo = gasRepo;
+        mEstimateRepository = estimateRepository;
+        mGateTxRepo = gateTxRepo;
     }
 
     @Override
@@ -177,7 +186,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
                     if (res.isOk()) {
-                        mGasPrice = res.data.gas;
+                        mGasPrice = res.result.gas;
                         Timber.d("Min Gas price: %s", mGasPrice.toString());
                         getViewState().setFee(String.format("%s %s", bdHuman(getOperationType().getFee().multiply(new BigDecimal(mGasPrice))), MinterSDK.DEFAULT_COIN.toUpperCase()));
 
@@ -226,13 +235,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             dialog.setCancelable(false);
 
             safeSubscribeIoToUi(
-                    rxExpGate(mTxRepo.getEntity().getTransactionCount(mAccount.address))
-                            .onErrorResumeNext(toExpGateError())
+                    rxGate(mEstimateRepository.getTransactionCount(mAccount.address))
+                            .onErrorResumeNext(toGateError())
             )
                     .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .switchMap((Function<BCExplorerResult<CountableData>, ObservableSource<BCExplorerResult<TransactionSendResult>>>) cntRes -> {
-                        if (!cntRes.isSuccess()) {
-                            return Observable.just(BCExplorerResult.copyError(cntRes));
+                    .switchMap((Function<GateResult<TxCount>, ObservableSource<GateResult<TransactionSendResult>>>) cntRes -> {
+                        if (!cntRes.isOk()) {
+                            GateResult<TransactionSendResult> errOut = new GateResult<>();
+                            errOut.error = cntRes.error;
+                            return Observable.just(errOut);
                         }
                         final BigInteger nonce = cntRes.result.count.add(new BigInteger("1"));
                         final Transaction tx = txData.build(nonce);
@@ -241,15 +252,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         data.cleanup();
 
                         return safeSubscribeIoToUi(
-                                rxExpGate(mTxRepo.getEntity().sendTransaction(sign))
-                                        .onErrorResumeNext(toExpGateError())
+                                rxExpGate(mGateTxRepo.sendTransaction(sign))
+                                        .onErrorResumeNext(toGateError())
                         );
 
                     })
                     .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .onErrorResumeNext(toExpGateError())
+                    .onErrorResumeNext(toGateError())
                     .subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, t -> {
-                        onErrorExecuteTransaction(createExpGateErrorPlain(t));
+                        onErrorExecuteTransaction(createGateErrorPlain(t));
                     });
 
 
@@ -257,8 +268,8 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         });
     }
 
-    private void onSuccessExecuteTransaction(BCExplorerResult<TransactionSendResult> result) {
-        if (!result.isSuccess()) {
+    private void onSuccessExecuteTransaction(GateResult<TransactionSendResult> result) {
+        if (!result.isOk()) {
             onErrorExecuteTransaction(result);
             return;
         }
@@ -279,7 +290,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .create());
     }
 
-    private void onErrorExecuteTransaction(BCExplorerResult<?> errorResult) {
+    private void onErrorExecuteTransaction(GateResult<?> errorResult) {
         Timber.e(errorResult.getMessage(), "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
                 .setText((errorResult.getMessage()))
@@ -416,7 +427,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
-        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mExplorerCoinsRepo)
+        ExchangeCalculator calculator = new ExchangeCalculator.Builder(mEstimateRepository)
                 .setAccount(() -> mAccounts, () -> mAccount)
                 .setGetAmount(() -> mGetAmount)
                 .setSpendAmount(() -> mSpendAmount)

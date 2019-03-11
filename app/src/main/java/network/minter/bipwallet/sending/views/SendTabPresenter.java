@@ -78,7 +78,6 @@ import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendWaitingDialog;
 import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
@@ -88,19 +87,21 @@ import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.explorer.models.BCExplorerResult;
+import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.TxCount;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
+import network.minter.explorer.repo.GateTransactionRepository;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.createExpGateErrorPlain;
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
@@ -129,6 +130,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Inject CacheManager cache;
     @Inject RecipientAutocompleteStorage recipientStorage;
     @Inject IdlingManager idlingManager;
+    @Inject GateEstimateRepository estimateRepo;
+    @Inject GateTransactionRepository gateTxRepo;
     private AccountItem mFromAccount = null;
     private BigDecimal mAmount = null;
     private CharSequence mToAddress = null;
@@ -219,7 +222,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
                     if (res.isOk()) {
-                        mGasPrice = res.data.gas;
+                        mGasPrice = res.result.gas;
                         Timber.d("Min Gas price: %s", mGasPrice.toString());
                         final BigDecimal fee = OperationType.SendCoin.getFee().multiply(new BigDecimal(mGasPrice));
                         getViewState().setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN.toUpperCase()));
@@ -451,10 +454,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
 
             // default coin for pay fee - MNT (base coin)
-            final BCExplorerResult<TransactionCommissionValue> val = new BCExplorerResult<>();
+            final GateResult<TransactionCommissionValue> val = new GateResult<>();
             val.result = new TransactionCommissionValue();
             val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-            Observable<BCExplorerResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
+            Observable<GateResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
 
             final boolean enoughBaseCoinForCommission = bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee());
 
@@ -485,10 +488,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
                     final TransactionSign preSign = preTx.signSingle(preData.getPrivateKey());
 
-                    exchangeResolver = rxExpGate(cachedTxRepo.getEntity().getTransactionCommission(preSign)).onErrorResumeNext(toExpGateError());
+                    exchangeResolver = rxGate(estimateRepo.getTransactionCommission(preSign)).onErrorResumeNext(toGateError());
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
-                    final BCExplorerResult<TransactionCommissionValue> commissionValue = new BCExplorerResult<>();
+                    final GateResult<TransactionCommissionValue> commissionValue = new GateResult<>();
                     val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
                     exchangeResolver = Observable.just(commissionValue);
                 }
@@ -497,16 +500,16 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             // creating preparation result to send transaction
             Disposable d = Observable.combineLatest(
                     exchangeResolver,
-                    rxExpGate(cachedTxRepo.getEntity().getTransactionCount(mFromAccount.address)).onErrorResumeNext(toExpGateError()),
-                    new BiFunction<BCExplorerResult<TransactionCommissionValue>, BCExplorerResult<CountableData>, SendInitData>() {
+                    rxGate(estimateRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(toGateError()),
+                    new BiFunction<GateResult<TransactionCommissionValue>, GateResult<TxCount>, SendInitData>() {
                         @Override
-                        public SendInitData apply(BCExplorerResult<TransactionCommissionValue> txCommissionValue, BCExplorerResult<CountableData> countableDataBCResult) {
+                        public SendInitData apply(GateResult<TransactionCommissionValue> txCommissionValue, GateResult<TxCount> countableDataBCResult) {
 
                             // if some request failed, returning error result
-                            if (!txCommissionValue.isSuccess()) {
-                                return new SendInitData(BCExplorerResult.copyError(txCommissionValue));
-                            } else if (!countableDataBCResult.isSuccess()) {
-                                return new SendInitData(BCExplorerResult.copyError(countableDataBCResult));
+                            if (!txCommissionValue.isOk()) {
+                                return new SendInitData(GateResult.copyError(txCommissionValue));
+                            } else if (!countableDataBCResult.isOk()) {
+                                return new SendInitData(GateResult.copyError(countableDataBCResult));
                             }
 
                             Timber.d("SendInitData: tx commission: %s", txCommissionValue.result.getValue());
@@ -521,10 +524,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             return data;
                         }
                     })
-                    .switchMap((Function<SendInitData, ObservableSource<BCExplorerResult<TransactionSendResult>>>) cntRes -> {
+                    .switchMap((Function<SendInitData, ObservableSource<GateResult<TransactionSendResult>>>) cntRes -> {
                         // if in previous request we've got error, returning it
                         if (!cntRes.isSuccess()) {
-                            return Observable.just(BCExplorerResult.copyError(cntRes.errorResult));
+                            return Observable.just(GateResult.copyError(cntRes.errorResult));
                         }
 
                         final BigDecimal amountToSend;
@@ -548,19 +551,19 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
                         // if after subtracting fee from sending sum has become less than account balance at all, returning error with message "insufficient funds"
                         if (bdLT(amountToSend, 0)) {
-                            BCExplorerResult<TransactionSendResult> errorRes;
+                            GateResult<TransactionSendResult> errorRes;
                             final BigDecimal balanceMustBe = cntRes.commission.add(mAmount);
                             if (bdLT(mAmount, mFromAccount.getBalance())) {
                                 final BigDecimal notEnough = cntRes.commission.subtract(mFromAccount.getBalance().subtract(mAmount));
                                 Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(notEnough));
-                                errorRes = createExpGateErrorPlain(
+                                errorRes = createGateErrorPlain(
                                         String.format("Insufficient funds: not enough %s %s, wanted: %s %s", bdHuman(notEnough), mFromAccount.getCoin(), bdHuman(balanceMustBe), mFromAccount.getCoin()),
                                         BCResult.ResultCode.InsufficientFunds.getValue(),
                                         400
                                 );
                             } else {
                                 Timber.d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(balanceMustBe));
-                                errorRes = createExpGateErrorPlain(
+                                errorRes = createGateErrorPlain(
                                         String.format("Insufficient funds: wanted %s %s", bdHuman(balanceMustBe), mFromAccount.getCoin()),
                                         BCResult.ResultCode.InsufficientFunds.getValue(),
                                         400
@@ -590,8 +593,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         final TransactionSign sign = tx.signSingle(data.getPrivateKey());
 
                         return safeSubscribeIoToUi(
-                                rxExpGate(cachedTxRepo.getEntity().sendTransaction(sign))
-                                        .onErrorResumeNext(toExpGateError())
+                                rxGate(gateTxRepo.sendTransaction(sign))
+                                        .onErrorResumeNext(toGateError())
                         );
 
                     })
@@ -624,7 +627,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .create());
     }
 
-    private void onErrorExecuteTransaction(BCExplorerResult<?> errorResult) {
+    private void onErrorExecuteTransaction(GateResult<?> errorResult) {
         Timber.e(errorResult.getMessage(), "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
                 .setText((errorResult.getMessage()))
@@ -632,8 +635,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .create());
     }
 
-    private void onSuccessExecuteTransaction(final BCExplorerResult<TransactionSendResult> result) {
-        if (!result.isSuccess()) {
+    private void onSuccessExecuteTransaction(final GateResult<TransactionSendResult> result) {
+        if (!result.isOk()) {
             onErrorExecuteTransaction(result);
             return;
         }
@@ -692,19 +695,19 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private static final class SendInitData {
         BigInteger nonce;
         BigDecimal commission;
-        BCExplorerResult<?> errorResult;
+        GateResult<?> errorResult;
 
         SendInitData(BigInteger nonce, BigDecimal commission) {
             this.nonce = nonce;
             this.commission = commission;
         }
 
-        SendInitData(BCExplorerResult<?> err) {
+        SendInitData(GateResult<?> err) {
             errorResult = err;
         }
 
         boolean isSuccess() {
-            return errorResult == null || errorResult.isSuccess();
+            return errorResult == null || errorResult.isOk();
         }
     }
 
