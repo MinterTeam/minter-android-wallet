@@ -51,6 +51,7 @@ public interface TransactionItem {
     int TX_REDEEM_CHECK = 9;
     int TX_SET_CANDIDATE_ONLINE = 10;
     int TX_SET_CANDIDATE_OFFLINE = 11;
+    int TX_MULTISEND = 13;
 
 
     @ListType
