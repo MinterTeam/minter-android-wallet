@@ -38,6 +38,8 @@ import centrifuge.Centrifuge;
 import centrifuge.Client;
 import centrifuge.ConnectEvent;
 import centrifuge.ConnectHandler;
+import centrifuge.DisconnectEvent;
+import centrifuge.DisconnectHandler;
 import centrifuge.ErrorEvent;
 import centrifuge.ErrorHandler;
 import centrifuge.MessageEvent;
@@ -138,7 +140,8 @@ public class LiveBalanceService extends Service {
 
     private void connect() {
         try {
-            mClient = Centrifuge.new_("wss://explorer-rtm.testnet.minter.network/connection/websocket", Centrifuge.defaultConfig());
+//            mClient = Centrifuge.new_("wss://explorer-rtm.testnet.minter.network/connection/websocket", Centrifuge.defaultConfig());
+            mClient = Centrifuge.new_("wss://rtm.explorer.minter.network/connection/websocket", Centrifuge.defaultConfig());
             mClient.onConnect(new ConnectHandler() {
                 @Override
                 public void onConnect(Client client, ConnectEvent connectEvent) {
@@ -146,10 +149,16 @@ public class LiveBalanceService extends Service {
                 }
             });
 
+            mClient.onDisconnect(new DisconnectHandler() {
+                @Override
+                public void onDisconnect(Client client, DisconnectEvent disconnectEvent) {
+                    Timber.w("Disconnected");
+                }
+            });
             mClient.onError(new ErrorHandler() {
                 @Override
                 public void onError(Client client, ErrorEvent errorEvent) {
-                    Timber.d("OnError[%d]: %s", errorEvent.incRefnum(), errorEvent.getMessage());
+                    Timber.w("OnError[%d]: %s", errorEvent.incRefnum(), errorEvent.getMessage());
                 }
             });
 
