@@ -80,7 +80,6 @@ import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.reactive.ReactiveBlockchain.rxBc;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
@@ -252,7 +251,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                         data.cleanup();
 
                         return safeSubscribeIoToUi(
-                                rxExpGate(mGateTxRepo.sendTransaction(sign))
+                                rxGate(mGateTxRepo.sendTransaction(sign))
                                         .onErrorResumeNext(toGateError())
                         );
 
