@@ -26,6 +26,7 @@
 package network.minter.bipwallet.exchange.views;
 
 import android.support.annotation.CallSuper;
+import android.support.v4.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 
@@ -69,6 +70,7 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.GasValue;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.models.TxCount;
@@ -78,7 +80,6 @@ import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.reactive.ReactiveBlockchain.rxBc;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
@@ -178,7 +179,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
 
     private void loadAndSetFee() {
         mIdlingManager.setNeedsWait(BaseCoinTabFragment.IDLE_WAIT_GAS, true);
-        rxBc(mGasRepo.getMinGas())
+        rxGate(mGasRepo.getMinGas())
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -225,6 +226,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 .findFirst();
     }
 
+    // @TODO REFACTORING!!! this is hell
     private void onStartExecuteTransaction(final ConvertTransactionData txData) {
         getViewState().startDialog(ctx -> {
             WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
@@ -234,28 +236,61 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             dialog.setCancelable(false);
 
             safeSubscribeIoToUi(
+                    // GET nonce
                     rxGate(mEstimateRepository.getTransactionCount(mAccount.address))
                             .onErrorResumeNext(toGateError())
             )
                     .doOnSubscribe(this::unsubscribeOnDestroy)
-                    .switchMap((Function<GateResult<TxCount>, ObservableSource<GateResult<TransactionSendResult>>>) cntRes -> {
-                        if (!cntRes.isOk()) {
-                            GateResult<TransactionSendResult> errOut = new GateResult<>();
-                            errOut.error = cntRes.error;
-                            return Observable.just(errOut);
+                    // GET min gas value
+                    .switchMap(new Function<GateResult<TxCount>, ObservableSource<GateResult<Pair<TxCount, GasValue>>>>() {
+                        @Override
+                        public ObservableSource<GateResult<Pair<TxCount, GasValue>>> apply(GateResult<TxCount> cntRes) {
+                            // if somewhere occurred error, return error, nothing else
+                            if (!cntRes.isOk()) {
+                                GateResult<Pair<TxCount, GasValue>> errOut = new GateResult<>();
+                                errOut.error = cntRes.error;
+                                return Observable.just(errOut);
+                            }
+
+                            // Map nonce and min gas value
+                            return rxGate(mGasRepo.getMinGas()).switchMap(new Function<GateResult<GasValue>, ObservableSource<? extends GateResult<Pair<TxCount, GasValue>>>>() {
+                                @Override
+                                public ObservableSource<? extends GateResult<Pair<TxCount, GasValue>>> apply(GateResult<GasValue> gasValueGateResult) {
+                                    GateResult<Pair<TxCount, GasValue>> out = new GateResult<>();
+                                    out.result = Pair.create(cntRes.result, gasValueGateResult.result);
+                                    out.statusCode = gasValueGateResult.statusCode;
+                                    out.error = gasValueGateResult.error;
+                                    return Observable.just(out);
+                                }
+                            });
+
                         }
-                        final BigInteger nonce = cntRes.result.count.add(new BigInteger("1"));
-                        final Transaction tx = txData.build(nonce);
-                        final SecretData data = mSecretStorage.getSecret(mAccount.address);
-                        final TransactionSign sign = tx.signSingle(data.getPrivateKey());
-                        data.cleanup();
+                        // build transaction with prefetched nonce and gas
+                    }).switchMap((Function<GateResult<Pair<TxCount, GasValue>>, ObservableSource<GateResult<TransactionSendResult>>>) cntRes -> {
+                // if error occurred upper, notify error
+                if (!cntRes.isOk()) {
+                    GateResult<TransactionSendResult> errOut = new GateResult<>();
+                    errOut.error = cntRes.error;
+                    return Observable.just(errOut);
+                }
 
-                        return safeSubscribeIoToUi(
-                                rxGate(mGateTxRepo.sendTransaction(sign))
-                                        .onErrorResumeNext(toGateError())
-                        );
+                BigDecimal balance = new BigDecimal("0");
 
-                    })
+                if (getOperationType() == OperationType.SellCoin || getOperationType() == OperationType.SellAllCoins) {
+                    balance = mAccount.getBalance();
+                }
+                final BigInteger nonce = cntRes.result.first.count.add(new BigInteger("1"));
+                final Transaction tx = txData.build(nonce, cntRes.result.second.gas, balance);
+                final SecretData data = mSecretStorage.getSecret(mAccount.address);
+                final TransactionSign sign = tx.signSingle(data.getPrivateKey());
+                data.cleanup();
+
+                return safeSubscribeIoToUi(
+                        rxGate(mGateTxRepo.sendTransaction(sign))
+                                .onErrorResumeNext(toGateError())
+                );
+
+            })
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .onErrorResumeNext(toGateError())
                     .subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, t -> {

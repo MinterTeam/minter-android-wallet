@@ -583,6 +583,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         // creating tx
                         final Transaction tx = new Transaction.Builder(cntRes.nonce)
                                 .setGasCoin(mGasCoin)
+                                .setGasPrice(mGasPrice)
                                 .sendCoin()
                                 .setCoin(mFromAccount.coin)
                                 .setTo(mToAddress)

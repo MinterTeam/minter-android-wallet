@@ -75,7 +75,7 @@ public class ExchangeCalculator {
         final String targetCoin = mBuilder.mGetCoin.get();
 
         if (opType == OperationType.BuyCoin) {
-            // get
+            // get (buy)
             rxExpGate(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -133,7 +133,7 @@ public class ExchangeCalculator {
                         errFunc.accept("Unable to get currency");
                     });
         } else {
-            // spend
+            // spend (sell or sellAll)
             rxGate(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
