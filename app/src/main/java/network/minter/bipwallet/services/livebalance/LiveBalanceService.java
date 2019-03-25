@@ -52,6 +52,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
+import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
 
 /**
@@ -66,16 +67,17 @@ public class LiveBalanceService extends Service {
     @Inject AuthSession session;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private OnMessageListener mOnMessageListener;
+    private Client mClient = null;
+    private MinterAddress mAddress;
     private final PublishHandler mListener = new PublishHandler() {
         @Override
         public void onPublish(Subscription subscription, PublishEvent publishEvent) {
             Timber.d("OnPublish: sub=%s, ev=%s", subscription.channel(), publishEvent.toString());
             if (mOnMessageListener != null) {
-                mOnMessageListener.onMessage(new String(publishEvent.getData()), subscription.channel());
+                mOnMessageListener.onMessage(new String(publishEvent.getData()), subscription.channel(), mAddress);
             }
         }
     };
-    private Client mClient = null;
 
     @Override
     public void onLowMemory() {
@@ -140,8 +142,8 @@ public class LiveBalanceService extends Service {
 
     private void connect() {
         try {
-//            mClient = Centrifuge.new_("wss://explorer-rtm.testnet.minter.network/connection/websocket", Centrifuge.defaultConfig());
-            mClient = Centrifuge.new_("wss://rtm.explorer.minter.network/connection/websocket", Centrifuge.defaultConfig());
+            mClient = Centrifuge.new_("wss://explorer-rtm.testnet.minter.network/connection/websocket", Centrifuge.defaultConfig());
+//            mClient = Centrifuge.new_("wss://rtm.explorer.minter.network/connection/websocket", Centrifuge.defaultConfig());
             mClient.onConnect(new ConnectHandler() {
                 @Override
                 public void onConnect(Client client, ConnectEvent connectEvent) {
@@ -170,7 +172,8 @@ public class LiveBalanceService extends Service {
             });
             mClient.connect();
 
-            Subscription sub = mClient.newSubscription(secretStorage.getAddresses().get(0).toString());
+            mAddress = secretStorage.getAddresses().get(0);
+            Subscription sub = mClient.newSubscription(mAddress.toString());
             sub.onPublish(mListener);
             sub.subscribe();
         } catch (Throwable t) {
@@ -188,7 +191,7 @@ public class LiveBalanceService extends Service {
     }
 
     public interface OnMessageListener {
-        void onMessage(String message, String channel);
+        void onMessage(String message, String channel, MinterAddress address);
     }
 
     public final class LocalBinder extends Binder {

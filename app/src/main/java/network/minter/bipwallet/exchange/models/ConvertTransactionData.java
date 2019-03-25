@@ -91,8 +91,8 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setValueToBuy(mAmount)
                     .setCoinToBuy(mBuyCoin)
-//                    .setMaxValueToSell(getEstimate().multiply(new BigDecimal(1.1d)))
-                    .setMaxValueToSell(balance)
+                    .setMaxValueToSell(getEstimate().multiply(new BigDecimal(1.1d)))
+//                    .setMaxValueToSell(balance)
                     .build();
         } else {
             // this case used ONLY: when not enough mnt to pay fee with mnt

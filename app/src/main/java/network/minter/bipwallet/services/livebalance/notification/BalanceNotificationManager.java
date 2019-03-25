@@ -44,6 +44,7 @@ import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.notifications.BaseNotificationManager;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
@@ -72,21 +73,73 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
         mEnabledNotifications = () -> prefs.getBool(SettingsManager.EnableLiveNotifications);
     }
 
-    public void showBalanceUpdate(String json) {
+    public void showBalanceUpdate(String json, MinterAddress address) {
         if (!mEnabledNotifications.get()) {
             return;
         }
 
         Timber.d("Balance update message: %s", json);
 
-        LiveBalanceMessage message;
-        try {
-            message = mGsonBuilder.create().fromJson(json, LiveBalanceMessage.class);
-        } catch (Throwable t) {
-            Timber.e(t, "Unable to decode live balance message: %s", json);
-            return;
+        showBalanceUpdated(address);
+
+//        List<LiveBalanceMessage> message;
+//        try {
+//            message = mGsonBuilder.create().fromJson(json, new TypeToken<List<LiveBalanceMessage>>(){}.getType());
+//        } catch (Throwable t) {
+//            Timber.e(t, "Unable to decode live balance message: %s", json);
+//            return;
+//        }
+//
+//        for(LiveBalanceMessage msg: message) {
+//            showBalanceForCoin(msg, address);
+//        }
+
+
+    }
+
+    private void showBalanceUpdated(MinterAddress address) {
+        if (SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            final String channelName = mContext.getResources().getString(R.string.notification_balance_update_name);
+            final String channelDescription = mContext.getResources().getString(R.string.notification_balance_update_description);
+            NotificationChannel channel = new NotificationChannel(WALLET_BALANCE_UPDATE_CHANNEL, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(channelDescription);
+            channel.setShowBadge(true);
+            mNotificationManager.createNotificationChannel(channel);
         }
 
+        Intent contentIntent = ExternalActivity.createAction(mContext, ExternalActivity.ACTION_OPEN_HOME, null);
+
+        final String listTxLabel = mContext.getResources().getString(R.string.notification_balance_list_tx_label);
+        final Intent listTxIntent = new Intent(mContext, TransactionListActivity.class);
+        NotificationCompat.Action listTxAction =
+                new NotificationCompat.Action.Builder(
+                        R.drawable.ic_notify_list_tx,
+                        listTxLabel,
+                        createActionIntent(mContext, listTxIntent)
+                ).build();
+
+        NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+        style.addLine("Status: updated").setSummaryText(address.toShortString());
+
+        final Notification messageNotification = new NotificationCompat.Builder(mContext, WALLET_BALANCE_UPDATE_CHANNEL)
+                .setContentTitle("Balance")
+                .setContentText("Status: updated")
+                .setSmallIcon(R.drawable.ic_notify_coin)
+                .setColor(mContext.getResources().getColor(R.color.colorPrimaryDark))
+                .setAutoCancel(true)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setStyle(style)
+                .setGroup(address.toString())
+                .setContentIntent(createActionIntent(mContext, contentIntent))
+                .addAction(listTxAction)
+                .setNumber(1)
+                .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
+                .build();
+
+        mNotificationManager.notify(WALLET_BALANCE_ID, messageNotification);
+    }
+
+    private void showBalanceForCoin(LiveBalanceMessage message, MinterAddress address) {
         if (SDK_INT >= android.os.Build.VERSION_CODES.O) {
             final String channelName = mContext.getResources().getString(R.string.notification_balance_update_name);
             final String channelDescription = mContext.getResources().getString(R.string.notification_balance_update_description);
@@ -115,7 +168,7 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
                     final String text = String.format("%s: %s", message.getCoin(), bdHuman(message.getAmount()));
 
                     NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
-                    style.addLine(text).setSummaryText(message.getAddress().toShortString());
+                    style.addLine(text).setSummaryText(address.toShortString());
 
                     final Notification messageNotification = new NotificationCompat.Builder(mContext, WALLET_BALANCE_UPDATE_CHANNEL)
                             .setContentTitle("Balance updated")
@@ -126,7 +179,7 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
                             .setAutoCancel(true)
                             .setCategory(NotificationCompat.CATEGORY_STATUS)
                             .setStyle(style)
-                            .setGroup(message.getAddress().toString() + "_" + message.getCoin())
+                            .setGroup(address.toString() + "_" + message.getCoin())
                             .setContentIntent(createActionIntent(mContext, contentIntent))
                             .addAction(listTxAction)
                             .setNumber(1)
