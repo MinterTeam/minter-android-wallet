@@ -65,7 +65,6 @@ public class AdvancedModeModule {
     }
 
     public interface MainView extends MvpView, ErrorView, ProgressTextView {
-        void setOnGenerate(View.OnClickListener listener);
         void setMnemonicTextChangedListener(TextWatcher textWatcher);
         void setOnActivateMnemonic(View.OnClickListener listener);
         @StateStrategyType(OneExecutionStateStrategy.class)

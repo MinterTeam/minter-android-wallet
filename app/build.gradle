@@ -83,10 +83,10 @@ android {
 
     signingConfigs {
         config {
-            keyAlias getProperty("minter_key_alias")
-            keyPassword getProperty("minter_key_password")
-            storeFile file(getProperty("minter_key_store_file"))
-            storePassword getProperty("minter_key_store_password")
+            keyAlias localProps['minter_key_alias']
+            keyPassword localProps['minter_key_password']
+            storeFile file(localProps['minter_key_store_file'])
+            storePassword localProps['minter_key_store_password']
         }
     }
 
