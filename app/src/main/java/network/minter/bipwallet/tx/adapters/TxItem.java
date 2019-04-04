@@ -47,6 +47,7 @@ import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.profile.MinterProfileApi;
+import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
@@ -61,12 +62,12 @@ public class TxItem implements TransactionItem {
 
     public TxItem(HistoryTransaction tx) {
         mTx = tx;
-        if (tx.getAvatar() == null && tx.data instanceof HistoryTransaction.TxSendCoinResult) {
-            mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.<HistoryTransaction.TxSendCoinResult>getData().to);
-        } else {
-            mAvatar = firstNonNull(tx.getAvatar(), MinterProfileApi.getUserAvatarUrl(1));
-        }
-
+//        if (tx.getAvatar() == null && tx.data instanceof HistoryTransaction.TxSendCoinResult) {
+//            mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.<HistoryTransaction.TxSendCoinResult>getData().to);
+//        } else {
+//            mAvatar = firstNonNull(tx.getAvatar(), MinterProfileApi.getUserAvatarUrl(1));
+//        }
+        mAvatar = MinterProfileApi.getUserAvatarUrl(1);
         mUsername = tx.username;
     }
 
