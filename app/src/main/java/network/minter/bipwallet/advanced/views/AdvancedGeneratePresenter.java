@@ -89,7 +89,6 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
         // default value for basic user
         mSaveOnServer = session.getRole() == AuthSession.AuthType.Basic;
 
-        mMnemonicResult = NativeBip39.encodeBytes(mRandom.generateSeed(16));
         getViewState().setMnemonic(mMnemonicResult.getMnemonic());
 
         getViewState().setEnableCopy(true);
@@ -120,6 +119,7 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         getViewState().setEnableLaunch(false);
+        mMnemonicResult = NativeBip39.encodeBytes(mRandom.generateSeed(16));
     }
 
     private boolean saveServerAddress(String fieldName, String value, MinterAddress address) {

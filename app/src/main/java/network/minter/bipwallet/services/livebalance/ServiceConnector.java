@@ -42,15 +42,15 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ServiceConnector implements ServiceConnection {
-    private static BalanceUpdateService service = null;
+    private static LiveBalanceService service = null;
     private static ServiceConnector instance;
     private static boolean bound = false;
-    private static ReplaySubject<BalanceUpdateService> serviceConnected = ReplaySubject.create(1);
+    private static ReplaySubject<LiveBalanceService> serviceConnected = ReplaySubject.create(1);
 
     private ServiceConnector() {
     }
 
-    public static BalanceUpdateService get() {
+    public static LiveBalanceService get() {
         return service;
     }
 
@@ -65,7 +65,7 @@ public class ServiceConnector implements ServiceConnection {
 
         try {
             if (!bound) {
-                Intent intent = new Intent(context, BalanceUpdateService.class);
+                Intent intent = new Intent(context, LiveBalanceService.class);
                 context.startService(intent);
                 context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
             }
@@ -86,7 +86,7 @@ public class ServiceConnector implements ServiceConnection {
                     Timber.i(e);
                 }
 
-                context.stopService(new Intent(context, BalanceUpdateService.class));
+                context.stopService(new Intent(context, LiveBalanceService.class));
                 service = null;
             }
             bound = false;
@@ -95,7 +95,7 @@ public class ServiceConnector implements ServiceConnection {
         }
     }
 
-    public static Observable<BalanceUpdateService> onConnected() {
+    public static Observable<LiveBalanceService> onConnected() {
         if (service != null) {
             return Observable.just(service);
         }
@@ -106,7 +106,7 @@ public class ServiceConnector implements ServiceConnection {
     @Override
     public void onServiceConnected(ComponentName name, IBinder binder) {
         if (!bound) {
-            service = ((BalanceUpdateService.LocalBinder) binder).getService();
+            service = ((LiveBalanceService.LocalBinder) binder).getService();
             bound = true;
             serviceConnected.onNext(service);
             Timber.i("Service connected");

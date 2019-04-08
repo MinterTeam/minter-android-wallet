@@ -80,6 +80,10 @@ public class IdlingManager {
     }
 
     public void setNeedsWait(String name, boolean active) {
+        if (!mEnabled) {
+            return;
+        }
+
         if (!mContent.containsKey(name)) {
             Timber.e("Idling resource with name %s does not exists", name);
             return;

@@ -50,9 +50,9 @@ public class GateErrorMapped<Result> extends GateResult<Result> implements Resul
         }
 
         NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        data = null;
+        result = null;
         error = new ErrorResult();
-        error.statusCode = e.getStatusCode();
+        error.code = statusCode;
         error.message = e.getUserMessage();
         statusCode = e.getStatusCode();
         errorMessage = e.getUserMessage();

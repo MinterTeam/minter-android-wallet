@@ -40,14 +40,15 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.internal.common.Lazy;
-import network.minter.bipwallet.internal.exceptions.BCExplorerResponseException;
+import network.minter.bipwallet.internal.exceptions.GateResponseException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.core.MinterSDK;
-import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.models.GateResult;
+import network.minter.explorer.repo.GateEstimateRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
+import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -65,7 +66,7 @@ public class ExchangeCalculator {
     }
 
     public void calculate(OperationType opType, Consumer<CalculationResult> onResult, Consumer<String> onErrorMessage) {
-        final ExplorerCoinsRepository repo = mBuilder.mCoinsRepo;
+        final GateEstimateRepository repo = mBuilder.mCoinsRepo;
 
         final Consumer<String> errFunc = onErrorMessage == null ? e -> {
         } : onErrorMessage;
@@ -74,22 +75,22 @@ public class ExchangeCalculator {
         final String targetCoin = mBuilder.mGetCoin.get();
 
         if (opType == OperationType.BuyCoin) {
-            // get
-            rxExpGate(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
+            // get (buy)
+            rxGate(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(toExpGateError())
+                    .onErrorResumeNext(toGateError())
                     .doOnSubscribe(mBuilder.mDisposableConsumer)
                     .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
                     }))
                     .subscribe(res -> {
-                        if (!res.isSuccess()) {
-                            if (res.statusCode == 404 || res.statusCode == 400 || res.getErrorCode() == CoinNotExists) {
+                        if (!res.isOk()) {
+                            if (checkCoinNotExistError(res)) {
                                 errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
-                                Timber.w(new BCExplorerResponseException(res));
-                                errFunc.accept(firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
+                                Timber.w(new GateResponseException(res));
+                                errFunc.accept(firstNonNull(res.getMessage(), String.format("Error::%s", res.error.getResultCode().name())));
                                 return;
                             }
                         }
@@ -132,22 +133,22 @@ public class ExchangeCalculator {
                         errFunc.accept("Unable to get currency");
                     });
         } else {
-            // spend
-            rxExpGate(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
+            // spend (sell or sellAll)
+            rxGate(repo.getCoinExchangeCurrencyToSell(sourceCoin, mBuilder.mSpendAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(toExpGateError())
+                    .onErrorResumeNext(toGateError())
                     .doOnSubscribe(mBuilder.mDisposableConsumer)
                     .doFinally(firstNonNull(mBuilder.mOnCompleteListener, () -> {
                     }))
                     .subscribe(res -> {
                         if (!res.isOk()) {
-                            if (res.statusCode == 404 || res.statusCode == 400 || res.getErrorCode() == CoinNotExists) {
+                            if (checkCoinNotExistError(res)) {
                                 errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
-                                Timber.w(new BCExplorerResponseException(res));
-                                errFunc.accept(firstNonNull(res.getMessage(), String.format("Error::%s", res.getErrorCode().name())));
+                                Timber.w(new GateResponseException(res));
+                                errFunc.accept(firstNonNull(res.getMessage(), String.format("Error::%s", res.error.getResultCode().name())));
                                 return;
                             }
                         }
@@ -188,6 +189,19 @@ public class ExchangeCalculator {
         }
     }
 
+    // Error hell TODO
+    private boolean checkCoinNotExistError(GateResult<?> res) {
+        if (res == null) {
+            return false;
+        }
+
+        if (res.error != null) {
+            return res.error.code == 404 || res.error.getResultCode() == CoinNotExists;
+        }
+
+        return res.statusCode == 404 || res.statusCode == 400;
+    }
+
     private Optional<AccountItem> findAccountByCoin(String coin) {
         return Stream.of(mBuilder.mAccounts.get())
                 .filter(item -> item.getCoin().equals(coin.toUpperCase()))
@@ -195,7 +209,7 @@ public class ExchangeCalculator {
     }
 
     public static final class Builder {
-        private final ExplorerCoinsRepository mCoinsRepo;
+        private final GateEstimateRepository mCoinsRepo;
         private Action mOnCompleteListener;
         private Consumer<? super Disposable> mDisposableConsumer;
         private Lazy<List<AccountItem>> mAccounts;
@@ -203,7 +217,7 @@ public class ExchangeCalculator {
         private Lazy<BigDecimal> mGetAmount, mSpendAmount;
         private Lazy<String> mGetCoin;
 
-        public Builder(ExplorerCoinsRepository repo) {
+        public Builder(GateEstimateRepository repo) {
             mCoinsRepo = repo;
         }
 

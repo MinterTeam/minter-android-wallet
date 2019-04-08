@@ -140,9 +140,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
                         null,
                         balance.getCoin(),
                         entry.getKey(),
-                        balance.getAmount(),
-                        balance.getUsdAmount(),
-                        balance.baseCoinAmount
+                        balance.getAmount()
                 ));
             }
         }

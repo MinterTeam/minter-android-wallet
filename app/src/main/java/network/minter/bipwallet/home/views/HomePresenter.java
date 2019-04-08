@@ -139,8 +139,8 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
         super.onFirstViewAttach();
         ServiceConnector.bind(app().context());
         ServiceConnector.onConnected()
-                .subscribe(res -> res.setOnMessageListener((message, channel) -> {
-                    accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message));
+                .subscribe(res -> res.setOnMessageListener((message, channel, address) -> {
+                    accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message, address));
                     app().explorerTransactionsRepoCache().update(true);
                     Timber.d("WS ON MESSAGE[%s]: %s", channel, message);
                 }));

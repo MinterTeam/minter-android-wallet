@@ -31,6 +31,7 @@ import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
+import network.minter.core.MinterSDK;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -63,42 +64,56 @@ public final class ConvertTransactionData {
         mGasPrice = gasPrice;
     }
 
-    public Transaction build(BigInteger nonce) throws OperationInvalidDataException {
+    public Transaction build(BigInteger nonce, BigInteger gasPrice, BigDecimal balance) throws OperationInvalidDataException {
         final Transaction tx;
 
-        if (mType == Type.Sell) {
+        // if sellAll AND selling coin is a custom coin AND calculator says enough MNT to use as gas coin
+        boolean customToCustom = mType == Type.SellAll && !mSellCoin.equals(MinterSDK.DEFAULT_COIN) && mGasCoin.equals(MinterSDK.DEFAULT_COIN);
+
+        if (mType == Type.Sell || customToCustom) {
+            // SELL
             tx = new Transaction.Builder(nonce)
                     .setGasCoin(mGasCoin)
-                    .setGasPrice(mGasPrice)
+                    .setGasPrice(gasPrice)
                     .sellCoin()
                     .setCoinToSell(mSellCoin)
                     .setValueToSell(mAmount)
                     .setCoinToBuy(mBuyCoin)
-                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
+//                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
+                    .setMinValueToBuy(0)
                     .build();
         } else if (mType == Type.Buy) {
+            // BUY
             tx = new Transaction.Builder(nonce)
                     .setGasCoin(mGasCoin)
-                    .setGasPrice(mGasPrice)
+                    .setGasPrice(gasPrice)
                     .buyCoin()
                     .setCoinToSell(mSellCoin)
                     .setValueToBuy(mAmount)
                     .setCoinToBuy(mBuyCoin)
                     .setMaxValueToSell(getEstimate().multiply(new BigDecimal(1.1d)))
+//                    .setMaxValueToSell(balance)
                     .build();
         } else {
+            // this case used ONLY: when not enough mnt to pay fee with mnt
+            // SELL ALL
             tx = new Transaction.Builder(nonce)
                     .setGasCoin(mGasCoin)
-                    .setGasPrice(mGasPrice)
+                    .setGasPrice(gasPrice)
                     .sellAllCoins()
                     .setCoinToSell(mSellCoin)
                     .setCoinToBuy(mBuyCoin)
-                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
+//                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
+                    .setMinValueToBuy(0)
                     .build();
         }
 
         return tx;
     }
+
+//    public Transaction build(BigInteger nonce) throws OperationInvalidDataException {
+//        return build(nonce, mGasPrice);
+//    }
 
     private BigDecimal getEstimate() {
         return firstNonNull(mEstimate, new BigDecimal(0));

@@ -50,6 +50,7 @@ import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.SoundManager;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
@@ -64,7 +65,9 @@ import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
+import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
+import network.minter.explorer.repo.GateTransactionRepository;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileAuthRepository;
@@ -105,6 +108,7 @@ public interface WalletComponent {
     NetworkHelper network();
     ImageHelper image();
     SharedPreferences prefs();
+    SettingsManager settings();
     GsonBuilder gsonBuilder();
     CacheManager cache();
     AnalyticsManager analytics();
@@ -131,6 +135,8 @@ public interface WalletComponent {
     ExplorerAddressRepository addressExplorerRepo();
     ExplorerCoinsRepository explorerCoinsRepo();
     GateGasRepository gasRepo();
+    GateTransactionRepository txGateRepo();
+    GateEstimateRepository estimateRepo();
     // blockchain
     BlockChainAccountRepository accountRepoBlockChain();
     BlockChainCoinRepository coinRepoBlockChain();

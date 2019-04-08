@@ -53,8 +53,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 71
-        versionName "1.2.8"
+        versionCode 75
+        versionName "1.3.0-dev05"
         testInstrumentationRunner "network.minter.bipwallet.tests.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -83,10 +83,10 @@ android {
 
     signingConfigs {
         config {
-            keyAlias getProperty("minter_key_alias")
-            keyPassword getProperty("minter_key_password")
-            storeFile file(getProperty("minter_key_store_file"))
-            storePassword getProperty("minter_key_store_password")
+            keyAlias localProps['minter_key_alias']
+            keyPassword localProps['minter_key_password']
+            storeFile file(localProps['minter_key_store_file'])
+            storePassword localProps['minter_key_store_password']
         }
     }
 
@@ -157,10 +157,10 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.3.1"
+    minterExplorerSDK = "0.4.0"
     minterProfileSDK = "0.2.1"
-    minterBlockchainSDK = "0.5.2"
-    minterCoreSDK = "0.2.3"
+    minterBlockchainSDK = "0.5.5"
+    minterCoreSDK = "0.2.4"
 }
 
 dependencies {

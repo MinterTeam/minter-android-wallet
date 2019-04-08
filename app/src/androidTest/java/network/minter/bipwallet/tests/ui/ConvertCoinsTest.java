@@ -67,10 +67,11 @@ import network.minter.core.MinterSDK;
 import network.minter.core.bip39.MnemonicResult;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.MinterExplorerApi;
-import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.CoinItem;
 import network.minter.explorer.models.ExpResult;
+import network.minter.explorer.models.GateResult;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.profile.models.User;
 import retrofit2.Response;
 import timber.log.Timber;
@@ -85,8 +86,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxBc;
-import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveBlockchain.rxBc;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.tests.internal.MyMatchers.withInputLayoutError;
 import static network.minter.bipwallet.tests.internal.MyMatchers.withInputLayoutHint;
@@ -215,7 +216,7 @@ public class ConvertCoinsTest extends BaseUiTest {
     }
 
     @Test
-    public void testSpendCommission() {
+    public void testSpendCommission() throws Throwable {
         ApiMockInterceptor gateMock = new ApiMockInterceptor("gate", mActivityTestRule.getActivity());
         try {
             MinterExplorerApi.getInstance().getGateApiService().addHttpInterceptor(gateMock);
@@ -270,6 +271,7 @@ public class ConvertCoinsTest extends BaseUiTest {
     public void testSpendInputs() throws Throwable {
 
         ExplorerCoinsRepository repo = TestWallet.app().explorerCoinsRepo();
+        GateEstimateRepository estimateRepo = TestWallet.app().estimateRepo();
 
         final int tabPos = 0;
         // spend coins
@@ -350,8 +352,8 @@ public class ConvertCoinsTest extends BaseUiTest {
         calculationSum.perform(scrollTo());
 
 
-        Response<BCExplorerResult<ExchangeSellValue>> estimate1 = repo.getCoinExchangeCurrencyToSell(MinterSDK.DEFAULT_COIN, new BigDecimal(amount), mExchangeCoin.getSymbol()).execute();
-        assertTrue(estimate1.body().isSuccess());
+        Response<GateResult<ExchangeSellValue>> estimate1 = estimateRepo.getCoinExchangeCurrencyToSell(MinterSDK.DEFAULT_COIN, new BigDecimal(amount), mExchangeCoin.getSymbol()).execute();
+        assertTrue(estimate1.body().isOk());
         // amount without commission
         String expectEstimate3 = bdHuman(estimate1.body().result.getAmount());
         calculationSum.check(matches(withText(String.format("%s %s", expectEstimate3, mExchangeCoin.getSymbol()))));
@@ -362,8 +364,8 @@ public class ConvertCoinsTest extends BaseUiTest {
         actionUseMax.perform(click());
         amountInput.check(matches(withText("100")));
 
-        Response<BCExplorerResult<ExchangeSellValue>> estimate2 = repo.getCoinExchangeCurrencyToSell(MinterSDK.DEFAULT_COIN, new BigDecimal("100"), mExchangeCoin.getSymbol()).execute();
-        assertTrue(estimate2.body().isSuccess());
+        Response<GateResult<ExchangeSellValue>> estimate2 = estimateRepo.getCoinExchangeCurrencyToSell(MinterSDK.DEFAULT_COIN, new BigDecimal("100"), mExchangeCoin.getSymbol()).execute();
+        assertTrue(estimate2.body().isOk());
         // amount without commission
         String expectEstimate2 = bdHuman(estimate2.body().result.getAmount());
         calculationSum.check(matches(withText(String.format("%s %s", expectEstimate2, mExchangeCoin.getSymbol()))));
@@ -373,6 +375,7 @@ public class ConvertCoinsTest extends BaseUiTest {
     public void testGetInputs() throws Throwable {
 
         ExplorerCoinsRepository repo = TestWallet.app().explorerCoinsRepo();
+        GateEstimateRepository estimateRepo = TestWallet.app().estimateRepo();
 
         final int tabPos = 1;
         // spend coins
@@ -456,8 +459,8 @@ public class ConvertCoinsTest extends BaseUiTest {
         calculationSum.perform(scrollTo());
 
 
-        Response<BCExplorerResult<ExchangeBuyValue>> estimate1 = repo.getCoinExchangeCurrencyToBuy(MinterSDK.DEFAULT_COIN, new BigDecimal(amount), mExchangeCoin.getSymbol()).execute();
-        assertTrue(estimate1.body().isSuccess());
+        Response<GateResult<ExchangeBuyValue>> estimate1 = estimateRepo.getCoinExchangeCurrencyToBuy(MinterSDK.DEFAULT_COIN, new BigDecimal(amount), mExchangeCoin.getSymbol()).execute();
+        assertTrue(estimate1.body().isOk());
         // amount without commission
         String expectEstimate1 = bdHuman(estimate1.body().result.getAmount());
         calculationSum.check(matches(withText(String.format("%s %s", expectEstimate1, MinterSDK.DEFAULT_COIN))));

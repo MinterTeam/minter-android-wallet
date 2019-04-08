@@ -65,6 +65,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
@@ -185,6 +186,8 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         getViewState().startLogin();
     }
 
+    @Inject SettingsManager settings;
+
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
@@ -199,10 +202,16 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
 
             mAdditionalAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
+            mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         } else {
             mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
+            mMainAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         }
+    }
+
+    private void onSwitchNotifications(View view, Boolean enabled) {
+        settings.putBool(SettingsManager.EnableLiveNotifications, enabled);
     }
 
     private void onSwitchSounds(View view, Boolean isChecked) {

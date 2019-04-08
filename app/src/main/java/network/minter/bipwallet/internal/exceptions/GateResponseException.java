@@ -24,34 +24,31 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.services.livebalance.notification;
+package network.minter.bipwallet.internal.exceptions;
 
-import java.math.BigDecimal;
-
-import network.minter.profile.MinterProfileApi;
+import network.minter.explorer.models.GateResult;
 
 /**
- * minter-android-wallet. 2018
+ * Dogsy. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class LiveBalanceMessage {
-    //    public MinterAddress address;
-    public String coin;
-    public BigDecimal amount;
+public final class GateResponseException extends Exception {
+    private GateResult mError;
 
-//    public MinterAddress getAddress() {
-//        return address;
-//    }
-
-    public String getCoin() {
-        return coin.toUpperCase();
+    public GateResponseException(GateResult error) {
+        mError = error;
     }
 
-    public String getCoinAvatar() {
-        return MinterProfileApi.getCoinAvatarUrl(getCoin());
+    @Override
+    public String getMessage() {
+        if (mError != null && mError.getMessage() != null && !mError.getMessage().isEmpty()) {
+            return mError.getMessage();
+        }
+
+        return super.getMessage();
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public GateResult getError() {
+        return mError;
     }
 }
