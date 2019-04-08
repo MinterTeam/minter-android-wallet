@@ -43,10 +43,10 @@ import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.exceptions.GateResponseException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.GateResult;
 import network.minter.explorer.repo.GateEstimateRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
@@ -76,7 +76,7 @@ public class ExchangeCalculator {
 
         if (opType == OperationType.BuyCoin) {
             // get (buy)
-            rxExpGate(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
+            rxGate(repo.getCoinExchangeCurrencyToBuy(sourceCoin, mBuilder.mGetAmount.get(), targetCoin))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .onErrorResumeNext(toGateError())
@@ -85,7 +85,7 @@ public class ExchangeCalculator {
                     }))
                     .subscribe(res -> {
                         if (!res.isOk()) {
-                            if (res.statusCode == 404 || res.statusCode == 400 || res.error.getResultCode() == CoinNotExists) {
+                            if (checkCoinNotExistError(res)) {
                                 errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
@@ -143,7 +143,7 @@ public class ExchangeCalculator {
                     }))
                     .subscribe(res -> {
                         if (!res.isOk()) {
-                            if (res.statusCode == 404 || res.statusCode == 400 || res.error.getResultCode() == CoinNotExists) {
+                            if (checkCoinNotExistError(res)) {
                                 errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
@@ -187,6 +187,19 @@ public class ExchangeCalculator {
                         errFunc.accept("Unable to get currency");
                     });
         }
+    }
+
+    // Error hell TODO
+    private boolean checkCoinNotExistError(GateResult<?> res) {
+        if (res == null) {
+            return false;
+        }
+
+        if (res.error != null) {
+            return res.error.code == 404 || res.error.getResultCode() == CoinNotExists;
+        }
+
+        return res.statusCode == 404 || res.statusCode == 400;
     }
 
     private Optional<AccountItem> findAccountByCoin(String coin) {

@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.3.0
+ - New network api
+ - Fixed UI issues
+ - Fixed converting issues
+
 ## 1.2.8
  - Showing commission for exchanging transactions
 
