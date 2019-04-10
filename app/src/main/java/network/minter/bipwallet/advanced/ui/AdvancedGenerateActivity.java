@@ -53,10 +53,8 @@ import network.minter.bipwallet.advanced.views.AdvancedGeneratePresenter;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
-import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
-import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018

@@ -53,9 +53,7 @@ import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
-import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
-import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
@@ -67,6 +65,7 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements Advan
     public static final String EXTRA_FOR_RESULT = "EXTRA_FOR_RESULT";
     public static final String EXTRA_TITLE = "EXTRA_TITLE";
 
+    @BindView(R.id.action_generate) Button actionGenerate;
     @BindView(R.id.action_activate) Button actionActivate;
     @BindView(R.id.input_seed) AppCompatEditText seedInput;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -74,6 +73,11 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements Advan
     @Inject Provider<AdvancedMainPresenter> presenterProvider;
     @InjectPresenter AdvancedMainPresenter presenter;
     private WalletProgressDialog mProgress;
+
+    @Override
+    public void setOnGenerate(View.OnClickListener listener) {
+        actionGenerate.setOnClickListener(listener);
+    }
 
     @Override
     public void setMnemonicTextChangedListener(TextWatcher textWatcher) {
@@ -119,7 +123,6 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements Advan
 
     @Override
     public void startHome() {
-        KeyboardHelper.hideKeyboard(this);
         startActivityClearTop(this, HomeActivity.class);
         finish();
     }
