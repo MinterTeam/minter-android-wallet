@@ -104,15 +104,15 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.config
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro', 'proguard-release-rules.pro'
         }
 
         debug {
             signingConfig signingConfigs.config
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro', 'proguard-release-rules.pro'
             testCoverageEnabled false
         }
