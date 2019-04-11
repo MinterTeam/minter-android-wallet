@@ -54,6 +54,7 @@ public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
     @Override
     public void bind(TxItem item) {
         super.bind(item);
+        setupAvatar(item);
         title.setText(item.getTx().hash.toShortString());
         amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);

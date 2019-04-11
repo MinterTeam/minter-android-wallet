@@ -72,7 +72,8 @@ public interface TransactionItem {
             TX_UNBOUND,
             TX_REDEEM_CHECK,
             TX_SET_CANDIDATE_ONLINE,
-            TX_SET_CANDIDATE_OFFLINE
+            TX_SET_CANDIDATE_OFFLINE,
+            TX_MULTISEND
     })
     @interface ListType {
     }

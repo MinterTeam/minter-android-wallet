@@ -56,6 +56,7 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
     @Override
     public void bind(TxItem item) {
         super.bind(item);
+        setupAvatar(item);
         final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = item.getTx().getData();
 
         if (bdNull(item.getTx().getFee())) {

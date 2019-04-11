@@ -40,6 +40,7 @@ import network.minter.bipwallet.tx.adapters.vh.TxCreateCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxDeclareCandidacyViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxDelegateUnboundViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxHeaderViewHolder;
+import network.minter.bipwallet.tx.adapters.vh.TxMultiSendCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSendCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSetCandidateOnlineOfflineViewHolder;
@@ -47,12 +48,10 @@ import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.profile.MinterProfileApi;
-import timber.log.Timber;
-
-import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TxItem implements TransactionItem {
@@ -62,17 +61,13 @@ public class TxItem implements TransactionItem {
 
     public TxItem(HistoryTransaction tx) {
         mTx = tx;
-//        if (tx.getAvatar() == null && tx.data instanceof HistoryTransaction.TxSendCoinResult) {
-//            mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.<HistoryTransaction.TxSendCoinResult>getData().to);
-//        } else {
-//            mAvatar = firstNonNull(tx.getAvatar(), MinterProfileApi.getUserAvatarUrl(1));
-//        }
-        mAvatar = MinterProfileApi.getUserAvatarUrl(1);
+        mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.from);
         mUsername = tx.username;
     }
 
 
-    public static RecyclerView.ViewHolder createViewHolder(final LayoutInflater inflater, final ViewGroup parent, @ListType int viewType) {
+    public static RecyclerView.ViewHolder createViewHolder(final LayoutInflater inflater, final ViewGroup parent,
+                                                           @ListType int viewType) {
         View view;
         RecyclerView.ViewHolder out;
         switch (viewType) {
@@ -112,7 +107,10 @@ public class TxItem implements TransactionItem {
                 view = inflater.inflate(R.layout.item_list_tx_delegate_unbound_expandable, parent, false);
                 out = new TxDelegateUnboundViewHolder(view);
                 break;
-
+            case TX_MULTISEND:
+                view = inflater.inflate(R.layout.item_list_tx_multisend_expandable, parent, false);
+                out = new TxMultiSendCoinViewHolder(view);
+                break;
             default:
                 view = inflater.inflate(R.layout.item_list_tx_unhandled_expandable, parent, false);
                 out = new TxUnhandledViewHolder(view);
@@ -146,6 +144,9 @@ public class TxItem implements TransactionItem {
         } else if (holder instanceof TxDelegateUnboundViewHolder) {
             final TxItem txItem = ((TxItem) data);
             ((TxDelegateUnboundViewHolder) holder).bind(txItem);
+        } else if (holder instanceof TxMultiSendCoinViewHolder) {
+            final TxItem txItem = ((TxItem) data);
+            ((TxMultiSendCoinViewHolder) holder).bind(txItem, myAddresses);
         } else {
             final TxItem txItem = ((TxItem) data);
             ((TxUnhandledViewHolder) holder).bind(txItem);
