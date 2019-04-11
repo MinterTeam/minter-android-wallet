@@ -38,6 +38,7 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
@@ -48,10 +49,14 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
-    public @BindView(R.id.detail_from_value) TextView fromValue;
-    public @BindView(R.id.detail_to_value) TextView toValue;
-    public @BindView(R.id.detail_coin_value) TextView coinValue;
-    public @BindView(R.id.detail_amount_value) TextView amountValue;
+    public @BindView(R.id.detail_from_value)
+    TextView fromValue;
+    public @BindView(R.id.detail_to_value)
+    TextView toValue;
+    public @BindView(R.id.detail_coin_value)
+    TextView coinValue;
+    public @BindView(R.id.detail_amount_value)
+    TextView amountValue;
 
     public TxSendCoinViewHolder(View itemView) {
         super(itemView);
@@ -60,14 +65,14 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
 
     public void bind(TxItem txItem, List<MinterAddress> myAddresses) {
         super.bind(txItem);
-
         final HistoryTransaction item = txItem.getTx();
         final HistoryTransaction.TxSendCoinResult data = item.getData();
 
-
-
         final boolean isIncoming = item.isIncoming(myAddresses);
         final boolean isSelfSending = item.from.equals(data.to);
+
+        if (!isIncoming) txItem.setAvatar( MinterProfileApi.getUserAvatarUrlByAddress(data.to));
+        setupAvatar(txItem);
 
         if (isSelfSending) {
             if (txItem.getUsername() != null) {

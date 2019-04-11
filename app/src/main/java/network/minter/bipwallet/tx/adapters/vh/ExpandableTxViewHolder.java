@@ -45,17 +45,26 @@ import network.minter.bipwallet.tx.adapters.TxItem;
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
-    public @BindView(R.id.item_avatar) BipCircleImageView avatar;
-    public @BindView(R.id.item_title) TextView title;
-    public @BindView(R.id.item_amount) TextView amount;
-    public @BindView(R.id.item_subamount) TextView subamount;
-    public @BindView(R.id.detail_date_value) TextView dateValue;
-    public @BindView(R.id.detail_time_value) TextView timeValue;
-    public @BindView(R.id.action) Button action;
-    public @BindView(R.id.layout_details) ConstraintLayout detailsLayout;
+    public @BindView(R.id.item_avatar)
+    BipCircleImageView avatar;
+    public @BindView(R.id.item_title)
+    TextView title;
+    public @BindView(R.id.item_amount)
+    TextView amount;
+    public @BindView(R.id.item_subamount)
+    TextView subamount;
+    public @BindView(R.id.detail_date_value)
+    TextView dateValue;
+    public @BindView(R.id.detail_time_value)
+    TextView timeValue;
+    public @BindView(R.id.action)
+    Button action;
+    public @BindView(R.id.layout_details)
+    ConstraintLayout detailsLayout;
 
     private boolean mEnableExpanding = true;
     private boolean mUseAvatars = true;
@@ -80,6 +89,20 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(TxItem item) {
+//        if (mUseAvatars) {
+//            if (autoSetAvatar()) {
+//                avatar.setImageUrl(item.getAvatar(), R.dimen.tx_item_avatar_size);
+//            }
+//        } else {
+//            avatar.setImageDrawable(null);
+//        }
+
+        final DateTime dt = new DateTime(item.getTx().timestamp);
+        dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
+        timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
+    }
+
+    protected void setupAvatar(TxItem item) {
         if (mUseAvatars) {
             if (autoSetAvatar()) {
                 avatar.setImageUrl(item.getAvatar(), R.dimen.tx_item_avatar_size);
@@ -87,10 +110,6 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
         } else {
             avatar.setImageDrawable(null);
         }
-
-        final DateTime dt = new DateTime(item.getTx().timestamp);
-        dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
-        timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
     }
 
     public void setUserAvatars(boolean useAvatars) {

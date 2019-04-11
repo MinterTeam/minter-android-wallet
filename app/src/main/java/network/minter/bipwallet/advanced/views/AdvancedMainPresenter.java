@@ -115,6 +115,8 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
                 getViewState().startHome();
             }
         });
+
+        getViewState().setOnGenerate(this::onStartGenerate);
     }
 
     private void onStartGenerate(View view) {

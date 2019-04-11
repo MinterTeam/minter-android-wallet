@@ -26,9 +26,12 @@
 
 package network.minter.bipwallet.tx.adapters.vh;
 
+import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,19 +41,21 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
+import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
-    public @BindView(R.id.detail_from_value) TextView fromValue;
-    public @BindView(R.id.detail_to_value) TextView toValue;
-    public @BindView(R.id.detail_coin_value) TextView coinValue;
-    public @BindView(R.id.detail_amount_value) TextView amountValue;
+    public @BindView(R.id.detail_from_value)
+    TextView fromValue;
+    public @BindView(R.id.detail_amount_value)
+    TextView amountValue;
 
     public TxMultiSendCoinViewHolder(View itemView) {
         super(itemView);
@@ -61,52 +66,43 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
         super.bind(txItem);
 
         final HistoryTransaction item = txItem.getTx();
-        final HistoryTransaction.TxSendCoinResult data = item.getData();
+        final HistoryTransaction.TxMultisendResult data = item.getData();
 
+        final boolean isIncoming = !myAddresses.contains(item.from);
 
-        final boolean isIncoming = item.isIncoming(myAddresses);
-        final boolean isSelfSending = item.from.equals(data.to);
+        BigDecimal totalAmount = new BigDecimal(0);
 
-        if (isSelfSending) {
-            if (txItem.getUsername() != null) {
-                title.setText(String.format("@%s", txItem.getUsername()));
-            } else {
-                title.setText(item.getFrom().toShortString());
-            }
-
-            amount.setText(bdHuman(data.amount));
-            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        if (txItem.getUsername() != null) {
+            title.setText(String.format("@%s", txItem.getUsername()));
         } else {
-            if (isIncoming) {
-                if (txItem.getUsername() != null) {
-                    title.setText(String.format("@%s", txItem.getUsername()));
-                } else {
-                    title.setText(item.getFrom().toShortString());
-                }
-
-                amount.setText(String.format("+ %s", bdHuman(data.amount)));
-                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
-            } else {
-                if (txItem.getUsername() != null) {
-                    title.setText(String.format("@%s", txItem.getUsername()));
-                } else {
-                    title.setText(data.to.toShortString());
-                }
-
-                amount.setText(String.format("- %s", bdHuman(data.amount)));
-                amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
-            }
+            title.setText(item.getFrom().toShortString());
         }
 
-        if (bdNull(data.amount)) {
-            amount.setText(bdHuman(data.amount));
+        if (isIncoming) {
+            for (HistoryTransaction.TxSendCoinResult i : data.items) {
+                if (myAddresses.contains(i.to)) {
+                    totalAmount = totalAmount.add(i.amount);
+                }
+            }
+
+            amount.setText(String.format("+ %s", bdHuman(totalAmount)));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+        } else {
+            for (HistoryTransaction.TxSendCoinResult i : data.items) {
+                totalAmount = totalAmount.add(i.amount);
+            }
+
+            amount.setText(String.format("- %s", bdHuman(totalAmount)));
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+        }
+
+        if (bdNull(totalAmount)) {
+            amount.setText(bdHuman(totalAmount));
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
         }
 
         fromValue.setText(item.getFrom().toString());
-        toValue.setText(data.to.toString());
-        subamount.setText(data.getCoin());
-        coinValue.setText(data.getCoin());
-        amountValue.setText(bdHuman(data.amount));
+        amountValue.setText(bdHuman(totalAmount));
+        avatar.setImageDrawable(AppCompatResources.getDrawable(avatar.getContext(), R.drawable.img_avatar_multisend));
     }
 }
