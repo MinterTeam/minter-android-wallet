@@ -66,18 +66,18 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
         if (item.getTx().getType() == HistoryTransaction.Type.Delegate) {
             avatar.setImageResource(R.drawable.img_avatar_delegate);
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
-            if (bdNull(data.getStake())) {
-                amount.setText(String.format("%s", bdHuman(data.getStake())));
+            if (bdNull(data.getValue())) {
+                amount.setText(String.format("%s", bdHuman(data.getValue())));
             } else {
-                amount.setText(String.format("- %s", bdHuman(data.getStake())));
+                amount.setText(String.format("- %s", bdHuman(data.getValue())));
             }
         } else {
             avatar.setImageResource(R.drawable.img_avatar_unbond);
-            if (bdNull(data.getStake())) {
-                amount.setText(String.format("%s", bdHuman(data.getStake())));
+            if (bdNull(data.getValue())) {
+                amount.setText(String.format("%s", bdHuman(data.getValue())));
             } else {
                 amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
-                amount.setText(String.format("+ %s", bdHuman(data.getStake())));
+                amount.setText(String.format("+ %s", bdHuman(data.getValue())));
             }
         }
 
