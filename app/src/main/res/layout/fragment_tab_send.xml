@@ -251,7 +251,7 @@
                 android:layout_marginTop="@dimen/margin_edges_half"
                 android:layout_marginEnd="@dimen/margin_edges"
                 android:fontFamily="@font/_ubuntu_medium"
-                android:text="@string/tx_send_fee_value"
+                tools:text="@string/tx_send_fee_value"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/text_size_default"
                 app:layout_constraintEnd_toEndOf="parent"

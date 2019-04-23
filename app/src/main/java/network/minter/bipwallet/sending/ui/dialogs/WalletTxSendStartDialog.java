@@ -29,6 +29,7 @@ package network.minter.bipwallet.sending.ui.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.widget.Button;
@@ -76,6 +77,8 @@ public final class WalletTxSendStartDialog extends WalletDialog {
         amount.setText(String.format("%s %s", bdHuman(mBuilder.mAmount), mBuilder.mCoin));
         if (mBuilder.mAvatarUrl != null) {
             avatar.setImageUrl(mBuilder.mAvatarUrl);
+        } else if(mBuilder.mAvatarRes != -1){
+            avatar.setImageResource(mBuilder.mAvatarRes);
         }
 
         recipientName.setText(mBuilder.mRecipientName);
@@ -99,6 +102,7 @@ public final class WalletTxSendStartDialog extends WalletDialog {
     public static final class Builder extends WalletDialogBuilder<WalletTxSendStartDialog, Builder> {
         private BigDecimal mAmount;
         private String mAvatarUrl;
+        @DrawableRes private int mAvatarRes = -1;
         private CharSequence mRecipientName;
         private String mCoin = MinterSDK.DEFAULT_COIN;
 
@@ -121,6 +125,11 @@ public final class WalletTxSendStartDialog extends WalletDialog {
 
         public Builder setAvatarUrl(String avatarUrl) {
             mAvatarUrl = avatarUrl;
+            return this;
+        }
+
+        public Builder setAvatarResource(@DrawableRes int avatarResId) {
+            mAvatarRes = avatarResId;
             return this;
         }
 
