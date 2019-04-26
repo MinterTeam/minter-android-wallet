@@ -67,7 +67,7 @@
 
     <string name="title_tab_sending">Send Coins</string>
     <string name="tx_send_coin_hint">Coin</string>
-    <string name="tx_send_recipient_hint">To (@username, email, Mx or Mp address)</string>
+    <string name="tx_send_recipient_hint">To (@username, email, Mx Address or public key)</string>
     <string name="tx_send_amount_hint">Amount</string>
     <string name="tx_send_fee_hint">Transaction Fee</string>
     <string name="tx_send_fee_value">0.00000001 BIP</string>
