@@ -1,5 +1,16 @@
 # Release Notes
 
+## 1.4.0
+ - Added ability to send "delegate" transaction using "send" tab
+ - UI improvements
+ 
+## 1.3.2
+  - Update for new testnet with mainnet genesis (initial) block
+  - UI improvements
+  
+## 1.3.1
+ - Restored auth by username/password, it was a test feature. Created new branch for testnet
+
 ## 1.3.0
  - New network api
  - Fixed UI issues
