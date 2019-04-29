@@ -37,6 +37,7 @@ import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.blockchain.repo.BlockChainStatusRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -172,6 +173,12 @@ public class RepoModule {
     @WalletApp
     public BlockChainTransactionRepository provideBlockChainTxRepository() {
         return MinterBlockChainApi.getInstance().transactions();
+    }
+
+    @Provides
+    @WalletApp
+    public BlockChainStatusRepository provideBlockChainStatusRepository() {
+        return MinterBlockChainApi.getInstance().status();
     }
 
     @Provides

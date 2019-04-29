@@ -29,6 +29,7 @@ package network.minter.bipwallet.sending.views;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.DrawableRes;
 import android.view.View;
 import android.widget.EditText;
 
@@ -49,7 +50,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
@@ -78,18 +78,20 @@ import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendWaitingDialog;
 import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.models.NetworkStatus;
 import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
+import network.minter.blockchain.repo.BlockChainStatusRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
-import network.minter.explorer.models.TxCount;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
@@ -114,34 +116,53 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFro
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
 public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private static final int REQUEST_CODE_QR_SCAN = 101;
-    @Inject SecretStorage secretStorage;
-    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject
+    SecretStorage secretStorage;
+    @Inject
+    CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject
     CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cachedTxRepo;
-    @Inject ExplorerCoinsRepository coinRepo;
-    @Inject BlockChainTransactionRepository bcTxRepo;
-    @Inject ProfileInfoRepository infoRepo;
-    @Inject GateGasRepository gasRepo;
-    @Inject CacheManager cache;
-    @Inject RecipientAutocompleteStorage recipientStorage;
-    @Inject IdlingManager idlingManager;
-    @Inject GateEstimateRepository estimateRepo;
-    @Inject GateTransactionRepository gateTxRepo;
+    @Inject
+    ExplorerCoinsRepository coinRepo;
+    @Inject
+    BlockChainTransactionRepository bcTxRepo;
+    @Inject
+    BlockChainStatusRepository bcStatusRepo;
+    @Inject
+    ProfileInfoRepository infoRepo;
+    @Inject
+    GateGasRepository gasRepo;
+    @Inject
+    CacheManager cache;
+    @Inject
+    RecipientAutocompleteStorage recipientStorage;
+    @Inject
+    IdlingManager idlingManager;
+    @Inject
+    GateEstimateRepository estimateRepo;
+    @Inject
+    GateTransactionRepository gateTxRepo;
     private AccountItem mFromAccount = null;
     private BigDecimal mAmount = null;
-    private CharSequence mToAddress = null;
+    private CharSequence mToMxAddress = null;
+    private CharSequence mToMpAddress = null;
     private CharSequence mToName = null;
     private String mAvatar = null;
+    private @DrawableRes
+    int mAvatarRes;
     private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
     private BehaviorSubject<BigDecimal> mInputChange;
+    private BehaviorSubject<String> mAddressChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private BigInteger mGasPrice = new BigInteger("1");
     private AccountItem mLastAccount = null;
+    private BigDecimal sendFee;
 
     private enum SearchByType {
         Address, Username, Email
@@ -154,7 +175,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     @Override
     public void attachView(SendTabModule.SendView view) {
         super.attachView(view);
-
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
@@ -170,16 +190,23 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
-
         if (requestCode == REQUEST_CODE_QR_SCAN) {
             if (data != null && data.hasExtra(QRCodeScannerActivity.RESULT_TEXT)) {
                 //Getting the passed result
                 String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
-                Timber.d("QR Code scan result: %s", result);
-                try {
-                    mToAddress = new MinterAddress(result).toString();
-                    getViewState().setRecipient(mToAddress);
-                } catch (Throwable ignore) {
+                Timber.d("bitvale result " + result);
+                if (result != null) {
+                    boolean isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN);
+                    boolean isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN);
+                    if (isMxAddress) {
+                        mToMxAddress = new MinterAddress(result).toString();
+                        getViewState().setRecipient(mToMxAddress);
+                        mToName = mToMxAddress.toString();
+                    } else if (isMpAddress) {
+                        mToMpAddress = new MinterPublicKey(result).toString();
+                        getViewState().setRecipient(mToMpAddress);
+                        mToName = mToMpAddress.toString();
+                    }
                 }
             }
         }
@@ -204,9 +231,15 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 });
 
         mInputChange = BehaviorSubject.create();
+        mAddressChange = BehaviorSubject.create();
+
         unsubscribeOnDestroy(mInputChange
                 .toFlowable(BackpressureStrategy.LATEST)
                 .subscribe(this::onAmountChanged));
+
+        unsubscribeOnDestroy(mAddressChange
+                .toFlowable(BackpressureStrategy.LATEST)
+                .subscribe(this::onAddressChanged));
 
         setRecipientAutocomplete();
         getViewState().setSubmitEnabled(false);
@@ -224,14 +257,31 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     if (res.isOk()) {
                         mGasPrice = res.result.gas;
                         Timber.d("Min Gas price: %s", mGasPrice.toString());
-                        final BigDecimal fee = OperationType.SendCoin.getFee().multiply(new BigDecimal(mGasPrice));
-                        getViewState().setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN.toUpperCase()));
+                        setupFee();
                         idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_WAIT_GAS, false);
                     }
                 }, e -> {
                     idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_WAIT_GAS, false);
                     Timber.w(e);
                 });
+    }
+
+    private void setupFee() {
+        switch (getTransactionTypeByAddress()) {
+            case Delegate:
+                sendFee = OperationType.Delegate.getFee().multiply(new BigDecimal(mGasPrice));
+                break;
+            case SendCoin:
+                sendFee = OperationType.SendCoin.getFee().multiply(new BigDecimal(mGasPrice));
+                break;
+            default:
+                sendFee = null;
+                break;
+        }
+        String fee = "";
+        if (sendFee != null)
+            fee = String.format("%s %s", bdHuman(sendFee), MinterSDK.DEFAULT_COIN.toUpperCase());
+        getViewState().setFee(fee);
     }
 
     private void setRecipientAutocomplete() {
@@ -272,6 +322,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         loadAndSetFee();
     }
 
+    private void onAddressChanged(String address) {
+        if (address.isEmpty()) getViewState().setFee("");
+        else setupFee();
+    }
+
     private void onClickScanQR(View view) {
         getAnalytics().send(AppEvent.SendCoinsQRButton);
 
@@ -280,23 +335,29 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     private void onSubmit(View view) {
         getAnalytics().send(AppEvent.SendCoinsSendButton);
-        //TODO check this hell
-        if (mToName == null) {
-            getViewState().setRecipientError("Invalid recipient");
-            return;
+        switch (getTransactionTypeByAddress()) {
+            case Delegate:
+                mToMpAddress = mToName;
+                mAvatar = null;
+                mAvatarRes = R.drawable.img_avatar_delegate;
+                mToName = mToMpAddress.toString();
+                startSendDialog();
+                break;
+            case SendCoin:
+                mToMxAddress = mToName;
+                resolveUserInfo(mToName.toString(), false);
+                break;
+            default:
+                resolveUserInfo(mToName.toString(), true);
         }
-        if (mToAddress != null && mToName == null) {
-            resolveUserInfo(mToAddress.toString(), false);
-            return;
-        }
+    }
 
-        if (mToName.toString().substring(0, 2).equals(MinterSDK.PREFIX_ADDRESS)) {
-            mToAddress = mToName;
-            resolveUserInfo(mToName.toString(), false);
-            return;
+    private OperationType getTransactionTypeByAddress() {
+        if (mToName.toString().matches(MinterPublicKey.PUB_KEY_PATTERN)) {
+            return OperationType.Delegate;
+        } else {
+            return OperationType.SendCoin;
         }
-
-        resolveUserInfo(mToName.toString(), true);
     }
 
     private SearchByType getSearchByType(String input) {
@@ -323,7 +384,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .subscribe(result -> {
                         if (result.isSuccess()) {
                             mAvatar = result.data.user.getAvatar().getUrl();
-                            mToAddress = result.data.address.toString();
+                            mToMxAddress = result.data.address.toString();
                             final SearchByType nameType = getSearchByType(searchBy);
                             switch (nameType) {
                                 case Email:
@@ -340,14 +401,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             getViewState().setRecipientError(null);
                             startSendDialog();
                         } else {
-                            if (mToAddress != null) {
-                                mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(mToAddress.toString());
+                            if (mToMxAddress != null) {
+                                mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(mToMxAddress.toString());
                             } else {
                                 mAvatar = MinterProfileApi.getUserAvatarUrl(1);
                             }
 
                             if (failOnNotFound) {
-                                mToAddress = null;
+                                mToMxAddress = null;
                                 onErrorSearchUser(result);
                                 Timber.d(new ProfileResponseException(result), "Unable to find address");
                             } else {
@@ -363,6 +424,43 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         });
     }
 
+    private void resolveValidator(final String searchBy, final boolean failOnNotFound) {
+        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
+        getViewState().startDialog(ctx -> {
+            rxProfile(bcStatusRepo.getValidators())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        if (result.isOk()) {
+                            NetworkStatus.Validator validator = Stream.of(result.result)
+                                    .filter(v -> {
+                                        if (mToMpAddress.toString().substring(0, 2).equals(MinterSDK.PREFIX_PUBLIC_KEY))
+                                            return v.pubKey.toString().equals(mToMpAddress.toString());
+                                        else
+                                            return v.pubKey.toString().substring(2).equals(mToMpAddress.toString());
+                                    })
+                                    .findFirst().orElse(null);
+
+                            if (validator != null) {
+                                mAvatar = null;
+                                mAvatarRes = R.drawable.img_avatar_delegate;
+                                mToName = mToMpAddress.toString();
+                                startSendDialog();
+                                getViewState().setRecipientError(null);
+                            } else {
+                                onErrorSearchValidator();
+                            }
+                        } else {
+                            onErrorSearchValidator(result);
+                        }
+                    }, Wallet.Rx.errorHandler(getViewState()));
+
+            return new WalletProgressDialog.Builder(ctx, R.string.tx_address_searching)
+                    .setText(String.format("Please, wait, we are searching address for validator \"%s\"", searchBy))
+                    .create();
+        });
+    }
+
     private void startSendDialog() {
         idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
         Timber.d("Confirm dialog: wait for IDLE");
@@ -371,9 +469,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, false);
                 Timber.d("Confirm dialog: IDLING");
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
-                final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
+                final WalletTxSendStartDialog.Builder builder = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)
-                        .setAvatarUrl(mAvatar)
                         .setRecipientName(mToName)
                         .setCoin(mFromAccount.coin)
                         .setPositiveAction(R.string.btn_send, (d, w) -> {
@@ -386,8 +483,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                             Wallet.app().sounds().play(R.raw.cancel_pop_hi);
                             getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
                             d.dismiss();
-                        })
-                        .create();
+                        });
+                if (mAvatar == null) {
+                    builder.setAvatarResource(mAvatarRes);
+                } else {
+                    builder.setAvatarUrl(mAvatar);
+                }
+                final WalletTxSendStartDialog dialog = builder.create();
                 dialog.setCancelable(true);
                 return dialog;
             } catch (NullPointerException badState) {
@@ -402,6 +504,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
     /**
      * Unused now, soon
+     *
      * @param dialogInterface
      * @param which
      */
@@ -453,13 +556,21 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
             Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
 
+            OperationType type = getTransactionTypeByAddress();
+            final boolean enoughBaseCoinForCommission;
+
             // default coin for pay fee - MNT (base coin)
             final GateResult<TransactionCommissionValue> val = new GateResult<>();
             val.result = new TransactionCommissionValue();
-            val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-            Observable<GateResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
+            if (type == OperationType.Delegate) {
+                enoughBaseCoinForCommission = bdGTE(mntAccount.get().getBalance(), OperationType.Delegate.getFee());
+                val.result.value = OperationType.Delegate.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+            } else {
+                enoughBaseCoinForCommission = bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee());
+                val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+            }
 
-            final boolean enoughBaseCoinForCommission = bdGTE(mntAccount.get().getBalance(), OperationType.SendCoin.getFee());
+            Observable<GateResult<TransactionCommissionValue>> exchangeResolver = Observable.just(val);
 
             // if enough balance on MNT account, set gas coin MNT (BIP)
             if (enoughBaseCoinForCommission) {
@@ -468,7 +579,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 mGasCoin = mntAccount.get().getCoin();
             }
             // if sending account is not MNT (BIP), set gas coin CUSTOM
-            else if (!sendAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN) && !enoughBaseCoinForCommission) {
+            else if (!sendAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN)) {
                 Timber.d("Not enough balance in MNT to pay fee, using " + mFromAccount.getCoin());
                 mGasCoin = sendAccount.get().getCoin();
                 // otherwise getting
@@ -476,14 +587,27 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 // resolving fee currency for custom currency
                 // creating tx
                 try {
-                    final Transaction preTx = new Transaction.Builder(new BigInteger("1"))
-                            .setGasCoin(mGasCoin)
-                            .setGasPrice(mGasPrice)
-                            .sendCoin()
-                            .setCoin(mFromAccount.coin)
-                            .setTo(mToAddress)
-                            .setValue(mAmount)
-                            .build();
+                    final Transaction preTx;
+                    if (type == OperationType.Delegate) {
+                        preTx = new Transaction.Builder(new BigInteger("1"))
+                                .setGasCoin(mGasCoin)
+                                .setGasPrice(mGasPrice)
+                                .delegate()
+                                .setCoin(mFromAccount.coin)
+                                .setPublicKey(mToMpAddress.toString())
+                                .setStake(mAmount)
+                                .build();
+
+                    } else {
+                        preTx = new Transaction.Builder(new BigInteger("1"))
+                                .setGasCoin(mGasCoin)
+                                .setGasPrice(mGasPrice)
+                                .sendCoin()
+                                .setCoin(mFromAccount.coin)
+                                .setTo(mToMxAddress)
+                                .setValue(mAmount)
+                                .build();
+                    }
 
                     final SecretData preData = secretStorage.getSecret(mFromAccount.address);
                     final TransactionSign preSign = preTx.signSingle(preData.getPrivateKey());
@@ -492,7 +616,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
                     final GateResult<TransactionCommissionValue> commissionValue = new GateResult<>();
-                    val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+                    if (type == OperationType.Delegate) {
+                        val.result.value = OperationType.Delegate.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+                    } else {
+                        val.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+                    }
                     exchangeResolver = Observable.just(commissionValue);
                 }
             }
@@ -501,28 +629,25 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             Disposable d = Observable.combineLatest(
                     exchangeResolver,
                     rxGate(estimateRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(toGateError()),
-                    new BiFunction<GateResult<TransactionCommissionValue>, GateResult<TxCount>, SendInitData>() {
-                        @Override
-                        public SendInitData apply(GateResult<TransactionCommissionValue> txCommissionValue, GateResult<TxCount> countableDataBCResult) {
+                    (txCommissionValue, countableDataBCResult) -> {
 
-                            // if some request failed, returning error result
-                            if (!txCommissionValue.isOk()) {
-                                return new SendInitData(GateResult.copyError(txCommissionValue));
-                            } else if (!countableDataBCResult.isOk()) {
-                                return new SendInitData(GateResult.copyError(countableDataBCResult));
-                            }
-
-                            Timber.d("SendInitData: tx commission: %s", txCommissionValue.result.getValue());
-
-                            final SendInitData data = new SendInitData(
-                                    countableDataBCResult.result.count.add(new BigInteger("1")),
-                                    txCommissionValue.result.getValue()
-                            );
-                            Timber.tag("TX Send").d("Resolved: coin %s commission=%s; nonce=%s", mFromAccount.getCoin(), data.commission, data.nonce);
-
-                            // creating preparation data
-                            return data;
+                        // if some request failed, returning error result
+                        if (!txCommissionValue.isOk()) {
+                            return new SendInitData(GateResult.copyError(txCommissionValue));
+                        } else if (!countableDataBCResult.isOk()) {
+                            return new SendInitData(GateResult.copyError(countableDataBCResult));
                         }
+
+                        Timber.d("SendInitData: tx commission: %s", txCommissionValue.result.getValue());
+
+                        final SendInitData data = new SendInitData(
+                                countableDataBCResult.result.count.add(new BigInteger("1")),
+                                txCommissionValue.result.getValue()
+                        );
+                        Timber.tag("TX Send").d("Resolved: coin %s commission=%s; nonce=%s", mFromAccount.getCoin(), data.commission, data.nonce);
+
+                        // creating preparation data
+                        return data;
                     })
                     .switchMap((Function<SendInitData, ObservableSource<GateResult<TransactionSendResult>>>) cntRes -> {
                         // if in previous request we've got error, returning it
@@ -576,19 +701,32 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         Timber.tag("TX Send").d("Send data: gasCoin=%s, coin=%s, to=%s, from=%s, amount=%s",
                                 mFromAccount.getCoin(),
                                 mFromAccount.getCoin(),
-                                mToAddress,
+                                mToName,
                                 mFromAccount.getAddress().toString(),
                                 amountToSend
                         );
                         // creating tx
-                        final Transaction tx = new Transaction.Builder(cntRes.nonce)
-                                .setGasCoin(mGasCoin)
-                                .setGasPrice(mGasPrice)
-                                .sendCoin()
-                                .setCoin(mFromAccount.coin)
-                                .setTo(mToAddress)
-                                .setValue(amountToSend)
-                                .build();
+                        final Transaction tx;
+                        if (type == OperationType.Delegate) {
+                            tx = new Transaction.Builder(cntRes.nonce)
+                                    .setGasCoin(mGasCoin)
+                                    .setGasPrice(mGasPrice)
+                                    .delegate()
+                                    .setCoin(mFromAccount.coin)
+                                    .setPublicKey(mToMpAddress.toString())
+                                    .setStake(amountToSend)
+                                    .build();
+
+                        } else {
+                            tx = new Transaction.Builder(cntRes.nonce)
+                                    .setGasCoin(mGasCoin)
+                                    .setGasPrice(mGasPrice)
+                                    .sendCoin()
+                                    .setCoin(mFromAccount.coin)
+                                    .setTo(mToMxAddress)
+                                    .setValue(amountToSend)
+                                    .build();
+                        }
 
                         final SecretData data = secretStorage.getSecret(mFromAccount.address);
                         final TransactionSign sign = tx.signSingle(data.getPrivateKey());
@@ -628,6 +766,21 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .create());
     }
 
+    private void onErrorSearchValidator(BCResult<?> errorResult) {
+        Timber.e(errorResult.error.message, "Unable to find address");
+        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Error")
+                .setText(String.format("Unable to find validator for address \"%s\": %s", mToName, errorResult.error.message))
+                .setPositiveAction("Close")
+                .create());
+    }
+
+    private void onErrorSearchValidator() {
+        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Error")
+                .setText(String.format("Unable to find validator for address \"%s\"", mToName))
+                .setPositiveAction("Close")
+                .create());
+    }
+
     private void onErrorExecuteTransaction(GateResult<?> errorResult) {
         Timber.e(errorResult.getMessage(), "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
@@ -636,22 +789,28 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 .create());
     }
 
-    private void onSuccessExecuteTransaction(final GateResult<TransactionSendResult> result) {
+    private void onSuccessExecuteTransaction(
+            final GateResult<TransactionSendResult> result) {
         if (!result.isOk()) {
             onErrorExecuteTransaction(result);
             return;
         }
 
-        recipientStorage.add(new RecipientItem(mToAddress, mToName), this::setRecipientAutocomplete);
+        final CharSequence to;
+        if (getTransactionTypeByAddress() == OperationType.Delegate) {
+            to = mToMpAddress;
+        } else {
+            to = mToMxAddress;
+        }
+        recipientStorage.add(new RecipientItem(to, mToName), this::setRecipientAutocomplete);
 
         accountStorage.update(true);
         cachedTxRepo.update(true);
         getViewState().startDialog(ctx -> {
             getAnalytics().send(AppEvent.SentCoinPopupScreen);
 
-            return new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
+            WalletTxSendSuccessDialog.Builder builder = new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
                     .setRecipientName(mToName)
-                    .setAvatarUrl(mAvatar)
                     .setPositiveAction("View transaction", (d, v) -> {
                         Wallet.app().sounds().play(R.raw.click_pop_zap);
                         getViewState().startExplorer(result.result.txHash.toString());
@@ -661,18 +820,29 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                     .setNegativeAction("Close", (d, w) -> {
                         d.dismiss();
                         getAnalytics().send(AppEvent.SentCoinPopupCloseButton);
-                    })
-                    .create();
+                    });
+
+            if (mAvatar == null) {
+                builder.setAvatarResource(mAvatarRes);
+            } else {
+                builder.setAvatarUrl(mAvatar);
+            }
+            return builder.create();
         });
 
         getViewState().clearInputs();
+        mToName = null;
+        mToMpAddress = null;
+        mToMxAddress = null;
+        sendFee = null;
     }
 
     private void onInputTextChanged(EditText editText, boolean valid) {
         switch (editText.getId()) {
             case R.id.input_recipient:
                 mToName = editText.getText();
-                mToAddress = null;
+                mToMxAddress = null;
+                mAddressChange.onNext(mToName.toString());
                 break;
             case R.id.input_amount:
                 mAmount = bigDecimalFromString(editText.getText());

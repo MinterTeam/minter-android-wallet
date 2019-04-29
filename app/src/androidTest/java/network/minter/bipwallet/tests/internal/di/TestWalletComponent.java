@@ -57,6 +57,7 @@ import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.SoundManager;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
@@ -113,6 +114,7 @@ public interface TestWalletComponent extends WalletComponent {
     NetworkHelper network();
     ImageHelper image();
     SharedPreferences prefs();
+    SettingsManager settings();
     GsonBuilder gsonBuilder();
     CacheManager cache();
     AnalyticsManager analytics();

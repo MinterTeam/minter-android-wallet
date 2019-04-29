@@ -75,6 +75,7 @@ import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
@@ -84,6 +85,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @RuntimePermissions
@@ -92,19 +94,32 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
     public final static String IDLE_SEND_WAIT_GAS = "IDLE_SEND_WAIT_GAS";
 
-    @Inject IdlingManager idlingManager;
-    @Inject Provider<SendTabPresenter> presenterProvider;
-    @InjectPresenter SendTabPresenter presenter;
-    @BindView(R.id.input_coin) AppCompatEditText coinInput;
-    @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
-    @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
-    @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
-    @BindView(R.id.input_amount) AppCompatEditText amountInput;
-    @BindView(R.id.action) Button actionSend;
-    @BindView(R.id.action_scan_qr) View actionScanQR;
-    @BindView(R.id.action_maximum) View actionMaximum;
-    @BindView(R.id.text_error) TextView errorView;
-    @BindView(R.id.fee_value) TextView feeValue;
+    @Inject
+    IdlingManager idlingManager;
+    @Inject
+    Provider<SendTabPresenter> presenterProvider;
+    @InjectPresenter
+    SendTabPresenter presenter;
+    @BindView(R.id.input_coin)
+    AppCompatEditText coinInput;
+    @BindView(R.id.layout_input_recipient)
+    TextInputLayout recipientLayout;
+    @BindView(R.id.input_recipient)
+    AutoCompleteTextView recipientInput;
+    @BindView(R.id.layout_input_amount)
+    TextInputLayout amountLayout;
+    @BindView(R.id.input_amount)
+    AppCompatEditText amountInput;
+    @BindView(R.id.action)
+    Button actionSend;
+    @BindView(R.id.action_scan_qr)
+    View actionScanQR;
+    @BindView(R.id.action_maximum)
+    View actionMaximum;
+    @BindView(R.id.text_error)
+    TextView errorView;
+    @BindView(R.id.fee_value)
+    TextView feeValue;
     private Unbinder mUnbinder;
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;
@@ -144,7 +159,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
         mInputGroup.addValidator(recipientInput,
                 new RegexValidator(
                         // address or username with @ at begin or email
-                        String.format("%s|%s|%s", MinterAddress.ADDRESS_PATTERN, MinterUsernameValidator.PATTERN, Patterns.EMAIL_ADDRESS),
+                        String.format("%s|%s|%s", MinterAddress.ADDRESS_PATTERN + "|" + MinterPublicKey.PUB_KEY_PATTERN, MinterUsernameValidator.PATTERN, Patterns.EMAIL_ADDRESS),
                         "Incorrect recipient format"
                 ));
 

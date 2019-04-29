@@ -28,6 +28,7 @@ package network.minter.bipwallet.sending.ui.dialogs;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.TextView;
@@ -64,8 +65,11 @@ public class WalletTxSendSuccessDialog extends WalletDialog {
         title.setText(mBuilder.getTitle());
 
         recipientName.setText(mBuilder.mRecipientName);
+
         if (mBuilder.mAvatarUrl != null) {
             avatar.setImageUrl(mBuilder.mAvatarUrl);
+        } else if(mBuilder.mAvatarRes != -1){
+            avatar.setImageResource(mBuilder.mAvatarRes);
         }
 
         actionViewTx.setOnClickListener(v -> {
@@ -82,7 +86,7 @@ public class WalletTxSendSuccessDialog extends WalletDialog {
     public static class Builder extends WalletDialogBuilder<WalletTxSendSuccessDialog, WalletTxSendSuccessDialog.Builder> {
         private CharSequence mRecipientName;
         private String mAvatarUrl;
-
+        @DrawableRes private int mAvatarRes = -1;
 
         public Builder(Context context) {
             super(context);
@@ -90,6 +94,11 @@ public class WalletTxSendSuccessDialog extends WalletDialog {
 
         public Builder(Context context, CharSequence title) {
             super(context, title);
+        }
+
+        public Builder setAvatarResource(@DrawableRes int avatarResId) {
+            mAvatarRes = avatarResId;
+            return this;
         }
 
         public Builder setPositiveAction(CharSequence title, OnClickListener listener) {

@@ -51,6 +51,7 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.di.WalletApp;
 import network.minter.bipwallet.internal.di.WalletModule;
 import network.minter.bipwallet.internal.helpers.DateHelper;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.MinterBlockChainApi;
@@ -109,6 +110,12 @@ public class TestWalletModule {
     @WalletApp
     public Context provideContext() {
         return mContext;
+    }
+
+    @Provides
+    @WalletApp
+    public SettingsManager provideSettingsManager(SharedPreferences prefs) {
+        return new SettingsManager(prefs);
     }
 
     @Provides

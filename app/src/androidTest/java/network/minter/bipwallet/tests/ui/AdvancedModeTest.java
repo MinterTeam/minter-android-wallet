@@ -34,6 +34,8 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.test.runner.AndroidJUnitRunner;
 
 import org.junit.After;
 import org.junit.Before;
@@ -67,7 +69,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 
 @LargeTest
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(AndroidJUnitRunner.class)
+//@RunWith(AndroidJUnit4.class)
 public class AdvancedModeTest {
 
     private CallbackIdlingResource mAuthWaitIdlingRes = new CallbackIdlingResource();
