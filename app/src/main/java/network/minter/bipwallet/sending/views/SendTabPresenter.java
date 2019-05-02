@@ -194,7 +194,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             if (data != null && data.hasExtra(QRCodeScannerActivity.RESULT_TEXT)) {
                 //Getting the passed result
                 String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
-                Timber.d("bitvale result " + result);
                 if (result != null) {
                     boolean isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN);
                     boolean isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN);

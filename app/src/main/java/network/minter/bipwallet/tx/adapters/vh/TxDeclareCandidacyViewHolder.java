@@ -60,7 +60,7 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
     @Override
     public void bind(TxItem item) {
         super.bind(item);
-        setupAvatar(item);
+        avatar.setImageResource(R.drawable.img_avatar_candidate);
         final HistoryTransaction.TxDeclareCandidacyResult data = item.getTx().getData();
 
         amount.setText(String.format("- %s", bdHuman(firstNonNull(data.stake, new BigDecimal(0)))));
