@@ -49,6 +49,7 @@ import centrifuge.PublishHandler;
 import centrifuge.Subscription;
 import dagger.android.AndroidInjection;
 import io.reactivex.disposables.CompositeDisposable;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
@@ -142,8 +143,7 @@ public class LiveBalanceService extends Service {
 
     private void connect() {
         try {
-            mClient = Centrifuge.new_("wss://explorer-rtm.testnet.minter.network/connection/websocket", Centrifuge.defaultConfig());
-//            mClient = Centrifuge.new_("wss://rtm.explorer.minter.network/connection/websocket", Centrifuge.defaultConfig());
+            mClient = Centrifuge.new_(BuildConfig.LIVE_BALANCE_URL, Centrifuge.defaultConfig());
             mClient.onConnect(new ConnectHandler() {
                 @Override
                 public void onConnect(Client client, ConnectEvent connectEvent) {

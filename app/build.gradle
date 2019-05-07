@@ -141,21 +141,25 @@ android {
         netMain {
             dimension "env"
             applicationId = "network.minter.bipwallet.mainnet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
         }
 
         netMainNoCrashlytics {
             dimension "env"
             applicationId = "network.minter.bipwallet.mainnet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
         }
 
         netTest {
             dimension "env"
             applicationId = "network.minter.bipwallet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
         }
 
         netTestNoCrashlytics {
             dimension "env"
             applicationId = "network.minter.bipwallet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
         }
     }
 }
