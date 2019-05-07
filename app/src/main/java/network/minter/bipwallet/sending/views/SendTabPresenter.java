@@ -573,13 +573,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
 
             // if enough balance on MNT account, set gas coin MNT (BIP)
             if (enoughBaseCoinForCommission) {
-                Timber.d("Enough balance in MNT to pay fee");
+                Timber.d("Enough balance in %sw to pay fee", MinterSDK.DEFAULT_COIN);
                 Timber.tag("TX Send").d("Resolving base coin commission %s", MinterSDK.DEFAULT_COIN);
                 mGasCoin = mntAccount.get().getCoin();
             }
             // if sending account is not MNT (BIP), set gas coin CUSTOM
             else if (!sendAccount.get().getCoin().equals(MinterSDK.DEFAULT_COIN)) {
-                Timber.d("Not enough balance in MNT to pay fee, using " + mFromAccount.getCoin());
+                Timber.d("Not enough balance in %s to pay fee, using %s", MinterSDK.DEFAULT_COIN, mFromAccount.getCoin());
                 mGasCoin = sendAccount.get().getCoin();
                 // otherwise getting
                 Timber.tag("TX Send").d("Resolving custom coin commission %s", mFromAccount.getCoin());

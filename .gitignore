@@ -7,7 +7,7 @@
 /release
 /captures
 .externalNativeBuild
-gradle/**
+gradle/wrapper/gradle-wrapper.jar
 .keychain
 app/fabric.properties
 crashlytics-build.properties

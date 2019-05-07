@@ -243,7 +243,6 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
                 toConcat += calculation.substring(idx);
                 calculationView.setText(toConcat);
                 return;
-                //1 000 288 859 454 671 683 189 102 649 595 518 589 437 586 374 105 388 329 571 031 220 769 944 178 978 247 137 569 836 967 570 972 662 549 939 674 191 668 790 939 167 959 399 268 002 355 388 000 949 308 312 784 846 611 858 588 290 828.3882 MNT
             }
         }
 
