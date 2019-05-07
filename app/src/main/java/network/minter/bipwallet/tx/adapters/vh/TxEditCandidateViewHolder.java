@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link <a href="https://github.com/MinterTeam">Org Github</a>
- * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+ * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -42,13 +42,13 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 /**
  * minter-android-wallet. 2018
  *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Alexander Kolpakov <jquickapp@gmail.com>
  */
-public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxViewHolder {
+public class TxEditCandidateViewHolder extends ExpandableTxViewHolder  {
     public @BindView(R.id.detail_pub_value) TextView pubKey;
     public @BindView(R.id.item_title_type) TextView itemTitleType;
 
-    public TxSetCandidateOnlineOfflineViewHolder(View itemView) {
+    public TxEditCandidateViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
     }
@@ -57,7 +57,7 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
     public void bind(TxItem item) {
         super.bind(item);
         avatar.setImageResource(R.drawable.img_avatar_candidate);
-        final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = item.getTx().getData();
+        final HistoryTransaction.TxEditCandidateResult  data = item.getTx().getData();
 
         if (bdNull(item.getTx().getFee())) {
             amount.setText(String.format("%s", bdHuman(item.getTx().fee)));
@@ -66,7 +66,7 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
         }
 
         subamount.setText(MinterSDK.DEFAULT_COIN);
-        itemTitleType.setText(item.getTx().type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
+        itemTitleType.setText(itemTitleType.getContext().getString(R.string.tx_type_edit_candidate));
         if (data.getPublicKey() != null) {
             pubKey.setText(data.getPublicKey().toString());
             title.setText(data.getPublicKey().toShortString());

@@ -74,6 +74,7 @@ import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
 import network.minter.bipwallet.settings.views.rows.SettingsSwitchRow;
+import network.minter.core.MinterSDK;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAuthRepository;
 import network.minter.profile.repo.ProfileRepository;
@@ -127,7 +128,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             getViewState().setOnFreeCoinsClickListener(v -> {
                 Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
                 getViewState().startDialog(exec -> new WalletConfirmDialog.Builder(exec, "Get free coins")
-                        .setText("Are you wanna get FREE 100 MNT?")
+                        .setText(String.format("Are you wanna get FREE 100 %s?", MinterSDK.DEFAULT_COIN))
                         .setPositiveAction("Sure!", (d, w) -> {
                             d.dismiss();
                             onRequestFreeCoins();
@@ -257,7 +258,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             return;
         }
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Get free coins")
-                .setText("We sent to you 100 MNT")
+                .setText(String.format("We sent to you 100 %s", MinterSDK.DEFAULT_COIN))
                 .setPositiveAction("OK")
                 .create());
     }

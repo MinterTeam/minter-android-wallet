@@ -106,21 +106,21 @@ public class ExchangeCalculator {
                         final Optional<AccountItem> getAccount = findAccountByCoin(sourceCoin);
                         // if enough (exact) MNT ot pay fee, gas coin is MNT
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
-                            Timber.d("Enough MNT to pay fee using MNT");
+                            Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = mntAccount.get().getCoin();
                             out.mEstimate = res.result.getAmount();
                             out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), sourceCoin);
                         }
                         // if enough selected account coin ot pay fee, gas coin is selected coin
                         else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
-                            Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
+                            Timber.d("Enough %s to pay fee using instead %s", getAccount.get().getCoin(), MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = getAccount.get().getCoin();
                             out.mEstimate = res.result.getAmountWithCommission();
                             out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmountWithCommission()), sourceCoin);
                         }
                         // if not enough, break, error
                         else {
-                            Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
+                            Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().getCoin());
                             out.mGasCoin = mntAccount.get().getCoin();
                             out.mEstimate = res.result.getAmount();
                             out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), sourceCoin);
@@ -168,15 +168,15 @@ public class ExchangeCalculator {
 
                         // if enough (exact) MNT ot pay fee, gas coin is MNT
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.SellCoin.getFee())) {
-                            Timber.d("Enough MNT to pay fee using MNT");
+                            Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = mntAccount.get().getCoin();
                         }
                         // if enough selected account coin ot pay fee, gas coin is selected account coin
                         else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getCommission())) {
-                            Timber.d("Enough " + getAccount.get().getCoin() + " to pay fee using instead MNT");
+                            Timber.d("Enough %s to pay fee using instead %s", getAccount.get().getCoin(), MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = getAccount.get().getCoin();
                         } else {
-                            Timber.d("Not enough balance in MNT and " + getAccount.get().getCoin() + " to pay fee");
+                            Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().getCoin());
                             out.mGasCoin = mntAccount.get().getCoin();
                             errFunc.accept("Not enough balance");
                         }

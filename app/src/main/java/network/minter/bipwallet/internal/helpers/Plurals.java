@@ -79,7 +79,7 @@ public class Plurals {
     }
 
     public static String bips(Long n) {
-        if (MinterSDK.DEFAULT_COIN.toUpperCase().equals("MNT")) {
+        if (MinterSDK.DEFAULT_COIN.toUpperCase().equals(MinterSDK.DEFAULT_COIN)) {
             return MinterSDK.DEFAULT_COIN.toUpperCase();
         }
         return plurals(n, bips);

@@ -54,7 +54,7 @@ android {
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
         versionCode 80
-        versionName "1.4.0"
+        versionName "1.4.0-dev02"
         testInstrumentationRunner "network.minter.bipwallet.tests.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -157,9 +157,9 @@ android {
 }
 
 ext {
-    minterExplorerSDK = "0.4.0"
-    minterProfileSDK = "0.2.2"
-    minterBlockchainSDK = "0.6.1"
+    minterExplorerSDK = "0.4.2"
+    minterProfileSDK = "0.2.4"
+    minterBlockchainSDK = "0.6.2"
     minterCoreSDK = "0.2.5"
 }
 

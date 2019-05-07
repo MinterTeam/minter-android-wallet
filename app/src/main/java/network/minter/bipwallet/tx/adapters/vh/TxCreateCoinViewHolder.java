@@ -64,7 +64,7 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
         super.bind(item);
         final HistoryTransaction.TxCreateResult data = item.getTx().getData();
         final String symbol = firstNonNull(data.getSymbol(), "<unknown>");
-        avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(symbol), MinterProfileApi.getCoinAvatarUrl("MNT"));
+        avatar.setImageResource(R.drawable.img_avatar_create_coin);
         title.setText(symbol);
         amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
