@@ -136,6 +136,7 @@
                 app:layout_constraintStart_toEndOf="@id/item_title"
                 app:layout_constraintTop_toTopOf="@id/item_title"
                 app:layout_constraintVertical_bias=".7"
+                android:layout_marginStart="@dimen/margin_min"
                 app:srcCompat="@drawable/ic_text_arrow_right"
                 />
 

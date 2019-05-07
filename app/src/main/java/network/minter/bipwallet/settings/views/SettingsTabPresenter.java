@@ -201,11 +201,11 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             mMainSettingsRows.put("password", new SettingsButtonRow("Password", "Change", (view1, sharedView1, value1) -> onClickChangePassword()).setInactive(true));
             Stream.of(mMainSettingsRows.values()).forEach(item -> mMainAdapter.addRow(item));
 
-            mAdditionalAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
+//            mAdditionalAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
             mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         } else {
-            mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
+//            mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         }

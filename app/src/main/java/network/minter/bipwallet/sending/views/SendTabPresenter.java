@@ -352,6 +352,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private OperationType getTransactionTypeByAddress() {
+        if (mToName == null) {
+            // send - default fee
+            return OperationType.SendCoin;
+        }
+
         if (mToName.toString().matches(MinterPublicKey.PUB_KEY_PATTERN)) {
             return OperationType.Delegate;
         } else {

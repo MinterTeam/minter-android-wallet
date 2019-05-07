@@ -47,6 +47,7 @@ import javax.inject.Provider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.AuthModule;
 import network.minter.bipwallet.auth.views.AuthPresenter;
@@ -62,7 +63,6 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     @Inject Provider<AuthPresenter> authPresenterProvider;
     @InjectPresenter AuthPresenter presenter;
     @BindView(R.id.action_create_wallet) Button actionCreateWallet;
-    @BindView(R.id.action_advanced_mode) Button actionAdvancedMode;
     @BindView(R.id.action_signin) Button actionSignin;
     @BindView(R.id.action_help) Button actionHelp;
     @BindView(R.id.logo) ImageView logo;
@@ -79,11 +79,6 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     }
 
     @Override
-    public void setOnAdvancedMode(View.OnClickListener listener) {
-        actionAdvancedMode.setOnClickListener(listener);
-    }
-
-    @Override
     public void setOnSignin(View.OnClickListener listener) {
         actionSignin.setOnClickListener(listener);
     }
@@ -94,18 +89,13 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     }
 
     @Override
-    public void startAdvancedMode() {
-        getActivity().startActivity(new Intent(getActivity(), AdvancedMainActivity.class));
-    }
-
-    @Override
     public void startRegister() {
-        getActivity().startActivity(new Intent(getActivity(), RegisterActivity.class));
+        getActivity().startActivity(new Intent(getActivity(), AdvancedGenerateActivity.class));
     }
 
     @Override
     public void startSignIn() {
-        getActivity().startActivity(new Intent(getActivity(), SigninActivity.class));
+        getActivity().startActivity(new Intent(getActivity(), AdvancedMainActivity.class));
     }
 
     @Override
