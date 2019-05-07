@@ -120,6 +120,8 @@
         android:id="@+id/sep"
         android:layout_width="0dp"
         android:layout_height="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/shape_bottom_separator"
         app:layout_constraintTop_toBottomOf="@id/layout_info"
         />

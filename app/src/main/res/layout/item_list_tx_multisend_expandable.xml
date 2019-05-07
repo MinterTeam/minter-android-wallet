@@ -222,8 +222,7 @@
             android:text="@string/tx_detail_amount"
             android:textSize="@dimen/text_size_12"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@id/detail_coin_label"
-            app:layout_constraintTop_toBottomOf="@id/detail_time_value"
+            app:layout_constraintTop_toBottomOf="@+id/detail_time_value"
             app:layout_constraintWidth_percent=".5" />
 
         <TextView
@@ -233,7 +232,6 @@
             android:fontFamily="@font/_ubuntu_mono_bold"
             android:textSize="@dimen/text_size_tx_detail_value"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@id/detail_coin_value"
             app:layout_constraintTop_toBottomOf="@id/detail_amount_label"
             app:layout_constraintWidth_percent=".5"
             tools:text="10000000.010203040506070809" />

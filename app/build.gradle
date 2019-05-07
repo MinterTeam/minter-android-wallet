@@ -53,8 +53,8 @@ android {
         applicationId "network.minter.bipwallet"
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
-        versionCode 81
-        versionName "1.4.1-dev01"
+        versionCode 82
+        versionName "1.4.1-dev02"
         testInstrumentationRunner "network.minter.bipwallet.tests.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -140,18 +140,22 @@ android {
     productFlavors {
         netMain {
             dimension "env"
+            applicationId = "network.minter.bipwallet.mainnet"
         }
 
         netMainNoCrashlytics {
             dimension "env"
+            applicationId = "network.minter.bipwallet.mainnet"
         }
 
         netTest {
             dimension "env"
+            applicationId = "network.minter.bipwallet"
         }
 
         netTestNoCrashlytics {
             dimension "env"
+            applicationId = "network.minter.bipwallet"
         }
     }
 }

@@ -108,7 +108,6 @@
             android:fontFamily="@font/_ubuntu_bold"
             android:textSize="@dimen/text_size_default"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/item_title_separator"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/item_avatar"

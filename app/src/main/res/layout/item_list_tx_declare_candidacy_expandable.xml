@@ -108,7 +108,6 @@
             android:fontFamily="@font/_ubuntu_bold"
             android:textSize="@dimen/text_size_default"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/item_title_separator"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
@@ -139,6 +138,8 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@drawable/shape_bottom_separator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_info"
         />
 
