@@ -43,7 +43,7 @@
         android:paddingStart="62dp"
         android:paddingEnd="62dp"
         android:transitionName="@string/transaction_auth_logo"
-        app:layout_constraintBottom_toTopOf="@id/action_create_wallet"
+        app:layout_constraintBottom_toTopOf="@id/action_advanced_mode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -52,30 +52,16 @@
         />
 
     <network.minter.bipwallet.internal.views.widgets.WalletButton
-        android:id="@+id/action_create_wallet"
-        style="@style/Wallet.Button.White"
+        android:id="@+id/action_advanced_mode"
+        style="@style/Wallet.Button.Transparent.WhiteBorder"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="@dimen/margin_edges"
         android:text="@string/btn_create_wallet"
-        app:layout_constraintBottom_toTopOf="@id/action_signin"
+        app:layout_constraintBottom_toTopOf="@id/action_help"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
-
-    <network.minter.bipwallet.internal.views.widgets.WalletButton
-        android:id="@+id/action_signin"
-        style="@style/Wallet.Button.Transparent.WhiteBorder"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginBottom="32dp"
-        android:text="@string/btn_sign_in"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/action_help"
         app:layout_constraintStart_toStartOf="parent"
         />
 
@@ -86,12 +72,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_half"
+        android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="32dp"
         android:text="@string/btn_help"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/action_signin"
+        app:layout_constraintStart_toStartOf="parent"
         />
 
 

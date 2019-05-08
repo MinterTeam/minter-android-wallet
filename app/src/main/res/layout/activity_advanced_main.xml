@@ -54,7 +54,7 @@
             android:theme="@style/WalletPrimaryToolbar"
             app:layout_collapseMode="none"
             app:navigationIcon="@drawable/ic_arrow_back_white_compat"
-            app:title="@string/title_signin"
+            app:title="@string/title_advanced_main"
             app:titleTextColor="@android:color/white"
             />
     </android.support.design.widget.AppBarLayout>
@@ -74,6 +74,45 @@
             android:layout_height="wrap_content"
             >
 
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_generate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/btn_generate_address"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/Wallet.Button"
+                />
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:background="@color/greySeparator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action_generate"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingStart="@dimen/margin_edges"
+                android:paddingEnd="@dimen/margin_edges"
+                android:text="@string/or"
+                app:layout_constraintBottom_toBottomOf="@id/separator"
+                app:layout_constraintEnd_toEndOf="@id/separator"
+                app:layout_constraintStart_toStartOf="@id/separator"
+                app:layout_constraintTop_toTopOf="@id/separator"
+                app:layout_constraintVertical_bias=".57"
+                />
+
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/layout_input_seed"
                 android:layout_width="0dp"
@@ -87,7 +126,7 @@
                 app:hintTextAppearance="@style/Wallet.Hint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separator"
                 >
 
                 <android.support.v7.widget.AppCompatEditText

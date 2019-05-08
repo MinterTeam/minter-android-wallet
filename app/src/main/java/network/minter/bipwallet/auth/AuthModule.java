@@ -50,13 +50,10 @@ import network.minter.bipwallet.internal.mvp.ProgressView;
 public class AuthModule {
 
     public interface AuthView extends MvpView {
-        void setOnCreateWallet(View.OnClickListener listener);
-        void setOnSignin(View.OnClickListener listener);
+        void setOnAdvancedMode(View.OnClickListener listener);
         void setOnHelp(View.OnClickListener listener);
         @StateStrategyType(OneExecutionStateStrategy.class)
-        void startRegister();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startSignIn();
+        void startAdvancedMode();
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startHelp();
     }

@@ -62,8 +62,7 @@ import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
 public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthView {
     @Inject Provider<AuthPresenter> authPresenterProvider;
     @InjectPresenter AuthPresenter presenter;
-    @BindView(R.id.action_create_wallet) Button actionCreateWallet;
-    @BindView(R.id.action_signin) Button actionSignin;
+    @BindView(R.id.action_advanced_mode) Button actionAdvancedMode;
     @BindView(R.id.action_help) Button actionHelp;
     @BindView(R.id.logo) ImageView logo;
     private CallbackIdlingResource mAuthWait;
@@ -74,13 +73,8 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     }
 
     @Override
-    public void setOnCreateWallet(View.OnClickListener listener) {
-        actionCreateWallet.setOnClickListener(listener);
-    }
-
-    @Override
-    public void setOnSignin(View.OnClickListener listener) {
-        actionSignin.setOnClickListener(listener);
+    public void setOnAdvancedMode(View.OnClickListener listener) {
+        actionAdvancedMode.setOnClickListener(listener);
     }
 
     @Override
@@ -89,20 +83,15 @@ public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthV
     }
 
     @Override
-    public void startRegister() {
-        getActivity().startActivity(new Intent(getActivity(), AdvancedGenerateActivity.class));
-    }
-
-    @Override
-    public void startSignIn() {
-        getActivity().startActivity(new Intent(getActivity(), AdvancedMainActivity.class));
-    }
-
-    @Override
     public void startHelp() {
         getActivity().startActivity(
                 IntentHelper.newUrl("https://help.minter.network")
         );
+    }
+
+    @Override
+    public void startAdvancedMode() {
+        getActivity().startActivity(new Intent(getActivity(), AdvancedMainActivity.class));
     }
 
     @Nullable

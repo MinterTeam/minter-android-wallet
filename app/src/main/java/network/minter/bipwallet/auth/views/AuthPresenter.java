@@ -52,8 +52,7 @@ public class AuthPresenter extends MvpBasePresenter<AuthModule.AuthView> {
     @Override
     public void attachView(AuthModule.AuthView view) {
         super.attachView(view);
-        getViewState().setOnCreateWallet(this::onClickCreateWallet);
-        getViewState().setOnSignin(this::onClickSignIn);
+        getViewState().setOnAdvancedMode(this::onClickAdvancedMode);
         getViewState().setOnHelp(this::onClickHelp);
     }
 
@@ -61,11 +60,7 @@ public class AuthPresenter extends MvpBasePresenter<AuthModule.AuthView> {
         getViewState().startHelp();
     }
 
-    private void onClickSignIn(View view) {
-        getViewState().startSignIn();
-    }
-
-    private void onClickCreateWallet(View view) {
-        getViewState().startRegister();
+    private void onClickAdvancedMode(View view) {
+        getViewState().startAdvancedMode();
     }
 }
