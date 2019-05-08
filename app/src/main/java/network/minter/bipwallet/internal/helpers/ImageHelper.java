@@ -43,6 +43,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.DimenRes;
@@ -67,12 +68,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
+
+import javax.net.ssl.SSLContext;
 
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 import network.minter.bipwallet.internal.helpers.data.Vec2;
+import network.minter.core.internal.api.Tls12SocketFactory;
+import okhttp3.ConnectionSpec;
+import okhttp3.OkHttpClient;
+import okhttp3.TlsVersion;
 import timber.log.Timber;
 
 /**
@@ -90,11 +99,38 @@ public final class ImageHelper {
         mContext = context;
         mDisplay = displayHelper;
 
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        OkHttpClient client = enableTls12OnPreLollipop(httpClient).build();
         mPicasso = new Picasso.Builder(context)
-                .downloader(new OkHttp3Downloader(context))
+                .downloader(new OkHttp3Downloader(client))
                 .listener((picasso, uri, exception) -> Timber.w(exception, "Unable to load image %s", uri.toString()))
                 .indicatorsEnabled(false)
                 .build();
+    }
+
+    private OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder client) {
+        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 22) {
+            try {
+                SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, null, null);
+                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()));
+
+                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .build();
+
+                List<ConnectionSpec> specs = new ArrayList<>();
+                specs.add(cs);
+                specs.add(ConnectionSpec.COMPATIBLE_TLS);
+                specs.add(ConnectionSpec.CLEARTEXT);
+
+                client.connectionSpecs(specs);
+            } catch (Exception exc) {
+                Timber.e(exc);
+            }
+        }
+
+        return client;
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -133,9 +169,9 @@ public final class ImageHelper {
         return Base64.encodeToString(data, Base64.DEFAULT);
     }
 
-	public Bitmap drawableToBitmap(@DrawableRes int drawableRes) {
-    	return drawableToBitmap(mContext.getResources().getDrawable(drawableRes));
-	}
+    public Bitmap drawableToBitmap(@DrawableRes int drawableRes) {
+        return drawableToBitmap(mContext.getResources().getDrawable(drawableRes));
+    }
 
     public Bitmap drawableToBitmap(Drawable drawable) {
         Bitmap bitmap;
