@@ -89,6 +89,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabView> extends MvpBasePresenter<V> {
@@ -102,6 +103,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final GateTransactionRepository mGateTxRepo;
 
     private AccountItem mAccount;
+    private AccountItem mCurrentAccount;
     private String mGetCoin = null;
     private BigDecimal mSpendAmount = new BigDecimal(0);
     private BigDecimal mGetAmount = new BigDecimal(0);
@@ -492,12 +494,15 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mGasCoin = accountItem.getCoin();
         mAccount = accountItem;
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
-        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(), bdHuman(accountItem.balance)));
+
+        if (!initial || (mCurrentAccount == null || mCurrentAccount.getCoin().equals(accountItem.getCoin()))) {
+            getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(),
+                    bdHuman(accountItem.balance)));
+            mCurrentAccount = accountItem;
+        }
 
         if (!initial) {
             mInputChange.onNext(isAmountForGetting());
         }
     }
-
-
 }
