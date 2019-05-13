@@ -59,7 +59,7 @@
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges"
         android:layout_marginBottom="@dimen/margin_edges"
-        android:text="@string/btn_create_wallet"
+        android:text="@string/btn_advanced_mode"
         app:layout_constraintBottom_toTopOf="@id/action_help"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
