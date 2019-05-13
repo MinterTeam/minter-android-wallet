@@ -103,7 +103,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
     protected final GateTransactionRepository mGateTxRepo;
 
     private AccountItem mAccount;
-    private AccountItem mCurrentAccount;
+    private String mCurrentCoin;
     private String mGetCoin = null;
     private BigDecimal mSpendAmount = new BigDecimal(0);
     private BigDecimal mGetAmount = new BigDecimal(0);
@@ -150,6 +150,9 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                     if (!res.isEmpty()) {
                         mAccounts = res.getAccounts();
                         mAccount = res.getAccounts().get(0);
+                        if (mCurrentCoin != null) {
+                            mAccount = Stream.of(mAccounts).filter(value -> value.getCoin().equals(mCurrentCoin)).findFirst().orElse(mAccount);
+                        }
                         onAccountSelected(mAccount, true);
                     }
                 });
@@ -492,14 +495,13 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         if (accountItem == null) return;
 
         mGasCoin = accountItem.getCoin();
-        mAccount = accountItem;
+
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
 
-        if (!initial || (mCurrentAccount == null || mCurrentAccount.getCoin().equals(accountItem.getCoin()))) {
-            getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(),
-                    bdHuman(accountItem.balance)));
-            mCurrentAccount = accountItem;
-        }
+        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(),
+                bdHuman(accountItem.balance)));
+
+        mCurrentCoin = accountItem.getCoin();
 
         if (!initial) {
             mInputChange.onNext(isAmountForGetting());
