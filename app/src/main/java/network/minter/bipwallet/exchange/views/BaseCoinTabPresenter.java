@@ -495,7 +495,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         if (accountItem == null) return;
 
         mGasCoin = accountItem.getCoin();
-
+        mAccount = accountItem;
         getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
 
         getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(),
