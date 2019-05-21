@@ -71,21 +71,33 @@ import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.CoinsTabView {
 
-    @Inject Provider<CoinsTabPresenter> presenterProvider;
-    @Inject SoundManager soundManager;
-    @InjectPresenter CoinsTabPresenter presenter;
-    @BindView(R.id.bip_logo) View logo;
-    @BindView(R.id.user_avatar) BipCircleImageView avatar;
-    @BindView(R.id.username) TextView username;
-    @BindView(R.id.balance_int) TextView balanceInt;
-    @BindView(R.id.balance_fractions) TextView balanceFract;
-    @BindView(R.id.balance_coin_name) TextView balanceCoinName;
-    @BindView(R.id.list) RecyclerView list;
-    @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    @Inject
+    Provider<CoinsTabPresenter> presenterProvider;
+    @Inject
+    SoundManager soundManager;
+    @InjectPresenter
+    CoinsTabPresenter presenter;
+    @BindView(R.id.bip_logo)
+    View logo;
+    @BindView(R.id.user_avatar)
+    BipCircleImageView avatar;
+    @BindView(R.id.username)
+    TextView username;
+    @BindView(R.id.balance_int)
+    TextView balanceInt;
+    @BindView(R.id.balance_fractions)
+    TextView balanceFract;
+    @BindView(R.id.balance_coin_name)
+    TextView balanceCoinName;
+    @BindView(R.id.list)
+    RecyclerView list;
+    @BindView(R.id.container_swipe_refresh)
+    SwipeRefreshLayout swipeRefreshLayout;
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
     private GestureDetector mGestureDetector;
@@ -126,7 +138,9 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
 
     @Override
     public void scrollTop() {
-        list.post(() -> list.scrollToPosition(0));
+        list.post(() -> {
+            if (list != null) list.scrollToPosition(0);
+        });
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -238,7 +252,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
 
     @Override
     public void hideAvatar() {
-        avatar.setVisibility(View.GONE);
+        if (avatar != null) avatar.setVisibility(View.GONE);
     }
 
     @Override

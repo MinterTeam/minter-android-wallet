@@ -49,7 +49,6 @@ import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.profile.MinterProfileApi;
-import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018

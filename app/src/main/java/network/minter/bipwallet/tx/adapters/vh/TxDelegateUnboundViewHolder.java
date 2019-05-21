@@ -83,7 +83,7 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
 
         subamount.setText(data.coin);
         coin.setText(data.getCoin());
-        stake.setText(bdHuman(firstNonNull(data.getStake(), new BigDecimal(0))));
+        stake.setText(bdHuman(firstNonNull(data.getValue(), new BigDecimal(0))));
 
         itemTitleType.setText(item.getTx().getType().name());
         if (data.getPublicKey() != null) {
