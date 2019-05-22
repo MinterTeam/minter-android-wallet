@@ -54,6 +54,7 @@ import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.models.AddressInfoResult;
 import network.minter.profile.repo.ProfileInfoRepository;
+import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
@@ -184,6 +185,13 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, TransactionItem> callback) {
         mLoadState.postValue(LoadState.Loading);
+        if (mAddressList == null || mAddressList.isEmpty()) {
+            Timber.w("Unanble to load transactions list(page: 1): user address list is empty");
+            mLoadState.postValue(LoadState.Loaded);
+            callback.onResult(Collections.emptyList(), null, null);
+            return;
+        }
+
         rxExp(mRepo.getTransactions(mAddressList, 1))
                 .onErrorResumeNext(toExpError())
                 .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
@@ -198,6 +206,12 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, TransactionItem> callback) {
         mLoadState.postValue(LoadState.Loading);
+        if (mAddressList == null || mAddressList.isEmpty()) {
+            Timber.w("Unable to load previous transactions list (page: %s): user address list is empty", params.key);
+            mLoadState.postValue(LoadState.Loaded);
+            callback.onResult(Collections.emptyList(), null);
+            return;
+        }
         rxExp(mRepo.getTransactions(mAddressList, params.key))
                 .onErrorResumeNext(toExpError())
                 .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
