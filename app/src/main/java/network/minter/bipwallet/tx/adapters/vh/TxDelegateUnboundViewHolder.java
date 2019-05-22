@@ -93,6 +93,7 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
             pubKey.setText("<unknown>");
             title.setText(item.getTx().hash.toShortString());
         }
+        setupCopyListeners(pubKey);
     }
 
     @Override

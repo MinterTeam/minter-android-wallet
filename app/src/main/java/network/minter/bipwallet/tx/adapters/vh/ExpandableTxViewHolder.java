@@ -26,8 +26,12 @@
 
 package network.minter.bipwallet.tx.adapters.vh;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -40,6 +44,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.adapters.TxItem;
 
@@ -114,6 +119,25 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
 
     public void setUserAvatars(boolean useAvatars) {
         mUseAvatars = useAvatars;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    void setupCopyListeners(TextView... views) {
+        int selectedColor = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
+        int defaultColor = ContextCompat.getColor(itemView.getContext(), R.color.textColorPrimary);
+        for (TextView view : views) {
+            view.setOnLongClickListener(v -> {
+                view.setTextColor(selectedColor);
+                return true;
+            });
+            view.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    view.setTextColor(defaultColor);
+                    ContextHelper.copyToClipboard(view.getContext(), view.getText().toString());
+                }
+                return false;
+            });
+        }
     }
 
     protected boolean autoSetAvatar() {

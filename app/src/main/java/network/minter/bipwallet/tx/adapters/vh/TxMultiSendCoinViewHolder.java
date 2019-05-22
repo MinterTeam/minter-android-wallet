@@ -68,5 +68,6 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
 
         fromValue.setText(item.getFrom().toString());
         avatar.setImageResource(R.drawable.img_avatar_multisend);
+        setupCopyListeners(fromValue);
     }
 }

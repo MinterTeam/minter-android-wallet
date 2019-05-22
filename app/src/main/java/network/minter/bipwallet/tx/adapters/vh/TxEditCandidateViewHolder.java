@@ -74,5 +74,6 @@ public class TxEditCandidateViewHolder extends ExpandableTxViewHolder  {
             pubKey.setText("<unknown>");
             title.setText(item.getTx().hash.toShortString());
         }
+        setupCopyListeners(pubKey);
     }
 }

@@ -74,5 +74,6 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
             pubKey.setText("<unknown>");
             title.setText(item.getTx().hash.toShortString());
         }
+        setupCopyListeners(pubKey);
     }
 }

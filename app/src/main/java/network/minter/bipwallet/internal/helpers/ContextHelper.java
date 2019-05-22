@@ -70,6 +70,6 @@ public class ContextHelper {
         }
         ClipData data = ClipData.newPlainText("", text);
         clipboard.setPrimaryClip(data);
-        Toast.makeText(ctx, "Copied", Toast.LENGTH_LONG).show();
+        Toast.makeText(ctx, "Copied", Toast.LENGTH_SHORT).show();
     }
 }

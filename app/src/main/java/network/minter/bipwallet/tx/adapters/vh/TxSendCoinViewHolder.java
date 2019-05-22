@@ -115,5 +115,6 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
         subamount.setText(data.getCoin());
         coinValue.setText(data.getCoin());
         amountValue.setText(bdHuman(data.amount));
+        setupCopyListeners(fromValue, toValue);
     }
 }

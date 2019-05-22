@@ -40,5 +40,6 @@ public class TxRedeemCheckViewHolder extends ExpandableTxViewHolder {
         amountValue.setText(bdHuman(data.getCheck().getValue()));
         subamount.setText(data.getCheck().getCoin());
         coinValue.setText(data.getCheck().getCoin());
+        setupCopyListeners(fromValue);
     }
 }
