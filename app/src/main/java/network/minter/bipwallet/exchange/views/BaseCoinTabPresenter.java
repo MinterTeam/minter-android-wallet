@@ -342,6 +342,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
             return;
         }
 
+        if (mAccount == null) {
+            return;
+        }
+
         getViewState().setAmount(mAccount.balance.stripTrailingZeros().toPlainString());
         mUseMax = true;
 

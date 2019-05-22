@@ -147,7 +147,7 @@ public class ExchangeCalculator {
                                 errFunc.accept(firstNonNull(res.getMessage(), "Coin to buy not exists"));
                                 return;
                             } else {
-                                Timber.w(new GateResponseException(res));
+                                Timber.w(new GateResponseException(res), "Unable to calculate sell/sellAll currency");
                                 errFunc.accept(firstNonNull(res.getMessage(), String.format("Error::%s", res.error.getResultCode().name())));
                                 return;
                             }

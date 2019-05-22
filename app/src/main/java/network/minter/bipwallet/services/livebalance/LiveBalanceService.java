@@ -154,7 +154,7 @@ public class LiveBalanceService extends Service {
             mClient.onDisconnect(new DisconnectHandler() {
                 @Override
                 public void onDisconnect(Client client, DisconnectEvent disconnectEvent) {
-                    Timber.w("Disconnected");
+                    Timber.i("Disconnected");
                 }
             });
             mClient.onError(new ErrorHandler() {

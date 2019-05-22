@@ -333,6 +333,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     private void onSubmit(View view) {
+        if (mToName == null) {
+            getViewState().setRecipientError("Recipient required");
+            return;
+        }
         getAnalytics().send(AppEvent.SendCoinsSendButton);
         switch (getTransactionTypeByAddress()) {
             case Delegate:
@@ -630,8 +634,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
             }
 
             // creating preparation result to send transaction
+
             Disposable d = Observable.combineLatest(
                     exchangeResolver,
+
                     rxGate(estimateRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(toGateError()),
                     (txCommissionValue, countableDataBCResult) -> {
 

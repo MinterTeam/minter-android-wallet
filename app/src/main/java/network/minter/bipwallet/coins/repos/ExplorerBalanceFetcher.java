@@ -48,7 +48,7 @@ import network.minter.explorer.models.AddressData;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 
-import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpGateError;
 
 /**
@@ -74,7 +74,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
     }
 
     public static Observable<BigDecimal> createSingleTotalBalance(ExplorerAddressRepository addressRepository, MinterAddress address) {
-        return rxExp(addressRepository.getAddressData(address))
+        return rxExpGate(addressRepository.getAddressData(address))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(toExpGateError())
@@ -82,7 +82,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
     }
 
     public static Observable<BigDecimal> createSingleCoinBalance(ExplorerAddressRepository addressRepository, MinterAddress address, String coin) {
-        return rxExp(addressRepository.getAddressData(address))
+        return rxExpGate(addressRepository.getAddressData(address))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(toExpGateError())
@@ -110,7 +110,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
         }
 
         for (MinterAddress address : mAddresses) {
-            rxExp(mAddressRepository.getAddressData(address))
+            rxExpGate(mAddressRepository.getAddressData(address))
                     .onErrorResumeNext(toExpGateError())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
