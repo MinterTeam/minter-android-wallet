@@ -87,7 +87,7 @@
             android:layout_marginEnd="@dimen/margin_min"
             android:fontFamily="@font/_ubuntu_medium"
             android:textAlignment="viewEnd"
-            android:textColor="@color/textColorPrimary"
+            android:textColor="@color/textColorGreen"
             android:textSize="@dimen/text_size_tx_amount"
             app:layout_constraintBottom_toTopOf="@id/item_subamount"
             app:layout_constraintEnd_toEndOf="parent"

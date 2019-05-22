@@ -36,11 +36,9 @@ public class TxRedeemCheckViewHolder extends ExpandableTxViewHolder {
         final HistoryTransaction.TxRedeemCheckResult data = item.getTx().getData();
         fromValue.setText(data.getCheck().getSender().toString());
         title.setText(item.getTx().hash.toShortString());
-        amount.setText(bdHuman(data.getCheck().getValue()));
+        amount.setText(String.format("+ %s", bdHuman(data.getCheck().getValue())));
         amountValue.setText(bdHuman(data.getCheck().getValue()));
         subamount.setText(data.getCheck().getCoin());
         coinValue.setText(data.getCheck().getCoin());
-//        txType.setText(item.getTx().type.name());
-//        itemTitleType.setText(txType.getText());
     }
 }
