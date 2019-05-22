@@ -162,6 +162,7 @@
     <string name="tx_type_create_coin">Create Coin</string>
     <string name="tx_type_multisend">MultiSend</string>
     <string name="tx_type_edit_candidate">Edit candidate</string>
+    <string name="tx_type_redeem_check">Redeem Check</string>
     <string name="tx_incoming_multisend">+ …</string>
     <string name="tx_outgoing_multisend">- …</string>
     <string name="label_coin_name">Coin name</string>
@@ -182,7 +183,7 @@
     <string name="attention_please_wait">Please, wait</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_express_tx">Express transaction</string>
-    <string name="tx_send_in_progress">Sending transaction...</string>
+    <string name="tx_send_in_progress">Sending transaction…</string>
     <string name="error">Error</string>
     <string name="tx_send_overall_title">You\'re sending</string>
     <string name="tx_address_searching">Searching address</string>

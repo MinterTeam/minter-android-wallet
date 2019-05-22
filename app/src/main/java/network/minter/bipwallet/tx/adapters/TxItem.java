@@ -43,6 +43,7 @@ import network.minter.bipwallet.tx.adapters.vh.TxEditCandidateViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxHeaderViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxMultiSendCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder;
+import network.minter.bipwallet.tx.adapters.vh.TxRedeemCheckViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSendCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSetCandidateOnlineOfflineViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
@@ -116,6 +117,10 @@ public class TxItem implements TransactionItem {
                 view = inflater.inflate(R.layout.item_list_tx_set_candidate_on_off_expandable, parent, false);
                 out = new TxEditCandidateViewHolder(view);
                 break;
+            case TX_REDEEM_CHECK:
+                view = inflater.inflate(R.layout.item_list_tx_redeem_check_expandable, parent, false);
+                out = new TxRedeemCheckViewHolder(view);
+                break;
             default:
                 view = inflater.inflate(R.layout.item_list_tx_unhandled_expandable, parent, false);
                 out = new TxUnhandledViewHolder(view);
@@ -155,6 +160,9 @@ public class TxItem implements TransactionItem {
         } else if (holder instanceof TxEditCandidateViewHolder) {
             final TxItem txItem = ((TxItem) data);
             ((TxEditCandidateViewHolder) holder).bind(txItem);
+        } else if (holder instanceof TxRedeemCheckViewHolder) {
+            final TxItem txItem = ((TxItem) data);
+            ((TxRedeemCheckViewHolder) holder).bind(txItem);
         } else {
             final TxItem txItem = ((TxItem) data);
             ((TxUnhandledViewHolder) holder).bind(txItem);
