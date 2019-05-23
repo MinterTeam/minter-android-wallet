@@ -231,6 +231,7 @@ public class InputGroup {
             final TextInputLayout tl = ((TextInputLayout) mInputNames.get(fieldName).getParent().getParent());
 
             tl.post(() -> {
+                tl.setError(null);
                 tl.setErrorEnabled(message != null && message.length() > 0);
                 tl.setError(message);
             });
@@ -238,7 +239,10 @@ public class InputGroup {
         } else {
             final EditText in = mInputNames.get(fieldName);
             if (in != null) {
-                in.post(() -> in.setError((message == null || message.length() == 0) ? null : message));
+                in.post(() -> {
+                    in.setError(null);
+                    in.setError((message == null || message.length() == 0) ? null : message);
+                });
             }
 
         }

@@ -168,7 +168,7 @@ ext {
     minterExplorerSDK = "0.4.2"
     minterProfileSDK = "0.2.4"
     minterBlockchainSDK = "0.6.4"
-    minterCoreSDK = "0.2.5"
+    minterCoreSDK = "0.2.6"
 }
 
 dependencies {
