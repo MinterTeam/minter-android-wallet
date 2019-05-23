@@ -26,18 +26,24 @@
 
 package network.minter.bipwallet.tx.adapters.vh;
 
-import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
+import timber.log.Timber;
+
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -59,11 +65,60 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
         super.bind(txItem);
 
         final HistoryTransaction item = txItem.getTx();
+        final HistoryTransaction.TxMultisendResult data = item.getData();
+
+        final boolean isIncoming = !myAddresses.contains(item.from);
 
         if (txItem.getUsername() != null) {
             title.setText(String.format("@%s", txItem.getUsername()));
         } else {
             title.setText(item.getFrom().toShortString());
+        }
+
+        HashMap<String, BigDecimal> coinsAmount = new HashMap<>();
+
+        if (isIncoming) {
+            for (HistoryTransaction.TxSendCoinResult i : data.items) {
+                if (myAddresses.contains(i.to)) {
+                    if (coinsAmount.containsKey(i.coin)) {
+                        BigDecimal amount = coinsAmount.get(i.coin).add(i.amount);
+                        coinsAmount.put(i.coin, amount);
+                    } else {
+                        coinsAmount.put(i.coin, i.amount);
+                    }
+                }
+            }
+
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+
+            if (coinsAmount.size() > 1) {
+                amount.setText(R.string.dots);
+                subamount.setText(subamount.getContext().getString(R.string.multiple_coins));
+            } else {
+                Map.Entry<String, BigDecimal> entry = coinsAmount.entrySet().iterator().next();
+                amount.setText(String.format("+ %s", bdHuman(entry.getValue())));
+                subamount.setText(entry.getKey());
+            }
+        } else {
+            for (HistoryTransaction.TxSendCoinResult i : data.items) {
+                if (coinsAmount.containsKey(i.coin)) {
+                    BigDecimal amount = coinsAmount.get(i.coin).add(i.amount);
+                    coinsAmount.put(i.coin, amount);
+                } else {
+                    coinsAmount.put(i.coin, i.amount);
+                }
+            }
+
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+
+            if (coinsAmount.size() > 1) {
+                amount.setText(R.string.dots);
+                subamount.setText(subamount.getContext().getString(R.string.multiple_coins));
+            } else {
+                Map.Entry<String, BigDecimal> entry = coinsAmount.entrySet().iterator().next();
+                amount.setText(String.format("- %s", bdHuman(entry.getValue())));
+                subamount.setText(entry.getKey());
+            }
         }
 
         fromValue.setText(item.getFrom().toString());

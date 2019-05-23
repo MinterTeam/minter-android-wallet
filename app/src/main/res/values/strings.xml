@@ -188,4 +188,6 @@
     <string name="tx_send_overall_title">You\'re sending</string>
     <string name="tx_address_searching">Searching address</string>
     <string name="title_select_account">Select account</string>
+    <string name="dots">…</string>
+    <string name="multiple_coins">Multiple Coins</string>
 </resources>
