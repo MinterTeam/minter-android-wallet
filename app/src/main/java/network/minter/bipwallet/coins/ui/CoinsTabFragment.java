@@ -98,6 +98,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     RecyclerView list;
     @BindView(R.id.container_swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
+
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
     private GestureDetector mGestureDetector;

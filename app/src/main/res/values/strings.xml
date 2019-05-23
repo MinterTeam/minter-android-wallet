@@ -190,4 +190,6 @@
     <string name="title_select_account">Select account</string>
     <string name="dots">…</string>
     <string name="multiple_coins">Multiple Coins</string>
+    <string name="test_net_warning">This is a testnet.\nNot real money!</string>
+    <string name="test_net_warning_link"><u>DOWNLOAD MAINNET APP</u></string>
 </resources>

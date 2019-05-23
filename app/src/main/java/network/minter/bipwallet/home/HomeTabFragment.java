@@ -26,9 +26,17 @@
 
 package network.minter.bipwallet.home;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.View;
 
+import javax.annotation.Nullable;
+
+import butterknife.BindView;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseFragment;
 import network.minter.bipwallet.internal.mvp.ErrorView;
@@ -42,6 +50,21 @@ import network.minter.bipwallet.internal.views.SnackbarBuilder;
 
 public abstract class HomeTabFragment extends BaseFragment implements ErrorView, ErrorViewWithRetry {
 
+    @Nullable
+    @BindView(R.id.testnet_warning)
+    View testNetWarning;
+
+    @Override
+    public void onViewCreated(@NonNull View view, @android.support.annotation.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (BuildConfig.FLAVOR.contains("netTest") && testNetWarning != null) {
+            testNetWarning.setVisibility(View.VISIBLE);
+            testNetWarning.setOnClickListener(v -> {
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"));
+                startActivity(goToMarket);
+            });
+        }
+    }
 
     public void createToolbarMenuOptions(Menu menu) {
 

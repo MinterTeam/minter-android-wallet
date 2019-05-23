@@ -56,6 +56,11 @@
             app:title="@string/title_tab_sending"
             app:titleTextColor="@android:color/white"
             />
+
+        <include layout="@layout/include_testnet_warning_view"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"/>
+
     </android.support.design.widget.AppBarLayout>
 
     <ScrollView

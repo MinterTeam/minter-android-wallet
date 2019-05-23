@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -49,6 +50,7 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
@@ -71,6 +73,8 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.progress) ProgressBar progress;
     @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    @Nullable
+    @BindView(R.id.testnet_warning) View testNetWarning;
 
     @Override
     public void setAdapter(RecyclerView.Adapter<?> adapter) {
@@ -156,6 +160,14 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
                 presenter.onScrolledTo(((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
             }
         });
+
+        if (BuildConfig.FLAVOR.contains("netTest") && testNetWarning != null) {
+            testNetWarning.setVisibility(View.VISIBLE);
+            testNetWarning.setOnClickListener(v -> {
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"));
+                startActivity(goToMarket);
+            });
+        }
     }
 
     public static final class Builder extends ActivityBuilder {

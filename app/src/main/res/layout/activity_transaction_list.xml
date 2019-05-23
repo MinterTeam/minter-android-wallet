@@ -58,6 +58,11 @@
             app:title="@string/title_transaction_list"
             app:titleTextColor="@android:color/white"
             />
+
+        <include layout="@layout/include_testnet_warning_view"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"/>
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout

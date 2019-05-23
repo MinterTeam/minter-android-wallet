@@ -26,14 +26,18 @@
 
 package network.minter.bipwallet.exchange.ui;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -47,6 +51,7 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter;
@@ -64,11 +69,19 @@ public class ConvertCoinActivity extends BaseMvpInjectActivity implements Exchan
         add(GetCoinTabFragment.class);
     }};
 
-    @Inject Provider<ConvertCoinPresenter> presenterProvider;
-    @InjectPresenter ConvertCoinPresenter presenter;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.tabs) TabLayout tabs;
-    @BindView(R.id.pager) ViewPager tabsPager;
+    @Inject
+    Provider<ConvertCoinPresenter> presenterProvider;
+    @InjectPresenter
+    ConvertCoinPresenter presenter;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.tabs)
+    TabLayout tabs;
+    @BindView(R.id.pager)
+    ViewPager tabsPager;
+    @Nullable
+    @BindView(R.id.testnet_warning)
+    View testNetWarning;
 
     @VisibleForTesting
     public final BaseCoinTabFragment getTab(int position) {
@@ -115,6 +128,14 @@ public class ConvertCoinActivity extends BaseMvpInjectActivity implements Exchan
         setupToolbar(toolbar);
 
         tabs.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        if (BuildConfig.FLAVOR.contains("netTest") && testNetWarning != null) {
+            testNetWarning.setVisibility(View.VISIBLE);
+            testNetWarning.setOnClickListener(v -> {
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"));
+                startActivity(goToMarket);
+            });
+        }
     }
 
     private FragmentStatePagerAdapter createTabsAdapter() {

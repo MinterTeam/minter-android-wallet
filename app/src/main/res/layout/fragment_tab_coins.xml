@@ -104,6 +104,10 @@
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.Toolbar>
 
+        <include layout="@layout/include_testnet_warning_view"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"/>
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.CoordinatorLayout

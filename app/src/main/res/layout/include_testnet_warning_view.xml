@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/testnet_warning"
+    tools:visibility="visible"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/warning_bg"
+    android:visibility="gone">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:fontFamily="@font/_ubuntu_bold"
+        android:gravity="center"
+        android:text="@string/test_net_warning"
+        android:textAllCaps="true"
+        android:textColor="@color/textColorWhite"
+        android:textSize="@dimen/text_size_12" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:fontFamily="@font/_ubuntu_bold"
+        android:gravity="center"
+        android:text="@string/test_net_warning_link"
+        android:textColor="@color/textColorWhite"
+        android:textSize="@dimen/text_size_14" />
+</LinearLayout>
