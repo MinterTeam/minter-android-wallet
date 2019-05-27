@@ -28,6 +28,7 @@ package network.minter.bipwallet.tx.adapters.vh;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -121,17 +122,21 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
         mUseAvatars = useAvatars;
     }
 
+
+
     @SuppressLint("ClickableViewAccessibility")
     void setupCopyListeners(TextView... views) {
-        int selectedColor = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
-        int defaultColor = ContextCompat.getColor(itemView.getContext(), R.color.textColorPrimary);
+        int selectedColor = ContextCompat.getColor(itemView.getContext(), R.color.textColorSelectedAddress);
+        int defaultColor = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
         for (TextView view : views) {
+            view.setTextColor(defaultColor);
             view.setOnLongClickListener(v -> {
                 view.setTextColor(selectedColor);
                 return true;
             });
+
             view.setOnTouchListener((v, event) -> {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
                     view.setTextColor(defaultColor);
                     ContextHelper.copyToClipboard(view.getContext(), view.getText().toString());
                 }

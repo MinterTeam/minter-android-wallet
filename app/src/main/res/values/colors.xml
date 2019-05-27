@@ -43,6 +43,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
+    <color name="textColorSelectedAddress">#9e8be4</color>
 
     <color name="greySeparator">#FFE1E1E1</color>
     <color name="bottom_navigation_color">@color/colorPrimaryDark</color>
