@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.4.2
+ - Fixed non-canonical integer error in signature
+ - Fixed "128" transaction
+ - Added ability to copy address from transaction
+ - Added "testnet" warning banner for netTest* flavor
+ - Fixed minor issues
+
 ## 1.4.0
  - Added ability to send "delegate" transaction using "send" tab
  - UI improvements
