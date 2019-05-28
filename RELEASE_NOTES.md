@@ -1,6 +1,6 @@
 # Release Notes
 
-## 1.4.2
+## 1.5.0
  - Fixed non-canonical integer error in signature
  - Fixed "128" transaction
  - Added ability to copy address from transaction
