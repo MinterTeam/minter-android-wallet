@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.exchange.ui;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,11 +49,11 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.helpers.ContextHelper;
 
 /**
  * minter-android-wallet. 2018
@@ -129,13 +127,7 @@ public class ConvertCoinActivity extends BaseMvpInjectActivity implements Exchan
 
         tabs.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        if (BuildConfig.FLAVOR.contains("netTest") && testNetWarning != null) {
-            testNetWarning.setVisibility(View.VISIBLE);
-            testNetWarning.setOnClickListener(v -> {
-                Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"));
-                startActivity(goToMarket);
-            });
-        }
+        ContextHelper.showTestnetBanner(this, testNetWarning);
     }
 
     private FragmentStatePagerAdapter createTabsAdapter() {

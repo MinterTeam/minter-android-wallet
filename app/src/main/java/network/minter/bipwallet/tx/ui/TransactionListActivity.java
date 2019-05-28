@@ -50,10 +50,10 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
@@ -161,13 +161,7 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
             }
         });
 
-        if (BuildConfig.FLAVOR.contains("netTest") && testNetWarning != null) {
-            testNetWarning.setVisibility(View.VISIBLE);
-            testNetWarning.setOnClickListener(v -> {
-                Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"));
-                startActivity(goToMarket);
-            });
-        }
+        ContextHelper.showTestnetBanner(this, testNetWarning);
     }
 
     public static final class Builder extends ActivityBuilder {

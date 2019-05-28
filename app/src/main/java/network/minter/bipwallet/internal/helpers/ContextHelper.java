@@ -26,13 +26,17 @@
 package network.minter.bipwallet.internal.helpers;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.net.Uri;
+import android.view.View;
 import android.widget.Toast;
 
+import network.minter.bipwallet.BuildConfig;
 import timber.log.Timber;
 
 public class ContextHelper {
@@ -71,5 +75,22 @@ public class ContextHelper {
         ClipData data = ClipData.newPlainText("", text);
         clipboard.setPrimaryClip(data);
         Toast.makeText(ctx, "Copied", Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void showTestnetBanner(Context ctx, View view) {
+        if (BuildConfig.FLAVOR.contains("netTest") && view != null) {
+            view.setVisibility(View.VISIBLE);
+            view.setOnClickListener(v -> {
+                try {
+                    Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"));
+                    ctx.startActivity(goToMarket);
+                } catch (ActivityNotFoundException e) {
+                    Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://play.google.com/store/apps/details?id=network.minter.bipwallet.mainnet"));
+                    ctx.startActivity(goToMarket);
+                }
+
+            });
+        }
     }
 }
