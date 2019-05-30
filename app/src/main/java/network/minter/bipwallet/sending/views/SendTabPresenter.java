@@ -30,6 +30,8 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.DrawableRes;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
@@ -39,6 +41,7 @@ import com.arellomobile.mvp.InjectViewState;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -67,6 +70,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
+import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.SendTabModule;
@@ -122,6 +126,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFro
 @InjectViewState
 public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private static final int REQUEST_CODE_QR_SCAN = 101;
+    private static final BigDecimal PAYLOAD_FEE = BigDecimal.valueOf(0.002);
     @Inject
     SecretStorage secretStorage;
     @Inject
@@ -163,6 +168,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     private BigInteger mGasPrice = new BigInteger("1");
     private AccountItem mLastAccount = null;
     private BigDecimal sendFee;
+    private byte[] payload;
 
     private enum SearchByType {
         Address, Username, Email
@@ -180,6 +186,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickScanQR(this::onClickScanQR);
         getViewState().setOnClickMaximum(this::onClickMaximum);
+        getViewState().setPayloadChangeListener(payloadChangeListener);
         loadAndSetFee();
         accountStorage.update();
     }
@@ -277,9 +284,21 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 sendFee = null;
                 break;
         }
-        String fee = "";
-        if (sendFee != null)
-            fee = String.format("%s %s", bdHuman(sendFee), MinterSDK.DEFAULT_COIN.toUpperCase());
+
+        String fee;
+        BigDecimal payloadFee = new BigDecimal(0);
+        if (payload != null) {
+            payloadFee = PAYLOAD_FEE.multiply(BigDecimal.valueOf(payload.length));
+        }
+
+        if (sendFee != null) {
+            sendFee = sendFee.add(payloadFee);
+        } else {
+            sendFee = payloadFee;
+        }
+
+        fee = String.format("%s %s", bdHuman(sendFee), MinterSDK.DEFAULT_COIN.toUpperCase());
+
         getViewState().setFee(fee);
     }
 
@@ -596,10 +615,16 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                 // creating tx
                 try {
                     final Transaction preTx;
+                    Transaction.Builder builder = new Transaction.Builder(new BigInteger("1"))
+                            .setGasCoin(mGasCoin)
+                            .setGasPrice(mGasPrice);
+
+                    if (payload != null && payload.length > 0) {
+                        builder.setPayload(payload);
+                    }
+
                     if (type == OperationType.Delegate) {
-                        preTx = new Transaction.Builder(new BigInteger("1"))
-                                .setGasCoin(mGasCoin)
-                                .setGasPrice(mGasPrice)
+                        preTx = builder
                                 .delegate()
                                 .setCoin(mFromAccount.coin)
                                 .setPublicKey(mToMpAddress.toString())
@@ -607,9 +632,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                                 .build();
 
                     } else {
-                        preTx = new Transaction.Builder(new BigInteger("1"))
-                                .setGasCoin(mGasCoin)
-                                .setGasPrice(mGasPrice)
+                        preTx = builder
                                 .sendCoin()
                                 .setCoin(mFromAccount.coin)
                                 .setTo(mToMxAddress)
@@ -717,20 +740,23 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
                         );
                         // creating tx
                         final Transaction tx;
+                        Transaction.Builder builder = new Transaction.Builder(cntRes.nonce)
+                                .setGasCoin(mGasCoin)
+                                .setGasPrice(mGasPrice);
+
+                        if (payload != null && payload.length > 0) {
+                            builder.setPayload(payload);
+                        }
+
                         if (type == OperationType.Delegate) {
-                            tx = new Transaction.Builder(cntRes.nonce)
-                                    .setGasCoin(mGasCoin)
-                                    .setGasPrice(mGasPrice)
+                            tx = builder
                                     .delegate()
                                     .setCoin(mFromAccount.coin)
                                     .setPublicKey(mToMpAddress.toString())
                                     .setStake(amountToSend)
                                     .build();
-
                         } else {
-                            tx = new Transaction.Builder(cntRes.nonce)
-                                    .setGasCoin(mGasCoin)
-                                    .setGasPrice(mGasPrice)
+                            tx = builder
                                     .sendCoin()
                                     .setCoin(mFromAccount.coin)
                                     .setTo(mToMxAddress)
@@ -892,5 +918,25 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         }
     }
 
+    private TextWatcher payloadChangeListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            byte[] tmpPayload = s.toString().getBytes(StandardCharsets.UTF_8);
+            int totalBytes = tmpPayload.length;
+            if (totalBytes <= ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
+                payload = tmpPayload;
+                setupFee();
+            }
+        }
+    };
 }

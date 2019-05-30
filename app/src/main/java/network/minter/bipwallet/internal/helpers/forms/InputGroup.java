@@ -304,6 +304,7 @@ public class InputGroup {
                             lay.post(() -> {
                                 if (!valid) {
                                     lay.setErrorEnabled(true);
+                                    lay.setError(null);
                                     lay.setError(item.getErrorMessage());
                                 } else {
                                     lay.setError(null);

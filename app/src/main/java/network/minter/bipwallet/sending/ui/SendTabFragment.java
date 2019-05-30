@@ -36,6 +36,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatEditText;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +66,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
+import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -110,6 +112,8 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     TextInputLayout amountLayout;
     @BindView(R.id.input_amount)
     AppCompatEditText amountInput;
+    @BindView(R.id.input_payload)
+    AppCompatEditText payloadInput;
     @BindView(R.id.action)
     Button actionSend;
     @BindView(R.id.action_scan_qr)
@@ -153,7 +157,9 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
         mInputGroup = new InputGroup();
         mInputGroup.addInput(recipientInput);
         mInputGroup.addInput(amountInput);
+        mInputGroup.addInput(payloadInput);
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", false));
+        mInputGroup.addValidator(payloadInput, new ByteLengthValidator("Message too long", false));
         /* ideal case */
 
         mInputGroup.addValidator(recipientInput,
@@ -182,6 +188,11 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     }
 
     @Override
+    public void setPayloadChangeListener(TextWatcher listener) {
+        payloadInput.addTextChangedListener(listener);
+    }
+
+    @Override
     public void setOnTextChangedListener(InputGroup.OnTextChangedListener listener) {
         mInputGroup.addTextChangedListener(listener);
     }
@@ -205,6 +216,7 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     public void clearInputs() {
         recipientInput.setText(null);
         amountInput.setText(null);
+        payloadInput.setText(null);
         recipientLayout.clearFocus();
         amountLayout.clearFocus();
         mInputGroup.clearErrors();

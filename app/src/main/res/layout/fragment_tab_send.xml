@@ -225,6 +225,35 @@
                 app:layout_constraintVertical_bias="0.1"
                 />
 
+            <!--PAYLOAD-->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/layout_input_payload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_input"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges_input"
+                android:hint="@string/label_payload"
+                app:hintEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_input_amount"
+                app:passwordToggleDrawable="@null"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
+                >
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/input_payload"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:paddingStart="4dp"
+                    android:tag="payload"
+                    android:textSize="@dimen/text_size_default"
+                    tools:text="Payload text"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
             <!--LABELS-->
             <View
                 android:id="@+id/label_guide"
@@ -233,7 +262,7 @@
                 android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_amount"
+                app:layout_constraintTop_toBottomOf="@id/layout_input_payload"
                 />
 
             <TextView

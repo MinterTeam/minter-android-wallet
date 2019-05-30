@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.sending;
 
+import android.text.TextWatcher;
 import android.view.View;
 
 import com.arellomobile.mvp.MvpView;
@@ -77,5 +78,6 @@ public class SendTabModule {
         void setAmount(CharSequence amount);
         void setFee(CharSequence fee);
         void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);
+        void setPayloadChangeListener(TextWatcher listener);
     }
 }
