@@ -231,9 +231,9 @@
             android:id="@+id/detail_coin_to_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_edges_half"
             android:text="@string/label_to_coin"
             android:textSize="@dimen/text_size_12"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/detail_coin_from_label"
             app:layout_constraintWidth_percent=".5"
             />
@@ -252,26 +252,52 @@
 
 
         <TextView
-            android:id="@+id/detail_convert_amount_label"
+            android:id="@+id/detail_received_amount_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_edges_half"
-            android:text="@string/label_amount"
+            android:text="@string/label_amount_received"
             android:textSize="@dimen/text_size_12"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/detail_spent_amount_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/detail_coin_from_value"
+            app:layout_constraintWidth_percent=".5"
             />
 
         <TextView
-            android:id="@+id/detail_convert_amount_value"
+            android:id="@+id/detail_received_amount_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_ubuntu_mono_bold"
+            android:textSize="@dimen/text_size_tx_detail_value"
+            app:layout_constraintEnd_toStartOf="@id/detail_spent_amount_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_received_amount_label"
+            tools:text="20.0000000000"
+            app:layout_constraintWidth_percent=".5"
+            />
+
+        <TextView
+            android:id="@+id/detail_spent_amount_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_amount_spent"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/detail_received_amount_label"
+            app:layout_constraintWidth_percent=".5"
+            />
+
+        <TextView
+            android:id="@+id/detail_spent_amount_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/_ubuntu_mono_bold"
             android:textSize="@dimen/text_size_tx_detail_value"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_convert_amount_label"
+            app:layout_constraintTop_toTopOf="@+id/detail_received_amount_value"
+            app:layout_constraintStart_toEndOf="@id/detail_received_amount_value"
+            app:layout_constraintWidth_percent=".5"
             tools:text="20.0000000000"
             />
 
@@ -283,7 +309,7 @@
             android:text="@string/label_date"
             android:textSize="@dimen/text_size_12"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_convert_amount_value"
+            app:layout_constraintTop_toBottomOf="@id/detail_received_amount_value"
             app:layout_constraintWidth_percent=".5"
             />
 
@@ -307,7 +333,7 @@
             android:text="@string/label_time"
             android:textSize="@dimen/text_size_12"
             app:layout_constraintStart_toEndOf="@id/detail_date_label"
-            app:layout_constraintTop_toBottomOf="@id/detail_convert_amount_value"
+            app:layout_constraintTop_toBottomOf="@id/detail_received_amount_value"
             app:layout_constraintWidth_percent=".5"
             />
 

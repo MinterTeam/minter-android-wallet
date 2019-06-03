@@ -48,7 +48,8 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_coin_from_value) TextView coinFrom;
     public @BindView(R.id.detail_coin_to_value) TextView coinTo;
-    public @BindView(R.id.detail_convert_amount_value) TextView convertAmount;
+    public @BindView(R.id.detail_received_amount_value) TextView receivedAmount;
+    public @BindView(R.id.detail_spent_amount_value) TextView spentAmount;
     public @BindView(R.id.item_title_second) TextView titleSecond;
 
     public TxConvertCoinViewHolder(View itemView) {
@@ -74,7 +75,8 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
         subamount.setText(data.getCoinToBuy());
         coinFrom.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
         coinTo.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
-        convertAmount.setText(bdHuman(data.valueToBuy));
+        receivedAmount.setText(bdHuman(data.valueToBuy));
+        spentAmount.setText(bdHuman(data.valueToSell));
     }
 
     @Override

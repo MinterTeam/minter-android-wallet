@@ -149,6 +149,8 @@
     <string name="btn_help">Help</string>
     <string name="label_coin_you_want">Coin you want</string>
     <string name="label_amount">Amount</string>
+    <string name="label_amount_received">Amount Received</string>
+    <string name="label_amount_spent">Amount Spent</string>
     <string name="label_payload">Payload Message</string>
     <string name="btn_use_max">Use max</string>
     <string name="label_you_will_pay_approximately">You will pay approximately</string>
