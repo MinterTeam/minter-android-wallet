@@ -71,6 +71,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
+import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -564,6 +565,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
 
         getAnalytics().send(AppEvent.SendCoinsUseMaxButton);
+        if (view.getContext() instanceof Activity) {
+            KeyboardHelper.hideKeyboard((Activity) view.getContext());
+        }
     }
 
     private Optional<AccountItem> findAccountByCoin(String coin) {
@@ -934,7 +938,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         public void afterTextChanged(Editable s) {
             byte[] tmpPayload = s.toString().getBytes(StandardCharsets.UTF_8);
             int totalBytes = tmpPayload.length;
-            
+
             if (totalBytes > ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
                 tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH);
                 getViewState().setPayload(new String(tmpPayload, StandardCharsets.UTF_8));

@@ -54,7 +54,7 @@ android {
         minSdkVersion minterMinSdk
         targetSdkVersion minterMaxSdk
         versionCode 85
-        versionName "1.5.0-dev01"
+        versionName "1.5.1-dev01"
         testInstrumentationRunner "network.minter.bipwallet.tests.internal.WalletTestRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

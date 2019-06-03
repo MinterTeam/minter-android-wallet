@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.exchange.views;
 
+import android.app.Activity;
 import android.support.annotation.CallSuper;
 import android.support.v4.util.Pair;
 import android.view.View;
@@ -63,6 +64,7 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
+import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.models.TransactionSendResult;
@@ -350,6 +352,10 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
         mUseMax = true;
 
         getAnalytics().send(AppEvent.ConvertSpendUseMaxButton);
+
+        if (view.getContext() instanceof Activity) {
+            KeyboardHelper.hideKeyboard((Activity) view.getContext());
+        }
     }
 
     private void onClickSelectAccount(View view) {
