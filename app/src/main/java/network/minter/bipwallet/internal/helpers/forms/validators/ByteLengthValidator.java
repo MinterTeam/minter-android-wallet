@@ -28,15 +28,13 @@ package network.minter.bipwallet.internal.helpers.forms.validators;
 
 import java.nio.charset.StandardCharsets;
 
-import timber.log.Timber;
-
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 30-May-19
  */
-public class ByteLengthValidator extends BaseValidator  {
-    public static final double MAX_PAYLOAD_LENGTH = 1024;
+public class ByteLengthValidator extends BaseValidator {
+    public static final int MAX_PAYLOAD_LENGTH = 1024;
 
-     public ByteLengthValidator(CharSequence errorMessage, boolean required) {
+    public ByteLengthValidator(CharSequence errorMessage, boolean required) {
         super(errorMessage, required);
     }
 

@@ -42,6 +42,7 @@ import com.arellomobile.mvp.InjectViewState;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -933,10 +934,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
         public void afterTextChanged(Editable s) {
             byte[] tmpPayload = s.toString().getBytes(StandardCharsets.UTF_8);
             int totalBytes = tmpPayload.length;
-            if (totalBytes <= ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
-                payload = tmpPayload;
-                setupFee();
+            
+            if (totalBytes > ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
+                tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH);
+                getViewState().setPayload(new String(tmpPayload, StandardCharsets.UTF_8));
             }
+
+            payload = tmpPayload;
+            setupFee();
         }
     };
 }

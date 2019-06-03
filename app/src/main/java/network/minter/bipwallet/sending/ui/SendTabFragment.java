@@ -193,6 +193,12 @@ public class SendTabFragment extends HomeTabFragment implements SendTabModule.Se
     }
 
     @Override
+    public void setPayload(String payload) {
+        payloadInput.setText(payload);
+        payloadInput.setSelection(payload.length());
+    }
+
+    @Override
     public void setOnTextChangedListener(InputGroup.OnTextChangedListener listener) {
         mInputGroup.addTextChangedListener(listener);
     }
