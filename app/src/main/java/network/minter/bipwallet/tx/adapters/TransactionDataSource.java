@@ -46,7 +46,10 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.delegation.adapter.DelegationItem;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.adapter.DataSourceMeta;
+import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.ExpResult;
@@ -73,12 +76,6 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private DateTime mLastDate;
     private MutableLiveData<LoadState> mLoadState;
-
-    public enum LoadState {
-        Loading,
-        Loaded,
-        Failed
-    }
 
     public TransactionDataSource(ExplorerTransactionRepository repo, ProfileInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
         mRepo = repo;
@@ -199,7 +196,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
                     mLoadState.postValue(LoadState.Loaded);
-                    callback.onResult(res.items, null, res.getMeta().lastPage == 1 ? null : res.getMeta().currentPage + 1);
+                    callback.onResult(res.getItems(), null, res.getMeta().lastPage == 1 ? null : res.getMeta().currentPage + 1);
                 });
     }
 
@@ -219,7 +216,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
                     mLoadState.postValue(LoadState.Loaded);
-                    callback.onResult(res.items, params.key == 1 ? null : params.key - 1);
+                    callback.onResult(res.getItems(), params.key == 1 ? null : params.key - 1);
                 });
     }
 
@@ -233,7 +230,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
                     mLoadState.postValue(LoadState.Loaded);
-                    callback.onResult(res.items, params.key + 1 > res.getMeta().lastPage ? null : params.key + 1);
+                    callback.onResult(res.getItems(), params.key + 1 > res.getMeta().lastPage ? null : params.key + 1);
                 });
     }
 
@@ -255,7 +252,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         return new DateTime(d);
     }
 
-    private MetaTx groupByDate(ExpResult<List<HistoryTransaction>> res) {
+    private DataSourceMeta<TransactionItem> groupByDate(ExpResult<List<HistoryTransaction>> res) {
         List<TransactionItem> out = new ArrayList<>();
         for (HistoryTransaction tx : res.result) {
             if (mLastDate == null) {
@@ -269,20 +266,11 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
             out.add(new TxItem(tx));
         }
 
-        final MetaTx metaTx = new MetaTx();
-        metaTx.items = out;
-        metaTx.meta = res.getMeta();
+        final DataSourceMeta<TransactionItem> meta = new DataSourceMeta<>();
+        meta.setItems(out);
+        meta.setMeta(res.getMeta());
 
-        return metaTx;
-    }
-
-    private final static class MetaTx {
-        private List<TransactionItem> items;
-        private ExpResult.Meta meta;
-
-        ExpResult.Meta getMeta() {
-            return meta;
-        }
+        return meta;
     }
 
     public static class Factory extends DataSource.Factory<Integer, TransactionItem> {

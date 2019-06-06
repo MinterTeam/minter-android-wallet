@@ -56,6 +56,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.reactive.ReactiveExplorerGate;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.utils.HistoryTransactionDiffUtil;
 import network.minter.bipwallet.coins.views.rows.ListWithButtonRow;
@@ -87,21 +88,31 @@ import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddr
 
 /**
  * minter-android-wallet. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
 public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabView> {
 
     private final BalanceCurrentState mBalanceCurrentState = new BalanceCurrentState();
-    @Inject CacheManager cache;
-    @Inject AuthSession session;
-    @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
-    @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
-    @Inject SecretStorage secretRepo;
-    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
-    @Inject BlockChainAccountRepository accountRepo;
-    @Inject ExplorerAddressRepository addressRepo;
-    @Inject ProfileInfoRepository infoRepo;
+    @Inject
+    CacheManager cache;
+    @Inject
+    AuthSession session;
+    @Inject
+    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
+    @Inject
+    CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
+    @Inject
+    SecretStorage secretRepo;
+    @Inject
+    CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject
+    BlockChainAccountRepository accountRepo;
+    @Inject
+    ExplorerAddressRepository addressRepo;
+    @Inject
+    ProfileInfoRepository infoRepo;
     private List<MinterAddress> myAddresses = new ArrayList<>();
     private MultiRowAdapter mAdapter;
     private TransactionShortListAdapter mTransactionsAdapter;
@@ -247,6 +258,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
                         .subscribeOn(Schedulers.io())
         )
                 .subscribe(res -> {
+                    updateDelegation();
                     mTransactionsAdapter.dispatchChanges(HistoryTransactionDiffUtil.class, Stream.of(res).limit(5).toList(), true);
                     if (mTransactionsAdapter.getItemCount() == 0) {
                         mTransactionsRow.setStatus(ListWithButtonRow.Status.Empty);
@@ -262,6 +274,13 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
         mAdapter.addRow(mTransactionsRow);
         mAdapter.addRow(mCoinsRow);
+    }
+
+    private void updateDelegation() {
+        safeSubscribeIoToUi(ReactiveExplorerGate.rxExpGate(addressRepo.getDelegations(myAddresses.get(0), 0))
+                .subscribeOn(Schedulers.io())).subscribe(
+                res -> getViewState().setDelegationAmount(bdHuman(res.meta.additional.delegatedAmount)),
+                Timber::d);
     }
 
     private void onAvatarClick(View view) {
@@ -296,6 +315,10 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
 
     private void onClickStartTransactionList(View view) {
         getViewState().startTransactionList();
+    }
+
+    private void onClickStartDelegationList(View view) {
+        getViewState().startDelegationList();
     }
 
     private boolean isMyAddress(MinterAddress address) {
@@ -340,10 +363,14 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     }
 
     public final static class ItemViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.item_avatar) BipCircleImageView avatar;
-        @BindView(R.id.item_title) TextView title;
-        @BindView(R.id.item_amount) TextView amount;
-        @BindView(R.id.item_subamount) TextView subname;
+        @BindView(R.id.item_avatar)
+        BipCircleImageView avatar;
+        @BindView(R.id.item_title)
+        TextView title;
+        @BindView(R.id.item_amount)
+        TextView amount;
+        @BindView(R.id.item_subamount)
+        TextView subname;
 
         public ItemViewHolder(View itemView) {
             super(itemView);

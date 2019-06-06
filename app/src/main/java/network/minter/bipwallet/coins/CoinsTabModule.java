@@ -36,6 +36,8 @@ import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import dagger.Module;
+import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
+import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.mvp.ProgressView;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 
@@ -55,6 +57,8 @@ public interface CoinsTabModule {
         void setOnAvatarClick(View.OnClickListener listener);
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startTransactionList();
+        @StateStrategyType(OneExecutionStateStrategy.class)
+        void startDelegationList();
         void hideAvatar();
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startConvertCoins();
@@ -66,6 +70,8 @@ public interface CoinsTabModule {
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startExplorer(String hash);
         void scrollTop();
+
+        void setDelegationAmount(String amount);
     }
 
     interface TransactionListView extends MvpView, ProgressView {
@@ -76,6 +82,15 @@ public interface CoinsTabModule {
         void scrollTo(int pos);
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startExplorer(String hash);
-        void syncProgress(MutableLiveData<TransactionDataSource.LoadState> loadState);
+        void syncProgress(MutableLiveData<LoadState> loadState);
+    }
+
+    interface DelegationListView extends MvpView, ProgressView {
+        void setAdapter(RecyclerView.Adapter<?> adapter);
+        void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
+        void showRefreshProgress();
+        void hideRefreshProgress();
+        void scrollTo(int pos);
+        void syncProgress(MutableLiveData<LoadState> loadState);
     }
 }

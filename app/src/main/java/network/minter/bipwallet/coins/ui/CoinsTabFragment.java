@@ -53,10 +53,10 @@ import javax.inject.Provider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
 import network.minter.bipwallet.coins.views.CoinsTabPresenter;
+import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
@@ -66,6 +66,7 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import network.minter.explorer.BuildConfig;
 import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
@@ -98,6 +99,10 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     RecyclerView list;
     @BindView(R.id.container_swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.delegation_view)
+    View delegationView;
+    @BindView(R.id.delegation_amount)
+    TextView delegationAmount;
 
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
@@ -183,6 +188,12 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @javax.annotation.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        delegationView.setOnClickListener(v -> startDelegationList());
+    }
+
+    @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         presenter.onTrimMemory(level);
@@ -230,6 +241,12 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     }
 
     @Override
+    public void setDelegationAmount(String amount) {
+        delegationView.setVisibility(View.VISIBLE);
+        delegationAmount.setText(amount);
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         presenter.onSaveInstanceState(outState);
@@ -249,6 +266,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.
     @Override
     public void startTransactionList() {
         startActivity(new Intent(getActivity(), TransactionListActivity.class));
+    }
+
+    @Override
+    public void startDelegationList() {
+        startActivity(new Intent(getActivity(), DelegationListActivity.class));
     }
 
     @Override

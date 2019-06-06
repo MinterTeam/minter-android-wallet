@@ -130,6 +130,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
         <activity
+            android:name=".delegation.ui.DelegationListActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".sending.ui.QRCodeScannerActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"

@@ -24,13 +24,11 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.tx.ui;
+package network.minter.bipwallet.delegation.ui;
 
 import android.app.Activity;
 import android.app.Service;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,41 +39,66 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
-
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.coins.CoinsTabModule;
+import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
+import network.minter.bipwallet.delegation.views.DelegationListPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
+import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
-import network.minter.explorer.MinterExplorerApi;
 
 /**
- * minter-android-wallet. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * Created by Alexander Kolpakov (jquickapp@gmail.com) on 05-Jun-19
  */
-public class TransactionListActivity extends BaseMvpInjectActivity implements CoinsTabModule.TransactionListView {
+public class DelegationListActivity extends BaseMvpInjectActivity implements CoinsTabModule.DelegationListView {
 
-    @Inject Provider<TransactionListPresenter> presenterProvider;
-    @InjectPresenter TransactionListPresenter presenter;
+    @Inject
+    Provider<DelegationListPresenter> presenterProvider;
+    @InjectPresenter
+    DelegationListPresenter presenter;
+
+    @ProvidePresenter
+    DelegationListPresenter providePresenter() {
+        return presenterProvider.get();
+    }
 
     @BindView(R.id.list) RecyclerView list;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.progress) ProgressBar progress;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     @Nullable
-    @BindView(R.id.testnet_warning) View testNetWarning;
+    @BindView(R.id.testnet_warning)
+    View testNetWarning;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_delegation_list);
+        ButterKnife.bind(this);
+        setupToolbar(toolbar);
+        presenter.handleExtras(getIntent());
+        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                presenter.onScrolledTo(((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
+            }
+        });
+        ContextHelper.showTestnetBanner(this, testNetWarning);
+    }
 
     @Override
     public void setAdapter(RecyclerView.Adapter<?> adapter) {
@@ -99,17 +122,18 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
     }
 
     @Override
-    public void scrollTo(int pos) {
-        if (pos < 0) {
-            return;
-        }
-
-        list.scrollToPosition(pos);
+    public void showProgress() {
+        progress.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void startExplorer(String hash) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + hash)));
+    public void hideProgress() {
+        progress.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void scrollTo(int pos) {
+
     }
 
     @Override
@@ -132,39 +156,6 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
         });
     }
 
-    @Override
-    public void showProgress() {
-        progress.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideProgress() {
-        progress.setVisibility(View.GONE);
-    }
-
-    @ProvidePresenter
-    TransactionListPresenter providePresenter() {
-        return presenterProvider.get();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transaction_list);
-        ButterKnife.bind(this);
-        setupToolbar(toolbar);
-        presenter.handleExtras(getIntent());
-        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                presenter.onScrolledTo(((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
-            }
-        });
-
-        ContextHelper.showTestnetBanner(this, testNetWarning);
-    }
-
     public static final class Builder extends ActivityBuilder {
 
         public Builder(@NonNull Activity from) {
@@ -181,7 +172,7 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Co
 
         @Override
         protected Class<?> getActivityClass() {
-            return TransactionListActivity.class;
+            return DelegationListActivity.class;
         }
     }
 }

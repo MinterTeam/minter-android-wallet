@@ -24,13 +24,11 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.tx.views;
+package network.minter.bipwallet.delegation.views;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.paging.PagedList;
 import android.arch.paging.RxPagedListBuilder;
-import android.support.annotation.NonNull;
-import android.view.View;
 
 import com.arellomobile.mvp.InjectViewState;
 
@@ -38,42 +36,40 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.analytics.AppEvent;
-import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
 import network.minter.bipwallet.coins.CoinsTabModule;
+import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
+import network.minter.bipwallet.delegation.adapter.DelegationItem;
+import network.minter.bipwallet.delegation.adapter.DelegationListAdapter;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.bipwallet.tx.adapters.TransactionDataSource;
-import network.minter.bipwallet.tx.adapters.TransactionItem;
-import network.minter.bipwallet.tx.adapters.TransactionListAdapter;
-import network.minter.explorer.models.HistoryTransaction;
-import network.minter.explorer.repo.ExplorerTransactionRepository;
-import network.minter.profile.repo.ProfileInfoRepository;
+import network.minter.explorer.models.DelegationInfo;
+import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * Created by Alexander Kolpakov (jquickapp@gmail.com) on 05-Jun-19
  */
 @InjectViewState
-public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.TransactionListView> implements HasAnalyticsEvent {
+public class DelegationListPresenter extends MvpBasePresenter<CoinsTabModule.DelegationListView> {
 
-    @Inject ExplorerTransactionRepository transactionRepo;
-    @Inject SecretStorage secretRepo;
-    @Inject ProfileInfoRepository infoRepo;
+    @Inject
+    ExplorerAddressRepository addressRepo;
+    @Inject
+    SecretStorage secretRepo;
 
-    private TransactionListAdapter mAdapter;
-    private TransactionDataSource.Factory mSourceFactory;
+    private DelegationListAdapter mAdapter;
+    private DelegationDataSource.Factory mSourceFactory;
     private Disposable mListDisposable;
-    private RxPagedListBuilder<Integer, TransactionItem> listBuilder;
+    private RxPagedListBuilder<Integer, DelegationItem> listBuilder;
     private int mLastPosition = 0;
     private MutableLiveData<LoadState> mLoadState;
 
     @Inject
-    public TransactionListPresenter() {
+    public DelegationListPresenter() {
     }
 
+
     @Override
-    public void attachView(CoinsTabModule.TransactionListView view) {
+    public void attachView(CoinsTabModule.DelegationListView view) {
         super.attachView(view);
         getViewState().setAdapter(mAdapter);
         getViewState().setOnRefreshListener(this::onRefresh);
@@ -84,23 +80,15 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
         mLastPosition = position;
     }
 
-    @NonNull
-    @Override
-    public AppEvent getAnalyticsEvent() {
-        return AppEvent.TransactionsScreen;
-    }
-
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        mAdapter = new TransactionListAdapter(secretRepo.getAddresses());
+        mAdapter = new DelegationListAdapter();
 
-        mAdapter.setOnExplorerOpenClickListener(this::onExplorerClick);
-        mAdapter.setOnExpandDetailsListener(this::onExpandTx);
         mLoadState = new MutableLiveData<>();
         getViewState().syncProgress(mLoadState);
         mAdapter.setLoadState(mLoadState);
-        mSourceFactory = new TransactionDataSource.Factory(transactionRepo, infoRepo, secretRepo.getAddresses(), mLoadState);
+        mSourceFactory = new DelegationDataSource.Factory(addressRepo, secretRepo.getAddresses(), mLoadState);
         PagedList.Config cfg = new PagedList.Config.Builder()
                 .setPageSize(50)
                 .setEnablePlaceholders(false)
@@ -111,10 +99,6 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
         refresh();
 
         unsubscribeOnDestroy(mListDisposable);
-    }
-
-    private void onExpandTx(View view, HistoryTransaction tx) {
-        getAnalytics().send(AppEvent.TransactionDetailsButton);
     }
 
     private void onRefresh() {
@@ -130,10 +114,5 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
                     getViewState().hideRefreshProgress();
                     mAdapter.submitList(res);
                 });
-    }
-
-    private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
-        getViewState().startExplorer(historyTransaction.hash.toString());
-        getAnalytics().send(AppEvent.TransactionExplorerButton);
     }
 }

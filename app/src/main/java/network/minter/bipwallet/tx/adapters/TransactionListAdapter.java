@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.tx.adapters.vh.ExpandableTxViewHolder;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
@@ -70,7 +71,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     private LayoutInflater mInflater;
     private int mExpandedPosition = -1;
     private OnExplorerOpenClickListener mOnExplorerOpenClickListener;
-    private MutableLiveData<TransactionDataSource.LoadState> mLoadState;
+    private MutableLiveData<LoadState> mLoadState;
     private boolean mEnableExpanding = true;
     @SuppressLint("UseSparseArrays")
     private HashMap<Integer, Boolean> mExpandedPositions = new HashMap<>();
@@ -175,7 +176,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
         }
     }
 
-    public void setLoadState(MutableLiveData<TransactionDataSource.LoadState> loadState) {
+    public void setLoadState(MutableLiveData<LoadState> loadState) {
         mLoadState = loadState;
     }
 
@@ -184,7 +185,7 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     }
 
     private boolean hasProgressRow() {
-        return mLoadState != null && mLoadState.getValue() != TransactionDataSource.LoadState.Loaded;
+        return mLoadState != null && mLoadState.getValue() != LoadState.Loaded;
     }
 
     public interface OnExpandDetailsListener {

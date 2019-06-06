@@ -40,6 +40,7 @@ import network.minter.bipwallet.auth.ui.AuthFragment;
 import network.minter.bipwallet.auth.ui.RegisterActivity;
 import network.minter.bipwallet.auth.ui.SigninActivity;
 import network.minter.bipwallet.auth.ui.SplashFragment;
+import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.exchange.ui.GetCoinTabFragment;
@@ -99,6 +100,10 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @ActivityScope
     TransactionListActivity transactionListActivityInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    DelegationListActivity delegationListActivityInjector();
 
     @ContributesAndroidInjector(modules = ExchangeModule.class)
     @ActivityScope
