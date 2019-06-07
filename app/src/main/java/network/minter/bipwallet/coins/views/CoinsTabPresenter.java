@@ -279,7 +279,11 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     private void updateDelegation() {
         safeSubscribeIoToUi(ReactiveExplorerGate.rxExpGate(addressRepo.getDelegations(myAddresses.get(0), 0))
                 .subscribeOn(Schedulers.io())).subscribe(
-                res -> getViewState().setDelegationAmount(bdHuman(res.meta.additional.delegatedAmount)),
+                res -> {
+                    if (res.meta.additional.delegatedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                        getViewState().setDelegationAmount(bdHuman(res.meta.additional.delegatedAmount));
+                    }
+                },
                 Timber::d);
     }
 
