@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.5.1
+ - Added Payload message to send transaction
+ - Added summary delegated stake at coins screen
+ - Fixed minor issues
+
 ## 1.5.0
  - Fixed non-canonical integer error in signature
  - Fixed "128" transaction
