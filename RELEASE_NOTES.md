@@ -1,5 +1,8 @@
 # Release Notes
 
+## 1.5.2
+ - Fixed sending to address or public key with leading zero bytes
+
 ## 1.5.1
  - Added Payload message to send transaction
  - Added summary delegated stake at coins screen
