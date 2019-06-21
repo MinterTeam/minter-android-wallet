@@ -106,6 +106,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
         mInputGroup.addInput(inputIncomingCoin, inputAmount);
 
         mInputGroup.addValidator(inputAmount, new DecimalValidator("Invalid number"));
+        mInputGroup.addFilter(inputAmount, new DecimalInputFilter(() -> inputAmount));
         mInputGroup.addValidator(inputIncomingCoin, new RegexValidator("^[a-zA-Z0-9]+$", "Invalid coin name"));
 
         mInputGroup.addFilter(inputIncomingCoin, (source, start, end, dest, dstart, dend) -> {
@@ -245,7 +246,6 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
                 return;
             }
         }
-
 
 
         calculationView.setText(calculation);

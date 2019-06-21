@@ -54,6 +54,10 @@ public class DecimalInputFilter extends DigitsKeyListener {
     public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
         String tmp = mView.get().getText().toString();
 
+        if (source.length() > 1) {
+            return source.toString().replaceAll("[^0-9\\.]", "");
+        }
+
         if (source.equals(",")) {
             return "";
         }

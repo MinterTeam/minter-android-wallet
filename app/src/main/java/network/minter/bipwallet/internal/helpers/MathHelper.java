@@ -176,23 +176,6 @@ public final class MathHelper {
         return a.compareTo(b) == 0;
     }
 
-    private static String formatDecimalCurrency(BigDecimal in, int fractions, boolean exactFractions) {
-        DecimalFormat fmt = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-        DecimalFormatSymbols symbols = fmt.getDecimalFormatSymbols();
-        symbols.setGroupingSeparator(' ');
-        if (exactFractions) {
-            fmt.setMinimumFractionDigits(fractions);
-            fmt.setMaximumFractionDigits(fractions);
-        } else {
-            fmt.setMaximumFractionDigits(fractions);
-            fmt.setMinimumFractionDigits(0);
-        }
-
-        fmt.setDecimalFormatSymbols(symbols);
-
-        return fmt.format(in);
-    }
-
     public static boolean bdNull(BigDecimal source) {
         BigDecimal test;
         if (source.scale() > 18) {
@@ -239,8 +222,8 @@ public final class MathHelper {
         }
         String amountText = text
                 .toString()
-                .replaceAll("\\s", "")
-                .replaceAll("[,.]+", ".")
+                .replaceAll("\\s+", "")
+                .replaceAll("[,]+", "")
                 .replace(",", ".");
 
 
@@ -264,5 +247,22 @@ public final class MathHelper {
         }
 
         return out;
+    }
+
+    private static String formatDecimalCurrency(BigDecimal in, int fractions, boolean exactFractions) {
+        DecimalFormat fmt = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+        DecimalFormatSymbols symbols = fmt.getDecimalFormatSymbols();
+        symbols.setGroupingSeparator(' ');
+        if (exactFractions) {
+            fmt.setMinimumFractionDigits(fractions);
+            fmt.setMaximumFractionDigits(fractions);
+        } else {
+            fmt.setMaximumFractionDigits(fractions);
+            fmt.setMinimumFractionDigits(0);
+        }
+
+        fmt.setDecimalFormatSymbols(symbols);
+
+        return fmt.format(in);
     }
 }

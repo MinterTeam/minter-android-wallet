@@ -65,6 +65,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
+import network.minter.bipwallet.internal.helpers.MathHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.models.TransactionSendResult;
@@ -378,24 +379,7 @@ public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabV
                 mInputChange.onNext(isAmountForGetting());
                 break;
             case R.id.input_amount:
-                String amountText = text
-                        .replaceAll("\\s", "")
-                        .replaceAll("[,.]+", ".")
-                        .replace(",", ".");
-                if (amountText.isEmpty()) {
-                    amountText = "0";
-                }
-                if (amountText.equals(".")) {
-                    amountText = "0";
-                } else if (amountText.substring(0, 1).equals(".")) {
-                    amountText = "0" + amountText;
-                }
-                if (amountText.substring(amountText.length() - 1).equals(".")) {
-                    amountText = amountText + "0";
-                }
-
-                Timber.d("Amount: %s", amountText);
-                final BigDecimal am = new BigDecimal(amountText);
+                final BigDecimal am = MathHelper.bigDecimalFromString(text);
                 checkZero(am);
 
                 if (isAmountForGetting()) {
