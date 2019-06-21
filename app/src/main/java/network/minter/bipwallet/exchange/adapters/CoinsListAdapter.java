@@ -40,6 +40,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,6 +96,8 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
     @Override
     public Filter getFilter() {
         return new Filter() {
+            private Lock mLock = new ReentrantLock();
+
             @Override
             public String convertResultToString(Object resultValue) {
                 return ((CoinItem) (resultValue)).symbol;
@@ -128,7 +132,14 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
                     Timber.d("Add filter item (items: %d)", results.count);
                     clear();
                     for (CoinItem c : filteredList) {
-                        new Handler(Looper.getMainLooper()).post(() -> add(c));
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            mLock.lock();
+                            try {
+                                add(c);
+                            } finally {
+                                mLock.unlock();
+                            }
+                        });
                     }
                     notifyDataSetChanged();
                 }
