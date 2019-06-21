@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -86,6 +87,8 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
                     } else {
                         coinsAmount.put(i.coin, i.amount);
                     }
+                } else {
+                    Timber.w("No 'my' address in recipients");
                 }
             }
 
@@ -95,9 +98,14 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
                 amount.setText(R.string.dots);
                 subamount.setText(subamount.getContext().getString(R.string.multiple_coins));
             } else {
-                Map.Entry<String, BigDecimal> entry = coinsAmount.entrySet().iterator().next();
-                amount.setText(String.format("+ %s", bdHuman(entry.getValue())));
-                subamount.setText(entry.getKey());
+                try {
+                    Map.Entry<String, BigDecimal> entry = coinsAmount.entrySet().iterator().next();
+                    amount.setText(String.format("+ %s", bdHuman(entry.getValue())));
+                    subamount.setText(entry.getKey());
+                } catch (NoSuchElementException e) {
+                    amount.setText(R.string.dots);
+                    subamount.setText(null);
+                }
             }
         } else {
             for (HistoryTransaction.TxSendCoinResult i : data.items) {

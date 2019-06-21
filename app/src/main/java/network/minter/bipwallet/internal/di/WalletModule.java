@@ -89,9 +89,7 @@ public class WalletModule {
         mDebug = debug;
         mEnableExternalLog = enableExternalLog;
         initCrashlytics();
-        Hawk.init(mContext)
-//                .setLogInterceptor(message -> Timber.tag("Hawk").d(message))
-                .build();
+        Hawk.init(mContext).build();
 
         initCoreSdk(context);
         MinterBlockChainApi.initialize(debug);
@@ -242,7 +240,7 @@ public class WalletModule {
                 .setEmptyAuthTokenListener(session::logout)
                 .setDebug(mDebug)
                 .setAuthHeaderName("Authorization")
-                .addHeader("User-Agent", "Minter Android " + String.valueOf(BuildConfig.VERSION_CODE))
+                .addHeader("User-Agent", "Minter Android " + BuildConfig.VERSION_CODE)
                 .addHeader("X-Client-Version", BuildConfig.VERSION_NAME)
                 .addHeader("X-Client-Build", String.valueOf(BuildConfig.VERSION_CODE));
 

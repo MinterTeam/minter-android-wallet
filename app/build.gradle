@@ -167,7 +167,7 @@ android {
 ext {
     minterExplorerSDK = "0.4.3"
     minterProfileSDK = "0.2.4"
-    minterBlockchainSDK = "0.7.3"
+    minterBlockchainSDK = "0.7.4"
     minterCoreSDK = "0.3.2"
 }
 
