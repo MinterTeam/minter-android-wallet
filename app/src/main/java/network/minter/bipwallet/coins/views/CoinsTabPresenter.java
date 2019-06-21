@@ -170,9 +170,17 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAdapter.clear();
-        mTransactionsAdapter.clear();
-        mCoinsAdapter.clear();
+        // Strange thing on some devices, OOM ?
+
+        if (mAdapter != null) {
+            mAdapter.clear();
+        }
+        if (mTransactionsAdapter != null) {
+            mTransactionsAdapter.clear();
+        }
+        if (mCoinsAdapter != null) {
+            mCoinsAdapter.clear();
+        }
     }
 
     @Override
