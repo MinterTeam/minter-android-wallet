@@ -71,6 +71,18 @@ public class ExchangeCalculator {
         final Consumer<String> errFunc = onErrorMessage == null ? e -> {
         } : onErrorMessage;
 
+        // this may happens when user has slow internet or something like this
+        if (mBuilder.mAccount.get() == null) {
+            if (onErrorMessage != null) {
+                try {
+                    onErrorMessage.accept("Account not loaded yet");
+                } catch (Exception e) {
+                    Timber.w(e, "Unable to print error while calculating exchange currency");
+                }
+            }
+            return;
+        }
+
         final String sourceCoin = mBuilder.mAccount.get().getCoin();
         final String targetCoin = mBuilder.mGetCoin.get();
 
