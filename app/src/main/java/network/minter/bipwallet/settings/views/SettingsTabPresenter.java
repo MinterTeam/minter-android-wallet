@@ -67,6 +67,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.PhoneValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
+import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.bipwallet.settings.repo.MinterBotRepository;
@@ -91,6 +92,8 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileE
 @InjectViewState
 public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.SettingsTabView> {
     private final static int REQUEST_ATTACH_AVATAR = CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
+    private final static int REQUEST_CREATE_PIN_CODE = 1002;
+    private final static int REQUEST_VERIFY_PIN_CODE = 1003;
     public static PublishSubject<User.Avatar> AVATAR_CHANGE_SUBJECT = PublishSubject.create();
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
@@ -100,7 +103,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Inject SharedPreferences prefs;
     private String mSourceUsername = null;
 
-    private MultiRowAdapter mMainAdapter, mAdditionalAdapter;
+    private MultiRowAdapter mMainAdapter, mAdditionalAdapter, mSecurityAdapter;
     private ChangeAvatarRow mChangeAvatarRow;
     private Map<String, SettingsButtonRow> mMainSettingsRows = new LinkedHashMap<>();
     private MinterBotRepository mBotRepo = new MinterBotRepository();
@@ -109,6 +112,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     public SettingsTabPresenter() {
         mMainAdapter = new MultiRowAdapter();
         mAdditionalAdapter = new MultiRowAdapter();
+        mSecurityAdapter = new MultiRowAdapter();
     }
 
     @Override
@@ -122,6 +126,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         profileCachedRepo.update(profile -> mMainAdapter.notifyDataSetChanged());
         getViewState().setMainAdapter(mMainAdapter);
         getViewState().setAdditionalAdapter(mAdditionalAdapter);
+        getViewState().setSecurityAdapter(mSecurityAdapter);
         //noinspection ConstantConditions
         if (BuildConfig.FLAVOR.equals("netTest") || BuildConfig.FLAVOR.equals("netTestNoCrashlytics")) {
             getViewState().showFreeCoinsButton(true);
@@ -179,11 +184,21 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
                                 }, t -> mChangeAvatarRow.hideProgress())
                 );
             }
+        } else if (requestCode == REQUEST_CREATE_PIN_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Timber.d("PIN successfully handled");
+            }
+        } else if (requestCode == REQUEST_VERIFY_PIN_CODE && resultCode == Activity.RESULT_OK) {
+
         }
     }
 
     public void onLogout() {
         getAnalytics().send(AppEvent.SettingsLogoutButton);
+        Wallet.app().session().logout();
+        Wallet.app().secretStorage().destroy();
+        Wallet.app().storage().deleteAll();
+        Wallet.app().prefs().edit().clear().apply();
         getViewState().startLogin();
     }
 
@@ -192,6 +207,25 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
+
+        // security row
+        {
+            SettingsSwitchRow enablePinRow = new SettingsSwitchRow("Unlock with PIN-code", () -> prefs.getBoolean(PrefKeys.ENABLE_PIN_CODE, false), this::onEnablePinCode);
+
+            SettingsSwitchRow fingerprintRow = new SettingsSwitchRow("Unlock with fingerprint", () -> {
+                return prefs.getBoolean(PrefKeys.ENABLE_FP, false) && prefs.getBoolean(PrefKeys.ENABLE_PIN_CODE, false);
+            }, this::onEnableFingerprint);
+            fingerprintRow.setEnabled(() -> prefs.getBoolean(PrefKeys.ENABLE_PIN_CODE, false));
+
+            SettingsButtonRow changePinRow = new SettingsButtonRow("Change PIN-code", "", this::onChangePinClick);
+            changePinRow.setEnabled(secretStorage.hasPinCode());
+
+            mSecurityAdapter.addRow(enablePinRow);
+            mSecurityAdapter.addRow(fingerprintRow);
+            mSecurityAdapter.addRow(changePinRow);
+        }
+
+
         if (session.getRole() == AuthSession.AuthType.Basic) {
             mChangeAvatarRow = new ChangeAvatarRow(() -> session.getUser().getData().getAvatar(), this::onClickChangeAvatar);
             mMainAdapter.addRow(mChangeAvatarRow);
@@ -208,6 +242,29 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
 //            mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
+        }
+    }
+
+    private void onChangePinClick(View view, View view1, String s) {
+
+    }
+
+    private void onEnableFingerprint(View view, Boolean enabled) {
+        getViewState().startPinCodeManager(REQUEST_VERIFY_PIN_CODE, SecurityModule.PinMode.Validation);
+
+        if (enabled) {
+
+        } else {
+
+        }
+
+    }
+
+    private void onEnablePinCode(View view, Boolean enabled) {
+        if (!secretStorage.hasPinCode()) {
+            getViewState().startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Creation);
+        } else {
+            getViewState().startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Deletion);
         }
     }
 

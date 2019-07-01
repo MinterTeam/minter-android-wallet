@@ -29,15 +29,14 @@ package network.minter.bipwallet.settings.views.rows;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.common.CallbackProvider;
 import network.minter.bipwallet.internal.common.DeferredCall;
+import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract;
 
@@ -48,9 +47,10 @@ import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract;
 public class SettingsSwitchRow implements MultiRowContract.Row<SettingsSwitchRow.ViewHolder> {
 
     private CharSequence mKey;
-    private CallbackProvider<Boolean> mValue;
+    private Lazy<Boolean> mValue;
     private OnClickListener mListener;
     private DeferredCall<ViewHolder> mDefer = DeferredCall.createWithSize(1);
+    private Lazy<Boolean> mEnabled = () -> true;
 
     public SettingsSwitchRow(CharSequence key, boolean value, OnClickListener listener) {
         mKey = key;
@@ -58,13 +58,13 @@ public class SettingsSwitchRow implements MultiRowContract.Row<SettingsSwitchRow
         mListener = listener;
     }
 
-    public SettingsSwitchRow(CharSequence key, CallbackProvider<Boolean> value, OnClickListener listener) {
+    public SettingsSwitchRow(CharSequence key, Lazy<Boolean> value, OnClickListener listener) {
         mKey = key;
         mValue = value;
         mListener = listener;
     }
 
-    public SettingsSwitchRow setValue(CallbackProvider<Boolean> value, OnClickListener listener) {
+    public SettingsSwitchRow setValue(Lazy<Boolean> value, OnClickListener listener) {
         mValue = value;
         mListener = listener;
         mDefer.call(this::fill);
@@ -72,7 +72,7 @@ public class SettingsSwitchRow implements MultiRowContract.Row<SettingsSwitchRow
         return this;
     }
 
-    public SettingsSwitchRow setValue(CallbackProvider<Boolean> value) {
+    public SettingsSwitchRow setValue(Lazy<Boolean> value) {
         mValue = value;
         mDefer.call(this::fill);
         return this;
@@ -110,19 +110,26 @@ public class SettingsSwitchRow implements MultiRowContract.Row<SettingsSwitchRow
         return ViewHolder.class;
     }
 
+    public void setEnabled(Lazy<Boolean> enabled) {
+        mEnabled = enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        mEnabled = () -> enabled;
+    }
+
     private void fill(ViewHolder vh) {
         if (mKey != null && mKey.length() > 0) {
             ViewCompat.setTransitionName(vh.key, "settings_field");
         }
 
+
         vh.key.setText(mKey);
+        vh.value.setEnabled(mEnabled.get());
         vh.value.setChecked(mValue.get());
-        vh.value.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mListener != null) {
-                    mListener.onClick(buttonView, isChecked);
-                }
+        vh.value.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (mListener != null) {
+                mListener.onClick(buttonView, isChecked);
             }
         });
     }

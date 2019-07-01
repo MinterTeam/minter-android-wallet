@@ -264,15 +264,15 @@ dependencies {
     annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
 
     // Reactive
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     // networking
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
 
     //ui
     implementation 'com.jakewharton:butterknife:8.8.1'
@@ -280,6 +280,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.2'
     implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'com.github.pwittchen:rxbiometric:0.1.0'
 
     // don't update to 2.2.0 - some issues when using elevation
     //noinspection GradleDependency

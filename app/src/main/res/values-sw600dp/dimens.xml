@@ -39,5 +39,8 @@
     <dimen name="text_size_24">26sp</dimen>
     <dimen name="text_size_26">38sp</dimen>
     <dimen name="text_size_28">40sp</dimen>
+    <dimen name="text_size_30">44sp</dimen>
     <dimen name="qr_preview_size">320dp</dimen>
+    <dimen name="pin_pad_key_size">96dp</dimen>
+    <dimen name="pin_pad_key_margin">@dimen/margin_edges</dimen>
 </resources>

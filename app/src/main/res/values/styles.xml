@@ -139,6 +139,17 @@
         </item>
     </style>
 
+    <style name="Wallet.Button.PinPad">
+        <item name="android:background">@drawable/btn_pin_key</item>
+        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/textColorWhite</item>
+        <item name="android:textSize">@dimen/text_size_30</item>
+        <item name="android:layout_marginTop">@dimen/pin_pad_key_margin</item>
+        <item name="android:layout_marginBottom">@dimen/pin_pad_key_margin</item>
+
+    </style>
+
     <style name="Wallet.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/text_size_14</item>

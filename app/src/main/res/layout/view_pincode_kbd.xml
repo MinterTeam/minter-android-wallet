@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    >
+
+    <TextView
+        android:id="@+id/pin_hint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/_ubuntu_bold"
+        android:gravity="center"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges"
+        android:text="Please confirm your 4-digit PIN"
+        android:textColor="@color/textColorWhite"
+        android:textSize="@dimen/text_size_14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/pin_error"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:fontFamily="@font/_ubuntu_bold"
+        android:gravity="center"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges"
+        android:textColor="@color/errorColor"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/pin_guide_right"
+        app:layout_constraintStart_toStartOf="@id/pin_guide_left"
+        app:layout_constraintTop_toBottomOf="@id/pin_hint"
+        tools:text="Wallet is locked for 10 minutes, because you were entered invalid PIN-code 5 times in a row."
+        />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/pin_guide_left"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent=".155"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/pin_guide_right"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent=".845"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/pin_indicator_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_edges_large"
+        app:layout_constraintEnd_toEndOf="@id/pin_guide_right"
+        app:layout_constraintStart_toStartOf="@id/pin_guide_left"
+        app:layout_constraintTop_toBottomOf="@id/pin_error"
+        >
+
+        <View
+            android:id="@+id/pin_ind_0"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_pin_symbol"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/pin_ind_1"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <View
+            android:id="@+id/pin_ind_1"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_pin_symbol"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/pin_ind_2"
+            app:layout_constraintStart_toEndOf="@id/pin_ind_0"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <View
+            android:id="@+id/pin_ind_2"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_pin_symbol"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/pin_ind_3"
+            app:layout_constraintStart_toEndOf="@id/pin_ind_1"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <View
+            android:id="@+id/pin_ind_3"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_pin_symbol"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pin_ind_2"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/pin_key_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_edges_xlarge"
+        app:layout_constraintEnd_toEndOf="@id/pin_guide_right"
+        app:layout_constraintStart_toStartOf="@id/pin_guide_left"
+        app:layout_constraintTop_toBottomOf="@id/pin_indicator_container"
+        >
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_1"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:1"
+            android:text="1"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_2"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:2"
+            android:text="2"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_3"
+            app:layout_constraintStart_toEndOf="@id/pin_key_1"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_3"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:3"
+            android:text="3"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pin_key_2"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_4"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:4"
+            android:text="4"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_1"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_5"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:5"
+            android:text="5"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_3"
+            app:layout_constraintStart_toEndOf="@id/pin_key_4"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_2"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_6"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:6"
+            android:text="6"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pin_key_2"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_3"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_7"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:7"
+            android:text="7"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_4"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_8"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:8"
+            android:text="8"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_9"
+            app:layout_constraintStart_toEndOf="@id/pin_key_7"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_5"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_9"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:9"
+            android:text="9"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pin_key_8"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_6"
+            />
+
+        <View
+            android:id="@+id/pin_key_none"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:layout_marginTop="@dimen/pin_pad_key_margin"
+            android:layout_marginBottom="@dimen/pin_pad_key_margin"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_7"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/pin_key_0"
+            style="@style/Wallet.Button.PinPad"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:tag="key:0"
+            android:text="0"
+            android:theme="@style/Wallet.Button.PinPad"
+            app:layout_constraintEnd_toStartOf="@id/pin_key_backspace"
+            app:layout_constraintStart_toEndOf="@id/pin_key_none"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_8"
+            />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/pin_key_backspace"
+            android:layout_width="@dimen/pin_pad_key_size"
+            android:layout_height="@dimen/pin_pad_key_size"
+            android:layout_marginTop="@dimen/pin_pad_key_margin"
+            android:layout_marginBottom="@dimen/pin_pad_key_margin"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            android:tag="key:bsp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pin_key_0"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_9"
+            app:srcCompat="@drawable/ic_backspace_white"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="@dimen/pin_pad_key_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pin_key_0"
+            />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</android.support.constraint.ConstraintLayout>

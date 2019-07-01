@@ -63,6 +63,7 @@ public class SecretStorage {
     private final static String KEY_SECRETS_MIGRATION = "secret_storage_mnemonic_secret_list_migration";
     private final static String KEY_ADDRESSES = "secret_storage_addresses_list";
     private final static String KEY_ENCRYPTION_PASS = "secret_storage_encryption_key";
+    private final static String KEY_PIN_CODE = "secret_app_pin_code";
     private final KVStorage mStorage;
 
     public SecretStorage(KVStorage storage) {
@@ -91,6 +92,22 @@ public class SecretStorage {
 
     public String getEncryptionKey() {
         return mStorage.get(KEY_ENCRYPTION_PASS);
+    }
+
+    public boolean hasPinCode() {
+        return mStorage.contains(KEY_PIN_CODE);
+    }
+
+    public String getPinCode() {
+        return mStorage.get(KEY_PIN_CODE);
+    }
+
+    public void setPinCode(String pinCode) {
+        mStorage.put(KEY_PIN_CODE, pinCode);
+    }
+
+    public void removePinCode() {
+        mStorage.delete(KEY_PIN_CODE);
     }
 
     public void setEncryptionKey(String rawEncryptionKey) {

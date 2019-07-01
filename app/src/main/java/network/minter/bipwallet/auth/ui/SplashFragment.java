@@ -26,7 +26,9 @@
 
 package network.minter.bipwallet.auth.ui;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,21 +48,25 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
+import network.minter.bipwallet.security.SecurityModule;
+import network.minter.bipwallet.security.ui.PinPadActivity;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class SplashFragment extends BaseInjectFragment {
+    private final static int REQUEST_START_PIN_ENTER = 1030;
 
     @Inject AuthSession session;
     @Inject CacheManager cache;
+    @Inject SecretStorage secretStorage;
     @BindView(R.id.logo) ImageView logo;
     private AuthSwitchActivity mAuthSwitchActivity;
 
@@ -75,30 +81,47 @@ public class SplashFragment extends BaseInjectFragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_START_PIN_ENTER) {
+            if (resultCode == Activity.RESULT_OK) {
+                startHome();
+            }
+        }
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         Observable.timer(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(res->{
-                    if(mAuthSwitchActivity == null) {
+                .subscribe(res -> {
+                    if (mAuthSwitchActivity == null) {
                         return;
                     }
 
-                    if(!session.isLoggedIn(true)) {
-                        ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
-                        mAuthSwitchActivity.showAuth(logo);
+                    if (!session.isLoggedIn(true)) {
+                        startAuth();
                         return;
                     }
 
-//                    cache.update(true);
+                    if (secretStorage.hasPinCode()) {
+                        startPinEnter();
+                        return;
+                    }
 
-                    ((BaseMvpInjectActivity) getActivity()).startActivityClearTop(getActivity(), HomeActivity.class);
-                    getActivity().finish();
+                    startHome();
                 });
+    }
 
+    private void startPinEnter() {
+        new PinPadActivity.Builder(getActivity(), SecurityModule.PinMode.Validation)
+                .startHomeOnSuccess()
+                .startClearTop();
 
+        getActivity().finish();
     }
 
     @Override
@@ -117,6 +140,16 @@ public class SplashFragment extends BaseInjectFragment {
     public void onDetach() {
         super.onDetach();
         mAuthSwitchActivity = null;
+    }
+
+    private void startAuth() {
+        ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
+        mAuthSwitchActivity.showAuth(logo);
+    }
+
+    private void startHome() {
+        ((BaseMvpInjectActivity) getActivity()).startActivityClearTop(getActivity(), HomeActivity.class);
+        getActivity().finish();
     }
 
     public interface AuthSwitchActivity {

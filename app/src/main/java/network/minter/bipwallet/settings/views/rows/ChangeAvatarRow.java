@@ -34,8 +34,8 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.common.CallbackProvider;
 import network.minter.bipwallet.internal.common.DeferredCall;
+import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
@@ -43,15 +43,14 @@ import network.minter.profile.models.User;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ChangeAvatarRow implements MultiRowContract.Row<ChangeAvatarRow.ViewHolder> {
-    private CallbackProvider<User.Avatar> mAvatar;
+    private Lazy<User.Avatar> mAvatar;
     private View.OnClickListener mListener;
     private DeferredCall<ViewHolder> mDefer = DeferredCall.createWithSize(1);
 
-    public ChangeAvatarRow(CallbackProvider<User.Avatar> avatar, View.OnClickListener listener) {
+    public ChangeAvatarRow(Lazy<User.Avatar> avatar, View.OnClickListener listener) {
         mAvatar = avatar;
         mListener = listener;
     }
@@ -93,7 +92,7 @@ public class ChangeAvatarRow implements MultiRowContract.Row<ChangeAvatarRow.Vie
         return ViewHolder.class;
     }
 
-    public void setAvatar(CallbackProvider<User.Avatar> avatar) {
+    public void setAvatar(Lazy<User.Avatar> avatar) {
         mAvatar = avatar;
 
         if (mAvatar != null) {

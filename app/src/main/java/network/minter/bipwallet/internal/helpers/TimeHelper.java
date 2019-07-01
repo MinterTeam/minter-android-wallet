@@ -20,4 +20,11 @@ public class TimeHelper {
 	public static long timestamp() {
 		return new DateTime().getMillis() / 1000;
 	}
+
+    public static String formatDuration(long time) {
+        time *= 1000;
+        long minutes = time / (60 * 1000);
+        long seconds = (time / 1000) % 60;
+        return String.format("%d:%02d", minutes, seconds);
+    }
 }

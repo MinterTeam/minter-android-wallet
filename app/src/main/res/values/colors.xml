@@ -44,6 +44,9 @@
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="textColorSelectedAddress">#9e8be4</color>
+    <color name="pinPadDefault">#3E1EAA</color>
+    <color name="pinPadActive">#250C78</color>
+    <color name="pinPadDisabled">#32250C78</color>
 
     <color name="greySeparator">#FFE1E1E1</color>
     <color name="bottom_navigation_color">@color/colorPrimaryDark</color>

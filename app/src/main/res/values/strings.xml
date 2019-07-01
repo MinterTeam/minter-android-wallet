@@ -117,6 +117,15 @@
     <string name="btn_change_password">Change password</string>
     <string name="hint_change_password_old">Current password</string>
 
+    <!--    PIN-->
+    <string name="title_pin_set">Set PIN-code</string>
+    <string name="title_pin_repeat">Confirm PIN-code</string>
+    <string name="title_pin_enter">Enter PIN-code</string>
+    <string name="hint_pin_enter">Please enter a 4-digit PIN</string>
+    <string name="hint_pin_repeat">Please confirm your 4-digit PIN</string>
+    <string name="error_pin_invalid" formatted="false">Invalid PIN-code. Left %d tries.</string>
+    <string name="error_pin_locked" formatted="false">Wallet is locked for %s, because you were entered invalid PIN-code %d times in a row.</string>
+
     <string name="notification_balance_update_name">Balance updates</string>
     <string name="notification_balance_list_tx_label">View transactions</string>
     <string name="notification_balance_update_description">Updating balance notifications</string>

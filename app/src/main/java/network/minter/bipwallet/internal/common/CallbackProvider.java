@@ -33,8 +33,9 @@ package network.minter.bipwallet.internal.common;
  * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @deprecated Use {@link Lazy}
  */
-
+@Deprecated
 public interface CallbackProvider<T> {
 
     T get();

@@ -47,7 +47,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.common.CallbackProvider;
+import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.BaseValidator;
 import network.minter.bipwallet.internal.views.text.PrefixEditText;
@@ -56,7 +56,6 @@ import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class WalletInputDialog extends WalletDialog {
@@ -194,7 +193,7 @@ public class WalletInputDialog extends WalletDialog {
     public static final class Builder extends WalletDialogBuilder<WalletInputDialog, WalletInputDialog.Builder> {
         private OnSubmitListener mOnSubmitListener;
         private CharSequence mDescription;
-        private CallbackProvider<String> mValue = () -> null;
+        private Lazy<String> mValue = () -> null;
         private CharSequence mHint;
         private int mInputTypeFlags = InputType.TYPE_CLASS_TEXT;
         private CharSequence mActionTitle;
@@ -244,7 +243,7 @@ public class WalletInputDialog extends WalletDialog {
             return this;
         }
 
-        public Builder setValue(CallbackProvider<String> value) {
+        public Builder setValue(Lazy<String> value) {
             mValue = value;
             return this;
         }

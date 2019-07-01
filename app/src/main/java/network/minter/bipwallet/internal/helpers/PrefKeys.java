@@ -32,4 +32,6 @@ package network.minter.bipwallet.internal.helpers;
  */
 public final class PrefKeys {
     public static final String ENABLE_SOUNDS = "pref_enable_sounds";
+    public static final String ENABLE_PIN_CODE = "pref_sec_enable_pin";
+    public static final String ENABLE_FP = "pref_sec_enable_fp";
 }

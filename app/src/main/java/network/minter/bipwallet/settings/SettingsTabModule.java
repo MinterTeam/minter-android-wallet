@@ -35,6 +35,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
+import network.minter.bipwallet.security.SecurityModule;
 
 /**
  * minter-android-wallet. 2018
@@ -59,6 +60,7 @@ public interface SettingsTabModule {
         void startLogin();
         void setMainAdapter(RecyclerView.Adapter<?> mainAdapter);
         void setAdditionalAdapter(RecyclerView.Adapter<?> additionalAdapter);
+        void setSecurityAdapter(RecyclerView.Adapter<?> securityAdapter);
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startAddressList();
         @StateStrategyType(OneExecutionStateStrategy.class)
@@ -68,5 +70,7 @@ public interface SettingsTabModule {
         void showMessage(CharSequence message);
         @StateStrategyType(OneExecutionStateStrategy.class)
         void startDialog(WalletDialog.DialogExecutor executor);
+        @StateStrategyType(OneExecutionStateStrategy.class)
+        void startPinCodeManager(int requestCode, SecurityModule.PinMode mode);
     }
 }

@@ -30,21 +30,21 @@ import android.text.Spanned;
 import android.text.method.DigitsKeyListener;
 import android.widget.EditText;
 
-import network.minter.bipwallet.internal.common.CallbackProvider;
+import network.minter.bipwallet.internal.common.Lazy;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class DecimalInputFilter extends DigitsKeyListener {
-    private final CallbackProvider<EditText> mView;
+    private final Lazy<EditText> mView;
     private int mDecimals = 18;
 
-    public DecimalInputFilter(CallbackProvider<EditText> txtView) {
+    public DecimalInputFilter(Lazy<EditText> txtView) {
         this(txtView, 18);
     }
 
-    public DecimalInputFilter(CallbackProvider<EditText> txtView, int decimals) {
+    public DecimalInputFilter(Lazy<EditText> txtView, int decimals) {
         super(false, true);
         mView = txtView;
         mDecimals = decimals;

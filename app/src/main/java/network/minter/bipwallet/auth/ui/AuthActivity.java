@@ -26,7 +26,9 @@
 
 package network.minter.bipwallet.auth.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.transition.ChangeBounds;
 import android.support.transition.ChangeClipBounds;
@@ -70,6 +72,13 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
     @VisibleForTesting
     public final AuthFragment getAuthFragment() {
         return mAuthFragment;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (mSplashFragment != null) {
+            mSplashFragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

@@ -60,6 +60,8 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator;
 import network.minter.bipwallet.internal.views.list.NonScrollableLinearLayoutManager;
+import network.minter.bipwallet.security.SecurityModule;
+import network.minter.bipwallet.security.ui.PinPadActivity;
 import network.minter.bipwallet.settings.SettingsTabModule;
 import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 
@@ -73,6 +75,7 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.list_main) RecyclerView listMain;
     @BindView(R.id.list_additional) RecyclerView listAdditional;
+    @BindView(R.id.list_security) RecyclerView listSecurity;
     @BindView(R.id.free_get) Button freeGet;
 
     @Inject Provider<SettingsTabPresenter> presenterProvider;
@@ -122,6 +125,13 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     }
 
     @Override
+    public void setSecurityAdapter(RecyclerView.Adapter<?> securityAdapter) {
+        listSecurity.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
+        listSecurity.addItemDecoration(new BorderedItemSeparator(getActivity(), R.drawable.shape_bottom_separator, true, true));
+        listSecurity.setAdapter(securityAdapter);
+    }
+
+    @Override
     public void startAddressList() {
         getActivity().startActivity(new Intent(getActivity(), AddressListActivity.class));
     }
@@ -164,6 +174,12 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
     }
 
     @Override
+    public void startPinCodeManager(int requestCode, SecurityModule.PinMode mode) {
+        new PinPadActivity.Builder(getActivity(), mode)
+                .start(requestCode);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         presenter.onActivityResult(requestCode, resultCode, data);
@@ -203,10 +219,6 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
         Wallet.app().cache().clear();
         Intent intent = new Intent(getActivity(), AuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        Wallet.app().session().logout();
-        Wallet.app().secretStorage().destroy();
-        Wallet.app().storage().deleteAll();
 
         getActivity().startActivity(intent);
         getActivity().finish();

@@ -36,26 +36,26 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.bipwallet.internal.common.CallbackProvider;
 import network.minter.bipwallet.internal.common.DeferredCall;
+import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class SettingsButtonRow implements MultiRowContract.Row<SettingsButtonRow.ViewHolder> {
 
     private CharSequence mKey;
-    private CallbackProvider<String> mValue;
+    private Lazy<String> mValue;
+    private Lazy<Boolean> mEnabled = () -> true;
     private String mDefValue;
     private OnClickListener mListener;
     private boolean mInactive = false;
     private DeferredCall<ViewHolder> mDefer = DeferredCall.createWithSize(1);
 
-    public SettingsButtonRow(CharSequence key, CallbackProvider<String> value, String defValue, OnClickListener listener) {
+    public SettingsButtonRow(CharSequence key, Lazy<String> value, String defValue, OnClickListener listener) {
         this(key, value, listener);
         mDefValue = defValue;
     }
@@ -66,14 +66,10 @@ public class SettingsButtonRow implements MultiRowContract.Row<SettingsButtonRow
         mListener = listener;
     }
 
-    public SettingsButtonRow(CharSequence key, CallbackProvider<String> value, OnClickListener listener) {
+    public SettingsButtonRow(CharSequence key, Lazy<String> value, OnClickListener listener) {
         mKey = key;
         mValue = value;
         mListener = listener;
-    }
-
-    public interface OnClickListener {
-        void onClick(View view, View sharedView, String value);
     }
 
     public SettingsButtonRow setInactive(boolean inactive) {
@@ -81,7 +77,7 @@ public class SettingsButtonRow implements MultiRowContract.Row<SettingsButtonRow
         return this;
     }
 
-    public SettingsButtonRow setValue(CallbackProvider<String> value, OnClickListener listener) {
+    public SettingsButtonRow setValue(Lazy<String> value, OnClickListener listener) {
         mValue = value;
         mListener = listener;
         mDefer.call(this::fill);
@@ -89,9 +85,21 @@ public class SettingsButtonRow implements MultiRowContract.Row<SettingsButtonRow
         return this;
     }
 
-    public SettingsButtonRow setValue(CallbackProvider<String> value) {
+    public SettingsButtonRow setValue(Lazy<String> value) {
         mValue = value;
         mDefer.call(this::fill);
+        return this;
+    }
+
+    public SettingsButtonRow setEnabled(Lazy<Boolean> enabled) {
+        mEnabled = enabled;
+        setInactive(!enabled.get());
+        return this;
+    }
+
+    public SettingsButtonRow setEnabled(boolean enabled) {
+        mEnabled = () -> enabled;
+        setInactive(!enabled);
         return this;
     }
 
@@ -156,6 +164,10 @@ public class SettingsButtonRow implements MultiRowContract.Row<SettingsButtonRow
                 mListener.onClick(vh.itemView, vh.key, mValue.get());
             }
         });
+    }
+
+    public interface OnClickListener {
+        void onClick(View view, View sharedView, String value);
     }
 
     public static class ViewHolder extends MultiRowAdapter.RowViewHolder {
