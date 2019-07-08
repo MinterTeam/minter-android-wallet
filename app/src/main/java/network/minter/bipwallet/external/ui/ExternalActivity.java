@@ -35,10 +35,13 @@ import com.google.gson.GsonBuilder;
 import javax.inject.Inject;
 
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseInjectActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.security.SecurityModule;
+import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import timber.log.Timber;
 
@@ -53,6 +56,7 @@ public class ExternalActivity extends BaseInjectActivity {
     private final static String EXTRA_ACTION = "EXTRA_ACTION";
     private final static String EXTRA_PAYLOAD = "EXTRA_PAYLOAD";
     @Inject AuthSession session;
+    @Inject SecretStorage secretStorage;
     @Inject GsonBuilder gsonBuilder;
 
     public static Intent createAction(String action, String payload) {
@@ -105,11 +109,26 @@ public class ExternalActivity extends BaseInjectActivity {
 
         switch (action) {
             case ACTION_OPEN_HOME:
-                new HomeActivity.Builder(this).start();
+                if (secretStorage.hasPinCode()) {
+                    new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
+                            .startHomeOnSuccess()
+                            .start();
+                } else {
+                    new HomeActivity.Builder(this).start();
+                }
+
                 finish();
                 break;
             case ACTION_OPEN_TRANSACTION_LIST:
-                new TransactionListActivity.Builder(this).start();
+                if (secretStorage.hasPinCode()) {
+                    Intent intent = new Intent(this, TransactionListActivity.class);
+                    new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
+                            .setSuccessIntent(intent)
+                            .start();
+                } else {
+                    new TransactionListActivity.Builder(this).start();
+                }
+
                 finish();
                 break;
             default:

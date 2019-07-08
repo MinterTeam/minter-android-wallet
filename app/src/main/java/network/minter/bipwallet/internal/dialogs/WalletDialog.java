@@ -30,15 +30,16 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
+import moxy.MvpView;
 import network.minter.bipwallet.R;
 
 /**
@@ -100,6 +101,10 @@ public abstract class WalletDialog extends Dialog {
 
     public interface DialogExecutor {
         WalletDialog run(Context ctx);
+    }
+
+    public interface DialogContractView extends MvpView {
+        void startDialog(DialogExecutor executor);
     }
 
     public interface WithPositiveAction<T> {

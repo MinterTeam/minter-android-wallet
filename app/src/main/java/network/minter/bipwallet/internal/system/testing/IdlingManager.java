@@ -26,13 +26,12 @@
 
 package network.minter.bipwallet.internal.system.testing;
 
-import android.support.test.espresso.IdlingRegistry;
-
 import com.annimon.stream.Stream;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.test.espresso.IdlingRegistry;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;

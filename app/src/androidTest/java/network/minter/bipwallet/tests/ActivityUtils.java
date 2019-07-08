@@ -1,8 +1,8 @@
 package network.minter.bipwallet.tests;
 
-import android.support.annotation.IdRes;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.IdRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 18-Apr-19

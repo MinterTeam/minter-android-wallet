@@ -26,7 +26,7 @@
 
 package network.minter.bipwallet.internal.common;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * minter-android-wallet. 2018
@@ -40,7 +40,7 @@ public interface LazyFunction<F, T> {
      * <p>
      * <ul>
      * <li>Its execution does not cause any observable side effects.
-     * <li>The computation is <i>consistent with equals</i>; that is, {@link android.support.v4.util.ObjectsCompat#equals(Object)}
+     * <li>The computation is <i>consistent with equals</i>; that is, {@link androidx.core.util.ObjectsCompat#equals(Object)}
      * Objects.equal}{@code (a, b)} implies that {@code Objects.equal(function.apply(a),
      * function.apply(b))}.
      * </ul>

@@ -26,51 +26,13 @@
 
 package network.minter.bipwallet.settings;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-
-import network.minter.bipwallet.internal.dialogs.WalletDialog;
-import network.minter.bipwallet.internal.helpers.forms.InputGroup;
-import network.minter.bipwallet.security.SecurityModule;
+import dagger.Module;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Module
 public interface SettingsTabModule {
-    interface PasswordChangeMigrationView extends MvpView {
-        void setTextChangedListener(InputGroup.OnTextChangedListener listener);
-        void setFormValidateListener(InputGroup.OnFormValidateListener listener);
-        void setOnClickSubmit(View.OnClickListener listener);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startDialog(WalletDialog.DialogExecutor executor);
-        void setEnableSubmit(boolean enable);
-        void finish();
-    }
 
-    interface SettingsTabView extends MvpView {
-        void setOnFreeCoinsClickListener(View.OnClickListener listener);
-        void showFreeCoinsButton(boolean show);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startLogin();
-        void setMainAdapter(RecyclerView.Adapter<?> mainAdapter);
-        void setAdditionalAdapter(RecyclerView.Adapter<?> additionalAdapter);
-        void setSecurityAdapter(RecyclerView.Adapter<?> securityAdapter);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startAddressList();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startAvatarChooser();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startPasswordChange();
-        void showMessage(CharSequence message);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startDialog(WalletDialog.DialogExecutor executor);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startPinCodeManager(int requestCode, SecurityModule.PinMode mode);
-    }
 }

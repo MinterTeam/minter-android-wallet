@@ -28,16 +28,16 @@ package network.minter.bipwallet.auth.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.transition.ChangeBounds;
-import android.support.transition.ChangeClipBounds;
-import android.support.transition.Slide;
-import android.support.transition.TransitionSet;
-import android.support.v4.view.ViewCompat;
 import android.view.Gravity;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.view.ViewCompat;
+import androidx.transition.ChangeBounds;
+import androidx.transition.ChangeClipBounds;
+import androidx.transition.Slide;
+import androidx.transition.TransitionSet;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 

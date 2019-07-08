@@ -28,10 +28,10 @@ package network.minter.bipwallet.internal;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import dagger.android.support.AndroidSupportInjection;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.mvp.ErrorView;

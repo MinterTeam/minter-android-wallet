@@ -27,24 +27,17 @@
 package network.minter.bipwallet.home;
 
 import android.app.FragmentManager;
-import android.arch.lifecycle.LifecycleOwner;
-
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.lifecycle.LifecycleOwner;
 import dagger.Module;
 import dagger.Provides;
 import network.minter.bipwallet.coins.ui.CoinsTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.bipwallet.internal.mvp.ErrorView;
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
-import network.minter.bipwallet.internal.mvp.ProgressView;
 import network.minter.bipwallet.internal.system.BackPressedDelegate;
 import network.minter.bipwallet.receiving.ui.ReceiveTabFragment;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
@@ -121,7 +114,7 @@ public class HomeModule {
 
     @Provides
     @HomeScope
-    public android.support.v4.app.FragmentManager provideSupportFragmentManager(HomeActivity activity) {
+    public androidx.fragment.app.FragmentManager provideSupportFragmentManager(HomeActivity activity) {
         return activity.getSupportFragmentManager();
     }
 
@@ -130,12 +123,6 @@ public class HomeModule {
     @HomeScope
     public List<Class<? extends HomeTabFragment>> provideTabsClasses() {
         return tabsClassesClient;
-    }
-
-    public interface HomeView extends MvpView, ErrorView, ErrorViewWithRetry, ProgressView {
-        void setCurrentPage(int position);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startUrl(String url);
     }
 
 }

@@ -26,21 +26,20 @@
 
 package network.minter.bipwallet.tx.views;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.PagedList;
-import android.arch.paging.RxPagedListBuilder;
-import android.support.annotation.NonNull;
 import android.view.View;
-
-import com.arellomobile.mvp.InjectViewState;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.PagedList;
+import androidx.paging.RxPagedListBuilder;
 import io.reactivex.disposables.Disposable;
+import moxy.InjectViewState;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
-import network.minter.bipwallet.coins.CoinsTabModule;
+import network.minter.bipwallet.coins.contract.TransactionListView;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
@@ -55,7 +54,7 @@ import network.minter.profile.repo.ProfileInfoRepository;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.TransactionListView> implements HasAnalyticsEvent {
+public class TransactionListPresenter extends MvpBasePresenter<TransactionListView> implements HasAnalyticsEvent {
 
     @Inject ExplorerTransactionRepository transactionRepo;
     @Inject SecretStorage secretRepo;
@@ -73,7 +72,7 @@ public class TransactionListPresenter extends MvpBasePresenter<CoinsTabModule.Tr
     }
 
     @Override
-    public void attachView(CoinsTabModule.TransactionListView view) {
+    public void attachView(TransactionListView view) {
         super.attachView(view);
         getViewState().setAdapter(mAdapter);
         getViewState().setOnRefreshListener(this::onRefresh);

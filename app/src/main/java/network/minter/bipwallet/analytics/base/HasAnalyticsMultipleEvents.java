@@ -26,8 +26,7 @@
 
 package network.minter.bipwallet.analytics.base;
 
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import network.minter.bipwallet.analytics.AppEvent;
 
 

@@ -26,11 +26,6 @@
 
 package network.minter.bipwallet.internal.views.list;
 
-import android.support.annotation.CheckResult;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +37,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import androidx.annotation.CheckResult;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper;
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher;
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate;

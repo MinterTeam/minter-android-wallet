@@ -47,6 +47,7 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.helpers.DisplayHelper;
+import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.SoundManager;
@@ -114,6 +115,7 @@ public interface WalletComponent {
     CacheManager cache();
     AnalyticsManager analytics();
     SoundManager sounds();
+    FingerprintHelper fingerprint();
 
     // notification
     BalanceNotificationManager balanceNotifications();

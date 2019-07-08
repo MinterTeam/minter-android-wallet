@@ -26,8 +26,7 @@
 
 package network.minter.bipwallet.addresses.adapters;
 
-import android.arch.paging.DataSource;
-
+import androidx.paging.DataSource;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.explorer.repo.ExplorerAddressRepository;

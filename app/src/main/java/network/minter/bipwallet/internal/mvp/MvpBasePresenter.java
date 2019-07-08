@@ -27,16 +27,13 @@ package network.minter.bipwallet.internal.mvp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.v4.util.Pair;
 import android.view.View;
-
-import com.arellomobile.mvp.MvpPresenter;
-import com.arellomobile.mvp.MvpView;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.CallSuper;
+import androidx.core.util.Pair;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -46,6 +43,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import moxy.MvpPresenter;
+import moxy.MvpView;
 import network.minter.bipwallet.analytics.AnalyticsManager;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;

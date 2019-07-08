@@ -29,21 +29,20 @@ package network.minter.bipwallet.receiving.views;
 import android.content.Intent;
 import android.view.View;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import java.io.File;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import moxy.InjectViewState;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.helpers.TextHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.bipwallet.receiving.ReceiveTabModule;
+import network.minter.bipwallet.receiving.contract.ReceiveTabView;
 import network.minter.bipwallet.receiving.helpers.QRAddressGenerator;
 import network.minter.bipwallet.share.ShareManager;
 import network.minter.core.crypto.MinterAddress;
@@ -55,7 +54,7 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.ReceiveTabView> {
+public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabView> {
 
     @Inject SecretStorage secretStorage;
     private MinterAddress mAddress;
@@ -67,7 +66,7 @@ public class ReceiveTabPresenter extends MvpBasePresenter<ReceiveTabModule.Recei
     }
 
     @Override
-    public void attachView(ReceiveTabModule.ReceiveTabView view) {
+    public void attachView(ReceiveTabView view) {
         super.attachView(view);
         if (secretStorage.getAddresses().isEmpty()) {
             Timber.w("No one address stored. How this happened?");

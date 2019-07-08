@@ -28,40 +28,37 @@ package network.minter.bipwallet.delegation.ui;
 
 import android.app.Activity;
 import android.app.Service;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.coins.CoinsTabModule;
-import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
+import network.minter.bipwallet.coins.contract.DelegationListView;
 import network.minter.bipwallet.delegation.views.DelegationListPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
-import network.minter.bipwallet.tx.adapters.TransactionDataSource;
-import network.minter.bipwallet.tx.ui.TransactionListActivity;
-import network.minter.bipwallet.tx.views.TransactionListPresenter;
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 05-Jun-19
  */
-public class DelegationListActivity extends BaseMvpInjectActivity implements CoinsTabModule.DelegationListView {
+public class DelegationListActivity extends BaseMvpInjectActivity implements DelegationListView {
 
     @Inject
     Provider<DelegationListPresenter> presenterProvider;

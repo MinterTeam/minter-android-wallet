@@ -47,7 +47,7 @@
         />
 
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/row_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,9 +89,9 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/balance_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -156,9 +156,9 @@
             app:srcCompat="@drawable/ic_chevron_right_grey"
             />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/row_secured"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -197,9 +197,9 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Bip Wallet"
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
@@ -232,7 +232,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/default_label"
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:layout_width="match_parent"

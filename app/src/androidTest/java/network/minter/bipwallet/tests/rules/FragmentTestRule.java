@@ -1,14 +1,12 @@
 package network.minter.bipwallet.tests.rules;
 
-import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.rule.ActivityTestRule;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 18-Apr-19

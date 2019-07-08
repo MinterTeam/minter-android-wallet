@@ -1,10 +1,10 @@
 package network.minter.bipwallet.internal.common;
 
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 
 /**

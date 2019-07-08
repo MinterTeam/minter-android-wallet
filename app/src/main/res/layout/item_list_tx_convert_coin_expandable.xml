@@ -25,7 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -36,7 +36,7 @@
     android:focusable="true"
     >
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
             tools:text="-200000000.1020"
             />
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/exchange_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -157,7 +157,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="BIPTHEREUM"
                 />
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/item_subamount"
@@ -175,7 +175,7 @@
             app:layout_constraintTop_toBottomOf="@id/item_amount"
             tools:text="BIPTHEREUM"
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/sep"
@@ -187,7 +187,7 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_details"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -368,6 +368,6 @@
             app:layout_constraintTop_toBottomOf="@id/action"
 
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

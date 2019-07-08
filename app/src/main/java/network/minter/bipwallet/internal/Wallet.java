@@ -29,8 +29,6 @@ package network.minter.bipwallet.internal;
 import android.app.Activity;
 import android.app.Service;
 import android.os.Build;
-import android.support.multidex.MultiDexApplication;
-import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -39,6 +37,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.multidex.MultiDexApplication;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;

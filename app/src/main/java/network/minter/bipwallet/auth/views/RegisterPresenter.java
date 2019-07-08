@@ -29,18 +29,17 @@ package network.minter.bipwallet.auth.views;
 import android.view.View;
 import android.widget.EditText;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import java.util.Locale;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import moxy.InjectViewState;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.auth.AuthModule;
+import network.minter.bipwallet.auth.contract.RegisterView;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
@@ -60,7 +59,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileE
  */
 @ActivityScope
 @InjectViewState
-public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView> {
+public class RegisterPresenter extends MvpBasePresenter<RegisterView> {
     @Inject ProfileAuthRepository authRepo;
     @Inject SecretStorage secretStorage;
     @Inject AuthSession session;
@@ -74,7 +73,7 @@ public class RegisterPresenter extends MvpBasePresenter<AuthModule.RegisterView>
     }
 
     @Override
-    public void attachView(AuthModule.RegisterView view) {
+    public void attachView(RegisterView view) {
         super.attachView(view);
 
         getViewState().setOnSubmit(this::onSubmit);

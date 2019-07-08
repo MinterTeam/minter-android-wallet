@@ -1,6 +1,6 @@
 package network.minter.bipwallet.internal.views.list.multirow;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Stars. 2017

@@ -29,13 +29,13 @@ package network.minter.bipwallet.internal.views.widgets;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.DimenRes;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
 
 import java.lang.ref.WeakReference;
 
+import androidx.annotation.DimenRes;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 import timber.log.Timber;
 

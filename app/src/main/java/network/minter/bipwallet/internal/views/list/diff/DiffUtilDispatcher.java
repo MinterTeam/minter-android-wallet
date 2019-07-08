@@ -26,12 +26,12 @@
 
 package network.minter.bipwallet.internal.views.list.diff;
 
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 

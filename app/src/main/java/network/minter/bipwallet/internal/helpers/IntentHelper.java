@@ -2,11 +2,11 @@ package network.minter.bipwallet.internal.helpers;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.parceler.Parcels;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import network.minter.bipwallet.internal.common.Acceptor;
 
 

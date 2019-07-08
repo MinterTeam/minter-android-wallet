@@ -31,12 +31,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import javax.inject.Inject;
 
 import io.reactivex.schedulers.Schedulers;
-import network.minter.bipwallet.addresses.AddressManageModule;
+import moxy.InjectViewState;
+import network.minter.bipwallet.addresses.contract.AddressItemView;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.addresses.ui.AddressItemActivity;
 import network.minter.bipwallet.analytics.AppEvent;
@@ -53,7 +52,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.AddressItemView> {
+public class AddressItemPresenter extends MvpBasePresenter<AddressItemView> {
     @Inject ProfileAddressRepository addressRepo;
 
     private AddressItem mAddress;
@@ -77,7 +76,7 @@ public class AddressItemPresenter extends MvpBasePresenter<AddressManageModule.A
     }
 
     @Override
-    public void attachView(AddressManageModule.AddressItemView view) {
+    public void attachView(AddressItemView view) {
         super.attachView(view);
 
         getViewState().setAddress(mAddress.address.toString());

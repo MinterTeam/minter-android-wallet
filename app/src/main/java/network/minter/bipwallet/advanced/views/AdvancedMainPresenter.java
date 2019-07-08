@@ -31,11 +31,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import javax.inject.Inject;
 
-import network.minter.bipwallet.advanced.AdvancedModeModule;
+import moxy.InjectViewState;
+import network.minter.bipwallet.advanced.contract.MainView;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
@@ -54,7 +53,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
  * TODO: refactoring
  */
 @InjectViewState
-public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.MainView> {
+public class AdvancedMainPresenter extends MvpBasePresenter<MainView> {
 
     private final static int REQUEST_GENERATE = 200;
 
@@ -70,7 +69,7 @@ public class AdvancedMainPresenter extends MvpBasePresenter<AdvancedModeModule.M
     }
 
     @Override
-    public void attachView(AdvancedModeModule.MainView view) {
+    public void attachView(MainView view) {
         super.attachView(view);
 
         getViewState().setMnemonicTextChangedListener(onTextChanged());

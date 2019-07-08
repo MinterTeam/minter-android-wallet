@@ -26,10 +26,10 @@
 
 package network.minter.bipwallet.internal.views.list.diff;
 
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 
 /**
  * minter-android-wallet. 2018

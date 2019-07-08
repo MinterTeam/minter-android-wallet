@@ -1,10 +1,10 @@
 package network.minter.bipwallet.internal.common.annotations;
 
-import android.support.annotation.Dimension;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import androidx.annotation.Dimension;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.LOCAL_VARIABLE;

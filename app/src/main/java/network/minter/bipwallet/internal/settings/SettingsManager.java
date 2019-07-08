@@ -2,7 +2,8 @@ package network.minter.bipwallet.internal.settings;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 /**
  * minter-android-wallet. 2019

@@ -30,9 +30,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +39,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
@@ -55,7 +55,7 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.security.SecurityModule;
-import network.minter.bipwallet.security.ui.PinPadActivity;
+import network.minter.bipwallet.security.ui.PinEnterActivity;
 
 /**
  * minter-android-wallet. 2018
@@ -117,7 +117,7 @@ public class SplashFragment extends BaseInjectFragment {
     }
 
     private void startPinEnter() {
-        new PinPadActivity.Builder(getActivity(), SecurityModule.PinMode.Validation)
+        new PinEnterActivity.Builder(getActivity(), SecurityModule.PinMode.Validation)
                 .startHomeOnSuccess()
                 .startClearTop();
 

@@ -26,12 +26,12 @@
 
 package network.minter.bipwallet.sending.models;
 
-import android.support.annotation.NonNull;
-
 import org.parceler.Parcel;
 
 import java.util.Date;
 import java.util.Objects;
+
+import androidx.annotation.NonNull;
 
 /**
  * minter-android-wallet. 2018

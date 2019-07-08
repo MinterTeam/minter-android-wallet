@@ -28,10 +28,10 @@ package network.minter.bipwallet.internal.views.widgets;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.DimenRes;
-import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 
+import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
 import de.hdodenhof.circleimageview.CircleImageView;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 

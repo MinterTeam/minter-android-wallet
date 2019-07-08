@@ -26,13 +26,12 @@
 
 package network.minter.bipwallet.apis.explorer;
 
-import android.support.annotation.NonNull;
-
 import com.annimon.stream.Stream;
 
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.repo.SecretStorage;

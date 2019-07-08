@@ -28,11 +28,6 @@ package network.minter.bipwallet.exchange.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.AppCompatEditText;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,17 +36,23 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
-import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.adapters.CoinsListAdapter;
+import network.minter.bipwallet.exchange.contract.BaseCoinTabView;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
@@ -68,7 +69,7 @@ import timber.log.Timber;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public abstract class BaseCoinTabFragment extends BaseInjectFragment implements ExchangeModule.BaseCoinTabView {
+public abstract class BaseCoinTabFragment extends BaseInjectFragment implements BaseCoinTabView {
     public static final String IDLE_WAIT_ESTIMATE = "IDLE_WAIT_ESTIMATE";
     public static final String IDLE_WAIT_GAS = "IDLE_WAIT_GAS";
 

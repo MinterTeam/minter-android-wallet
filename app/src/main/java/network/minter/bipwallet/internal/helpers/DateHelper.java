@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.internal.helpers;
 
-import android.support.annotation.Nullable;
-
 import org.joda.time.DateTime;
 import org.joda.time.YearMonth;
 import org.joda.time.format.DateTimeFormat;
@@ -37,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import androidx.annotation.Nullable;
 import network.minter.bipwallet.internal.Wallet;
 import timber.log.Timber;
 

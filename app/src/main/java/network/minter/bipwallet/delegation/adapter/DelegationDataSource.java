@@ -26,28 +26,20 @@
 
 package network.minter.bipwallet.delegation.adapter;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.DataSource;
-import android.arch.paging.PageKeyedDataSource;
-import android.support.annotation.NonNull;
-
-import org.joda.time.DateTime;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.DataSource;
+import androidx.paging.PageKeyedDataSource;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.internal.adapter.DataSourceMeta;
 import network.minter.bipwallet.internal.adapter.LoadState;
-import network.minter.bipwallet.internal.helpers.DateHelper;
-import network.minter.bipwallet.tx.adapters.HeaderItem;
-import network.minter.bipwallet.tx.adapters.TransactionDataSource;
-import network.minter.bipwallet.tx.adapters.TransactionItem;
-import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.DelegationInfo;
 import network.minter.explorer.models.ExpResult;
-import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 

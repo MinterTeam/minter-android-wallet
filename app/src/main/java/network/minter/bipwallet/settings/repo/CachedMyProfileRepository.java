@@ -26,8 +26,7 @@
 
 package network.minter.bipwallet.settings.repo;
 
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CachedEntity;

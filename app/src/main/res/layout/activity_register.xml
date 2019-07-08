@@ -25,7 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -34,7 +34,7 @@
     tools:context=".advanced.ui.AdvancedMainActivity"
     >
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
             app:title="@string/title_register"
             app:titleTextColor="@android:color/white"
             />
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="0dp"
@@ -71,13 +71,13 @@
         app:layout_constraintTop_toBottomOf="@id/appbar"
         >
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/margin_edges_half"
             >
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_input_username"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -104,9 +104,9 @@
                     android:tag="username"
                     android:textSize="@dimen/text_size_default"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_input_password"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/input_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -134,9 +134,9 @@
                     android:textSize="@dimen/text_size_default"
                     tools:text="Ppaaa"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_input_password_repeat"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/inputPasswordRepeat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -163,9 +163,9 @@
                     android:textSize="@dimen/text_size_default"
                     tools:text="qwe123"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:visibility="gone"
                 android:id="@+id/layout_input_email"
                 android:layout_width="0dp"
@@ -185,7 +185,7 @@
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/inputEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -194,9 +194,9 @@
                     android:textSize="@dimen/text_size_default"
                     tools:text="a@b"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_input_phone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -215,14 +215,14 @@
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/input_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text|phone"
                     android:tag="phone"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action"
@@ -279,6 +279,6 @@
                 app:layout_constraintTop_toBottomOf="@id/hint_email"
                 />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

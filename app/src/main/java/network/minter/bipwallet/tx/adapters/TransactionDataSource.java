@@ -26,11 +26,6 @@
 
 package network.minter.bipwallet.tx.adapters;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.DataSource;
-import android.arch.paging.PageKeyedDataSource;
-import android.support.annotation.NonNull;
-
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -42,11 +37,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.DataSource;
+import androidx.paging.PageKeyedDataSource;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.delegation.adapter.DelegationItem;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.adapter.DataSourceMeta;
 import network.minter.bipwallet.internal.adapter.LoadState;

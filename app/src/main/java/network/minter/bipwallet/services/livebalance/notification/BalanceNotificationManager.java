@@ -31,10 +31,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.GsonBuilder;
 
+import androidx.core.app.NotificationCompat;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.R;
@@ -110,7 +110,8 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
         Intent contentIntent = ExternalActivity.createAction(mContext, ExternalActivity.ACTION_OPEN_HOME, null);
 
         final String listTxLabel = mContext.getResources().getString(R.string.notification_balance_list_tx_label);
-        final Intent listTxIntent = new Intent(mContext, TransactionListActivity.class);
+        final Intent listTxIntent = ExternalActivity.createAction(mContext, ExternalActivity.ACTION_OPEN_TRANSACTION_LIST, null);
+
         NotificationCompat.Action listTxAction =
                 new NotificationCompat.Action.Builder(
                         R.drawable.ic_notify_list_tx,

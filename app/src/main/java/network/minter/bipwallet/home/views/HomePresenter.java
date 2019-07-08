@@ -28,21 +28,20 @@ package network.minter.bipwallet.home.views;
 
 import android.view.MenuItem;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import moxy.InjectViewState;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.analytics.AppEvent;
-import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.HomeTabsClasses;
+import network.minter.bipwallet.home.contract.HomeView;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.services.livebalance.ServiceConnector;
@@ -55,7 +54,7 @@ import static network.minter.bipwallet.internal.Wallet.app;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
+public class HomePresenter extends MvpBasePresenter<HomeView> {
 
     private final HashMap<Integer, Integer> mBottomIdPositionMap = new HashMap<Integer, Integer>() {{
         put(R.id.bottom_coins, 0);
@@ -74,7 +73,7 @@ public class HomePresenter extends MvpBasePresenter<HomeModule.HomeView> {
     }
 
     @Override
-    public void attachView(HomeModule.HomeView view) {
+    public void attachView(HomeView view) {
         super.attachView(view);
         getViewState().setCurrentPage(mLastPosition);
     }

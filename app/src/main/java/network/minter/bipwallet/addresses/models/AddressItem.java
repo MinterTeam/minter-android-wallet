@@ -26,13 +26,12 @@
 
 package network.minter.bipwallet.addresses.models;
 
-import android.arch.lifecycle.MutableLiveData;
-
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
 import java.math.BigDecimal;
 
+import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.models.ProfileAddressData;

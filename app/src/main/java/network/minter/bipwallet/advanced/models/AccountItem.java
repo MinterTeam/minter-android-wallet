@@ -26,9 +26,6 @@
 
 package network.minter.bipwallet.advanced.models;
 
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-
 import org.parceler.Parcel;
 
 import java.io.Serializable;
@@ -37,6 +34,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.MinterProfileApi;
 

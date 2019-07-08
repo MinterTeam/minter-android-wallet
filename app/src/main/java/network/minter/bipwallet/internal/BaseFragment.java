@@ -30,8 +30,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.arellomobile.mvp.MvpAppCompatFragment;
-
+import moxy.MvpAppCompatFragment;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 
 

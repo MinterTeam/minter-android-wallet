@@ -31,8 +31,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.transition.AutoTransition;
 import android.widget.ImageView;
 
@@ -40,6 +38,8 @@ import com.squareup.picasso.Callback;
 
 import java.io.File;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseActivity;
 import network.minter.bipwallet.internal.Wallet;

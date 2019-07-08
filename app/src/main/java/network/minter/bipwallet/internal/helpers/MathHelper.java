@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.internal.helpers;
 
-import android.support.annotation.NonNull;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -35,6 +33,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import androidx.annotation.NonNull;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 

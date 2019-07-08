@@ -29,27 +29,33 @@ package network.minter.bipwallet.settings.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.biometric.BiometricPrompt;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.addresses.ui.AddressListActivity;
 import network.minter.bipwallet.auth.ui.AuthActivity;
@@ -61,16 +67,15 @@ import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator;
 import network.minter.bipwallet.internal.views.list.NonScrollableLinearLayoutManager;
 import network.minter.bipwallet.security.SecurityModule;
-import network.minter.bipwallet.security.ui.PinPadActivity;
-import network.minter.bipwallet.settings.SettingsTabModule;
+import network.minter.bipwallet.security.ui.PinEnterActivity;
+import network.minter.bipwallet.settings.contract.SettingsTabView;
 import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class SettingsTabFragment extends HomeTabFragment implements SettingsTabModule.SettingsTabView {
+public class SettingsTabFragment extends HomeTabFragment implements SettingsTabView {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.list_main) RecyclerView listMain;
@@ -175,8 +180,35 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabM
 
     @Override
     public void startPinCodeManager(int requestCode, SecurityModule.PinMode mode) {
-        new PinPadActivity.Builder(getActivity(), mode)
+        new PinEnterActivity.Builder(getActivity(), mode)
                 .start(requestCode);
+    }
+
+    @Override
+    public void startBiometricPrompt(BiometricPrompt.AuthenticationCallback callback) {
+        final BiometricPrompt.PromptInfo info = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.pin_fp_title_enable))
+                .setDescription("")
+                .setSubtitle("")
+                .setNegativeButtonText(getString(R.string.btn_cancel))
+                .build();
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        final BiometricPrompt prompt = new BiometricPrompt(getActivity(), executor, callback);
+
+        prompt.authenticate(info);
+    }
+
+    @Override
+    public void startFingerprintEnrollment() {
+        Intent intent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            intent = new Intent(Settings.ACTION_FINGERPRINT_ENROLL);
+        } else {
+            intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+        }
+
+        startActivity(intent);
     }
 
     @Override

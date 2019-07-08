@@ -28,28 +28,26 @@ package network.minter.bipwallet.auth.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.view.ViewCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
-import network.minter.bipwallet.auth.AuthModule;
+import network.minter.bipwallet.auth.contract.AuthView;
 import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.helpers.IntentHelper;
@@ -59,7 +57,7 @@ import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class AuthFragment extends BaseInjectFragment implements AuthModule.AuthView {
+public class AuthFragment extends BaseInjectFragment implements AuthView {
     @Inject Provider<AuthPresenter> authPresenterProvider;
     @InjectPresenter AuthPresenter presenter;
     @BindView(R.id.action_advanced_mode) Button actionAdvancedMode;

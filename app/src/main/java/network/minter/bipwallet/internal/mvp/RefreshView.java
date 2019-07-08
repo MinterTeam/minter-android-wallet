@@ -1,6 +1,6 @@
 package network.minter.bipwallet.internal.mvp;
 
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * Stars. 2017

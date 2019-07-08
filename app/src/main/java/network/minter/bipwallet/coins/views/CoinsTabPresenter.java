@@ -27,13 +27,11 @@
 package network.minter.bipwallet.coins.views;
 
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.arellomobile.mvp.InjectViewState;
 
 import org.parceler.Parcel;
 import org.parceler.Parcels;
@@ -45,10 +43,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import moxy.InjectViewState;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.advanced.models.UserAccount;
@@ -57,7 +57,7 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.apis.reactive.ReactiveExplorerGate;
-import network.minter.bipwallet.coins.CoinsTabModule;
+import network.minter.bipwallet.coins.contract.CoinsTabView;
 import network.minter.bipwallet.coins.utils.HistoryTransactionDiffUtil;
 import network.minter.bipwallet.coins.views.rows.ListWithButtonRow;
 import network.minter.bipwallet.internal.Wallet;
@@ -92,7 +92,7 @@ import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddr
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabView> {
+public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
     private final BalanceCurrentState mBalanceCurrentState = new BalanceCurrentState();
     @Inject
@@ -126,7 +126,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
     }
 
     @Override
-    public void attachView(CoinsTabModule.CoinsTabView view) {
+    public void attachView(CoinsTabView view) {
         super.attachView(view);
         myAddresses = secretRepo.getAddresses();
         if (!mLowMemory) {
@@ -356,7 +356,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabModule.CoinsTabV
             mBips = bips;
         }
 
-        void applyTo(CoinsTabModule.CoinsTabView view) {
+        void applyTo(CoinsTabView view) {
             view.setBalance(mIntPart, mFractPart, mBips);
         }
 

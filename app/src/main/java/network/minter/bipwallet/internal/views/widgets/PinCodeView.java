@@ -3,9 +3,6 @@ package network.minter.bipwallet.internal.views.widgets;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
@@ -32,6 +32,7 @@ public class PinCodeView extends FrameLayout {
     @BindView(R.id.pin_indicator_container) ViewGroup pinIndicatorContainer;
     @BindView(R.id.pin_hint) TextView pinHint;
     @BindView(R.id.pin_error) TextView pinError;
+    @BindView(R.id.pin_key_fp) View fingerprintButton;
 
     private List<View> mPinKeys = new ArrayList<>(12);
     /**
@@ -44,10 +45,12 @@ public class PinCodeView extends FrameLayout {
     private OnInputListener mOnInputListener;
     private OnValueListener mOnValueListener;
     private OnValidationErrorListener mOnValidationErrorListener;
+    private OnFingerprintClickListener mOnFingerprintClickListener;
     private Stack<String> mValue = new Stack<>();
     private List<String> mValidValue = new ArrayList<>(4);
     private boolean mEnableValidation = false;
     private boolean mClearReset = false;
+    private boolean mEnableFingerprint = false;
 
     public PinCodeView(@NonNull Context context) {
         super(context);
@@ -102,9 +105,33 @@ public class PinCodeView extends FrameLayout {
                     popValue();
                     updateIndicator();
                 });
+            } else if (isFingerprintKey(((String) key.getTag()))) {
+                key.setOnClickListener(v -> {
+                    if (mEnableFingerprint && mOnFingerprintClickListener != null) {
+                        mOnFingerprintClickListener.onClick(v);
+                    }
+                });
             }
 
         }
+    }
+
+    public void setOnFingerprintClickListener(OnFingerprintClickListener listener) {
+        mOnFingerprintClickListener = listener;
+    }
+
+    public void setEnableFingerprint(boolean enable) {
+        mEnableFingerprint = enable;
+        fingerprintButton.setVisibility(mEnableFingerprint ? VISIBLE : INVISIBLE);
+    }
+
+    public void reset() {
+        setEnabled(true);
+        mValue.clear();
+        mValidValue.clear();
+        Stream.of(mIndicators).forEach(item -> item.getBackground().setState(new int[0]));
+        setPinHint(null);
+        setError(null);
     }
 
     @Override
@@ -264,10 +291,20 @@ public class PinCodeView extends FrameLayout {
         return tag.substring(4).equals("bsp");
     }
 
+    private boolean isFingerprintKey(String tag) {
+        if (!isValidKey(tag)) return false;
+
+        return tag.substring(4).equals("fp");
+    }
+
     private String getKey(String tag) {
         if (!isValidKey(tag)) return null;
 
         return tag.substring(4);
+    }
+
+    public interface OnFingerprintClickListener {
+        void onClick(View view);
     }
 
     public interface OnInputListener {

@@ -32,6 +32,7 @@ import android.content.SharedPreferences;
 import dagger.Module;
 import dagger.Provides;
 import network.minter.bipwallet.internal.helpers.DisplayHelper;
+import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.PrefKeys;
@@ -68,4 +69,12 @@ public class HelpersModule {
     public SoundManager provideSoundManager(Context context, SharedPreferences prefs) {
         return new SoundManager(() -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), context);
     }
+
+    @Provides
+    @WalletApp
+    public FingerprintHelper provideFingerprintHelper(Context context) {
+        return new FingerprintHelper(context);
+    }
+
+
 }

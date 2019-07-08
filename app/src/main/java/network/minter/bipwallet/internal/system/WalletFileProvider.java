@@ -26,7 +26,7 @@
 
 package network.minter.bipwallet.internal.system;
 
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 
 /**
  * minter-android-wallet. 2018

@@ -30,10 +30,10 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.widget.Button;
 
+import androidx.core.view.ViewCompat;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
 
 /**

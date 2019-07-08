@@ -27,15 +27,13 @@
 package network.minter.bipwallet.auth.ui;
 
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 import java.util.Map;
@@ -45,8 +43,10 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.auth.AuthModule;
+import network.minter.bipwallet.auth.contract.SigninView;
 import network.minter.bipwallet.auth.views.SigninPresenter;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
@@ -56,14 +56,14 @@ import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsername
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 
-import static android.support.v4.content.res.ResourcesCompat.getFont;
+import static androidx.core.content.res.ResourcesCompat.getFont;
 
 /**
  * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class SigninActivity extends BaseMvpInjectActivity implements AuthModule.SigninView {
+public class SigninActivity extends BaseMvpInjectActivity implements SigninView {
 
     @Inject Provider<SigninPresenter> presenterProvider;
     @InjectPresenter SigninPresenter presenter;

@@ -25,7 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -33,7 +33,7 @@
     android:layout_height="match_parent"
     >
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         app:layout_constraintTop_toTopOf="parent"
         >
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"/>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="0dp"
@@ -73,7 +73,7 @@
         app:layout_constraintTop_toBottomOf="@id/appbar"
         >
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="false"
@@ -81,7 +81,7 @@
             >
 
             <!--ACCOUNT-->
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/row_coin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                 app:passwordToggleDrawable="@null"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/input_coin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
                     android:textSize="@dimen/text_size_default"
                     tools:text="MINTERBIG (12400000000000.1020304050607080900)"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/dropdown"
@@ -138,7 +138,7 @@
                 app:layout_constraintTop_toBottomOf="@id/row_coin"
                 >
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layout_input_recipient"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -161,7 +161,7 @@
                         android:textSize="@dimen/text_size_default"
                         tools:ignore="LabelFor"
                         tools:text="\@PavelDurov"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
             </FrameLayout>
 
             <ImageView
@@ -179,7 +179,7 @@
                 />
 
             <!--AMOUNT-->
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_input_amount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -195,7 +195,7 @@
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/input_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -208,7 +208,7 @@
                     android:textSize="@dimen/text_size_default"
                     tools:text="1.102030405060708090102030405060708090"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/action_maximum"
@@ -226,7 +226,7 @@
                 />
 
             <!--PAYLOAD-->
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_input_payload"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -242,7 +242,7 @@
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 >
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/input_payload"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -252,7 +252,7 @@
                     android:textSize="@dimen/text_size_default"
                     tools:text="Payload text"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!--LABELS-->
             <View
@@ -341,7 +341,7 @@
                 app:layout_constraintTop_toBottomOf="@id/action"
                 />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

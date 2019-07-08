@@ -1,31 +1,28 @@
 package network.minter.bipwallet.security;
 
-import android.support.annotation.StringRes;
-
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
-import network.minter.bipwallet.internal.views.widgets.PinCodeView;
+import dagger.Module;
 
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
+@Module
 public class SecurityModule {
     public final static int MAX_TRIES_UNTIL_LOCK = 5;
     public final static int LOCK_INTERVAL_S = 60 * 1;
 
     public final static String EXTRA_MODE = "EXTRA_MODE";
     public final static String EXTRA_PIN = "EXTRA_PIN";
-    public final static String EXTRA_START_HOME = "EXTRA_START_HOME";
+    public final static String EXTRA_SUCCESS_INTENT = "EXTRA_SUCCESS_INTENT";
 
     public enum PinMode {
         Creation,
         Confirmation,
         Validation,
-        Deletion;
+        Deletion,
+        Change,
+        EnableFingerprint,
+        DisableFingerprint;
 
         public static PinMode fromInt(int ordinal) {
             for (PinMode m : PinMode.values()) {
@@ -42,17 +39,4 @@ public class SecurityModule {
 
     }
 
-    public interface PinPadView extends MvpView, ErrorViewWithRetry {
-        void setKeypadListener(KeypadListener listener);
-        void setupTitle(@StringRes int title);
-        void setEnableValidation(String pin);
-        void setPinHint(@StringRes int resId);
-        void setOnPinValueListener(PinCodeView.OnValueListener listener);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startConfirmation(int requestCode, String pin);
-        void finishSuccess(boolean startHome);
-        void setOnPinValidationError(PinCodeView.OnValidationErrorListener listener);
-        void setPinError(CharSequence error);
-        void setPinEnabled(boolean enabled);
-    }
 }

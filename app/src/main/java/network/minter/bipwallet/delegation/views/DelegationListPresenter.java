@@ -26,30 +26,27 @@
 
 package network.minter.bipwallet.delegation.views;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.paging.PagedList;
-import android.arch.paging.RxPagedListBuilder;
-
-import com.arellomobile.mvp.InjectViewState;
-
 import javax.inject.Inject;
 
+import androidx.lifecycle.MutableLiveData;
+import androidx.paging.PagedList;
+import androidx.paging.RxPagedListBuilder;
 import io.reactivex.disposables.Disposable;
+import moxy.InjectViewState;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.coins.CoinsTabModule;
+import network.minter.bipwallet.coins.contract.DelegationListView;
 import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
 import network.minter.bipwallet.delegation.adapter.DelegationItem;
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.explorer.models.DelegationInfo;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 05-Jun-19
  */
 @InjectViewState
-public class DelegationListPresenter extends MvpBasePresenter<CoinsTabModule.DelegationListView> {
+public class DelegationListPresenter extends MvpBasePresenter<DelegationListView> {
 
     @Inject
     ExplorerAddressRepository addressRepo;
@@ -69,7 +66,7 @@ public class DelegationListPresenter extends MvpBasePresenter<CoinsTabModule.Del
 
 
     @Override
-    public void attachView(CoinsTabModule.DelegationListView view) {
+    public void attachView(DelegationListView view) {
         super.attachView(view);
         getViewState().setAdapter(mAdapter);
         getViewState().setOnRefreshListener(this::onRefresh);

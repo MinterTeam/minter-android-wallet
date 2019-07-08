@@ -27,7 +27,6 @@
 package network.minter.bipwallet.internal.helpers.forms;
 
 import android.annotation.SuppressLint;
-import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -35,6 +34,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.annimon.stream.Stream;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,8 +120,8 @@ public class InputGroup {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!mTextWatchers.isEmpty()) {
-                    final boolean refValid[] = new boolean[]{false, false};
-                    final boolean hasRelated[] = new boolean[]{false};
+                    final boolean[] refValid = new boolean[]{false, false};
+                    final boolean[] hasRelated = new boolean[]{false};
                     Stream.of(mTextWatchers).forEach(item -> {
                         if (mValidateRelations.containsKey(input)) {
                             hasRelated[0] = true;

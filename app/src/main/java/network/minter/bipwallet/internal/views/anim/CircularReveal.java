@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.TimeInterpolator;
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.DecelerateInterpolator;
@@ -13,6 +12,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
 
+import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 

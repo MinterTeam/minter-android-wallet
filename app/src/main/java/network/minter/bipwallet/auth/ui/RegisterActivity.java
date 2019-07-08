@@ -29,15 +29,13 @@ package network.minter.bipwallet.auth.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 import java.util.Map;
@@ -47,8 +45,10 @@ import javax.inject.Provider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.auth.AuthModule;
+import network.minter.bipwallet.auth.contract.RegisterView;
 import network.minter.bipwallet.auth.views.RegisterPresenter;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
@@ -59,14 +59,14 @@ import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidato
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.views.widgets.ToolbarProgress;
 
-import static android.support.v4.content.res.ResourcesCompat.getFont;
+import static androidx.core.content.res.ResourcesCompat.getFont;
 
 /**
  * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class RegisterActivity extends BaseMvpInjectActivity implements AuthModule.RegisterView {
+public class RegisterActivity extends BaseMvpInjectActivity implements RegisterView {
     @Inject Provider<RegisterPresenter> presenterProvider;
     @InjectPresenter RegisterPresenter presenter;
     @BindView(R.id.layout_input_username) TextInputLayout usernameLayout;

@@ -121,10 +121,14 @@
     <string name="title_pin_set">Set PIN-code</string>
     <string name="title_pin_repeat">Confirm PIN-code</string>
     <string name="title_pin_enter">Enter PIN-code</string>
+    <string name="title_pin_enter_current">Enter current PIN-code</string>
+    <string name="title_pin_enter_new">Enter new PIN-code</string>
     <string name="hint_pin_enter">Please enter a 4-digit PIN</string>
     <string name="hint_pin_repeat">Please confirm your 4-digit PIN</string>
     <string name="error_pin_invalid" formatted="false">Invalid PIN-code. Left %d tries.</string>
+    <string name="error_pin_invalid_simple" formatted="false">Invalid PIN-code.</string>
     <string name="error_pin_locked" formatted="false">Wallet is locked for %s, because you were entered invalid PIN-code %d times in a row.</string>
+    <string name="pin_fp_title_enable">Unlock the wallet with fingerprint</string>
 
     <string name="notification_balance_update_name">Balance updates</string>
     <string name="notification_balance_list_tx_label">View transactions</string>
@@ -208,4 +212,9 @@
     <string name="test_net_warning">This is a testnet.\nNot real money!</string>
     <string name="test_net_warning_link"><u>DOWNLOAD MAINNET APP</u></string>
     <string name="copy">Copy</string>
+    <string name="fingerprint_dialog_enroll_title">Enroll your fingerprints</string>
+    <string name="fingerprint_dialog_enroll_text">Please, check your security settings and enable fingerprint device lock</string>
+    <string name="btn_settings">Open settings</string>
+    <string name="pin_invalid_logout">You\'ve entered invalid PIN-code 5 times in a row. Logging out…</string>
+
 </resources>

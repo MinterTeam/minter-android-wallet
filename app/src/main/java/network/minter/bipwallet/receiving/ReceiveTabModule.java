@@ -26,17 +26,7 @@
 
 package network.minter.bipwallet.receiving;
 
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.view.View;
-
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-
 import dagger.Module;
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
-import network.minter.core.crypto.MinterAddress;
 
 /**
  * minter-android-wallet. 2018
@@ -45,17 +35,4 @@ import network.minter.core.crypto.MinterAddress;
  */
 @Module
 public class ReceiveTabModule {
-    public interface ReceiveTabView extends MvpView, ErrorViewWithRetry {
-        void setQRCode(Bitmap bmp);
-        void setAddress(MinterAddress address);
-        void setOnActionShareQR(View.OnClickListener listener);
-        void setOnActionQR(View.OnClickListener listener);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startQRPreview(View shared, String filePath);
-        void showQRProgress();
-        void hideQRProgress();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startShare(Intent intent);
-        void setOnClickAddress(View.OnClickListener listener);
-    }
 }

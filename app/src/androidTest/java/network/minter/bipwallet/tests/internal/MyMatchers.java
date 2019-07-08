@@ -26,11 +26,10 @@
 
 package network.minter.bipwallet.tests.internal;
 
-import android.support.annotation.RestrictTo;
-import android.support.annotation.StringRes;
-import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.view.ViewParent;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import junit.framework.AssertionFailedError;
 
@@ -38,6 +37,8 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+import androidx.annotation.RestrictTo;
+import androidx.annotation.StringRes;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.system.StringUtil;
 import timber.log.Timber;

@@ -1,8 +1,7 @@
 package network.minter.bipwallet.internal.helpers;
 
-import android.support.annotation.NonNull;
-import android.support.v4.util.SimpleArrayMap;
-
+import androidx.annotation.NonNull;
+import androidx.collection.SimpleArrayMap;
 import network.minter.bipwallet.BuildConfig;
 import timber.log.Timber;
 

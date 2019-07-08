@@ -26,13 +26,12 @@
 
 package network.minter.bipwallet.internal.system.testing;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.test.espresso.IdlingResource;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.test.espresso.IdlingResource;
 import timber.log.Timber;
 
 import static network.minter.core.internal.common.Preconditions.firstNonNull;
@@ -60,7 +59,7 @@ public class CallbackIdlingResource implements IdlingResource {
 
     @Override
     public String getName() {
-        return firstNonNull(mName, this.getClass().getName() + "_" + String.valueOf(sInc.get()));
+        return firstNonNull(mName, this.getClass().getName() + "_" + sInc.get());
     }
 
     @Override

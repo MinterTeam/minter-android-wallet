@@ -27,10 +27,11 @@
 package network.minter.bipwallet.internal.helpers.forms.validators;
 
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.widget.EditText;
 
+import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.annotation.NonNull;
 import network.minter.core.internal.common.CallbackProvider;
 
 /**

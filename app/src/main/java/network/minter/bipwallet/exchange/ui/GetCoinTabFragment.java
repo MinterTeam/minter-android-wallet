@@ -26,19 +26,18 @@
 package network.minter.bipwallet.exchange.ui;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.view.View;
-
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.exchange.ExchangeModule.GetCoinTabView;
+import network.minter.bipwallet.exchange.contract.GetCoinTabView;
 import network.minter.bipwallet.exchange.views.GetCoinTabPresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 

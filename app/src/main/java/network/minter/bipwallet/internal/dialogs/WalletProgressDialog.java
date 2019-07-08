@@ -28,12 +28,12 @@ package network.minter.bipwallet.internal.dialogs;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.widget.TextView;
 
 import com.pnikosis.materialishprogress.ProgressWheel;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;

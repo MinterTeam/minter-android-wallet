@@ -26,14 +26,14 @@
 
 package network.minter.bipwallet.coins.ui;
 
-import android.support.v4.widget.CircularProgressDrawable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.animation.Animation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import timber.log.Timber;
 
 /**

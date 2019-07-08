@@ -32,29 +32,28 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.coins.CoinsTabModule;
+import network.minter.bipwallet.coins.contract.CoinsTabView;
 import network.minter.bipwallet.coins.views.CoinsTabPresenter;
 import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
@@ -75,7 +74,7 @@ import timber.log.Timber;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class CoinsTabFragment extends HomeTabFragment implements CoinsTabModule.CoinsTabView {
+public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
 
     @Inject
     Provider<CoinsTabPresenter> presenterProvider;

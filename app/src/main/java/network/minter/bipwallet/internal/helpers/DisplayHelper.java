@@ -27,12 +27,12 @@
 package network.minter.bipwallet.internal.helpers;
 
 import android.content.Context;
-import android.support.annotation.DimenRes;
-import android.support.annotation.FloatRange;
-import android.support.annotation.Px;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import androidx.annotation.DimenRes;
+import androidx.annotation.FloatRange;
+import androidx.annotation.Px;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 import network.minter.bipwallet.internal.common.annotations.Sp;
 import network.minter.bipwallet.internal.helpers.data.Vec2;

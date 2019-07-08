@@ -31,25 +31,24 @@ import android.app.Dialog;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import org.parceler.Parcels;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.addresses.AddressManageModule;
+import network.minter.bipwallet.addresses.contract.AddressItemView;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.addresses.views.AddressItemPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
@@ -62,7 +61,7 @@ import network.minter.bipwallet.internal.system.ActivityBuilder;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class AddressItemActivity extends BaseMvpInjectActivity implements AddressManageModule.AddressItemView {
+public class AddressItemActivity extends BaseMvpInjectActivity implements AddressItemView {
     public final static String EXTRA_ADDRESS_DATA = "EXTRA_ADDRESS_DATA";
     public final static String EXTRA_ADDRESS_NAME = "EXTRA_ADDRESS_NAME";
 

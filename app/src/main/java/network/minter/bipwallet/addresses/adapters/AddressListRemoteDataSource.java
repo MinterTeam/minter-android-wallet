@@ -26,13 +26,12 @@
 
 package network.minter.bipwallet.addresses.adapters;
 
-import android.arch.paging.PageKeyedDataSource;
-import android.support.annotation.NonNull;
-
 import com.annimon.stream.Stream;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.paging.PageKeyedDataSource;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;

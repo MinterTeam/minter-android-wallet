@@ -32,10 +32,11 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.media.ExifInterface;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import androidx.exifinterface.media.ExifInterface;
 
 /**
  * Dogsy. 2018

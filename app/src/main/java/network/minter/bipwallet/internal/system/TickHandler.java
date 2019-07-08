@@ -26,14 +26,13 @@
 
 package network.minter.bipwallet.internal.system;
 
-import android.support.annotation.NonNull;
-
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;

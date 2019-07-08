@@ -30,10 +30,10 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.test.runner.AndroidJUnitRunner;
 
 import com.squareup.rx2.idler.Rx2Idler;
 
+import androidx.test.runner.AndroidJUnitRunner;
 import io.reactivex.plugins.RxJavaPlugins;
 
 /**

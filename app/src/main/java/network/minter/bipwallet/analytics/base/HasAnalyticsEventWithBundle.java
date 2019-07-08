@@ -27,9 +27,9 @@
 package network.minter.bipwallet.analytics.base;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 
+import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 import network.minter.bipwallet.analytics.AppEvent;
 
 

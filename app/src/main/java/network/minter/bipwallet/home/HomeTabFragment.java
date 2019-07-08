@@ -27,12 +27,12 @@
 package network.minter.bipwallet.home;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.View;
 
 import javax.annotation.Nullable;
 
+import androidx.annotation.NonNull;
 import butterknife.BindView;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseFragment;

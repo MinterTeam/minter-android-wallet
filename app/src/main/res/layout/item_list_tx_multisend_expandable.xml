@@ -24,7 +24,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -33,7 +33,7 @@
     android:clickable="true"
     android:focusable="true">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
             app:layout_constraintStart_toEndOf="@id/item_title"
             app:layout_constraintTop_toBottomOf="@id/item_amount"
             tools:text="STBX" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/sep"
@@ -133,7 +133,7 @@
         android:background="@drawable/shape_bottom_separator"
         app:layout_constraintTop_toBottomOf="@id/layout_info" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_details"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -253,6 +253,6 @@
             app:layout_constraintTop_toBottomOf="@id/action"
 
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

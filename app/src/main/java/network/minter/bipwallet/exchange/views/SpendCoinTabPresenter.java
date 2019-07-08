@@ -25,17 +25,16 @@
  */
 package network.minter.bipwallet.exchange.views;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import java.util.List;
 
 import javax.inject.Inject;
 
+import moxy.InjectViewState;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
-import network.minter.bipwallet.exchange.ExchangeModule.SpendCoinTabView;
+import network.minter.bipwallet.exchange.contract.SpendCoinTabView;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.models.operational.OperationType;

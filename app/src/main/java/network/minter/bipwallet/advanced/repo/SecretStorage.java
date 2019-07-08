@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.advanced.repo;
 
-import android.support.annotation.NonNull;
-
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import androidx.annotation.NonNull;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.core.bip39.HDKey;

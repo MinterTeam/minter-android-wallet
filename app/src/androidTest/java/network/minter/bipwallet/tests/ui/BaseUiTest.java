@@ -26,12 +26,11 @@
 
 package network.minter.bipwallet.tests.ui;
 
-import android.support.test.espresso.ViewInteraction;
-
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import androidx.test.espresso.ViewInteraction;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import network.minter.bipwallet.R;
@@ -39,8 +38,8 @@ import network.minter.bipwallet.tests.internal.TestWallet;
 import network.minter.core.bip39.MnemonicResult;
 import network.minter.core.bip39.NativeBip39;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdEQ;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;

@@ -26,10 +26,9 @@
 
 package network.minter.bipwallet.coins.utils;
 
-import android.support.v7.util.DiffUtil;
-
 import java.util.List;
 
+import androidx.recyclerview.widget.DiffUtil;
 import network.minter.explorer.models.HistoryTransaction;
 
 /**

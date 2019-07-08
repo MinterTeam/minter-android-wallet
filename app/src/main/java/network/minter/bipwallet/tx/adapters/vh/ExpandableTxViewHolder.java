@@ -27,11 +27,6 @@
 package network.minter.bipwallet.tx.adapters.vh;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.Rect;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +37,9 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.util.Locale;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;

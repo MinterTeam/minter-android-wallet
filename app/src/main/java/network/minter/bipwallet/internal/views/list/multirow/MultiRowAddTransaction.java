@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.internal.views.list.multirow;
 
-import android.support.annotation.IntDef;
-
 import com.annimon.stream.Stream;
 
 import java.lang.annotation.Retention;
@@ -35,6 +33,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import androidx.annotation.IntDef;
 import timber.log.Timber;
 
 /**

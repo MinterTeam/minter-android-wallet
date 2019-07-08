@@ -27,19 +27,19 @@
 package network.minter.bipwallet.settings.ui;
 
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import com.google.android.material.textfield.TextInputLayout;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
@@ -47,17 +47,17 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.CompareValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.LengthValidator;
-import network.minter.bipwallet.settings.SettingsTabModule;
+import network.minter.bipwallet.settings.contract.PasswordChangeMigrationView;
 import network.minter.bipwallet.settings.views.migration.PasswordChangeMigrationPresenter;
 
-import static android.support.v4.content.res.ResourcesCompat.getFont;
+import static androidx.core.content.res.ResourcesCompat.getFont;
 
 /**
  * minter-android-wallet. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class PasswordChangeMigrationActivity extends BaseMvpInjectActivity implements SettingsTabModule.PasswordChangeMigrationView {
+public class PasswordChangeMigrationActivity extends BaseMvpInjectActivity implements PasswordChangeMigrationView {
 
     @Inject Provider<PasswordChangeMigrationPresenter> presenterProvider;
     @InjectPresenter PasswordChangeMigrationPresenter presenter;

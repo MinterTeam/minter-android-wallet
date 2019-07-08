@@ -26,10 +26,11 @@
 
 package network.minter.bipwallet.tx.adapters.vh;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * minter-android-wallet. 2018

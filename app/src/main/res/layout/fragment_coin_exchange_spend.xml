@@ -34,7 +34,7 @@
     android:id="@+id/exchange_root"
     >
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/root"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -48,7 +48,7 @@
 
 
         <!--SOURCE COIN-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_outgoing_coin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
             app:passwordToggleDrawable="@null"
             >
 
-            <android.support.v7.widget.AppCompatEditText
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/input_outgoing_coin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                 android:textSize="@dimen/text_size_default"
                 tools:text="NIOCNIOCNIAAA (22)"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
             android:contentDescription="@string/cd_choose_account"
@@ -95,7 +95,7 @@
 
 
         <!--AMOUNT-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_amount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -110,7 +110,7 @@
             app:passwordToggleDrawable="@null"
             >
 
-            <android.support.v7.widget.AppCompatEditText
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/input_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                 tools:text="1.102030405060708090102030405060708090"
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/action_maximum"
@@ -167,7 +167,7 @@
             />
 
         <!--INCOMING COIN-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_incoming_coin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -195,9 +195,9 @@
                 tools:text="COINCOIAAAAA"
                 android:inputType="textVisiblePassword"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_calculation"
             android:visibility="gone"
             tools:visibility="visible"
@@ -244,7 +244,7 @@
                 app:layout_constraintTop_toBottomOf="@id/calculation_title"
                 tools:text="1 000 288 859 454 671 683 189 102 649 595 518 589 437 586 374 105 388 329 571 031 220 769 944 178 978 247 137 569 836 967 570 972 662 549 939 674 191 668 790 939 167 959 399 268 002 355 388 000 949 308 312 784 846 611 858 588 290 828.3882 MNT"
                 />
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:id="@+id/label_guide"
@@ -333,5 +333,5 @@
             app:layout_constraintTop_toBottomOf="@id/action"
             />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -24,14 +24,14 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginBottom="@dimen/margin_edges_half"
-    android:layout_marginTop="@dimen/margin_edges_half"
-    android:background="@android:color/white"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_edges_half"
+    android:layout_marginBottom="@dimen/margin_edges_half"
+    android:background="@android:color/white">
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
         android:id="@+id/item_avatar"
@@ -107,4 +107,4 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         android:orientation="vertical"/>
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

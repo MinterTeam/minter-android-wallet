@@ -29,12 +29,12 @@ package network.minter.bipwallet.exchange.ui.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
 
+import androidx.annotation.NonNull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;

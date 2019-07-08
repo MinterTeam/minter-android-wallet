@@ -26,12 +26,11 @@
 
 package network.minter.bipwallet.exchange.views;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import javax.inject.Inject;
 
+import moxy.InjectViewState;
 import network.minter.bipwallet.analytics.AppEvent;
-import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.contract.ConvertCoinView;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 
 /**
@@ -40,7 +39,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.ConvertCoinView> {
+public class ConvertCoinPresenter extends MvpBasePresenter<ConvertCoinView> {
     private int mLastPage = 0;
 
     @Inject
@@ -48,7 +47,7 @@ public class ConvertCoinPresenter extends MvpBasePresenter<ExchangeModule.Conver
     }
 
     @Override
-    public void attachView(ExchangeModule.ConvertCoinView view) {
+    public void attachView(ConvertCoinView view) {
         super.attachView(view);
         getViewState().setCurrentPage(mLastPage);
     }

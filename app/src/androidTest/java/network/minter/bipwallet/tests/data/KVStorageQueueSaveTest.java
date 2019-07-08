@@ -26,16 +26,15 @@
 
 package network.minter.bipwallet.tests.data;
 
-import android.support.annotation.NonNull;
-import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
+import androidx.annotation.NonNull;
+import androidx.test.filters.SmallTest;
+import androidx.test.runner.AndroidJUnit4;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.tests.internal.TestWallet;
 

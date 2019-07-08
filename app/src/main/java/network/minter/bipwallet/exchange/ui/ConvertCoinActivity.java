@@ -27,19 +27,10 @@
 package network.minter.bipwallet.exchange.ui;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +38,19 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.contract.ConvertCoinView;
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
@@ -60,7 +60,7 @@ import network.minter.bipwallet.internal.helpers.ContextHelper;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class ConvertCoinActivity extends BaseMvpInjectActivity implements ExchangeModule.ConvertCoinView {
+public class ConvertCoinActivity extends BaseMvpInjectActivity implements ConvertCoinView {
 
     private final static List<Class<? extends BaseCoinTabFragment>> sTabs = new ArrayList<Class<? extends BaseCoinTabFragment>>() {{
         add(SpendCoinTabFragment.class);

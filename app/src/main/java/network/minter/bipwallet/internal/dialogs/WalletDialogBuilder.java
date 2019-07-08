@@ -29,9 +29,10 @@ package network.minter.bipwallet.internal.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.StringRes;
 
 import java.lang.ref.WeakReference;
+
+import androidx.annotation.StringRes;
 
 /**
  * minter-android-wallet. 2018

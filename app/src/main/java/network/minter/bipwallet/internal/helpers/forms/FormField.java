@@ -1,10 +1,9 @@
 package network.minter.bipwallet.internal.helpers.forms;
 
-import android.support.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.helpers.forms.validators.BaseValidator;
 
@@ -142,7 +141,7 @@ public class FormField {
 
     @NonNull
     public String getErrorsString(boolean labelPrefix) {
-        final StringBuilder sb = new StringBuilder("");
+        final StringBuilder sb = new StringBuilder();
         for (String err : getErrors()) {
             if (labelPrefix && getLabel() != null) {
                 sb.append(getLabel());

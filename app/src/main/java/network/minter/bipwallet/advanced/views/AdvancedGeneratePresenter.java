@@ -29,14 +29,13 @@ package network.minter.bipwallet.advanced.views;
 import android.content.Context;
 import android.content.Intent;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import java.security.SecureRandom;
 
 import javax.inject.Inject;
 
+import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.AdvancedModeModule;
+import network.minter.bipwallet.advanced.contract.GenerateView;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
 import network.minter.bipwallet.internal.Wallet;
@@ -57,7 +56,7 @@ import static network.minter.bipwallet.internal.helpers.ContextHelper.copyToClip
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModule.GenerateView> {
+public class AdvancedGeneratePresenter extends MvpBasePresenter<GenerateView> {
 
     @Inject Context context;
     @Inject SecretStorage repo;
@@ -81,7 +80,7 @@ public class AdvancedGeneratePresenter extends MvpBasePresenter<AdvancedModeModu
 
     //TODO: refactoring
     @Override
-    public void attachView(AdvancedModeModule.GenerateView view) {
+    public void attachView(GenerateView view) {
         super.attachView(view);
 
         // if basic user, give secure variant selector

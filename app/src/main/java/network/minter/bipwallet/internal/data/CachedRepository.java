@@ -26,15 +26,14 @@
 
 package network.minter.bipwallet.internal.data;
 
-import android.support.annotation.CallSuper;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.CallSuper;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;

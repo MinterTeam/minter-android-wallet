@@ -34,7 +34,7 @@
     android:id="@+id/exchange_root"
     >
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -45,7 +45,7 @@
         >
 
         <!--INCOMING COIN-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_incoming_coin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -74,10 +74,10 @@
                 android:textSize="@dimen/text_size_default"
                 tools:text="COINCOIAAAAA"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!--AMOUNT-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_amount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
             app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
             >
 
-            <android.support.v7.widget.AppCompatEditText
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/input_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
                 tools:text="1.102030405060708090102030405060708090"
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/action_maximum"
@@ -151,7 +151,7 @@
             />
 
         <!--SOURCE COIN-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_outgoing_coin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
             app:passwordToggleDrawable="@null"
             >
 
-            <android.support.v7.widget.AppCompatEditText
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/input_outgoing_coin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -182,7 +182,7 @@
                 android:textSize="@dimen/text_size_default"
                 tools:text="NIOCNIOCNIAAA"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
             android:id="@+id/dropdown"
@@ -196,7 +196,7 @@
             app:srcCompat="@drawable/ic_drop_down_grey"
             />
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_calculation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -249,7 +249,7 @@
                 app:layout_constraintTop_toBottomOf="@id/calculation_title"
                 tools:text="1500 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000 .3304 000  000  000  000  000  000  BLTCOIN"
                 />
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:id="@+id/label_guide"
@@ -336,5 +336,5 @@
             app:layout_constraintTop_toBottomOf="@id/action"
             />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

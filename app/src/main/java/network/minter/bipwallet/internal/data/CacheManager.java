@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.internal.data;
 
-import android.support.annotation.Nullable;
-
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.exceptions.Exceptions;

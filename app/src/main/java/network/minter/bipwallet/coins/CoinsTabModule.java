@@ -26,71 +26,13 @@
 
 package network.minter.bipwallet.coins;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
-import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy;
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
-
 import dagger.Module;
-import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
-import network.minter.bipwallet.internal.adapter.LoadState;
-import network.minter.bipwallet.internal.mvp.ProgressView;
-import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Module
 public interface CoinsTabModule {
 
-    interface CoinsTabView extends MvpView {
-        void setAvatar(String url);
-        void setUsername(CharSequence name);
-        void setBalance(String intPart, String fractionalPart, CharSequence coinName);
-        void setAdapter(RecyclerView.Adapter<?> adapter);
-        void setOnAvatarClick(View.OnClickListener listener);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startTransactionList();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startDelegationList();
-        void hideAvatar();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startConvertCoins();
-        void startTab(int tab);
-
-        void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
-        void showRefreshProgress();
-        void hideRefreshProgress();
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startExplorer(String hash);
-        void scrollTop();
-
-        void setDelegationAmount(String amount);
-    }
-
-    interface TransactionListView extends MvpView, ProgressView {
-        void setAdapter(RecyclerView.Adapter<?> adapter);
-        void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
-        void showRefreshProgress();
-        void hideRefreshProgress();
-        void scrollTo(int pos);
-        @StateStrategyType(OneExecutionStateStrategy.class)
-        void startExplorer(String hash);
-        void syncProgress(MutableLiveData<LoadState> loadState);
-    }
-
-    interface DelegationListView extends MvpView, ProgressView {
-        void setAdapter(RecyclerView.Adapter<?> adapter);
-        void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener);
-        void showRefreshProgress();
-        void hideRefreshProgress();
-        void scrollTo(int pos);
-        void syncProgress(MutableLiveData<LoadState> loadState);
-    }
 }

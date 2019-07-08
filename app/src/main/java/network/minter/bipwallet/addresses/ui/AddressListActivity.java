@@ -27,23 +27,22 @@
 package network.minter.bipwallet.addresses.ui;
 
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.addresses.AddressManageModule;
+import network.minter.bipwallet.addresses.contract.AddressListView;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.addresses.views.AddressListPresenter;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
@@ -56,7 +55,7 @@ import network.minter.bipwallet.tx.ui.TransactionListActivity;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class AddressListActivity extends BaseMvpInjectActivity implements AddressManageModule.AddressListView {
+public class AddressListActivity extends BaseMvpInjectActivity implements AddressListView {
 
     @Inject Provider<AddressListPresenter> presenterProvider;
     @InjectPresenter AddressListPresenter presenter;

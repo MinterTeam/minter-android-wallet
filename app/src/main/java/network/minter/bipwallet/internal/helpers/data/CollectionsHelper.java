@@ -27,8 +27,6 @@
 package network.minter.bipwallet.internal.helpers.data;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import com.annimon.stream.Stream;
@@ -39,6 +37,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * minter-android-wallet. 2018

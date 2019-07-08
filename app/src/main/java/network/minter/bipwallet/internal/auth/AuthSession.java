@@ -26,13 +26,12 @@
 
 package network.minter.bipwallet.internal.auth;
 
-import android.support.annotation.NonNull;
-
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import io.reactivex.subjects.PublishSubject;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.core.internal.common.Lazy;

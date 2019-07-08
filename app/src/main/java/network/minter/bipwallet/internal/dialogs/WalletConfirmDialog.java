@@ -30,14 +30,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.IOException;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
@@ -124,6 +124,10 @@ public final class WalletConfirmDialog extends WalletDialog {
             return this;
         }
 
+        public Builder setText(@StringRes int resId) {
+            return setText(getContext().getString(resId));
+        }
+
         public Builder setText(String text, Object... args) {
             mText = String.format(text, args);
             return this;
@@ -137,11 +141,11 @@ public final class WalletConfirmDialog extends WalletDialog {
         public Builder setText(Throwable t) {
             if (t instanceof HttpException) {
                 if (((HttpException) t).code() >= 500 && ((HttpException) t).code() < 1000) {
-                    setTitle(mTitle + " (server error " + String.valueOf(((HttpException) t).code()) + ")");
+                    setTitle(mTitle + " (server error " + ((HttpException) t).code() + ")");
                 } else if (((HttpException) t).code() < 500 && ((HttpException) t).code() > 0) {
-                    setTitle(mTitle + " (client error " + String.valueOf(((HttpException) t).code()) + ")");
+                    setTitle(mTitle + " (client error " + ((HttpException) t).code() + ")");
                 } else {
-                    setTitle(mTitle + " (network error " + String.valueOf(((HttpException) t).code()) + ")");
+                    setTitle(mTitle + " (network error " + ((HttpException) t).code() + ")");
                 }
                 try {
                     String out = ((HttpException) t).response().errorBody().string() + "\n";
@@ -156,11 +160,11 @@ public final class WalletConfirmDialog extends WalletDialog {
             } else if (t instanceof NetworkException) {
                 final int statusCode = ((NetworkException) t).getStatusCode();
                 if (statusCode >= 500 && statusCode < 1000) {
-                    setTitle(mTitle + " (server error " + String.valueOf(statusCode) + ")");
+                    setTitle(mTitle + " (server error " + statusCode + ")");
                 } else if (statusCode < 500 && statusCode > 0) {
-                    setTitle(mTitle + " (client error " + String.valueOf(statusCode) + ")");
+                    setTitle(mTitle + " (client error " + statusCode + ")");
                 } else {
-                    setTitle(mTitle + " (network error " + String.valueOf(statusCode) + ")");
+                    setTitle(mTitle + " (network error " + statusCode + ")");
                 }
                 mText = t.getMessage();
 

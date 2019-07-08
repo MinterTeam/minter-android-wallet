@@ -1,8 +1,9 @@
 package network.minter.bipwallet.internal.views.list;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.AttributeSet;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 /**
  * Minter. 2017

@@ -1,8 +1,9 @@
 package network.minter.bipwallet.internal.views.list.multirow;
 
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.view.View;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 
 /**
  * Dogsy. 2018

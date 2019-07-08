@@ -32,10 +32,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.AppCompatEditText;
 import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -45,17 +41,21 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
@@ -70,10 +70,10 @@ import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthVali
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
-import network.minter.bipwallet.sending.SendTabModule;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
+import network.minter.bipwallet.sending.contract.SendView;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
 import network.minter.core.crypto.MinterAddress;
@@ -91,7 +91,7 @@ import permissions.dispatcher.RuntimePermissions;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @RuntimePermissions
-public class SendTabFragment extends HomeTabFragment implements SendTabModule.SendView {
+public class SendTabFragment extends HomeTabFragment implements SendView {
     public final static String IDLE_SEND_CONFIRM_DIALOG = "IDLE_SEND_CONFIRM_DIALOG";
     public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
     public final static String IDLE_SEND_WAIT_GAS = "IDLE_SEND_WAIT_GAS";

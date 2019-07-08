@@ -28,11 +28,10 @@ package network.minter.bipwallet.auth.views;
 
 import android.view.View;
 
-import com.arellomobile.mvp.InjectViewState;
-
 import javax.inject.Inject;
 
-import network.minter.bipwallet.auth.AuthModule;
+import moxy.InjectViewState;
+import network.minter.bipwallet.auth.contract.AuthView;
 import network.minter.bipwallet.internal.di.annotations.FragmentScope;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 
@@ -43,14 +42,14 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
  */
 @InjectViewState
 @FragmentScope
-public class AuthPresenter extends MvpBasePresenter<AuthModule.AuthView> {
+public class AuthPresenter extends MvpBasePresenter<AuthView> {
 
     @Inject
     public AuthPresenter() {
     }
 
     @Override
-    public void attachView(AuthModule.AuthView view) {
+    public void attachView(AuthView view) {
         super.attachView(view);
         getViewState().setOnAdvancedMode(this::onClickAdvancedMode);
         getViewState().setOnHelp(this::onClickHelp);

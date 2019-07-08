@@ -29,7 +29,6 @@ package network.minter.bipwallet.sending.views;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.DrawableRes;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -37,7 +36,6 @@ import android.widget.EditText;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.arellomobile.mvp.InjectViewState;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -49,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import androidx.annotation.DrawableRes;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -57,6 +56,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import moxy.InjectViewState;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.AccountItem;
 import network.minter.bipwallet.advanced.models.SecretData;
@@ -75,7 +75,7 @@ import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
-import network.minter.bipwallet.sending.SendTabModule;
+import network.minter.bipwallet.sending.contract.SendView;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
@@ -126,7 +126,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFro
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
+public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private static final int REQUEST_CODE_QR_SCAN = 101;
     private static final BigDecimal PAYLOAD_FEE = BigDecimal.valueOf(0.002);
     @Inject
@@ -181,7 +181,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendTabModule.SendView> {
     }
 
     @Override
-    public void attachView(SendTabModule.SendView view) {
+    public void attachView(SendView view) {
         super.attachView(view);
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);

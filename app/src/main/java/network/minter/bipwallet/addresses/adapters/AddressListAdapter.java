@@ -26,13 +26,6 @@
 
 package network.minter.bipwallet.addresses.adapters;
 
-import android.arch.lifecycle.Observer;
-import android.arch.paging.PagedListAdapter;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.recyclerview.extensions.AsyncDifferConfig;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +33,13 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.AsyncDifferConfig;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
@@ -107,7 +107,7 @@ public class AddressListAdapter extends PagedListAdapter<AddressItem, AddressLis
         if (item.isMain || position == 0) {
             holder.addressTitle.setText("Main address");
         } else {
-            holder.addressTitle.setText("Address #" + String.valueOf(position + 1));
+            holder.addressTitle.setText("Address #" + (position + 1));
         }
         holder.defSwitch.setChecked(item.isMain || position == 0);
 

@@ -27,14 +27,15 @@
 package network.minter.bipwallet.settings.views;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Switch;
 
 import com.annimon.stream.Stream;
-import com.arellomobile.mvp.InjectViewState;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.IOException;
@@ -44,9 +45,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.biometric.BiometricPrompt;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import moxy.InjectViewState;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
@@ -59,6 +63,7 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
+import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.PrefKeys;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmailValidator;
@@ -68,7 +73,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.security.SecurityModule;
-import network.minter.bipwallet.settings.SettingsTabModule;
+import network.minter.bipwallet.settings.contract.SettingsTabView;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.bipwallet.settings.repo.MinterBotRepository;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
@@ -90,7 +95,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileE
  */
 @HomeScope
 @InjectViewState
-public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.SettingsTabView> {
+public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
     private final static int REQUEST_ATTACH_AVATAR = CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
     private final static int REQUEST_CREATE_PIN_CODE = 1002;
     private final static int REQUEST_VERIFY_PIN_CODE = 1003;
@@ -101,8 +106,9 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
     @Inject ProfileAuthRepository profileAuthRepo;
     @Inject SharedPreferences prefs;
+    @Inject SettingsManager settings;
+    @Inject FingerprintHelper fingerHelper;
     private String mSourceUsername = null;
-
     private MultiRowAdapter mMainAdapter, mAdditionalAdapter, mSecurityAdapter;
     private ChangeAvatarRow mChangeAvatarRow;
     private Map<String, SettingsButtonRow> mMainSettingsRows = new LinkedHashMap<>();
@@ -121,8 +127,9 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     @Override
-    public void attachView(SettingsTabModule.SettingsTabView view) {
+    public void attachView(SettingsTabView view) {
         super.attachView(view);
+//        getViewState().setFingerprintHandler(fingerHelper);
         profileCachedRepo.update(profile -> mMainAdapter.notifyDataSetChanged());
         getViewState().setMainAdapter(mMainAdapter);
         getViewState().setAdditionalAdapter(mAdditionalAdapter);
@@ -143,6 +150,11 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             });
         }
 
+    }
+
+    @Override
+    public void detachView(SettingsTabView view) {
+        super.detachView(view);
     }
 
     @Override
@@ -188,7 +200,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             if (resultCode == Activity.RESULT_OK) {
                 Timber.d("PIN successfully handled");
             }
-        } else if (requestCode == REQUEST_VERIFY_PIN_CODE && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == REQUEST_VERIFY_PIN_CODE) {
 
         }
     }
@@ -201,8 +213,6 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
         Wallet.app().prefs().edit().clear().apply();
         getViewState().startLogin();
     }
-
-    @Inject SettingsManager settings;
 
     @Override
     protected void onFirstViewAttach() {
@@ -221,7 +231,11 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
             changePinRow.setEnabled(secretStorage.hasPinCode());
 
             mSecurityAdapter.addRow(enablePinRow);
-            mSecurityAdapter.addRow(fingerprintRow);
+
+            if (fingerHelper.isHardwareDetected()) {
+                mSecurityAdapter.addRow(fingerprintRow);
+            }
+
             mSecurityAdapter.addRow(changePinRow);
         }
 
@@ -246,18 +260,57 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     private void onChangePinClick(View view, View view1, String s) {
-
+        getViewState().startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Creation);
     }
 
     private void onEnableFingerprint(View view, Boolean enabled) {
-        getViewState().startPinCodeManager(REQUEST_VERIFY_PIN_CODE, SecurityModule.PinMode.Validation);
-
         if (enabled) {
+            if (!fingerHelper.hasEnrolledFingerprints()) {
+                getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
+                        .setText(R.string.fingerprint_dialog_enroll_text)
+                        .setPositiveAction(R.string.btn_settings, this::openFingerprintEnroll)
+                        .setNegativeAction(R.string.btn_cancel, (d, w) -> d.dismiss())
+                        .create());
 
-        } else {
+                return;
+            }
 
+            getViewState().startBiometricPrompt(new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                    super.onAuthenticationError(errorCode, errString);
+                    view.post(() -> {
+                        ((Switch) view).setChecked(false);
+                    });
+                    if (errorCode == BiometricPrompt.ERROR_CANCELED || errorCode == BiometricPrompt.ERROR_USER_CANCELED || errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                        return;
+                    }
+
+                    Timber.e("Unable to auth FP: [%d] %s", errorCode, errString);
+                }
+
+                @Override
+                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+                    prefs.edit().putBoolean(PrefKeys.ENABLE_FP, true).apply();
+                    Timber.e("Success to auth FP");
+                }
+
+                @Override
+                public void onAuthenticationFailed() {
+                    super.onAuthenticationFailed();
+                    Timber.e("FP auth failed");
+                }
+            });
+
+            return;
         }
 
+        prefs.edit().putBoolean(PrefKeys.ENABLE_FP, false).apply();
+    }
+
+    private void openFingerprintEnroll(DialogInterface dialogInterface, int i) {
+        getViewState().startFingerprintEnrollment();
     }
 
     private void onEnablePinCode(View view, Boolean enabled) {
@@ -364,7 +417,6 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabModule.Set
     }
 
     /**
-     *
      * @param dialog
      * @param fieldName
      * @param value

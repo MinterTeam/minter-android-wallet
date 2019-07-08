@@ -27,9 +27,9 @@
 package network.minter.bipwallet.internal.views.widgets;
 
 import android.net.Uri;
-import android.support.annotation.DimenRes;
-import android.support.annotation.DrawableRes;
 
+import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 
 

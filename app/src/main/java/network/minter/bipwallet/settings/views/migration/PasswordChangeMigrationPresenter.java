@@ -26,12 +26,9 @@
 
 package network.minter.bipwallet.settings.views.migration;
 
-import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
-
-import com.arellomobile.mvp.InjectViewState;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -39,6 +36,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
@@ -46,6 +44,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import moxy.InjectViewState;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
@@ -55,7 +54,7 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
-import network.minter.bipwallet.settings.SettingsTabModule;
+import network.minter.bipwallet.settings.contract.PasswordChangeMigrationView;
 import network.minter.core.crypto.EncryptedString;
 import network.minter.core.crypto.HashUtil;
 import network.minter.profile.models.PasswordChangeRequest;
@@ -74,7 +73,7 @@ import static network.minter.bipwallet.settings.views.migration.MigrationExcepti
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsTabModule.PasswordChangeMigrationView> implements HasAnalyticsEvent {
+public class PasswordChangeMigrationPresenter extends MvpBasePresenter<PasswordChangeMigrationView> implements HasAnalyticsEvent {
 
     @Inject ProfileRepository profileRepo;
     @Inject ProfileAddressRepository addressRepo;
@@ -92,7 +91,7 @@ public class PasswordChangeMigrationPresenter extends MvpBasePresenter<SettingsT
     }
 
     @Override
-    public void attachView(SettingsTabModule.PasswordChangeMigrationView view) {
+    public void attachView(PasswordChangeMigrationView view) {
         super.attachView(view);
     }
 

@@ -26,9 +26,6 @@
 
 package network.minter.bipwallet.coins.repos;
 
-import android.support.annotation.GuardedBy;
-import android.support.annotation.NonNull;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import androidx.annotation.GuardedBy;
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;

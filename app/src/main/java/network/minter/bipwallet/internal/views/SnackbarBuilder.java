@@ -4,17 +4,18 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.ColorRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import network.minter.bipwallet.R;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
@@ -59,7 +60,7 @@ public class SnackbarBuilder {
         mContainerView = activity.findViewById(containerId);
     }
 
-    public SnackbarBuilder(android.support.v4.app.Fragment fragment) {
+    public SnackbarBuilder(androidx.fragment.app.Fragment fragment) {
         mContext = fragment.getActivity();
         mContainerView = fragment.getView();
     }
@@ -189,8 +190,8 @@ public class SnackbarBuilder {
             }
         }
 
-        mTextView = mSnackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        mAction = mSnackbar.getView().findViewById(android.support.design.R.id.snackbar_action);
+        mTextView = mSnackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+        mAction = mSnackbar.getView().findViewById(com.google.android.material.R.id.snackbar_action);
         mAction.setEnabled(mEnableAction);
         mAction.setAlpha(mEnableAction ? 1f : 0.3f);
 

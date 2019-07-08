@@ -32,7 +32,6 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,6 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Type;
 
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 

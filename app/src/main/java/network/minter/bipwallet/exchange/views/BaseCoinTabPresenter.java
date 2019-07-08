@@ -26,8 +26,6 @@
 package network.minter.bipwallet.exchange.views;
 
 import android.app.Activity;
-import android.support.annotation.CallSuper;
-import android.support.v4.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 
@@ -40,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.CallSuper;
+import androidx.core.util.Pair;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -56,7 +56,7 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.exchange.ExchangeCalculator;
-import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.contract.BaseCoinTabView;
 import network.minter.bipwallet.exchange.models.ConvertTransactionData;
 import network.minter.bipwallet.exchange.ui.BaseCoinTabFragment;
 import network.minter.bipwallet.exchange.ui.dialogs.WalletTxConvertStartDialog;
@@ -95,7 +95,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public abstract class BaseCoinTabPresenter<V extends ExchangeModule.BaseCoinTabView> extends MvpBasePresenter<V> {
+public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends MvpBasePresenter<V> {
     protected final SecretStorage mSecretStorage;
     protected final CachedRepository<UserAccount, AccountStorage> mAccountStorage;
     protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;

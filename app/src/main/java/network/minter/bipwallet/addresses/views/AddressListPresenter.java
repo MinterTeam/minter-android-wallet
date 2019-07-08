@@ -26,20 +26,19 @@
 
 package network.minter.bipwallet.addresses.views;
 
-import android.arch.paging.PagedList;
-import android.arch.paging.RxPagedListBuilder;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.view.View;
-
-import com.arellomobile.mvp.InjectViewState;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.paging.PagedList;
+import androidx.paging.RxPagedListBuilder;
 import io.reactivex.disposables.Disposable;
-import network.minter.bipwallet.addresses.AddressManageModule;
+import moxy.InjectViewState;
 import network.minter.bipwallet.addresses.adapters.AddressListAdapter;
 import network.minter.bipwallet.addresses.adapters.AddressListFactory;
+import network.minter.bipwallet.addresses.contract.AddressListView;
 import network.minter.bipwallet.addresses.models.AddressItem;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
@@ -57,7 +56,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
-public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.AddressListView> implements HasAnalyticsEvent {
+public class AddressListPresenter extends MvpBasePresenter<AddressListView> implements HasAnalyticsEvent {
     private final static int REQUEST_ADDRESS_ITEM = 100;
     private final static int REQUEST_FOR_RESULT = 200;
     @Inject SecretStorage secretRepo;
@@ -114,7 +113,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressManageModule.A
     }
 
     @Override
-    public void attachView(AddressManageModule.AddressListView view) {
+    public void attachView(AddressListView view) {
         super.attachView(view);
         getViewState().setAdapter(mAdapter);
     }

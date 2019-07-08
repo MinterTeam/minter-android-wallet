@@ -30,11 +30,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.support.annotation.RawRes;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.RawRes;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.common.Lazy;
 

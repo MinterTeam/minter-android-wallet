@@ -26,11 +26,10 @@
 
 package network.minter.bipwallet.internal.paging;
 
-import android.arch.paging.PositionalDataSource;
-import android.support.annotation.NonNull;
-
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.paging.PositionalDataSource;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 

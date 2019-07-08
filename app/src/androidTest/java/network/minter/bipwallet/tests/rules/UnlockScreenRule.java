@@ -1,12 +1,12 @@
 package network.minter.bipwallet.tests.rules;
 
-import android.support.test.rule.ActivityTestRule;
-import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 18-Apr-19

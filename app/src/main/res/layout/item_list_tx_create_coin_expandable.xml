@@ -25,7 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -36,7 +36,7 @@
     android:focusable="true"
     >
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -131,7 +131,7 @@
             app:layout_constraintTop_toBottomOf="@id/item_amount"
             tools:text="BIP"
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         app:layout_constraintEnd_toEndOf="parent"
@@ -143,7 +143,7 @@
         app:layout_constraintTop_toBottomOf="@id/layout_info"
         />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_details"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -349,6 +349,6 @@
             app:layout_constraintTop_toBottomOf="@id/action"
 
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
