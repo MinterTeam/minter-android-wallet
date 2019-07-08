@@ -50,7 +50,7 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
     }
 
     private void init() {
-        if (storage.hasPinCode()) {
+        if (storage.hasPinCode() && mMode != SecurityModule.PinMode.Creation && mMode != SecurityModule.PinMode.Confirmation) {
             mSourcePin = storage.getPinCode();
         }
 
