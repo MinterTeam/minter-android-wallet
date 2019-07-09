@@ -26,6 +26,8 @@
 
 package network.minter.bipwallet.advanced.repo;
 
+import com.annimon.stream.Stream;
+
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,6 +153,10 @@ public class SecretStorage {
         }
 
         return secrets;
+    }
+
+    public Stream<Map.Entry<String, SecretData>> getSecretsStream() {
+        return Stream.of(getSecrets().entrySet());
     }
 
     public List<MinterAddress> getAddresses() {

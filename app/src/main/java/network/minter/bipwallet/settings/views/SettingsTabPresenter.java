@@ -31,9 +31,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -63,6 +65,7 @@ import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletInputDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
+import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.PrefKeys;
@@ -228,7 +231,9 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             fingerprintRow.setEnabled(() -> prefs.getBoolean(PrefKeys.ENABLE_PIN_CODE, false));
 
             SettingsButtonRow changePinRow = new SettingsButtonRow("Change PIN-code", "", this::onChangePinClick);
-            changePinRow.setEnabled(secretStorage.hasPinCode());
+            changePinRow.setEnabled(() -> secretStorage.hasPinCode());
+
+            SettingsButtonRow mnemonicViewRow = new SettingsButtonRow("Show mnemonic", "", this::onClickShowMnemonic);
 
             mSecurityAdapter.addRow(enablePinRow);
 
@@ -237,6 +242,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             }
 
             mSecurityAdapter.addRow(changePinRow);
+            mSecurityAdapter.addRow(mnemonicViewRow);
         }
 
 
@@ -257,6 +263,23 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         }
+    }
+
+    private void onClickShowMnemonic(View view, View view1, String s) {
+        if (!secretStorage.hasPinCode()) {
+            getViewState().showMessage("Please, first set PIN-code to see your mnemonic");
+            return;
+        }
+        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, R.string.dialog_show_mnemonic_title)
+                .setDescription(R.string.dialog_show_mnemonic_description)
+                .setText(secretStorage.getSecretsStream().findFirst().get().getValue().getSeedPhrase())
+                .setTextTypeface(Typeface.DEFAULT_BOLD)
+                .setDescriptionTypeface(Typeface.DEFAULT_BOLD)
+                .setTextAlignment(View.TEXT_ALIGNMENT_CENTER)
+                .setOnTextClickListener(v -> ContextHelper.copyToClipboard(v.getContext(), ((TextView) v).getText()))
+                .setPositiveAction("Close")
+                .create());
+
     }
 
     private void onChangePinClick(View view, View view1, String s) {

@@ -37,7 +37,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
         classpath 'io.fabric.tools:gradle:1.25.4'
-        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.gms:google-services:4.3.0'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
 
     }
@@ -68,7 +68,7 @@ task clean(type: Delete) {
 
 ext {
     minterMinSdk = 19
-    minterMaxSdk = 28
+    minterMaxSdk = 29
     minterLibSupport = "28.0.0"
-    minterBuildTools = "28.0.3"
+    minterBuildTools = "29.0.0"
 }

@@ -66,7 +66,7 @@ public class ContextHelper {
         Toast.makeText(ctx, "Copied", Toast.LENGTH_LONG).show();
     }
 
-    public static void copyToClipboard(Context ctx, String text) {
+    public static void copyToClipboard(Context ctx, CharSequence text) {
         ClipboardManager clipboard = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard == null) {
             Timber.e("Clipboard is null. Is this requires some access?");

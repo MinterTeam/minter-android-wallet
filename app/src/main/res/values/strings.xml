@@ -216,5 +216,7 @@
     <string name="fingerprint_dialog_enroll_text">Please, check your security settings and enable fingerprint device lock</string>
     <string name="btn_settings">Open settings</string>
     <string name="pin_invalid_logout">You\'ve entered invalid PIN-code 5 times in a row. Logging out…</string>
+    <string name="dialog_show_mnemonic_title">⚠️ Your Mnemonic</string>
+    <string name="dialog_show_mnemonic_description">Attention! This is sensitive information, don\'t show it anyone!</string>
 
 </resources>

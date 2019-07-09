@@ -33,6 +33,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -223,5 +224,10 @@ public final class ViewHelper {
     public static void setButtonEnabledElevation(View button, boolean enabled) {
         float elevation = Wallet.app().display().dpToPx(4f);
         ViewCompat.setElevation(button, enabled ? elevation : 0f);
+    }
+
+    public static void setSelectableItemBackground(View view) {
+        TypedValue outValue = new TypedValue();
+        view.getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
     }
 }

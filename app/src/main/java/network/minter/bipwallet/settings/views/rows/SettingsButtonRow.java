@@ -140,6 +140,8 @@ public class SettingsButtonRow implements MultiRowContract.Row<SettingsButtonRow
             ViewCompat.setTransitionName(vh.key, "settings_field");
         }
 
+        vh.itemView.setEnabled(mEnabled.get());
+
         vh.key.setText(mKey);
         vh.value.setText(mValue.get());
 

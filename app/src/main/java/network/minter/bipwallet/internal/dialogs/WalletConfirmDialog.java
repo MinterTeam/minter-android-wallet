@@ -43,21 +43,23 @@ import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.apis.reactive.ReactiveMyMinter;
 import network.minter.bipwallet.internal.helpers.ExceptionHelper;
+import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.profile.models.ProfileResult;
 import retrofit2.HttpException;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
+import static network.minter.bipwallet.internal.helpers.ViewHelper.visible;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class WalletConfirmDialog extends WalletDialog {
 
     private final Builder mBuilder;
     @BindView(R.id.dialog_text) TextView text;
+    @BindView(R.id.dialog_description) TextView description;
     @BindView(R.id.action_confirm) Button actionConfirm;
     @BindView(R.id.action_decline) Button actionDecline;
 
@@ -72,11 +74,29 @@ public final class WalletConfirmDialog extends WalletDialog {
         setContentView(R.layout.wallet_confirm_dialog);
         ButterKnife.bind(this);
         title.setText(mBuilder.mTitle);
+
+        visible(description, mBuilder.mDescription);
+        if (mBuilder.mDescription != null) {
+            description.setText(mBuilder.mDescription);
+        }
+
         text.setText(mBuilder.mText);
+        text.setTextAlignment(mBuilder.mTextAlignment);
         text.setTextIsSelectable(mBuilder.mTextIsSelectable);
+        if (mBuilder.mOnTextClickListener != null) {
+            text.setClickable(true);
+            text.setFocusable(true);
+            ViewHelper.setSelectableItemBackground(text);
+            text.setOnClickListener(mBuilder.mOnTextClickListener);
+        }
+
         if (mBuilder.mTypeface != null) {
             text.setTypeface(mBuilder.mTypeface);
         }
+        if (mBuilder.mDescriptionTypeface != null) {
+            description.setTypeface(mBuilder.mDescriptionTypeface);
+        }
+
         actionConfirm.setText(mBuilder.getPositiveTitle());
         actionConfirm.setOnClickListener(v -> {
             if (mBuilder.hasPositiveListener()) {
@@ -102,8 +122,12 @@ public final class WalletConfirmDialog extends WalletDialog {
 
     public static final class Builder extends WalletDialogBuilder<WalletConfirmDialog, WalletConfirmDialog.Builder> {
         private CharSequence mText;
+        private CharSequence mDescription;
         private boolean mTextIsSelectable = false;
         private Typeface mTypeface;
+        private Typeface mDescriptionTypeface;
+        private View.OnClickListener mOnTextClickListener;
+        private int mTextAlignment = View.TEXT_ALIGNMENT_INHERIT;
 
         public Builder(Context context, @StringRes int title) {
             super(context, title);
@@ -130,6 +154,20 @@ public final class WalletConfirmDialog extends WalletDialog {
 
         public Builder setText(String text, Object... args) {
             mText = String.format(text, args);
+            return this;
+        }
+
+        public Builder setDescription(CharSequence description) {
+            mDescription = description;
+            return this;
+        }
+
+        public Builder setDescription(@StringRes int resId) {
+            return setDescription(getContext().getString(resId));
+        }
+
+        public Builder setOnTextClickListener(View.OnClickListener listener) {
+            mOnTextClickListener = listener;
             return this;
         }
 
@@ -207,8 +245,18 @@ public final class WalletConfirmDialog extends WalletDialog {
             return super.setAction(BUTTON_POSITIVE, title, listener);
         }
 
+        public Builder setDescriptionTypeface(Typeface typeface) {
+            mDescriptionTypeface = typeface;
+            return this;
+        }
+
         public Builder setTextTypeface(Typeface typeface) {
             mTypeface = typeface;
+            return this;
+        }
+
+        public Builder setTextAlignment(int textAlignment) {
+            mTextAlignment = textAlignment;
             return this;
         }
     }

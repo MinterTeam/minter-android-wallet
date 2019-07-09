@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,25 +24,22 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginStart="@dimen/margin_edges"
-    android:layout_marginEnd="@dimen/margin_edges"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="@dimen/btn_border_radius"
-    app:cardElevation="4dp"
-    app:cardPreventCornerOverlap="false"
-    >
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                   xmlns:tools="http://schemas.android.com/tools"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="wrap_content"
+                                   android:layout_gravity="center"
+                                   android:layout_marginStart="@dimen/margin_edges"
+                                   android:layout_marginEnd="@dimen/margin_edges"
+                                   app:cardBackgroundColor="@color/white"
+                                   app:cardCornerRadius="@dimen/btn_border_radius"
+                                   app:cardElevation="4dp"
+                                   app:cardPreventCornerOverlap="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/title"
@@ -58,8 +54,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@tools:sample/cities"
-            />
+            tools:text="@tools:sample/cities"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
@@ -69,21 +64,33 @@
             android:paddingEnd="@dimen/margin_edges"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            >
+            app:layout_constraintTop_toBottomOf="@id/title">
 
             <TextView
+                android:id="@+id/dialog_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Description example"
+                tools:visibility="visible"/>
+
+            <TextView
+                android:layout_marginTop="@dimen/margin_edges"
                 android:id="@+id/dialog_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
                 android:fontFamily="@font/_ubuntu_regular"
                 android:textSize="@dimen/text_size_14"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialog_description"
+                app:layout_goneMarginTop="0dp"
                 tools:maxLines="4"
-                tools:text="@tools:sample/lorem/random"
-                />
+                tools:text="@tools:sample/lorem/random"/>
 
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton
@@ -94,8 +101,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/dialog_text"
-                tools:text="Agree"
-                />
+                tools:text="Agree"/>
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action_decline"
@@ -106,16 +112,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/action_confirm"
-                tools:text="Not agree"
-                />
+                tools:text="Not agree"/>
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/action_decline"
-                />
+                app:layout_constraintTop_toBottomOf="@id/action_decline"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
