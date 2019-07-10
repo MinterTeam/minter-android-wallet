@@ -32,6 +32,7 @@
         android:paddingEnd="@dimen/margin_edges"
         android:textColor="@color/errorColor"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="@id/pin_guide_right"
         app:layout_constraintStart_toStartOf="@id/pin_guide_left"
         app:layout_constraintTop_toBottomOf="@id/pin_hint"
@@ -59,7 +60,7 @@
         android:id="@+id/pin_indicator_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_edges_large"
+        android:layout_marginTop="@dimen/pin_pad_margin_indicator"
         app:layout_constraintEnd_toEndOf="@id/pin_guide_right"
         app:layout_constraintStart_toStartOf="@id/pin_guide_left"
         app:layout_constraintTop_toBottomOf="@id/pin_error">
@@ -118,7 +119,7 @@
         android:id="@+id/pin_key_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_edges_xlarge"
+        android:layout_marginTop="@dimen/pin_pad_margin_top"
         app:layout_constraintEnd_toEndOf="@id/pin_guide_right"
         app:layout_constraintStart_toStartOf="@id/pin_guide_left"
         app:layout_constraintTop_toBottomOf="@id/pin_indicator_container">

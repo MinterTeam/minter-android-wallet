@@ -85,6 +85,10 @@
     <dimen name="tx_item_avatar_size">34dp</dimen>
     <dimen name="qr_preview_size">140dp</dimen>
 
+    <dimen name="pin_pad_text_size">@dimen/text_size_30</dimen>
     <dimen name="pin_pad_key_size">72dp</dimen>
     <dimen name="pin_pad_key_margin">12dp</dimen>
+    <dimen name="pin_pad_margin_top">48dp</dimen>
+    <dimen name="pin_pad_margin_indicator">32dp</dimen>
+    <dimen name="pin_pad_top_offset">32dp</dimen>
 </resources>

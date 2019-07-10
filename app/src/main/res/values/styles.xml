@@ -144,7 +144,7 @@
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/textColorWhite</item>
-        <item name="android:textSize">@dimen/text_size_30</item>
+        <item name="android:textSize">@dimen/pin_pad_text_size</item>
         <item name="android:layout_marginTop">@dimen/pin_pad_key_margin</item>
         <item name="android:layout_marginBottom">@dimen/pin_pad_key_margin</item>
 

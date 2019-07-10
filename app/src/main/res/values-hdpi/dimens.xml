@@ -1,0 +1,8 @@
+<resources>
+    <dimen name="pin_pad_key_size">60dp</dimen>
+    <dimen name="pin_pad_key_margin">10dp</dimen>
+    <dimen name="pin_pad_text_size">@dimen/text_size_24</dimen>
+    <dimen name="pin_pad_margin_top">16dp</dimen>
+    <dimen name="pin_pad_margin_indicator">16dp</dimen>
+    <dimen name="pin_pad_top_offset">16dp</dimen>
+</resources>
