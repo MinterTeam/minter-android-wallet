@@ -27,7 +27,6 @@
 package network.minter.bipwallet.settings.views;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -292,9 +291,13 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
     private void onEnableFingerprint(View view, Boolean enabled) {
         if (enabled) {
             if (!fingerHelper.hasEnrolledFingerprints()) {
+                ((Switch) view).setChecked(false);
                 getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
                         .setText(R.string.fingerprint_dialog_enroll_text)
-                        .setPositiveAction(R.string.btn_settings, this::openFingerprintEnroll)
+                        .setPositiveAction(R.string.btn_settings, (d, w) -> {
+                            d.dismiss();
+                            getViewState().startFingerprintEnrollment();
+                        })
                         .setNegativeAction(R.string.btn_cancel, (d, w) -> d.dismiss())
                         .create());
 
@@ -333,10 +336,6 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
         }
 
         prefs.edit().putBoolean(PrefKeys.ENABLE_FP, false).apply();
-    }
-
-    private void openFingerprintEnroll(DialogInterface dialogInterface, int i) {
-        getViewState().startFingerprintEnrollment();
     }
 
     private void onEnablePinCode(View view, Boolean enabled) {
