@@ -56,10 +56,10 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
 
         getViewState().setOnPinValueListener(this::onPinEntered);
 
-        if (isPinLocked()) {
-            setPinErrorLocked();
-            startLockTimeUpdate();
-        }
+//        if (isPinLocked()) {
+//            setPinErrorLocked();
+//            startLockTimeUpdate();
+//        }
 
         switch (mMode) {
             case Creation:
@@ -74,16 +74,21 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
             case EnableFingerprint:
             case DisableFingerprint:
             case Validation:
+                getViewState().setupTitle(R.string.title_pin_enter);
+                getViewState().setPinHint(R.string.hint_pin_enter);
                 if (prefs.getBoolean(PrefKeys.ENABLE_FP, false) && Wallet.app().fingerprint().hasEnrolledFingerprints()) {
                     getViewState().setFingerprintEnabled(true);
                     getViewState().setOnFingerprintClickListener(this::onClickFingerprintButton);
                     startFingerprintValidation();
                 }
+                getViewState().setEnableValidation(mSourcePin);
                 getViewState().setOnPinValidationError(this::onValidationError);
+                break;
             case Deletion:
                 getViewState().setupTitle(R.string.title_pin_enter);
                 getViewState().setPinHint(R.string.hint_pin_enter);
                 getViewState().setEnableValidation(mSourcePin);
+                getViewState().setOnPinValidationError(this::onValidationError);
                 break;
         }
     }
@@ -153,7 +158,7 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
     }
 
     private boolean isPinLocked() {
-        return getLockSecondsLeft() > 0;
+        return getLockSecondsLeft() > 0 && kvStorage.get(PREF_PIN_INVALID_TYPE_COUNT, 0) >= SecurityModule.MAX_TRIES_UNTIL_LOCK;
     }
 
     private void setPinErrorLocked() {
@@ -240,10 +245,6 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
                 prefs.edit().remove(PrefKeys.ENABLE_PIN_CODE).commit();
                 Timber.d("PIN removed");
                 getViewState().finishSuccess(mSuccessIntent);
-            }
-
-            if (len == 4 && !valid) {
-                getViewState().setPinError(R.string.error_pin_invalid_simple);
             }
         } else if (mMode == SecurityModule.PinMode.EnableFingerprint) {
             if (valid && len == 4) {
