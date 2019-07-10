@@ -80,12 +80,24 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/greyBackground"
             >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_security"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_list_settings"
+                />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_main"
                 android:layout_width="0dp"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_security"
                 android:layout_height="wrap_content"
                 tools:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -94,17 +106,7 @@
                 tools:listitem="@layout/item_list_settings"
                 />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list_security"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/list_main"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_list_settings"
-                />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_additional"
@@ -113,7 +115,7 @@
                 android:layout_marginTop="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/list_security"
+                app:layout_constraintTop_toBottomOf="@id/list_main"
                 tools:itemCount="2"
                 tools:listitem="@layout/item_list_settings"
                 />

@@ -83,6 +83,7 @@ import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow;
 import network.minter.bipwallet.settings.views.rows.SettingsSwitchRow;
+import network.minter.bipwallet.settings.views.rows.TitleRow;
 import network.minter.core.MinterSDK;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAuthRepository;
@@ -235,6 +236,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
 
             SettingsButtonRow mnemonicViewRow = new SettingsButtonRow("Show mnemonic", "", this::onClickShowMnemonic);
 
+            mSecurityAdapter.addRow(new TitleRow("Security"));
             mSecurityAdapter.addRow(enablePinRow);
 
             if (fingerHelper.isHardwareDetected()) {
@@ -260,6 +262,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             mAdditionalAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         } else {
 //            mMainAdapter.addRow(new SettingsButtonRow("My Addresses", "Manage", (view, sharedView, value) -> onClickAddresses()).setInactive(true));
+            mMainAdapter.addRow(new TitleRow("Notifications"));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable sounds", () -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), this::onSwitchSounds));
             mMainAdapter.addRow(new SettingsSwitchRow("Enable notifications", () -> settings.getBool(SettingsManager.EnableLiveNotifications), this::onSwitchNotifications));
         }
