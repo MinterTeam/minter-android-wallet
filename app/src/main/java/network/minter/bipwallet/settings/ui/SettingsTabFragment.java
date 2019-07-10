@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.settings.ui;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -208,7 +209,13 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
             intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
         }
 
-        startActivity(intent);
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException wtf) {
+            intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+            startActivity(intent);
+        }
+
     }
 
     @Override
