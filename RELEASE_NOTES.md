@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.6.0
+ - Added PIN-code
+ - Added Fingerprint auth
+ - Added button to show mnemonic for authenticated user
+
 ## 1.5.2
  - Fixed sending to address or public key with leading zero bytes
 
