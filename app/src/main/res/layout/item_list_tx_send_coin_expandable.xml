@@ -285,6 +285,28 @@
             tools:text="10000000.010203040506070809"
             />
 
+        <TextView
+            android:id="@+id/detail_payload_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:text="@string/label_tx_payload"
+            android:textSize="@dimen/text_size_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_amount_value" />
+
+        <TextView
+            android:id="@+id/detail_payload_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_ubuntu_mono_bold"
+            android:text="@string/empty_data"
+            android:textSize="@dimen/text_size_tx_detail_value"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/detail_payload_label"
+            app:layout_constraintTop_toBottomOf="@id/detail_payload_label" />
+
         <network.minter.bipwallet.internal.views.widgets.WalletButton
             android:id="@+id/action"
             style="@style/Wallet.Button.Transparent.BlueBorder"
@@ -294,7 +316,7 @@
             android:text="@string/btn_explorer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_amount_value"
+            app:layout_constraintTop_toBottomOf="@id/detail_payload_value"
             />
 
         <Space

@@ -27,6 +27,7 @@
 package network.minter.bipwallet.tx.adapters.vh;
 
 import android.annotation.SuppressLint;
+import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -46,6 +47,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.adapters.TxItem;
+import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
@@ -69,6 +71,8 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     Button action;
     public @BindView(R.id.layout_details)
     ConstraintLayout detailsLayout;
+    @BindView(R.id.detail_payload_value)
+    public TextView payload;
 
     private boolean mEnableExpanding = true;
     private boolean mUseAvatars = true;
@@ -93,17 +97,23 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(TxItem item) {
-//        if (mUseAvatars) {
-//            if (autoSetAvatar()) {
-//                avatar.setImageUrl(item.getAvatar(), R.dimen.tx_item_avatar_size);
-//            }
-//        } else {
-//            avatar.setImageDrawable(null);
-//        }
-
         final DateTime dt = new DateTime(item.getTx().timestamp);
         dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
         timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
+
+        if (item.getTx().getPayload() != null && !item.getTx().getPayload().isEmpty()) {
+            String decPayload;
+            try {
+                decPayload = new String(Base64.decode(item.getTx().getPayload(), Base64.DEFAULT));
+                payload.setText(decPayload);
+                payload.setTextIsSelectable(true);
+            } catch (Throwable t) {
+                Timber.w(t, "Unable to decode payload data");
+                payload.setText(R.string.empty_data);
+            }
+        } else {
+            payload.setText(R.string.empty_data);
+        }
     }
 
     protected void setupAvatar(TxItem item) {
@@ -119,8 +129,6 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     public void setUserAvatars(boolean useAvatars) {
         mUseAvatars = useAvatars;
     }
-
-
 
     @SuppressLint("ClickableViewAccessibility")
     void setupCopyListeners(TextView... views) {

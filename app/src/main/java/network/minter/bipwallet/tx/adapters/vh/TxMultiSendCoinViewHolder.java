@@ -42,7 +42,6 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
-import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
@@ -87,8 +86,6 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
                     } else {
                         coinsAmount.put(i.coin, i.amount);
                     }
-                } else {
-                    Timber.w("No 'my' address in recipients");
                 }
             }
 
