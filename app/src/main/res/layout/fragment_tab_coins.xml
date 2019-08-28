@@ -149,11 +149,14 @@
                     app:layout_collapseMode="pin">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/balance_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/colorPrimary"
                         android:paddingStart="@dimen/margin_edges"
                         android:paddingEnd="4dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:paddingTop="@dimen/margin_edges_half"
                         android:paddingBottom="@dimen/margin_edges_half"
                         >

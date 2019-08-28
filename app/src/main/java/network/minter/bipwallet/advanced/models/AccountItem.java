@@ -40,6 +40,7 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
+import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
@@ -53,6 +54,8 @@ public class AccountItem implements Serializable, Cloneable {
     public String coin;
     public MinterAddress address;
     public BigDecimal balance;
+    public BigDecimal balanceAll;
+    public BigDecimal balanceUSD;
     int mHashCode;
 
     public AccountItem(final AccountItem another) {
@@ -61,6 +64,8 @@ public class AccountItem implements Serializable, Cloneable {
         coin = another.coin;
         address = another.address;
         balance = another.balance;
+        balanceAll = another.balanceAll;
+        balanceUSD = another.balanceUSD;
         mHashCode = another.mHashCode;
     }
 
@@ -105,6 +110,14 @@ public class AccountItem implements Serializable, Cloneable {
         }
 
         return balance;
+    }
+
+    public BigDecimal getTotalBalanceBase() {
+        return firstNonNull(balanceAll, BigDecimal.ZERO);
+    }
+
+    public BigDecimal getTotalBanaceUSD() {
+        return firstNonNull(balanceUSD, BigDecimal.ZERO);
     }
 
     @Deprecated

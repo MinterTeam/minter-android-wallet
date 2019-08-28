@@ -76,32 +76,20 @@ import timber.log.Timber;
  */
 public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
 
-    @Inject
-    Provider<CoinsTabPresenter> presenterProvider;
-    @Inject
-    SoundManager soundManager;
-    @InjectPresenter
-    CoinsTabPresenter presenter;
-    @BindView(R.id.bip_logo)
-    View logo;
-    @BindView(R.id.user_avatar)
-    BipCircleImageView avatar;
-    @BindView(R.id.username)
-    TextView username;
-    @BindView(R.id.balance_int)
-    TextView balanceInt;
-    @BindView(R.id.balance_fractions)
-    TextView balanceFract;
-    @BindView(R.id.balance_coin_name)
-    TextView balanceCoinName;
-    @BindView(R.id.list)
-    RecyclerView list;
-    @BindView(R.id.container_swipe_refresh)
-    SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.delegation_view)
-    View delegationView;
-    @BindView(R.id.delegation_amount)
-    TextView delegationAmount;
+    @Inject Provider<CoinsTabPresenter> presenterProvider;
+    @Inject SoundManager soundManager;
+    @InjectPresenter CoinsTabPresenter presenter;
+    @BindView(R.id.bip_logo) View logo;
+    @BindView(R.id.user_avatar) BipCircleImageView avatar;
+    @BindView(R.id.username) TextView username;
+    @BindView(R.id.balance_int) TextView balanceInt;
+    @BindView(R.id.balance_fractions) TextView balanceFract;
+    @BindView(R.id.balance_coin_name) TextView balanceCoinName;
+    @BindView(R.id.list) RecyclerView list;
+    @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.delegation_view) View delegationView;
+    @BindView(R.id.delegation_amount) TextView delegationAmount;
+    @BindView(R.id.balance_container) View balanceContainer;
 
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
@@ -243,6 +231,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
     public void setDelegationAmount(String amount) {
         delegationView.setVisibility(View.VISIBLE);
         delegationAmount.setText(amount);
+    }
+
+    @Override
+    public void setBalanceClickListener(View.OnClickListener listener) {
+        balanceContainer.setOnClickListener(listener);
     }
 
     @Override

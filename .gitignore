@@ -12,3 +12,4 @@ gradle/wrapper/gradle-wrapper.jar
 app/fabric.properties
 crashlytics-build.properties
 com_crashlytics_export_strings.xml
+centrifuge/build

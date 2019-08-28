@@ -36,6 +36,7 @@ import com.annimon.stream.Stream;
 import org.parceler.Parcel;
 import org.parceler.Parcels;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -84,35 +85,26 @@ import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
+import static network.minter.bipwallet.internal.helpers.Plurals.usd;
 import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
 public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
     private final BalanceCurrentState mBalanceCurrentState = new BalanceCurrentState();
-    @Inject
-    CacheManager cache;
-    @Inject
-    AuthSession session;
-    @Inject
-    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
-    @Inject
-    CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
-    @Inject
-    SecretStorage secretRepo;
-    @Inject
-    CachedRepository<UserAccount, AccountStorage> accountStorage;
-    @Inject
-    BlockChainAccountRepository accountRepo;
-    @Inject
-    ExplorerAddressRepository addressRepo;
-    @Inject
-    ProfileInfoRepository infoRepo;
+    @Inject CacheManager cache;
+    @Inject AuthSession session;
+    @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
+    @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
+    @Inject SecretStorage secretRepo;
+    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject BlockChainAccountRepository accountRepo;
+    @Inject ExplorerAddressRepository addressRepo;
+    @Inject ProfileInfoRepository infoRepo;
     private List<MinterAddress> myAddresses = new ArrayList<>();
     private MultiRowAdapter mAdapter;
     private TransactionShortListAdapter mTransactionsAdapter;
@@ -242,20 +234,25 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
                             .filter(item -> item.getCoin().equals(MinterSDK.DEFAULT_COIN))
                             .findFirst();
 
-                    final StringHelper.DecimalStringFraction num;
+                    final StringHelper.DecimalStringFraction numBIP, numAll, numUSD;
                     if (!defAccount.isPresent()) {
-                        num = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
+                        numBIP = numAll = numUSD = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
                     } else {
-                        num = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
+                        numBIP = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
+                        numAll = StringHelper.splitDecimalStringFractions(defAccount.get().getTotalBalanceBase().setScale(4, RoundingMode.DOWN));
+                        numUSD = StringHelper.splitDecimalStringFractions(defAccount.get().getTotalBanaceUSD().setScale(2, RoundingMode.DOWN));
                     }
 
-                    mBalanceCurrentState.set(num.intPart, num.fractionalPart, bips(Long.parseLong(num.intPart)));
+                    mBalanceCurrentState.setBIP(numBIP.intPart, numBIP.fractionalPart, bips(Long.parseLong(numBIP.intPart)));
+                    mBalanceCurrentState.setAll(numAll.intPart, numAll.fractionalPart, bips(Long.parseLong(numAll.intPart)));
+                    mBalanceCurrentState.setUSD(usd(numUSD.intPart), numUSD.fractionalPart, "");
 
                     mBalanceCurrentState.applyTo(getViewState());
 
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Normal);
                     getViewState().hideRefreshProgress();
                 }, t -> {
+                    Timber.e(t);
                     mCoinsRow.setStatus(ListWithButtonRow.Status.Error);
                     getViewState().hideRefreshProgress();
                 });
@@ -343,21 +340,51 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         return false;
     }
 
+    final static class BalanceState implements Serializable {
+        String mIntPart = "0";
+        String mFractPart = "0000";
+        String mAmount = bips(0L);
+
+        BalanceState(String intPart, String fractPart, String amount) {
+            mIntPart = intPart;
+            mFractPart = fractPart;
+            mAmount = amount;
+        }
+    }
+
     @Parcel
     final static class BalanceCurrentState {
         private final static String sStateBalance = "BalanceCurrentState::CURRENT";
-        String mIntPart = "0";
-        String mFractPart = "0000";
-        String mBips = bips(0L);
+        int cursor = 0;
+        List<BalanceState> items = new ArrayList<>(3);
 
-        void set(String intPart, String fractPart, String bips) {
-            mIntPart = intPart;
-            mFractPart = fractPart;
-            mBips = bips;
+        BalanceCurrentState() {
+            items.add(new BalanceState("0", "0000", bips(0L)));
+            items.add(new BalanceState("0", "0000", bips(0L)));
+            items.add(new BalanceState("$0", "00", ""));
+        }
+
+        void setBIP(String intPart, String fractPart, String amount) {
+            items.set(0, new BalanceState(intPart, fractPart, amount));
+        }
+
+        void setAll(String intPart, String fractPart, String amount) {
+            items.set(1, new BalanceState(intPart, fractPart, amount));
+        }
+
+        void setUSD(String intPart, String fractPart, String amount) {
+            items.set(2, new BalanceState(intPart, fractPart, ""));
         }
 
         void applyTo(CoinsTabView view) {
-            view.setBalance(mIntPart, mFractPart, mBips);
+            BalanceState state = items.get(cursor);
+            view.setBalance(state.mIntPart, state.mFractPart, state.mAmount);
+
+            view.setBalanceClickListener(v -> {
+                cursor += 1;
+                cursor %= 3;
+                applyTo(view);
+            });
         }
 
         void onSaveInstanceState(Bundle outState) {
@@ -368,7 +395,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
             if (savedInstanceState != null && savedInstanceState.containsKey(sStateBalance)) {
                 final BalanceCurrentState saved = Parcels.unwrap(savedInstanceState.getParcelable(sStateBalance));
                 if (saved != null) {
-                    set(saved.mIntPart, saved.mFractPart, saved.mBips);
+                    cursor = saved.cursor;
+                    items = saved.items;
                 }
             }
         }

@@ -73,7 +73,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
     }
 
     public static Observable<BigDecimal> createSingleTotalBalance(ExplorerAddressRepository addressRepository, MinterAddress address) {
-        return rxExpGate(addressRepository.getAddressData(address))
+        return rxExpGate(addressRepository.getAddressData(address, true))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(toExpGateError())
@@ -81,7 +81,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
     }
 
     public static Observable<BigDecimal> createSingleCoinBalance(ExplorerAddressRepository addressRepository, MinterAddress address, String coin) {
-        return rxExpGate(addressRepository.getAddressData(address))
+        return rxExpGate(addressRepository.getAddressData(address, true))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .onErrorResumeNext(toExpGateError())
@@ -109,7 +109,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
         }
 
         for (MinterAddress address : mAddresses) {
-            rxExpGate(mAddressRepository.getAddressData(address))
+            rxExpGate(mAddressRepository.getAddressData(address, true))
                     .onErrorResumeNext(toExpGateError())
                     .subscribeOn(Schedulers.io())
                     .subscribe(res -> {
@@ -135,12 +135,16 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
             if (entry.getKey() == null) continue;
 
             for (AddressData.CoinBalance balance : entry.getValue().coins.values()) {
-                out.add(new AccountItem(
+                AccountItem item = new AccountItem(
                         null,
                         balance.getCoin(),
                         entry.getKey(),
                         balance.getAmount()
-                ));
+                );
+                // @todo this is hack
+                item.balanceAll = entry.getValue().balanceSumInBaseCoin;
+                item.balanceUSD = entry.getValue().balanceSumInUSD;
+                out.add(item);
             }
         }
 

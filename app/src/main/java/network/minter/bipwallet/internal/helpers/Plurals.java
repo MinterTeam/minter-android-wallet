@@ -85,6 +85,14 @@ public class Plurals {
         return plurals(n, bips);
     }
 
+    public static String usd(Long n) {
+        return String.format("$%d", n);
+    }
+
+    public static String usd(String n) {
+        return String.format("$%s", n);
+    }
+
 
     private static String plurals(Long n, String[] words) {
         if (n == null) {
