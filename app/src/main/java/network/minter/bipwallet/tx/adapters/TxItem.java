@@ -162,7 +162,7 @@ public class TxItem implements TransactionItem {
             ((TxEditCandidateViewHolder) holder).bind(txItem);
         } else if (holder instanceof TxRedeemCheckViewHolder) {
             final TxItem txItem = ((TxItem) data);
-            ((TxRedeemCheckViewHolder) holder).bind(txItem);
+            ((TxRedeemCheckViewHolder) holder).bind(txItem, myAddresses);
         } else {
             final TxItem txItem = ((TxItem) data);
             ((TxUnhandledViewHolder) holder).bind(txItem);

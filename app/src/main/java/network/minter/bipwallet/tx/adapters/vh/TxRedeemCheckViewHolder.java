@@ -3,10 +3,14 @@ package network.minter.bipwallet.tx.adapters.vh;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.tx.adapters.TxItem;
+import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -29,14 +33,22 @@ public class TxRedeemCheckViewHolder extends ExpandableTxViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    @Override
-    public void bind(TxItem item) {
+
+    public void bind(TxItem item, List<MinterAddress> myAddresses) {
         super.bind(item);
         avatar.setImageResource(R.drawable.img_avatar_redeem);
         final HistoryTransaction.TxRedeemCheckResult data = item.getTx().getData();
         fromValue.setText(data.getCheck().getSender().toString());
         title.setText(item.getTx().hash.toShortString());
-        amount.setText(String.format("+ %s", bdHuman(data.getCheck().getValue())));
+
+        if (myAddresses.contains(item.getTx().from)) {
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
+            amount.setText(String.format("+ %s", bdHuman(data.getCheck().getValue())));
+        } else {
+            amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
+            amount.setText(String.format("- %s", bdHuman(data.getCheck().getValue())));
+        }
+
         amountValue.setText(bdHuman(data.getCheck().getValue()));
         subamount.setText(data.getCheck().getCoin());
         coinValue.setText(data.getCheck().getCoin());
