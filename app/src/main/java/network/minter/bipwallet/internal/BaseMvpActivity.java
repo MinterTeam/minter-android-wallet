@@ -43,6 +43,7 @@ import moxy.MvpAppCompatActivity;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
+import network.minter.bipwallet.internal.system.ForegroundDetector;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
@@ -50,7 +51,6 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @SuppressLint("Registered")
@@ -173,5 +173,17 @@ public class BaseMvpActivity extends MvpAppCompatActivity implements LifecycleOw
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Wallet.app().foregroundDetector().setListener(new ForegroundDetector.ForegroundDelegate() {
+            @Override
+            public void onAppBackgrounded() {
+                Timber.d("Destroy application");
+                finishAffinity();
+            }
+
+            @Override
+            public void onAppForegrounded() {
+
+            }
+        });
     }
 }

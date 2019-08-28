@@ -53,6 +53,7 @@ import network.minter.bipwallet.internal.di.WalletComponent;
 import network.minter.bipwallet.internal.di.WalletModule;
 import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ProgressView;
+import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.core.internal.exceptions.NetworkException;
 import timber.log.Timber;
 
@@ -82,6 +83,8 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     @Inject
     DispatchingAndroidInjector<Service> dispatchingServiceInjector;
 
+    @Inject ForegroundDetector foregroundDetector;
+
     /**
      * Usage:
      * <p>
@@ -105,6 +108,7 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     public void onCreate() {
         super.onCreate();
 
+
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
@@ -127,6 +131,9 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
 
             app.inject(this);
         }
+
+        registerActivityLifecycleCallbacks(foregroundDetector);
+        registerComponentCallbacks(foregroundDetector);
     }
 
     @Override

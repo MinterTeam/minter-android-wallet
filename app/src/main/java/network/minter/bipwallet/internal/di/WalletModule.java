@@ -62,6 +62,7 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.UnzipUtil;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.MinterBlockChainApi;
@@ -267,6 +268,12 @@ public class WalletModule {
         return context
                 .getSharedPreferences(context.getString(R.string.user_local_settings_key),
                         Context.MODE_PRIVATE);
+    }
+
+    @Provides
+    @WalletApp
+    public ForegroundDetector provideForegroundDetector() {
+        return new ForegroundDetector();
     }
 
     @Provides

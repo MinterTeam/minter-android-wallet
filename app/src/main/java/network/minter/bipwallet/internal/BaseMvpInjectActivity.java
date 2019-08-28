@@ -52,6 +52,7 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.internal.mvp.ProgressTextView;
+import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import timber.log.Timber;
 
@@ -203,18 +204,22 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasFr
         mProgress = null;
     }
 
-//    protected void setupStatusView(final StatusView statusView) {
-//        if (statusView == null) {
-//            return;
-//        }
-//
-//        mStatusView = statusView;
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         prepareIdlingResources();
+        Wallet.app().foregroundDetector().setListener(new ForegroundDetector.ForegroundDelegate() {
+            @Override
+            public void onAppBackgrounded() {
+                Timber.d("Destroy application");
+                finishAffinity();
+            }
+
+            @Override
+            public void onAppForegrounded() {
+
+            }
+        });
     }
 }

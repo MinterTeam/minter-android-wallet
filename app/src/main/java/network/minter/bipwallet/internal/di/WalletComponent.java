@@ -53,6 +53,7 @@ import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
@@ -116,6 +117,7 @@ public interface WalletComponent {
     AnalyticsManager analytics();
     SoundManager sounds();
     FingerprintHelper fingerprint();
+    ForegroundDetector foregroundDetector();
 
     // notification
     BalanceNotificationManager balanceNotifications();
