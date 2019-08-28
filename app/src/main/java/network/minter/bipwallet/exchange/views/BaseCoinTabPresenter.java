@@ -35,6 +35,8 @@ import com.annimon.stream.Stream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -73,6 +75,7 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.CoinItem;
 import network.minter.explorer.models.GasValue;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
@@ -223,6 +226,12 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
                     if (res.result != null) {
+                        Collections.sort(res.result, new Comparator<CoinItem>() {
+                            @Override
+                            public int compare(CoinItem coinItem, CoinItem t1) {
+                                return t1.reserveBalance.compareTo(coinItem.reserveBalance);
+                            }
+                        });
                         getViewState().setCoinsAutocomplete(res.result, (item, position) -> getViewState().setIncomingCoin(item.symbol));
                     }
                 }, Wallet.Rx.errorHandler(getViewState()));
