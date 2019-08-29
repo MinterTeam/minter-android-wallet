@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.7.0
+ - Payload in transactions
+ - Fixed check
+ - Switching balance: bip/all coins/all coins in USD
+ - Sorting coins in autocomplete by it reserve (descending)
+ - Autolock app after idling 30 seconds in background state
+
 ## 1.6.0
  - Added PIN-code
  - Added Fingerprint auth
