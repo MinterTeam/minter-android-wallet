@@ -37,4 +37,5 @@ interface CoinsTabView extends MvpView {
 
     void setDelegationAmount(String amount);
     void setBalanceClickListener(View.OnClickListener listener);
+    void setBalanceTitle(int title);
 }

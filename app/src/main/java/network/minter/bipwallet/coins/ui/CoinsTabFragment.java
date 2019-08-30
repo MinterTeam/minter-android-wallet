@@ -90,6 +90,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
     @BindView(R.id.delegation_view) View delegationView;
     @BindView(R.id.delegation_amount) TextView delegationAmount;
     @BindView(R.id.balance_container) View balanceContainer;
+    @BindView(R.id.balance_title) TextView balanceTitle;
 
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
@@ -236,6 +237,11 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
     @Override
     public void setBalanceClickListener(View.OnClickListener listener) {
         balanceContainer.setOnClickListener(listener);
+    }
+
+    @Override
+    public void setBalanceTitle(int title) {
+        balanceTitle.setText(title);
     }
 
     @Override

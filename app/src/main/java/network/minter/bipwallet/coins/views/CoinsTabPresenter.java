@@ -66,6 +66,7 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
@@ -245,7 +246,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
                     mBalanceCurrentState.setBIP(numBIP.intPart, numBIP.fractionalPart, bips(Long.parseLong(numBIP.intPart)));
                     mBalanceCurrentState.setAll(numAll.intPart, numAll.fractionalPart, bips(Long.parseLong(numAll.intPart)));
-                    mBalanceCurrentState.setUSD(usd(numUSD.intPart), numUSD.fractionalPart, "");
+                    mBalanceCurrentState.setUSD(usd(numUSD.intPart), numUSD.fractionalPart);
 
                     mBalanceCurrentState.applyTo(getViewState());
 
@@ -341,9 +342,9 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
     }
 
     final static class BalanceState implements Serializable {
-        String mIntPart = "0";
-        String mFractPart = "0000";
-        String mAmount = bips(0L);
+        final String mIntPart;
+        final String mFractPart;
+        final String mAmount;
 
         BalanceState(String intPart, String fractPart, String amount) {
             mIntPart = intPart;
@@ -355,10 +356,16 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
     @Parcel
     final static class BalanceCurrentState {
         private final static String sStateBalance = "BalanceCurrentState::CURRENT";
+        private final static int[] sTitles = new int[]{
+                R.string.tab_coins_title,
+                R.string.tab_coins_title_total,
+                R.string.tab_coins_title_total,
+        };
         int cursor = 0;
         List<BalanceState> items = new ArrayList<>(3);
 
         BalanceCurrentState() {
+            cursor = Wallet.app().settings().getInt(SettingsManager.CurrentBalanceCursor);
             items.add(new BalanceState("0", "0000", bips(0L)));
             items.add(new BalanceState("0", "0000", bips(0L)));
             items.add(new BalanceState("$0", "00", ""));
@@ -372,18 +379,22 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
             items.set(1, new BalanceState(intPart, fractPart, amount));
         }
 
-        void setUSD(String intPart, String fractPart, String amount) {
+        void setUSD(String intPart, String fractPart) {
             items.set(2, new BalanceState(intPart, fractPart, ""));
         }
 
         void applyTo(CoinsTabView view) {
             BalanceState state = items.get(cursor);
+            view.setBalanceTitle(sTitles[cursor]);
             view.setBalance(state.mIntPart, state.mFractPart, state.mAmount);
+
 
             view.setBalanceClickListener(v -> {
                 cursor += 1;
                 cursor %= 3;
                 applyTo(view);
+
+                Wallet.app().settings().putInt(SettingsManager.CurrentBalanceCursor, cursor);
             });
         }
 

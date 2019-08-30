@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 @SuppressLint("CommitPrefEdits")
 public class SettingsManager {
     public static final Key<Boolean> EnableLiveNotifications = new Key<>("enable_live_notifications", true);
+    public static final Key<Integer> CurrentBalanceCursor = new Key<>("current_balance_cursor", 0);
     private final static String sPrefsPrefix = "minter_wallet_";
     private final SharedPreferences mPrefs;
 
