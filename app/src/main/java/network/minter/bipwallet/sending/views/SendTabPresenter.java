@@ -117,7 +117,6 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLTE;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString;
 
 /**
@@ -336,9 +335,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private boolean checkZero(BigDecimal amount) {
-        boolean valid = amount == null || !bdNull(amount);
+        boolean valid = amount == null || bdGTE(amount, BigDecimal.ZERO);
         if (!valid) {
-            getViewState().setAmountError("Amount must be greater than 0");
+            getViewState().setAmountError("Amount must be greater or equals to 0");
         } else {
             getViewState().setAmountError(null);
         }
