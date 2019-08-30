@@ -49,4 +49,5 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);
     void setPayloadChangeListener(TextWatcher listener);
     void setPayload(String payload);
+    void setActionTitle(int buttonTitle);
 }

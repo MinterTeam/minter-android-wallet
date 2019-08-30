@@ -221,5 +221,6 @@
     <string name="dialog_show_mnemonic_description">Attention! This is sensitive information, don\'t show it anyone!</string>
     <string name="label_tx_payload">Payload</string>
     <string name="empty_data"><![CDATA[<empty>]]></string>
+    <string name="btn_delegate">Delegate</string>
 
 </resources>

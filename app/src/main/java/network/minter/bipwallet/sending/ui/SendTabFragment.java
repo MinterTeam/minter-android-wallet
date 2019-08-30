@@ -198,6 +198,12 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         payloadInput.setSelection(payload.length());
     }
 
+    //@TODO
+    @Override
+    public void setActionTitle(int buttonTitle) {
+        actionSend.setText(buttonTitle);
+    }
+
     @Override
     public void setOnTextChangedListener(InputGroup.OnTextChangedListener listener) {
         mInputGroup.addTextChangedListener(listener);

@@ -122,39 +122,48 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFro
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @InjectViewState
 public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private static final int REQUEST_CODE_QR_SCAN = 101;
     private static final BigDecimal PAYLOAD_FEE = BigDecimal.valueOf(0.002);
-    @Inject
-    SecretStorage secretStorage;
-    @Inject
-    CachedRepository<UserAccount, AccountStorage> accountStorage;
+    private final TextWatcher mPayloadChangeListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            byte[] tmpPayload = s.toString().getBytes(StandardCharsets.UTF_8);
+            int totalBytes = tmpPayload.length;
+
+            if (totalBytes > ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
+                tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH);
+                getViewState().setPayload(new String(tmpPayload, StandardCharsets.UTF_8));
+            }
+
+            payload = tmpPayload;
+            setupFee();
+        }
+    };
+    @Inject SecretStorage secretStorage;
     @Inject
     CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cachedTxRepo;
-    @Inject
-    ExplorerCoinsRepository coinRepo;
-    @Inject
-    BlockChainTransactionRepository bcTxRepo;
-    @Inject
-    BlockChainStatusRepository bcStatusRepo;
-    @Inject
-    ProfileInfoRepository infoRepo;
-    @Inject
-    GateGasRepository gasRepo;
-    @Inject
-    CacheManager cache;
-    @Inject
-    RecipientAutocompleteStorage recipientStorage;
-    @Inject
-    IdlingManager idlingManager;
-    @Inject
-    GateEstimateRepository estimateRepo;
-    @Inject
-    GateTransactionRepository gateTxRepo;
+    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject ExplorerCoinsRepository coinRepo;
+    @Inject BlockChainTransactionRepository bcTxRepo;
+    @Inject BlockChainStatusRepository bcStatusRepo;
+    @Inject ProfileInfoRepository infoRepo;
+    @Inject GateGasRepository gasRepo;
+    @Inject CacheManager cache;
+    @Inject RecipientAutocompleteStorage recipientStorage;
+    @Inject IdlingManager idlingManager;
+    @Inject GateEstimateRepository estimateRepo;
     private AccountItem mFromAccount = null;
     private BigDecimal mAmount = null;
     private CharSequence mToMxAddress = null;
@@ -171,6 +180,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private AccountItem mLastAccount = null;
     private BigDecimal sendFee;
     private byte[] payload;
+    @Inject GateTransactionRepository gateTxRepo;
 
     private enum SearchByType {
         Address, Username, Email
@@ -188,7 +198,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickScanQR(this::onClickScanQR);
         getViewState().setOnClickMaximum(this::onClickMaximum);
-        getViewState().setPayloadChangeListener(payloadChangeListener);
+        getViewState().setPayloadChangeListener(mPayloadChangeListener);
         loadAndSetFee();
         accountStorage.update();
     }
@@ -533,7 +543,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
     /**
      * Unused now, soon
-     *
      * @param dialogInterface
      * @param which
      */
@@ -922,30 +931,4 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             return errorResult == null || errorResult.isOk();
         }
     }
-
-    private TextWatcher payloadChangeListener = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            byte[] tmpPayload = s.toString().getBytes(StandardCharsets.UTF_8);
-            int totalBytes = tmpPayload.length;
-
-            if (totalBytes > ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
-                tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH);
-                getViewState().setPayload(new String(tmpPayload, StandardCharsets.UTF_8));
-            }
-
-            payload = tmpPayload;
-            setupFee();
-        }
-    };
 }
