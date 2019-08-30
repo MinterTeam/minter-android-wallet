@@ -71,6 +71,8 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     Button action;
     public @BindView(R.id.layout_details)
     ConstraintLayout detailsLayout;
+    @BindView(R.id.detail_payload_label)
+    public TextView payloadLabel;
     @BindView(R.id.detail_payload_value)
     public TextView payload;
 
@@ -107,12 +109,16 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
                 decPayload = new String(Base64.decode(item.getTx().getPayload(), Base64.DEFAULT));
                 payload.setText(decPayload);
                 payload.setTextIsSelectable(true);
+                payload.setVisibility(View.VISIBLE);
+                payloadLabel.setVisibility(View.VISIBLE);
             } catch (Throwable t) {
                 Timber.w(t, "Unable to decode payload data");
-                payload.setText(R.string.empty_data);
+                payload.setVisibility(View.GONE);
+                payloadLabel.setVisibility(View.GONE);
             }
         } else {
-            payload.setText(R.string.empty_data);
+            payload.setVisibility(View.GONE);
+            payloadLabel.setVisibility(View.GONE);
         }
     }
 
