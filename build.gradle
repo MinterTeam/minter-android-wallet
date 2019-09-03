@@ -78,5 +78,5 @@ ext {
     minterCoreSDK = "0.4.0"
 
     appVersionName = "1.7.0"
-    appVersionCode = 100
+    appVersionCode = 101
 }
