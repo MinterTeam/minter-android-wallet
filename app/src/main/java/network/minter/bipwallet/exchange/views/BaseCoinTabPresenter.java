@@ -226,6 +226,10 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
                     if (res.result != null) {
+                        Stream.of(res.result)
+                                .filter(item -> item.symbol.toUpperCase().equals(MinterSDK.DEFAULT_COIN))
+                                .forEach(item -> item.reserveBalance = new BigDecimal("10e9"));
+
                         Collections.sort(res.result, new Comparator<CoinItem>() {
                             @Override
                             public int compare(CoinItem coinItem, CoinItem t1) {
