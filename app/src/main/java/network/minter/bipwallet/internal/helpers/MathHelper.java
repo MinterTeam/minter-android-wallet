@@ -136,6 +136,14 @@ public final class MathHelper {
         return from.compareTo(to) <= 0;
     }
 
+    public static String bdIntHuman(String source) {
+        return bdIntHuman(new BigDecimal(source));
+    }
+
+    public static String bdIntHuman(BigDecimal source) {
+        return formatDecimalCurrency(source.setScale(0, BigDecimal.ROUND_UNNECESSARY), 0, true);
+    }
+
     public static String bdHuman(double source) {
         return bdHuman(new BigDecimal(source));
     }

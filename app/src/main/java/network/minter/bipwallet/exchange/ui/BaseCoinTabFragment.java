@@ -50,7 +50,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.exchange.adapters.CoinsListAdapter;
 import network.minter.bipwallet.exchange.contract.BaseCoinTabView;
 import network.minter.bipwallet.internal.BaseInjectFragment;
@@ -182,7 +182,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     }
 
     @Override
-    public void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
+    public void startAccountSelector(List<CoinAccount> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
         new WalletAccountSelectorDialog.Builder(getActivity(), R.string.title_select_account)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)

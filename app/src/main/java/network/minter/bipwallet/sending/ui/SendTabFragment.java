@@ -43,6 +43,8 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -58,7 +60,7 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
@@ -96,40 +98,26 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
     public final static String IDLE_SEND_WAIT_GAS = "IDLE_SEND_WAIT_GAS";
 
-    @Inject
-    IdlingManager idlingManager;
-    @Inject
-    Provider<SendTabPresenter> presenterProvider;
-    @InjectPresenter
-    SendTabPresenter presenter;
-    @BindView(R.id.input_coin)
-    AppCompatEditText coinInput;
-    @BindView(R.id.layout_input_recipient)
-    TextInputLayout recipientLayout;
-    @BindView(R.id.input_recipient)
-    AutoCompleteTextView recipientInput;
-    @BindView(R.id.layout_input_amount)
-    TextInputLayout amountLayout;
-    @BindView(R.id.input_amount)
-    AppCompatEditText amountInput;
-    @BindView(R.id.input_payload)
-    AppCompatEditText payloadInput;
-    @BindView(R.id.action)
-    Button actionSend;
-    @BindView(R.id.action_scan_qr)
-    View actionScanQR;
-    @BindView(R.id.action_maximum)
-    View actionMaximum;
-    @BindView(R.id.text_error)
-    TextView errorView;
-    @BindView(R.id.fee_value)
-    TextView feeValue;
+    @Inject IdlingManager idlingManager;
+    @Inject Provider<SendTabPresenter> presenterProvider;
+    @InjectPresenter SendTabPresenter presenter;
+    @BindView(R.id.input_coin) AppCompatEditText coinInput;
+    @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
+    @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
+    @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
+    @BindView(R.id.input_amount) AppCompatEditText amountInput;
+    @BindView(R.id.input_payload) AppCompatEditText payloadInput;
+    @BindView(R.id.action) Button actionSend;
+    @BindView(R.id.action_scan_qr) View actionScanQR;
+    @BindView(R.id.action_maximum) View actionMaximum;
+    @BindView(R.id.text_error) TextView errorView;
+    @BindView(R.id.fee_value) TextView feeValue;
     private Unbinder mUnbinder;
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         HomeModule.getComponent().inject(this);
         super.onAttach(context);
         idlingManager.add(IDLE_SEND_CONFIRM_DIALOG, IDLE_SEND_COMPLETE_DIALOG, IDLE_SEND_WAIT_GAS);
@@ -318,7 +306,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
-    public void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
+    public void startAccountSelector(List<CoinAccount> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
         new WalletAccountSelectorDialog.Builder(getActivity(), "Select account")
                 .setItems(accounts)
                 .setOnClickListener(clickListener)

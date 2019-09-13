@@ -55,6 +55,7 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.external.ui.AppDeepLink;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.HomeTabsClasses;
@@ -71,6 +72,7 @@ import timber.log.Timber;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@AppDeepLink({"tx"})
 public class HomeActivity extends BaseMvpActivity implements HomeView, BackPressedDelegate {
 
     @Inject Provider<HomePresenter> presenterProvider;

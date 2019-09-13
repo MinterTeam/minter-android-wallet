@@ -67,7 +67,7 @@ public abstract class BaseUiTest {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
-                    mMntBalance = res.getAccounts().get(0).getBalance();
+                    mMntBalance = res.getCoinAccounts().get(0).getBalance();
                     mUpdatedBalance.set(true);
                 });
 

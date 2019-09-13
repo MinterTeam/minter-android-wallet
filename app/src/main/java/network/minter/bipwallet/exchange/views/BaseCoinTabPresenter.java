@@ -50,7 +50,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
@@ -108,14 +108,14 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     protected final GateGasRepository mGasRepo;
     protected final GateTransactionRepository mGateTxRepo;
 
-    private AccountItem mAccount;
+    private CoinAccount mAccount;
     private String mCurrentCoin;
     private String mGetCoin = null;
     private BigDecimal mSpendAmount = new BigDecimal(0);
     private BigDecimal mGetAmount = new BigDecimal(0);
     private BehaviorSubject<Boolean> mInputChange;
     private String mGasCoin;
-    private List<AccountItem> mAccounts = new ArrayList<>(1);
+    private List<CoinAccount> mAccounts = new ArrayList<>(1);
     private boolean mUseMax = false;
     private BigInteger mGasPrice = new BigInteger("1");
     private BigDecimal mEstimate;
@@ -154,8 +154,8 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
         safeSubscribeIoToUi(mAccountStorage.observe())
                 .subscribe(res -> {
                     if (!res.isEmpty()) {
-                        mAccounts = res.getAccounts();
-                        mAccount = res.getAccounts().get(0);
+                        mAccounts = res.getCoinAccounts();
+                        mAccount = res.getCoinAccounts().get(0);
                         if (mCurrentCoin != null) {
                             mAccount = Stream.of(mAccounts).filter(value -> value.getCoin().equals(mCurrentCoin)).findFirst().orElse(mAccount);
                         }
@@ -241,7 +241,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 }, Wallet.Rx.errorHandler(getViewState()));
     }
 
-    private Optional<AccountItem> findAccountByCoin(String coin) {
+    private Optional<CoinAccount> findAccountByCoin(String coin) {
         return Stream.of(mAccounts)
                 .filter(item -> item.getCoin().equals(coin.toUpperCase()))
                 .findFirst();
@@ -373,7 +373,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     }
 
     private void onClickSelectAccount(View view) {
-        getViewState().startAccountSelector(mAccountStorage.getData().getAccounts(), accountItem -> {
+        getViewState().startAccountSelector(mAccountStorage.getData().getCoinAccounts(), accountItem -> {
             onAccountSelected(accountItem, false);
         });
     }
@@ -498,17 +498,17 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
         });
     }
 
-    private void onAccountSelected(AccountItem accountItem, boolean initial) {
-        if (accountItem == null) return;
+    private void onAccountSelected(CoinAccount coinAccount, boolean initial) {
+        if (coinAccount == null) return;
 
-        mGasCoin = accountItem.getCoin();
-        mAccount = accountItem;
-        getViewState().setMaximumEnabled(accountItem.balance.compareTo(new BigDecimal(0)) > 0);
+        mGasCoin = coinAccount.getCoin();
+        mAccount = coinAccount;
+        getViewState().setMaximumEnabled(coinAccount.balance.compareTo(new BigDecimal(0)) > 0);
 
-        getViewState().setOutAccountName(String.format("%s (%s)", accountItem.getCoin().toUpperCase(),
-                bdHuman(accountItem.balance)));
+        getViewState().setOutAccountName(String.format("%s (%s)", coinAccount.getCoin().toUpperCase(),
+                bdHuman(coinAccount.balance)));
 
-        mCurrentCoin = accountItem.getCoin();
+        mCurrentCoin = coinAccount.getCoin();
 
         if (!initial) {
             mInputChange.onNext(isAmountForGetting());

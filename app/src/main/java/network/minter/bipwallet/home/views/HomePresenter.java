@@ -26,7 +26,11 @@
 
 package network.minter.bipwallet.home.views;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
+
+import com.airbnb.deeplinkdispatch.DeepLink;
 
 import java.util.HashMap;
 import java.util.List;
@@ -100,6 +104,28 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
             case R.id.bottom_settings:
                 getAnalytics().send(AppEvent.SettingsScreen);
                 break;
+        }
+    }
+
+    @Override
+    public void handleExtras(Intent intent) {
+        super.handleExtras(intent);
+        if (intent.getBooleanExtra(DeepLink.IS_DEEP_LINK, false)) {
+            Bundle params = intent.getExtras();
+            if (params == null) {
+                return;
+            }
+
+            final String uri = params.getString(DeepLink.URI, null);
+            if (uri == null) return;
+
+            if (uri.startsWith("minter://tx")) {
+                getViewState().setCurrentPage(mBottomIdPositionMap.get(R.id.bottom_send));
+                final String hash = params.getString("d", null);
+
+                Timber.d("Deeplink URI: %s", uri);
+                Timber.d("Deeplink TX: %s", hash);
+            }
         }
     }
 

@@ -38,7 +38,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.exceptions.GateResponseException;
 import network.minter.blockchain.models.operational.OperationType;
@@ -114,8 +114,8 @@ public class ExchangeCalculator {
                         out.mCommission = res.result.getCommission();
                         errFunc.accept(null);
 
-                        final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-                        final Optional<AccountItem> getAccount = findAccountByCoin(sourceCoin);
+                        final Optional<CoinAccount> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+                        final Optional<CoinAccount> getAccount = findAccountByCoin(sourceCoin);
                         // if enough (exact) MNT ot pay fee, gas coin is MNT
                         if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
                             Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN);
@@ -173,8 +173,8 @@ public class ExchangeCalculator {
                         out.mCommission = res.result.getCommission();
 
 
-                        final Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-                        final Optional<AccountItem> getAccount = findAccountByCoin(sourceCoin);
+                        final Optional<CoinAccount> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+                        final Optional<CoinAccount> getAccount = findAccountByCoin(sourceCoin);
 
                         out.mEstimate = res.result.getAmount();
 
@@ -214,7 +214,7 @@ public class ExchangeCalculator {
         return res.statusCode == 404 || res.statusCode == 400;
     }
 
-    private Optional<AccountItem> findAccountByCoin(String coin) {
+    private Optional<CoinAccount> findAccountByCoin(String coin) {
         return Stream.of(mBuilder.mAccounts.get())
                 .filter(item -> item.getCoin().equals(coin.toUpperCase()))
                 .findFirst();
@@ -224,8 +224,8 @@ public class ExchangeCalculator {
         private final GateEstimateRepository mCoinsRepo;
         private Action mOnCompleteListener;
         private Consumer<? super Disposable> mDisposableConsumer;
-        private Lazy<List<AccountItem>> mAccounts;
-        private Lazy<AccountItem> mAccount;
+        private Lazy<List<CoinAccount>> mAccounts;
+        private Lazy<CoinAccount> mAccount;
         private Lazy<BigDecimal> mGetAmount, mSpendAmount;
         private Lazy<String> mGetCoin;
 
@@ -233,7 +233,7 @@ public class ExchangeCalculator {
             mCoinsRepo = repo;
         }
 
-        public Builder setAccount(Lazy<List<AccountItem>> accounts, Lazy<AccountItem> account) {
+        public Builder setAccount(Lazy<List<CoinAccount>> accounts, Lazy<CoinAccount> account) {
             mAccounts = accounts;
             mAccount = account;
             return this;

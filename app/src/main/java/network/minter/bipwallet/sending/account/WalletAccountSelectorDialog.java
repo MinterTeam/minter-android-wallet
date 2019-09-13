@@ -40,7 +40,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder;
 import network.minter.core.crypto.MinterAddress;
@@ -69,7 +69,7 @@ public class WalletAccountSelectorDialog extends WalletDialog {
         AccountSelectedAdapter adapter = new AccountSelectedAdapter(mBuilder.mItems);
         adapter.setOnClickListener(new AccountSelectedAdapter.OnClickListener() {
             @Override
-            public void onClick(AccountItem item) {
+            public void onClick(CoinAccount item) {
                 if (mBuilder.mOnClickListener != null) {
                     mBuilder.mOnClickListener.onClick(item);
                 }
@@ -82,7 +82,7 @@ public class WalletAccountSelectorDialog extends WalletDialog {
     }
 
     public static final class Builder extends WalletDialogBuilder<WalletAccountSelectorDialog, WalletAccountSelectorDialog.Builder> {
-        private List<AccountItem> mItems = new ArrayList<>();
+        private List<CoinAccount> mItems = new ArrayList<>();
         private AccountSelectedAdapter.OnClickListener mOnClickListener;
 
         public Builder(Context context) {
@@ -108,26 +108,26 @@ public class WalletAccountSelectorDialog extends WalletDialog {
         }
 
         public Builder addItem(String avatar, String coin, MinterAddress address, BigDecimal balance) {
-            mItems.add(new AccountItem(avatar, coin, address, balance));
+            mItems.add(new CoinAccount(avatar, coin, address, balance));
             return this;
         }
 
         public Builder addItem(String coin, MinterAddress address, BigDecimal balance) {
-            mItems.add(new AccountItem(coin, address, balance));
+            mItems.add(new CoinAccount(coin, address, balance));
             return this;
         }
 
-        public Builder addItem(AccountItem item) {
+        public Builder addItem(CoinAccount item) {
             mItems.add(item);
             return this;
         }
 
-        public Builder addItems(List<AccountItem> items) {
+        public Builder addItems(List<CoinAccount> items) {
             mItems.addAll(items);
             return this;
         }
 
-        public Builder setItems(List<AccountItem> items) {
+        public Builder setItems(List<CoinAccount> items) {
             mItems = new ArrayList<>(items);
             return this;
         }

@@ -26,14 +26,24 @@
 
 package network.minter.bipwallet.external.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.airbnb.deeplinkdispatch.DeepLink;
+import com.airbnb.deeplinkdispatch.DeepLinkEntry;
+import com.airbnb.deeplinkdispatch.DeepLinkHandler;
+import com.airbnb.deeplinkdispatch.DeepLinkUri;
 import com.google.gson.GsonBuilder;
+
+import java.lang.reflect.Method;
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import androidx.core.app.TaskStackBuilder;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.auth.ui.AuthActivity;
@@ -50,6 +60,7 @@ import timber.log.Timber;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@DeepLinkHandler({DeepLinkModule.class})
 public class ExternalActivity extends BaseInjectActivity {
     public final static String ACTION_OPEN_HOME = "OPEN_HOME";
     public final static String ACTION_OPEN_TRANSACTION_LIST = "OPEN_TRANSACTION_LIST";
@@ -88,7 +99,138 @@ public class ExternalActivity extends BaseInjectActivity {
         startAction();
     }
 
+    private DeepLinkModuleLoader mLinkLoader;
+
+    private void startDeepLink() {
+
+//        if(secretStorage.hasPinCode()) {
+//            new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
+//                    .startHomeOnSuccess()
+//                    .setSuccessIntent()
+//                    .start();
+//        }
+
+        mLinkLoader = new DeepLinkModuleLoader();
+        DeepLinkDelegate delegate = new DeepLinkDelegate(mLinkLoader);
+        String old = getIntent().getData().toString();
+        if (old.substring(old.length() - 1).equals("/")) {
+            old = old.substring(0, old.length() - 1);
+        }
+        Uri uri = Uri.parse(old);
+        getIntent().setData(uri);
+
+        if (!secretStorage.hasPinCode()) {
+            delegate.dispatchFrom(this);
+            finish();
+        } else {
+            Intent target = dispatchDeeplink(this, getIntent());
+            target.setClass(this, HomeActivity.class);
+
+            new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
+                    .setSuccessIntent(target)
+                    .startClearTop();
+            finish();
+        }
+    }
+
+    private DeepLinkEntry findEntry(String uri) {
+        return mLinkLoader.parseUri(uri);
+    }
+
+    private Intent dispatchDeeplink(Activity activity, Intent sourceIntent) {
+        if (activity == null) {
+            throw new NullPointerException("activity == null");
+        }
+        if (sourceIntent == null) {
+            throw new NullPointerException("sourceIntent == null");
+        }
+        Uri uri = sourceIntent.getData();
+        if (uri == null) {
+            return null;
+        }
+        String uriString = uri.toString();
+        DeepLinkEntry entry = findEntry(uriString);
+        if (entry != null) {
+            DeepLinkUri deepLinkUri = DeepLinkUri.parse(uriString);
+            Map<String, String> parameterMap = entry.getParameters(uriString);
+            for (String queryParameter : deepLinkUri.queryParameterNames()) {
+                for (String queryParameterValue : deepLinkUri.queryParameterValues(queryParameter)) {
+                    if (parameterMap.containsKey(queryParameter)) {
+                        Timber.w("Duplicate parameter name in path and query param: %s", queryParameter);
+                    }
+                    parameterMap.put(queryParameter, queryParameterValue);
+                }
+            }
+            parameterMap.put(DeepLink.URI, uri.toString());
+            Bundle parameters;
+            if (sourceIntent.getExtras() != null) {
+                parameters = new Bundle(sourceIntent.getExtras());
+            } else {
+                parameters = new Bundle();
+            }
+            for (Map.Entry<String, String> parameterEntry : parameterMap.entrySet()) {
+                parameters.putString(parameterEntry.getKey(), parameterEntry.getValue());
+            }
+            try {
+                Class<?> c = entry.getActivityClass();
+                Intent newIntent;
+                TaskStackBuilder taskStackBuilder = null;
+                if (entry.getType() == DeepLinkEntry.Type.CLASS) {
+                    newIntent = new Intent(activity, c);
+                } else {
+                    Method method;
+                    try {
+                        method = c.getMethod(entry.getMethod(), Context.class);
+                        if (method.getReturnType().equals(TaskStackBuilder.class)) {
+                            taskStackBuilder = (TaskStackBuilder) method.invoke(c, activity);
+                            if (taskStackBuilder.getIntentCount() == 0) {
+                                return null;
+                            }
+                            newIntent = taskStackBuilder.editIntentAt(taskStackBuilder.getIntentCount() - 1);
+                        } else {
+                            newIntent = (Intent) method.invoke(c, activity);
+                        }
+                    } catch (NoSuchMethodException exception) {
+                        method = c.getMethod(entry.getMethod(), Context.class, Bundle.class);
+                        if (method.getReturnType().equals(TaskStackBuilder.class)) {
+                            taskStackBuilder = (TaskStackBuilder) method.invoke(c, activity, parameters);
+                            if (taskStackBuilder.getIntentCount() == 0) {
+                                return null;
+                            }
+                            newIntent = taskStackBuilder.editIntentAt(taskStackBuilder.getIntentCount() - 1);
+                        } else {
+                            newIntent = (Intent) method.invoke(c, activity, parameters);
+                        }
+                    }
+                }
+                if (newIntent.getAction() == null) {
+                    newIntent.setAction(sourceIntent.getAction());
+                }
+                if (newIntent.getData() == null) {
+                    newIntent.setData(sourceIntent.getData());
+                }
+                newIntent.putExtras(parameters);
+                newIntent.putExtra(DeepLink.IS_DEEP_LINK, true);
+                newIntent.putExtra(DeepLink.REFERRER_URI, uri);
+                if (activity.getCallingActivity() != null) {
+                    newIntent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                }
+
+                return newIntent;
+            } catch (Throwable t) {
+                Timber.e(t, "Unable to handle deeplink");
+            }
+        }
+
+        return null;
+    }
+
     private void startAction() {
+        if (getIntent() != null && getIntent().getExtras() == null) {
+            startDeepLink();
+            return;
+        }
+
         if (getIntent() == null || getIntent().getExtras() == null) {
             startSplash();
             return;
@@ -132,7 +274,8 @@ public class ExternalActivity extends BaseInjectActivity {
                 finish();
                 break;
             default:
-                startSplash();
+                startDeepLink();
+//                startSplash();
                 break;
         }
 

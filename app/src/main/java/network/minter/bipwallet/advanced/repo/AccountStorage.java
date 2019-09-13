@@ -26,29 +26,24 @@
 
 package network.minter.bipwallet.advanced.repo;
 
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
 import network.minter.bipwallet.internal.data.CachedEntity;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class AccountStorage implements CachedEntity<UserAccount> {
@@ -57,75 +52,29 @@ public class AccountStorage implements CachedEntity<UserAccount> {
     private final SecretStorage mSecretStorage;
     private final KVStorage mStorage;
 
-
     public AccountStorage(KVStorage storage, SecretStorage secretStorage, ExplorerAddressRepository expAddressRepo) {
         mStorage = storage;
         mExpAddressRepo = expAddressRepo;
         mSecretStorage = secretStorage;
     }
 
-    @Override
-    public UserAccount initialData() {
-        if (mStorage.contains(KEY_BALANCE)) {
-            return mStorage.get(KEY_BALANCE);
-        }
-
-        return new UserAccount(Collections.emptyList());
-    }
-
-    public static BigDecimal calcBalanceBase(List<AccountItem> items, final String coin, final MinterAddress address) {
-        final Optional<BigDecimal> res = Stream.of(items)
-                .filter(item -> item.getCoin().equals(coin))
-                .filter(item -> item.getAddress().equals(address))
-                .map(AccountItem::getBalanceBase)
-                .reduce(BigDecimal::add);
-
-        if (!res.isPresent()) {
-            return new BigDecimal(0);
-        }
-
-        return res.get();
-    }
-
-    public static BigDecimal calcBalanceBase(List<AccountItem> items) {
-        final Optional<BigDecimal> res = Stream.of(items)
-                .map(AccountItem::getBalanceBase)
-                .reduce(BigDecimal::add);
-
-        if (!res.isPresent()) {
-            return new BigDecimal(0);
-        }
-
-        return res.get();
-    }
-
-    public List<AccountItem> getAccountItems() {
-        if (mStorage.contains(KEY_BALANCE)) {
-            return mStorage.<UserAccount>get(KEY_BALANCE).getAccounts();
-        }
-
-        return Collections.emptyList();
-    }
-
-    public UserAccount getAccount() {
-        return initialData();
-    }
-
     /**
      * Group AccountItems's (inside UserAccount) by coin, but reduces MinterAddress (it will be null after grouping)
      * Map does not changes original data
-     *
      * @return RxJava2 function
      */
     public static Function<UserAccount, UserAccount> groupAccountByCoin() {
         return items -> {
-            List<AccountItem> in = new ArrayList<>(items.size());
-            Stream.of(items.getAccounts()).forEach(item -> in.add(new AccountItem(item)));
-            List<AccountItem> out = new ArrayList<>();
-            final Map<String, AccountItem> tmp = new HashMap<>();
-            for (AccountItem item : in) {
+            if (true) {
+                return items;
+            }
+
+            List<CoinAccount> in = new ArrayList<>(items.size());
+            Stream.of(items.getCoinAccounts()).forEach(item -> in.add(new CoinAccount(item)));
+            List<CoinAccount> out = new ArrayList<>();
+            final Map<String, CoinAccount> tmp = new HashMap<>();
+            for (CoinAccount item : in) {
                 if (!tmp.containsKey(item.coin)) {
-//                    item.address = null;
                     tmp.put(item.coin, item);
                 } else {
                     tmp.get(item.coin).balance = tmp.get(item.coin).balance.add(item.balance);
@@ -139,31 +88,17 @@ public class AccountStorage implements CachedEntity<UserAccount> {
         };
     }
 
-    /**
-     * Group AccountItems's by coin, but reduces MinterAddress (it will be null after grouping)
-     *
-     * @return RxJava2 function
-     */
-    public static Function<List<AccountItem>, List<AccountItem>> groupAccountItemsByCoin() {
-        return items -> {
-            List<AccountItem> in = new ArrayList<>(items.size());
-            Stream.of(items).forEach(item -> in.add(new AccountItem(item)));
-            List<AccountItem> out = new ArrayList<>();
-            final Map<String, AccountItem> tmp = new HashMap<>();
-            for (AccountItem item : items) {
-                if (!tmp.containsKey(item.coin)) {
-//                    item.address = null;
-                    tmp.put(item.coin, item);
-                } else {
-                    tmp.get(item.coin).balance = tmp.get(item.coin).balance.add(item.balance);
-                }
-            }
+    @Override
+    public UserAccount initialData() {
+        if (mStorage.contains(KEY_BALANCE)) {
+            return mStorage.get(KEY_BALANCE);
+        }
 
-            Stream.of(tmp.values())
-                    .forEach(out::add);
+        return new UserAccount();
+    }
 
-            return out;
-        };
+    public UserAccount getAccount() {
+        return initialData();
     }
 
     @Override
@@ -180,7 +115,13 @@ public class AccountStorage implements CachedEntity<UserAccount> {
     public Observable<UserAccount> getUpdatableData() {
         return ExplorerBalanceFetcher
                 .create(mExpAddressRepo, mSecretStorage.getAddresses())
-                .map(UserAccount::new);
+                .map(item -> {
+                    if (item.size() != 0) {
+                        return item.get(0);
+                    }
+
+                    return new UserAccount();
+                });
     }
 
 }

@@ -37,7 +37,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'io.fabric.tools:gradle:1.30.0'
-        classpath 'com.google.gms:google-services:4.3.1'
+        classpath 'com.google.gms:google-services:4.3.2'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
 
     }
@@ -70,13 +70,13 @@ ext {
     minterMinSdk = 19
     minterMaxSdk = 29
     minterLibSupport = "28.0.0"
-    minterBuildTools = "29.0.0"
+    minterBuildTools = "29.0.2"
 
-    minterExplorerSDK = "0.4.5"
+    minterExplorerSDK = "0.5.0"
     minterProfileSDK = "0.2.4"
-    minterBlockchainSDK = "0.7.5"
-    minterCoreSDK = "0.4.0"
+    minterBlockchainSDK = "0.8.0"
+    minterCoreSDK = "0.5.0"
 
-    appVersionName = "1.7.0"
-    appVersionCode = 101
+    appVersionName = "1.7.1"
+    appVersionCode = 102
 }

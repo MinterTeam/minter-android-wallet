@@ -8,7 +8,7 @@ import java.util.List;
 import moxy.MvpView;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
@@ -26,7 +26,7 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void setOnTextChangedListener(InputGroup.OnTextChangedListener listener);
     void setFormValidationListener(InputGroup.OnFormValidateListener listener);
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void startAccountSelector(List<AccountItem> accounts, AccountSelectedAdapter.OnClickListener clickListener);
+    void startAccountSelector(List<CoinAccount> accounts, AccountSelectedAdapter.OnClickListener clickListener);
     void setAccountName(CharSequence accountName);
     void setOnSubmit(View.OnClickListener listener);
     void setSubmitEnabled(boolean enabled);

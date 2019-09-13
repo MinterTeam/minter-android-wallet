@@ -46,8 +46,7 @@
         android:supportsRtl="true"
         android:theme="@style/Wallet"
         tools:replace="android:allowBackup"
-
-        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute,LockedOrientationActivity">
 
         <uses-library
             android:name="android.test.runner"
@@ -81,7 +80,6 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -150,7 +148,7 @@
         <activity
             android:name=".exchange.ui.ConvertCoinActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".settings.ui.PasswordChangeMigrationActivity"
             android:launchMode="singleTop"
@@ -169,13 +167,17 @@
                 <action android:name="OPEN_TRANSACTION_LIST"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.VIEW"/>-->
+            <!--                <category android:name="android.intent.category.DEFAULT"/>-->
+            <!--                <category android:name="android.intent.category.BROWSABLE"/>-->
+            <!--                <data android:scheme="minter" />-->
+            <!--            </intent-filter>-->
         </activity>
         <activity
             android:name=".security.ui.PinEnterActivity"
             android:screenOrientation="portrait"
             />
-
-
         <service
             android:name=".services.livebalance.LiveBalanceService"
             android:exported="false"

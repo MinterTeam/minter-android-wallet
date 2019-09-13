@@ -41,7 +41,8 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
+import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.AddressData;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -54,7 +55,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.toExpG
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<AccountItem>> {
+public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<UserAccount>> {
     @GuardedBy("mLock")
     private final Map<MinterAddress, AddressData> mRawBalances = new HashMap<>();
     private final Object mLock = new Object();
@@ -68,7 +69,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
         mWaiter = new CountDownLatch(addresses.size());
     }
 
-    public static Observable<List<AccountItem>> create(@NonNull ExplorerAddressRepository addressRepository, @NonNull final List<MinterAddress> addresses) {
+    public static Observable<List<UserAccount>> create(@NonNull ExplorerAddressRepository addressRepository, @NonNull final List<MinterAddress> addresses) {
         return Observable.create(new ExplorerBalanceFetcher(addressRepository, addresses));
     }
 
@@ -99,7 +100,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
     }
 
     @Override
-    public void subscribe(ObservableEmitter<List<AccountItem>> emitter) throws Exception {
+    public void subscribe(ObservableEmitter<List<UserAccount>> emitter) throws Exception {
         Timber.d("Fetching amount in thread: %s", Thread.currentThread().getName());
         if (mAddresses.isEmpty()) {
             Timber.w("No one address");
@@ -130,22 +131,31 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<Accoun
 
         mWaiter.await();
 
-        List<AccountItem> out = new ArrayList<>();
+        List<UserAccount> out = new ArrayList<>();
+
         for (Map.Entry<MinterAddress, AddressData> entry : mRawBalances.entrySet()) {
             if (entry.getKey() == null) continue;
 
+            List<CoinAccount> accounts = new ArrayList<>();
+
             for (AddressData.CoinBalance balance : entry.getValue().coins.values()) {
-                AccountItem item = new AccountItem(
+                CoinAccount item = new CoinAccount(
                         null,
                         balance.getCoin(),
                         entry.getKey(),
                         balance.getAmount()
                 );
-                // @todo this is hack
-                item.balanceAll = entry.getValue().balanceSumInBaseCoin;
-                item.balanceUSD = entry.getValue().balanceSumInUSD;
-                out.add(item);
+                accounts.add(item);
             }
+
+            UserAccount ua = new UserAccount(
+                    accounts,
+                    entry.getValue().availableBalanceInBase,
+                    entry.getValue().availableBalanceInUSD,
+                    entry.getValue().totalBalanceInBase,
+                    entry.getValue().totalBalanceInUSD);
+
+            out.add(ua);
         }
 
         emitter.onNext(out);

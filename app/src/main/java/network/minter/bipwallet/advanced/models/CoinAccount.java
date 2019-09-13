@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.advanced.models;
 
+import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcel;
 
 import java.io.Serializable;
@@ -40,42 +41,36 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
-import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
-public class AccountItem implements Serializable, Cloneable {
+public class CoinAccount implements Serializable, Cloneable {
     public String id;
     public String avatar;
     public String coin;
     public MinterAddress address;
     public BigDecimal balance;
-    public BigDecimal balanceAll;
-    public BigDecimal balanceUSD;
     int mHashCode;
 
-    public AccountItem(final AccountItem another) {
+    public CoinAccount(final CoinAccount another) {
         id = another.id;
         avatar = another.avatar;
         coin = another.coin;
         address = another.address;
         balance = another.balance;
-        balanceAll = another.balanceAll;
-        balanceUSD = another.balanceUSD;
         mHashCode = another.mHashCode;
     }
 
-    public AccountItem(String avatar, String coin, MinterAddress address, BigDecimal balance) {
+    public CoinAccount(String avatar, String coin, MinterAddress address, BigDecimal balance) {
         this(coin, address, balance);
         this.avatar = avatar;
     }
 
     @SuppressWarnings("NullableProblems")
-    public AccountItem(@NonNull String coin, MinterAddress address, BigDecimal balance) {
+    public CoinAccount(@NonNull String coin, MinterAddress address, BigDecimal balance) {
         this.id = UUID.randomUUID().toString();
         this.coin = checkNotNull(coin, "Coin name required");
         this.address = checkNotNull(address, "Address required");
@@ -84,7 +79,7 @@ public class AccountItem implements Serializable, Cloneable {
         mHashCode = Objects.hash(id, avatar, coin, address, balance);
     }
 
-    AccountItem() {
+    CoinAccount() {
     }
 
     public String getAvatar() {
@@ -94,11 +89,13 @@ public class AccountItem implements Serializable, Cloneable {
         return avatar;
     }
 
+    @NotNull
     @Override
-    public AccountItem clone() throws CloneNotSupportedException {
-        return (AccountItem) super.clone();
+    public CoinAccount clone() throws CloneNotSupportedException {
+        return (CoinAccount) super.clone();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format("AccountItem{address=%s, coin=%s, amount=%s}", address, coin, balance.toPlainString());
@@ -112,29 +109,11 @@ public class AccountItem implements Serializable, Cloneable {
         return balance;
     }
 
-    public BigDecimal getTotalBalanceBase() {
-        return firstNonNull(balanceAll, BigDecimal.ZERO);
-    }
-
-    public BigDecimal getTotalBanaceUSD() {
-        return firstNonNull(balanceUSD, BigDecimal.ZERO);
-    }
-
-    @Deprecated
-    public BigDecimal getBalanceBase() {
-        return getBalance();
-    }
-
-    @Deprecated
-    public BigDecimal getBalanceUsd() {
-        return getBalance();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AccountItem that = (AccountItem) o;
+        CoinAccount that = (CoinAccount) o;
         return Objects.equals(coin, that.coin) &&
                 Objects.equals(address, that.address) &&
                 Objects.equals(balance, that.balance);
@@ -154,9 +133,9 @@ public class AccountItem implements Serializable, Cloneable {
     }
 
     public static class DiffUtilImpl extends DiffUtil.Callback {
-        private final List<AccountItem> mOldList, mNewList;
+        private final List<CoinAccount> mOldList, mNewList;
 
-        public DiffUtilImpl(List<AccountItem> oldList, List<AccountItem> newList) {
+        public DiffUtilImpl(List<CoinAccount> oldList, List<CoinAccount> newList) {
             mOldList = oldList;
             mNewList = newList;
         }
@@ -173,16 +152,16 @@ public class AccountItem implements Serializable, Cloneable {
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            AccountItem oldItem = mOldList.get(oldItemPosition);
-            AccountItem newItem = mNewList.get(newItemPosition);
+            CoinAccount oldItem = mOldList.get(oldItemPosition);
+            CoinAccount newItem = mNewList.get(newItemPosition);
 
             return oldItem.address.equals(newItem.address) && oldItem.coin.equals(newItem.coin);
         }
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            AccountItem oldItem = mOldList.get(oldItemPosition);
-            AccountItem newItem = mNewList.get(newItemPosition);
+            CoinAccount oldItem = mOldList.get(oldItemPosition);
+            CoinAccount newItem = mNewList.get(newItemPosition);
             return oldItem.equals(newItem);
         }
     }

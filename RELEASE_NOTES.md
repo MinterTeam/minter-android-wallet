@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.7.1
+ - Fixed autocomplete BIP order
+ - Sorting coins in accounts by name, BIP always on top
+ - Switchable balance fixes
+ - Separate decimals
+
 ## 1.7.0
  - Payload in transactions
  - Fixed outgoing check
@@ -7,6 +13,7 @@
  - Sorting coins in autocomplete by it reserve (descending)
  - Autolock app after idling 30 seconds in background state
  - Ability to send 0 coins
+ 
 
 ## 1.6.0
  - Added PIN-code

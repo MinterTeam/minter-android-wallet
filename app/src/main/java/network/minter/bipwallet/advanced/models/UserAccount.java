@@ -35,46 +35,52 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import network.minter.core.MinterSDK;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
 public class UserAccount implements Serializable, Cloneable {
-    List<AccountItem> mAccounts;
-    BigDecimal mTotalBalance;
-    BigDecimal mTotalBalanceUsd;
+    List<CoinAccount> mCoinAccounts;
+    BigDecimal mAvailableBalanceBase;
+    BigDecimal mAvailableBalanceUSD;
     BigDecimal mTotalBalanceBase;
+    BigDecimal mTotalBalanceUSD;
     int mHashCode;
 
-    public UserAccount(List<AccountItem> accounts) {
-        mAccounts = new ArrayList<>(accounts);
-        mTotalBalance = new BigDecimal(0);
-        mTotalBalanceUsd = new BigDecimal(0);
-        mTotalBalanceBase = new BigDecimal(0);
-        for (AccountItem item : mAccounts) {
-            mTotalBalance = mTotalBalance.add(item.getBalance());
-            mTotalBalanceUsd = mTotalBalanceUsd.add(item.getBalanceUsd());
-            mTotalBalanceBase = mTotalBalanceBase.add(item.getBalanceBase());
-        }
-        mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd, mTotalBalanceBase);
+    public UserAccount(List<CoinAccount> coinAccounts, BigDecimal availableBalanceBase, BigDecimal availableBalanceUSD, BigDecimal totalBalanceBase, BigDecimal totalBalanceUSD) {
+        mCoinAccounts = new ArrayList<>(coinAccounts);
+        mAvailableBalanceBase = firstNonNull(availableBalanceBase, BigDecimal.ZERO);
+        mAvailableBalanceUSD = firstNonNull(availableBalanceUSD, BigDecimal.ZERO);
+        mTotalBalanceBase = firstNonNull(totalBalanceBase, BigDecimal.ZERO);
+        mTotalBalanceUSD = firstNonNull(totalBalanceUSD, BigDecimal.ZERO);
+        mHashCode = Objects.hash(mCoinAccounts, mAvailableBalanceBase, mAvailableBalanceUSD, mTotalBalanceBase, mTotalBalanceUSD);
     }
 
-    public UserAccount(List<AccountItem> accounts, BigDecimal totalBalance, BigDecimal totalBalanceUsd, BigDecimal totalBalanceBase) {
-        mAccounts = new ArrayList<>(accounts);
-        mTotalBalance = firstNonNull(totalBalance, new BigDecimal(0));
-        mTotalBalanceUsd = firstNonNull(totalBalanceUsd, new BigDecimal(0));
-        mTotalBalanceBase = firstNonNull(totalBalanceBase, new BigDecimal(0));
-        mHashCode = Objects.hash(mAccounts, mTotalBalance, mTotalBalanceUsd, mTotalBalanceBase);
+    public UserAccount(List<CoinAccount> coinAccounts) {
+        mCoinAccounts = coinAccounts;
+        mAvailableBalanceBase = BigDecimal.ZERO;
+        mAvailableBalanceUSD = BigDecimal.ZERO;
+        mTotalBalanceBase = BigDecimal.ZERO;
+        mTotalBalanceUSD = BigDecimal.ZERO;
+        mHashCode = Objects.hash(mCoinAccounts, mAvailableBalanceBase, mAvailableBalanceUSD, mTotalBalanceBase, mTotalBalanceUSD);
     }
 
-    UserAccount() {
+    public UserAccount() {
+        mCoinAccounts = Collections.emptyList();
+        mAvailableBalanceBase = BigDecimal.ZERO;
+        mAvailableBalanceUSD = BigDecimal.ZERO;
+        mTotalBalanceBase = BigDecimal.ZERO;
+        mTotalBalanceUSD = BigDecimal.ZERO;
+        mHashCode = Objects.hash(mCoinAccounts, mAvailableBalanceBase, mAvailableBalanceUSD, mTotalBalanceBase, mTotalBalanceUSD);
     }
 
     @Override
@@ -82,10 +88,11 @@ public class UserAccount implements Serializable, Cloneable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserAccount that = (UserAccount) o;
-        return Objects.equals(mAccounts, that.mAccounts) &&
-                Objects.equals(mTotalBalance, that.mTotalBalance) &&
-                Objects.equals(mTotalBalanceUsd, that.mTotalBalanceUsd) &&
-                Objects.equals(mTotalBalanceBase, that.mTotalBalanceBase);
+        return Objects.equals(mCoinAccounts, that.mCoinAccounts) &&
+                Objects.equals(mAvailableBalanceBase, that.mAvailableBalanceBase) &&
+                Objects.equals(mAvailableBalanceUSD, that.mAvailableBalanceUSD) &&
+                Objects.equals(mTotalBalanceBase, that.mTotalBalanceBase) &&
+                Objects.equals(mTotalBalanceUSD, that.mTotalBalanceUSD);
     }
 
     @Override
@@ -94,46 +101,67 @@ public class UserAccount implements Serializable, Cloneable {
     }
 
     public int size() {
-        return mAccounts != null ? mAccounts.size() : 0;
+        return mCoinAccounts != null ? mCoinAccounts.size() : 0;
     }
 
     public boolean isEmpty() {
         return size() == 0;
     }
 
-    public BigDecimal getTotalBalance() {
-        if (mTotalBalance == null) {
-            mTotalBalance = new BigDecimal(0);
+    public BigDecimal getAvailableBalanceBase() {
+        if (mAvailableBalanceBase == null) {
+            mAvailableBalanceBase = BigDecimal.ZERO;
         }
-        return mTotalBalance;
+        return mAvailableBalanceBase;
     }
 
     public BigDecimal getTotalBalanceBase() {
         if (mTotalBalanceBase == null) {
-            mTotalBalanceBase = new BigDecimal(0);
+            mTotalBalanceBase = BigDecimal.ZERO;
         }
         return mTotalBalanceBase;
     }
 
-    public BigDecimal getTotalBalanceUsd() {
-        if (mTotalBalanceUsd == null) {
-            mTotalBalanceUsd = new BigDecimal(0);
+    public BigDecimal getAvailableBalanceUSD() {
+        if (mAvailableBalanceUSD == null) {
+            mAvailableBalanceUSD = BigDecimal.ZERO;
         }
-        return mTotalBalanceUsd;
+        return mAvailableBalanceUSD;
     }
 
-    public Optional<AccountItem> findAccountByCoin(String coin) {
-        return Stream.of(getAccounts())
+    public BigDecimal getTotalBalanceUSD() {
+        if (mTotalBalanceUSD == null) {
+            mTotalBalanceUSD = BigDecimal.ZERO;
+        }
+
+        return mTotalBalanceUSD;
+    }
+
+    public Optional<CoinAccount> findAccountByCoin(String coin) {
+        return Stream.of(getCoinAccounts())
                 .filter(item -> item.getCoin().equals(coin))
                 .findFirst();
     }
 
-    public List<AccountItem> getAccounts() {
-        if (mAccounts == null) {
-            mAccounts = Collections.emptyList();
+    public List<CoinAccount> getCoinAccounts() {
+        if (mCoinAccounts == null) {
+            mCoinAccounts = Collections.emptyList();
         }
 
-        return mAccounts;
+        List<CoinAccount> items = mCoinAccounts;
+        Collections.sort(items, new Comparator<CoinAccount>() {
+            @Override
+            public int compare(CoinAccount a, CoinAccount b) {
+                if (a.getCoin().toUpperCase().equals(MinterSDK.DEFAULT_COIN)) {
+                    return -1;
+                }
+
+                return a.getCoin().compareTo(b.getCoin());
+
+            }
+        });
+
+        return mCoinAccounts;
     }
 
 }

@@ -58,7 +58,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
@@ -163,7 +163,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     @Inject RecipientAutocompleteStorage recipientStorage;
     @Inject IdlingManager idlingManager;
     @Inject GateEstimateRepository estimateRepo;
-    private AccountItem mFromAccount = null;
+    private CoinAccount mFromAccount = null;
     private BigDecimal mAmount = null;
     private CharSequence mToMxAddress = null;
     private CharSequence mToMpAddress = null;
@@ -176,7 +176,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private BehaviorSubject<String> mAddressChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private BigInteger mGasPrice = new BigInteger("1");
-    private AccountItem mLastAccount = null;
+    private CoinAccount mLastAccount = null;
     private BigDecimal sendFee;
     private byte[] payload;
     @Inject GateTransactionRepository gateTxRepo;
@@ -238,9 +238,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 .subscribe(res -> {
                     if (!res.isEmpty()) {
                         if (mLastAccount != null) {
-                            onAccountSelected(res.findAccountByCoin(mLastAccount.getCoin()).orElse(res.getAccounts().get(0)));
+                            onAccountSelected(res.findAccountByCoin(mLastAccount.getCoin()).orElse(res.getCoinAccounts().get(0)));
                         } else {
-                            onAccountSelected(res.getAccounts().get(0));
+                            onAccountSelected(res.getCoinAccounts().get(0));
                         }
                     }
                 }, t -> {
@@ -568,7 +568,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             return;
         }
         mEnableUseMax.set(true);
-        checkEnoughBalance(mFromAccount.getBalanceBase());
+        checkEnoughBalance(mFromAccount.getBalance());
         mAmount = mFromAccount.getBalance();
         getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
 
@@ -578,8 +578,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
     }
 
-    private Optional<AccountItem> findAccountByCoin(String coin) {
-        return Stream.of(accountStorage.getData().getAccounts())
+    private Optional<CoinAccount> findAccountByCoin(String coin) {
+        return Stream.of(accountStorage.getData().getCoinAccounts())
                 .filter(item -> item.getCoin().equals(coin.toUpperCase()))
                 .findFirst();
     }
@@ -593,8 +593,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                     .create();
             dialog.setCancelable(false);
 
-            Optional<AccountItem> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-            Optional<AccountItem> sendAccount = findAccountByCoin(mFromAccount.getCoin());
+            Optional<CoinAccount> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+            Optional<CoinAccount> sendAccount = findAccountByCoin(mFromAccount.getCoin());
 
             OperationType type = getTransactionTypeByAddress();
             final boolean enoughBaseCoinForCommission;
@@ -902,13 +902,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
     private void onClickAccountSelector(View view) {
         getAnalytics().send(AppEvent.SendCoinsChooseCoinButton);
-        getViewState().startAccountSelector(accountStorage.getData().getAccounts(), this::onAccountSelected);
+        getViewState().startAccountSelector(accountStorage.getData().getCoinAccounts(), this::onAccountSelected);
     }
 
-    private void onAccountSelected(AccountItem accountItem) {
-        mFromAccount = accountItem;
-        mLastAccount = accountItem;
-        getViewState().setAccountName(String.format("%s (%s)", accountItem.coin.toUpperCase(), bdHuman(accountItem.getBalance())));
+    private void onAccountSelected(CoinAccount coinAccount) {
+        mFromAccount = coinAccount;
+        mLastAccount = coinAccount;
+        getViewState().setAccountName(String.format("%s (%s)", coinAccount.coin.toUpperCase(), bdHuman(coinAccount.getBalance())));
 
     }
 

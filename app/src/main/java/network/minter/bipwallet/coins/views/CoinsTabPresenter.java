@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import org.parceler.Parcel;
@@ -51,7 +50,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
@@ -74,7 +73,6 @@ import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
-import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.explorer.models.HistoryTransaction;
@@ -85,6 +83,7 @@ import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman;
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
 import static network.minter.bipwallet.internal.helpers.Plurals.usd;
 import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
@@ -109,7 +108,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
     private List<MinterAddress> myAddresses = new ArrayList<>();
     private MultiRowAdapter mAdapter;
     private TransactionShortListAdapter mTransactionsAdapter;
-    private SimpleRecyclerAdapter<AccountItem, ItemViewHolder> mCoinsAdapter;
+    private SimpleRecyclerAdapter<CoinAccount, ItemViewHolder> mCoinsAdapter;
     private ListWithButtonRow mTransactionsRow, mCoinsRow;
     private boolean mUseAvatars = true;
     private boolean mLowMemory = false;
@@ -190,7 +189,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         mTransactionsAdapter.setOnExplorerOpenClickListener(this::onExplorerClick);
         session.getUserUpdate().doOnSubscribe(this::unsubscribeOnDestroy).subscribe(res -> setUsername());
 
-        mCoinsAdapter = new SimpleRecyclerAdapter.Builder<AccountItem, ItemViewHolder>()
+        mCoinsAdapter = new SimpleRecyclerAdapter.Builder<CoinAccount, ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, ItemViewHolder.class)
                 .setBinder((itemViewHolder, item, position) -> {
                     itemViewHolder.title.setText(item.coin.toUpperCase());
@@ -229,24 +228,17 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
                 .map(AccountStorage.groupAccountByCoin())
                 .subscribe(res -> {
                     Timber.d("Update coins list");
-                    mCoinsAdapter.dispatchChanges(AccountItem.DiffUtilImpl.class, res.getAccounts());
+                    mCoinsAdapter.dispatchChanges(CoinAccount.DiffUtilImpl.class, res.getCoinAccounts());
 
-                    Optional<AccountItem> defAccount = Stream.of(res.getAccounts())
-                            .filter(item -> item.getCoin().equals(MinterSDK.DEFAULT_COIN))
-                            .findFirst();
+                    final StringHelper.DecimalStringFraction availableBIP, availableUSD, totalBIP, totalUSD;
 
-                    final StringHelper.DecimalStringFraction numBIP, numAll, numUSD;
-                    if (!defAccount.isPresent()) {
-                        numBIP = numAll = numUSD = StringHelper.splitDecimalStringFractions(new BigDecimal("0").setScale(4, RoundingMode.DOWN));
-                    } else {
-                        numBIP = StringHelper.splitDecimalStringFractions(defAccount.get().getBalance().setScale(4, RoundingMode.DOWN));
-                        numAll = StringHelper.splitDecimalStringFractions(defAccount.get().getTotalBalanceBase().setScale(4, RoundingMode.DOWN));
-                        numUSD = StringHelper.splitDecimalStringFractions(defAccount.get().getTotalBanaceUSD().setScale(2, RoundingMode.DOWN));
-                    }
+                    availableBIP = StringHelper.splitDecimalStringFractions(res.getAvailableBalanceBase().setScale(4, RoundingMode.DOWN));
+                    totalBIP = StringHelper.splitDecimalStringFractions(res.getTotalBalanceBase().setScale(4, RoundingMode.DOWN));
+                    totalUSD = StringHelper.splitDecimalStringFractions(res.getTotalBalanceUSD().setScale(2, RoundingMode.DOWN));
 
-                    mBalanceCurrentState.setBIP(numBIP.intPart, numBIP.fractionalPart, bips(Long.parseLong(numBIP.intPart)));
-                    mBalanceCurrentState.setAll(numAll.intPart, numAll.fractionalPart, bips(Long.parseLong(numAll.intPart)));
-                    mBalanceCurrentState.setUSD(usd(numUSD.intPart), numUSD.fractionalPart);
+                    mBalanceCurrentState.setAvailableBIP(bdIntHuman(availableBIP.intPart), availableBIP.fractionalPart, bips(Long.parseLong(availableBIP.intPart)));
+                    mBalanceCurrentState.setTotalBIP(bdIntHuman(totalBIP.intPart), totalBIP.fractionalPart, bips(Long.parseLong(totalBIP.intPart)));
+                    mBalanceCurrentState.setTotalUSD(usd(bdIntHuman(totalUSD.intPart)), totalUSD.fractionalPart);
 
                     mBalanceCurrentState.applyTo(getViewState());
 
@@ -371,15 +363,15 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
             items.add(new BalanceState("$0", "00", ""));
         }
 
-        void setBIP(String intPart, String fractPart, String amount) {
+        void setAvailableBIP(String intPart, String fractPart, String amount) {
             items.set(0, new BalanceState(intPart, fractPart, amount));
         }
 
-        void setAll(String intPart, String fractPart, String amount) {
+        void setTotalBIP(String intPart, String fractPart, String amount) {
             items.set(1, new BalanceState(intPart, fractPart, amount));
         }
 
-        void setUSD(String intPart, String fractPart) {
+        void setTotalUSD(String intPart, String fractPart) {
             items.set(2, new BalanceState(intPart, fractPart, ""));
         }
 
@@ -391,7 +383,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
             view.setBalanceClickListener(v -> {
                 cursor += 1;
-                cursor %= 3;
+                cursor %= items.size();
                 applyTo(view);
 
                 Wallet.app().settings().putInt(SettingsManager.CurrentBalanceCursor, cursor);

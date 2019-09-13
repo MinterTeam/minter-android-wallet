@@ -38,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AccountItem;
+import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -50,11 +50,11 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
  */
 public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelectedAdapter.ViewHolder> {
 
-    private List<AccountItem> mItems;
+    private List<CoinAccount> mItems;
     private LayoutInflater mInflater;
     private OnClickListener mOnClickListener;
 
-    public AccountSelectedAdapter(List<AccountItem> items) {
+    public AccountSelectedAdapter(List<CoinAccount> items) {
         mItems = items;
     }
 
@@ -75,7 +75,7 @@ public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelected
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final AccountItem item = mItems.get(position);
+        final CoinAccount item = mItems.get(position);
         holder.avatar.setImageUrlFallback(item.getAvatar(), R.drawable.img_avatar_default);
         holder.title.setText(String.format("%s (%s)", item.coin.toUpperCase(), bdHuman(item.balance)));
         holder.subtitle.setText(item.address.toShortString());
@@ -93,7 +93,7 @@ public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelected
     }
 
     public interface OnClickListener {
-        void onClick(AccountItem item);
+        void onClick(CoinAccount item);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
