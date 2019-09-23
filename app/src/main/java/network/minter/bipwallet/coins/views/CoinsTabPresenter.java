@@ -175,14 +175,15 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-
+/*
         profileCachedRepo.observe().subscribe(res -> {
             setUsername();
         });
-
+*/
         myAddresses = secretRepo.getAddresses();
         mAdapter = new MultiRowAdapter();
         mTransactionsAdapter = new TransactionShortListAdapter(myAddresses);
@@ -230,9 +231,16 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
                     Timber.d("Update coins list");
                     mCoinsAdapter.dispatchChanges(CoinAccount.DiffUtilImpl.class, res.getCoinAccounts());
 
-                    final StringHelper.DecimalStringFraction availableBIP, availableUSD, totalBIP, totalUSD;
+                    StringBuilder testSb = new StringBuilder();
+                    testSb.append("Balances: \n");
+                    for (CoinAccount acc : res.getCoinAccounts()) {
+                        testSb.append(acc.getCoin()).append(" ").append(acc.getBalance().toPlainString()).append("\n");
+                    }
+                    Timber.d(testSb.toString());
 
-                    availableBIP = StringHelper.splitDecimalStringFractions(res.getAvailableBalanceBase().setScale(4, RoundingMode.DOWN));
+                    final StringHelper.DecimalStringFraction availableBIP, totalBIP, totalUSD;
+
+                    availableBIP = StringHelper.splitDecimalStringFractions(res.getAvailableBalanceBIP().setScale(4, RoundingMode.DOWN));
                     totalBIP = StringHelper.splitDecimalStringFractions(res.getTotalBalanceBase().setScale(4, RoundingMode.DOWN));
                     totalUSD = StringHelper.splitDecimalStringFractions(res.getTotalBalanceUSD().setScale(2, RoundingMode.DOWN));
 

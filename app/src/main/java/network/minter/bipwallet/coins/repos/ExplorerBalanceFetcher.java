@@ -43,6 +43,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.internal.helpers.data.CollectionsHelper;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.AddressData;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -71,14 +72,6 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<UserAc
 
     public static Observable<List<UserAccount>> create(@NonNull ExplorerAddressRepository addressRepository, @NonNull final List<MinterAddress> addresses) {
         return Observable.create(new ExplorerBalanceFetcher(addressRepository, addresses));
-    }
-
-    public static Observable<BigDecimal> createSingleTotalBalance(ExplorerAddressRepository addressRepository, MinterAddress address) {
-        return rxExpGate(addressRepository.getAddressData(address, true))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .onErrorResumeNext(toExpGateError())
-                .map(item -> item.result.getTotalBalance());
     }
 
     public static Observable<BigDecimal> createSingleCoinBalance(ExplorerAddressRepository addressRepository, MinterAddress address, String coin) {
@@ -136,7 +129,7 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<UserAc
         for (Map.Entry<MinterAddress, AddressData> entry : mRawBalances.entrySet()) {
             if (entry.getKey() == null) continue;
 
-            List<CoinAccount> accounts = new ArrayList<>();
+            List<CoinAccount> accounts = new ArrayList<>(entry.getValue().coins.size());
 
             for (AddressData.CoinBalance balance : entry.getValue().coins.values()) {
                 CoinAccount item = new CoinAccount(
@@ -147,13 +140,13 @@ public class ExplorerBalanceFetcher implements ObservableOnSubscribe<List<UserAc
                 );
                 accounts.add(item);
             }
+            Collections.sort(accounts, new CollectionsHelper.StableCoinSorting());
 
             UserAccount ua = new UserAccount(
                     accounts,
-                    entry.getValue().availableBalanceInBase,
-                    entry.getValue().availableBalanceInUSD,
-                    entry.getValue().totalBalanceInBase,
-                    entry.getValue().totalBalanceInUSD);
+                    entry.getValue().getAvailableBalanceBIP(),
+                    entry.getValue().getTotalBalance(),
+                    entry.getValue().getTotalBalanceUSD());
 
             out.add(ua);
         }

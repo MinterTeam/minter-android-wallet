@@ -33,6 +33,7 @@ import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,10 +41,11 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import network.minter.bipwallet.advanced.models.CoinAccount;
+import network.minter.core.MinterSDK;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class CollectionsHelper {
@@ -166,10 +168,6 @@ public class CollectionsHelper {
         }});
     }
 
-    public interface IOFunc<Input, Output> {
-        Output apply(Input input);
-    }
-
     public static void bzero(byte[] arr) {
         if (arr == null || arr.length == 0) {
             return;
@@ -177,6 +175,29 @@ public class CollectionsHelper {
 
         for (int i = 0; i < arr.length; i++) {
             arr[i] = (byte) 0;
+        }
+    }
+
+    public interface IOFunc<Input, Output> {
+        Output apply(Input input);
+    }
+
+    public static class StableCoinSorting implements Comparator<CoinAccount> {
+        private final static String sStable = MinterSDK.DEFAULT_COIN.toLowerCase();
+
+        @Override
+        public int compare(CoinAccount ac, CoinAccount bc) {
+            final String a = ac.getCoin().toLowerCase();
+            final String b = bc.getCoin().toLowerCase();
+
+            if (a.equals(b)) // update to make it stable
+                return 0;
+            if (a.equals(sStable))
+                return -1;
+            if (b.equals(sStable))
+                return 1;
+
+            return a.compareTo(b);
         }
     }
 }
