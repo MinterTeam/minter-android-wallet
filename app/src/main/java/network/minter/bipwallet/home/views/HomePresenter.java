@@ -125,6 +125,8 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
 
                 Timber.d("Deeplink URI: %s", uri);
                 Timber.d("Deeplink TX: %s", hash);
+
+                getViewState().startRemoteTransaction(hash);
             }
         }
     }

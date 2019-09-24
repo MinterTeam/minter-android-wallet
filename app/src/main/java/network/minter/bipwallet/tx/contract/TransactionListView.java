@@ -1,4 +1,4 @@
-package network.minter.bipwallet.coins.contract;
+package network.minter.bipwallet.tx.contract;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;

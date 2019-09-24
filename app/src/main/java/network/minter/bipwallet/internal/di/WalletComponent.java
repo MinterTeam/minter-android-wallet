@@ -68,6 +68,7 @@ import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
+import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
@@ -139,6 +140,7 @@ public interface WalletComponent {
     ExplorerTransactionRepository explorerTransactionsRepo();
     ExplorerAddressRepository addressExplorerRepo();
     ExplorerCoinsRepository explorerCoinsRepo();
+    ExplorerValidatorsRepository validatorsRepo();
     GateGasRepository gasRepo();
     GateTransactionRepository txGateRepo();
     GateEstimateRepository estimateRepo();

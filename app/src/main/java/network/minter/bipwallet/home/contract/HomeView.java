@@ -15,4 +15,6 @@ public interface HomeView extends MvpView, ErrorView, ErrorViewWithRetry, Progre
     void setCurrentPage(int position);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startUrl(String url);
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startRemoteTransaction(String txHash);
 }

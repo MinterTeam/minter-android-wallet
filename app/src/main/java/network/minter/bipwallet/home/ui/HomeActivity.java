@@ -109,6 +109,11 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
     }
 
     @Override
+    public void startRemoteTransaction(String txHash) {
+
+    }
+
+    @Override
     public void addBackPressedListener(BackPressedListener listener) {
         mBackPressedListeners.add(listener);
     }

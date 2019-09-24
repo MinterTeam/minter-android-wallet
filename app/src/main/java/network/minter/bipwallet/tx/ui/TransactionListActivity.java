@@ -50,11 +50,11 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.coins.contract.TransactionListView;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
+import network.minter.bipwallet.tx.contract.TransactionListView;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
 import network.minter.explorer.MinterExplorerApi;
 

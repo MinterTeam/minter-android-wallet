@@ -168,9 +168,9 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.VIEW"/>-->
-            <!--                <category android:name="android.intent.category.DEFAULT"/>-->
-            <!--                <category android:name="android.intent.category.BROWSABLE"/>-->
+            <!--                <action android:name="android.intent.action.VIEW" />-->
+            <!--                <category android:name="android.intent.category.DEFAULT" />-->
+            <!--                <category android:name="android.intent.category.BROWSABLE" />-->
             <!--                <data android:scheme="minter" />-->
             <!--            </intent-filter>-->
         </activity>
@@ -178,6 +178,10 @@
             android:name=".security.ui.PinEnterActivity"
             android:screenOrientation="portrait"
             />
+        <!--        <activity android:name=".tx.ui.RemoteTransactionActivity">-->
+
+        <!--        </activity>-->
+
         <service
             android:name=".services.livebalance.LiveBalanceService"
             android:exported="false"
