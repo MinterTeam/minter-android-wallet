@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.7.2
+ - Fixed available balance
+ - Fixed updating balance
+
 ## 1.7.1
  - Fixed autocomplete BIP order
  - Sorting coins in accounts by name, BIP always on top
