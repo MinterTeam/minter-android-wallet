@@ -110,8 +110,6 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
                     for (CoinItem item : mItemsAll) {
                         if (item.symbol != null && item.symbol.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                             mSuggestions.add(item);
-                        } else if (item.name != null && item.name.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
-                            mSuggestions.add(item);
                         }
                     }
                     FilterResults filterResults = new FilterResults();
