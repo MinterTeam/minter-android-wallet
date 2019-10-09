@@ -200,10 +200,6 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         getViewState().setCommission(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN));
     }
 
-
-    //
-    // adb shell am start -a android.intent.action.VIEW -d "minter://tx?d=f83b01abea8a4d4e5400000000000000948d008dffe2f9144a39a2094ebdedadad335e814f89056bc75e2d631000008080018a4d4e5400000000000000" network.minter.bipwallet
-
     private void fillData(ExternalTransaction tx) {
         getViewState().setPayload(tx.getPayloadString());
         calculateFee(tx);
