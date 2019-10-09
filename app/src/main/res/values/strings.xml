@@ -223,5 +223,7 @@
     <string name="empty_data"><![CDATA[<empty>]]></string>
     <string name="btn_delegate">Delegate</string>
     <string name="title_confirm_tx">Confirm Transaction</string>
+    <string name="btn_confirm_send">Confirm and send</string>
+    <string name="btn_ok">Ok</string>
 
 </resources>

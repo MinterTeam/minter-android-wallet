@@ -80,7 +80,7 @@ public final class ConvertTransactionData {
                     .setValueToSell(mAmount)
                     .setCoinToBuy(mBuyCoin)
 //                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
-                    .setMinValueToBuy(0)
+                    .setMinValueToBuy("0")
                     .build();
         } else if (mType == Type.Buy) {
             // BUY
@@ -104,7 +104,7 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setCoinToBuy(mBuyCoin)
 //                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
-                    .setMinValueToBuy(0)
+                    .setMinValueToBuy("0")
                     .build();
         }
 

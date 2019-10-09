@@ -35,6 +35,7 @@ import android.provider.Settings;
 import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
@@ -53,6 +54,7 @@ import javax.inject.Provider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -78,6 +80,8 @@ import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
 import network.minter.bipwallet.sending.contract.SendView;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
+import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
+import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.explorer.MinterExplorerApi;
@@ -98,9 +102,13 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     public final static String IDLE_SEND_COMPLETE_DIALOG = "IDLE_SEND_COMPLETE_DIALOG";
     public final static String IDLE_SEND_WAIT_GAS = "IDLE_SEND_WAIT_GAS";
 
+    public final static int REQUEST_CODE_QR_SCAN_TX = 2001;
+
+
     @Inject IdlingManager idlingManager;
     @Inject Provider<SendTabPresenter> presenterProvider;
     @InjectPresenter SendTabPresenter presenter;
+    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.input_coin) AppCompatEditText coinInput;
     @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
     @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
@@ -162,7 +170,20 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         recipientLayout.clearFocus();
         amountLayout.clearFocus();
 
+        setHasOptionsMenu(true);
+        getActivity().getMenuInflater().inflate(R.menu.menu_tab_send, toolbar.getMenu());
+        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_scan_tx) {
+            startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX);
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -190,6 +211,12 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @Override
     public void setActionTitle(int buttonTitle) {
         actionSend.setText(buttonTitle);
+    }
+
+    @Override
+    public void startExternalTransaction(ExternalTransaction tx) {
+        new ExternalTransactionActivity.Builder(getActivity(), tx)
+                .start();
     }
 
     @Override

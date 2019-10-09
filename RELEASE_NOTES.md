@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.9.0
+ - Added ability to scan external transaction or open with deeplink
+ - Adopted to Android 10
+ - Reduced app size
+
 ## 1.7.2
  - Fixed available balance
  - Fixed updating balance

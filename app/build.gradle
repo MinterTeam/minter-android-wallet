@@ -198,7 +198,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.biometric:biometric:1.0.0-beta02'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'com.google.android.material:material:1.1.0-alpha10'
+    implementation 'com.google.android.material:material:1.1.0-beta01'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
@@ -235,7 +235,11 @@ dependencies {
         exclude module: "support-v13"
     }
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
-    implementation project(':centrifuge')
+//    implementation project(':centrifuge')
+
+    implementation 'io.github.centrifugal:centrifuge-java:0.0.2'
+
+    implementation 'xyz.belvi.mobilevision:barcodescanner:2.0.3'
 
     // Annotations and DI
     annotationProcessor 'com.google.dagger:dagger-compiler:2.23.2'

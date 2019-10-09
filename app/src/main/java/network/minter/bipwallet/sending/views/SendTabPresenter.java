@@ -71,6 +71,7 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
+import network.minter.bipwallet.internal.helpers.DeepLinkHelper;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
@@ -87,6 +88,7 @@ import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.NetworkStatus;
 import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.TransactionSendResult;
+import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
@@ -224,6 +226,21 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                         getViewState().setRecipient(mToMpAddress);
                         mToName = mToMpAddress.toString();
                     }
+                }
+            }
+        } else if (requestCode == SendTabFragment.REQUEST_CODE_QR_SCAN_TX) {
+            String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
+            if (result != null) {
+                try {
+                    ExternalTransaction tx = DeepLinkHelper.parseTransaction(result);
+
+                    getViewState().startExternalTransaction(tx);
+                } catch (Throwable t) {
+                    Timber.w(t, "Unable to parse remote transaction: %s", result);
+                    getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                            .setText(t.getMessage())
+                            .setPositiveAction(R.string.btn_close)
+                            .create());
                 }
             }
         }
@@ -838,8 +855,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 .create());
     }
 
-    private void onSuccessExecuteTransaction(
-            final GateResult<TransactionSendResult> result) {
+    private void onSuccessExecuteTransaction(final GateResult<TransactionSendResult> result) {
         if (!result.isOk()) {
             onErrorExecuteTransaction(result);
             return;

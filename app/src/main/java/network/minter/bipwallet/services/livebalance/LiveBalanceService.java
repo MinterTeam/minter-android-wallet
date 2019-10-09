@@ -34,20 +34,17 @@ import android.os.IBinder;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
-import centrifuge.Centrifuge;
-import centrifuge.Client;
-import centrifuge.ConnectEvent;
-import centrifuge.ConnectHandler;
-import centrifuge.DisconnectEvent;
-import centrifuge.DisconnectHandler;
-import centrifuge.ErrorEvent;
-import centrifuge.ErrorHandler;
-import centrifuge.MessageEvent;
-import centrifuge.MessageHandler;
-import centrifuge.PublishEvent;
-import centrifuge.PublishHandler;
-import centrifuge.Subscription;
 import dagger.android.AndroidInjection;
+import io.github.centrifugal.centrifuge.Client;
+import io.github.centrifugal.centrifuge.ConnectEvent;
+import io.github.centrifugal.centrifuge.DisconnectEvent;
+import io.github.centrifugal.centrifuge.ErrorEvent;
+import io.github.centrifugal.centrifuge.EventListener;
+import io.github.centrifugal.centrifuge.MessageEvent;
+import io.github.centrifugal.centrifuge.Options;
+import io.github.centrifugal.centrifuge.PublishEvent;
+import io.github.centrifugal.centrifuge.Subscription;
+import io.github.centrifugal.centrifuge.SubscriptionEventListener;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
@@ -70,15 +67,6 @@ public class LiveBalanceService extends Service {
     private OnMessageListener mOnMessageListener;
     private Client mClient = null;
     private MinterAddress mAddress;
-    private final PublishHandler mListener = new PublishHandler() {
-        @Override
-        public void onPublish(Subscription subscription, PublishEvent publishEvent) {
-            Timber.d("OnPublish: sub=%s, ev=%s", subscription.channel(), publishEvent.toString());
-            if (mOnMessageListener != null) {
-                mOnMessageListener.onMessage(new String(publishEvent.getData()), subscription.channel(), mAddress);
-            }
-        }
-    };
 
     @Override
     public void onLowMemory() {
@@ -143,38 +131,47 @@ public class LiveBalanceService extends Service {
 
     private void connect() {
         try {
-            mClient = Centrifuge.new_(BuildConfig.LIVE_BALANCE_URL, Centrifuge.defaultConfig());
-            mClient.onConnect(new ConnectHandler() {
+            EventListener listener = new EventListener() {
                 @Override
-                public void onConnect(Client client, ConnectEvent connectEvent) {
+                public void onConnect(Client client, ConnectEvent event) {
+                    super.onConnect(client, event);
                     Timber.d("Connected");
                 }
-            });
 
-            mClient.onDisconnect(new DisconnectHandler() {
                 @Override
-                public void onDisconnect(Client client, DisconnectEvent disconnectEvent) {
+                public void onDisconnect(Client client, DisconnectEvent event) {
+                    super.onDisconnect(client, event);
                     Timber.i("Disconnected");
                 }
-            });
-            mClient.onError(new ErrorHandler() {
-                @Override
-                public void onError(Client client, ErrorEvent errorEvent) {
-                    Timber.w("OnError[%d]: %s", errorEvent.incRefnum(), errorEvent.getMessage());
-                }
-            });
 
-            mClient.onMessage(new MessageHandler() {
                 @Override
-                public void onMessage(Client p0, MessageEvent p1) {
-                    Timber.d("OnMessage: event=%s", p1.toString());
+                public void onError(Client client, ErrorEvent event) {
+                    super.onError(client, event);
+                    // @TODO WTF?
+                    Timber.w("OnError");
                 }
-            });
+
+                @Override
+                public void onMessage(Client client, MessageEvent event) {
+                    super.onMessage(client, event);
+                    Timber.d("OnMessage: event=%s", new String(event.getData()));
+                }
+            };
+            Options opts = new Options();
+            mClient = new Client(BuildConfig.LIVE_BALANCE_URL + "?format=protobuf", opts, listener);
             mClient.connect();
 
             mAddress = secretStorage.getAddresses().get(0);
-            Subscription sub = mClient.newSubscription(mAddress.toString());
-            sub.onPublish(mListener);
+            Subscription sub = mClient.newSubscription(mAddress.toString(), new SubscriptionEventListener() {
+                @Override
+                public void onPublish(Subscription subscription, PublishEvent publishEvent) {
+                    super.onPublish(subscription, publishEvent);
+                    Timber.d("OnPublish: sub=%s, ev=%s", subscription.getChannel(), new String(publishEvent.getData()));
+                    if (mOnMessageListener != null) {
+                        mOnMessageListener.onMessage(new String(publishEvent.getData()), subscription.getChannel(), mAddress);
+                    }
+                }
+            });
             sub.subscribe();
         } catch (Throwable t) {
             Timber.w(t, "Unable to connect with RTM");

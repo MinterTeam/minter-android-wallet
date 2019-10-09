@@ -24,4 +24,4 @@
  * THE SOFTWARE.
  */
 
-include ':app' , ':centrifuge'
+include ':app'

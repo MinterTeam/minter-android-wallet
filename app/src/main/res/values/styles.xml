@@ -305,6 +305,16 @@
 
     </style>
 
+    <style name="Wallet.Input" parent="Wallet">
+
+    </style>
+
+    <style name="Wallet.Input.Disabled" parent="Wallet.Input">
+        <item name="android:background">@drawable/bg_input_disabled</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+
 
     <color name="grey">#FF9E9E9E</color>
 </resources>

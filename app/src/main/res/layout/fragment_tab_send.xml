@@ -175,7 +175,7 @@
                 android:paddingTop="7dp"
                 app:layout_constraintEnd_toEndOf="@id/row_recipient"
                 app:layout_constraintTop_toTopOf="@id/row_recipient"
-                app:srcCompat="@drawable/ic_qr"
+                app:srcCompat="@drawable/ic_qr_grey"
                 />
 
             <!--AMOUNT-->

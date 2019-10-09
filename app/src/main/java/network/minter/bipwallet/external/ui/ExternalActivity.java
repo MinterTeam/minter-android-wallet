@@ -102,14 +102,6 @@ public class ExternalActivity extends BaseInjectActivity {
     private DeepLinkModuleLoader mLinkLoader;
 
     private void startDeepLink() {
-
-//        if(secretStorage.hasPinCode()) {
-//            new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
-//                    .startHomeOnSuccess()
-//                    .setSuccessIntent()
-//                    .start();
-//        }
-
         mLinkLoader = new DeepLinkModuleLoader();
         DeepLinkDelegate delegate = new DeepLinkDelegate(mLinkLoader);
         String old = getIntent().getData().toString();
@@ -124,7 +116,12 @@ public class ExternalActivity extends BaseInjectActivity {
             finish();
         } else {
             Intent target = dispatchDeeplink(this, getIntent());
-            target.setClass(this, HomeActivity.class);
+//            if(uri.getHost() != null && uri.getHost().equals("tx")) {
+//                target.setClass(this, ExternalTransactionActivity.class);
+//            } else {
+//                target.setClass(this, HomeActivity.class);
+//            }
+
 
             new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
                     .setSuccessIntent(target)
