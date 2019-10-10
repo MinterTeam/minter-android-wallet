@@ -237,8 +237,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                     getViewState().startExternalTransaction(tx);
                 } catch (Throwable t) {
                     Timber.w(t, "Unable to parse remote transaction: %s", result);
-                    getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
-                            .setText(t.getMessage())
+                    getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan QR")
+                            .setText("Invalid transaction data")
                             .setPositiveAction(R.string.btn_close)
                             .create());
                 }
