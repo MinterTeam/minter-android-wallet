@@ -112,7 +112,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 android:clipChildren="false"
-                android:hint="@string/label_payload"
+                android:hint="@string/label_payload_short"
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -122,9 +122,11 @@
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/input_payload"
+                    style="@style/Wallet.Input.Disabled"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
+                    android:enabled="false"
                     android:inputType="textMultiLine"
                     android:paddingStart="4dp"
                     android:textSize="@dimen/text_size_default"
