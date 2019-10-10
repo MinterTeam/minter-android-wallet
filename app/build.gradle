@@ -190,13 +190,15 @@ dependencies {
             "network.minter.android:minter-android-profile:${minterProfileSDK}"
     ])
 
+
+
     // support
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core:1.2.0-alpha04'
+    implementation 'androidx.core:core:1.2.0-beta01'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.biometric:biometric:1.0.0-beta02'
+    implementation 'androidx.biometric:biometric:1.0.0-rc01'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
     implementation 'com.google.android.material:material:1.1.0-beta01'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
@@ -216,8 +218,8 @@ dependencies {
 
     // common
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.budiyev.android:code-scanner:1.9.0'
-    implementation 'com.google.zxing:core:3.3.3'
+    implementation 'com.edwardstock.android:code-scanner:2.2.0'
+    implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:android-integration:3.3.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
@@ -235,11 +237,9 @@ dependencies {
         exclude module: "support-v13"
     }
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
-//    implementation project(':centrifuge')
+
 
     implementation 'io.github.centrifugal:centrifuge-java:0.0.2'
-
-    implementation 'xyz.belvi.mobilevision:barcodescanner:2.0.3'
 
     // Annotations and DI
     annotationProcessor 'com.google.dagger:dagger-compiler:2.23.2'
@@ -248,23 +248,9 @@ dependencies {
     implementation 'com.google.dagger:dagger-android-support:2.23.2'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    // MVP ignore 1.5.5 - not working with inner class interfaces, waiting for 1.5.6
-
-    //noinspection GradleDependency
-//    implementation 'tech.schoolhelper:moxy-x:1.7.0'
+    // MVP
     implementation 'com.github.moxy-community:moxy:1.0.14'
-
-    //noinspection GradleDependency
-//    implementation 'tech.schoolhelper:moxy-x-androidx:1.7.0'
     implementation 'com.github.moxy-community:moxy-androidx:1.0.14'
-
-
-    //noinspection GradleDependency
-//    implementation 'tech.schoolhelper:moxy-x-app-compat:1.7.0'
-//    implementation 'com.github.moxy-community:moxy-app-compat:1.0.13'
-
-    //noinspection GradleDependency
-//    annotationProcessor 'tech.schoolhelper:moxy-x-compiler:1.7.0'
     annotationProcessor 'com.github.moxy-community:moxy-compiler:1.0.14'
 
     // Reactive

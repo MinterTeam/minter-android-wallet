@@ -26,12 +26,14 @@
 
 package network.minter.bipwallet.sending.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.budiyev.android.codescanner.ScanMode;
 import com.google.zxing.Result;
 
 import androidx.annotation.NonNull;
@@ -45,7 +47,6 @@ import static com.budiyev.android.codescanner.CodeScanner.TWO_DIMENSIONAL_FORMAT
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class QRCodeScannerActivity extends BaseActivity implements DecodeCallback {
@@ -75,6 +76,7 @@ public class QRCodeScannerActivity extends BaseActivity implements DecodeCallbac
         super.onBackPressed();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +86,7 @@ public class QRCodeScannerActivity extends BaseActivity implements DecodeCallbac
         mCodeScanner = new CodeScanner(this, scannerView);
         mCodeScanner.setDecodeCallback(this);
         mCodeScanner.setFormats(TWO_DIMENSIONAL_FORMATS);
+        mCodeScanner.setScanMode(ScanMode.SINGLE);
         scannerView.setOnClickListener(v -> {
             mCodeScanner.startPreview();
         });
