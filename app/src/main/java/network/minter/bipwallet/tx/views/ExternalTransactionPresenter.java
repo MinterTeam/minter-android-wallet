@@ -193,6 +193,10 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             baseFee = baseFee.add(
                     new BigDecimal(clamp(txData.getItems().size() - 1, 0)).multiply(OperationType.FEE_BASE.multiply(new BigDecimal("5")))
             );
+        } else if (tx.getType().equals(OperationType.CreateCoin)) {
+            // https://docs.minter.network/#section/Commissions
+            final TxCreateCoin txData = tx.getData(TxCreateCoin.class);
+            baseFee = TxCreateCoin.calculateCreatingCost(txData.getSymbol());
         }
 
         BigDecimal fee = baseFee.add(new BigDecimal(bytesLen).multiply(new BigDecimal("0.002")));
