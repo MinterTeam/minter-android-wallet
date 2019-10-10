@@ -4,6 +4,7 @@
  - Added ability to scan external transaction or open with deeplink
  - Adopted to Android 10
  - Reduced app size
+ - Fixed auto-exposure in QR-code scanner
 
 ## 1.7.2
  - Fixed available balance
