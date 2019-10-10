@@ -113,9 +113,11 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             try {
                 mExtTx = DeepLinkHelper.parseTransaction(hash);
             } catch (Throwable t) {
+                getViewState().setFirstVisible(View.GONE);
+                getViewState().setSecondVisible(View.GONE);
                 Timber.w(t, "Unable to parse remote transaction: %s", hash);
                 getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
-                        .setText(t.getMessage())
+                        .setText("Invalid transaction data")
                         .setPositiveAction(R.string.btn_close, (d, w) -> {
                             getViewState().finishCancel();
                         })
@@ -446,10 +448,8 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
     private void onSubmit(View view) {
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Sign transaction")
-                .setText("Please, press OK to sign and send transaction to the network, or CANCEL to dismiss")
-                .setPositiveAction(R.string.btn_ok, (d, w) -> {
-                    startExecuteTransaction();
-                })
+                .setText("Press \"Confirm and send\" to sign and send transaction to the network, or Cancel to dismiss")
+                .setPositiveAction(R.string.btn_confirm_send, (d, w) -> startExecuteTransaction())
                 .setNegativeAction(R.string.btn_cancel)
                 .create());
     }

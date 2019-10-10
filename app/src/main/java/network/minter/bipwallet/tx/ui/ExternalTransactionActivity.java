@@ -93,6 +93,11 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
     }
 
     @Override
+    public void setFirstVisible(int visibility) {
+        layoutInputFirst.setVisibility(visibility);
+    }
+
+    @Override
     public void setSecondVisible(int visibility) {
         layoutInputSecond.setVisibility(visibility);
     }

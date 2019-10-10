@@ -226,5 +226,6 @@
     <string name="title_confirm_tx">Confirm Transaction</string>
     <string name="btn_confirm_send">Confirm and send</string>
     <string name="btn_ok">Ok</string>
+    <string name="btn_proceed">Proceed</string>
 
 </resources>

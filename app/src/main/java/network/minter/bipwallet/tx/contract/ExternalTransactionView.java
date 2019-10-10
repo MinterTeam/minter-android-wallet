@@ -16,10 +16,12 @@ import network.minter.bipwallet.internal.mvp.ProgressView;
 public interface ExternalTransactionView extends MvpView, ProgressView {
     void setFirstLabel(CharSequence label);
     void setFirstValue(CharSequence value);
+
     void setSecondLabel(CharSequence label);
     void setSecondValue(CharSequence value);
     void setPayload(CharSequence payloadString);
     void setCommission(CharSequence fee);
+    void setFirstVisible(int visibility);
     void setSecondVisible(int visibility);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startDialog(WalletDialog.DialogExecutor executor);
@@ -32,4 +34,5 @@ public interface ExternalTransactionView extends MvpView, ProgressView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startExplorer(String hash);
+
 }
