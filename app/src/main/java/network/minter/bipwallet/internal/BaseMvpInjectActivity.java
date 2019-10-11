@@ -28,7 +28,6 @@ package network.minter.bipwallet.internal;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -42,8 +41,7 @@ import androidx.appcompat.widget.Toolbar;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasFragmentInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.HasAndroidInjector;
 import moxy.MvpAppCompatActivity;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
@@ -61,24 +59,13 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @SuppressLint("Registered")
-public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasFragmentInjector, HasSupportFragmentInjector, ErrorView, ErrorViewWithRetry, ProgressTextView {
+public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAndroidInjector, ErrorView, ErrorViewWithRetry, ProgressTextView {
 
-    @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
-    @Inject DispatchingAndroidInjector<androidx.fragment.app.Fragment> supportFragmentInjector;
-
-    @Override
-    public AndroidInjector<Fragment> fragmentInjector() {
-        return fragmentInjector;
-    }
-
-    @Override
-    public AndroidInjector<androidx.fragment.app.Fragment> supportFragmentInjector() {
-        return supportFragmentInjector;
-    }
+    @Inject DispatchingAndroidInjector<Object> androidInjector;
+    private WalletProgressDialog mProgress;
 
     @VisibleForTesting
     public void prepareIdlingResources() {
@@ -127,8 +114,6 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasFr
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
-    private WalletProgressDialog mProgress;
 
     @Override
     public void onError(Throwable t) {
@@ -202,6 +187,11 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasFr
 
         mProgress.dismiss();
         mProgress = null;
+    }
+
+    @Override
+    public AndroidInjector<Object> androidInjector() {
+        return androidInjector;
     }
 
     @Override

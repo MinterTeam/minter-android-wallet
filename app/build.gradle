@@ -242,10 +242,10 @@ dependencies {
     implementation 'io.github.centrifugal:centrifuge-java:0.0.2'
 
     // Annotations and DI
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.23.2'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.23.2'
-    implementation 'com.google.dagger:dagger:2.23.2'
-    implementation 'com.google.dagger:dagger-android-support:2.23.2'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.24'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.24'
+    implementation 'com.google.dagger:dagger:2.24'
+    implementation 'com.google.dagger:dagger-android-support:2.24'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP

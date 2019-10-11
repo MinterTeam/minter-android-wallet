@@ -180,6 +180,7 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:windowSoftInputMode="stateHidden"
             android:name=".tx.ui.ExternalTransactionActivity"
             android:parentActivityName=".home.ui.HomeActivity">
             <meta-data

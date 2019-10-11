@@ -27,7 +27,6 @@
 package network.minter.bipwallet.internal;
 
 import android.annotation.SuppressLint;
-import android.app.Fragment;
 import android.os.Bundle;
 
 import javax.inject.Inject;
@@ -35,30 +34,22 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasFragmentInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.HasAndroidInjector;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @SuppressLint("Registered")
-public class BaseInjectActivity extends BaseActivity implements HasFragmentInjector, HasSupportFragmentInjector {
+public class BaseInjectActivity extends BaseActivity implements HasAndroidInjector {
     @Inject
-    DispatchingAndroidInjector<Fragment> fragmentInjector;
-    @Inject
-    DispatchingAndroidInjector<androidx.fragment.app.Fragment> supportFragmentInjector;
+    DispatchingAndroidInjector<Object> androidInjector;
 
     @Override
-    public AndroidInjector<Fragment> fragmentInjector() {
-        return fragmentInjector;
+    public AndroidInjector<Object> androidInjector() {
+        return androidInjector;
     }
 
-    @Override
-    public AndroidInjector<androidx.fragment.app.Fragment> supportFragmentInjector() {
-        return supportFragmentInjector;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

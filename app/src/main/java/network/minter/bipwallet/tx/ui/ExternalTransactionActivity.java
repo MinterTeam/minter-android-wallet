@@ -1,6 +1,7 @@
 package network.minter.bipwallet.tx.ui;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.parceler.Parcels;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,6 +35,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.internal.views.widgets.WalletButton;
+import network.minter.bipwallet.security.PauseTimer;
 import network.minter.bipwallet.tx.contract.ExternalTransactionView;
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter;
 import network.minter.blockchain.models.operational.ExternalTransaction;
@@ -137,14 +141,32 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
 
     @Override
     public void finishSuccess() {
-        setResult(RESULT_CANCELED);
-        finish();
+        setResult(RESULT_OK);
+        if (checkIsLastActivity()) {
+            try {
+                PauseTimer.logout();
+                finishAffinity();
+            } catch (Throwable ignore) {
+                finish();
+            }
+        } else {
+            finish();
+        }
     }
 
     @Override
     public void finishCancel() {
-        setResult(RESULT_OK);
-        finish();
+        setResult(RESULT_CANCELED);
+        if (checkIsLastActivity()) {
+            try {
+                PauseTimer.logout();
+                finishAffinity();
+            } catch (Throwable ignore) {
+                finish();
+            }
+        } else {
+            finish();
+        }
     }
 
     @Override
@@ -172,6 +194,16 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
         setupToolbar(toolbar);
 
         presenter.handleExtras(getIntent());
+    }
+
+    private boolean checkIsLastActivity() {
+        ActivityManager mngr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (mngr != null) {
+            List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(3);
+            return taskList.get(0).numActivities == 1 && taskList.get(0).topActivity.getClassName().equals(this.getClass().getName());
+        }
+
+        return false;
     }
 
     public static final class Builder extends ActivityBuilder {

@@ -12,7 +12,7 @@ import timber.log.Timber;
 public class PauseTimer {
     private final static PauseTimer INSTANCE = new PauseTimer();
 
-    private AtomicBoolean mLoggedIn = new AtomicBoolean(true);
+    private AtomicBoolean mLoggedIn = new AtomicBoolean(false);
     private AtomicBoolean mRun = new AtomicBoolean(false);
     private Disposable mTimer;
 
@@ -32,15 +32,21 @@ public class PauseTimer {
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .subscribe(res -> {
-                    INSTANCE.mLoggedIn.set(false);
-                    INSTANCE.mRun.set(false);
-                    INSTANCE.mTimer = null;
+                    logout();
                     Timber.d("Logging out...");
                     if (listener != null) {
                         listener.onExit();
                     }
                 });
         INSTANCE.mRun.set(true);
+    }
+
+    public static void logout() {
+        if (INSTANCE == null) return;
+        INSTANCE.mLoggedIn.set(false);
+        INSTANCE.mRun.set(false);
+        INSTANCE.mTimer = null;
+        Timber.d("Logging out...");
     }
 
     public static void onResume() {

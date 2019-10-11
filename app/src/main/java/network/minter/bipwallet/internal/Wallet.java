@@ -26,8 +26,6 @@
 
 package network.minter.bipwallet.internal;
 
-import android.app.Activity;
-import android.app.Service;
 import android.os.Build;
 import android.util.Log;
 
@@ -41,8 +39,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
-import dagger.android.HasServiceInjector;
+import dagger.android.HasAndroidInjector;
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
 import network.minter.bipwallet.BuildConfig;
@@ -63,7 +60,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.firstNonNul
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class Wallet extends MultiDexApplication implements HasActivityInjector, HasServiceInjector {
+public class Wallet extends MultiDexApplication implements HasAndroidInjector {
 
     public static final Locale LC_EN = Locale.US;
     @SuppressWarnings("ConstantConditions")
@@ -79,9 +76,7 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     }
 
     @Inject
-    DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
-    @Inject
-    DispatchingAndroidInjector<Service> dispatchingServiceInjector;
+    DispatchingAndroidInjector<Object> dispatchingAndroidInjector;
 
     @Inject ForegroundDetector foregroundDetector;
 
@@ -137,13 +132,8 @@ public class Wallet extends MultiDexApplication implements HasActivityInjector, 
     }
 
     @Override
-    public AndroidInjector<Activity> activityInjector() {
-        return dispatchingActivityInjector;
-    }
-
-    @Override
-    public AndroidInjector<Service> serviceInjector() {
-        return dispatchingServiceInjector;
+    public AndroidInjector<Object> androidInjector() {
+        return dispatchingAndroidInjector;
     }
 
     public static class Rx {
