@@ -16,7 +16,23 @@ public final class ForegroundDetector implements Application.ActivityLifecycleCa
     private boolean mForeground = false;
 
     public void setListener(ForegroundDelegate lifecycleDelegate) {
-        mDelegate = lifecycleDelegate;
+        mDelegate = new ForegroundDelegate() {
+            @Override
+            public void onAppBackgrounded() {
+                mForeground = false;
+                lifecycleDelegate.onAppBackgrounded();
+            }
+
+            @Override
+            public void onAppForegrounded() {
+                mForeground = true;
+                lifecycleDelegate.onAppForegrounded();
+            }
+        };
+    }
+
+    public boolean isForeground() {
+        return mForeground;
     }
 
     @Override
@@ -34,6 +50,7 @@ public final class ForegroundDetector implements Application.ActivityLifecycleCa
         if (!mForeground && mDelegate != null) {
             mForeground = true;
             PauseTimer.onResume();
+
             mDelegate.onAppForegrounded();
         }
     }
@@ -63,7 +80,6 @@ public final class ForegroundDetector implements Application.ActivityLifecycleCa
         if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
             // lifecycleDelegate instance was passed in on the constructor
             mForeground = false;
-
             if (mDelegate != null) {
                 PauseTimer.onPause(() -> mDelegate.onAppBackgrounded());
             }

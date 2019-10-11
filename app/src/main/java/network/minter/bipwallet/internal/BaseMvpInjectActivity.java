@@ -213,7 +213,10 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasFr
             @Override
             public void onAppBackgrounded() {
                 Timber.d("Destroy application");
-                finishAffinity();
+                try {
+                    finishAffinity();
+                } catch (Throwable ignore) {
+                }
             }
 
             @Override

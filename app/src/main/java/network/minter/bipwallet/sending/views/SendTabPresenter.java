@@ -127,7 +127,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFro
  */
 @InjectViewState
 public class SendTabPresenter extends MvpBasePresenter<SendView> {
-    private static final int REQUEST_CODE_QR_SCAN = 101;
+    private static final int REQUEST_CODE_QR_SCAN_ADDRESS = 101;
     private static final BigDecimal PAYLOAD_FEE = BigDecimal.valueOf(0.002);
     private final TextWatcher mPayloadChangeListener = new TextWatcher() {
         @Override
@@ -210,7 +210,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
-        if (requestCode == REQUEST_CODE_QR_SCAN) {
+        if (requestCode == REQUEST_CODE_QR_SCAN_ADDRESS) {
             if (data != null && data.hasExtra(QRCodeScannerActivity.RESULT_TEXT)) {
                 //Getting the passed result
                 String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
@@ -231,6 +231,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         } else if (requestCode == SendTabFragment.REQUEST_CODE_QR_SCAN_TX) {
             String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
             if (result != null) {
+
+                boolean isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN);
+                boolean isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN);
+                if (isMxAddress || isMpAddress) {
+                    onActivityResult(REQUEST_CODE_QR_SCAN_ADDRESS, resultCode, data);
+                    return;
+                }
+
                 try {
                     ExternalTransaction tx = DeepLinkHelper.parseTransaction(result);
 
@@ -376,7 +384,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private void onClickScanQR(View view) {
         getAnalytics().send(AppEvent.SendCoinsQRButton);
 
-        getViewState().startScanQRWithPermissions(REQUEST_CODE_QR_SCAN);
+        getViewState().startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_ADDRESS);
     }
 
     private void onSubmit(View view) {

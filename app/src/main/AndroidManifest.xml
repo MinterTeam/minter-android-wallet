@@ -178,8 +178,13 @@
         <activity
             android:name=".security.ui.PinEnterActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".tx.ui.ExternalTransactionActivity">
 
+        <activity
+            android:name=".tx.ui.ExternalTransactionActivity"
+            android:parentActivityName=".home.ui.HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".home.ui.HomeActivity" />
         </activity>
 
         <service

@@ -218,8 +218,8 @@ dependencies {
 
     // common
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.edwardstock.android:code-scanner:2.2.0'
-    implementation 'com.google.zxing:core:3.4.0'
+    implementation 'com.edwardstock.android:code-scanner:2.2.1'
+    implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.google.zxing:android-core:3.3.0'
     implementation 'com.google.zxing:android-integration:3.3.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'

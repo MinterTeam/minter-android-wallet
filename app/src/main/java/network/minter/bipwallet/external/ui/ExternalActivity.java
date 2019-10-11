@@ -50,6 +50,7 @@ import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseInjectActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.security.PauseTimer;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
@@ -57,7 +58,6 @@ import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @DeepLinkHandler({DeepLinkModule.class})
@@ -69,6 +69,7 @@ public class ExternalActivity extends BaseInjectActivity {
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
     @Inject GsonBuilder gsonBuilder;
+    private DeepLinkModuleLoader mLinkLoader;
 
     public static Intent createAction(String action, String payload) {
         Intent intent = new Intent(action);
@@ -99,8 +100,6 @@ public class ExternalActivity extends BaseInjectActivity {
         startAction();
     }
 
-    private DeepLinkModuleLoader mLinkLoader;
-
     private void startDeepLink() {
         mLinkLoader = new DeepLinkModuleLoader();
         DeepLinkDelegate delegate = new DeepLinkDelegate(mLinkLoader);
@@ -111,18 +110,11 @@ public class ExternalActivity extends BaseInjectActivity {
         Uri uri = Uri.parse(old);
         getIntent().setData(uri);
 
-        if (!secretStorage.hasPinCode()) {
+        if (!secretStorage.hasPinCode() || PauseTimer.isLoggedIn()) {
             delegate.dispatchFrom(this);
             finish();
         } else {
             Intent target = dispatchDeeplink(this, getIntent());
-//            if(uri.getHost() != null && uri.getHost().equals("tx")) {
-//                target.setClass(this, ExternalTransactionActivity.class);
-//            } else {
-//                target.setClass(this, HomeActivity.class);
-//            }
-
-
             new PinEnterActivity.Builder(this, SecurityModule.PinMode.Validation)
                     .setSuccessIntent(target)
                     .startClearTop();

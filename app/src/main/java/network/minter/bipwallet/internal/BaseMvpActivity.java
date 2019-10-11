@@ -177,7 +177,10 @@ public class BaseMvpActivity extends MvpAppCompatActivity implements LifecycleOw
             @Override
             public void onAppBackgrounded() {
                 Timber.d("Destroy application");
-                finishAffinity();
+                try {
+                    finishAffinity();
+                } catch (Throwable ignore) {
+                }
             }
 
             @Override
