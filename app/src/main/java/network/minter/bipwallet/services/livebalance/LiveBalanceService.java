@@ -26,10 +26,13 @@
 
 package network.minter.bipwallet.services.livebalance;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+
+import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -144,11 +147,28 @@ public class LiveBalanceService extends Service {
                     Timber.i("Disconnected");
                 }
 
+
+                @SuppressLint("TimberExceptionLogging")
                 @Override
                 public void onError(Client client, ErrorEvent event) {
                     super.onError(client, event);
+                    try {
+                        Field msgField = ErrorEvent.class.getDeclaredField("message");
+                        Field exceptionField = ErrorEvent.class.getDeclaredField("exception");
+                        msgField.setAccessible(true);
+                        exceptionField.setAccessible(true);
+
+                        String msg = ((String) msgField.get("message"));
+                        Throwable exception = (Throwable) exceptionField.get("exception");
+
+                        Timber.w(exception, msg);
+                    } catch (Throwable t) {
+                        Timber.d(t);
+                        Timber.d("LiveBalance connection error (unknown)");
+                    }
                     // @TODO WTF?
-                    Timber.w("OnError");
+
+
                 }
 
                 @Override

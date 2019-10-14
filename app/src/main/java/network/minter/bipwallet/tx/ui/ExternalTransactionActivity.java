@@ -40,6 +40,7 @@ import network.minter.bipwallet.tx.contract.ExternalTransactionView;
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.explorer.MinterExplorerApi;
+import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2019
@@ -197,10 +198,15 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
     }
 
     private boolean checkIsLastActivity() {
-        ActivityManager mngr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        if (mngr != null) {
-            List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(3);
-            return taskList.get(0).numActivities == 1 && taskList.get(0).topActivity.getClassName().equals(this.getClass().getName());
+        try {
+            ActivityManager mngr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+            if (mngr != null) {
+                List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(3);
+                return taskList.get(0).numActivities == 1 && taskList.get(0).topActivity.getClassName().equals(this.getClass().getName());
+            }
+        } catch (Throwable ignore) {
+            Timber.w(ignore, "Unable to detect left activity count");
+            return false;
         }
 
         return false;

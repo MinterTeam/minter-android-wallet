@@ -27,15 +27,7 @@ public final class DeepLinkHelper {
 
     private static ExternalTransaction parseRawTransaction(String rawTx) throws InvalidExternalTransaction {
         ExternalTransaction tx;
-        try {
-            tx = ExternalTransaction.fromEncoded(rawTx);
-        } catch (Throwable t) {
-            throw new InvalidExternalTransaction("Unable to parse transaction", InvalidExternalTransaction.CODE_INVALID_TX, t);
-        }
-
-        if (tx == null) {
-            throw new InvalidExternalTransaction("Unable to parse transaction: unrecognized data encoded", InvalidExternalTransaction.CODE_INVALID_TX);
-        }
+        tx = ExternalTransaction.fromEncoded(rawTx);
 
         return tx;
     }
