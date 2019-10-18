@@ -1,5 +1,8 @@
 # Release Notes
 
+## 1.9.1
+ - Fixed QR transactions decoding
+
 ## 1.9.0
  - Added ability to scan external transaction or open with deeplink
  - Adopted to Android 10
