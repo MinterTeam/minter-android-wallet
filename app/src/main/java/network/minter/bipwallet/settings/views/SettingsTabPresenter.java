@@ -233,8 +233,6 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             SettingsButtonRow changePinRow = new SettingsButtonRow("Change PIN-code", "", this::onChangePinClick);
             changePinRow.setEnabled(() -> secretStorage.hasPinCode());
 
-            SettingsButtonRow mnemonicViewRow = new SettingsButtonRow("Show mnemonic", "", this::onClickShowMnemonic);
-
             mSecurityAdapter.addRow(new TitleRow("Security"));
             mSecurityAdapter.addRow(enablePinRow);
 
@@ -243,9 +241,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             }
 
             mSecurityAdapter.addRow(changePinRow);
-            mSecurityAdapter.addRow(mnemonicViewRow);
         }
-
 
         if (session.getRole() == AuthSession.AuthType.Basic) {
             mChangeAvatarRow = new ChangeAvatarRow(() -> session.getUser().getData().getAvatar(), this::onClickChangeAvatar);
