@@ -37,6 +37,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.contract.ExternalTransactionView;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.blockchain.models.TransactionSendResult;
+import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
@@ -86,6 +87,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     private ExternalTransaction mExtTx;
     private MinterAddress mFrom;
     private UnsignedBytesData mPayload;
+    private String mCheckPassword = null;
 
     @Inject
     public ExternalTransactionPresenter() {
@@ -96,11 +98,13 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     public void attachView(ExternalTransactionView view) {
         super.attachView(view);
         accountStorage.update();
+        mFrom = secretStorage.getAddresses().get(0);
     }
 
     @Override
     public void handleExtras(Intent intent) {
         super.handleExtras(intent);
+        mFrom = secretStorage.getAddresses().get(0);
 
         if (intent.getBooleanExtra(DeepLink.IS_DEEP_LINK, false)) {
             Bundle params = intent.getExtras();
@@ -109,9 +113,26 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                 return;
             }
 
+            mCheckPassword = params.getString("p", null);
+
             final String hash = params.getString("d", null);
             try {
                 mExtTx = DeepLinkHelper.parseTransaction(hash);
+                if (mExtTx.getType() == OperationType.RedeemCheck) {
+                    TxRedeemCheck d = mExtTx.getData();
+                    if (d.getProof().size() == 0 && mCheckPassword == null) {
+                        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                                .setText("This check given without proof and password. One of parameters is required.")
+                                .setPositiveAction(R.string.btn_close, (_d, _w) -> {
+                                    _d.dismiss();
+                                    getViewState().finishCancel();
+                                })
+                                .create());
+                        return;
+                    } else if (d.getProof().size() == 0 && mCheckPassword != null) {
+                        d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
+                    }
+                }
             } catch (Throwable t) {
                 getViewState().setFirstVisible(View.GONE);
                 getViewState().setSecondVisible(View.GONE);
@@ -119,6 +140,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                 getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
                         .setText("Invalid transaction data: %s", t.getMessage())
                         .setPositiveAction(R.string.btn_close, (d, w) -> {
+                            d.dismiss();
                             getViewState().finishCancel();
                         })
                         .create());
@@ -128,8 +150,6 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             mExtTx = IntentHelper.getParcelExtraOrError(intent, ExternalTransactionActivity.EXTRA_EXTERNAL_TX, "Empty transaction hash passed");
         }
 
-
-        mFrom = secretStorage.getAddresses().get(0);
         mPayload = mExtTx.getPayload();
         calculateFee(mExtTx);
         fillData(mExtTx);
@@ -299,7 +319,8 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             case RedeemCheck: {
                 final TxRedeemCheck data = tx.getData(TxRedeemCheck.class);
                 getViewState().setFirstLabel("You're using check");
-                getViewState().setFirstValue(data.getRawCheck().toHexString());
+                CheckTransaction check = data.getDecodedCheck();
+                getViewState().setFirstValue(String.format("%s %s", check.getCoin(), bdHuman(check.getValue())));
                 getViewState().setSecondVisible(View.GONE);
             }
             break;

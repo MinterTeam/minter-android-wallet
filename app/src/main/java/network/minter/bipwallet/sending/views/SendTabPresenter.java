@@ -197,7 +197,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         getViewState().setOnClickAccountSelectedListener(this::onClickAccountSelector);
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
-        getViewState().setOnClickScanQR(this::onClickScanQR);
         getViewState().setOnClickMaximum(this::onClickMaximum);
         getViewState().setPayloadChangeListener(mPayloadChangeListener);
         loadAndSetFee();
@@ -379,12 +378,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private void onAddressChanged(String address) {
         if (address.isEmpty()) getViewState().setFee("");
         else setupFee();
-    }
-
-    private void onClickScanQR(View view) {
-        getAnalytics().send(AppEvent.SendCoinsQRButton);
-
-        getViewState().startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_ADDRESS);
     }
 
     private void onSubmit(View view) {

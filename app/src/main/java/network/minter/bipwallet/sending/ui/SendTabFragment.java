@@ -116,7 +116,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @BindView(R.id.input_amount) AppCompatEditText amountInput;
     @BindView(R.id.input_payload) AppCompatEditText payloadInput;
     @BindView(R.id.action) Button actionSend;
-    @BindView(R.id.action_scan_qr) View actionScanQR;
+    //    @BindView(R.id.action_scan_qr) View actionScanQR;
     @BindView(R.id.action_maximum) View actionMaximum;
     @BindView(R.id.text_error) TextView errorView;
     @BindView(R.id.fee_value) TextView feeValue;
@@ -171,7 +171,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         amountLayout.clearFocus();
 
         setHasOptionsMenu(true);
-        getActivity().getMenuInflater().inflate(R.menu.menu_tab_send, toolbar.getMenu());
+        getActivity().getMenuInflater().inflate(R.menu.menu_tab_scan_tx, toolbar.getMenu());
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         return view;
@@ -257,11 +257,6 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @Override
     public void startExplorer(String txHash) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + txHash)));
-    }
-
-    @Override
-    public void setOnClickScanQR(View.OnClickListener listener) {
-        actionScanQR.setOnClickListener(listener);
     }
 
     @NeedsPermission(Manifest.permission.CAMERA)

@@ -36,7 +36,6 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void startDialog(WalletDialog.DialogExecutor executor);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startExplorer(String txHash);
-    void setOnClickScanQR(View.OnClickListener listener);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startScanQR(int requestCode);
     @StateStrategyType(OneExecutionStateStrategy.class)

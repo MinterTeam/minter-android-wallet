@@ -7,6 +7,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import moxy.MvpView;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.blockchain.models.operational.ExternalTransaction;
 
 /**
  * minter-android-wallet. 2019
@@ -38,4 +40,17 @@ interface CoinsTabView extends MvpView {
     void setDelegationAmount(String amount);
     void setBalanceClickListener(View.OnClickListener listener);
     void setBalanceTitle(int title);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startDialog(WalletDialog.DialogExecutor executor);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startExternalTransaction(ExternalTransaction tx);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startScanQRWithPermissions(int requestCode);
+
+    void setOnClickScanQR(View.OnClickListener listener);
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startScanQR(int requestCode);
 }

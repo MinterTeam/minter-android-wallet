@@ -227,5 +227,6 @@
     <string name="btn_confirm_send">Confirm and send</string>
     <string name="btn_ok">Ok</string>
     <string name="btn_proceed">Proceed</string>
+    <string name="btn_scan_qr">Scan QR</string>
 
 </resources>

@@ -67,40 +67,6 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/img_logo_main"
                     />
-
-                <TextView
-                    android:id="@+id/username"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/margin_edges"
-                    android:ellipsize="middle"
-                    android:singleLine="true"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@color/textColorWhite"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/user_avatar"
-                    app:layout_constraintStart_toEndOf="@id/bip_logo"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="\@superwalletverylonglonglonglongl"
-                    />
-
-                <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-                    android:id="@+id/user_avatar"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:layout_marginEnd="@dimen/margin_edges"
-                    android:background="@drawable/bg_image_round_shadow"
-                    android:elevation="4dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/img_avatar_default"
-                    app:civ_border_color="@color/white"
-                    app:civ_border_overlay="true"
-                    app:civ_border_width="2dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.Toolbar>
 

@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.coins.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -46,7 +47,6 @@ import javax.inject.Inject;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
@@ -58,22 +58,27 @@ import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
 import network.minter.bipwallet.apis.reactive.ReactiveExplorerGate;
 import network.minter.bipwallet.coins.contract.CoinsTabView;
+import network.minter.bipwallet.coins.ui.CoinsTabFragment;
 import network.minter.bipwallet.coins.utils.HistoryTransactionDiffUtil;
 import network.minter.bipwallet.coins.views.rows.ListWithButtonRow;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
+import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
+import network.minter.bipwallet.internal.helpers.DeepLinkHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
+import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
-import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
+import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerAddressRepository;
@@ -126,6 +131,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
             accountStorage.update();
         }
 
+        /* Frozen ability, for now
         unsubscribeOnDestroy(
                 SettingsTabPresenter.AVATAR_CHANGE_SUBJECT
                         .subscribeOn(AndroidSchedulers.mainThread())
@@ -136,13 +142,16 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
                             }
                         }, Timber::w)
         );
+         */
 
         getViewState().setOnRefreshListener(this::onRefresh);
         getViewState().setAdapter(mAdapter);
 
+        /* Frozen
         if (session.getUser() != null && session.getUser().getData() != null && session.getUser().getData().getAvatar() != null) {
             getViewState().setAvatar(session.getUser().getData().getAvatar().getUrl());
         }
+         */
 
         mBalanceCurrentState.applyTo(getViewState());
     }
@@ -173,6 +182,63 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         if (mCoinsAdapter != null) {
             mCoinsAdapter.clear();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CoinsTabFragment.REQUEST_CODE_QR_SCAN_TX) {
+            String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
+            if (result != null) {
+
+                boolean isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN);
+                boolean isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN);
+                if (isMxAddress || isMpAddress) {
+                    getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan QR")
+                            .setText("Invalid transaction data")
+                            .setPositiveAction(R.string.btn_close)
+                            .create());
+                    return;
+                }
+
+                try {
+                    ExternalTransaction tx = DeepLinkHelper.parseTransaction(result);
+
+                    getViewState().startExternalTransaction(tx);
+                } catch (Throwable t) {
+                    Timber.w(t, "Unable to parse remote transaction: %s", result);
+                    getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan QR")
+                            .setText("Invalid transaction data: %s", t.getMessage())
+                            .setPositiveAction(R.string.btn_close)
+                            .create());
+                }
+            }
+        }
+    }
+
+    private void updateDelegation() {
+        safeSubscribeIoToUi(ReactiveExplorerGate.rxExpGate(addressRepo.getDelegations(myAddresses.get(0), 0))
+                .subscribeOn(Schedulers.io())).subscribe(
+                res -> {
+                    if (res.meta.additional.delegatedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                        getViewState().setDelegationAmount(bdHuman(res.meta.additional.delegatedAmount));
+                    }
+                },
+                Timber::d);
+    }
+
+    private void onAvatarClick(View view) {
+        getAnalytics().send(AppEvent.CoinsUsernameButton);
+        getViewState().startTab(R.id.bottom_settings);
+    }
+
+    private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
+        getViewState().startExplorer(historyTransaction.hash.toString());
+    }
+
+    private void onRefresh() {
+        txRepo.update(true);
+        accountStorage.update(true);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -208,7 +274,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
         setUsername();
 
-        getViewState().setOnAvatarClick(this::onAvatarClick);
+        // Frozen
+        // getViewState().setOnAvatarClick(this::onAvatarClick);
 
         mTransactionsRow = new ListWithButtonRow.Builder(Wallet.app().res().getString(R.string.frag_coins_last_transactions_title))
                 .setAction("All transactions", this::onClickStartTransactionList)
@@ -282,32 +349,9 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         mAdapter.addRow(mCoinsRow);
     }
 
-    private void updateDelegation() {
-        safeSubscribeIoToUi(ReactiveExplorerGate.rxExpGate(addressRepo.getDelegations(myAddresses.get(0), 0))
-                .subscribeOn(Schedulers.io())).subscribe(
-                res -> {
-                    if (res.meta.additional.delegatedAmount.compareTo(BigDecimal.ZERO) > 0) {
-                        getViewState().setDelegationAmount(bdHuman(res.meta.additional.delegatedAmount));
-                    }
-                },
-                Timber::d);
-    }
-
-    private void onAvatarClick(View view) {
-        getAnalytics().send(AppEvent.CoinsUsernameButton);
-        getViewState().startTab(R.id.bottom_settings);
-    }
-
-    private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
-        getViewState().startExplorer(historyTransaction.hash.toString());
-    }
-
-    private void onRefresh() {
-        txRepo.update(true);
-        accountStorage.update(true);
-    }
-
     private void setUsername() {
+        if (true) return;
+
         if (session.getRole() == AuthSession.AuthType.Advanced) {
             getViewState().hideAvatar();
         } else {

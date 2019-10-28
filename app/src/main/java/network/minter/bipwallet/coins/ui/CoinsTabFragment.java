@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.coins.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ import javax.inject.Provider;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -62,26 +65,33 @@ import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
+import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.SoundManager;
-import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
+import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
+import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.explorer.BuildConfig;
 import network.minter.explorer.MinterExplorerApi;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@RuntimePermissions
 public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
+    public final static int REQUEST_CODE_QR_SCAN_TX = 2002;
 
     @Inject Provider<CoinsTabPresenter> presenterProvider;
     @Inject SoundManager soundManager;
     @InjectPresenter CoinsTabPresenter presenter;
     @BindView(R.id.bip_logo) View logo;
-    @BindView(R.id.user_avatar) BipCircleImageView avatar;
-    @BindView(R.id.username) TextView username;
+    //    @BindView(R.id.user_avatar) BipCircleImageView avatar;
+//    @BindView(R.id.username) TextView username;
+    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.balance_int) TextView balanceInt;
     @BindView(R.id.balance_fractions) TextView balanceFract;
     @BindView(R.id.balance_coin_name) TextView balanceCoinName;
@@ -95,6 +105,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
     private GestureDetector mGestureDetector;
+    private WalletDialog mCurrentDialog = null;
 
     @Override
     public void onAttach(Context context) {
@@ -137,6 +148,12 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
         });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        presenter.onActivityResult(requestCode, resultCode, data);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @SuppressWarnings("StringBufferReplaceableByString")
     @Nullable
@@ -147,7 +164,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
         mUnbinder = ButterKnife.bind(this, view);
         presenter.onRestoreInstanceState(savedInstanceState);
 
-        if (BuildConfig.DEBUG) {
+        if (network.minter.bipwallet.BuildConfig.DEBUG) {
             logo.setOnLongClickListener(v -> {
                 final StringBuilder sb = new StringBuilder();
                 sb.append("    Env: ").append(BuildConfig.FLAVOR).append("\n");
@@ -165,7 +182,49 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
                 return false;
             });
         }
+
+        setHasOptionsMenu(true);
+        getActivity().getMenuInflater().inflate(R.menu.menu_tab_scan_tx, toolbar.getMenu());
+        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_scan_tx) {
+            startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX);
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void startDialog(WalletDialog.DialogExecutor executor) {
+        mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor);
+    }
+
+    @Override
+    public void startExternalTransaction(ExternalTransaction tx) {
+        new ExternalTransactionActivity.Builder(getActivity(), tx)
+                .start();
+    }
+
+    @Override
+    public void setOnClickScanQR(View.OnClickListener listener) {
+
+    }
+
+    @NeedsPermission(Manifest.permission.CAMERA)
+    @Override
+    public void startScanQR(int requestCode) {
+        Intent i = new Intent(getActivity(), QRCodeScannerActivity.class);
+        getActivity().startActivityForResult(i, requestCode);
+    }
+
+    @Override
+    public void startScanQRWithPermissions(int requestCode) {
+        CoinsTabFragmentPermissionsDispatcher.startScanQRWithPermissionCheck(this, requestCode);
     }
 
     @Override
@@ -193,14 +252,14 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
             return;
         }
 
-        avatar.setImageUrl(url);
+//        avatar.setImageUrl(url);
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         presenter.onLowMemory();
-        avatar.setImageDrawable(null);
+//        avatar.setImageDrawable(null);
         Timber.d("OnLowMemory");
     }
 
@@ -213,7 +272,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
 
     @Override
     public void setUsername(CharSequence name) {
-        username.setText(name);
+//        username.setText(name);
     }
 
     @SuppressLint("SetTextI18n")
@@ -258,7 +317,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
 
     @Override
     public void setOnAvatarClick(View.OnClickListener listener) {
-        avatar.setOnClickListener(listener);
+//        avatar.setOnClickListener(listener);
     }
 
     @Override
@@ -273,7 +332,7 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
 
     @Override
     public void hideAvatar() {
-        if (avatar != null) avatar.setVisibility(View.GONE);
+//        if (avatar != null) avatar.setVisibility(View.GONE);
     }
 
     @Override

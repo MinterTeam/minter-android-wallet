@@ -29,7 +29,7 @@
     <item
         android:id="@+id/menu_scan_tx"
         android:icon="@drawable/ic_qr_compat"
-        android:title="@string/btn_logout"
+        android:title="@string/btn_scan_qr"
         app:icon="@drawable/ic_qr_compat"
         app:showAsAction="ifRoom" />
 </menu>

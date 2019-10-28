@@ -156,27 +156,13 @@
                         android:dropDownHeight="wrap_content"
                         android:inputType="text|textMultiLine|textNoSuggestions"
                         android:paddingStart="4dp"
-                        android:paddingEnd="32dp"
+                        android:paddingEnd="4dp"
                         android:tag="recipient"
                         android:textSize="@dimen/text_size_default"
                         tools:ignore="LabelFor"
-                        tools:text="\@PavelDurov"/>
+                        tools:text="Mx8d008dffe2f9144a39a2094ebdedadad335e814f" />
                 </com.google.android.material.textfield.TextInputLayout>
             </FrameLayout>
-
-            <ImageView
-                android:id="@+id/action_scan_qr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|top"
-                android:layout_marginTop="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_qr_scan"
-                android:paddingTop="7dp"
-                app:layout_constraintEnd_toEndOf="@id/row_recipient"
-                app:layout_constraintTop_toTopOf="@id/row_recipient"
-                app:srcCompat="@drawable/ic_qr_grey"
-                />
 
             <!--AMOUNT-->
             <com.google.android.material.textfield.TextInputLayout

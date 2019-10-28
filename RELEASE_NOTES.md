@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.10.0
+ - Now app supports only android starting version 5.0 (api 21)
+ - Added check redeeming ability
+
 ## 1.9.1
  - Fixed QR transactions decoding
 
