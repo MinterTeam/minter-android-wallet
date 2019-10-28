@@ -26,6 +26,8 @@
 
 package network.minter.bipwallet.delegation.views;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 
 import androidx.lifecycle.MutableLiveData;
@@ -48,10 +50,8 @@ import network.minter.explorer.repo.ExplorerAddressRepository;
 @InjectViewState
 public class DelegationListPresenter extends MvpBasePresenter<DelegationListView> {
 
-    @Inject
-    ExplorerAddressRepository addressRepo;
-    @Inject
-    SecretStorage secretRepo;
+    @Inject ExplorerAddressRepository addressRepo;
+    @Inject SecretStorage secretRepo;
 
     private DelegationListAdapter mAdapter;
     private DelegationDataSource.Factory mSourceFactory;
@@ -98,6 +98,7 @@ public class DelegationListPresenter extends MvpBasePresenter<DelegationListView
         unsubscribeOnDestroy(mListDisposable);
     }
 
+
     private void onRefresh() {
         mListDisposable.dispose();
         getViewState().scrollTo(0);
@@ -109,6 +110,7 @@ public class DelegationListPresenter extends MvpBasePresenter<DelegationListView
                 .doOnSubscribe(this::unsubscribeOnDestroy)
                 .subscribe(res -> {
                     getViewState().hideRefreshProgress();
+                    Collections.sort(res, (o1, o2) -> o2.delegatedBips.compareTo(o1.delegatedBips));
                     mAdapter.submitList(res);
                 });
     }

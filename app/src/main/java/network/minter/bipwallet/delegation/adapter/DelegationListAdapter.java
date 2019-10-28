@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.AsyncDifferConfig;
@@ -17,6 +18,7 @@ import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
+import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
@@ -87,13 +89,10 @@ public class DelegationListAdapter extends PagedListAdapter<DelegationItem, Recy
     }
 
     public class DelegationViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.item_public_key)
-        TextView publicKey;
-        @BindView(R.id.item_copy)
-        View actionCopy;
-        @BindView(R.id.delegation_info)
-        LinearLayout coins;
+        @BindView(R.id.item_public_key) TextView publicKey;
+        @BindView(R.id.item_copy) View actionCopy;
+        @BindView(R.id.item_avatar) BipCircleImageView icon;
+        @BindView(R.id.delegation_info) LinearLayout coins;
 
         DelegationViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,7 +100,17 @@ public class DelegationListAdapter extends PagedListAdapter<DelegationItem, Recy
         }
 
         public void bind(DelegationItem item) {
-            publicKey.setText(item.pubKey.toShortString());
+            publicKey.setText(item.name);
+            if (item.description != null) {
+                ViewCompat.setTooltipText(publicKey, item.description);
+            }
+
+            if (item.icon != null) {
+                icon.setImageUrlFallback(item.icon, R.drawable.img_avatar_default);
+            } else {
+                icon.setImageResource(R.drawable.img_avatar_delegate);
+            }
+
             actionCopy.setOnClickListener(v ->
                     ContextHelper.copyToClipboard(actionCopy.getContext(), item.pubKey.toString()));
 

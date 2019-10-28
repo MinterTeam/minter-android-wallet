@@ -28,6 +28,7 @@ package network.minter.bipwallet.delegation.adapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -37,12 +38,14 @@ import androidx.paging.PageKeyedDataSource;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.internal.adapter.DataSourceMeta;
 import network.minter.bipwallet.internal.adapter.LoadState;
+import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.DelegationInfo;
 import network.minter.explorer.models.ExpResult;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
 
@@ -127,6 +130,7 @@ public class DelegationDataSource extends PageKeyedDataSource<Integer, Delegatio
                 if(item.pubKey.toString().equals(info.pubKey.toString())){
                     isPresent = true;
                     item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value));
+                    item.delegatedBips = item.delegatedBips.add(info.bipValue);
                     break;
                 }
             }
@@ -134,14 +138,43 @@ public class DelegationDataSource extends PageKeyedDataSource<Integer, Delegatio
             DelegationItem item = new DelegationItem();
             item.pubKey = info.pubKey;
             item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value));
+            item.delegatedBips = info.bipValue;
+            if (info.meta != null) {
+                item.name = firstNonNull(info.meta.name, item.pubKey.toShortString());
+                item.icon = info.meta.iconUrl;
+                item.description = info.meta.description;
+            }
             data.add(item);
         }
 
         final DataSourceMeta<DelegationItem> meta = new DataSourceMeta<>();
+        for (DelegationItem item : data) {
+            Collections.sort(item.coins, new StableCoinSorting());
+        }
+        Collections.sort(data, (o1, o2) -> o2.delegatedBips.compareTo(o1.delegatedBips));
         meta.setItems(data);
         meta.setMeta(res.getMeta());
 
         return meta;
+    }
+
+    public static class StableCoinSorting implements Comparator<DelegationItem.DelegatedCoin> {
+        private final static String sStable = MinterSDK.DEFAULT_COIN.toLowerCase();
+
+        @Override
+        public int compare(DelegationItem.DelegatedCoin ac, DelegationItem.DelegatedCoin bc) {
+            final String a = ac.coin.toLowerCase();
+            final String b = bc.coin.toLowerCase();
+
+            if (a.equals(b)) // update to make it stable
+                return 0;
+            if (a.equals(sStable))
+                return -1;
+            if (b.equals(sStable))
+                return 1;
+
+            return a.compareTo(b);
+        }
     }
 
     @Override
