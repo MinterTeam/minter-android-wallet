@@ -60,7 +60,7 @@ public final class TxCreateCoinViewHolder extends ExpandableTxViewHolder {
     @Override
     public void bind(TxItem item) {
         super.bind(item);
-        final HistoryTransaction.TxCreateResult data = item.getTx().getData();
+        final HistoryTransaction.TxCreateResult data = item.getTx().get().getData();
         final String symbol = firstNonNull(data.getSymbol(), "<unknown>");
         avatar.setImageResource(R.drawable.img_avatar_create_coin);
         title.setText(symbol);

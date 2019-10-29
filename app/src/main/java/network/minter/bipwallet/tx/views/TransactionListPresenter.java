@@ -42,10 +42,10 @@ import network.minter.bipwallet.analytics.base.HasAnalyticsEvent;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
+import network.minter.bipwallet.tx.adapters.TransactionFacade;
 import network.minter.bipwallet.tx.adapters.TransactionItem;
 import network.minter.bipwallet.tx.adapters.TransactionListAdapter;
 import network.minter.bipwallet.tx.contract.TransactionListView;
-import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.repo.ProfileInfoRepository;
 
@@ -59,9 +59,9 @@ public class TransactionListPresenter extends MvpBasePresenter<TransactionListVi
     @Inject ExplorerTransactionRepository transactionRepo;
     @Inject SecretStorage secretRepo;
     @Inject ProfileInfoRepository infoRepo;
-
+    @Inject TransactionDataSource.Factory sourceFactory;
     private TransactionListAdapter mAdapter;
-    private TransactionDataSource.Factory mSourceFactory;
+
     private Disposable mListDisposable;
     private RxPagedListBuilder<Integer, TransactionItem> listBuilder;
     private int mLastPosition = 0;
@@ -99,20 +99,20 @@ public class TransactionListPresenter extends MvpBasePresenter<TransactionListVi
         mLoadState = new MutableLiveData<>();
         getViewState().syncProgress(mLoadState);
         mAdapter.setLoadState(mLoadState);
-        mSourceFactory = new TransactionDataSource.Factory(transactionRepo, infoRepo, secretRepo.getAddresses(), mLoadState);
+        sourceFactory.observeLoadState(mLoadState);
         PagedList.Config cfg = new PagedList.Config.Builder()
                 .setPageSize(50)
                 .setEnablePlaceholders(false)
                 .build();
 
 
-        listBuilder = new RxPagedListBuilder<>(mSourceFactory, cfg);
+        listBuilder = new RxPagedListBuilder<>(sourceFactory, cfg);
         refresh();
 
         unsubscribeOnDestroy(mListDisposable);
     }
 
-    private void onExpandTx(View view, HistoryTransaction tx) {
+    private void onExpandTx(View view, TransactionFacade tx) {
         getAnalytics().send(AppEvent.TransactionDetailsButton);
     }
 
@@ -131,8 +131,8 @@ public class TransactionListPresenter extends MvpBasePresenter<TransactionListVi
                 });
     }
 
-    private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
-        getViewState().startExplorer(historyTransaction.hash.toString());
+    private void onExplorerClick(View view, TransactionFacade historyTransaction) {
+        getViewState().startExplorer(historyTransaction.getHash().toString());
         getAnalytics().send(AppEvent.TransactionExplorerButton);
     }
 }

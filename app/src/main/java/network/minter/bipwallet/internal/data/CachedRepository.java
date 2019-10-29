@@ -167,8 +167,8 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
         mExpiredAt.setTime(mExpiredAt.getTime() + expireTime);
     }
 
-    public CachedRepository<ResultModel, Entity> setTimeToLive(int ttl) {
-        mExpireTime = ttl;
+    public CachedRepository<ResultModel, Entity> setTimeToLive(int ttlSeconds) {
+        mExpireTime = ttlSeconds;
         return this;
     }
 
@@ -248,11 +248,10 @@ public class CachedRepository<ResultModel, Entity extends CachedEntity<ResultMod
     }
 
     /**
-     * @return
+     * Returns local data, or if doesn't loaded, returns observable to remote source
      * @see #observe()
      * @see #observeWithMeta()
      */
-    @Deprecated
     public Observable<ResultModel> getOrUpdate() {
         if (isDataReady()) {
             return Observable.just(getData())

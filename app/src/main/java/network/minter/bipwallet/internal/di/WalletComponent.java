@@ -42,6 +42,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AnalyticsManager;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
@@ -65,6 +66,7 @@ import network.minter.blockchain.repo.BlockChainStatusRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.ValidatorItem;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
@@ -131,6 +133,7 @@ public interface WalletComponent {
     CachedRepository<UserAccount, AccountStorage> accountStorageCache();
     CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> explorerTransactionsRepoCache();
     CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo();
+    CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorsRepoCache();
     // profile
     ProfileAuthRepository authRepo();
     ProfileInfoRepository infoRepo();

@@ -34,6 +34,7 @@ import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
@@ -55,11 +56,13 @@ public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         setupAvatar(item);
-        title.setText(item.getTx().hash.toShortString());
-        amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+        HistoryTransaction tx = item.getTx().get();
+
+        title.setText(tx.hash.toShortString());
+        amount.setText(String.format("- %s", bdHuman(tx.fee)));
         subamount.setText(MinterSDK.DEFAULT_COIN);
-        if (item.getTx().type != null) {
-            txType.setText(item.getTx().type.name());
+        if (tx.type != null) {
+            txType.setText(tx.type.name());
         } else {
             txType.setText("<unknown>");
         }

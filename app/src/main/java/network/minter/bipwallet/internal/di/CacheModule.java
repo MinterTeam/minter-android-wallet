@@ -37,6 +37,7 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
@@ -45,6 +46,7 @@ import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.ValidatorItem;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.User;
 
@@ -83,12 +85,26 @@ public abstract class CacheModule {
                 .setTimeToLive(60);
     }
 
+    @Provides
+    @WalletApp
+    public static CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> provideCachedValidatorsRepo(KVStorage storage, MinterExplorerApi api) {
+        return
+                new CachedRepository<>(new CachedValidatorsRepository(storage, api.getApiService()))
+                        .setTimeToLive(60 * 10);
+    }
+
     // Bindings for CacheManager
     @Binds
     @IntoSet
     @Cached
     @WalletApp
     public abstract CachedRepository provideExplorerRepoForCache(CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cache);
+
+    @Binds
+    @IntoSet
+    @Cached
+    @WalletApp
+    public abstract CachedRepository provideExplorerValidatorsRepoForCache(CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> cache);
 
     @Binds
     @IntoSet

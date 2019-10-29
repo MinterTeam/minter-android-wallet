@@ -60,9 +60,9 @@ public class TxEditCandidateViewHolder extends ExpandableTxViewHolder  {
         final HistoryTransaction.TxEditCandidateResult  data = item.getTx().getData();
 
         if (bdNull(item.getTx().getFee())) {
-            amount.setText(String.format("%s", bdHuman(item.getTx().fee)));
+            amount.setText(String.format("%s", bdHuman(item.getTx().getFee())));
         } else {
-            amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+            amount.setText(String.format("- %s", bdHuman(item.getTx().getFee())));
         }
 
         subamount.setText(MinterSDK.DEFAULT_COIN);
@@ -72,7 +72,7 @@ public class TxEditCandidateViewHolder extends ExpandableTxViewHolder  {
             title.setText(data.getPublicKey().toShortString());
         } else {
             pubKey.setText("<unknown>");
-            title.setText(item.getTx().hash.toShortString());
+            title.setText(item.getTx().getHash().toShortString());
         }
         setupCopyListeners(pubKey);
     }

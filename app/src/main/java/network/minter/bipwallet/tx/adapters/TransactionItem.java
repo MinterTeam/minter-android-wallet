@@ -59,6 +59,8 @@ public interface TransactionItem {
     int getViewType();
     boolean isSameOf(TransactionItem item);
 
+    boolean equals(Object obj);
+
     @Retention(SOURCE)
     @IntDef({
             ITEM_PROGRESS,

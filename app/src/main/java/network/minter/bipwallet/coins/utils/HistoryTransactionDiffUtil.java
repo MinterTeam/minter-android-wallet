@@ -29,7 +29,7 @@ package network.minter.bipwallet.coins.utils;
 import java.util.List;
 
 import androidx.recyclerview.widget.DiffUtil;
-import network.minter.explorer.models.HistoryTransaction;
+import network.minter.bipwallet.tx.adapters.TransactionFacade;
 
 /**
  * minter-android-wallet. 2018
@@ -37,9 +37,9 @@ import network.minter.explorer.models.HistoryTransaction;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class HistoryTransactionDiffUtil extends DiffUtil.Callback {
-    private final List<HistoryTransaction> mOldItems, mNewItems;
+    private final List<TransactionFacade> mOldItems, mNewItems;
 
-    public HistoryTransactionDiffUtil(List<HistoryTransaction> oldItems, List<HistoryTransaction> newItems) {
+    public HistoryTransactionDiffUtil(List<TransactionFacade> oldItems, List<TransactionFacade> newItems) {
         mOldItems = oldItems;
         mNewItems = newItems;
     }
@@ -56,16 +56,16 @@ public class HistoryTransactionDiffUtil extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        HistoryTransaction oldItem = mOldItems.get(oldItemPosition);
-        HistoryTransaction newItem = mNewItems.get(newItemPosition);
+        TransactionFacade oldItem = mOldItems.get(oldItemPosition);
+        TransactionFacade newItem = mNewItems.get(newItemPosition);
 
-        return oldItem.hash.equals(newItem.hash);
+        return oldItem.get().hash.equals(newItem.get().hash);
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        HistoryTransaction oldItem = mOldItems.get(oldItemPosition);
-        HistoryTransaction newItem = mNewItems.get(newItemPosition);
+        TransactionFacade oldItem = mOldItems.get(oldItemPosition);
+        TransactionFacade newItem = mNewItems.get(newItemPosition);
         return oldItem.equals(newItem);
     }
 }

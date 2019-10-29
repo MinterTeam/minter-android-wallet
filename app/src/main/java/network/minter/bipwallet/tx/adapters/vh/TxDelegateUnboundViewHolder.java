@@ -64,7 +64,9 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
         final HistoryTransaction.TxDelegateUnbondResult data = item.getTx().getData();
 
         if (item.getTx().getType() == HistoryTransaction.Type.Delegate) {
-            avatar.setImageResource(R.drawable.img_avatar_delegate);
+
+            avatar.setImageUrlFallback(item.getAvatar(), R.drawable.img_avatar_delegate);
+//            avatar.setImageResource(R.drawable.img_avatar_delegate);
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary));
             if (bdNull(data.getValue())) {
                 amount.setText(String.format("%s", bdHuman(data.getValue())));
@@ -72,7 +74,8 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
                 amount.setText(String.format("- %s", bdHuman(data.getValue())));
             }
         } else {
-            avatar.setImageResource(R.drawable.img_avatar_unbond);
+            avatar.setImageUrlFallback(item.getAvatar(), R.drawable.img_avatar_unbond);
+//            avatar.setImageResource(R.drawable.img_avatar_unbond);
             if (bdNull(data.getValue())) {
                 amount.setText(String.format("%s", bdHuman(data.getValue())));
             } else {
@@ -86,12 +89,13 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
         stake.setText(bdHuman(firstNonNull(data.getValue(), new BigDecimal(0))));
 
         itemTitleType.setText(item.getTx().getType().name());
+
+        title.setText(firstNonNull(item.getUsername(), data.getPublicKey().toShortString(), item.getTx().getHash().toShortString(), "<unknown>"));
+
         if (data.getPublicKey() != null) {
             pubKey.setText(data.getPublicKey().toString());
-            title.setText(data.getPublicKey().toShortString());
         } else {
             pubKey.setText("<unknown>");
-            title.setText(item.getTx().hash.toShortString());
         }
         setupCopyListeners(pubKey);
     }

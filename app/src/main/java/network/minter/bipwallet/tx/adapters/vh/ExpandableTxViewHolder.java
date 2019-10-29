@@ -55,26 +55,16 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
-    public @BindView(R.id.item_avatar)
-    BipCircleImageView avatar;
-    public @BindView(R.id.item_title)
-    TextView title;
-    public @BindView(R.id.item_amount)
-    TextView amount;
-    public @BindView(R.id.item_subamount)
-    TextView subamount;
-    public @BindView(R.id.detail_date_value)
-    TextView dateValue;
-    public @BindView(R.id.detail_time_value)
-    TextView timeValue;
-    public @BindView(R.id.action)
-    Button action;
-    public @BindView(R.id.layout_details)
-    ConstraintLayout detailsLayout;
-    @BindView(R.id.detail_payload_label)
-    public TextView payloadLabel;
-    @BindView(R.id.detail_payload_value)
-    public TextView payload;
+    public @BindView(R.id.item_avatar) BipCircleImageView avatar;
+    public @BindView(R.id.item_title) TextView title;
+    public @BindView(R.id.item_amount) TextView amount;
+    public @BindView(R.id.item_subamount) TextView subamount;
+    public @BindView(R.id.detail_date_value) TextView dateValue;
+    public @BindView(R.id.detail_time_value) TextView timeValue;
+    public @BindView(R.id.action) Button action;
+    public @BindView(R.id.layout_details) ConstraintLayout detailsLayout;
+    @BindView(R.id.detail_payload_label) public TextView payloadLabel;
+    @BindView(R.id.detail_payload_value) public TextView payload;
 
     private boolean mEnableExpanding = true;
     private boolean mUseAvatars = true;
@@ -99,14 +89,14 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(TxItem item) {
-        final DateTime dt = new DateTime(item.getTx().timestamp);
+        final DateTime dt = new DateTime(item.getTx().get().timestamp);
         dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
         timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
 
-        if (item.getTx().getPayload() != null && !item.getTx().getPayload().isEmpty()) {
+        if (item.getTx().get().getPayload() != null && !item.getTx().get().getPayload().isEmpty()) {
             String decPayload;
             try {
-                decPayload = new String(Base64.decode(item.getTx().getPayload(), Base64.DEFAULT));
+                decPayload = new String(Base64.decode(item.getTx().get().getPayload(), Base64.DEFAULT));
                 payload.setText(decPayload);
                 payload.setTextIsSelectable(true);
                 payload.setVisibility(View.VISIBLE);

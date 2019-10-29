@@ -64,7 +64,7 @@ public final class TxMultiSendCoinViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem txItem, List<MinterAddress> myAddresses) {
         super.bind(txItem);
 
-        final HistoryTransaction item = txItem.getTx();
+        final HistoryTransaction item = txItem.getTx().get();
         final HistoryTransaction.TxMultisendResult data = item.getData();
 
         final boolean isIncoming = !myAddresses.contains(item.from);

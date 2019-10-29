@@ -26,16 +26,21 @@
 
 package network.minter.bipwallet.tx.adapters;
 
+import com.annimon.stream.Stream;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -45,13 +50,19 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.advanced.repo.SecretStorage;
+import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.adapter.DataSourceMeta;
 import network.minter.bipwallet.internal.adapter.LoadState;
+import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.explorer.models.ExpResult;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.ValidatorItem;
+import network.minter.explorer.models.ValidatorMeta;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.profile.models.AddressInfoResult;
 import network.minter.profile.repo.ProfileInfoRepository;
@@ -68,30 +79,53 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileE
  */
 public class TransactionDataSource extends PageKeyedDataSource<Integer, TransactionItem> {
 
-    private ExplorerTransactionRepository mRepo;
-    private ProfileInfoRepository mInfoRepo;
-    private List<MinterAddress> mAddressList;
+
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private DateTime mLastDate;
-    private MutableLiveData<LoadState> mLoadState;
+    private TransactionDataSource.Factory factory;
 
-    public TransactionDataSource(ExplorerTransactionRepository repo, ProfileInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
-        mRepo = repo;
-        mInfoRepo = infoRepo;
-        mAddressList = addresses;
-        mLoadState = loadState;
+    public TransactionDataSource(TransactionDataSource.Factory factory) {
+        this.factory = factory;
     }
 
-    public static ObservableSource<ExpResult<List<HistoryTransaction>>> mapAddressesInfo(List<MinterAddress> myAddresses, ProfileInfoRepository infoRepo, ExpResult<List<HistoryTransaction>> items) {
+    public static ObservableSource<ExpResult<List<TransactionFacade>>> mapToFacade(ExpResult<List<HistoryTransaction>> result) {
+        List<TransactionFacade> items;
+        if (result.result == null) {
+            items = Collections.emptyList();
+        } else {
+            items = Stream.of(result.result).map(TransactionFacade::new).toList();
+        }
+
+        ExpResult<List<TransactionFacade>> out = new ExpResult<>();
+        out.code = result.code;
+        out.links = result.meta;
+        out.meta = result.meta;
+        out.error = result.error;
+        out.result = items;
+
+        return Observable.just(out);
+    }
+
+    public static ObservableSource<List<TransactionFacade>> mapToFacade(List<HistoryTransaction> result) {
+        if (result == null || result.isEmpty()) {
+            return Observable.just(Collections.emptyList());
+        }
+
+        return Observable.just(
+                Stream.of(result).map(TransactionFacade::new).toList()
+        );
+    }
+
+    public static ObservableSource<ExpResult<List<TransactionFacade>>> mapAddressesInfo(List<MinterAddress> myAddresses, ProfileInfoRepository infoRepo, ExpResult<List<TransactionFacade>> items) {
         if (items.result == null || items.result.isEmpty()) {
             return Observable.just(items);
         }
 
         List<MinterAddress> toFetch = new ArrayList<>();
-        final Map<MinterAddress, List<HistoryTransaction>> toFetchAddresses = new LinkedHashMap<>(items.result.size());
-        for (HistoryTransaction tx : items.result) {
+        final Map<MinterAddress, List<TransactionFacade>> toFetchAddresses = new LinkedHashMap<>(items.result.size());
+        for (TransactionFacade tx : items.result) {
             final MinterAddress add;
-            if (tx.type != HistoryTransaction.Type.Send) {
+            if (tx.getType() != HistoryTransaction.Type.Send) {
                 continue;
             }
 
@@ -119,8 +153,8 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                     }
 
                     for (AddressInfoResult info : listInfoResult.data) {
-                        for (HistoryTransaction t : toFetchAddresses.get(info.address)) {
-                            t.setUsername(info.user.username).setAvatar(info.user.getAvatar().getUrl());
+                        for (TransactionFacade t : toFetchAddresses.get(info.address)) {
+                            t.setUserMeta(info.user.username, info.user.getAvatar().getUrl());
                         }
                     }
 
@@ -128,16 +162,53 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 });
     }
 
-    public static ObservableSource<List<HistoryTransaction>> mapAddressesInfo(List<MinterAddress> addresses, ProfileInfoRepository infoRepo, List<HistoryTransaction> items) {
+    public static ObservableSource<ExpResult<List<TransactionFacade>>> mapValidatorsInfo(CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorRepo, ExpResult<List<TransactionFacade>> result) {
+        return Observable.just(result)
+                .map(items -> items.result)
+                .switchMap(items -> mapValidatorsInfo(validatorRepo, items))
+                .switchMap(items -> {
+                    result.result = items;
+                    return Observable.just(result);
+                });
+    }
+
+    public static ObservableSource<List<TransactionFacade>> mapValidatorsInfo(CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorRepo, List<TransactionFacade> items) {
+        if (Stream.of(items).filter(item -> item.getType() == HistoryTransaction.Type.Delegate).count() == 0) {
+            return Observable.just(items);
+        }
+
+        return validatorRepo.getOrUpdate()
+                .map(validatorItems -> {
+                    Map<MinterPublicKey, ValidatorMeta> out = new HashMap<>();
+                    Stream.of(validatorItems).forEach(item -> out.put(item.pubKey, item.meta));
+                    return out;
+                })
+                .map(validators -> {
+                    for (TransactionFacade tx : items) {
+                        if (tx.getType() == HistoryTransaction.Type.Delegate || tx.getType() == HistoryTransaction.Type.Unbond) {
+                            HistoryTransaction.TxDelegateUnbondResult d = tx.getData();
+                            if (validators.containsKey(d.getPublicKey())) {
+                                tx.setValidatorMeta(validators.get(d.getPublicKey()));
+                            }
+                        }
+                    }
+
+                    return items;
+                });
+
+    }
+
+    public static ObservableSource<List<TransactionFacade>> mapAddressesInfo(List<MinterAddress> addresses, ProfileInfoRepository infoRepo, List<TransactionFacade> items) {
         if (items == null || items.isEmpty()) {
             return Observable.just(Collections.emptyList());
         }
 
         List<MinterAddress> toFetch = new ArrayList<>();
-        final Map<MinterAddress, List<HistoryTransaction>> toFetchAddresses = new LinkedHashMap<>(items.size());
-        for (HistoryTransaction tx : items) {
+        final Map<MinterAddress, List<TransactionFacade>> toFetchAddresses = new LinkedHashMap<>(items.size());
+        for (TransactionFacade tx : items) {
+
             final MinterAddress add;
-            if (tx.type != HistoryTransaction.Type.Send) {
+            if (tx.getType() != HistoryTransaction.Type.Send) {
                 continue;
             }
 
@@ -168,8 +239,11 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                     }
 
                     for (AddressInfoResult info : listInfoResult.data) {
-                        for (HistoryTransaction t : toFetchAddresses.get(info.address)) {
-                            t.setUsername(info.user.username).setAvatar(info.user.getAvatar().getUrl());
+                        for (TransactionFacade t : toFetchAddresses.get(info.address)) {
+                            t.userMeta = new TransactionFacade.UserMeta();
+                            t.userMeta.username = info.user.username;
+                            t.userMeta.avatarUrl = info.user.getAvatar().getUrl();
+
                         }
                     }
 
@@ -179,57 +253,59 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, TransactionItem> callback) {
-        mLoadState.postValue(LoadState.Loading);
-        if (mAddressList == null || mAddressList.isEmpty()) {
+        factory.loadState.postValue(LoadState.Loading);
+        if (factory.addressList == null || factory.addressList.isEmpty()) {
             Timber.w("Unanble to load transactions list(page: 1): user address list is empty");
-            mLoadState.postValue(LoadState.Loaded);
+            factory.loadState.postValue(LoadState.Loaded);
             callback.onResult(Collections.emptyList(), null, null);
             return;
         }
 
-        rxExp(mRepo.getTransactions(mAddressList, 1))
-                .onErrorResumeNext(toExpError())
-                .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
+        resolveInfo(rxExp(factory.repo.getTransactions(factory.addressList, 1)))
                 .map(this::groupByDate)
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
-                    mLoadState.postValue(LoadState.Loaded);
+                    factory.loadState.postValue(LoadState.Loaded);
                     callback.onResult(res.getItems(), null, res.getMeta().lastPage == 1 ? null : res.getMeta().currentPage + 1);
                 });
     }
 
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, TransactionItem> callback) {
-        mLoadState.postValue(LoadState.Loading);
-        if (mAddressList == null || mAddressList.isEmpty()) {
+        factory.loadState.postValue(LoadState.Loading);
+        if (factory.addressList == null || factory.addressList.isEmpty()) {
             Timber.w("Unable to load previous transactions list (page: %s): user address list is empty", params.key);
-            mLoadState.postValue(LoadState.Loaded);
+            factory.loadState.postValue(LoadState.Loaded);
             callback.onResult(Collections.emptyList(), null);
             return;
         }
-        rxExp(mRepo.getTransactions(mAddressList, params.key))
-                .onErrorResumeNext(toExpError())
-                .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
+        resolveInfo(rxExp(factory.repo.getTransactions(factory.addressList, params.key)))
                 .map(this::groupByDate)
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
-                    mLoadState.postValue(LoadState.Loaded);
+                    factory.loadState.postValue(LoadState.Loaded);
                     callback.onResult(res.getItems(), params.key == 1 ? null : params.key - 1);
                 });
     }
 
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, TransactionItem> callback) {
-        mLoadState.postValue(LoadState.Loading);
-        rxExp(mRepo.getTransactions(mAddressList, params.key))
-                .onErrorResumeNext(toExpError())
-                .switchMap(items -> mapAddressesInfo(mAddressList, mInfoRepo, items))
+        factory.loadState.postValue(LoadState.Loading);
+        resolveInfo(rxExp(factory.repo.getTransactions(factory.addressList, params.key)))
                 .map(this::groupByDate)
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
-                    mLoadState.postValue(LoadState.Loaded);
+                    factory.loadState.postValue(LoadState.Loaded);
                     callback.onResult(res.getItems(), params.key + 1 > res.getMeta().lastPage ? null : params.key + 1);
                 });
+    }
+
+    private Observable<ExpResult<List<TransactionFacade>>> resolveInfo(Observable<ExpResult<List<HistoryTransaction>>> source) {
+        return source
+                .onErrorResumeNext(toExpError())
+                .switchMap(TransactionDataSource::mapToFacade)
+                .switchMap(items -> mapAddressesInfo(factory.addressList, factory.infoRepo, items))
+                .switchMap(items -> mapValidatorsInfo(factory.validatorsRepo, items));
     }
 
     @Override
@@ -250,14 +326,14 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         return new DateTime(d);
     }
 
-    private DataSourceMeta<TransactionItem> groupByDate(ExpResult<List<HistoryTransaction>> res) {
+    private DataSourceMeta<TransactionItem> groupByDate(ExpResult<List<TransactionFacade>> res) {
         List<TransactionItem> out = new ArrayList<>();
-        for (HistoryTransaction tx : res.result) {
+        for (TransactionFacade tx : res.result) {
             if (mLastDate == null) {
-                mLastDate = new DateTime(tx.timestamp);
+                mLastDate = new DateTime(tx.get().timestamp);
                 out.add(new HeaderItem(lastDay()));
-            } else if (!DateHelper.compareFlatDay(mLastDate, dt(tx.timestamp))) {
-                mLastDate = dt(tx.timestamp);
+            } else if (!DateHelper.compareFlatDay(mLastDate, dt(tx.get().timestamp))) {
+                mLastDate = dt(tx.get().timestamp);
                 out.add(new HeaderItem(lastDay()));
             }
 
@@ -272,21 +348,24 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     }
 
     public static class Factory extends DataSource.Factory<Integer, TransactionItem> {
-        private ExplorerTransactionRepository mRepo;
-        private List<MinterAddress> mAddressList;
-        private ProfileInfoRepository mInfoRepo;
-        private MutableLiveData<LoadState> mLoadState;
+        @Inject ExplorerTransactionRepository repo;
+        @Inject ProfileInfoRepository infoRepo;
+        @Inject CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorsRepo;
+        private List<MinterAddress> addressList;
+        private MutableLiveData<LoadState> loadState;
 
-        public Factory(ExplorerTransactionRepository repo, ProfileInfoRepository infoRepo, List<MinterAddress> addresses, MutableLiveData<LoadState> loadState) {
-            mRepo = repo;
-            mInfoRepo = infoRepo;
-            mAddressList = addresses;
-            mLoadState = loadState;
+        @Inject
+        public Factory(SecretStorage secretStorage) {
+            addressList = secretStorage.getAddresses();
         }
 
         @Override
         public DataSource<Integer, TransactionItem> create() {
-            return new TransactionDataSource(mRepo, mInfoRepo, mAddressList, mLoadState);
+            return new TransactionDataSource(this);
+        }
+
+        public void observeLoadState(MutableLiveData<LoadState> loadState) {
+            this.loadState = loadState;
         }
     }
 }

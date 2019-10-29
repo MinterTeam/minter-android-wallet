@@ -45,13 +45,12 @@ import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher;
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate;
 import network.minter.bipwallet.tx.adapters.vh.ExpandableTxViewHolder;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.explorer.models.HistoryTransaction;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements DiffUtilDispatcherDelegate<HistoryTransaction> {
+public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements DiffUtilDispatcherDelegate<TransactionFacade> {
 
     private final List<MinterAddress> mMyAddresses;
     private List<TxItem> mItems = new ArrayList<>(0);
@@ -101,24 +100,24 @@ public class TransactionShortListAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     @Override
-    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<HistoryTransaction> items, boolean detectMoves) {
+    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<TransactionFacade> items, boolean detectMoves) {
         DiffUtilDispatcher.dispatchChanges(this, diffUtilCallbackCls, items, detectMoves);
     }
 
     @Override
-    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<HistoryTransaction> items) {
+    public <T extends DiffUtil.Callback> void dispatchChanges(Class<T> diffUtilCallbackCls, @NonNull List<TransactionFacade> items) {
         DiffUtilDispatcher.dispatchChanges(this, diffUtilCallbackCls, items);
     }
 
     @Override
-    public List<HistoryTransaction> getItems() {
+    public List<TransactionFacade> getItems() {
         return Stream.of(mItems)
                 .map(TxItem::getTx)
                 .toList();
     }
 
     @Override
-    public void setItems(List<HistoryTransaction> items) {
+    public void setItems(List<TransactionFacade> items) {
         mItems = Stream.of(items)
                 .map(TxItem::new)
                 .toList();

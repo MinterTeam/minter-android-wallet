@@ -46,7 +46,6 @@ import androidx.transition.TransitionManager;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.tx.adapters.vh.ExpandableTxViewHolder;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.explorer.models.HistoryTransaction;
 
 import static network.minter.bipwallet.tx.adapters.TransactionItem.ITEM_PROGRESS;
 
@@ -189,11 +188,11 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     }
 
     public interface OnExpandDetailsListener {
-        void onExpand(View view, HistoryTransaction tx);
+        void onExpand(View view, TransactionFacade tx);
     }
 
     public interface OnExplorerOpenClickListener {
-        void onClick(View view, HistoryTransaction tx);
+        void onClick(View view, TransactionFacade tx);
     }
 
 }

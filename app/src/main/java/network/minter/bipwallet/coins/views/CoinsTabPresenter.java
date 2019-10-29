@@ -56,6 +56,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
 import network.minter.bipwallet.apis.reactive.ReactiveExplorerGate;
 import network.minter.bipwallet.coins.contract.CoinsTabView;
 import network.minter.bipwallet.coins.ui.CoinsTabFragment;
@@ -74,6 +75,8 @@ import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.tx.adapters.TransactionDataSource;
+import network.minter.bipwallet.tx.adapters.TransactionFacade;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
@@ -81,6 +84,7 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.ValidatorItem;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.User;
@@ -92,6 +96,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman;
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
 import static network.minter.bipwallet.internal.helpers.Plurals.usd;
 import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
+import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapValidatorsInfo;
 
 /**
  * minter-android-wallet. 2018
@@ -105,6 +110,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
     @Inject AuthSession session;
     @Inject CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo;
     @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
+    @Inject CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorsRepo;
     @Inject SecretStorage secretRepo;
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject BlockChainAccountRepository accountRepo;
@@ -232,15 +238,6 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         getViewState().startTab(R.id.bottom_settings);
     }
 
-    private void onExplorerClick(View view, HistoryTransaction historyTransaction) {
-        getViewState().startExplorer(historyTransaction.hash.toString());
-    }
-
-    private void onRefresh() {
-        txRepo.update(true);
-        accountStorage.update(true);
-    }
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void onFirstViewAttach() {
@@ -327,6 +324,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
         safeSubscribeIoToUi(
                 txRepo.observe()
+                        .switchMap(TransactionDataSource::mapToFacade)
+                        .switchMap(items -> mapValidatorsInfo(validatorsRepo, items))
                         .switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
                         .subscribeOn(Schedulers.io())
         )
@@ -347,6 +346,15 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
 
         mAdapter.addRow(mTransactionsRow);
         mAdapter.addRow(mCoinsRow);
+    }
+
+    private void onRefresh() {
+        txRepo.update(true);
+        accountStorage.update(true);
+    }
+
+    private void onExplorerClick(View view, TransactionFacade historyTransaction) {
+        getViewState().startExplorer(historyTransaction.getHash().toString());
     }
 
     private void setUsername() {

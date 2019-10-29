@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.vh.TxConvertCoinViewHolder;
@@ -48,8 +49,6 @@ import network.minter.bipwallet.tx.adapters.vh.TxSendCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxSetCandidateOnlineOfflineViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxUnhandledViewHolder;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.explorer.models.HistoryTransaction;
-import network.minter.profile.MinterProfileApi;
 
 /**
  * minter-android-wallet. 2018
@@ -57,16 +56,11 @@ import network.minter.profile.MinterProfileApi;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TxItem implements TransactionItem {
-    private final HistoryTransaction mTx;
-    private String mAvatar;
-    private String mUsername;
+    private final TransactionFacade mTx;
 
-    public TxItem(HistoryTransaction tx) {
+    public TxItem(TransactionFacade tx) {
         mTx = tx;
-        mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.from);
-        mUsername = tx.username;
     }
-
 
     public static RecyclerView.ViewHolder createViewHolder(final LayoutInflater inflater, final ViewGroup parent,
                                                            @ListType int viewType) {
@@ -170,39 +164,43 @@ public class TxItem implements TransactionItem {
     }
 
     public String getAvatar() {
-        if (mAvatar == null) {
-            return "https://my.beta.minter.network/api/v1/avatar/by/user/1";
-        }
-
-        return mAvatar;
+        return mTx.getAvatar();
     }
 
-    public TxItem setAvatar(String avatar) {
-        mAvatar = avatar;
-        return this;
+    public void setAvatar(String url) {
+        if (mTx.userMeta != null) {
+            mTx.userMeta.avatarUrl = url;
+        } else {
+            mTx.userMeta = new TransactionFacade.UserMeta();
+            mTx.userMeta.avatarUrl = url;
+        }
     }
 
     public String getUsername() {
-        return mUsername;
-    }
-
-    public TxItem setUsername(String username) {
-        mUsername = username;
-        return this;
+        return mTx.getName();
     }
 
     @SuppressLint("WrongConstant")
     @Override
     public int getViewType() {
-        return mTx.type != null ? mTx.type.ordinal() + 1 : 0xFF;
+        return mTx.get().type != null ? mTx.get().type.ordinal() + 1 : 0xFF;
     }
 
-    public HistoryTransaction getTx() {
+    public TransactionFacade getTx() {
         return mTx;
     }
 
     @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof TxItem) {
+            return mTx.equals(((TxItem) obj).mTx);
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean isSameOf(TransactionItem item) {
-        return item.getViewType() == TX_SEND && ((TxItem) item).getTx().hash.equals(mTx.hash);
+        return ((TxItem) item).getTx().get().hash.equals(mTx.get().hash);
     }
 }

@@ -37,11 +37,13 @@ public class TxRedeemCheckViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item, List<MinterAddress> myAddresses) {
         super.bind(item);
         avatar.setImageResource(R.drawable.img_avatar_redeem);
-        final HistoryTransaction.TxRedeemCheckResult data = item.getTx().getData();
+        HistoryTransaction tx = item.getTx().get();
+        final HistoryTransaction.TxRedeemCheckResult data = tx.getData();
         fromValue.setText(data.getCheck().getSender().toString());
-        title.setText(item.getTx().hash.toShortString());
 
-        if (myAddresses.contains(item.getTx().from)) {
+        title.setText(tx.hash.toShortString());
+
+        if (myAddresses.contains(tx.from)) {
             amount.setTextColor(Wallet.app().res().getColor(R.color.textColorGreen));
             amount.setText(String.format("+ %s", bdHuman(data.getCheck().getValue())));
         } else {

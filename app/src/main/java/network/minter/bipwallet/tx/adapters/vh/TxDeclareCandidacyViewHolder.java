@@ -61,7 +61,7 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         avatar.setImageResource(R.drawable.img_avatar_candidate);
-        final HistoryTransaction.TxDeclareCandidacyResult data = item.getTx().getData();
+        final HistoryTransaction.TxDeclareCandidacyResult data = item.getTx().get().getData();
 
         amount.setText(String.format("- %s", bdHuman(firstNonNull(data.stake, new BigDecimal(0)))));
         subamount.setText(data.getCoin());
@@ -78,7 +78,7 @@ public final class TxDeclareCandidacyViewHolder extends ExpandableTxViewHolder {
             title.setText(data.address.toShortString());
         } else {
             address.setText("<unknown>");
-            title.setText(item.getTx().hash.toShortString());
+            title.setText(item.getTx().getHash().toShortString());
         }
 
         commission.setText(String.format("%d%%", data.commission));

@@ -54,6 +54,7 @@ import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.security.ui.PinValidationDialog;
 import network.minter.bipwallet.services.livebalance.LiveBalanceService;
 import network.minter.bipwallet.settings.ui.PasswordChangeMigrationActivity;
+import network.minter.bipwallet.tx.TransactionsModule;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 
@@ -101,7 +102,7 @@ public interface InjectorsModule {
     @ActivityScope
     AddressItemActivity addressItemActivityInjector();
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = TransactionsModule.class)
     @ActivityScope
     TransactionListActivity transactionListActivityInjector();
 

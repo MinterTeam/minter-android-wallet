@@ -57,22 +57,23 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
     public void bind(TxItem item) {
         super.bind(item);
         avatar.setImageResource(R.drawable.img_avatar_candidate);
-        final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = item.getTx().getData();
+        HistoryTransaction tx = item.getTx().get();
+        final HistoryTransaction.TxSetCandidateOnlineOfflineResult data = tx.getData();
 
-        if (bdNull(item.getTx().getFee())) {
-            amount.setText(String.format("%s", bdHuman(item.getTx().fee)));
+        if (bdNull(tx.getFee())) {
+            amount.setText(String.format("%s", bdHuman(tx.fee)));
         } else {
-            amount.setText(String.format("- %s", bdHuman(item.getTx().fee)));
+            amount.setText(String.format("- %s", bdHuman(tx.fee)));
         }
 
         subamount.setText(MinterSDK.DEFAULT_COIN);
-        itemTitleType.setText(item.getTx().type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
+        itemTitleType.setText(tx.type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
         if (data.getPublicKey() != null) {
             pubKey.setText(data.getPublicKey().toString());
             title.setText(data.getPublicKey().toShortString());
         } else {
             pubKey.setText("<unknown>");
-            title.setText(item.getTx().hash.toShortString());
+            title.setText(tx.hash.toShortString());
         }
         setupCopyListeners(pubKey);
     }

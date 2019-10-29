@@ -65,7 +65,7 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
 
     public void bind(TxItem txItem, List<MinterAddress> myAddresses) {
         super.bind(txItem);
-        final HistoryTransaction item = txItem.getTx();
+        final HistoryTransaction item = txItem.getTx().get();
         final HistoryTransaction.TxSendCoinResult data = item.getData();
 
         final boolean isIncoming = item.isIncoming(myAddresses);
