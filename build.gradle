@@ -59,6 +59,7 @@ allprojects {
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://dl.bintray.com/minterteam/android" }
         maven { url "https://dl.bintray.com/edwardstock/android" }
+        maven { url "https://oss.jfrog.org/libs-snapshot/" }
 
     }
 }

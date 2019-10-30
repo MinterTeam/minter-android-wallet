@@ -25,6 +25,8 @@ public interface ExternalTransactionView extends MvpView, ProgressView {
     void setSecondVisible(int visibility);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startDialog(WalletDialog.DialogExecutor executor);
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startDialog(boolean cancelable, WalletDialog.DialogExecutor executor);
     void setPayloadTextChangedListener(TextWatcher textWatcher);
     void setOnConfirmListener(View.OnClickListener listener);
     void setOnCancelListener(View.OnClickListener listener);
@@ -35,4 +37,5 @@ public interface ExternalTransactionView extends MvpView, ProgressView {
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startExplorer(String hash);
 
+    void disableAll();
 }

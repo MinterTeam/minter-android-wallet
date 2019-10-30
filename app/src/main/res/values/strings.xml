@@ -216,6 +216,7 @@
     <string name="copy">Copy</string>
     <string name="fingerprint_dialog_enroll_title">Enroll your fingerprints</string>
     <string name="fingerprint_dialog_enroll_text">Please, check your security settings and enable fingerprint device lock</string>
+    <string name="fingerprint_dialog_enroll_text_fix">Please, manually open security settings and enable fingerprint device lock</string>
     <string name="btn_settings">Open settings</string>
     <string name="pin_invalid_logout">You\'ve entered invalid PIN-code 5 times in a row. Logging out…</string>
     <string name="dialog_show_mnemonic_title">⚠️ Your Mnemonic</string>

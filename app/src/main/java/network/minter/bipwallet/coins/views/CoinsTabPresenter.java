@@ -192,6 +192,11 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CoinsTabFragment.REQUEST_CODE_QR_SCAN_TX) {
+            if (data == null) {
+                Timber.w("Something wrong on activity result: req(%d), res(%d), data(null)", requestCode, resultCode);
+                return;
+            }
+
             String result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT);
             if (result != null) {
 

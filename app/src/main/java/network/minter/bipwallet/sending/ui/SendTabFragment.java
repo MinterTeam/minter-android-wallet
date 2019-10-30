@@ -74,6 +74,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthVali
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
+import network.minter.bipwallet.internal.views.utils.SingleCallHandler;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
@@ -180,8 +181,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_scan_tx) {
-            startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX);
-
+            SingleCallHandler.call(item, () -> startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX));
         }
         return super.onOptionsItemSelected(item);
     }

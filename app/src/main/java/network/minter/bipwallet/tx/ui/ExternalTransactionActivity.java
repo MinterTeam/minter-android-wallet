@@ -113,6 +113,12 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
     }
 
     @Override
+    public void startDialog(boolean cancelable, WalletDialog.DialogExecutor executor) {
+        mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor);
+        mCurrentDialog.setCancelable(cancelable);
+    }
+
+    @Override
     public void setPayloadTextChangedListener(TextWatcher textWatcher) {
         inputPayload.addTextChangedListener(textWatcher);
     }
@@ -173,6 +179,14 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
     @Override
     public void startExplorer(String txHash) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + txHash)));
+    }
+
+    @Override
+    public void disableAll() {
+        setFirstVisible(View.GONE);
+        setSecondVisible(View.GONE);
+        action.setEnabled(false);
+        action.setClickable(false);
     }
 
     @ProvidePresenter

@@ -254,6 +254,10 @@ dependencies {
     annotationProcessor 'com.github.moxy-community:moxy-compiler:1.0.14'
 
     // Reactive
+//    implementation "io.reactivex.rxjava3:rxjava:3.0.0-RC4"
+//    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0-SNAPSHOT'
+//    implementation 'com.jakewharton.rxbinding3:rxbinding-core:3.0.0'
+//    implementation 'com.jakewharton.rxbinding3:rxbinding-appcompat:3.0.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 

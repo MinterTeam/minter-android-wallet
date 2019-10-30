@@ -63,10 +63,12 @@ import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator;
 import network.minter.bipwallet.internal.views.list.NonScrollableLinearLayoutManager;
+import network.minter.bipwallet.internal.views.utils.SingleCallHandler;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.settings.contract.SettingsTabView;
@@ -181,8 +183,10 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
 
     @Override
     public void startPinCodeManager(int requestCode, SecurityModule.PinMode mode) {
-        new PinEnterActivity.Builder(getActivity(), mode)
-                .start(requestCode);
+        SingleCallHandler.call("pin-manager",
+                () -> new PinEnterActivity.Builder(getActivity(), mode)
+                        .start(requestCode)
+        );
     }
 
     @Override
@@ -214,8 +218,19 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
         } catch (ActivityNotFoundException wtf) {
             intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
             startActivity(intent);
+        } catch (SecurityException wtf2) {
+            try {
+                intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+                startActivity(intent);
+            } catch (Throwable wtf3) {
+                startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
+                        .setText(R.string.fingerprint_dialog_enroll_text_fix)
+                        .setPositiveAction(R.string.btn_ok, (d, w) -> {
+                            d.dismiss();
+                        })
+                        .create());
+            }
         }
-
     }
 
     @Override

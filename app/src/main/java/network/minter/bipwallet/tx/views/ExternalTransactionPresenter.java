@@ -122,10 +122,9 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                     return;
                 }
             } catch (Throwable t) {
-                getViewState().setFirstVisible(View.GONE);
-                getViewState().setSecondVisible(View.GONE);
+                getViewState().disableAll();
                 Timber.w(t, "Unable to parse remote transaction: %s", hash);
-                getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
                         .setText("Invalid transaction data: %s", t.getMessage())
                         .setPositiveAction(R.string.btn_close, (d, w) -> {
                             d.dismiss();
@@ -150,10 +149,9 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         if (mExtTx.getType() == OperationType.RedeemCheck) {
             TxRedeemCheck d = mExtTx.getData();
             if (d.getProof().size() == 0 && mCheckPassword == null) {
-                getViewState().setFirstVisible(View.GONE);
-                getViewState().setSecondVisible(View.GONE);
+                getViewState().disableAll();
 
-                getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
                         .setText("This check given without proof and password. One of parameters is required.")
                         .setPositiveAction(R.string.btn_close, (_d, _w) -> {
                             _d.dismiss();
@@ -379,7 +377,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             break;
 
             default: {
-                getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send")
+                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send")
                         .setText("Wallet doesn't support this type of transaction: %s", tx.getType().name())
                         .setPositiveAction(R.string.btn_close)
                         .create());
@@ -389,7 +387,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     }
 
     private void startExecuteTransaction() {
-        getViewState().startDialog(ctx -> {
+        getViewState().startDialog(false, ctx -> {
             final WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, R.string.please_wait)
                     .setText(R.string.tx_send_in_progress)
                     .create();
@@ -457,7 +455,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
         accountStorage.update(true);
         cachedTxRepo.update(true);
-        getViewState().startDialog(ctx -> {
+        getViewState().startDialog(false, ctx -> {
             WalletConfirmDialog.Builder builder = new WalletConfirmDialog.Builder(ctx, "Success!")
                     .setText("Transaction successfully sent")
                     .setPositiveAction("View transaction", (d, v) -> {
