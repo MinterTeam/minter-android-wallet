@@ -126,7 +126,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".sending.ui.QRCodeScannerActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Wallet" />
         <activity
@@ -178,11 +178,13 @@
         </activity>
         <activity
             android:name=".security.ui.PinEnterActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <activity
             android:windowSoftInputMode="stateHidden"
             android:name=".tx.ui.ExternalTransactionActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".home.ui.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

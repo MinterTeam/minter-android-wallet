@@ -40,6 +40,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -53,6 +55,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
@@ -224,7 +229,13 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
 
     @Override
     public void startScanQRWithPermissions(int requestCode) {
-        CoinsTabFragmentPermissionsDispatcher.startScanQRWithPermissionCheck(this, requestCode);
+        Observable.timer(1, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(res -> {
+                    CoinsTabFragmentPermissionsDispatcher.startScanQRWithPermissionCheck(this, requestCode);
+                });
+
     }
 
     @Override

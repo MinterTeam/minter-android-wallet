@@ -118,20 +118,8 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             final String hash = params.getString("d", null);
             try {
                 mExtTx = DeepLinkHelper.parseTransaction(hash);
-                if (mExtTx.getType() == OperationType.RedeemCheck) {
-                    TxRedeemCheck d = mExtTx.getData();
-                    if (d.getProof().size() == 0 && mCheckPassword == null) {
-                        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
-                                .setText("This check given without proof and password. One of parameters is required.")
-                                .setPositiveAction(R.string.btn_close, (_d, _w) -> {
-                                    _d.dismiss();
-                                    getViewState().finishCancel();
-                                })
-                                .create());
-                        return;
-                    } else if (d.getProof().size() == 0 && mCheckPassword != null) {
-                        d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
-                    }
+                if (!validateTx()) {
+                    return;
                 }
             } catch (Throwable t) {
                 getViewState().setFirstVisible(View.GONE);
@@ -147,12 +135,38 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                 return;
             }
         } else {
-            mExtTx = IntentHelper.getParcelExtraOrError(intent, ExternalTransactionActivity.EXTRA_EXTERNAL_TX, "Empty transaction hash passed");
+            mExtTx = IntentHelper.getParcelExtraOrError(intent, ExternalTransactionActivity.EXTRA_EXTERNAL_TX, "Empty transaction passed");
+            if (!validateTx()) {
+                return;
+            }
         }
 
         mPayload = mExtTx.getPayload();
         calculateFee(mExtTx);
         fillData(mExtTx);
+    }
+
+    private boolean validateTx() {
+        if (mExtTx.getType() == OperationType.RedeemCheck) {
+            TxRedeemCheck d = mExtTx.getData();
+            if (d.getProof().size() == 0 && mCheckPassword == null) {
+                getViewState().setFirstVisible(View.GONE);
+                getViewState().setSecondVisible(View.GONE);
+
+                getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                        .setText("This check given without proof and password. One of parameters is required.")
+                        .setPositiveAction(R.string.btn_close, (_d, _w) -> {
+                            _d.dismiss();
+                            getViewState().finishCancel();
+                        })
+                        .create());
+                return false;
+            } else if (d.getProof().size() == 0 && mCheckPassword != null) {
+                d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
+            }
+        }
+
+        return true;
     }
 
     @Override

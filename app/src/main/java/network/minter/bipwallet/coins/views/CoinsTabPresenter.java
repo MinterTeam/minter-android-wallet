@@ -95,8 +95,6 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman;
 import static network.minter.bipwallet.internal.helpers.Plurals.bips;
 import static network.minter.bipwallet.internal.helpers.Plurals.usd;
-import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapAddressesInfo;
-import static network.minter.bipwallet.tx.adapters.TransactionDataSource.mapValidatorsInfo;
 
 /**
  * minter-android-wallet. 2018
@@ -325,8 +323,8 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
         safeSubscribeIoToUi(
                 txRepo.observe()
                         .switchMap(TransactionDataSource::mapToFacade)
-                        .switchMap(items -> mapValidatorsInfo(validatorsRepo, items))
-                        .switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
+//                        .switchMap(items -> mapValidatorsInfo(validatorsRepo, items))
+//                        .switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
                         .subscribeOn(Schedulers.io())
         )
                 .subscribe(res -> {

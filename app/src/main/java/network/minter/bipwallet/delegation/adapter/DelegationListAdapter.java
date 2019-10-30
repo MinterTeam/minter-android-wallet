@@ -21,6 +21,7 @@ import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder;
 
+import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
@@ -89,6 +90,7 @@ public class DelegationListAdapter extends PagedListAdapter<DelegationItem, Recy
     }
 
     public class DelegationViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.item_title) TextView title;
         @BindView(R.id.item_public_key) TextView publicKey;
         @BindView(R.id.item_copy) View actionCopy;
         @BindView(R.id.item_avatar) BipCircleImageView icon;
@@ -100,10 +102,12 @@ public class DelegationListAdapter extends PagedListAdapter<DelegationItem, Recy
         }
 
         public void bind(DelegationItem item) {
-            publicKey.setText(item.name);
+            title.setText(firstNonNull(item.name, title.getContext().getString(R.string.label_public_key)));
+            publicKey.setText(item.pubKey.toShortString());
             if (item.description != null) {
                 ViewCompat.setTooltipText(publicKey, item.description);
             }
+
 
             if (item.icon != null) {
                 icon.setImageUrlFallback(item.icon, R.drawable.img_avatar_default);

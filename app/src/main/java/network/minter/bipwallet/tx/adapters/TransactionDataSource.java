@@ -304,8 +304,9 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
         return source
                 .onErrorResumeNext(toExpError())
                 .switchMap(TransactionDataSource::mapToFacade)
-                .switchMap(items -> mapAddressesInfo(factory.addressList, factory.infoRepo, items))
-                .switchMap(items -> mapValidatorsInfo(factory.validatorsRepo, items));
+//                .switchMap(items -> mapAddressesInfo(factory.addressList, factory.infoRepo, items))
+//                .switchMap(items -> mapValidatorsInfo(factory.validatorsRepo, items));
+                ;
     }
 
     @Override
