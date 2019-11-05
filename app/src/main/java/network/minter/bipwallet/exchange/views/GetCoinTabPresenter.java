@@ -33,7 +33,7 @@ import moxy.InjectViewState;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.exchange.contract.GetCoinTabView;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -58,7 +58,7 @@ public class GetCoinTabPresenter extends BaseCoinTabPresenter<GetCoinTabView> {
     public GetCoinTabPresenter(
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
-            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
+            CachedRepository<List<HistoryTransaction>, CacheTxRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
             GateGasRepository gasRepo,

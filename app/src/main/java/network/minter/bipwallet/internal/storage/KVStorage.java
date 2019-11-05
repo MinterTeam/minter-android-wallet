@@ -28,10 +28,13 @@ package network.minter.bipwallet.internal.storage;
 
 import com.orhanobut.hawk.Hawk;
 import com.orhanobut.hawk.Storage;
+import com.orhanobut.hawk.StorageBatch;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+
+import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
@@ -39,39 +42,57 @@ import java.util.Queue;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class KVStorage implements Storage {
+    private String mDbName = Hawk.DEFAULT_DB_TAG;
+
+    public KVStorage() {
+    }
+
+    public KVStorage(String dbTag) {
+        mDbName = dbTag;
+    }
+
     @Override
     public <T> boolean put(String key, T value) {
-        return Hawk.put(key, value);
+        return Hawk.db(mDbName).put(key, value);
+    }
+
+    @Override
+    public void batch(StorageBatch batch) {
+        Hawk.db(mDbName).batch(batch);
     }
 
     @Override
     public <T> T get(String key) {
         try {
-            return Hawk.get(key);
+            return Hawk.db(mDbName).get(key);
         } catch (Throwable t) {
+            Timber.w(t);
             try {
-                Hawk.delete(key);
+                Hawk.db(mDbName).delete(key);
             } catch (Throwable ignore) {
+                Timber.w(ignore);
             }
             return null;
         }
     }
 
     public <T> Queue<T> getQueue(String key) {
-        return new LinkedList<>(Hawk.<ArrayList<T>>get(key));
+        return new LinkedList<>(Hawk.db(mDbName).<ArrayList<T>>get(key));
     }
 
     public <T> boolean putQueue(String key, Queue<T> queue) {
-        return Hawk.put(key, queue);
+        return Hawk.db(mDbName).put(key, queue);
     }
 
     public <T> T get(String key, T defaultValue) {
         try {
-            return Hawk.get(key, defaultValue);
+            return Hawk.db(mDbName).get(key, defaultValue);
         } catch (Throwable t) {
+            Timber.w(t);
             try {
-                Hawk.delete(key);
+                Hawk.db(mDbName).delete(key);
             } catch (Throwable ignore) {
+                Timber.w(ignore);
             }
             return defaultValue;
         }
@@ -79,21 +100,21 @@ public class KVStorage implements Storage {
 
     @Override
     public boolean delete(String key) {
-        return Hawk.delete(key);
+        return Hawk.db(mDbName).delete(key);
     }
 
     @Override
     public boolean deleteAll() {
-        return Hawk.deleteAll();
+        return Hawk.db(mDbName).deleteAll();
     }
 
     @Override
     public long count() {
-        return Hawk.count();
+        return Hawk.db(mDbName).count();
     }
 
     @Override
     public boolean contains(String key) {
-        return Hawk.contains(key);
+        return Hawk.db(mDbName).contains(key);
     }
 }

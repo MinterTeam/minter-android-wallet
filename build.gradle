@@ -77,7 +77,7 @@ ext {
     minterExplorerSDK = "0.6.1"
     minterProfileSDK = "0.2.4"
     minterBlockchainSDK = "0.10.0"
-    minterCoreSDK = "0.6.2"
+    minterCoreSDK = "0.6.3"
 
     appVersionName = "1.10.0-dev01"
     appVersionCode = 112

@@ -26,7 +26,7 @@ import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
@@ -83,7 +83,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     @Inject GateTransactionRepository gateTxRepo;
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject
-    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cachedTxRepo;
+    CachedRepository<List<HistoryTransaction>, CacheTxRepository> cachedTxRepo;
     private ExternalTransaction mExtTx;
     private MinterAddress mFrom;
     private UnsignedBytesData mPayload;

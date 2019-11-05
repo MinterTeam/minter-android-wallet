@@ -65,6 +65,7 @@ public class PinValidatingPresenter extends MvpBasePresenter<PinValidatingView> 
         Wallet.app().session().logout();
         Wallet.app().secretStorage().destroy();
         Wallet.app().storage().deleteAll();
+        Wallet.app().storageCache().deleteAll();
         Wallet.app().prefs().edit().clear().apply();
         getViewState().startLogin();
     }

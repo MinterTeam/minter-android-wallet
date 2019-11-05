@@ -51,7 +51,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
+import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.adapter.DataSourceMeta;
 import network.minter.bipwallet.internal.adapter.LoadState;
@@ -162,7 +162,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 });
     }
 
-    public static ObservableSource<ExpResult<List<TransactionFacade>>> mapValidatorsInfo(CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorRepo, ExpResult<List<TransactionFacade>> result) {
+    public static ObservableSource<ExpResult<List<TransactionFacade>>> mapValidatorsInfo(CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> validatorRepo, ExpResult<List<TransactionFacade>> result) {
         return Observable.just(result)
                 .map(items -> items.result)
                 .switchMap(items -> mapValidatorsInfo(validatorRepo, items))
@@ -172,7 +172,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
                 });
     }
 
-    public static ObservableSource<List<TransactionFacade>> mapValidatorsInfo(CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorRepo, List<TransactionFacade> items) {
+    public static ObservableSource<List<TransactionFacade>> mapValidatorsInfo(CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> validatorRepo, List<TransactionFacade> items) {
         if (Stream.of(items).filter(item -> item.getType() == HistoryTransaction.Type.Delegate).count() == 0) {
             return Observable.just(items);
         }
@@ -351,7 +351,7 @@ public class TransactionDataSource extends PageKeyedDataSource<Integer, Transact
     public static class Factory extends DataSource.Factory<Integer, TransactionItem> {
         @Inject ExplorerTransactionRepository repo;
         @Inject ProfileInfoRepository infoRepo;
-        @Inject CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorsRepo;
+        @Inject CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> validatorsRepo;
         private List<MinterAddress> addressList;
         private MutableLiveData<LoadState> loadState;
 

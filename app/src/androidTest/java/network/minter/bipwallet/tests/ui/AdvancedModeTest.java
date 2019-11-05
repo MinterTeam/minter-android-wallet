@@ -81,6 +81,7 @@ public class AdvancedModeTest {
     public void setUp() {
         Intents.init();
         TestWallet.app().storage().deleteAll();
+        TestWallet.app().storageCache().deleteAll();
         TestWallet.app().secretStorage().destroy();
 
 

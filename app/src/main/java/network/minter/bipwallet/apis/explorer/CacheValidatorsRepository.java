@@ -15,11 +15,11 @@ import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
 
-public class CachedValidatorsRepository extends ExplorerValidatorsRepository implements CachedEntity<List<ValidatorItem>> {
+public class CacheValidatorsRepository extends ExplorerValidatorsRepository implements CachedEntity<List<ValidatorItem>> {
     private final static String KEY_VALIDATORS = "cached_explorer_validators_repository_list";
     private KVStorage mStorage;
 
-    public CachedValidatorsRepository(KVStorage storage, @Nonnull ApiService.Builder apiBuilder) {
+    public CacheValidatorsRepository(KVStorage storage, @Nonnull ApiService.Builder apiBuilder) {
         super(apiBuilder);
         mStorage = storage;
     }

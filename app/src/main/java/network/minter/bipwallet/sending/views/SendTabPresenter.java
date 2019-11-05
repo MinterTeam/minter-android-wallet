@@ -64,7 +64,7 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
@@ -154,7 +154,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     };
     @Inject SecretStorage secretStorage;
     @Inject
-    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cachedTxRepo;
+    CachedRepository<List<HistoryTransaction>, CacheTxRepository> cachedTxRepo;
     @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
     @Inject ExplorerCoinsRepository coinRepo;
     @Inject BlockChainTransactionRepository bcTxRepo;

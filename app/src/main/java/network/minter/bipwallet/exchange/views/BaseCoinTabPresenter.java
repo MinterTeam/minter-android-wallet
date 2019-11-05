@@ -56,7 +56,7 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.exchange.ExchangeCalculator;
 import network.minter.bipwallet.exchange.contract.BaseCoinTabView;
 import network.minter.bipwallet.exchange.models.ConvertTransactionData;
@@ -101,7 +101,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends MvpBasePresenter<V> {
     protected final SecretStorage mSecretStorage;
     protected final CachedRepository<UserAccount, AccountStorage> mAccountStorage;
-    protected final CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> mTxRepo;
+    protected final CachedRepository<List<HistoryTransaction>, CacheTxRepository> mTxRepo;
     protected final ExplorerCoinsRepository mExplorerCoinsRepo;
     protected final GateEstimateRepository mEstimateRepository;
     protected final IdlingManager mIdlingManager;
@@ -123,7 +123,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     public BaseCoinTabPresenter(
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
-            CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> txRepo,
+            CachedRepository<List<HistoryTransaction>, CacheTxRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
             GateGasRepository gasRepo,

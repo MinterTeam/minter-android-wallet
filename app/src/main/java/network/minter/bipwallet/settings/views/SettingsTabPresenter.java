@@ -76,7 +76,7 @@ import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.settings.contract.SettingsTabView;
-import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.bipwallet.settings.repo.MinterBotRepository;
 import network.minter.bipwallet.settings.ui.SettingsFieldType;
 import network.minter.bipwallet.settings.views.rows.ChangeAvatarRow;
@@ -106,7 +106,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
     @Inject ProfileRepository profileRepo;
-    @Inject CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo;
+    @Inject CachedRepository<User.Data, CacheProfileRepository> profileCachedRepo;
     @Inject ProfileAuthRepository profileAuthRepo;
     @Inject SharedPreferences prefs;
     @Inject SettingsManager settings;
@@ -213,6 +213,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
         Wallet.app().session().logout();
         Wallet.app().secretStorage().destroy();
         Wallet.app().storage().deleteAll();
+        Wallet.app().storageCache().deleteAll();
         Wallet.app().prefs().edit().clear().apply();
         getViewState().startLogin();
     }

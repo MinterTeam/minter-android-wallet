@@ -41,7 +41,7 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AnalyticsManager;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
@@ -61,7 +61,7 @@ import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
-import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.bipwallet.tests.data.KVStorageQueueSaveTest;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
@@ -129,8 +129,8 @@ public interface TestWalletComponent extends WalletComponent {
     AccountStorage accountStorage();
     RecipientAutocompleteStorage recipientStorage();
     CachedRepository<UserAccount, AccountStorage> accountStorageCache();
-    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> explorerTransactionsRepoCache();
-    CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo();
+    CachedRepository<List<HistoryTransaction>, CacheTxRepository> explorerTransactionsRepoCache();
+    CachedRepository<User.Data, CacheProfileRepository> profileCachedRepo();
     // profile
     ProfileAuthRepository authRepo();
     ProfileInfoRepository infoRepo();

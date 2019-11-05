@@ -39,12 +39,17 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.edwardstock.secp256k1.NativeSecp256k1;
 import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.GsonBuilder;
+import com.orhanobut.hawk.ConcealEncryption;
+import com.orhanobut.hawk.GsonParser;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.hawk.HawkDB;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +64,8 @@ import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.internal.di.annotations.DbCache;
+import network.minter.bipwallet.internal.gson.BigDecimalJsonConverter;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
@@ -68,7 +75,18 @@ import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.MinterSDK;
 import network.minter.core.bip39.NativeBip39;
+import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterCheck;
+import network.minter.core.crypto.MinterHash;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.api.ApiService;
+import network.minter.core.internal.api.converters.BigIntegerJsonConverter;
+import network.minter.core.internal.api.converters.BytesDataJsonConverter;
+import network.minter.core.internal.api.converters.MinterAddressJsonConverter;
+import network.minter.core.internal.api.converters.MinterCheckJsonConverter;
+import network.minter.core.internal.api.converters.MinterHashJsonConverter;
+import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
 import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
@@ -81,6 +99,7 @@ import static network.minter.bipwallet.internal.Wallet.ENABLE_CRASHLYTICS;
  */
 @Module
 public class WalletModule {
+    public final static String DB_CACHE = "minter_cache";
     private Context mContext;
     private boolean mDebug;
     private boolean mEnableExternalLog;
@@ -90,7 +109,16 @@ public class WalletModule {
         mDebug = debug;
         mEnableExternalLog = enableExternalLog;
         initCrashlytics();
-        Hawk.init(mContext).build();
+
+        Hawk.init(mContext)
+                .setLogger(message -> Timber.tag("HAWK_SECRET").d(message))
+                .setEncryption(new ConcealEncryption(mContext))
+                .build();
+
+        Hawk.init(DB_CACHE, mContext)
+                .setLogger(message -> Timber.tag("HAWK_CACHE").d(message))
+                .setParser(new GsonParser(getGson()))
+                .build();
 
         initCoreSdk(context);
         MinterBlockChainApi.initialize(debug);
@@ -111,6 +139,7 @@ public class WalletModule {
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public static void initCoreSdk(Context context) {
+        HawkDB db = Hawk.db(DB_CACHE);
         try {
             // Try loading our native lib, see if it works...
             MinterSDK.initialize();
@@ -125,8 +154,8 @@ public class WalletModule {
             Iterator<String> iter = libFiles.iterator();
             while (iter.hasNext()) {
                 String libFileName = iter.next();
-                String libFilePath = Hawk.get(libFileName);
-                if (Hawk.contains(libFileName) && new File(libFilePath).exists()) {
+                String libFilePath = db.get(libFileName);
+                if (db.contains(libFileName) && new File(libFilePath).exists()) {
                     iter.remove();
                 }
                 System.load(libFilePath);
@@ -147,7 +176,7 @@ public class WalletModule {
                     Timber.d("Extract lib (%s) %s to %s...", Build.CPU_ABI, libFileName, destPath);
 
                     UnzipUtil.extractFile(appInfo.sourceDir, "lib/" + Build.CPU_ABI + "/" + libFileName, destPath);
-                    Hawk.put(libFileName, libFilePath);
+                    db.put(libFileName, libFilePath);
                     System.load(libFilePath);
                 }
 
@@ -212,8 +241,15 @@ public class WalletModule {
 
     @Provides
     @WalletApp
-    public KVStorage provideKeyValueStorage() {
+    public KVStorage provideSecretKVStorage() {
         return new KVStorage();
+    }
+
+    @Provides
+    @WalletApp
+    @DbCache
+    public KVStorage provideCacheKVStorage() {
+        return new KVStorage(DB_CACHE);
     }
 
     @Provides
@@ -280,6 +316,19 @@ public class WalletModule {
     @WalletApp
     public SettingsManager provideSettingsManager(SharedPreferences prefs) {
         return new SettingsManager(prefs);
+    }
+
+    private GsonBuilder getGson() {
+        GsonBuilder out = new GsonBuilder();
+        out.registerTypeAdapter(MinterAddress.class, new MinterAddressJsonConverter());
+        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyJsonConverter());
+        out.registerTypeAdapter(MinterHash.class, new MinterHashJsonConverter());
+        out.registerTypeAdapter(MinterCheck.class, new MinterCheckJsonConverter());
+        out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
+        out.registerTypeAdapter(BigDecimal.class, new BigDecimalJsonConverter());
+        out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
+
+        return out;
     }
 
     private void initCrashlytics() {

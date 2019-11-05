@@ -60,7 +60,7 @@ public class KVStorageQueueSaveTest {
         data.add(new QueuedObj(5, "E"));
         data.add(new QueuedObj(6, "F"));
 
-        final KVStorage storage = TestWallet.app().storage();
+        final KVStorage storage = TestWallet.app().storageCache();
         storage.putQueue("test_queue", data);
 
         assertTrue(storage.contains("test_queue"));

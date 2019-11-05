@@ -36,14 +36,15 @@ import dagger.multibindings.IntoSet;
 import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
-import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
+import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.di.annotations.Cached;
+import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.models.ValidatorItem;
@@ -74,22 +75,22 @@ public abstract class CacheModule {
 
     @Provides
     @WalletApp
-    public static CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> provideExplorerRepo(KVStorage storage, SecretStorage secretStorage, MinterExplorerApi api) {
-        return new CachedRepository<>(new CachedExplorerTransactionRepository(storage, secretStorage, api.getApiService()));
+    public static CachedRepository<List<HistoryTransaction>, CacheTxRepository> provideExplorerRepo(@DbCache KVStorage storage, SecretStorage secretStorage, MinterExplorerApi api) {
+        return new CachedRepository<>(new CacheTxRepository(storage, secretStorage, api.getApiService()));
     }
 
     @Provides
     @WalletApp
-    public static CachedRepository<User.Data, CachedMyProfileRepository> provideCachedProfileRepo(KVStorage storage, AuthSession session, MinterProfileApi api) {
-        return new CachedRepository<>(new CachedMyProfileRepository(api.getApiService(), storage, session))
+    public static CachedRepository<User.Data, CacheProfileRepository> provideCachedProfileRepo(KVStorage storage, AuthSession session, MinterProfileApi api) {
+        return new CachedRepository<>(new CacheProfileRepository(api.getApiService(), storage, session))
                 .setTimeToLive(60);
     }
 
     @Provides
     @WalletApp
-    public static CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> provideCachedValidatorsRepo(KVStorage storage, MinterExplorerApi api) {
+    public static CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> provideCachedValidatorsRepo(@DbCache KVStorage storage, MinterExplorerApi api) {
         return
-                new CachedRepository<>(new CachedValidatorsRepository(storage, api.getApiService()))
+                new CachedRepository<>(new CacheValidatorsRepository(storage, api.getApiService()))
                         .setTimeToLive(60 * 10);
     }
 
@@ -98,19 +99,19 @@ public abstract class CacheModule {
     @IntoSet
     @Cached
     @WalletApp
-    public abstract CachedRepository provideExplorerRepoForCache(CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> cache);
+    public abstract CachedRepository provideExplorerRepoForCache(CachedRepository<List<HistoryTransaction>, CacheTxRepository> cache);
 
     @Binds
     @IntoSet
     @Cached
     @WalletApp
-    public abstract CachedRepository provideExplorerValidatorsRepoForCache(CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> cache);
+    public abstract CachedRepository provideExplorerValidatorsRepoForCache(CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> cache);
 
     @Binds
     @IntoSet
     @Cached
     @WalletApp
-    public abstract CachedRepository provideMyProfileRepoForCache(CachedRepository<User.Data, CachedMyProfileRepository> cache);
+    public abstract CachedRepository provideMyProfileRepoForCache(CachedRepository<User.Data, CacheProfileRepository> cache);
 
     @Binds
     @IntoSet

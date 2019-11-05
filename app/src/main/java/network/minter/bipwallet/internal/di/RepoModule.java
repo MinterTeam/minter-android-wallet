@@ -31,6 +31,7 @@ import dagger.Provides;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.blockchain.MinterBlockChainApi;
@@ -195,7 +196,7 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public RecipientAutocompleteStorage provideRecipientStorage(KVStorage storage) {
+    public RecipientAutocompleteStorage provideRecipientStorage(@DbCache KVStorage storage) {
         return new RecipientAutocompleteStorage(storage);
     }
 

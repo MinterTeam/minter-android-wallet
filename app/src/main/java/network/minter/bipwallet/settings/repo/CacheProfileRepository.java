@@ -42,12 +42,12 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileE
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class CachedMyProfileRepository extends ProfileRepository implements CachedEntity<User.Data> {
+public class CacheProfileRepository extends ProfileRepository implements CachedEntity<User.Data> {
     private final static String KEY_USER_DATA = "cached_my_profile_repository_user_data";
     private final KVStorage mStorage;
     private final AuthSession mSession;
 
-    public CachedMyProfileRepository(@NonNull ApiService.Builder apiBuilder, KVStorage storage, AuthSession session) {
+    public CacheProfileRepository(@NonNull ApiService.Builder apiBuilder, KVStorage storage, AuthSession session) {
         super(apiBuilder);
         mStorage = storage;
         mSession = session;

@@ -41,12 +41,13 @@ import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AnalyticsManager;
-import network.minter.bipwallet.apis.explorer.CachedExplorerTransactionRepository;
-import network.minter.bipwallet.apis.explorer.CachedValidatorsRepository;
+import network.minter.bipwallet.apis.explorer.CacheTxRepository;
+import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
+import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
@@ -58,7 +59,7 @@ import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
-import network.minter.bipwallet.settings.repo.CachedMyProfileRepository;
+import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainBlockRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
@@ -105,6 +106,8 @@ public interface WalletComponent {
     ApiService.Builder apiBuilder();
     AuthSession session();
     KVStorage storage();
+    @DbCache
+    KVStorage storageCache();
 
     @Named("uuid")
     String uuid();
@@ -131,9 +134,9 @@ public interface WalletComponent {
     AccountStorage accountStorage();
     RecipientAutocompleteStorage recipientStorage();
     CachedRepository<UserAccount, AccountStorage> accountStorageCache();
-    CachedRepository<List<HistoryTransaction>, CachedExplorerTransactionRepository> explorerTransactionsRepoCache();
-    CachedRepository<User.Data, CachedMyProfileRepository> profileCachedRepo();
-    CachedRepository<List<ValidatorItem>, CachedValidatorsRepository> validatorsRepoCache();
+    CachedRepository<List<HistoryTransaction>, CacheTxRepository> explorerTransactionsRepoCache();
+    CachedRepository<User.Data, CacheProfileRepository> profileCachedRepo();
+    CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> validatorsRepoCache();
     // profile
     ProfileAuthRepository authRepo();
     ProfileInfoRepository infoRepo();

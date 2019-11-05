@@ -41,6 +41,7 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
+import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
@@ -49,12 +50,12 @@ import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class CachedExplorerTransactionRepository extends ExplorerTransactionRepository implements CachedEntity<List<HistoryTransaction>> {
+public class CacheTxRepository extends ExplorerTransactionRepository implements CachedEntity<List<HistoryTransaction>> {
     private final static String KEY_TRANSACTIONS = "cached_explorer_transaction_repository_transactions";
     private final KVStorage mStorage;
     private final SecretStorage mSecretStorage;
 
-    public CachedExplorerTransactionRepository(KVStorage storage, SecretStorage secretStorage, @NonNull ApiService.Builder apiBuilder) {
+    public CacheTxRepository(KVStorage storage, SecretStorage secretStorage, @NonNull ApiService.Builder apiBuilder) {
         super(apiBuilder);
         mStorage = storage;
         mSecretStorage = secretStorage;
@@ -77,7 +78,7 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
                         return res.result;
                     }
 
-                    return Collections.<HistoryTransaction>emptyList();
+                    return initialData();
                 })
                 .subscribeOn(Schedulers.io());
     }
@@ -85,6 +86,8 @@ public class CachedExplorerTransactionRepository extends ExplorerTransactionRepo
     @Override
     public void onAfterUpdate(List<HistoryTransaction> result) {
         mStorage.put(KEY_TRANSACTIONS, result);
+        List<HistoryTransaction> d = mStorage.get(KEY_TRANSACTIONS, null);
+        Timber.d("Test");
     }
 
     @Override

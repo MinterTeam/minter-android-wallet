@@ -120,7 +120,7 @@ public class AccountStorage implements CachedEntity<UserAccount> {
                         return item.get(0);
                     }
 
-                    return new UserAccount();
+                    return initialData();
                 });
     }
 
