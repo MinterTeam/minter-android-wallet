@@ -90,11 +90,7 @@ public class AccountStorage implements CachedEntity<UserAccount> {
 
     @Override
     public UserAccount initialData() {
-        if (mStorage.contains(KEY_BALANCE)) {
-            return mStorage.get(KEY_BALANCE);
-        }
-
-        return new UserAccount();
+        return mStorage.get(KEY_BALANCE, new UserAccount());
     }
 
     public UserAccount getAccount() {

@@ -43,6 +43,7 @@ import com.orhanobut.hawk.ConcealEncryption;
 import com.orhanobut.hawk.GsonParser;
 import com.orhanobut.hawk.Hawk;
 import com.orhanobut.hawk.HawkDB;
+import com.orhanobut.hawk.NoEncryption;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -66,6 +67,7 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.gson.BigDecimalJsonConverter;
+import network.minter.bipwallet.internal.gson.HistoryTransactionsJsonConverter;
 import network.minter.bipwallet.internal.helpers.DateHelper;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
@@ -89,6 +91,7 @@ import network.minter.core.internal.api.converters.MinterHashJsonConverter;
 import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
 import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.models.HistoryTransaction;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.Wallet.ENABLE_CRASHLYTICS;
@@ -115,14 +118,15 @@ public class WalletModule {
                 .setEncryption(new ConcealEncryption(mContext))
                 .build();
 
-        Hawk.init(DB_CACHE, mContext)
-                .setLogger(message -> Timber.tag("HAWK_CACHE").d(message))
-                .setParser(new GsonParser(getGson()))
-                .build();
-
         initCoreSdk(context);
         MinterBlockChainApi.initialize(debug);
         MinterExplorerApi.initialize(debug);
+
+        Hawk.init(DB_CACHE, mContext)
+                .setLogger(message -> Timber.tag("HAWK_CACHE").d(message))
+                .setEncryption(new NoEncryption())
+                .setParser(new GsonParser(getGson()))
+                .build();
 
         Timber.uprootAll();
 
@@ -139,7 +143,7 @@ public class WalletModule {
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public static void initCoreSdk(Context context) {
-        HawkDB db = Hawk.db(DB_CACHE);
+        HawkDB db = Hawk.db();
         try {
             // Try loading our native lib, see if it works...
             MinterSDK.initialize();
@@ -327,6 +331,7 @@ public class WalletModule {
         out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
         out.registerTypeAdapter(BigDecimal.class, new BigDecimalJsonConverter());
         out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
+        out.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionsJsonConverter());
 
         return out;
     }

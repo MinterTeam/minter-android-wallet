@@ -41,7 +41,6 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
-import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError;
@@ -86,8 +85,6 @@ public class CacheTxRepository extends ExplorerTransactionRepository implements 
     @Override
     public void onAfterUpdate(List<HistoryTransaction> result) {
         mStorage.put(KEY_TRANSACTIONS, result);
-        List<HistoryTransaction> d = mStorage.get(KEY_TRANSACTIONS, null);
-        Timber.d("Test");
     }
 
     @Override
