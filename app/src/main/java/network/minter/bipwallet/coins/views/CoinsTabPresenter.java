@@ -203,10 +203,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
                 boolean isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN);
                 boolean isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN);
                 if (isMxAddress || isMpAddress) {
-                    getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan QR")
-                            .setText("Invalid transaction data")
-                            .setPositiveAction(R.string.btn_close)
-                            .create());
+                    getViewState().showSendAndSetAddress(result);
                     return;
                 }
 

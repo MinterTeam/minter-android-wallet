@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -69,12 +70,16 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
+import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.explorer.BuildConfig;
 import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
@@ -224,6 +229,19 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
     }
 
     @Override
+    public void showSendAndSetAddress(String address) {
+        runOnUiThread(() -> {
+            try {
+                ((HomeActivity) getActivity()).setCurrentPage(1);
+                ((SendTabFragment) ((HomeActivity) getActivity()).getCurrentTabFragment()).setRecipient(address);
+            } catch (Throwable t) {
+                Timber.w("Unable to scan address directly to send tab");
+            }
+
+        });
+    }
+
+    @Override
     public void startScanQRWithPermissions(int requestCode) {
         CoinsTabFragmentPermissionsDispatcher.startScanQRWithPermissionCheck(this, requestCode);
     }
@@ -357,7 +375,43 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
         Wallet.app().sounds().play(R.raw.refresh_pop_down);
     }
 
-    private void onSwipeRefreshDown() {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        CoinsTabFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
 
+    @OnShowRationale(Manifest.permission.CAMERA)
+    void showRationaleForCamera(final PermissionRequest request) {
+        new WalletConfirmDialog.Builder(getActivity(), "Camera request")
+                .setText("We need access to your camera to take a shot with Minter Address QR Code")
+                .setPositiveAction("Sure", (d, w) -> {
+                    request.proceed();
+                    d.dismiss();
+                })
+                .setNegativeAction("No, I've change my mind", (d, w) -> {
+                    request.cancel();
+                    d.dismiss();
+                }).create()
+                .show();
+    }
+
+    @OnPermissionDenied(Manifest.permission.CAMERA)
+    void showOpenPermissionsForCamera() {
+        new WalletConfirmDialog.Builder(getActivity(), "Camera request")
+                .setText("We need access to your camera to take a shot with Minter Address QR Code")
+                .setPositiveAction("Open settings", (d, w) -> {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", network.minter.bipwallet.BuildConfig.APPLICATION_ID, null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                    d.dismiss();
+                })
+                .setNegativeAction("Cancel", (d, w) -> {
+                    d.dismiss();
+                })
+                .create()
+                .show();
     }
 }

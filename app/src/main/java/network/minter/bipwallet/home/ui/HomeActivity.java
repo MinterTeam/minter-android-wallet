@@ -101,6 +101,10 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
         });
     }
 
+    public HomeTabFragment getCurrentTabFragment() {
+        return mActiveTabs.get(homePager.getCurrentItem());
+    }
+
     @Override
     public void startUrl(@NonNull String url) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));

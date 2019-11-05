@@ -53,4 +53,5 @@ interface CoinsTabView extends MvpView {
     void setOnClickScanQR(View.OnClickListener listener);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startScanQR(int requestCode);
+    void showSendAndSetAddress(String address);
 }
