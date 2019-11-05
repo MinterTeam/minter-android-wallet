@@ -36,10 +36,12 @@ public class DelegationItem implements RemoteImageContainer {
     public static class DelegatedCoin{
         public String coin;
         public BigDecimal amount;
+        public BigDecimal amountBIP;
 
-        DelegatedCoin(String coin, BigDecimal amount) {
+        DelegatedCoin(String coin, BigDecimal amount, BigDecimal amountBIP) {
             this.coin = coin;
             this.amount = amount;
+            this.amountBIP = amountBIP;
         }
     }
 }

@@ -129,7 +129,7 @@ public class DelegationDataSource extends PageKeyedDataSource<Integer, Delegatio
             for (DelegationItem item : data) {
                 if(item.pubKey.toString().equals(info.pubKey.toString())){
                     isPresent = true;
-                    item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value));
+                    item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value, info.bipValue));
                     item.delegatedBips = item.delegatedBips.add(info.bipValue);
                     break;
                 }
@@ -137,7 +137,7 @@ public class DelegationDataSource extends PageKeyedDataSource<Integer, Delegatio
             if (isPresent) continue;
             DelegationItem item = new DelegationItem();
             item.pubKey = info.pubKey;
-            item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value));
+            item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value, info.bipValue));
             item.delegatedBips = info.bipValue;
             if (info.meta != null) {
                 item.name = firstNonNull(info.meta.name, item.pubKey.toShortString());
@@ -149,7 +149,7 @@ public class DelegationDataSource extends PageKeyedDataSource<Integer, Delegatio
 
         final DataSourceMeta<DelegationItem> meta = new DataSourceMeta<>();
         for (DelegationItem item : data) {
-            Collections.sort(item.coins, new StableCoinSorting());
+            Collections.sort(item.coins, (o1, o2) -> o2.amountBIP.compareTo(o1.amountBIP));
         }
         Collections.sort(data, (o1, o2) -> o2.delegatedBips.compareTo(o1.delegatedBips));
         meta.setItems(data);
