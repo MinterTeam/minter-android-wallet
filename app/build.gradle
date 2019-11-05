@@ -225,7 +225,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
-    implementation 'com.edwardstock.android:hawk:3.0.0'
+    implementation 'com.edwardstock.android:hawk:3.0.1'
     implementation 'com.annimon:stream:1.2.1'
     implementation 'net.danlew:android.joda:2.9.9.1'
     implementation('com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.6.0') {
