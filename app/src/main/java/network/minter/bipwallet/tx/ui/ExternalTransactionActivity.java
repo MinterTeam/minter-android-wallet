@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,7 +36,6 @@ import network.minter.bipwallet.internal.views.widgets.WalletButton;
 import network.minter.bipwallet.security.PauseTimer;
 import network.minter.bipwallet.tx.contract.ExternalTransactionView;
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter;
-import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
@@ -49,8 +46,9 @@ import timber.log.Timber;
 @AppDeepLink({"tx"})
 @WebDeepLink({"tx"})
 public class ExternalTransactionActivity extends BaseMvpInjectActivity implements ExternalTransactionView {
-
-    public final static String EXTRA_EXTERNAL_TX = "EXTRA_EXTERNAL_TX";
+    public final static String EXTRA_RAW_DATA = "EXTRA_RAW_TX";
+//    public final static String EXTRA_EXTERNAL_TX = "EXTRA_EXTERNAL_TX";
+//    public final static String EXTRA_PASS = "EXTRA_PASS";
 
     @Inject Provider<ExternalTransactionPresenter> presenterProvider;
     @InjectPresenter ExternalTransactionPresenter presenter;
@@ -227,21 +225,21 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
     }
 
     public static final class Builder extends ActivityBuilder {
-        private final ExternalTransaction mTx;
+        private String mRawData;
 
-        public Builder(@NonNull Activity from, ExternalTransaction tx) {
+        public Builder(@NonNull Activity from, String rawData) {
             super(from);
-            mTx = tx;
+            mRawData = rawData;
         }
 
-        public Builder(@NonNull Fragment from, ExternalTransaction tx) {
+        public Builder(@NonNull Fragment from, String rawData) {
             super(from);
-            mTx = tx;
+            mRawData = rawData;
         }
 
-        public Builder(@NonNull Service from, ExternalTransaction tx) {
+        public Builder(@NonNull Service from, String rawData) {
             super(from);
-            mTx = tx;
+            mRawData = rawData;
         }
 
         @Override
@@ -252,7 +250,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
         @Override
         protected void onBeforeStart(Intent intent) {
             super.onBeforeStart(intent);
-            intent.putExtra(EXTRA_EXTERNAL_TX, Parcels.wrap(mTx));
+            intent.putExtra(EXTRA_RAW_DATA, mRawData);
         }
     }
 }

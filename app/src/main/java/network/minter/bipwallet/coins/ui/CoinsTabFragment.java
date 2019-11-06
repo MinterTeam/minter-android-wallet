@@ -73,7 +73,6 @@ import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
-import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.explorer.BuildConfig;
 import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
@@ -211,8 +210,8 @@ public class CoinsTabFragment extends HomeTabFragment implements CoinsTabView {
     }
 
     @Override
-    public void startExternalTransaction(ExternalTransaction tx) {
-        new ExternalTransactionActivity.Builder(getActivity(), tx)
+    public void startExternalTransaction(String rawData) {
+        new ExternalTransactionActivity.Builder(getActivity(), rawData)
                 .start();
     }
 

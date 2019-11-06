@@ -82,7 +82,6 @@ import network.minter.bipwallet.sending.contract.SendView;
 import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
-import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.explorer.MinterExplorerApi;
@@ -214,8 +213,8 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
-    public void startExternalTransaction(ExternalTransaction tx) {
-        new ExternalTransactionActivity.Builder(getActivity(), tx)
+    public void startExternalTransaction(String rawData) {
+        new ExternalTransactionActivity.Builder(getActivity(), rawData)
                 .start();
     }
 

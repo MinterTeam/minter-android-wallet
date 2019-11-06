@@ -31,8 +31,8 @@ import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
+import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction;
 import network.minter.bipwallet.internal.helpers.DeepLinkHelper;
-import network.minter.bipwallet.internal.helpers.IntentHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.contract.ExternalTransactionView;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
@@ -117,25 +117,34 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
             final String hash = params.getString("d", null);
             try {
-                mExtTx = DeepLinkHelper.parseTransaction(hash);
+                mExtTx = DeepLinkHelper.parseRawTransaction(hash);
                 if (!validateTx()) {
                     return;
                 }
+            } catch (StringIndexOutOfBoundsException t) {
+                getViewState().disableAll();
+                Timber.w(t, "Unable to parse remote transaction: %s", hash);
+                showTxErrorDialog("Invalid transaction data: non-hex string passed");
+                return;
             } catch (Throwable t) {
                 getViewState().disableAll();
                 Timber.w(t, "Unable to parse remote transaction: %s", hash);
-                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
-                        .setText("Invalid transaction data: %s", t.getMessage())
-                        .setPositiveAction(R.string.btn_close, (d, w) -> {
-                            d.dismiss();
-                            getViewState().finishCancel();
-                        })
-                        .create());
+                showTxErrorDialog("Invalid transaction data: %s", t.getMessage());
                 return;
             }
         } else {
-            mExtTx = IntentHelper.getParcelExtraOrError(intent, ExternalTransactionActivity.EXTRA_EXTERNAL_TX, "Empty transaction passed");
-            if (!validateTx()) {
+            String rawTx = intent.getStringExtra(ExternalTransactionActivity.EXTRA_RAW_DATA);
+            try {
+                if (rawTx == null) {
+                    throw new InvalidExternalTransaction("Empty transaction data", InvalidExternalTransaction.CODE_INVALID_TX);
+                }
+                Intent out = DeepLinkHelper.rawTxToIntent(rawTx);
+                handleExtras(out);
+                return;
+            } catch (Throwable t) {
+                getViewState().disableAll();
+                Timber.w(t, "Unable to parse remote transaction: %s", rawTx);
+                showTxErrorDialog("Invalid transaction data: %s", t.getMessage());
                 return;
             }
         }
@@ -143,6 +152,16 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         mPayload = mExtTx.getPayload();
         calculateFee(mExtTx);
         fillData(mExtTx);
+    }
+
+    private void showTxErrorDialog(String message, Object... args) {
+        getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                .setText(message, args)
+                .setPositiveAction(R.string.btn_close, (d, w) -> {
+                    d.dismiss();
+                    getViewState().finishCancel();
+                })
+                .create());
     }
 
     private boolean validateTx() {

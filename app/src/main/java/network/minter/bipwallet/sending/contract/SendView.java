@@ -15,7 +15,6 @@ import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
 import network.minter.bipwallet.sending.models.RecipientItem;
-import network.minter.blockchain.models.operational.ExternalTransaction;
 
 /**
  * minter-android-wallet. 2019
@@ -51,5 +50,5 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void setPayload(String payload);
     void setActionTitle(int buttonTitle);
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void startExternalTransaction(ExternalTransaction tx);
+    void startExternalTransaction(String rawData);
 }

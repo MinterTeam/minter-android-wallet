@@ -71,7 +71,6 @@ import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
-import network.minter.bipwallet.internal.helpers.DeepLinkHelper;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
@@ -88,7 +87,6 @@ import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.NetworkStatus;
 import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.TransactionSendResult;
-import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
@@ -239,9 +237,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 }
 
                 try {
-                    ExternalTransaction tx = DeepLinkHelper.parseTransaction(result);
-
-                    getViewState().startExternalTransaction(tx);
+                    getViewState().startExternalTransaction(result);
                 } catch (Throwable t) {
                     Timber.w(t, "Unable to parse remote transaction: %s", result);
                     getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan QR")

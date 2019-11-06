@@ -67,7 +67,6 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
-import network.minter.bipwallet.internal.helpers.DeepLinkHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter;
@@ -78,7 +77,6 @@ import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.bipwallet.tx.adapters.TransactionDataSource;
 import network.minter.bipwallet.tx.adapters.TransactionFacade;
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter;
-import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
@@ -208,9 +206,9 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
                 }
 
                 try {
-                    ExternalTransaction tx = DeepLinkHelper.parseTransaction(result);
+//                    ExternalTransaction tx = DeepLinkHelper.parseTransaction(result);
 
-                    getViewState().startExternalTransaction(tx);
+                    getViewState().startExternalTransaction(result);
                 } catch (Throwable t) {
                     Timber.w(t, "Unable to parse remote transaction: %s", result);
                     getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan QR")
