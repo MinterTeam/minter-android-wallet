@@ -19,6 +19,10 @@ public final class DeepLinkHelper {
     }
 
     public static Intent rawTxToIntent(String result) throws InvalidExternalTransaction {
+        if (!isDeeplinkUrl(result)) {
+            throw new InvalidExternalTransaction("Unable to parse transaction url", InvalidExternalTransaction.CODE_INVALID_LINK);
+        }
+
         Intent intent = new Intent();
         intent.putExtra(DeepLink.IS_DEEP_LINK, true);
 
@@ -36,8 +40,6 @@ public final class DeepLinkHelper {
             for (int i = 0; i < url.querySize(); i++) {
                 intent.putExtra(url.queryParameterName(i), url.queryParameterValue(i));
             }
-        } else {
-            intent.putExtra("d", result);
         }
 
         return intent;
