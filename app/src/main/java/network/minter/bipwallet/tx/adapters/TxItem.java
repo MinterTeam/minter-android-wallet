@@ -167,6 +167,10 @@ public class TxItem implements TransactionItem {
         return mTx.getAvatar();
     }
 
+    public void setAvatar(TransactionFacade.UserMeta meta) {
+        mTx.userMeta = meta;
+    }
+
     public void setAvatar(String url) {
         if (mTx.userMeta != null) {
             mTx.userMeta.avatarUrl = url;

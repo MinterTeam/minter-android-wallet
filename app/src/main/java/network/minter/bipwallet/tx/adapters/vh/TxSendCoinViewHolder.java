@@ -35,6 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.tx.adapters.TransactionFacade;
 import network.minter.bipwallet.tx.adapters.TxItem;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.explorer.models.HistoryTransaction;
@@ -71,7 +72,12 @@ public final class TxSendCoinViewHolder extends ExpandableTxViewHolder {
         final boolean isIncoming = item.isIncoming(myAddresses);
         final boolean isSelfSending = item.from.equals(data.to);
 
-        if (!isIncoming) txItem.setAvatar( MinterProfileApi.getUserAvatarUrlByAddress(data.to));
+        if (!isIncoming) {
+            txItem.setAvatar(new TransactionFacade.UserMeta(null, MinterProfileApi.getUserAvatarUrlByAddress(data.to)));
+        } else {
+            txItem.setAvatar(new TransactionFacade.UserMeta(null, MinterProfileApi.getUserAvatarUrlByAddress(item.from)));
+        }
+
         setupAvatar(txItem);
 
         if (isSelfSending) {
