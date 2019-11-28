@@ -45,6 +45,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.contract.MainView;
 import network.minter.bipwallet.advanced.views.AdvancedMainPresenter;
@@ -67,6 +68,7 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements MainV
 
     @BindView(R.id.action_generate) Button actionGenerate;
     @BindView(R.id.action_activate) Button actionActivate;
+    @BindView(R.id.action_activate_ledger) Button actionLedger;
     @BindView(R.id.input_seed) AppCompatEditText seedInput;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -77,6 +79,11 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements MainV
     @Override
     public void setOnGenerate(View.OnClickListener listener) {
         actionGenerate.setOnClickListener(listener);
+    }
+
+    @Override
+    public void setOnLedger(View.OnClickListener listener) {
+        actionLedger.setOnClickListener(listener);
     }
 
     @Override
@@ -92,6 +99,11 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements MainV
     @Override
     public void startGenerate() {
         startActivity(new Intent(this, AdvancedGenerateActivity.class));
+    }
+
+    @Override
+    public void startLedger() {
+        new AdvancedLedgerActivity.Builder(this).start();
     }
 
     @Override
@@ -133,6 +145,11 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements MainV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_main);
         ButterKnife.bind(this);
+        if (!BuildConfig.ENABLE_LEDGER_UI) {
+            actionLedger.setVisibility(View.GONE);
+            findViewById(R.id.separator2).setVisibility(View.GONE);
+            findViewById(R.id.separator2_text).setVisibility(View.GONE);
+        }
         setupToolbar(toolbar);
         presenter.handleExtras(getIntent());
     }

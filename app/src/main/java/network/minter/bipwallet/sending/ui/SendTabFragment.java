@@ -292,6 +292,12 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
+    public void setError(int error) {
+        ViewHelper.visible(errorView, error != 0);
+        errorView.setText(error);
+    }
+
+    @Override
     public void setAmount(CharSequence amount) {
         amountInput.setText(amount);
     }

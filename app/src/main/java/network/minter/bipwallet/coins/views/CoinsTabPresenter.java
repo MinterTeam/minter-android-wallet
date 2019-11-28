@@ -358,7 +358,7 @@ public class CoinsTabPresenter extends MvpBasePresenter<CoinsTabView> {
     private void setUsername() {
         if (true) return;
 
-        if (session.getRole() == AuthSession.AuthType.Advanced) {
+        if (session.isAdvancedUser()) {
             getViewState().hideAvatar();
         } else {
             if (session.getUser().data.username == null) {

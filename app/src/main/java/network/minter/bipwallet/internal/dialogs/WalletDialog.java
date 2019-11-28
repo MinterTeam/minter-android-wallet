@@ -30,6 +30,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -57,6 +59,10 @@ public abstract class WalletDialog extends Dialog {
     public static void dismissInstance(WalletDialog inputDialog) {
         if (inputDialog == null) return;
         inputDialog.dismiss();
+    }
+
+    public void runOnUiThread(Runnable task) {
+        new Handler(Looper.getMainLooper()).post(task);
     }
 
     public static <T extends WalletDialog> T switchDialogWithExecutor(Fragment fragment, T dialog, DialogExecutor executor) {

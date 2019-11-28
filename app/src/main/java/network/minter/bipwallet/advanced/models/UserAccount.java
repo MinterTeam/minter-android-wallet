@@ -124,7 +124,7 @@ public class UserAccount implements Serializable, Cloneable {
 
     public Optional<CoinAccount> findAccountByCoin(String coin) {
         return Stream.of(getCoinAccounts())
-                .filter(item -> item.getCoin().equals(coin))
+                .filter(item -> item.getCoin().toLowerCase().equals(coin.toLowerCase()))
                 .findFirst();
     }
 

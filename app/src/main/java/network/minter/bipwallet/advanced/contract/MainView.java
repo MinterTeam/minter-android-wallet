@@ -16,10 +16,13 @@ import network.minter.bipwallet.internal.mvp.ProgressTextView;
  */
 public interface MainView extends MvpView, ErrorView, ProgressTextView {
     void setOnGenerate(View.OnClickListener listener);
+    void setOnLedger(View.OnClickListener listener);
     void setMnemonicTextChangedListener(TextWatcher textWatcher);
     void setOnActivateMnemonic(View.OnClickListener listener);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startGenerate();
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void startLedger();
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startGenerate(int requestCode);
     void setError(CharSequence errorMessage);

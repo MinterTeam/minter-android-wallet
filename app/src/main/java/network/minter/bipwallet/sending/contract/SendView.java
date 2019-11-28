@@ -5,6 +5,7 @@ import android.view.View;
 
 import java.util.List;
 
+import androidx.annotation.StringRes;
 import moxy.MvpView;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
@@ -43,6 +44,7 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void setRecipientError(CharSequence error);
     void setAmountError(CharSequence error);
     void setError(CharSequence error);
+    void setError(@StringRes int error);
     void setAmount(CharSequence amount);
     void setFee(CharSequence fee);
     void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener);

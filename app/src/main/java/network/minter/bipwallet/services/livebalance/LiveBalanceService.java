@@ -62,6 +62,8 @@ import timber.log.Timber;
  */
 public class LiveBalanceService extends Service {
 
+    public static String LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
+
     private final IBinder mBinder = new LocalBinder();
     @Inject CacheManager cache;
     @Inject SecretStorage secretStorage;

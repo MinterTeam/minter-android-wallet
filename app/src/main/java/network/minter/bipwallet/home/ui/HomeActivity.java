@@ -61,6 +61,7 @@ import network.minter.bipwallet.home.HomeTabsClasses;
 import network.minter.bipwallet.home.contract.HomeView;
 import network.minter.bipwallet.home.views.HomePresenter;
 import network.minter.bipwallet.internal.BaseMvpActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.internal.system.BackPressedDelegate;
 import network.minter.bipwallet.internal.system.BackPressedListener;
@@ -203,6 +204,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
     protected void onDestroy() {
         super.onDestroy();
         HomeModule.destroy();
+        Wallet.app().ledger().destroy();
         Timber.d("Destroy");
     }
 

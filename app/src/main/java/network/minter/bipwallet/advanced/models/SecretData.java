@@ -48,6 +48,15 @@ public final class SecretData implements Serializable {
     private PublicKey mPublicKey;
     private MinterAddress mMinterAddress;
 
+    public SecretData(MinterAddress address) {
+        id = UUID.randomUUID().toString();
+        mSeedPhrase = null;
+        mSeed = new BytesData(0);
+        mPrivateKey = null;
+        mPublicKey = null;
+        mMinterAddress = address;
+    }
+
     public SecretData(String seedPhrase, BytesData seed, PrivateKey privateKey, PublicKey publicKey) {
         id = UUID.randomUUID().toString();
         mSeedPhrase = seedPhrase;
@@ -84,7 +93,9 @@ public final class SecretData implements Serializable {
     public void cleanup() {
         mSeedPhrase = "";
         mSeed.cleanup();
-        mPrivateKey.cleanup();
+        if (mPrivateKey != null) {
+            mPrivateKey.cleanup();
+        }
     }
 
     public String getId() {

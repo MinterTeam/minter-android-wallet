@@ -75,6 +75,7 @@ import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
+import network.minter.ledger.connector.rxjava2.RxMinterLedger;
 import network.minter.profile.models.User;
 import network.minter.profile.repo.ProfileAddressRepository;
 import network.minter.profile.repo.ProfileAuthRepository;
@@ -111,6 +112,7 @@ public interface WalletComponent {
 
     @Named("uuid")
     String uuid();
+    RxMinterLedger ledger();
 
     // helpers
     DisplayHelper display();

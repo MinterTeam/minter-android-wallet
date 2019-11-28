@@ -92,7 +92,7 @@ public class AddressListPresenter extends MvpBasePresenter<AddressListView> impl
     }
 
     public void onClickAddAddress() {
-        if (session.getRole() == AuthSession.AuthType.Advanced) {
+        if (session.isAdvancedUser()) {
             getViewState().startCreateAddress(REQUEST_FOR_RESULT);
         } else {
             /*

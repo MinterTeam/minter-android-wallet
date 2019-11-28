@@ -157,8 +157,43 @@
                 android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/action_activate"
-                />
+                app:layout_constraintTop_toBottomOf="@id/action_activate_ledger" />
+
+            <TextView
+                android:id="@+id/separator2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingStart="@dimen/margin_edges"
+                android:paddingEnd="@dimen/margin_edges"
+                android:text="@string/or"
+                app:layout_constraintBottom_toBottomOf="@id/separator2"
+                app:layout_constraintEnd_toEndOf="@id/separator2"
+                app:layout_constraintStart_toStartOf="@id/separator2"
+                app:layout_constraintTop_toTopOf="@id/separator2"
+                app:layout_constraintVertical_bias=".57" />
+
+            <View
+                android:id="@+id/separator2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:background="@color/greySeparator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action_activate" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_activate_ledger"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/btn_activate_via_ledger"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separator2" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

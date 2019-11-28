@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
+import android.hardware.usb.UsbManager;
 import android.os.Build;
 
 import com.annimon.stream.Stream;
@@ -74,6 +75,7 @@ import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.UnzipUtil;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
+import network.minter.bipwallet.services.livebalance.LiveBalanceService;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.MinterSDK;
 import network.minter.core.bip39.NativeBip39;
@@ -92,8 +94,10 @@ import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
 import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.ledger.connector.rxjava2.RxMinterLedger;
 import timber.log.Timber;
 
+import static android.content.Context.USB_SERVICE;
 import static network.minter.bipwallet.internal.Wallet.ENABLE_CRASHLYTICS;
 
 /**
@@ -120,7 +124,18 @@ public class WalletModule {
 
         initCoreSdk(context);
         MinterBlockChainApi.initialize(debug);
-        MinterExplorerApi.initialize(debug);
+
+        //noinspection ConstantConditions
+        if (BuildConfig.EXPLORER_API_URL != null) {
+            MinterExplorerApi.initialize(
+                    BuildConfig.EXPLORER_API_URL,
+                    BuildConfig.GATE_API_URL,
+                    debug);
+            LiveBalanceService.LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
+        } else {
+            MinterExplorerApi.initialize(debug);
+
+        }
 
         Hawk.init(DB_CACHE, mContext)
                 .setLogger(message -> Timber.tag("HAWK_CACHE").d(message))
@@ -320,6 +335,11 @@ public class WalletModule {
     @WalletApp
     public SettingsManager provideSettingsManager(SharedPreferences prefs) {
         return new SettingsManager(prefs);
+    }
+
+    @Provides
+    public RxMinterLedger provideLedger(Context context) {
+        return new RxMinterLedger(context, (UsbManager) context.getSystemService(USB_SERVICE));
     }
 
     private GsonBuilder getGson() {

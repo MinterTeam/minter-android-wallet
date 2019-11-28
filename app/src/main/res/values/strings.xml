@@ -41,6 +41,8 @@
     <string name="crop_image_menu_crop">Save</string>
 
     <string name="advanced_generate_seed_description">Save this seed phrase in case you plan to use this address in the future.</string>
+    <string name="advanced_using_ledger">This feature is absolutely safe, because all your private data (including mnemonic and private keys) staying on your hardware wallet and no one, except you, don\'t have access to it.
+    \n\nTo activate wallet, unlock your device and open Minter application</string>
     <string name="advanced_action_generate">Generate Address</string>
     <string name="menu_item_coins">Coins</string>
     <string name="menu_item_send">Send</string>
@@ -105,6 +107,7 @@
     <string name="title_address_list">My Addresses</string>
     <string name="title_address_item">Manage Address</string>
     <string name="title_advanced_generate">Generate Address</string>
+    <string name="title_advanced_ledger">Create wallet from Ledger</string>
     <string name="title_advanced_main">Advanced Mode</string>
     <string name="title_register">Create Wallet</string>
     <string name="title_signin">Sign In</string>
@@ -154,10 +157,14 @@
     <string name="cd_action">Action</string>
     <string name="label_secured_by">Secured By</string>
     <string name="value_secured_by_wallet">Bip Wallet</string>
+    <string name="value_secured_by_ledger">Nano S</string>
+    <string name="value_secured_by_dots">…</string>
     <string name="label_ive_saved_mnemonic">I\'ve saved the phrase!</string>
+    <string name="label_ive_compared_addresses">I\'ve compared above address with the Ledger!</string>
     <string name="btn_launch_wallet">Launch the wallet</string>
     <string name="btn_generate_address">Generate Address</string>
     <string name="btn_activate">Activate</string>
+    <string name="btn_activate_via_ledger">Activate via Ledger</string>
     <string name="or">or</string>
     <string name="label_paste_seed_phrase">Paste Seed Phrase</string>
     <string name="at">\@</string>
@@ -205,6 +212,8 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_express_tx">Express transaction</string>
     <string name="tx_send_in_progress">Sending transaction…</string>
+    <string name="tx_convert_began">Please, wait a few seconds…</string>
+    <string name="tx_convert_in_progress">Converting…</string>
     <string name="error">Error</string>
     <string name="tx_send_overall_title">You\'re sending</string>
     <string name="tx_address_searching">Searching address</string>
@@ -229,5 +238,6 @@
     <string name="btn_ok">Ok</string>
     <string name="btn_proceed">Proceed</string>
     <string name="btn_scan_qr">Scan QR</string>
+    <string name="hw_not_connected">Hardware wallet not connected</string>
 
 </resources>

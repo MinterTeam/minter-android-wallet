@@ -70,10 +70,28 @@ public class WalletProgressDialog extends WalletDialog {
         });
     }
 
+    public void setText(@StringRes int resId) {
+        mDefer.call(ctx -> {
+            runOnUiThread(() -> ctx.text.setText(resId));
+        });
+    }
+
+    public void setText(CharSequence text, Object... args) {
+        setText(String.format(text.toString(), args));
+    }
+
+    public void setText(CharSequence text) {
+        mDefer.call(ctx -> {
+            runOnUiThread(() -> ctx.text.setText(text));
+        });
+    }
+
     public void setProgress(final int current) {
         mDefer.call(ctx -> {
-            float val = current == 0F ? 1 : (float) current;
-            ctx.progress.setProgress(val / (float) ctx.mMaxProgress);
+            runOnUiThread(() -> {
+                float val = current == 0F ? 1 : (float) current;
+                ctx.progress.setProgress(val / (float) ctx.mMaxProgress);
+            });
         });
     }
 

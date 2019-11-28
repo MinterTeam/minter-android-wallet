@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.CallSuper;
-import androidx.core.util.Pair;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -63,6 +62,7 @@ import network.minter.bipwallet.exchange.models.ConvertTransactionData;
 import network.minter.bipwallet.exchange.ui.BaseCoinTabFragment;
 import network.minter.bipwallet.exchange.ui.dialogs.WalletTxConvertStartDialog;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
@@ -70,20 +70,21 @@ import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.MathHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
+import network.minter.bipwallet.tx.contract.TxInitData;
 import network.minter.blockchain.models.TransactionSendResult;
+import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.models.CoinItem;
-import network.minter.explorer.models.GasValue;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
-import network.minter.explorer.models.TxCount;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
+import network.minter.ledger.connector.rxjava2.RxMinterLedger;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp;
@@ -95,7 +96,6 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends MvpBasePresenter<V> {
@@ -108,6 +108,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     protected final GateGasRepository mGasRepo;
     protected final GateTransactionRepository mGateTxRepo;
 
+    private AuthSession mSession;
     private CoinAccount mAccount;
     private String mCurrentCoin;
     private String mGetCoin = null;
@@ -121,6 +122,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     private BigDecimal mEstimate;
 
     public BaseCoinTabPresenter(
+            AuthSession session,
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CacheTxRepository> txRepo,
@@ -130,6 +132,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
             GateEstimateRepository estimateRepository,
             GateTransactionRepository gateTxRepo
     ) {
+        mSession = session;
         mSecretStorage = secretStorage;
         mAccountStorage = accountStorage;
         mTxRepo = txRepo;
@@ -247,71 +250,35 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 .findFirst();
     }
 
-    // @TODO REFACTORING!!! this is hell
     private void onStartExecuteTransaction(final ConvertTransactionData txData) {
         getViewState().startDialog(ctx -> {
             WalletProgressDialog dialog = new WalletProgressDialog.Builder(ctx, "Exchanging")
-                    .setText("Please, wait a few seconds")
+                    .setText(R.string.tx_convert_began)
                     .create();
 
             dialog.setCancelable(false);
 
-            safeSubscribeIoToUi(
-                    // GET nonce
-                    rxGate(mEstimateRepository.getTransactionCount(mAccount.address))
-                            .onErrorResumeNext(toGateError())
-            )
-                    .doOnSubscribe(this::unsubscribeOnDestroy)
-                    // GET min gas value
-                    .switchMap(new Function<GateResult<TxCount>, ObservableSource<GateResult<Pair<TxCount, GasValue>>>>() {
-                        @Override
-                        public ObservableSource<GateResult<Pair<TxCount, GasValue>>> apply(GateResult<TxCount> cntRes) {
-                            // if somewhere occurred error, return error, nothing else
-                            if (!cntRes.isOk()) {
-                                GateResult<Pair<TxCount, GasValue>> errOut = new GateResult<>();
-                                errOut.error = cntRes.error;
-                                return Observable.just(errOut);
-                            }
 
-                            // Map nonce and min gas value
-                            return rxGate(mGasRepo.getMinGas()).switchMap(new Function<GateResult<GasValue>, ObservableSource<? extends GateResult<Pair<TxCount, GasValue>>>>() {
-                                @Override
-                                public ObservableSource<? extends GateResult<Pair<TxCount, GasValue>>> apply(GateResult<GasValue> gasValueGateResult) {
-                                    GateResult<Pair<TxCount, GasValue>> out = new GateResult<>();
-                                    out.result = Pair.create(cntRes.result, gasValueGateResult.result);
-                                    out.statusCode = gasValueGateResult.statusCode;
-                                    out.error = gasValueGateResult.error;
-                                    return Observable.just(out);
-                                }
-                            });
-
+            Observable
+                    .combineLatest(
+                            rxGate(mEstimateRepository.getTransactionCount(mAccount.address)).onErrorResumeNext(toGateError()),
+                            rxGate(mGasRepo.getMinGas()).onErrorResumeNext(toGateError()),
+                            TxInitData::new
+                    )
+                    .switchMap((Function<TxInitData, ObservableSource<GateResult<TransactionSendResult>>>) initData -> {
+                        // if error occurred upper, notify error
+                        if (!initData.isSuccess()) {
+                            return Observable.just(GateResult.copyError(initData.errorResult));
                         }
-                        // build transaction with prefetched nonce and gas
-                    }).switchMap((Function<GateResult<Pair<TxCount, GasValue>>, ObservableSource<GateResult<TransactionSendResult>>>) cntRes -> {
-                // if error occurred upper, notify error
-                if (!cntRes.isOk()) {
-                    GateResult<TransactionSendResult> errOut = new GateResult<>();
-                    errOut.error = cntRes.error;
-                    return Observable.just(errOut);
-                }
 
-                BigDecimal balance = new BigDecimal("0");
+                        BigDecimal balance = new BigDecimal("0");
 
-                if (getOperationType() == OperationType.SellCoin || getOperationType() == OperationType.SellAllCoins) {
-                    balance = mAccount.getBalance();
-                }
-                final BigInteger nonce = cntRes.result.first.count.add(new BigInteger("1"));
-                final Transaction tx = txData.build(nonce, cntRes.result.second.gas, balance);
-                final SecretData data = mSecretStorage.getSecret(mAccount.address);
-                final TransactionSign sign = tx.signSingle(data.getPrivateKey());
-                data.cleanup();
+                        if (getOperationType() == OperationType.SellCoin || getOperationType() == OperationType.SellAllCoins) {
+                            balance = mAccount.getBalance();
+                        }
 
-                return safeSubscribeIoToUi(
-                        rxGate(mGateTxRepo.sendTransaction(sign))
-                                .onErrorResumeNext(toGateError())
-                );
-
-            })
+                        return signSendTx(dialog, txData, initData, balance);
+                    })
                     .doOnSubscribe(this::unsubscribeOnDestroy)
                     .onErrorResumeNext(toGateError())
                     .subscribe(BaseCoinTabPresenter.this::onSuccessExecuteTransaction, t -> {
@@ -321,6 +288,62 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
 
             return dialog;
         });
+    }
+
+    private ObservableSource<GateResult<TransactionSendResult>> signSendTx(
+            WalletProgressDialog dialog,
+            ConvertTransactionData txData,
+            TxInitData initData,
+            BigDecimal balance) throws OperationInvalidDataException {
+
+        // creating tx
+        final Transaction tx = txData.build(initData.nonce.add(BigInteger.ONE), initData.gas, balance);
+
+        // if user created account with ledger, use it to sign tx
+        if (mSession.getRole() == AuthSession.AuthType.Hardware) {
+            dialog.setText("Please, compare transaction hashes: %s", tx.getUnsignedTxHash());
+            Timber.d("Unsigned tx hash: %s", tx.getUnsignedTxHash());
+            return signSendTxExternally(tx, dialog);
+        } else {
+            // old school signing
+            return signSendTxInternally(tx);
+        }
+    }
+
+    private ObservableSource<GateResult<TransactionSendResult>> signSendTxInternally(Transaction tx) {
+        final SecretData data = mSecretStorage.getSecret(mAccount.address);
+        final TransactionSign sign = tx.signSingle(data.getPrivateKey());
+
+        return safeSubscribeIoToUi(
+                rxGate(mGateTxRepo.sendTransaction(sign))
+                        .onErrorResumeNext(toGateError())
+        );
+    }
+
+    private ObservableSource<GateResult<TransactionSendResult>> signSendTxExternally(Transaction tx, WalletProgressDialog dialog) {
+        RxMinterLedger devInstance = Wallet.app().ledger();
+        if (!devInstance.isReady()) {
+            dialog.setText("Please, connect ledger and open Minter Application");
+        }
+
+        return RxMinterLedger
+                .initObserve(devInstance)
+                .flatMap(dev -> {
+                    dialog.setText("Please, compare hashes: " + tx.getUnsignedTxHash().toHexString());
+                    return dev.signTxHash(tx.getUnsignedTxHash());
+                })
+                .toObservable()
+                .switchMap(signatureSingleData -> {
+                    final TransactionSign sign = tx.signExternal(signatureSingleData);
+                    dialog.setText(R.string.tx_convert_in_progress);
+                    return safeSubscribeIoToUi(
+                            rxGate(mGateTxRepo.sendTransaction(sign))
+                                    .onErrorResumeNext(toGateError())
+                    );
+                })
+                .doFinally(devInstance::destroy)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     private void onSuccessExecuteTransaction(GateResult<TransactionSendResult> result) {
@@ -435,8 +458,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                             mAccount.getCoin(),
                             mGetCoin,
                             isAmountForGetting() ? mGetAmount : mSpendAmount,
-                            mEstimate,
-                            mGasPrice
+                            mEstimate
                     );
 
                     onStartExecuteTransaction(txData);

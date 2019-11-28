@@ -34,6 +34,7 @@ import network.minter.bipwallet.addresses.ui.AddressItemActivity;
 import network.minter.bipwallet.addresses.ui.AddressListActivity;
 import network.minter.bipwallet.advanced.AdvancedModeModule;
 import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
+import network.minter.bipwallet.advanced.ui.AdvancedLedgerActivity;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.auth.ui.AuthFragment;
@@ -89,6 +90,10 @@ public interface InjectorsModule {
     @ContributesAndroidInjector(modules = AdvancedModeModule.class)
     @ActivityScope
     AdvancedMainActivity advancedMainActivity();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    AdvancedLedgerActivity advancedLedgerActivity();
 
     @ContributesAndroidInjector
     @ActivityScope

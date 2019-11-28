@@ -46,7 +46,6 @@ public final class ConvertTransactionData {
     private final String mBuyCoin;
     private final BigDecimal mAmount;
     private final BigDecimal mEstimate;
-    private final BigInteger mGasPrice;
 
     public enum Type {
         Sell,
@@ -54,14 +53,13 @@ public final class ConvertTransactionData {
         Buy,
     }
 
-    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount, BigDecimal estimate, BigInteger gasPrice) {
+    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount, BigDecimal estimate) {
         mType = type;
         mGasCoin = gasCoin;
         mSellCoin = sellCoin;
         mBuyCoin = buyCoin;
         mAmount = amount;
         mEstimate = estimate;
-        mGasPrice = gasPrice;
     }
 
     public Transaction build(BigInteger nonce, BigInteger gasPrice, BigDecimal balance) throws OperationInvalidDataException {
@@ -79,7 +77,6 @@ public final class ConvertTransactionData {
                     .setCoinToSell(mSellCoin)
                     .setValueToSell(mAmount)
                     .setCoinToBuy(mBuyCoin)
-//                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
                     .setMinValueToBuy("0")
                     .build();
         } else if (mType == Type.Buy) {
@@ -92,7 +89,6 @@ public final class ConvertTransactionData {
                     .setValueToBuy(mAmount)
                     .setCoinToBuy(mBuyCoin)
                     .setMaxValueToSell(getEstimate().multiply(new BigDecimal(1.1d)))
-//                    .setMaxValueToSell(balance)
                     .build();
         } else {
             // this case used ONLY: when not enough mnt to pay fee with mnt
@@ -103,17 +99,12 @@ public final class ConvertTransactionData {
                     .sellAllCoins()
                     .setCoinToSell(mSellCoin)
                     .setCoinToBuy(mBuyCoin)
-//                    .setMinValueToBuy(getEstimate().multiply(new BigDecimal(0.9d)))
                     .setMinValueToBuy("0")
                     .build();
         }
 
         return tx;
     }
-
-//    public Transaction build(BigInteger nonce) throws OperationInvalidDataException {
-//        return build(nonce, mGasPrice);
-//    }
 
     private BigDecimal getEstimate() {
         return firstNonNull(mEstimate, new BigDecimal(0));

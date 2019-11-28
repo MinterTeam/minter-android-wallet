@@ -38,6 +38,8 @@ import network.minter.core.internal.common.Lazy;
 import network.minter.core.internal.common.LazyMem;
 import network.minter.profile.models.User;
 
+import static network.minter.bipwallet.internal.auth.AuthSession.AuthType.Advanced;
+import static network.minter.bipwallet.internal.auth.AuthSession.AuthType.Hardware;
 import static network.minter.bipwallet.internal.auth.AuthSession.AuthType.None;
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 
@@ -68,6 +70,7 @@ public class AuthSession {
         None,
         Advanced,
         Basic,
+        Hardware,
     }
 
     public AuthSession(KVStorage storage) {
@@ -138,6 +141,10 @@ public class AuthSession {
      */
     public boolean isLoggedIn() {
         return isLoggedIn(true);
+    }
+
+    public boolean isAdvancedUser() {
+        return getRole() == Advanced || getRole() == Hardware;
     }
 
     /**

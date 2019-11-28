@@ -35,6 +35,7 @@ import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.exchange.contract.SpendCoinTabView;
+import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.blockchain.models.operational.OperationType;
@@ -56,6 +57,7 @@ public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView
 
     @Inject
     public SpendCoinTabPresenter(
+            AuthSession session,
             SecretStorage secretStorage,
             CachedRepository<UserAccount, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CacheTxRepository> txRepo,
@@ -64,7 +66,7 @@ public class SpendCoinTabPresenter extends BaseCoinTabPresenter<SpendCoinTabView
             GateGasRepository gasRepo,
             GateEstimateRepository estimateRepository,
             GateTransactionRepository gateTransactionRepository) {
-        super(secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, gasRepo, estimateRepository, gateTransactionRepository);
+        super(session, secretStorage, accountStorage, txRepo, explorerCoinsRepository, idlingManager, gasRepo, estimateRepository, gateTransactionRepository);
     }
 
     @Override

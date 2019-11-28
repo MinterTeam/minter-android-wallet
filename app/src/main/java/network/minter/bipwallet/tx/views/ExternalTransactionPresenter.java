@@ -35,6 +35,7 @@ import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction;
 import network.minter.bipwallet.internal.helpers.DeepLinkHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.tx.contract.ExternalTransactionView;
+import network.minter.bipwallet.tx.contract.TxInitData;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.CheckTransaction;
@@ -56,8 +57,9 @@ import network.minter.blockchain.models.operational.TxSetCandidateOffline;
 import network.minter.blockchain.models.operational.TxSetCandidateOnline;
 import network.minter.blockchain.models.operational.TxUnbound;
 import network.minter.core.MinterSDK;
+import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.crypto.UnsignedBytesData;
+import network.minter.core.util.RLPBoxed;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.GateEstimateRepository;
@@ -70,6 +72,7 @@ import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.clamp;
+import static network.minter.core.internal.helpers.StringHelper.hexStringToChars;
 
 /**
  * minter-android-wallet. 2019
@@ -86,7 +89,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     CachedRepository<List<HistoryTransaction>, CacheTxRepository> cachedTxRepo;
     private ExternalTransaction mExtTx;
     private MinterAddress mFrom;
-    private UnsignedBytesData mPayload;
+    private BytesData mPayload;
     private String mCheckPassword = null;
 
     @Inject
@@ -113,7 +116,18 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                 return;
             }
 
-            mCheckPassword = params.getString("p", null);
+            String rawPass;
+            try {
+                rawPass = params.getString("p", null);
+                if (rawPass == null) {
+                    mCheckPassword = null;
+                } else {
+                    mCheckPassword = RLPBoxed.decodeString(hexStringToChars(rawPass));
+                }
+            } catch (Throwable t) {
+                Timber.w(t, "Unable to decode check password");
+                mCheckPassword = null;
+            }
 
             final String hash = params.getString("d", null);
             try {
@@ -202,7 +216,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
             @Override
             public void afterTextChanged(Editable s) {
-                mPayload = new UnsignedBytesData(s.toString().getBytes());
+                mPayload = new BytesData(s.toString().getBytes());
                 calculateFee(mExtTx);
             }
         });
@@ -232,7 +246,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     }
 
     private void calculateFee(ExternalTransaction tx) {
-        long bytesLen = firstNonNull(mPayload, tx.getPayload(), new UnsignedBytesData(new char[0])).size();
+        long bytesLen = firstNonNull(mPayload, tx.getPayload(), new BytesData(new char[0])).size();
         BigDecimal baseFee = tx.getType().getFee();
         if (tx.getType().equals(OperationType.Multisend)) {
             TxMultisend txData = tx.getData(TxMultisend.class);
@@ -510,24 +524,4 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         getViewState().finishCancel();
     }
 
-    //@TODO refactor, make single class for all screens
-    public static class TxInitData {
-        public BigInteger nonce;
-        public BigInteger gas;
-        public BigDecimal commission;
-        public GateResult<?> errorResult;
-
-        public TxInitData(BigInteger nonce, BigInteger gas) {
-            this.nonce = nonce;
-            this.gas = gas;
-        }
-
-        public TxInitData(GateResult<?> err) {
-            errorResult = err;
-        }
-
-        boolean isSuccess() {
-            return errorResult == null || errorResult.isOk();
-        }
-    }
 }

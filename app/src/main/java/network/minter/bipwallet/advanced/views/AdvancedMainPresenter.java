@@ -54,7 +54,6 @@ import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
  */
 @InjectViewState
 public class AdvancedMainPresenter extends MvpBasePresenter<MainView> {
-
     private final static int REQUEST_GENERATE = 200;
 
     @Inject SecretStorage repo;
@@ -71,6 +70,8 @@ public class AdvancedMainPresenter extends MvpBasePresenter<MainView> {
     @Override
     public void attachView(MainView view) {
         super.attachView(view);
+
+        getViewState().setOnLedger(v -> getViewState().startLedger());
 
         getViewState().setMnemonicTextChangedListener(onTextChanged());
         getViewState().setOnActivateMnemonic(v -> {

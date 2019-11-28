@@ -78,6 +78,20 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
+            <!--            </intent-filter>-->
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />-->
+            <!--            </intent-filter>-->
+
+            <!--            <meta-data-->
+            <!--                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
+            <!--                android:resource="@xml/ledger_dev" />-->
+            <!--            <meta-data-->
+            <!--                android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"-->
+            <!--                android:resource="@xml/ledger_dev" />-->
         </activity>
         <activity
             android:name=".advanced.ui.AdvancedMainActivity"
@@ -85,6 +99,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".advanced.ui.AdvancedGenerateActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".advanced.ui.AdvancedLedgerActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 

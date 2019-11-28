@@ -127,13 +127,14 @@ android {
 
     applicationVariants.all { variant ->
         variant.buildConfigField "String", "MINTER_BOT_SECRET", '"'+localProps.getProperty("minter_bot_secret")+'"'
+        variant.buildConfigField "Boolean", "ENABLE_LEDGER_UI", 'Boolean.parseBoolean("'+(localProps.getProperty("ledger_ui", "false"))+'")'
+
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
 
     flavorDimensions "env"
 
@@ -142,24 +143,48 @@ android {
             dimension "env"
             applicationId = "network.minter.bipwallet.mainnet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "GATE_API_URL", 'null'
         }
 
-        netMainNoCrashlytics {
+        netMainLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet.mainnet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "GATE_API_URL", 'null'
         }
 
         netTest {
             dimension "env"
             applicationId = "network.minter.bipwallet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "GATE_API_URL", 'null'
         }
 
-        netTestNoCrashlytics {
+        netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "GATE_API_URL", 'null'
+        }
+
+        texasnet {
+            dimension "env"
+            applicationId = "network.minter.bipwallet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"'+localProps["texasnet_ws"]+'"'
+            buildConfigField "String", "EXPLORER_API_URL", '"'+localProps["texasnet_explorer_api"]+'"'
+            buildConfigField "String", "GATE_API_URL", '"'+localProps["texasnet_gate_api"]+'"'
+        }
+
+        texasnetLocal {
+            dimension "env"
+            applicationId = "network.minter.bipwallet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"'+localProps["texasnet_ws"]+'"'
+            buildConfigField "String", "EXPLORER_API_URL", '"'+localProps["texasnet_explorer_api"]+'"'
+            buildConfigField "String", "GATE_API_URL", '"'+localProps["texasnet_gate_api"]+'"'
         }
     }
 }
@@ -169,40 +194,63 @@ dependencies {
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
+            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}",
+            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
     netMainImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile:${minterProfileSDK}"
+            "network.minter.android:minter-android-profile:${minterProfileSDK}",
+            "network.minter.android:ledger-connector:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
-    netTestNoCrashlyticsImplementation([
+    netTestLocalImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}"
+            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}",
+            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
-    netMainNoCrashlyticsImplementation([
+    netMainLocalImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile:${minterProfileSDK}"
+            "network.minter.android:minter-android-profile:${minterProfileSDK}",
+            "network.minter.android:ledger-connector:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
-
-
+    //texasnet
+    texasnetImplementation([
+            "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
+            "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
+            "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
+            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}",
+            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
+    ])
+    texasnetLocalImplementation([
+            "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
+            "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
+            "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
+            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}",
+            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
+    ])
 
     // support
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core:1.2.0-beta01'
+    implementation 'androidx.core:core:1.2.0-rc01'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.biometric:biometric:1.0.0-rc02'
+    implementation 'androidx.biometric:biometric:1.0.0'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha01'
+    implementation 'com.google.android.material:material:1.2.0-alpha02'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
-    implementation 'androidx.exifinterface:exifinterface:1.0.0'
+    implementation 'androidx.exifinterface:exifinterface:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     // android arch
@@ -214,7 +262,7 @@ dependencies {
 
     // yandex
     implementation 'com.yandex.android:mobmetricalib:3.1.0'
-    implementation 'com.android.installreferrer:installreferrer:1.0'
+    implementation 'com.android.installreferrer:installreferrer:1.1'
 
     // common
     implementation 'androidx.multidex:multidex:2.0.1'
