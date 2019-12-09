@@ -158,33 +158,17 @@ android {
         netTest {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", 'null'
-            buildConfigField "String", "GATE_API_URL", 'null'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", '"https://texasnet.explorer-api.minter.network/api/"'
+            buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
         }
 
         netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", 'null'
-            buildConfigField "String", "GATE_API_URL", 'null'
-        }
-
-        texasnet {
-            dimension "env"
-            applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"'+localProps["texasnet_ws"]+'"'
-            buildConfigField "String", "EXPLORER_API_URL", '"'+localProps["texasnet_explorer_api"]+'"'
-            buildConfigField "String", "GATE_API_URL", '"'+localProps["texasnet_gate_api"]+'"'
-        }
-
-        texasnetLocal {
-            dimension "env"
-            applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"'+localProps["texasnet_ws"]+'"'
-            buildConfigField "String", "EXPLORER_API_URL", '"'+localProps["texasnet_explorer_api"]+'"'
-            buildConfigField "String", "GATE_API_URL", '"'+localProps["texasnet_gate_api"]+'"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", '"https://texasnet.explorer-api.minter.network/api/"'
+            buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
         }
     }
 }
@@ -221,23 +205,6 @@ dependencies {
             "network.minter.android:minter-android-profile:${minterProfileSDK}",
             "network.minter.android:ledger-connector:${minterLedgerSDK}",
             "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
-    ])
-    //texasnet
-    texasnetImplementation([
-            "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
-            "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
-            "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}",
-            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
-    ])
-    texasnetLocalImplementation([
-            "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
-            "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
-            "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile-testnet:${minterProfileSDK}",
-            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
 
     // support

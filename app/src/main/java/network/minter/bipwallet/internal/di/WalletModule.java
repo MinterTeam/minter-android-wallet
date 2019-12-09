@@ -118,7 +118,6 @@ public class WalletModule {
         initCrashlytics();
 
         Hawk.init(mContext)
-                .setLogger(message -> Timber.tag("HAWK_SECRET").d(message))
                 .setEncryption(new ConcealEncryption(mContext))
                 .build();
 
@@ -138,7 +137,6 @@ public class WalletModule {
         }
 
         Hawk.init(DB_CACHE, mContext)
-                .setLogger(message -> Timber.tag("HAWK_CACHE").d(message))
                 .setEncryption(new NoEncryption())
                 .setParser(new GsonParser(getGson()))
                 .build();

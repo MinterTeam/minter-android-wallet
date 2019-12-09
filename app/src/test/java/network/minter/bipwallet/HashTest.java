@@ -35,7 +35,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class HashTest {
