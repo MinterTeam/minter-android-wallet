@@ -51,12 +51,12 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.tx.contract.TransactionListView;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
-import network.minter.explorer.MinterExplorerApi;
 
 /**
  * minter-android-wallet. 2018
@@ -107,7 +107,7 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Tr
 
     @Override
     public void startExplorer(String hash) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + hash)));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)));
     }
 
     @Override

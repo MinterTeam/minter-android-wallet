@@ -54,6 +54,7 @@ import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.exchange.adapters.CoinsListAdapter;
 import network.minter.bipwallet.exchange.contract.BaseCoinTabView;
 import network.minter.bipwallet.internal.BaseInjectFragment;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
@@ -61,7 +62,6 @@ import network.minter.bipwallet.internal.helpers.forms.validators.DecimalValidat
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
-import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.CoinItem;
 import timber.log.Timber;
 
@@ -212,7 +212,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     @Override
     public void startExplorer(String txHash) {
         //TODO
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + txHash)));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)));
     }
 
     @Override

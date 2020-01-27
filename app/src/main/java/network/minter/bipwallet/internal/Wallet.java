@@ -52,6 +52,7 @@ import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ProgressView;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.core.internal.exceptions.NetworkException;
+import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
@@ -79,6 +80,15 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
     DispatchingAndroidInjector<Object> dispatchingAndroidInjector;
 
     @Inject ForegroundDetector foregroundDetector;
+
+    @SuppressWarnings("ConstantConditions")
+    public static String urlExplorerFront() {
+        if (BuildConfig.EXPLORER_FRONT_URL != null) {
+            return BuildConfig.EXPLORER_FRONT_URL;
+        }
+
+        return MinterExplorerApi.FRONT_URL;
+    }
 
     /**
      * Usage:

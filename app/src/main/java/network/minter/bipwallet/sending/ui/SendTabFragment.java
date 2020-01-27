@@ -65,6 +65,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
@@ -84,7 +85,6 @@ import network.minter.bipwallet.sending.views.SendTabPresenter;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
-import network.minter.explorer.MinterExplorerApi;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.OnShowRationale;
@@ -255,7 +255,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
 
     @Override
     public void startExplorer(String txHash) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + txHash)));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)));
     }
 
     @NeedsPermission(Manifest.permission.CAMERA)

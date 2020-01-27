@@ -144,6 +144,7 @@ android {
             applicationId = "network.minter.bipwallet.mainnet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
             buildConfigField "String", "GATE_API_URL", 'null'
         }
 
@@ -152,6 +153,7 @@ android {
             applicationId = "network.minter.bipwallet.mainnet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
             buildConfigField "String", "GATE_API_URL", 'null'
         }
 
@@ -160,6 +162,7 @@ android {
             applicationId = "network.minter.bipwallet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", '"https://texasnet.explorer-api.minter.network/api/"'
+            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://texasnet.explorer.minter.network"'
             buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
         }
 
@@ -168,6 +171,7 @@ android {
             applicationId = "network.minter.bipwallet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", '"https://texasnet.explorer-api.minter.network/api/"'
+            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://texasnet.explorer.minter.network"'
             buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
         }
     }

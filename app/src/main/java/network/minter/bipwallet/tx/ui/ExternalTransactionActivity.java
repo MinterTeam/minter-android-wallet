@@ -30,6 +30,7 @@ import network.minter.bipwallet.external.ui.AppDeepLink;
 import network.minter.bipwallet.external.ui.TestnetWebDeepLink;
 import network.minter.bipwallet.external.ui.WebDeepLink;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
@@ -37,7 +38,6 @@ import network.minter.bipwallet.internal.views.widgets.WalletButton;
 import network.minter.bipwallet.security.PauseTimer;
 import network.minter.bipwallet.tx.contract.ExternalTransactionView;
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter;
-import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
 
 /**
@@ -178,7 +178,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
 
     @Override
     public void startExplorer(String txHash) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MinterExplorerApi.FRONT_URL + "/transactions/" + txHash)));
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)));
     }
 
     @Override
