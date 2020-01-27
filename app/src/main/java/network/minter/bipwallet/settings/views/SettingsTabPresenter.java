@@ -52,7 +52,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import moxy.InjectViewState;
-import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
@@ -138,7 +137,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
         getViewState().setAdditionalAdapter(mAdditionalAdapter);
         getViewState().setSecurityAdapter(mSecurityAdapter);
         //noinspection ConstantConditions
-        if (BuildConfig.FLAVOR.equals("netTest") || BuildConfig.FLAVOR.equals("netTestNoCrashlytics")) {
+        if (false) {
             getViewState().showFreeCoinsButton(true);
             getViewState().setOnFreeCoinsClickListener(v -> {
                 Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
