@@ -169,7 +169,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             int totalBytes = tmpPayload.length;
 
             if (totalBytes > ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
-                tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH);
+                tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH - 1);
                 getViewState().setPayload(new String(tmpPayload, StandardCharsets.UTF_8));
             }
 
