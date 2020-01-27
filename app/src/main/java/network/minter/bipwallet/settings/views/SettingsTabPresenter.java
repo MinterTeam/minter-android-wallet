@@ -282,7 +282,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
     }
 
     private void onChangePinClick(View view, View view1, String s) {
-        getViewState().startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Creation);
+        getViewState().startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Change);
     }
 
     private void onEnableFingerprint(View view, Boolean enabled) {

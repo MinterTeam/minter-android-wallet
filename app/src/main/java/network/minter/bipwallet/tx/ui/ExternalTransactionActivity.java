@@ -27,6 +27,7 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.external.ui.AppDeepLink;
+import network.minter.bipwallet.external.ui.TestnetWebDeepLink;
 import network.minter.bipwallet.external.ui.WebDeepLink;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
@@ -45,6 +46,7 @@ import timber.log.Timber;
  */
 @AppDeepLink({"tx"})
 @WebDeepLink({"tx"})
+@TestnetWebDeepLink({"tx"})
 public class ExternalTransactionActivity extends BaseMvpInjectActivity implements ExternalTransactionView {
     public final static String EXTRA_RAW_DATA = "EXTRA_RAW_TX";
 //    public final static String EXTRA_EXTERNAL_TX = "EXTRA_EXTERNAL_TX";

@@ -194,6 +194,18 @@
                     android:pathPrefix="/tx"
                     android:scheme="https" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="testnet.bip.to"
+                    android:pathPrefix="/tx"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".security.ui.PinEnterActivity"

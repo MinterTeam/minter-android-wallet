@@ -58,7 +58,13 @@ public class PinEnterActivity extends BaseMvpInjectActivity implements PinEnterV
 
     @Override
     public void setEnableValidation(String pin) {
-        pinCode.setValue(pin);
+        if (pin == null) {
+            pinCode.setEnableValidation(false);
+        } else {
+            pinCode.setEnableValidation(true);
+            pinCode.setValue(pin);
+        }
+
     }
 
     @Override

@@ -62,7 +62,14 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
 //        }
 
         switch (mMode) {
+            case Change:
+                getViewState().setupTitle(R.string.title_pin_enter);
+                getViewState().setPinHint(R.string.hint_pin_enter);
+                getViewState().setEnableValidation(mSourcePin);
+                getViewState().setOnPinValidationError(this::onValidationError);
+                break;
             case Creation:
+                getViewState().setEnableValidation(null);
                 getViewState().setupTitle(R.string.title_pin_set);
                 getViewState().setPinHint(R.string.hint_pin_enter);
                 break;
@@ -259,7 +266,15 @@ public class PinEnterPresenter extends MvpBasePresenter<PinEnterView> {
                 getViewState().finishSuccess(mSuccessIntent);
             }
         } else if (mMode == SecurityModule.PinMode.Change) {
-
+            if (valid && len == 4) {
+                getViewState().setPinEnabled(true);
+                Timber.d("PIN validated");
+                kvStorage.put(PREF_PIN_INVALID_TYPE_TIME, 0L);
+                kvStorage.put(PREF_PIN_INVALID_TYPE_COUNT, 0);
+                mMode = SecurityModule.PinMode.Creation;
+                getViewState().resetPin();
+                init();
+            }
         }
     }
 }
