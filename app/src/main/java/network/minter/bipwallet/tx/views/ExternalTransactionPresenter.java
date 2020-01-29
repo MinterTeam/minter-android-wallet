@@ -165,7 +165,11 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
         mPayload = mExtTx.getPayload();
         calculateFee(mExtTx);
-        fillData(mExtTx);
+        try {
+            fillData(mExtTx);
+        } catch (Throwable t) {
+            showTxErrorDialog("Invalid transaction data: %s", t.getMessage());
+        }
     }
 
     private void showTxErrorDialog(String message, Object... args) {
