@@ -26,4 +26,5 @@
   -->
 <resources>
     <string name="app_name">BIP Wallet TESTNET</string>
+    <string name="bip">MNT</string>
 </resources>

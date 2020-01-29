@@ -621,7 +621,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                     .build();
         }
 
-        final PrivateKey dummyPrivate = new PrivateKey("0000000000000000000000000000000000000000000000000000000000000000");
+        final PrivateKey dummyPrivate = new PrivateKey("F000000000000000000000000000000000000000000000000000000000000000");
         return preTx.signSingle(dummyPrivate);
     }
 
