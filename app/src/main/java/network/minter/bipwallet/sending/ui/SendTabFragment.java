@@ -155,7 +155,8 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         mInputGroup.addInput(recipientInput);
         mInputGroup.addInput(amountInput);
         mInputGroup.addInput(payloadInput);
-        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", true));
+//        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", true));
+        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$", "Invalid number", true));
         mInputGroup.addValidator(payloadInput, new ByteLengthValidator("Message too long", false));
         /* ideal case */
 

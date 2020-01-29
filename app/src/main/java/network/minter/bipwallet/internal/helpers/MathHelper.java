@@ -227,7 +227,10 @@ public final class MathHelper {
     public static BigDecimal bigDecimalFromString(CharSequence text) {
         if (text == null) {
             return BigDecimal.ZERO;
+        } else if(text.toString().equals("0.")) {
+            return BigDecimal.ZERO;
         }
+
         String amountText = text
                 .toString()
                 .replaceAll("\\s+", "")
