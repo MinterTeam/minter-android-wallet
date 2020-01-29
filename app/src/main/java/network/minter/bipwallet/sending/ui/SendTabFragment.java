@@ -113,9 +113,11 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
     @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
     @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
+    @BindView(R.id.layout_input_payload_container) View payloadContainer;
     @BindView(R.id.input_amount) AppCompatEditText amountInput;
     @BindView(R.id.input_payload) AppCompatEditText payloadInput;
     @BindView(R.id.action) Button actionSend;
+    @BindView(R.id.action_add_payload) View actionAddPayload;
     //    @BindView(R.id.action_scan_qr) View actionScanQR;
     @BindView(R.id.action_maximum) View actionMaximum;
     @BindView(R.id.text_error) TextView errorView;
@@ -196,6 +198,11 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
+    public void setOnClickAddPayload(View.OnClickListener listener) {
+        actionAddPayload.setOnClickListener(listener);
+    }
+
+    @Override
     public void setPayloadChangeListener(TextWatcher listener) {
         payloadInput.addTextChangedListener(listener);
     }
@@ -216,6 +223,17 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     public void startExternalTransaction(String rawData) {
         new ExternalTransactionActivity.Builder(getActivity(), rawData)
                 .start();
+    }
+
+    @Override
+    public void togglePayload() {
+        if (actionAddPayload.getVisibility() == View.VISIBLE) {
+            actionAddPayload.setVisibility(View.GONE);
+            payloadContainer.setVisibility(View.VISIBLE);
+        } else {
+            actionAddPayload.setVisibility(View.VISIBLE);
+            payloadContainer.setVisibility(View.GONE);
+        }
     }
 
     @Override

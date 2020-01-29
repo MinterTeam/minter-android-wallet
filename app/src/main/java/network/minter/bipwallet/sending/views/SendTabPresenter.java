@@ -194,9 +194,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         getViewState().setOnTextChangedListener(this::onInputTextChanged);
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickMaximum(this::onClickMaximum);
+        getViewState().setOnClickAddPayload(this::onClickAddPayload);
         getViewState().setPayloadChangeListener(mPayloadChangeListener);
         loadAndSetFee();
         accountStorage.update();
+    }
+
+    private void onClickAddPayload(View view) {
+        getViewState().togglePayload();
     }
 
     @Override
@@ -920,6 +925,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             to = mToMxAddress;
         }
         recipientStorage.add(new RecipientItem(to, mToName), this::setRecipientAutocomplete);
+
+        getViewState().togglePayload();
 
         accountStorage.update(true);
         cachedTxRepo.update(true);

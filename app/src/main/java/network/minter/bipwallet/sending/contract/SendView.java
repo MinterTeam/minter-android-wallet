@@ -24,6 +24,7 @@ import network.minter.bipwallet.sending.models.RecipientItem;
 public interface SendView extends MvpView, ErrorViewWithRetry {
     void setOnClickAccountSelectedListener(View.OnClickListener listener);
     void setOnClickMaximum(View.OnClickListener listener);
+    void setOnClickAddPayload(View.OnClickListener listener);
     void setOnTextChangedListener(InputGroup.OnTextChangedListener listener);
     void setFormValidationListener(InputGroup.OnFormValidateListener listener);
     @StateStrategyType(OneExecutionStateStrategy.class)
@@ -53,4 +54,5 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void setActionTitle(int buttonTitle);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startExternalTransaction(String rawData);
+    void togglePayload();
 }
