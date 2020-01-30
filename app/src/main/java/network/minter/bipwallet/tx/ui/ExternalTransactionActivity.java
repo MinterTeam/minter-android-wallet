@@ -211,6 +211,16 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
         presenter.handleExtras(getIntent());
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent != null) {
+            presenter.handleExtras(intent);
+        } else {
+            presenter.handleExtras(getIntent());
+        }
+    }
+
     private boolean checkIsLastActivity() {
         try {
             ActivityManager mngr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
