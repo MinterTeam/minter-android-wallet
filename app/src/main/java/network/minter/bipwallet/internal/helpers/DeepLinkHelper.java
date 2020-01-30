@@ -37,8 +37,18 @@ public final class DeepLinkHelper {
                 throw new InvalidExternalTransaction("Unable to parse transaction url", InvalidExternalTransaction.CODE_INVALID_LINK);
             }
 
+            boolean hasParam = false;
+
             for (int i = 0; i < url.querySize(); i++) {
+                final String param = url.queryParameterName(i);
+                if (param.equals("d")) {
+                    hasParam = true;
+                }
                 intent.putExtra(url.queryParameterName(i), url.queryParameterValue(i));
+            }
+
+            if (!hasParam) {
+                throw new InvalidExternalTransaction("No ?d parameter passed to deeplink", InvalidExternalTransaction.CODE_INVALID_DEEPLINK);
             }
         }
 

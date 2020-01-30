@@ -226,14 +226,15 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
-    public void togglePayload() {
-        if (actionAddPayload.getVisibility() == View.VISIBLE) {
-            actionAddPayload.setVisibility(View.GONE);
-            payloadContainer.setVisibility(View.VISIBLE);
-        } else {
-            actionAddPayload.setVisibility(View.VISIBLE);
-            payloadContainer.setVisibility(View.GONE);
-        }
+    public void showPayload() {
+        actionAddPayload.setVisibility(View.GONE);
+        payloadContainer.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hidePayload() {
+        actionAddPayload.setVisibility(View.VISIBLE);
+        payloadContainer.setVisibility(View.GONE);
     }
 
     @Override

@@ -201,7 +201,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private void onClickAddPayload(View view) {
-        getViewState().togglePayload();
+        getViewState().showPayload();
     }
 
     @Override
@@ -926,7 +926,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
         recipientStorage.add(new RecipientItem(to, mToName), this::setRecipientAutocomplete);
 
-        getViewState().togglePayload();
+        getViewState().hidePayload();
 
         accountStorage.update(true);
         cachedTxRepo.update(true);

@@ -12,13 +12,17 @@ import com.annimon.stream.Optional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.models.CoinAccount;
@@ -249,6 +253,8 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
     }
 
+    private BigInteger mGasPrice = BigInteger.ONE;
+
     private void calculateFee(ExternalTransaction tx) {
         long bytesLen = firstNonNull(mPayload, tx.getPayload(), new BytesData(new char[0])).size();
         BigDecimal baseFee = tx.getType().getFee();
@@ -271,13 +277,29 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         }
 
         BigDecimal fee = baseFee.add(new BigDecimal(bytesLen).multiply(new BigDecimal("0.002")));
+        fee = fee.multiply(new BigDecimal(mGasPrice));
 
         getViewState().setCommission(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN));
     }
 
     private void fillData(ExternalTransaction tx) {
         getViewState().setPayload(tx.getPayloadString());
-        calculateFee(tx);
+
+        rxGate(gasRepo.getMinGas())
+                .subscribeOn(Schedulers.io())
+                .toFlowable(BackpressureStrategy.LATEST)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (res.isOk()) {
+                        mGasPrice = res.result.gas;
+                        Timber.d("Min Gas price: %s", mGasPrice.toString());
+
+                        calculateFee(tx);
+                    }
+                }, Timber::w);
+
+
         getViewState().setSecondVisible(View.VISIBLE);
 
         getViewState().setOnConfirmListener(this::onSubmit);
