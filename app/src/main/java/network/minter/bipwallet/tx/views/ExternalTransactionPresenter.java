@@ -274,6 +274,9 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             // https://docs.minter.network/#section/Commissions
             final TxCreateCoin txData = tx.getData(TxCreateCoin.class);
             baseFee = TxCreateCoin.calculateCreatingCost(txData.getSymbol());
+        } else if(tx.getType().equals(OperationType.RedeemCheck)) {
+            getViewState().setCommission("You don't pay transaction fee.");
+            return;
         }
 
         BigDecimal fee = baseFee.add(new BigDecimal(bytesLen).multiply(new BigDecimal("0.002")));
