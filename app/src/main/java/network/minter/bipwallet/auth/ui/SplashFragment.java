@@ -52,6 +52,7 @@ import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.security.SecurityModule;
@@ -102,7 +103,9 @@ public class SplashFragment extends BaseInjectFragment {
                         return;
                     }
 
-                    if (!session.isLoggedIn(true)) {
+                    if (!session.isLoggedIn(true) || Wallet.app().secretStorage().getAddresses().isEmpty()) {
+                        Wallet.app().secretStorage().destroy();
+                        Wallet.app().storageCache().deleteAll();
                         startAuth();
                         return;
                     }
