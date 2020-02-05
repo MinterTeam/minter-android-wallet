@@ -208,6 +208,7 @@
                 app:layout_constraintTop_toBottomOf="@id/layout_input_amount"
                 android:id="@+id/action_add_payload"
                 android:layout_width="wrap_content"
+                android:visibility="visible"
                 android:layout_height="wrap_content"
                 android:text="Add message"
                 style="@style/Wallet.Text.ButtonBorderless" />
@@ -218,7 +219,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges_medium"
+
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -228,7 +229,6 @@
                     android:id="@+id/layout_input_payload"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/label_payload"
                     app:hintEnabled="true"
                     app:passwordToggleDrawable="@null"
                     app:errorTextAppearance="@style/Wallet.ErrorTextAppearance">

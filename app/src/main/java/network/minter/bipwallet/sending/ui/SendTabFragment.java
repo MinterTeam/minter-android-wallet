@@ -72,6 +72,7 @@ import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
+import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -158,6 +159,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
 //        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", true));
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$", "Invalid number", true));
         mInputGroup.addValidator(payloadInput, new ByteLengthValidator("Message too long", false));
+        mInputGroup.addValidator(payloadInput, new IsNotMnemonicValidator("You're trying to send mnemonic phrase. Don't do it!", false));
         /* ideal case */
 
         mInputGroup.addValidator(recipientInput,
