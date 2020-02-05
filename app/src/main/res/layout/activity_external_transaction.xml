@@ -164,6 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges_half"
                 android:layout_marginEnd="@dimen/margin_edges"
+                app:layout_goneMarginStart="@dimen/margin_edges"
                 android:fontFamily="@font/_ubuntu_medium"
                 android:textAlignment="textEnd"
                 android:textSize="@dimen/text_size_default"

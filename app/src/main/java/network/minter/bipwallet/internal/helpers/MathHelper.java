@@ -223,6 +223,15 @@ public final class MathHelper {
         return from.compareTo(new BigInteger(String.valueOf(to))) <= 0;
     }
 
+    public static boolean startsFromNumber(CharSequence value) {
+        if(value == null || value.length() == 0) {
+            return false;
+        }
+
+        String val = value.toString();
+        return val.matches("^[0-9\\.]+.*");
+    }
+
     @NonNull
     public static BigDecimal bigDecimalFromString(CharSequence text) {
         if (text == null) {

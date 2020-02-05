@@ -20,7 +20,7 @@ public final class DeepLinkHelper {
 
     public static Intent rawTxToIntent(String result) throws InvalidExternalTransaction {
         if (!isDeeplinkUrl(result)) {
-            throw new InvalidExternalTransaction("Unable to parse transaction url", InvalidExternalTransaction.CODE_INVALID_LINK);
+            result = "https://" + result;
         }
 
         Intent intent = new Intent();

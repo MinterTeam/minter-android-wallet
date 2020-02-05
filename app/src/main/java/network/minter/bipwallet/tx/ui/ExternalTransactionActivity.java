@@ -28,11 +28,14 @@ import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.external.ui.AppDeepLink;
 import network.minter.bipwallet.external.ui.TestnetWebDeepLink;
+import network.minter.bipwallet.external.ui.TestnetWebDeepLinkInsecure;
 import network.minter.bipwallet.external.ui.WebDeepLink;
+import network.minter.bipwallet.external.ui.WebDeepLinkInsecure;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
+import network.minter.bipwallet.internal.helpers.MathHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.internal.views.widgets.WalletButton;
 import network.minter.bipwallet.security.PauseTimer;
@@ -46,7 +49,9 @@ import timber.log.Timber;
  */
 @AppDeepLink({"tx"})
 @WebDeepLink({"tx"})
+@WebDeepLinkInsecure({"tx"})
 @TestnetWebDeepLink({"tx"})
+@TestnetWebDeepLinkInsecure({"tx"})
 public class ExternalTransactionActivity extends BaseMvpInjectActivity implements ExternalTransactionView {
     public final static String EXTRA_RAW_DATA = "EXTRA_RAW_TX";
 //    public final static String EXTRA_EXTERNAL_TX = "EXTRA_EXTERNAL_TX";
@@ -61,6 +66,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
     @BindView(R.id.layout_input_second) TextInputLayout layoutInputSecond;
     @BindView(R.id.input_payload) AppCompatEditText inputPayload;
     @BindView(R.id.fee_value) TextView feeValue;
+    @BindView(R.id.fee_label) TextView feeLabel;
     @BindView(R.id.text_error) TextView textError;
     @BindView(R.id.action) WalletButton action;
     @BindView(R.id.cancel_action) WalletButton cancelAction;
@@ -94,7 +100,17 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
 
     @Override
     public void setCommission(CharSequence fee) {
+        if (fee == null || fee.length() == 0) {
+            return;
+        }
         feeValue.setText(fee);
+        if (MathHelper.startsFromNumber(fee)) {
+            feeLabel.setVisibility(View.VISIBLE);
+            feeValue.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+        } else {
+            feeLabel.setVisibility(View.GONE);
+            feeValue.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        }
     }
 
     @Override
