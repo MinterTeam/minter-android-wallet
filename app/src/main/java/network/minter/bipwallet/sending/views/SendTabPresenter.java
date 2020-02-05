@@ -39,7 +39,6 @@ import com.annimon.stream.Stream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -169,8 +168,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             int totalBytes = tmpPayload.length;
 
             if (totalBytes > ByteLengthValidator.MAX_PAYLOAD_LENGTH) {
-                tmpPayload = Arrays.copyOfRange(tmpPayload, 0, ByteLengthValidator.MAX_PAYLOAD_LENGTH - 1);
-                getViewState().setPayload(new String(tmpPayload, StandardCharsets.UTF_8));
+                byte[] tmp = new byte[1024];
+                System.arraycopy(tmpPayload, 0, tmp, 0, 1024);
+                getViewState().setPayload(new String(tmp, StandardCharsets.UTF_8));
+                tmpPayload = tmp;
             }
 
             mPayload = tmpPayload;
