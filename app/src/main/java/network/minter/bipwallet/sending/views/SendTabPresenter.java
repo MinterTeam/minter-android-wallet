@@ -155,7 +155,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private String mAvatar = null;
     private @DrawableRes int mAvatarRes;
     private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
-    private BehaviorSubject<BigDecimal> mInputChange;
+    private BehaviorSubject<String> mInputChange;
     private BehaviorSubject<String> mAddressChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private BigInteger mGasPrice = new BigInteger("1");
@@ -367,7 +367,16 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private boolean checkAmountIsZero(BigDecimal amount) {
-        boolean valid = amount == null || bdGTE(amount, BigDecimal.ZERO);
+        return bdGTE(amount, BigDecimal.ZERO);
+    }
+
+    private boolean checkAmountIsZero(String amount) {
+        if(amount == null || amount.isEmpty()) {
+            getViewState().setAmountError("Amount can't be empty");
+            return false;
+        }
+
+        boolean valid = bdGTE(bigDecimalFromString(amount), BigDecimal.ZERO);
         if (!valid) {
             getViewState().setAmountError("Amount must be greater or equals to 0");
         } else {
@@ -377,7 +386,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         return valid;
     }
 
-    private void onAmountChanged(BigDecimal amount) {
+    private void onAmountChanged(String amount) {
+        if(amount == null || amount.isEmpty()) {
+            mAmount = BigDecimal.ZERO;
+        } else {
+            mAmount = bigDecimalFromString(amount);
+        }
+
         checkAmountIsZero(amount);
         mEnableUseMax.set(false);
         loadAndSetFee();
@@ -969,8 +984,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 mAddressChange.onNext(mToName.toString());
                 break;
             case R.id.input_amount:
-                mAmount = bigDecimalFromString(editText.getText());
-                mInputChange.onNext(mAmount);
+                mInputChange.onNext(editText.getText().toString());
                 break;
         }
     }
