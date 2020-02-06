@@ -95,6 +95,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     private MinterAddress mFrom;
     private BytesData mPayload;
     private String mCheckPassword = null;
+    private BigInteger mGasPrice = BigInteger.ONE;
 
     @Inject
     public ExternalTransactionPresenter() {
@@ -176,38 +177,6 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         }
     }
 
-    private void showTxErrorDialog(String message, Object... args) {
-        getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
-                .setText(message, args)
-                .setPositiveAction(R.string.btn_close, (d, w) -> {
-                    d.dismiss();
-                    getViewState().finishCancel();
-                })
-                .create());
-    }
-
-    private boolean validateTx() {
-        if (mExtTx.getType() == OperationType.RedeemCheck) {
-            TxRedeemCheck d = mExtTx.getData();
-            if (d.getProof().size() == 0 && mCheckPassword == null) {
-                getViewState().disableAll();
-
-                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
-                        .setText("This check given without proof and password. One of parameters is required.")
-                        .setPositiveAction(R.string.btn_close, (_d, _w) -> {
-                            _d.dismiss();
-                            getViewState().finishCancel();
-                        })
-                        .create());
-                return false;
-            } else if (d.getProof().size() == 0 && mCheckPassword != null) {
-                d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
-            }
-        }
-
-        return true;
-    }
-
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
@@ -253,7 +222,37 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
 
     }
 
-    private BigInteger mGasPrice = BigInteger.ONE;
+    private void showTxErrorDialog(String message, Object... args) {
+        getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                .setText(message, args)
+                .setPositiveAction(R.string.btn_close, (d, w) -> {
+                    d.dismiss();
+                    getViewState().finishCancel();
+                })
+                .create());
+    }
+
+    private boolean validateTx() {
+        if (mExtTx.getType() == OperationType.RedeemCheck) {
+            TxRedeemCheck d = mExtTx.getData();
+            if (d.getProof().size() == 0 && mCheckPassword == null) {
+                getViewState().disableAll();
+
+                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
+                        .setText("This check given without proof and password. One of parameters is required.")
+                        .setPositiveAction(R.string.btn_close, (_d, _w) -> {
+                            _d.dismiss();
+                            getViewState().finishCancel();
+                        })
+                        .create());
+                return false;
+            } else if (d.getProof().size() == 0 && mCheckPassword != null) {
+                d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
+            }
+        }
+
+        return true;
+    }
 
     private void calculateFee(ExternalTransaction tx) {
         long bytesLen = firstNonNull(mPayload, tx.getPayload(), new BytesData(new char[0])).size();
@@ -274,7 +273,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             // https://docs.minter.network/#section/Commissions
             final TxCreateCoin txData = tx.getData(TxCreateCoin.class);
             baseFee = TxCreateCoin.calculateCreatingCost(txData.getSymbol());
-        } else if(tx.getType().equals(OperationType.RedeemCheck)) {
+        } else if (tx.getType().equals(OperationType.RedeemCheck)) {
             getViewState().setCommission("You don't pay transaction fee.");
             return;
         }
@@ -473,7 +472,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                         }
 
                         Transaction tx = new Transaction.Builder(cntRes.nonce, mExtTx)
-                                .setGasPrice(cntRes.gas)
+                                .setGasPrice(mExtTx.getType() == OperationType.RedeemCheck ? BigInteger.ONE : cntRes.gas)
                                 .setPayload(mPayload)
                                 .buildFromExternal();
 
