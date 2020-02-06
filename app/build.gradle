@@ -186,14 +186,6 @@ dependencies {
             "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
             "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
-    netMainImplementation([
-            "network.minter.android:minter-android-core:${minterCoreSDK}",
-            "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
-            "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
-            "network.minter.android:minter-android-profile:${minterProfileSDK}",
-            "network.minter.android:ledger-connector:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
-    ])
     netTestLocalImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
@@ -202,14 +194,28 @@ dependencies {
             "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
             "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
-    netMainLocalImplementation([
+
+    netMainImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
-            "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
-            "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
+            "network.minter.android:minter-android-blockchain:${prevMinterBlockchainSDK}",
             "network.minter.android:minter-android-profile:${minterProfileSDK}",
             "network.minter.android:ledger-connector:${minterLedgerSDK}",
             "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
+    netMainImplementation("network.minter.android:minter-android-explorer:${minterExplorerSDK}") {
+        exclude group: "network.minter.android", module: "minter-android-blockchain"
+    }
+
+    netMainLocalImplementation([
+            "network.minter.android:minter-android-core:${minterCoreSDK}",
+            "network.minter.android:minter-android-blockchain:${prevMinterBlockchainSDK}",
+            "network.minter.android:minter-android-profile:${minterProfileSDK}",
+            "network.minter.android:ledger-connector:${minterLedgerSDK}",
+            "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
+    ])
+    netMainLocalImplementation("network.minter.android:minter-android-explorer:${minterExplorerSDK}") {
+        exclude group: "network.minter.android", module: "minter-android-blockchain"
+    }
 
     // support
     implementation 'androidx.appcompat:appcompat:1.1.0'
