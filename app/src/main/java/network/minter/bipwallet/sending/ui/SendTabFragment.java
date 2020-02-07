@@ -161,7 +161,9 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$", "Invalid number", true));
         mInputGroup.addValidator(amountInput, new EmptyValidator("Value can't be empty"));
         mInputGroup.addValidator(payloadInput, new ByteLengthValidator("Message too long", false));
-        mInputGroup.addValidator(payloadInput, new IsNotMnemonicValidator("You're trying to send mnemonic phrase. Don't do it!", false));
+        mInputGroup.addValidator(payloadInput, new IsNotMnemonicValidator("ATTENTION: You are about to send seed phrase in the message attached to this transaction.\n" +
+                "\n" +
+                "If you do this, anyone will be able to see it and access your funds!", false));
         /* ideal case */
 
         mInputGroup.addValidator(recipientInput,
