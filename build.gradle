@@ -80,6 +80,6 @@ ext {
     minterCoreSDK = "0.7.0"
     minterLedgerSDK = "0.1.0"
 
-    appVersionName = "1.12.0-texasnet04"
-    appVersionCode = 123
+    appVersionName = "1.12.0-texasnet05"
+    appVersionCode = 124
 }
