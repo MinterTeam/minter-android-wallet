@@ -238,6 +238,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
+                        android:hint="@string/label_payload"
                         android:paddingStart="4dp"
                         android:tag="payload"
                         android:textSize="@dimen/text_size_default"
