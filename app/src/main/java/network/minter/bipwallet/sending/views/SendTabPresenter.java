@@ -72,6 +72,7 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
+import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.SimpleTextWatcher;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -175,6 +176,18 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             }
 
             mPayload = tmpPayload;
+
+
+            IsNotMnemonicValidator validator = new IsNotMnemonicValidator("ATTENTION: You are about to send seed phrase in the message attached to this transaction.\n" +
+                    "\n" +
+                    "If you do this, anyone will be able to see it and access your funds!", false);
+
+            if (!validator.validate(new String(mPayload))) {
+                getViewState().setPayloadError(validator.getErrorMessage());
+            } else {
+                getViewState().setPayloadError(null);
+            }
+
             setupFee();
         }
     };
@@ -199,10 +212,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         getViewState().setPayloadChangeListener(mPayloadChangeListener);
         loadAndSetFee();
         accountStorage.update();
-    }
-
-    private void onClickAddPayload(View view) {
-        getViewState().showPayload();
     }
 
     @Override
@@ -258,7 +267,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
     }
 
-
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
@@ -294,6 +302,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             mFormValid = valid;
             checkEnableSubmit();
         });
+    }
+
+    private void onClickAddPayload(View view) {
+        getViewState().showPayload();
     }
 
     private void loadAndSetFee() {
@@ -372,7 +384,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private boolean checkAmountIsZero(String amount) {
-        if(amount == null || amount.isEmpty()) {
+        if (amount == null || amount.isEmpty()) {
             getViewState().setAmountError("Amount can't be empty");
             return false;
         }
@@ -388,7 +400,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private void onAmountChanged(String amount) {
-        if(amount == null || amount.isEmpty()) {
+        if (amount == null || amount.isEmpty()) {
             mAmount = BigDecimal.ZERO;
         } else {
             mAmount = bigDecimalFromString(amount);

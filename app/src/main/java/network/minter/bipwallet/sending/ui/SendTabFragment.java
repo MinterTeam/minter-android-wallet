@@ -73,7 +73,6 @@ import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmptyValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
@@ -161,9 +160,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$", "Invalid number", true));
         mInputGroup.addValidator(amountInput, new EmptyValidator("Value can't be empty"));
         mInputGroup.addValidator(payloadInput, new ByteLengthValidator("Message too long", false));
-        mInputGroup.addValidator(payloadInput, new IsNotMnemonicValidator("ATTENTION: You are about to send seed phrase in the message attached to this transaction.\n" +
-                "\n" +
-                "If you do this, anyone will be able to see it and access your funds!", false));
+
         /* ideal case */
 
         mInputGroup.addValidator(recipientInput,
@@ -241,6 +238,11 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     public void hidePayload() {
         actionAddPayload.setVisibility(View.VISIBLE);
         payloadContainer.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setPayloadError(CharSequence errorMessage) {
+        mInputGroup.setError("payload", errorMessage);
     }
 
     @Override

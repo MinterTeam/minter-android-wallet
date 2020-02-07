@@ -44,6 +44,7 @@ public interface SendView extends MvpView, ErrorViewWithRetry {
     void setRecipient(CharSequence to);
     void setRecipientError(CharSequence error);
     void setAmountError(CharSequence error);
+    void setPayloadError(CharSequence error);
     void setError(CharSequence error);
     void setError(@StringRes int error);
     void setAmount(CharSequence amount);
