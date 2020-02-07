@@ -219,7 +219,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_input"
-
+                android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_input"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
