@@ -344,7 +344,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         String fee;
         BigDecimal payloadFee = new BigDecimal(0);
         if (mPayload != null) {
-            payloadFee = PAYLOAD_FEE.multiply(BigDecimal.valueOf(mPayload.length));
+            payloadFee = getPayloadFee();
         }
 
         if (mSendFee != null) {
@@ -357,6 +357,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
         getViewState().setFee(fee);
     }
+
+    private BigDecimal getPayloadFee() {
+        return BigDecimal.valueOf(mPayload.length).multiply(PAYLOAD_FEE);
+    }
+
+
 
     private void setRecipientAutocomplete() {
         if (true) {
@@ -682,6 +688,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         return tx;
     }
 
+    private BigDecimal getFee() {
+        return getTransactionTypeByAddress().getFee().add(getPayloadFee());
+    }
+
+    private BigInteger getFeeNormalized() {
+        return getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+    }
+
     /**
      * This is a complex sending method, read carefully, almost each line is commented, i don't know how
      * to simplify all of this
@@ -720,13 +734,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             // default coin for pay fee - MNT (base coin)
             final GateResult<TransactionCommissionValue> txFeeValue = new GateResult<>();
             txFeeValue.result = new TransactionCommissionValue();
-            if (type == OperationType.Delegate) {
-                enoughBaseForFee = bdGTE(baseAccount.getBalance(), OperationType.Delegate.getFee());
-                txFeeValue.result.value = OperationType.Delegate.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-            } else {
-                enoughBaseForFee = bdGTE(baseAccount.getBalance(), OperationType.SendCoin.getFee());
-                txFeeValue.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-            }
+            txFeeValue.result.value = getFeeNormalized();
+            enoughBaseForFee = bdGTE(baseAccount.getBalance(), getFee());
 
             Observable<GateResult<TransactionCommissionValue>> txFeeValueResolver = Observable.just(txFeeValue);
             Observable<GateResult<TxCount>> txNonceResolver = rxGate(estimateRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(toGateError());
@@ -746,16 +755,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 // creating tx
                 try {
                     final TransactionSign preSign = createPreTx(type);
-
                     txFeeValueResolver = rxGate(estimateRepo.getTransactionCommission(preSign)).onErrorResumeNext(toGateError());
                 } catch (OperationInvalidDataException e) {
                     Timber.w(e);
                     final GateResult<TransactionCommissionValue> commissionValue = new GateResult<>();
-                    if (type == OperationType.Delegate) {
-                        txFeeValue.result.value = OperationType.Delegate.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-                    } else {
-                        txFeeValue.result.value = OperationType.SendCoin.getFee().multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-                    }
+                    txFeeValue.result.value = getFeeNormalized();
                     txFeeValueResolver = Observable.just(commissionValue);
                 }
             }
