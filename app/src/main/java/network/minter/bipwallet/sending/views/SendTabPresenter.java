@@ -112,6 +112,7 @@ import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.lang.String.format;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
@@ -342,10 +343,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
 
         String fee;
-        BigDecimal payloadFee = new BigDecimal(0);
-        if (mPayload != null) {
-            payloadFee = getPayloadFee();
-        }
+        BigDecimal payloadFee = getPayloadFee();
 
         if (mSendFee != null) {
             mSendFee = mSendFee.add(payloadFee);
@@ -359,7 +357,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private BigDecimal getPayloadFee() {
-        return BigDecimal.valueOf(mPayload.length).multiply(PAYLOAD_FEE);
+        return BigDecimal.valueOf(firstNonNull(mPayload, new byte[0]).length).multiply(PAYLOAD_FEE);
     }
 
 
