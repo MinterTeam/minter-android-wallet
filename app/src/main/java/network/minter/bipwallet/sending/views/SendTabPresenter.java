@@ -374,6 +374,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private boolean checkEnoughBalance(BigDecimal amount) {
+        if(!mFromAccount.getCoin().toLowerCase().equals(MinterSDK.DEFAULT_COIN.toLowerCase())) {
+            return true;
+        }
         boolean enough = bdGT(amount, OperationType.SendCoin.getFee());
         if (!enough) {
             getViewState().setAmountError("Insufficient balance");
