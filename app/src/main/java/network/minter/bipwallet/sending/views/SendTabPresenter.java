@@ -119,7 +119,6 @@ import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdGT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
@@ -377,7 +376,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         if(!mFromAccount.getCoin().toLowerCase().equals(MinterSDK.DEFAULT_COIN.toLowerCase())) {
             return true;
         }
-        boolean enough = bdGT(amount, OperationType.SendCoin.getFee());
+        boolean enough = bdGTE(amount, OperationType.SendCoin.getFee());
         if (!enough) {
             getViewState().setAmountError("Insufficient balance");
         } else {
