@@ -119,10 +119,10 @@ import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdEQ;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdLTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString;
 
 /**
@@ -411,9 +411,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         } else {
             mAmount = bigDecimalFromString(amount);
         }
+        if(bdGTE(mAmount, BigDecimal.ZERO) && bdEQ(mAmount, mFromAccount.getBalance())) {
+            mEnableUseMax.set(true);
+        } else {
+            mEnableUseMax.set(false);
+        }
 
         checkAmountIsZero(amount);
-        mEnableUseMax.set(false);
+
         loadAndSetFee();
     }
 
@@ -781,17 +786,20 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
                         // don't calc fee if enough balance in base coin and we are sending not a base coin (MNT or BIP)
                         if (enoughBaseForFee && !isBaseAccount) {
-                            txInitData.commission = new BigDecimal(0);
+                            txInitData.commission = BigDecimal.ZERO;
                         }
 
                         // if balance enough to send required sum + fee, do nothing
                         // (mAmount + txInitData.commission) <= mFromAccount.getBalance()
-                        if (bdLTE(mAmount.add(txInitData.commission), mFromAccount.getBalance())) {
+                        if (bdGTE(/*total*/mFromAccount.getBalance(), /*send+fee*/mAmount.add(txInitData.commission))) {
                             Timber.tag("TX Send").d("Don't change sending amount - balance enough to send");
                             amountToSend = mAmount;
                         }
                         // if balance not enough to send required sum + fee - subtracting fee from sending sum ("use max" for example)
                         else {
+                            if(!mEnableUseMax.get()) {
+                                txInitData.commission = BigDecimal.ZERO;
+                            }
                             amountToSend = mAmount.subtract(txInitData.commission);
                             Timber.tag("TX Send").d("Subtracting sending amount (-%s): balance not enough to send", txInitData.commission);
                         }
