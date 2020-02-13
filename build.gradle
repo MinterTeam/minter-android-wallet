@@ -81,5 +81,5 @@ ext {
     minterLedgerSDK = "0.1.0"
 
     appVersionName = "1.12.0-texasnet11"
-    appVersionCode = 1301
+    appVersionCode = 130
 }
