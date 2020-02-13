@@ -119,7 +119,6 @@ import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
 import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
-import static network.minter.bipwallet.internal.helpers.MathHelper.bdEQ;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
@@ -154,7 +153,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private CharSequence mToName = null;
     private String mAvatar = null;
     private @DrawableRes int mAvatarRes;
-    private AtomicBoolean mEnableUseMax = new AtomicBoolean(false);
+    private AtomicBoolean mUseMax = new AtomicBoolean(false);
+    private AtomicBoolean mClickedUseMax = new AtomicBoolean(false);
     private BehaviorSubject<String> mInputChange;
     private BehaviorSubject<String> mAddressChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
@@ -290,10 +290,12 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
         unsubscribeOnDestroy(mInputChange
                 .toFlowable(BackpressureStrategy.LATEST)
+                .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribe(this::onAmountChanged));
 
         unsubscribeOnDestroy(mAddressChange
                 .toFlowable(BackpressureStrategy.LATEST)
+                .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribe(this::onAddressChanged));
 
         setRecipientAutocomplete();
@@ -411,11 +413,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         } else {
             mAmount = bigDecimalFromString(amount);
         }
-        if(bdGTE(mAmount, BigDecimal.ZERO) && bdEQ(mAmount, mFromAccount.getBalance())) {
-            mEnableUseMax.set(true);
-        } else {
-            mEnableUseMax.set(false);
+
+        if(!mClickedUseMax.get()) {
+            mUseMax.set(false);
         }
+        mClickedUseMax.set(false);
 
         checkAmountIsZero(amount);
 
@@ -618,13 +620,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             getViewState().setError("Account didn't loaded yet...");
             return;
         }
-        mEnableUseMax.set(true);
+        mUseMax.set(true);
+        mClickedUseMax.set(true);
         checkEnableSubmit();
         mAmount = mFromAccount.getBalance();
         getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
 
         getAnalytics().send(AppEvent.SendCoinsUseMaxButton);
-        if (view.getContext() instanceof Activity) {
+        if (view != null && view.getContext() instanceof Activity) {
             KeyboardHelper.hideKeyboard((Activity) view.getContext());
         }
     }
@@ -797,7 +800,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                         }
                         // if balance not enough to send required sum + fee - subtracting fee from sending sum ("use max" for example)
                         else {
-                            if(!mEnableUseMax.get()) {
+                            if(!mUseMax.get()) {
                                 txInitData.commission = BigDecimal.ZERO;
                             }
                             amountToSend = mAmount.subtract(txInitData.commission);
@@ -1023,6 +1026,5 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         mFromAccount = coinAccount;
         mLastAccount = coinAccount;
         getViewState().setAccountName(format("%s (%s)", coinAccount.coin.toUpperCase(), bdHuman(coinAccount.getBalance())));
-
     }
 }

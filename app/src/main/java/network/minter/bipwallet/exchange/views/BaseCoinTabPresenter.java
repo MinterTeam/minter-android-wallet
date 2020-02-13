@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.CallSuper;
 import io.reactivex.BackpressureStrategy;
@@ -117,7 +118,8 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     private BehaviorSubject<Boolean> mInputChange;
     private String mGasCoin;
     private List<CoinAccount> mAccounts = new ArrayList<>(1);
-    private boolean mUseMax = false;
+    private AtomicBoolean mUseMax = new AtomicBoolean(false);
+    private AtomicBoolean mClickedUseMax = new AtomicBoolean(false);
     private BigInteger mGasPrice = new BigInteger("1");
     private BigDecimal mEstimate;
 
@@ -386,11 +388,12 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
         }
 
         getViewState().setAmount(mAccount.balance.stripTrailingZeros().toPlainString());
-        mUseMax = true;
+        mUseMax.set(true);
+        mClickedUseMax.set(true);
 
         getAnalytics().send(AppEvent.ConvertSpendUseMaxButton);
 
-        if (view.getContext() instanceof Activity) {
+        if (view != null && view.getContext() instanceof Activity) {
             KeyboardHelper.hideKeyboard((Activity) view.getContext());
         }
     }
@@ -421,7 +424,10 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 if (isAmountForGetting()) {
                     mGetAmount = am;
                 } else {
-                    mUseMax = false;
+                    if(!mClickedUseMax.get()) {
+                        mUseMax.set(false);
+                    }
+                    mClickedUseMax.set(false);
                     mSpendAmount = am;
                 }
 
@@ -443,7 +449,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
             getAnalytics().send(AppEvent.ConvertSpendExchangeButton);
         }
 
-        Timber.d("Use max: %b", mUseMax);
+        Timber.d("Use max: %b", mUseMax.get());
 
         getViewState().startDialog(ctx -> new WalletTxConvertStartDialog.Builder(ctx, "Convert coin")
                 .setAmount(isAmountForGetting() ? mGetAmount : mSpendAmount)
@@ -453,7 +459,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 .setToCoin(mGetCoin)
                 .setPositiveAction("Convert!", (d, w) -> {
                     final ConvertTransactionData txData = new ConvertTransactionData(
-                            mUseMax ? ConvertTransactionData.Type.SellAll : !isAmountForGetting() ? ConvertTransactionData.Type.Sell : ConvertTransactionData.Type.Buy,
+                            mUseMax.get() ? ConvertTransactionData.Type.SellAll : !isAmountForGetting() ? ConvertTransactionData.Type.Sell : ConvertTransactionData.Type.Buy,
                             mGasCoin,
                             mAccount.getCoin(),
                             mGetCoin,
@@ -473,7 +479,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
 
     private OperationType getOperationType() {
         OperationType opType;
-        if (mUseMax) {
+        if (mUseMax.get()) {
             opType = OperationType.SellAllCoins;
         } else if (!isAmountForGetting()) {
             opType = OperationType.SellCoin;
