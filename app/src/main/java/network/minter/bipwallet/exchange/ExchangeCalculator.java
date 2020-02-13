@@ -132,11 +132,16 @@ public class ExchangeCalculator {
                         }
                         // if not enough, break, error
                         else {
+                            //@todo logic duplication to synchronize with iOS app
                             Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().getCoin());
-                            out.mGasCoin = mntAccount.get().getCoin();
-                            out.mEstimate = res.result.getAmount();
-                            out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), sourceCoin);
-                            errFunc.accept("Not enough balance");
+                            out.mGasCoin = getAccount.get().getCoin();
+                            out.mEstimate = res.result.getAmountWithCommission();
+                            out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmountWithCommission()), sourceCoin);
+//                            Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().getCoin());
+//                            out.mGasCoin = mntAccount.get().getCoin();
+//                            out.mEstimate = res.result.getAmount();
+//                            out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), sourceCoin);
+//                            errFunc.accept("Not enough balance");
                         }
 
                         onResult.accept(out);
