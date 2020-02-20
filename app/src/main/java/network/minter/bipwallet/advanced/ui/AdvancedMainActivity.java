@@ -45,7 +45,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.advanced.contract.MainView;
 import network.minter.bipwallet.advanced.views.AdvancedMainPresenter;
@@ -145,11 +144,11 @@ public class AdvancedMainActivity extends BaseMvpInjectActivity implements MainV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_main);
         ButterKnife.bind(this);
-        if (!BuildConfig.ENABLE_LEDGER_UI) {
+//        if (!BuildConfig.ENABLE_LEDGER_UI) {
             actionLedger.setVisibility(View.GONE);
             findViewById(R.id.separator2).setVisibility(View.GONE);
             findViewById(R.id.separator2_text).setVisibility(View.GONE);
-        }
+//        }
         setupToolbar(toolbar);
         presenter.handleExtras(getIntent());
     }

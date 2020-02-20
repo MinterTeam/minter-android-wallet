@@ -262,7 +262,9 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
 
     @Override
     public void setSubmitEnabled(boolean enabled) {
-        actionSend.setEnabled(enabled);
+        actionSend.post(()->{
+            actionSend.setEnabled(enabled);
+        });
     }
 
     @Override

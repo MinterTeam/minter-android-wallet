@@ -302,6 +302,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         checkEnableSubmit();
         getViewState().setFormValidationListener(valid -> {
             mFormValid = valid;
+            Timber.d("Form is valid: %b", valid);
             checkEnableSubmit();
         });
     }
@@ -362,7 +363,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
 
-
     private void setRecipientAutocomplete() {
         if (true) {
             // FIXME some cases working wrong, this task is low priority, so just disable it for now
@@ -375,7 +375,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private boolean checkEnoughBalance(BigDecimal amount) {
-        if(!mFromAccount.getCoin().toLowerCase().equals(MinterSDK.DEFAULT_COIN.toLowerCase())) {
+        if (!mFromAccount.getCoin().toLowerCase().equals(MinterSDK.DEFAULT_COIN.toLowerCase())) {
             return true;
         }
         boolean enough = bdGTE(amount, OperationType.SendCoin.getFee());
@@ -387,22 +387,19 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         return enough;
     }
 
-    private boolean checkAmountIsZero(BigDecimal amount) {
-        return bdGTE(amount, BigDecimal.ZERO);
-    }
-
-    private boolean checkAmountIsZero(String amount) {
+    /**
+     * Checks input amount is not empty and not negative number
+     * @param amount
+     * @return
+     */
+    private boolean checkAmountIsValid(String amount) {
         if (amount == null || amount.isEmpty()) {
             getViewState().setAmountError("Amount can't be empty");
             return false;
         }
 
         boolean valid = bdGTE(bigDecimalFromString(amount), BigDecimal.ZERO);
-        if (!valid) {
-            getViewState().setAmountError("Amount must be greater or equals to 0");
-        } else {
-            getViewState().setAmountError(null);
-        }
+        getViewState().setAmountError(!valid ? "Amount must be greater or equals to 0" : null);
 
         return valid;
     }
@@ -414,14 +411,15 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             mAmount = bigDecimalFromString(amount);
         }
 
-        if(!mClickedUseMax.get()) {
+        if (!mClickedUseMax.get()) {
             mUseMax.set(false);
         }
         mClickedUseMax.set(false);
 
-        checkAmountIsZero(amount);
-
+        checkAmountIsValid(amount);
+//        checkEnableSubmit();
         loadAndSetFee();
+        checkEnableSubmit();
     }
 
     private void onAddressChanged(String address) {
@@ -608,9 +606,24 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private void checkEnableSubmit() {
-        boolean formFullyValid = checkAmountIsZero(mAmount)
-                && mFormValid
-                && checkEnoughBalance(mFromAccount.getBalance());
+        if (mFromAccount == null) {
+            Timber.d("Account did not loaded yet!");
+            getViewState().setSubmitEnabled(false);
+            return;
+        }
+
+        if (mAmount == null) {
+            Timber.w("Amount did not set and it is NULL");
+            getViewState().setSubmitEnabled(false);
+            return;
+        } else {
+            Timber.d("Amount did set and it's NOT a NULL");
+        }
+
+        boolean a = bdGTE(mAmount, BigDecimal.ZERO);
+        boolean b = mFormValid;
+        boolean c = checkEnoughBalance(mFromAccount.getBalance());
+        boolean formFullyValid = a && b && c;
 
         getViewState().setSubmitEnabled(formFullyValid);
     }
@@ -622,8 +635,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
         mUseMax.set(true);
         mClickedUseMax.set(true);
-        checkEnableSubmit();
         mAmount = mFromAccount.getBalance();
+//        checkEnableSubmit();
         getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
 
         getAnalytics().send(AppEvent.SendCoinsUseMaxButton);
@@ -800,7 +813,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                         }
                         // if balance not enough to send required sum + fee - subtracting fee from sending sum ("use max" for example)
                         else {
-                            if(!mUseMax.get()) {
+                            if (!mUseMax.get()) {
                                 txInitData.commission = BigDecimal.ZERO;
                             }
                             amountToSend = mAmount.subtract(txInitData.commission);

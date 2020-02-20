@@ -175,6 +175,12 @@ android {
             buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
         }
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'network.minter.android:minter-android-blockchain:0.11.2'
+        }
+    }
 }
 
 dependencies {
@@ -197,25 +203,21 @@ dependencies {
 
     netMainImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
-            "network.minter.android:minter-android-blockchain:${prevMinterBlockchainSDK}",
+            "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
+            "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
             "network.minter.android:minter-android-profile:${minterProfileSDK}",
             "network.minter.android:ledger-connector:${minterLedgerSDK}",
             "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
-    netMainImplementation("network.minter.android:minter-android-explorer:${minterExplorerSDK}") {
-        exclude group: "network.minter.android", module: "minter-android-blockchain"
-    }
 
     netMainLocalImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
-            "network.minter.android:minter-android-blockchain:${prevMinterBlockchainSDK}",
+            "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
+            "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
             "network.minter.android:minter-android-profile:${minterProfileSDK}",
             "network.minter.android:ledger-connector:${minterLedgerSDK}",
             "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
-    netMainLocalImplementation("network.minter.android:minter-android-explorer:${minterExplorerSDK}") {
-        exclude group: "network.minter.android", module: "minter-android-blockchain"
-    }
 
     // support
     implementation 'androidx.appcompat:appcompat:1.1.0'

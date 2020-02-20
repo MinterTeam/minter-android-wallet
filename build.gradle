@@ -76,11 +76,10 @@ ext {
 
     minterExplorerSDK = "0.6.3"
     minterProfileSDK = "0.2.5"
-    minterBlockchainSDK = "0.11.1"
-    prevMinterBlockchainSDK = "0.10.0"
+    minterBlockchainSDK = "0.11.2"
     minterCoreSDK = "0.7.0"
     minterLedgerSDK = "0.1.0"
 
-    appVersionName = "1.12.0-texasnet11"
-    appVersionCode = 130
+    appVersionName = "1.12.0"
+    appVersionCode = 134
 }

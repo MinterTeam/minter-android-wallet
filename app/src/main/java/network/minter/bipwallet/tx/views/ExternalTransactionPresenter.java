@@ -43,6 +43,7 @@ import network.minter.bipwallet.tx.contract.TxInitData;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.CheckTransaction;
+import network.minter.blockchain.models.operational.CheckTransactionCompat;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
@@ -392,7 +393,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             case RedeemCheck: {
                 final TxRedeemCheck data = tx.getData(TxRedeemCheck.class);
                 getViewState().setFirstLabel("You're using check");
-                CheckTransaction check = data.getDecodedCheck();
+                CheckTransactionCompat check = CheckTransactionCompat.fromEncoded(data.getRawCheck());
                 getViewState().setFirstValue(String.format("%s %s", check.getCoin(), bdHuman(check.getValue())));
                 getViewState().setSecondVisible(View.GONE);
             }
