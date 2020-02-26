@@ -221,19 +221,19 @@ dependencies {
 
     // support
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core:1.2.0-rc01'
+    implementation 'androidx.core:core:1.3.0-alpha01'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.biometric:biometric:1.0.0'
+    implementation 'androidx.biometric:biometric:1.0.1'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha02'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.exifinterface:exifinterface:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     // android arch
-    implementation 'androidx.paging:paging-runtime:2.1.0'
+    implementation 'androidx.paging:paging-runtime:2.1.1'
     implementation 'android.arch.paging:rxjava2:1.0.1'
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
@@ -241,7 +241,7 @@ dependencies {
 
     // yandex
     implementation 'com.yandex.android:mobmetricalib:3.1.0'
-    implementation 'com.android.installreferrer:installreferrer:1.1'
+    implementation 'com.android.installreferrer:installreferrer:1.1.1'
 
     // common
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -269,10 +269,10 @@ dependencies {
     implementation 'io.github.centrifugal:centrifuge-java:0.0.2'
 
     // Annotations and DI
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.24'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.24'
-    implementation 'com.google.dagger:dagger:2.24'
-    implementation 'com.google.dagger:dagger-android-support:2.24'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.26'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.26'
+    implementation 'com.google.dagger:dagger:2.26'
+    implementation 'com.google.dagger:dagger-android-support:2.26'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP
@@ -331,8 +331,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
 
-    androidTestAnnotationProcessor 'com.google.dagger:dagger-compiler:2.24'
-    androidTestAnnotationProcessor 'com.google.dagger:dagger-android-processor:2.24'
+    androidTestAnnotationProcessor 'com.google.dagger:dagger-compiler:2.26'
+    androidTestAnnotationProcessor 'com.google.dagger:dagger-android-processor:2.26'
 
 }
 repositories {
