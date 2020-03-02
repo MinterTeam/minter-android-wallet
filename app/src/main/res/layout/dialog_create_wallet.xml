@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_dialog_rounded">
+
+    <include
+        android:id="@+id/dialog_top"
+        layout="@layout/dialog_sheet_top" />
+
+
+    <FrameLayout
+        android:id="@+id/layout_seed"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges_medium"
+        android:background="@drawable/bg_input_grey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_top">
+
+        <TextView
+            android:id="@+id/seed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_inter_medium"
+            android:paddingStart="@dimen/margin_edges"
+            android:paddingTop="@dimen/margin_edges_input_vertical"
+            android:paddingEnd="@dimen/margin_edges"
+            android:paddingBottom="@dimen/margin_edges_input_vertical"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/text_size_default"
+            tools:text="wasp fantasy drive twenty lady dose demise arrange tiny solar now horn" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_seed_alert"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:background="@drawable/bg_input_green"
+        app:layout_constraintBottom_toBottomOf="@id/layout_seed"
+        app:layout_constraintEnd_toEndOf="@id/layout_seed"
+        app:layout_constraintStart_toStartOf="@id/layout_seed"
+        app:layout_constraintTop_toTopOf="@id/layout_seed"
+        tools:alpha="0.7">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/alert_copied"
+            android:textColor="@color/textColorWhite"
+            android:textSize="@dimen/text_size_default" />
+    </FrameLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_saved_seed"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges_medium"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_seed">
+
+        <Switch
+            style="@style/Wallet.Switch"
+            android:id="@+id/action_saved_seed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:checked="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:fontFamily="@font/_inter_medium"
+            android:text="@string/label_ive_saved_mnemonic"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/text_size_default"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <Button
+        android:enabled="false"
+        android:id="@+id/submit"
+        style="@style/Wallet.Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges"
+        android:text="@string/btn_activate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_saved_seed" />
+
+    <Space
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/submit"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/margin_edges_large"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

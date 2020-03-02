@@ -25,60 +25,90 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    tools:context=".auth.ui.AuthActivity"
+    android:background="@drawable/bg_rect_combined"
+    android:fitsSystemWindows="true"
     >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".auth.ui.AuthActivity"
 
-    <ImageView
-        android:contentDescription="@string/cd_logo"
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingStart="62dp"
-        android:paddingEnd="62dp"
-        android:transitionName="@string/transaction_auth_logo"
-        app:layout_constraintBottom_toTopOf="@id/action_advanced_mode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias=".5"
-        app:srcCompat="@drawable/img_logo_main"
-        />
+        >
 
-    <network.minter.bipwallet.internal.views.widgets.WalletButton
-        android:id="@+id/action_advanced_mode"
-        style="@style/Wallet.Button.Transparent.WhiteBorder"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges"
-        android:layout_marginBottom="@dimen/margin_edges"
-        android:text="@string/btn_advanced_mode"
-        app:layout_constraintBottom_toTopOf="@id/action_help"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
+        <ImageView
+            android:contentDescription="@string/cd_logo"
+            android:id="@+id/logo"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingStart="49dp"
+            android:paddingEnd="49dp"
+            android:layout_marginBottom="@dimen/margin_edges"
+            android:transitionName="@string/transaction_auth_logo"
+            app:layout_constraintBottom_toTopOf="@id/action_signin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias=".5"
+            app:srcCompat="@drawable/img_logo_main"
+            />
 
-    <network.minter.bipwallet.internal.views.widgets.WalletButton
-        android:id="@+id/action_help"
-        style="@style/Wallet.Button.Transparent.WhiteBorder"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges"
-        android:layout_marginBottom="32dp"
-        android:text="@string/btn_help"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:contentDescription="@string/btn_sign_in"
+            android:id="@+id/action_signin"
+            style="@style/Wallet.Button.White"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:layout_marginBottom="@dimen/margin_edges"
+            android:text="@string/btn_sign_in"
+            app:layout_constraintBottom_toTopOf="@id/action_create_wallet"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/action_create_wallet"
+            android:contentDescription="@string/btn_create_wallet"
+            style="@style/Wallet.Button.Transparent.WhiteBorder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:layout_marginBottom="@dimen/margin_edges"
+            android:text="@string/btn_create_wallet"
+            app:layout_constraintBottom_toTopOf="@id/action_help"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/action_help"
+            style="@style/Wallet.Button.Transparent.WhiteBorder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="@string/btn_help"
+            android:text="@string/btn_help"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+

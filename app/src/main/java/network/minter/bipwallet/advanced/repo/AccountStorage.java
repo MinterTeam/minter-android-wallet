@@ -37,9 +37,9 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.advanced.models.UserAccount;
-import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
 import network.minter.bipwallet.internal.data.CachedEntity;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.wallets.repos.ExplorerBalanceFetcher;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**

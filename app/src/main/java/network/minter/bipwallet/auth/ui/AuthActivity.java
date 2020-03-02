@@ -57,7 +57,8 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
         TransitionSet commonSet = new TransitionSet();
         commonSet.addTransition(new Slide(Gravity.BOTTOM));
         commonSet.setDuration(sharedSet.getDuration() * 2);
-        commonSet.addTarget(R.id.action_advanced_mode);
+        commonSet.addTarget(R.id.action_signin);
+        commonSet.addTarget(R.id.action_create_wallet);
         commonSet.addTarget(R.id.action_help);
 
         mAuthFragment.setEnterTransition(commonSet);

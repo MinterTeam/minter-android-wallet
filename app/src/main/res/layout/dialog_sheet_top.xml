@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/dialog_draggable"
+        android:contentDescription="@string/btn_draggable"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/shape_draggable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/margin_edges_half"
+        />
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/dialog_draggable"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:id="@+id/dialog_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginEnd="@dimen/margin_edges_medium"
+        android:textAlignment="center"
+        android:fontFamily="@font/_inter_semi_bold"
+        android:textSize="@dimen/text_size_18"
+        tools:text="@string/btn_create_wallet"
+        />
+
+    <TextView
+        android:id="@+id/dialog_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title"
+        android:layout_marginTop="@dimen/margin_edges_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginEnd="@dimen/margin_edges_medium"
+        android:fontFamily="@font/_inter_bold"
+        android:lineHeight="20sp"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_size_14"
+        tools:text="⚠️ Save this seed phrase in case you plan to use this address in the future."
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

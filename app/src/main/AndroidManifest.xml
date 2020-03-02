@@ -113,16 +113,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Wallet"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".auth.ui.RegisterActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/Wallet" />
-        <activity
-            android:name=".auth.ui.SigninActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/Wallet" />
+
         <activity
             android:name=".addresses.ui.AddressListActivity"
             android:screenOrientation="portrait"

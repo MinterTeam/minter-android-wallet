@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
-  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
-  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~ Copyright (C) 2018 by MinterTeam
+  ~ @link https://github.com/MinterTeam
   ~
   ~ The MIT License
   ~
@@ -25,23 +24,29 @@
   ~ THE SOFTWARE.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/btn_disabled_transparent"/>
-        </shape>
-    </item>
-    <item android:state_focused="true">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/colorPrimaryFocused"/>
-        </shape>
-    </item>
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#80502EC2">
     <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/white"/>
-        </shape>
+        <selector>
+            <item android:state_enabled="false">
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="@color/btn_disabled_transparent"/>
+                </shape>
+            </item>
+            <item android:state_focused="true">
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="@color/colorPrimaryFocused"/>
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="@color/white"/>
+                </shape>
+            </item>
+        </selector>
     </item>
-</selector>
+</ripple>

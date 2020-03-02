@@ -48,12 +48,12 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.coins.contract.DelegationListView;
 import network.minter.bipwallet.delegation.views.DelegationListPresenter;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
+import network.minter.bipwallet.wallets.contract.DelegationListView;
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 05-Jun-19

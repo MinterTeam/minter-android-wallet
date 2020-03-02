@@ -36,12 +36,12 @@ import androidx.paging.RxPagedListBuilder;
 import io.reactivex.disposables.Disposable;
 import moxy.InjectViewState;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.coins.contract.DelegationListView;
 import network.minter.bipwallet.delegation.adapter.DelegationDataSource;
 import network.minter.bipwallet.delegation.adapter.DelegationItem;
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter;
 import network.minter.bipwallet.internal.adapter.LoadState;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.wallets.contract.DelegationListView;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 
 /**

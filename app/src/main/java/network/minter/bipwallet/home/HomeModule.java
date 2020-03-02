@@ -35,13 +35,12 @@ import java.util.List;
 import androidx.lifecycle.LifecycleOwner;
 import dagger.Module;
 import dagger.Provides;
-import network.minter.bipwallet.coins.ui.CoinsTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.system.BackPressedDelegate;
-import network.minter.bipwallet.receiving.ui.ReceiveTabFragment;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.settings.ui.SettingsTabFragment;
+import network.minter.bipwallet.wallets.ui.WalletsTabFragment;
 
 /**
  * minter-android-wallet. 2018
@@ -52,16 +51,14 @@ import network.minter.bipwallet.settings.ui.SettingsTabFragment;
 public class HomeModule {
     public final static String EXTRA_TAB = "EXTRA_TAB";
     public final static String EXTRA_MENU_ID = "EXTRA_MENU_ID";
-    public final static String TAB_COINS = CoinsTabFragment.class.getName();
+    public final static String TAB_COINS = WalletsTabFragment.class.getName();
     public final static String TAB_SENDING = SendTabFragment.class.getName();
-    public final static String TAB_RECEIVING = ReceiveTabFragment.class.getName();
     public final static String TAB_SETTINGS = SettingsTabFragment.class.getName();
     private static HomeComponent component = null;
     private final List<Class<? extends HomeTabFragment>> tabsClassesClient = new ArrayList<Class<? extends HomeTabFragment>>() {
         {
-            add(CoinsTabFragment.class);
+            add(WalletsTabFragment.class);
             add(SendTabFragment.class);
-            add(ReceiveTabFragment.class);
             add(SettingsTabFragment.class);
         }
     };

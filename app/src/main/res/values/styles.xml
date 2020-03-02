@@ -28,26 +28,52 @@
     <!-- Base application theme. -->
     <style name="Wallet" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorControlHighlight">@color/colorHighlight</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/greyBackground</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
 
-        <item name="android:textColorHint">#60000000</item>
+        <!--        <item name="android:colorControlHighlight">@color/colorHighlight</item>-->
+                <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:fontFamily">@font/_inter_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
+
+        <item name="android:textColorHint">#8E8E8E</item>
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
         <item name="android:textColorSecondary">@color/textColorSecondary</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
-        <item name="android:fontFamily">@font/_ubuntu_regular</item>
 
-        <item name="android:textStyle">normal</item>
-        <item name="android:colorBackground">@color/white</item>
+        <item name="android:editTextStyle">@style/Wallet.EditText</item>
+        <item name="editTextStyle">@style/Wallet.EditText</item>
 
         <item name="buttonStyle">@style/Wallet.Button</item>
         <item name="android:buttonStyle">@style/Wallet.Button</item>
-        <!--<item name="borderlessButtonStyle">@style/Wallet.Button</item>-->
-        <!--<item name="android:borderlessButtonStyle">@style/Wallet.Button</item>-->
         <item name="android:soundEffectsEnabled">false</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+
+        <item name="bottomSheetDialogTheme">@style/WalletBottomSheetDialogTheme</item>
+    </style>
+
+    <style name="WalletBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/WalletModalStyle</item>
+    </style>
+
+    <style name="WalletModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/shape_dialog_rounded</item>
+    </style>
+
+    <style name="Wallet.Switch" parent="Wallet">
+        <item name="android:thumb">@drawable/switch_thumb_states</item>
+        <item name="android:track">@drawable/switch_track_states</item>
+    </style>
+
+    <style name="Wallet.EditText" parent="Wallet">
+        <item name="android:background">@drawable/bg_edittext_states</item>
     </style>
 
     <style name="Wallet.Hint" parent="TextAppearance.Design.Hint">
@@ -123,9 +149,10 @@
 
 
     <style name="Wallet.Button" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:textAllCaps">false</item>
         <item name="android:soundEffectsEnabled">false</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:padding">14dp</item>
         <item name="android:textColor">@color/textColorWhite</item>
         <item name="android:minHeight">@dimen/btn_long_height</item>
@@ -134,14 +161,14 @@
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
         <item name="android:elevation" tools:ignore="NewApi">4dp</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
         <item name="android:stateListAnimator" tools:ignore="NewApi">@animator/btn_state_list_anim
         </item>
     </style>
 
     <style name="Wallet.Button.PinPad">
         <item name="android:background">@drawable/btn_pin_key</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:fontFamily">@font/_inter_bold</item>
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/textColorWhite</item>
         <item name="android:textSize">@dimen/pin_pad_text_size</item>
@@ -152,32 +179,32 @@
 
     <style name="Wallet.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
     </style>
 
-    <style name="Wallet.Text">
-    </style>
+    <style name="Wallet.Text"></style>
 
     <style name="Wallet.Text.ButtonBorderless">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
-        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
 
     <style name="Wallet.Button.White" parent="Wallet.Button">
         <item name="android:background">@drawable/btn_white</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/textColorButton</item>
     </style>
 
     <style name="Wallet.Button.Transparent.WhiteBorder" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:padding">14dp</item>
         <item name="android:textColor">@color/textColorWhite</item>
         <item name="android:minHeight">@dimen/btn_long_height</item>
@@ -186,27 +213,36 @@
         <item name="android:clickable">true</item>
         <item name="android:elevation" tools:targetApi="lollipop">0dp</item>
         <item name="android:background">@drawable/btn_blue_wb</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
         <item name="android:stateListAnimator" tools:targetApi="lollipop">@null</item>
     </style>
 
     <style name="Wallet.Button.Transparent.BlueBorder" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
         <item name="android:padding">14dp</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/textColorWhite</item>
         <item name="android:minHeight">@dimen/btn_long_height</item>
         <item name="android:minWidth">@dimen/btn_min_width</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
         <item name="android:elevation" tools:ignore="NewApi">0dp</item>
         <item name="android:background">@drawable/btn_white_bb</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
     </style>
 
     <style name="WalletDrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">@color/colorPrimary</item>
+        <item name="color">#502EC2</item>
+    </style>
+
+    <style name="WalletDarkToolbar" parent="Wallet">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="background">@color/colorPrimary</item>
+        <item name="drawerArrowStyle">@style/WalletDrawerArrowStyle</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
     </style>
 
     <style name="WalletPrimaryToolbar" parent="Wallet">
@@ -214,21 +250,21 @@
         <item name="background">@color/colorPrimary</item>
         <item name="drawerArrowStyle">@style/WalletDrawerArrowStyle</item>
         <item name="colorControlNormal">@android:color/white</item>
-        <item name="android:fontFamily">@font/_ubuntu_bold</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
     </style>
 
     <style name="Wallet.DialogFragment" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorControlHighlight">@color/colorHighlight</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColorHint">@color/textColorPrimary</item>
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
         <item name="android:textColorSecondary">@color/textColorSecondary</item>
         <item name="android:textSize">@dimen/text_size_14</item>
-        <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="android:fontFamily">@font/inter</item>
         <item name="android:textStyle">normal</item>
         <item name="android:colorBackground">@android:color/white</item>
 
@@ -244,6 +280,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">false</item>
     </style>
+
+
 
     <style name="Wallet.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <!--COMMON THEME-->
@@ -287,8 +325,8 @@
     </style>
 
     <style name="Wallet.TabLayout.TabItem" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/text_size_14</item>
-        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textSize">@dimen/text_size_default</item>
+        <item name="android:textColor">@color/colorAccent</item>
         <item name="android:fontFamily">@font/_ubuntu_bold</item>
     </style>
 
@@ -305,6 +343,8 @@
 
     </style>
 
+
+
     <style name="Wallet.Input" parent="Wallet">
 
     </style>
@@ -316,5 +356,4 @@
     </style>
 
 
-    <color name="grey">#FF9E9E9E</color>
 </resources>

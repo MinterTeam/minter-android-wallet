@@ -61,10 +61,9 @@ import static network.minter.bipwallet.internal.Wallet.app;
 public class HomePresenter extends MvpBasePresenter<HomeView> {
 
     private final HashMap<Integer, Integer> mBottomIdPositionMap = new HashMap<Integer, Integer>() {{
-        put(R.id.bottom_coins, 0);
+        put(R.id.bottom_wallets, 0);
         put(R.id.bottom_send, 1);
-        put(R.id.bottom_receive, 2);
-        put(R.id.bottom_settings, 3);
+        put(R.id.bottom_settings, 2);
     }};
 
     @Inject @HomeTabsClasses
@@ -92,11 +91,8 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
     public void onPageSelected(int position) {
         mLastPosition = position;
         switch (position) {
-            case R.id.bottom_coins:
-                getAnalytics().send(AppEvent.CoinsScreen);
-                break;
-            case R.id.bottom_receive:
-                getAnalytics().send(AppEvent.ReceiveScreen);
+            case R.id.bottom_wallets:
+                getAnalytics().send(AppEvent.WalletsSreen);
                 break;
             case R.id.bottom_send:
                 getAnalytics().send(AppEvent.SendScreen);

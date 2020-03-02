@@ -34,7 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.paging.PageKeyedDataSource;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.addresses.models.AddressItem;
-import network.minter.bipwallet.coins.repos.ExplorerBalanceFetcher;
+import network.minter.bipwallet.wallets.repos.ExplorerBalanceFetcher;
 import network.minter.core.MinterSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.profile.models.ProfileAddressData;

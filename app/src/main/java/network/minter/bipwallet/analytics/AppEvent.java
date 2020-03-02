@@ -35,7 +35,7 @@ import org.parceler.Parcel;
 @Parcel
 public enum AppEvent {
     //Screens
-    CoinsScreen,
+    WalletsSreen,
     SendScreen,
     ReceiveScreen,
     SettingsScreen,

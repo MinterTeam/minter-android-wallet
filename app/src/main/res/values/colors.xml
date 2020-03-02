@@ -26,21 +26,25 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#502EC2</color>
+    <color name="colorPrimary">#200B4F</color>
+    <color name="colorPrimaryDark">#1C0D46</color>
     <color name="colorPrimaryDarker">#4225A4</color>
     <color name="colorPrimaryHalf">#60502EC2</color>
 
     <color name="colorPrimaryFocused">#19502EC2</color>
     <color name="colorPrimaryPressed">#33502EC2</color>
-    <color name="colorPrimaryDark">#492AB2</color>
+
+    <color name="grey">#8E8E8E</color>
     <color name="colorAccent">@color/colorHighlight</color>
-    <color name="colorHighlight">#D4CBF2</color>
-    <color name="textColorPrimary">#000000</color>
+    <color name="colorHighlight">#12C841</color>
+    <color name="textColorPrimary">#191919</color>
     <color name="textColorSecondary">#000000</color>
     <color name="textColorWhite">@color/white</color>
+    <color name="textColorButton">#222222</color>
     <color name="textColorGreen">#35B65C</color>
     <color name="errorColor">#C83A3A</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="white70">#B2FFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="textColorSelectedAddress">#9e8be4</color>
@@ -51,7 +55,7 @@
     <color name="greySeparator">#FFE1E1E1</color>
     <color name="bottom_navigation_color">@color/colorPrimaryDark</color>
     <color name="textColorGrey">#929292</color>
-    <color name="greyBackground">#F0F0F0</color>
+    <color name="greyBackground">#F8F8F8</color>
     <color name="bg_alert_dialog">#B2FFFFFF</color>
     <color name="btn_disabled">#929292</color>
     <color name="btn_disabled2">#FFD4D4D4</color>

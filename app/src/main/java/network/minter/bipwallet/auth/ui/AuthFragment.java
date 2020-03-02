@@ -26,13 +26,14 @@
 
 package network.minter.bipwallet.auth.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -46,7 +47,6 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.contract.AuthView;
 import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
@@ -60,7 +60,8 @@ import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
 public class AuthFragment extends BaseInjectFragment implements AuthView {
     @Inject Provider<AuthPresenter> authPresenterProvider;
     @InjectPresenter AuthPresenter presenter;
-    @BindView(R.id.action_advanced_mode) Button actionAdvancedMode;
+    @BindView(R.id.action_signin) Button actionSignIn;
+    @BindView(R.id.action_create_wallet) Button actionCreate;
     @BindView(R.id.action_help) Button actionHelp;
     @BindView(R.id.logo) ImageView logo;
     private CallbackIdlingResource mAuthWait;
@@ -71,13 +72,23 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
     }
 
     @Override
-    public void setOnAdvancedMode(View.OnClickListener listener) {
-        actionAdvancedMode.setOnClickListener(listener);
+    public void setOnClickSignIn(View.OnClickListener listener) {
+        actionSignIn.setOnClickListener(listener);
+    }
+
+    @Override
+    public void setOnClickCreateWallet(View.OnClickListener listener) {
+        actionCreate.setOnClickListener(listener);
     }
 
     @Override
     public void setOnHelp(View.OnClickListener listener) {
         actionHelp.setOnClickListener(listener);
+    }
+
+    @Override
+    public void startSignIn() {
+
     }
 
     @Override
@@ -87,9 +98,22 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
         );
     }
 
+    private BottomSheetDialogFragment mDialog;
+
     @Override
-    public void startAdvancedMode() {
-        getActivity().startActivity(new Intent(getActivity(), AdvancedMainActivity.class));
+    public void startCreateWallet() {
+        if (mDialog != null) {
+            try {
+                mDialog.dismiss();
+            } catch (Throwable ignore) {
+            }
+            mDialog = null;
+        }
+
+        mDialog = new CreateWalletDialog();
+        if (getFragmentManager() != null) {
+            mDialog.show(getFragmentManager(), null);
+        }
     }
 
     @Nullable

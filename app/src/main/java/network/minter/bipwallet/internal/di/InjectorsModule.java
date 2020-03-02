@@ -38,8 +38,7 @@ import network.minter.bipwallet.advanced.ui.AdvancedLedgerActivity;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.auth.ui.AuthFragment;
-import network.minter.bipwallet.auth.ui.RegisterActivity;
-import network.minter.bipwallet.auth.ui.SigninActivity;
+import network.minter.bipwallet.auth.ui.CreateWalletDialog;
 import network.minter.bipwallet.auth.ui.SplashFragment;
 import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ExchangeModule;
@@ -77,15 +76,11 @@ public interface InjectorsModule {
 
     @ContributesAndroidInjector
     @FragmentScope
+    CreateWalletDialog createWalletDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
     AuthFragment authFragmentInjector();
-
-    @ContributesAndroidInjector
-    @ActivityScope
-    SigninActivity signinActivityInjector();
-
-    @ContributesAndroidInjector
-    @ActivityScope
-    RegisterActivity registerActivityInjector();
 
     @ContributesAndroidInjector(modules = AdvancedModeModule.class)
     @ActivityScope

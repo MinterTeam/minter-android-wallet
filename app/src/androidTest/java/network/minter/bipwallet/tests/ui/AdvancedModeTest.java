@@ -100,7 +100,7 @@ public class AdvancedModeTest {
     public void advancedAuthTest() throws Throwable {
         // STEP 1 - creating new mnemonic
         // wait for fragments
-        ViewInteraction advanceModeButton = onView(withId(R.id.action_advanced_mode));
+        ViewInteraction advanceModeButton = onView(withId(R.id.action_create_wallet));
         // click on advanced mode
         advanceModeButton.perform(click());
 

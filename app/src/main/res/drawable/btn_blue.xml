@@ -25,36 +25,39 @@
   ~ THE SOFTWARE.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/btn_disabled2"/>
-        </shape>
-    </item>
-    <item android:state_pressed="true">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="#40249B"/>
-        </shape>
-    </item>
-    <item android:state_focused="true">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="#6142C7"/>
-        </shape>
-    </item>
-    <item android:state_hovered="true">
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="#6142C7"/>
-        </shape>
-    </item>
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:colorControlHighlight">
 
     <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="@dimen/btn_border_radius"/>
-            <solid android:color="@color/colorPrimary"/>
-        </shape>
+        <selector>
+            <item android:state_enabled="false">
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="@color/btn_disabled2"/>
+                </shape>
+            </item>
+
+            <item android:state_focused="true">
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="#6142C7"/>
+                </shape>
+            </item>
+
+            <item android:state_hovered="true">
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="#6142C7"/>
+                </shape>
+            </item>
+
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/btn_border_radius"/>
+                    <solid android:color="#5024C5"/>
+                </shape>
+            </item>
+        </selector>
     </item>
-</selector>
+</ripple>

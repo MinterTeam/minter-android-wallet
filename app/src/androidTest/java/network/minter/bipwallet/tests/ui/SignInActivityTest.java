@@ -9,7 +9,6 @@ import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.filters.LargeTest;
 import androidx.test.runner.AndroidJUnit4;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.auth.ui.SigninActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.tests.rules.ActivityTestRule;
 

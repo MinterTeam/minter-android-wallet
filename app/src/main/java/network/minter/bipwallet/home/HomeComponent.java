@@ -29,12 +29,12 @@ package network.minter.bipwallet.home;
 import java.util.List;
 
 import dagger.Component;
-import network.minter.bipwallet.coins.ui.CoinsTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.di.WalletComponent;
 import network.minter.bipwallet.receiving.ui.ReceiveTabFragment;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.settings.ui.SettingsTabFragment;
+import network.minter.bipwallet.wallets.ui.WalletsTabFragment;
 
 /**
  * minter-android-wallet. 2018
@@ -48,7 +48,7 @@ import network.minter.bipwallet.settings.ui.SettingsTabFragment;
 public interface HomeComponent {
 
     void inject(HomeActivity activity);
-    void inject(CoinsTabFragment fragment);
+    void inject(WalletsTabFragment fragment);
     void inject(SendTabFragment fragment);
     void inject(ReceiveTabFragment fragment);
     void inject(SettingsTabFragment fragment);
