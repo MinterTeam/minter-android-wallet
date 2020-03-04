@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.tx.adapters.vh.TxConvertCoinViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxCreateCoinViewHolder;
+import network.minter.bipwallet.tx.adapters.vh.TxCreateMultisigAddressViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxDeclareCandidacyViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxDelegateUnboundViewHolder;
 import network.minter.bipwallet.tx.adapters.vh.TxEditCandidateViewHolder;
@@ -115,6 +116,10 @@ public class TxItem implements TransactionItem {
                 view = inflater.inflate(R.layout.item_list_tx_redeem_check_expandable, parent, false);
                 out = new TxRedeemCheckViewHolder(view);
                 break;
+            case TX_CREATE_MULTISIG_ADDRESS:
+                view = inflater.inflate(R.layout.item_list_tx_create_multisig_expandable, parent, false);
+                out = new TxCreateMultisigAddressViewHolder(view);
+                break;
             default:
                 view = inflater.inflate(R.layout.item_list_tx_unhandled_expandable, parent, false);
                 out = new TxUnhandledViewHolder(view);
@@ -157,6 +162,9 @@ public class TxItem implements TransactionItem {
         } else if (holder instanceof TxRedeemCheckViewHolder) {
             final TxItem txItem = ((TxItem) data);
             ((TxRedeemCheckViewHolder) holder).bind(txItem, myAddresses);
+        } else if(holder instanceof TxCreateMultisigAddressViewHolder) {
+            final TxItem txItem = ((TxItem) data);
+            ((TxCreateMultisigAddressViewHolder) holder).bind(txItem);
         } else {
             final TxItem txItem = ((TxItem) data);
             ((TxUnhandledViewHolder) holder).bind(txItem);

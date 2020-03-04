@@ -175,12 +175,6 @@ android {
             buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
         }
     }
-
-    configurations.all {
-        resolutionStrategy {
-            force 'network.minter.android:minter-android-blockchain:0.11.2'
-        }
-    }
 }
 
 dependencies {
