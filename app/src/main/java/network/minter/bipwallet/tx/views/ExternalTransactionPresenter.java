@@ -51,6 +51,7 @@ import network.minter.blockchain.models.operational.TxCoinBuy;
 import network.minter.blockchain.models.operational.TxCoinSell;
 import network.minter.blockchain.models.operational.TxCoinSellAll;
 import network.minter.blockchain.models.operational.TxCreateCoin;
+import network.minter.blockchain.models.operational.TxCreateMultisigAddress;
 import network.minter.blockchain.models.operational.TxDeclareCandidacy;
 import network.minter.blockchain.models.operational.TxDelegate;
 import network.minter.blockchain.models.operational.TxEditCandidate;
@@ -424,6 +425,22 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             }
             break;
 
+            case CreateMultisigAddress: {
+                final TxCreateMultisigAddress data = tx.getData();
+                getViewState().setFirstLabel("You're creating MultiSig address");
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < data.getAddresses().size(); i++) {
+                    MinterAddress address = data.getAddresses().get(i);
+                    Long weight = data.getWeights().get(i);
+                    sb.append("Weight: ").append(weight).append(" - ").append(address.toShortString()).append('\n');
+                }
+                getViewState().setFirstValue(sb.toString());
+                getViewState().setSecondLabel("Threshold");
+                getViewState().setSecondValue(String.valueOf(data.getThreshold()));
+                getViewState().setSecondVisible(View.VISIBLE);
+            }
+            break;
+
             case EditCandidate: {
                 final TxEditCandidate data = tx.getData(TxEditCandidate.class);
                 getViewState().setFirstLabel("You're editing candidate");
@@ -443,7 +460,6 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                         .setPositiveAction(R.string.btn_close)
                         .create());
             }
-
         }
     }
 
