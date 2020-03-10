@@ -1,5 +1,8 @@
 # Release Notes
 
+## 1.13.0
+ - Texasnet release
+
 ## 1.10.0
  - Now app supports only android starting version 5.0 (api 21)
  - Added check redeeming ability
