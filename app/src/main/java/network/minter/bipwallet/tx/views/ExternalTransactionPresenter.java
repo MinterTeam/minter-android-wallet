@@ -61,6 +61,7 @@ import network.minter.blockchain.models.operational.TxSendCoin;
 import network.minter.blockchain.models.operational.TxSetCandidateOffline;
 import network.minter.blockchain.models.operational.TxSetCandidateOnline;
 import network.minter.blockchain.models.operational.TxUnbound;
+import network.minter.blockchain.utils.Base64UrlSafe;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
@@ -122,20 +123,43 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                 return;
             }
 
-            String rawPass;
-            try {
-                rawPass = params.getString("p", null);
-                if (rawPass == null) {
-                    mCheckPassword = null;
-                } else {
-                    mCheckPassword = RLPBoxed.decodeString(hexStringToChars(rawPass));
-                }
-            } catch (Throwable t) {
-                Timber.w(t, "Unable to decode check password");
-                mCheckPassword = null;
+
+            String hash = null;
+            // this value represents that we are parsing old-style deeplinks
+            boolean support = true;
+
+            if (!params.containsKey("d") && !params.containsKey("data")) {
+                getViewState().disableAll();
+                showTxErrorDialog("Unable to parse deeplink: No transaction data passed");
+                return;
+            } else if (params.containsKey("d")) {
+                hash = params.getString("d", null);
+            } else if (params.containsKey("data")) {
+                support = false;
+                hash = new BytesData(
+                        Base64UrlSafe.decode(params.getString("data", null).getBytes())
+                ).toHexString();
             }
 
-            final String hash = params.getString("d", null);
+            if (params.containsKey("p")) {
+                try {
+                    String rawPass = params.getString("p", null);
+                    if (rawPass == null) {
+                        mCheckPassword = null;
+                    } else {
+                        if (support) {
+                            mCheckPassword = RLPBoxed.decodeString(hexStringToChars(rawPass));
+                        } else {
+                            mCheckPassword = Base64UrlSafe.decodeString(rawPass);
+                        }
+
+                    }
+                } catch (Throwable t) {
+                    Timber.w(t, "Unable to decode check password");
+                    mCheckPassword = null;
+                }
+            }
+
             try {
                 mExtTx = DeepLinkHelper.parseRawTransaction(hash);
                 if (!validateTx()) {

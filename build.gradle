@@ -74,9 +74,9 @@ ext {
     minterLibSupport = "28.0.0"
     minterBuildTools = "29.0.2"
 
-    minterExplorerSDK = "0.7.0"
+    minterExplorerSDK = "0.7.1"
     minterProfileSDK = "0.2.5"
-    minterBlockchainSDK = "0.12.0"
+    minterBlockchainSDK = "0.12.2"
     minterCoreSDK = "0.7.0"
     minterLedgerSDK = "0.1.0"
 

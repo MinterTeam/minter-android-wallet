@@ -161,18 +161,18 @@ android {
             dimension "env"
             applicationId = "network.minter.bipwallet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", '"https://texasnet.explorer-api.minter.network/api/"'
-            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://texasnet.explorer.minter.network"'
-            buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
+            buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
+            buildConfigField "String", "GATE_API_URL", 'null'
         }
 
         netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", '"https://texasnet.explorer-api.minter.network/api/"'
-            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://texasnet.explorer.minter.network"'
-            buildConfigField "String", "GATE_API_URL", '"https://texasnet.gate-api.minter.network/api/"'
+            buildConfigField "String", "EXPLORER_API_URL", 'null'
+            buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
+            buildConfigField "String", "GATE_API_URL", 'null'
         }
     }
 }
@@ -215,7 +215,7 @@ dependencies {
 
     // support
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core:1.3.0-alpha01'
+    implementation 'androidx.core:core:1.3.0-alpha02'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
