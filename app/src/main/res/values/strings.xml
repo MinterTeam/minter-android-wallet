@@ -240,5 +240,8 @@
     <string name="btn_proceed">Proceed</string>
     <string name="btn_scan_qr">Scan QR</string>
     <string name="hw_not_connected">Hardware wallet not connected</string>
+    <string name="balance_last_updated"><![CDATA[Last updated <b>%d %s</b> ago]]></string>
+    <string name="balance_last_updated_now"><![CDATA[Last updated <b>now</b>]]></string>
+    <string name="balance_last_updated_never"><![CDATA[Last updated <b>never</b>]]></string>
 
 </resources>

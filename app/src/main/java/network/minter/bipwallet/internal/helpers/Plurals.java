@@ -32,13 +32,13 @@ import network.minter.core.MinterSDK;
 
 /**
  * Minter. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class Plurals {
     private static final String[] seconds = new String[]{"second", "seconds", "seconds"};
     private static final String[] minutes = new String[]{"minute", "minutes", "minutes"};
     private static final String[] hours = new String[]{"hour", "hours", "hours"};
+    private static final String[] days = new String[]{"day", "days", "days"};
     private static final String[] bips = new String[]{"bip", "bips", "bips"};
 
 
@@ -52,6 +52,10 @@ public class Plurals {
 
     public static String hours(Long n) {
         return plurals(n, hours);
+    }
+
+    public static String days(Long n) {
+        return plurals(n, days);
     }
 
     public static String countdown(Long seconds) {
@@ -91,6 +95,31 @@ public class Plurals {
 
     public static String usd(String n) {
         return String.format("$%s", n);
+    }
+
+
+    public static String time(Long seconds) {
+        if (seconds < 60) {
+            return seconds(seconds);
+        } else if (seconds < 3600) {
+            return minutes(seconds / 60);
+        } else if (seconds < 86400) {
+            return hours(seconds / 60 / 60);
+        } else {
+            return days(seconds / 60 / 60 / 24);
+        }
+    }
+
+    public static Long timeValue(Long seconds) {
+        if (seconds < 60) {
+            return seconds;
+        } else if (seconds < 3600) {
+            return seconds / 60;
+        } else if (seconds < 86400) {
+            return seconds / 60 / 60;
+        } else {
+            return seconds / 60 / 60 / 24;
+        }
     }
 
 

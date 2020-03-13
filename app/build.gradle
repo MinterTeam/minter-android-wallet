@@ -160,7 +160,7 @@ android {
         netTest {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
             buildConfigField "String", "GATE_API_URL", 'null'
@@ -169,7 +169,7 @@ android {
         netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://texasnet.explorer-rtm.minter.network/connection/websocket"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
             buildConfigField "String", "GATE_API_URL", 'null'

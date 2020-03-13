@@ -46,6 +46,7 @@ import io.github.centrifugal.centrifuge.EventListener;
 import io.github.centrifugal.centrifuge.MessageEvent;
 import io.github.centrifugal.centrifuge.Options;
 import io.github.centrifugal.centrifuge.PublishEvent;
+import io.github.centrifugal.centrifuge.SubscribeErrorEvent;
 import io.github.centrifugal.centrifuge.Subscription;
 import io.github.centrifugal.centrifuge.SubscriptionEventListener;
 import io.reactivex.disposables.CompositeDisposable;
@@ -60,7 +61,8 @@ import timber.log.Timber;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class LiveBalanceService extends Service {
+public class RTMService extends Service {
+    public static final String CHANNEL_BLOCKS = "blocks";
 
     public static String LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
 
@@ -146,7 +148,7 @@ public class LiveBalanceService extends Service {
                 @Override
                 public void onDisconnect(Client client, DisconnectEvent event) {
                     super.onDisconnect(client, event);
-                    Timber.i("Disconnected");
+                    Timber.i("Disconnected: %s", event.getReason());
                 }
 
 
@@ -155,13 +157,14 @@ public class LiveBalanceService extends Service {
                 public void onError(Client client, ErrorEvent event) {
                     super.onError(client, event);
                     try {
+
                         Field msgField = ErrorEvent.class.getDeclaredField("message");
                         Field exceptionField = ErrorEvent.class.getDeclaredField("exception");
                         msgField.setAccessible(true);
                         exceptionField.setAccessible(true);
 
-                        String msg = ((String) msgField.get("message"));
-                        Throwable exception = (Throwable) exceptionField.get("exception");
+                        String msg = ((String) msgField.get(event));
+                        Throwable exception = (Throwable) exceptionField.get(event);
 
                         Timber.w(exception, msg);
                     } catch (Throwable t) {
@@ -184,17 +187,40 @@ public class LiveBalanceService extends Service {
             mClient.connect();
 
             mAddress = secretStorage.getAddresses().get(0);
-            Subscription sub = mClient.newSubscription(mAddress.toString(), new SubscriptionEventListener() {
+            Subscription balanceSubscription = mClient.newSubscription(mAddress.toString(), new SubscriptionEventListener() {
                 @Override
                 public void onPublish(Subscription subscription, PublishEvent publishEvent) {
                     super.onPublish(subscription, publishEvent);
-                    Timber.d("OnPublish: sub=%s, ev=%s", subscription.getChannel(), new String(publishEvent.getData()));
+                    Timber.d("Balance::OnPublish: sub=%s, ev=%s", subscription.getChannel(), new String(publishEvent.getData()));
                     if (mOnMessageListener != null) {
                         mOnMessageListener.onMessage(new String(publishEvent.getData()), subscription.getChannel(), mAddress);
                     }
                 }
+
+                @Override
+                public void onSubscribeError(Subscription sub, SubscribeErrorEvent event) {
+                    super.onSubscribeError(sub, event);
+                    Timber.w("Balance::OnError: sub=%s, ev=[%d]%s", sub.getChannel(), event.getCode(), event.getMessage());
+                }
             });
-            sub.subscribe();
+            balanceSubscription.subscribe();
+            Subscription blocksSubscription = mClient.newSubscription(CHANNEL_BLOCKS, new SubscriptionEventListener() {
+                @Override
+                public void onPublish(Subscription sub, PublishEvent event) {
+                    super.onPublish(sub, event);
+//                    Timber.d("Blocks::OnPublish: sub=%s, ev=%s", sub.getChannel(), new String(event.getData()));
+                    if (mOnMessageListener != null) {
+                        mOnMessageListener.onMessage(new String(event.getData()), sub.getChannel(), mAddress);
+                    }
+                }
+
+                @Override
+                public void onSubscribeError(Subscription sub, SubscribeErrorEvent event) {
+                    super.onSubscribeError(sub, event);
+                    Timber.w("Blocks::OnError: sub=%s, ev=[%d]%s", sub.getChannel(), event.getCode(), event.getMessage());
+                }
+            });
+            blocksSubscription.subscribe();
         } catch (Throwable t) {
             Timber.w(t, "Unable to connect with RTM");
         }
@@ -214,8 +240,8 @@ public class LiveBalanceService extends Service {
     }
 
     public final class LocalBinder extends Binder {
-        public LiveBalanceService getService() {
-            return LiveBalanceService.this;
+        public RTMService getService() {
+            return RTMService.this;
         }
     }
 }

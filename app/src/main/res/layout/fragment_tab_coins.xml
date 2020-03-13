@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2018
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,19 +24,16 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -50,29 +46,28 @@
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/WalletPrimaryToolbar"
             app:theme="@style/WalletPrimaryToolbar"
-            app:titleTextColor="@android:color/white"
-            >
+            app:titleTextColor="@android:color/white">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:contentDescription="@string/cd_logo"
                     android:id="@+id/bip_logo"
                     android:layout_width="35dp"
                     android:layout_height="24dp"
+                    android:contentDescription="@string/cd_logo"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/img_logo_main"
-                    />
+                    app:srcCompat="@drawable/img_logo_main" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <include layout="@layout/include_testnet_warning_view"
+        <include
+            layout="@layout/include_testnet_warning_view"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="?attr/actionBarSize" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -85,8 +80,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        >
+        app:layout_constraintTop_toBottomOf="@id/appbar">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -94,8 +88,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
-            app:elevation="0dp"
-            >
+            app:elevation="0dp">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing"
@@ -104,8 +97,7 @@
                 android:background="@android:color/transparent"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                app:layout_scrollFlags="scroll|enterAlways"
-                >
+                app:layout_scrollFlags="scroll|enterAlways">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -119,13 +111,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/colorPrimary"
-                        android:paddingStart="@dimen/margin_edges"
-                        android:paddingEnd="4dp"
                         android:clickable="true"
                         android:focusable="true"
+                        android:paddingStart="@dimen/margin_edges"
                         android:paddingTop="@dimen/margin_edges_half"
-                        android:paddingBottom="@dimen/margin_edges_half"
-                        >
+                        android:paddingEnd="4dp"
+                        android:paddingBottom="@dimen/margin_edges_half">
 
                         <TextView
                             android:id="@+id/balance_title"
@@ -139,8 +130,7 @@
                             app:layout_constraintBottom_toTopOf="@id/balance_int"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/balance_int"
@@ -150,15 +140,14 @@
                             android:textColor="@color/textColorWhite"
                             android:textSize="32sp"
                             android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintBottom_toTopOf="@id/last_update_icon"
                             app:layout_constraintEnd_toStartOf="@id/balance_fractions"
                             app:layout_constraintHorizontal_bias="0"
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/balance_title"
                             app:layout_constraintVertical_bias="1"
-                            tools:text="120 912"
-                            />
+                            tools:text="120 912" />
 
                         <TextView
                             android:id="@+id/balance_fractions"
@@ -174,26 +163,48 @@
                             app:layout_constraintStart_toEndOf="@id/balance_int"
                             app:layout_constraintTop_toTopOf="@id/balance_int"
                             app:layout_constraintVertical_bias=".8"
-                            tools:text=".492404"
-                            />
+                            tools:text=".492404" />
 
                         <TextView
-                            android:fontFamily="@font/_ubuntu_bold"
                             android:id="@+id/balance_coin_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/margin_edges_half"
+                            android:fontFamily="@font/_ubuntu_bold"
                             android:textAllCaps="true"
-                            tools:text="bip"
                             android:textColor="@color/textColorWhite"
                             android:textSize="@dimen/text_size_20"
                             android:textStyle="normal"
-                            app:layout_constraintTop_toTopOf="@id/balance_int"
+                            app:layout_constraintBottom_toBottomOf="@id/balance_int"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@id/balance_fractions"
-                            app:layout_constraintBottom_toBottomOf="@id/balance_int"
+                            app:layout_constraintTop_toTopOf="@id/balance_int"
                             app:layout_constraintVertical_bias=".8"
-                            />
+                            tools:text="bip" />
+
+                        <ImageView
+                            android:id="@+id/last_update_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:src="@drawable/ic_watch_later"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/last_update_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/balance_int" />
+
+                        <TextView
+                            android:id="@+id/last_update_time"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_edges_half"
+                            android:fontFamily="@font/ubuntu"
+                            android:textColor="@color/textColorWhite"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/last_update_icon"
+                            app:layout_constraintTop_toBottomOf="@id/balance_int"
+                            tools:text="@string/balance_last_updated" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -202,13 +213,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/colorPrimaryDarker"
-                        android:paddingStart="@dimen/margin_edges"
-                        android:visibility="gone"
-                        tools:visibility="visible"
                         android:foreground="?attr/selectableItemBackground"
-                        android:paddingEnd="4dp"
+                        android:paddingStart="@dimen/margin_edges"
                         android:paddingTop="@dimen/margin_edges_half"
-                        android:paddingBottom="@dimen/margin_edges_half">
+                        android:paddingEnd="4dp"
+                        android:paddingBottom="@dimen/margin_edges_half"
+                        android:visibility="gone"
+                        tools:visibility="visible">
 
                         <TextView
                             android:id="@+id/delegation_title"
@@ -222,8 +233,7 @@
                             app:layout_constraintBottom_toTopOf="@id/delegation_amount"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/delegation_amount"
@@ -240,38 +250,36 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/delegation_title"
                             app:layout_constraintVertical_bias="1"
-                            tools:text="120 912"
-                            />
+                            tools:text="120 912" />
 
 
                         <TextView
-                            android:fontFamily="@font/_ubuntu_bold"
                             android:id="@+id/delegation_coin_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/margin_edges_half"
-                            android:textAllCaps="true"
+                            android:layout_marginEnd="@dimen/margin_edges"
+                            android:fontFamily="@font/_ubuntu_bold"
                             android:text="@string/bip"
+                            android:textAllCaps="true"
                             android:textColor="@color/textColorWhite"
                             android:textSize="@dimen/text_size_20"
                             android:textStyle="normal"
-                            android:layout_marginEnd="@dimen/margin_edges"
-                            app:layout_constraintTop_toTopOf="@id/delegation_amount"
-                            app:layout_constraintEnd_toStartOf="@+id/img_delegation"
-                            app:layout_constraintStart_toEndOf="@id/delegation_amount"
                             app:layout_constraintBottom_toBottomOf="@id/delegation_amount"
+                            app:layout_constraintEnd_toStartOf="@+id/img_delegation"
                             app:layout_constraintHorizontal_bias=".0"
-                            />
+                            app:layout_constraintStart_toEndOf="@id/delegation_amount"
+                            app:layout_constraintTop_toTopOf="@id/delegation_amount" />
 
                         <ImageView
                             android:id="@+id/img_delegation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/margin_edges"
+                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            android:layout_marginEnd="@dimen/margin_edges"
-                            app:srcCompat="@drawable/ic_chevron_right"/>
+                            app:srcCompat="@drawable/ic_chevron_right" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <Space
@@ -280,8 +288,7 @@
                         android:layout_height="10dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        />
+                        app:layout_constraintStart_toStartOf="parent" />
                 </LinearLayout>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -300,8 +307,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/appbar"
-                >
+                app:layout_constraintTop_toBottomOf="@id/appbar">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/list"

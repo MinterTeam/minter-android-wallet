@@ -260,7 +260,9 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     private boolean validateTx() {
         if (mExtTx.getType() == OperationType.RedeemCheck) {
             TxRedeemCheck d = mExtTx.getData();
-            if (d.getProof().size() == 0 && mCheckPassword == null) {
+            if (mCheckPassword != null) {
+                d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
+            } else if (d.getProof().size() == 0 && mCheckPassword == null) {
                 getViewState().disableAll();
 
                 getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to scan transaction")
@@ -271,8 +273,6 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                         })
                         .create());
                 return false;
-            } else if (d.getProof().size() == 0 && mCheckPassword != null) {
-                d.setProof(CheckTransaction.makeProof(mFrom, mCheckPassword));
             }
         }
 

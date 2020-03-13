@@ -75,7 +75,7 @@ import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.UnzipUtil;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
-import network.minter.bipwallet.services.livebalance.LiveBalanceService;
+import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.MinterSDK;
 import network.minter.core.bip39.NativeBip39;
@@ -130,7 +130,7 @@ public class WalletModule {
                     BuildConfig.EXPLORER_API_URL,
                     BuildConfig.GATE_API_URL,
                     debug);
-            LiveBalanceService.LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
+            RTMService.LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
         } else {
             MinterExplorerApi.initialize(debug);
 

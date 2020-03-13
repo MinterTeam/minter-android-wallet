@@ -43,6 +43,7 @@ import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.notifications.BaseNotificationManager;
 import network.minter.bipwallet.internal.settings.SettingsManager;
+import network.minter.bipwallet.services.livebalance.models.RTMBalance;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
@@ -82,15 +83,15 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
 
         showBalanceUpdated(address);
 
-//        List<LiveBalanceMessage> message;
+//        List<RTMBalance> message;
 //        try {
-//            message = mGsonBuilder.create().fromJson(json, new TypeToken<List<LiveBalanceMessage>>(){}.getType());
+//            message = mGsonBuilder.create().fromJson(json, new TypeToken<List<RTMBalance>>(){}.getType());
 //        } catch (Throwable t) {
 //            Timber.e(t, "Unable to decode live balance message: %s", json);
 //            return;
 //        }
 //
-//        for(LiveBalanceMessage msg: message) {
+//        for(RTMBalance msg: message) {
 //            showBalanceForCoin(msg, address);
 //        }
 
@@ -140,7 +141,7 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
         mNotificationManager.notify(WALLET_BALANCE_ID, messageNotification);
     }
 
-    private void showBalanceForCoin(LiveBalanceMessage message, MinterAddress address) {
+    private void showBalanceForCoin(RTMBalance message, MinterAddress address) {
         if (SDK_INT >= android.os.Build.VERSION_CODES.O) {
             final String channelName = mContext.getResources().getString(R.string.notification_balance_update_name);
             final String channelDescription = mContext.getResources().getString(R.string.notification_balance_update_description);

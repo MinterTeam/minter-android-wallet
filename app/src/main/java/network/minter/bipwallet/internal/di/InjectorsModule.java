@@ -53,7 +53,7 @@ import network.minter.bipwallet.internal.di.annotations.ServiceScope;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.security.ui.PinValidationDialog;
-import network.minter.bipwallet.services.livebalance.LiveBalanceService;
+import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.bipwallet.settings.ui.PasswordChangeMigrationActivity;
 import network.minter.bipwallet.tx.TransactionsModule;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
@@ -133,7 +133,7 @@ public interface InjectorsModule {
 
     @ContributesAndroidInjector
     @ServiceScope
-    LiveBalanceService balanceUpdateService();
+    RTMService balanceUpdateService();
 
     @ContributesAndroidInjector
     @ActivityScope
