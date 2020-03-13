@@ -274,6 +274,21 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                         .create());
                 return false;
             }
+        } else if (mExtTx.getType() == OperationType.SellAllCoins) {
+            final TxCoinSellAll data = mExtTx.getData(TxCoinSellAll.class);
+            Optional<CoinAccount> acc = accountStorage.getData().findAccountByCoin(data.getCoinToSell());
+            if (acc.isEmpty()) {
+                getViewState().disableAll();
+
+                getViewState().startDialog(false, ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
+                        .setText("You are trying to sell all %s for %s, but your %s balance is 0", data.getCoinToSell(), data.getCoinToBuy(), data.getCoinToSell())
+                        .setPositiveAction(R.string.btn_close, (_d, _w) -> {
+                            _d.dismiss();
+                            getViewState().finishCancel();
+                        })
+                        .create());
+                return false;
+            }
         }
 
         return true;
@@ -357,6 +372,8 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
                 Optional<CoinAccount> acc = accountStorage.getData().findAccountByCoin(data.getCoinToSell());
                 if (acc.isPresent()) {
                     getViewState().setFirstValue(String.format("%s %s", bdHuman(acc.get().getBalance()), data.getCoinToSell()));
+                } else {
+                    getViewState().setFirstValue(String.format("%s %s", bdHuman(0), data.getCoinToSell()));
                 }
 
                 getViewState().setSecondLabel("For");
