@@ -168,6 +168,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
                 PauseTimer.logout();
                 finishAffinity();
             } catch (Throwable ignore) {
+                Timber.e(ignore);
                 finish();
             }
         } else {
@@ -183,6 +184,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
                 PauseTimer.logout();
                 finishAffinity();
             } catch (Throwable ignore) {
+                Timber.e(ignore);
                 finish();
             }
         } else {
@@ -201,6 +203,8 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
         setSecondVisible(View.GONE);
         action.setEnabled(false);
         action.setClickable(false);
+        cancelAction.setEnabled(true);
+        cancelAction.setClickable(true);
     }
 
     @ProvidePresenter

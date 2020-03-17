@@ -109,6 +109,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         super.attachView(view);
         accountStorage.update();
         mFrom = secretStorage.getAddresses().get(0);
+        getViewState().setOnCancelListener(this::onCancel);
     }
 
     @Override
@@ -345,7 +346,6 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
         getViewState().setSecondVisible(View.VISIBLE);
 
         getViewState().setOnConfirmListener(this::onSubmit);
-        getViewState().setOnCancelListener(this::onCancel);
 
         switch (tx.getType()) {
             case SendCoin: {
