@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.14.0
+ - Added support new deeplinks protocol
+ - Added information about last updated block
+ - Fixed cancel button at external transaction activity after app recreated
+
 ## 1.13.0
  - Texasnet release
 
