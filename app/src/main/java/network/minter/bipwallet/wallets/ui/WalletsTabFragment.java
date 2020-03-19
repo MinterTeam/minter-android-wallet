@@ -40,6 +40,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -65,10 +68,15 @@ import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.bipwallet.internal.helpers.HtmlCompat;
+import network.minter.bipwallet.internal.helpers.Plurals;
+import network.minter.bipwallet.internal.helpers.PrefKeys;
 import network.minter.bipwallet.internal.helpers.SoundManager;
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager;
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
 import network.minter.bipwallet.wallets.contract.CoinsTabView;
@@ -104,6 +112,7 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
     @BindView(R.id.delegation_amount) TextView delegationAmount;
     @BindView(R.id.balance_container) View balanceContainer;
     @BindView(R.id.balance_title) TextView balanceTitle;
+    @BindView(R.id.last_update_time) TextView lastUpdateText;
 
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
@@ -163,6 +172,10 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
         View view = inflater.inflate(R.layout.fragment_tab_wallets, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         presenter.onRestoreInstanceState(savedInstanceState);
+        checkLastUpdate();
+        BroadcastReceiverManager bbm = new BroadcastReceiverManager(getActivity());
+        bbm.add(new RTMBlockReceiver(this::checkLastUpdate));
+        bbm.register();
 
         if (network.minter.bipwallet.BuildConfig.DEBUG) {
             logo.setOnLongClickListener(v -> {
@@ -188,6 +201,18 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         return view;
+    }
+
+    private void checkLastUpdate() {
+        if (!Wallet.app().storage().contains(PrefKeys.LAST_BLOCK_TIME)) {
+            lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated_never)));
+            return;
+        }
+        DateTime lastBlockTime = new DateTime((long) Wallet.app().storage().get(PrefKeys.LAST_BLOCK_TIME, 0L));
+        Seconds diff = Seconds.secondsBetween(lastBlockTime, new DateTime());
+        int res = diff.getSeconds();
+        Timber.d("Diff: now=%s, ts=%s", new DateTime().toString(), lastBlockTime.toString());
+        lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated, Plurals.timeValue((long) res), Plurals.time((long) res))));
     }
 
     @Override

@@ -37,18 +37,28 @@ public final class DeepLinkHelper {
                 throw new InvalidExternalTransaction("Unable to parse transaction url", InvalidExternalTransaction.CODE_INVALID_LINK);
             }
 
-            boolean hasParam = false;
+            // old-style deeplinks
+            if (url.pathSegments().size() == 1 && url.pathSegments().get(0).equals("tx")) {
+                boolean hasParam = false;
 
-            for (int i = 0; i < url.querySize(); i++) {
-                final String param = url.queryParameterName(i);
-                if (param.equals("d")) {
-                    hasParam = true;
+                for (int i = 0; i < url.querySize(); i++) {
+                    final String param = url.queryParameterName(i);
+                    if (param.equals("d")) {
+                        hasParam = true;
+                    }
+                    intent.putExtra(url.queryParameterName(i), url.queryParameterValue(i));
                 }
-                intent.putExtra(url.queryParameterName(i), url.queryParameterValue(i));
-            }
 
-            if (!hasParam) {
-                throw new InvalidExternalTransaction("No ?d parameter passed to deeplink", InvalidExternalTransaction.CODE_INVALID_DEEPLINK);
+                if (!hasParam) {
+                    throw new InvalidExternalTransaction("No ?d parameter passed to deeplink", InvalidExternalTransaction.CODE_INVALID_DEEPLINK);
+                }
+            } else if (url.pathSegments().size() == 2 && url.pathSegments().get(0).equals("tx")) {
+                for (int i = 0; i < url.querySize(); i++) {
+                    intent.putExtra(url.queryParameterName(i), url.queryParameterValue(i));
+                }
+                intent.putExtra("data", url.pathSegments().get(1));
+            } else {
+                throw new InvalidExternalTransaction("Unknown deeplink format", InvalidExternalTransaction.CODE_INVALID_DEEPLINK);
             }
         }
 

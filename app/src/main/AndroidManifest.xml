@@ -190,7 +190,7 @@
         </activity>
 
         <service
-            android:name=".services.livebalance.LiveBalanceService"
+            android:name=".services.livebalance.RTMService"
             android:exported="false"
             android:screenOrientation="portrait">
             <intent-filter>

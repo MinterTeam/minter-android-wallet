@@ -47,15 +47,13 @@ import timber.log.Timber;
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@AppDeepLink({"tx"})
-@WebDeepLink({"tx"})
-@WebDeepLinkInsecure({"tx"})
-@TestnetWebDeepLink({"tx"})
-@TestnetWebDeepLinkInsecure({"tx"})
+@AppDeepLink({"tx", "tx/{data}"})
+@WebDeepLink({"tx", "tx/{data}"})
+@WebDeepLinkInsecure({"tx", "tx/{data}"})
+@TestnetWebDeepLink({"tx", "tx/{data}"})
+@TestnetWebDeepLinkInsecure({"tx", "tx/{data}"})
 public class ExternalTransactionActivity extends BaseMvpInjectActivity implements ExternalTransactionView {
     public final static String EXTRA_RAW_DATA = "EXTRA_RAW_TX";
-//    public final static String EXTRA_EXTERNAL_TX = "EXTRA_EXTERNAL_TX";
-//    public final static String EXTRA_PASS = "EXTRA_PASS";
 
     @Inject Provider<ExternalTransactionPresenter> presenterProvider;
     @InjectPresenter ExternalTransactionPresenter presenter;
@@ -170,6 +168,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
                 PauseTimer.logout();
                 finishAffinity();
             } catch (Throwable ignore) {
+                Timber.e(ignore);
                 finish();
             }
         } else {
@@ -185,6 +184,7 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
                 PauseTimer.logout();
                 finishAffinity();
             } catch (Throwable ignore) {
+                Timber.e(ignore);
                 finish();
             }
         } else {
@@ -203,6 +203,8 @@ public class ExternalTransactionActivity extends BaseMvpInjectActivity implement
         setSecondVisible(View.GONE);
         action.setEnabled(false);
         action.setClickable(false);
+        cancelAction.setEnabled(true);
+        cancelAction.setClickable(true);
     }
 
     @ProvidePresenter

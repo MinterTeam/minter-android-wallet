@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.services.livebalance.notification;
+package network.minter.bipwallet.services.livebalance.models;
 
 import java.math.BigDecimal;
 
@@ -34,14 +34,9 @@ import network.minter.profile.MinterProfileApi;
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class LiveBalanceMessage {
-    //    public MinterAddress address;
+public class RTMBalance {
     public String coin;
     public BigDecimal amount;
-
-//    public MinterAddress getAddress() {
-//        return address;
-//    }
 
     public String getCoin() {
         return coin.toUpperCase();

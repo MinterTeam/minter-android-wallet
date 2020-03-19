@@ -189,6 +189,7 @@
     <string name="label_to_coin">To coin</string>
     <string name="tx_type_create_coin">Create Coin</string>
     <string name="tx_type_multisend">MultiSend</string>
+    <string name="tx_type_create_multisig">Create MultiSig Address</string>
     <string name="tx_type_edit_candidate">Edit candidate</string>
     <string name="tx_type_redeem_check">Redeem Check</string>
     <string name="tx_incoming_multisend">+ …</string>
@@ -242,5 +243,8 @@
     <string name="btn_draggable">Drag the dialog</string>
     <string name="alert_copied">Copied!</string>
     <string name="hint_save_seed">⚠️ Save this seed phrase in case you plan to use this address in the future.</string>
+    <string name="balance_last_updated"><![CDATA[Last updated <b>%d %s</b> ago]]></string>
+    <string name="balance_last_updated_now"><![CDATA[Last updated <b>now</b>]]></string>
+    <string name="balance_last_updated_never"><![CDATA[Last updated <b>never</b>]]></string>
 
 </resources>

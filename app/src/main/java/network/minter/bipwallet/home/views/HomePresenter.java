@@ -46,9 +46,13 @@ import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.HomeTabsClasses;
 import network.minter.bipwallet.home.contract.HomeView;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.bipwallet.services.livebalance.ServiceConnector;
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.Wallet.app;
@@ -59,6 +63,8 @@ import static network.minter.bipwallet.internal.Wallet.app;
  */
 @InjectViewState
 public class HomePresenter extends MvpBasePresenter<HomeView> {
+
+    @Inject KVStorage storage;
 
     private final HashMap<Integer, Integer> mBottomIdPositionMap = new HashMap<Integer, Integer>() {{
         put(R.id.bottom_wallets, 0);
@@ -163,9 +169,13 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
         ServiceConnector.bind(app().context());
         ServiceConnector.onConnected()
                 .subscribe(res -> res.setOnMessageListener((message, channel, address) -> {
-                    accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message, address));
-                    app().explorerTransactionsRepoCache().update(true);
-                    Timber.d("WS ON MESSAGE[%s]: %s", channel, message);
+                    if (channel.equals(RTMService.CHANNEL_BLOCKS)) {
+                        RTMBlockReceiver.send(Wallet.app().context(), message);
+                    } else {
+                        accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message, address));
+                        app().explorerTransactionsRepoCache().update(true);
+                        Timber.d("WS ON MESSAGE[%s]: %s", channel, message);
+                    }
                 }));
     }
 }
