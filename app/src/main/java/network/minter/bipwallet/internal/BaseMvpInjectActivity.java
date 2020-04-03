@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -45,6 +45,7 @@ import dagger.android.HasAndroidInjector;
 import moxy.MvpAppCompatActivity;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialog;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.ErrorView;
@@ -66,6 +67,17 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
 
     @Inject DispatchingAndroidInjector<Object> androidInjector;
     private WalletProgressDialog mProgress;
+    private BaseBottomSheetDialog mBaseBottomSheetDialog;
+
+    public void startBottomDialog(BaseBottomSheetDialog dialog, String tag) {
+        if (mBaseBottomSheetDialog != null) {
+            mBaseBottomSheetDialog.dismiss();
+            mBaseBottomSheetDialog = null;
+        }
+
+        mBaseBottomSheetDialog = dialog;
+        mBaseBottomSheetDialog.show(getSupportFragmentManager(), tag);
+    }
 
     @VisibleForTesting
     public void prepareIdlingResources() {

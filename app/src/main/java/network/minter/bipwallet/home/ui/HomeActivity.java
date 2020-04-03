@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,8 +32,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.ViewGroup;
 
+import com.annimon.stream.Stream;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.util.ArrayList;
@@ -48,8 +48,9 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
@@ -80,7 +81,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
     @Inject @HomeTabsClasses List<Class<? extends HomeTabFragment>> tabsClasses;
 
     @BindView(R.id.navigation_bottom) BottomNavigationViewEx bottomNavigation;
-    @BindView(R.id.home_pager) ViewPager homePager;
+    @BindView(R.id.home_pager) ViewPager2 homePager;
 
     private Map<Integer, HomeTabFragment> mActiveTabs = new WeakHashMap<>();
     private List<BackPressedListener> mBackPressedListeners = new ArrayList<>(1);
@@ -227,9 +228,15 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
     }
 
     private void setupTabAdapter() {
-        final FragmentPagerAdapter adapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
+        final FragmentStateAdapter adapter = new FragmentStateAdapter(this) {
             @Override
-            public Fragment getItem(int position) {
+            public int getItemCount() {
+                return tabsClasses.size();
+            }
+
+            @NonNull
+            @Override
+            public Fragment createFragment(int position) {
                 Timber.d("Get item by position: %d", position);
                 HomeTabFragment fragment = null;
                 try {
@@ -249,38 +256,46 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
                 return fragment;
             }
 
-            @NonNull
             @Override
-            public Object instantiateItem(@NonNull ViewGroup container, int position) {
-                HomeTabFragment fragment = (HomeTabFragment) super.instantiateItem(container, position);
-                Timber.d("Instantiate item %s by position: %d", fragment.getClass().getSimpleName(), position);
+            public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+                super.onDetachedFromRecyclerView(recyclerView);
 
-                mActiveTabs.put(position, fragment);
-                return fragment;
             }
 
-            @Override
-            public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-                super.destroyItem(container, position, object);
-                mActiveTabs.remove(position);
-                Timber.d("Destroy item %s by position: %d", object.getClass().getSimpleName(), position);
-            }
+            //            @NonNull
+//            @Override
+//            public Object instantiateItem(@NonNull ViewGroup container, int position) {
+//                HomeTabFragment fragment = (HomeTabFragment) super.instantiateItem(container, position);
+//                Timber.d("Instantiate item %s by position: %d", fragment.getClass().getSimpleName(), position);
+//
+//                mActiveTabs.put(position, fragment);
+//                return fragment;
+//            }
 
-            @Override
-            public int getCount() {
-                return tabsClasses.size();
-            }
+//            @Override
+//            public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+//                super.destroyItem(container, position, object);
+//                mActiveTabs.remove(position);
+//                Timber.d("Destroy item %s by position: %d", object.getClass().getSimpleName(), position);
+//            }
         };
 
         homePager.setOffscreenPageLimit(mIsLowRamDevice ? 1 : 4);
-        homePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        homePager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
             @Override
             public void onPageSelected(int position) {
+                super.onPageSelected(position);
                 presenter.onPageSelected(position);
+                Stream.of(mActiveTabs.entrySet())
+                        .filter(item -> item.getValue() != null)
+                        .filter(item -> item.getKey() != position)
+                        .forEach(item -> item.getValue().onTabUnselected());
+
                 if (mActiveTabs.get(position) != null && mActiveTabs.get(position) != null) {
                     final HomeTabFragment f = mActiveTabs.get(position);
                     if (f != null) {
@@ -293,6 +308,7 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
 
             @Override
             public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
             }
         });
         homePager.setAdapter(adapter);

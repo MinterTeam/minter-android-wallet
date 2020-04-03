@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,13 +30,16 @@ import com.annimon.stream.Stream;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.advanced.models.SecretData;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.core.bip39.HDKey;
@@ -44,27 +47,24 @@ import network.minter.core.bip39.MnemonicResult;
 import network.minter.core.bip39.NativeBip39;
 import network.minter.core.bip39.NativeHDKeyEncoder;
 import network.minter.core.crypto.BytesData;
-import network.minter.core.crypto.HashUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.crypto.PublicKey;
-import network.minter.core.internal.helpers.StringHelper;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkArgument;
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class SecretStorage {
 
-    private final static String KEY_SECRETS = "secret_storage_mnemonic_secret_list";
-    private final static String KEY_SECRETS_MIGRATION = "secret_storage_mnemonic_secret_list_migration";
-    private final static String KEY_ADDRESSES = "secret_storage_addresses_list";
-    private final static String KEY_ENCRYPTION_PASS = "secret_storage_encryption_key";
-    private final static String KEY_PIN_CODE = "secret_app_pin_code";
+    private final static String KEY_SECRETS = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_mnemonic_secret_list";
+    private final static String KEY_ADDRESSES = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_addresses_list";
+    private final static String KEY_ENCRYPTION_PASS = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_encryption_key";
+    private final static String KEY_PIN_CODE = BuildConfig.MINTER_STORAGE_VERS + "secret_app_pin_code";
+    private final static String KEY_MAIN_WALLET = BuildConfig.MINTER_STORAGE_VERS + "secret_main_wallet";
     private final KVStorage mStorage;
 
     public SecretStorage(KVStorage storage) {
@@ -83,18 +83,6 @@ public class SecretStorage {
         return new SecretData(mnemonicResult.getMnemonic(), seed, privateKey, publicKey);
     }
 
-    public void setEncryptionKey(byte[] sha256EncryptedKey) {
-        mStorage.put(KEY_ENCRYPTION_PASS, StringHelper.bytesToHexString(sha256EncryptedKey));
-    }
-
-    public boolean hasEncryptionKey() {
-        return mStorage.contains(KEY_ENCRYPTION_PASS);
-    }
-
-    public String getEncryptionKey() {
-        return mStorage.get(KEY_ENCRYPTION_PASS);
-    }
-
     public boolean hasPinCode() {
         return mStorage.contains(KEY_PIN_CODE);
     }
@@ -111,11 +99,15 @@ public class SecretStorage {
         mStorage.delete(KEY_PIN_CODE);
     }
 
-    public void setEncryptionKey(String rawEncryptionKey) {
-        mStorage.put(KEY_ENCRYPTION_PASS, HashUtil.sha256Hex(rawEncryptionKey));
+    public void setMain(MinterAddress mainWallet) {
+        mStorage.put(KEY_MAIN_WALLET, mainWallet);
     }
 
     public MinterAddress add(@NonNull MnemonicResult mnemonicResult) {
+        return add(mnemonicResult, null);
+    }
+
+    public MinterAddress add(@NonNull MnemonicResult mnemonicResult, String title) {
         if (!mnemonicResult.isOk()) {
             throw new IllegalArgumentException("Mnemonic result is not in valid state");
         }
@@ -129,27 +121,59 @@ public class SecretStorage {
         final PrivateKey privateKey = extKey.getPrivateKey();
         final PublicKey publicKey = privateKey.getPublicKey(false);
 
-        final SecretData data = new SecretData(mnemonicResult.getMnemonic(), seed, privateKey, publicKey);
+        final SecretData data = new SecretData(mnemonicResult.getMnemonic(), seed, privateKey, publicKey, title);
         return add(data);
     }
 
     public MinterAddress add(@NonNull final String mnemonicPhrase) {
-        return add(new MnemonicResult(mnemonicPhrase));
+        return add(new MnemonicResult(mnemonicPhrase), null);
     }
 
-    public void remove(MinterAddress address) {
-        Map<MinterAddress, SecretData> secrets = mStorage.get(KEY_SECRETS);
-        if (secrets == null || secrets.isEmpty()) {
-            return;
-        }
-
-        secrets.remove(address);
+    public MinterAddress add(@NonNull final String mnemonicPhrase, @Nullable String title) {
+        return add(new MnemonicResult(mnemonicPhrase), title);
     }
 
     public Map<String, SecretData> getSecrets() {
         Map<String, SecretData> secrets = mStorage.get(KEY_SECRETS);
         if (secrets == null) {
             secrets = new HashMap<>();
+        }
+
+        return secrets;
+    }
+
+    public List<SecretData> getSecretsListSafe() {
+        final Map<String, SecretData> src = getSecretsSafe();
+        final SecretData main = getSecret(getMainWallet());
+        final List<SecretData> out = Stream.of(src.values()).toList();
+        Collections.sort(out, new Comparator<SecretData>() {
+            @Override
+            public int compare(SecretData as, SecretData bs) {
+                final Date a = as.getDate();
+                final Date b = bs.getDate();
+
+                if (a.equals(b)) // update to make it stable
+                    return 0;
+                if (a.equals(main.getDate()))
+                    return -1;
+                if (b.equals(main.getDate()))
+                    return 1;
+
+                return a.compareTo(b);
+            }
+        });
+
+        return out;
+    }
+
+    public Map<String, SecretData> getSecretsSafe() {
+        Map<String, SecretData> secrets = mStorage.get(KEY_SECRETS);
+        if (secrets == null) {
+            secrets = new HashMap<>();
+        }
+
+        for (Map.Entry<String, SecretData> entry : secrets.entrySet()) {
+            entry.getValue().cleanup();
         }
 
         return secrets;
@@ -173,13 +197,13 @@ public class SecretStorage {
 
     /**
      * DON'T FORGET to cleanup SecretData by yourself
-     *
      * @param secretData
      * @return
      */
     public MinterAddress add(@NonNull final SecretData secretData) {
         Map<String, SecretData> secrets = getSecrets();
         List<MinterAddress> addresses = getAddresses();
+        boolean isMain = secrets.size() == 0;
 
         final MinterAddress address = secretData.getMinterAddress();
         secrets.put(address.toString(), secretData);
@@ -190,30 +214,57 @@ public class SecretStorage {
             mStorage.put(KEY_ADDRESSES, addresses);
         }
 
+        if (isMain) {
+            setMain(address);
+        }
+
         return address;
+    }
+
+    public MinterAddress getMainWallet() {
+        return mStorage.get(KEY_MAIN_WALLET, getAddresses().get(0));
+    }
+
+    public void update(SecretData data) {
+        Map<String, SecretData> secrets = getSecrets();
+        secrets.put(data.getMinterAddress().toString(), data);
+        mStorage.put(KEY_SECRETS, secrets);
     }
 
     public SecretData getSecret(MinterAddress address) {
         return mStorage.<Map<String, SecretData>>get(KEY_SECRETS).get(address.toString());
     }
 
-    public void removeMigrationQueue() {
-        mStorage.delete(KEY_SECRETS_MIGRATION);
+    public SecretData getSecretSafe(MinterAddress address) {
+        final SecretData sd = getSecret(address);
+        sd.cleanup();
+        return sd;
     }
 
-    public void updateMigrationQueue(Queue<SecretData> secretData) {
-        mStorage.delete(KEY_SECRETS_MIGRATION);
-        mStorage.putQueue(KEY_SECRETS_MIGRATION, secretData);
+    @NonNull
+    public boolean isMainWallet(@NonNull MinterAddress minterAddress) {
+        checkNotNull(minterAddress, "Address can't be null while getting main wallet");
+        return getMainWallet().equals(minterAddress);
     }
 
-    public Queue<SecretData> getOrCreateMigrationQueue() {
-        if (mStorage.contains(KEY_SECRETS_MIGRATION)) {
-            return mStorage.getQueue(KEY_SECRETS_MIGRATION);
+    public boolean delete(@NonNull MinterAddress address) {
+        checkNotNull(address, "Address required");
+
+        Map<String, SecretData> secrets = getSecrets();
+        if (secrets.size() == 1) {
+            throw new IllegalStateException("Can't delete last wallet");
         }
 
-        Queue<SecretData> secretQueue = new LinkedList<>(getSecrets().values());
-        mStorage.putQueue(KEY_SECRETS_MIGRATION, secretQueue);
+        if (!secrets.containsKey(address.toString())) {
+            return false;
+        }
+        secrets.remove(address.toString());
 
-        return secretQueue;
+        if (secrets.size() == 1) {
+            Map.Entry<String, SecretData> it = secrets.entrySet().iterator().next();
+            setMain(new MinterAddress(it.getKey()));
+        }
+
+        return mStorage.put(KEY_SECRETS, secrets);
     }
 }

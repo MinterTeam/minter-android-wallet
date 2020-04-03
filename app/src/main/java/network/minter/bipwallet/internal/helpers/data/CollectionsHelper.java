@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -41,8 +41,8 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.CoinBalance;
 
 /**
  * minter-android-wallet. 2018
@@ -182,11 +182,11 @@ public class CollectionsHelper {
         Output apply(Input input);
     }
 
-    public static class StableCoinSorting implements Comparator<CoinAccount> {
+    public static class StableCoinSorting implements Comparator<CoinBalance> {
         private final static String sStable = MinterSDK.DEFAULT_COIN.toLowerCase();
 
         @Override
-        public int compare(CoinAccount ac, CoinAccount bc) {
+        public int compare(CoinBalance ac, CoinBalance bc) {
             final String a = ac.getCoin().toLowerCase();
             final String b = bc.getCoin().toLowerCase();
 

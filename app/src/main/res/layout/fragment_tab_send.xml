@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -24,41 +24,52 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="10dp"
+        android:layout_height="?android:attr/actionBarSize"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
+        app:contentInsetStart="@dimen/margin_edges"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title="Main Wallet"
+        app:titleTextColor="@color/white">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="?android:attr/actionBarSize"
-            android:theme="@style/WalletPrimaryToolbar"
-            app:enableAction="false"
-            app:layout_collapseMode="none"
-            app:title="@string/title_tab_sending"
-            app:titleTextColor="@android:color/white" />
+            android:layout_height="match_parent">
 
-        <include
-            layout="@layout/include_testnet_warning_view"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            <network.minter.bipwallet.wallets.selector.WalletSelector
+                android:id="@+id/wallet_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:ws_dropdown_tint="@color/grey"
+                app:ws_name_color="@color/textColorPrimary" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
 
-    </com.google.android.material.appbar.AppBarLayout>
+    <include
+        layout="@layout/include_testnet_warning_view"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -67,206 +78,364 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar">
+        app:layout_constraintTop_toBottomOf="@id/testnet_warning">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusableInTouchMode="false"
-            android:paddingTop="@dimen/margin_edges_half">
+            android:background="@color/white">
 
-            <!--ACCOUNT-->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/row_coin"
+            <TextView
+                android:id="@+id/tab_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:text="Send Coins"
+                android:textAllCaps="true"
+                android:textColor="@color/grey"
+                android:textSize="@dimen/text_size_11"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges_medium"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                android:hint="@string/tx_send_coin_hint"
-                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
-                app:hintEnabled="true"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:gravity="center_vertical|end"
+
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="@id/tab_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toEndOf="@id/tab_title"
+                app:layout_constraintTop_toTopOf="@id/tab_title"
+                app:layout_constraintVertical_bias="0.5">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_watch_later"
+                    android:tint="@color/grey" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_edges_half"
+                    android:fontFamily="@font/inter"
+                    android:textSize="@dimen/text_size_12"
+                    android:textStyle="bold"
+                    tools:text="Last updated 10 seconds ago" />
+            </LinearLayout>
+
+
+            <!--ACCOUNT-->
+            <TextView
+                android:id="@+id/hint_input_account"
+                style="@style/Wallet.EditText.Hint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/tx_send_coin_hint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tab_title" />
+
+            <EditText
+                android:id="@+id/input_coin"
+                style="@style/Wallet.EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:background="@drawable/bg_edittext_states"
+                android:ellipsize="end"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:hint="@string/tx_send_coin_hint"
+                android:inputType="none"
+                android:paddingEnd="32dp"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                app:layout_constraintTop_toBottomOf="@id/hint_input_account"
                 app:passwordToggleDrawable="@null"
-                >
+                tools:text="MINTERBIG (12400000000000.1020304050607080900)" />
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/input_coin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_edittext_states"
-                    android:ellipsize="end"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:fontFamily="@font/_ubuntu_regular"
-                    android:inputType="none"
-
-                    android:paddingEnd="24dp"
-                    android:textSize="@dimen/text_size_default"
-                    tools:text="MINTERBIG (12400000000000.1020304050607080900)" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/dropdown"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="@dimen/margin_edges_half"
                 android:contentDescription="@string/cd_choose_account"
-                app:layout_constraintBottom_toBottomOf="@id/row_coin"
-                app:layout_constraintEnd_toEndOf="@id/row_coin"
-                app:layout_constraintTop_toTopOf="@id/row_coin"
-                app:srcCompat="@drawable/ic_drop_down_grey" />
-
-            <!--RECIPIENT-->
-            <FrameLayout
-                android:id="@+id/row_recipient"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges_medium"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/row_coin">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layout_input_recipient"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/tx_send_recipient_hint"
-                    app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
-                    app:hintEnabled="true"
-                    app:passwordToggleDrawable="@null">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/input_recipient"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:completionThreshold="1"
-                        android:background="@drawable/bg_edittext_states"
-                        android:dropDownHeight="wrap_content"
-                        android:inputType="text|textMultiLine|textNoSuggestions"
-                        android:tag="recipient"
-                        android:textSize="@dimen/text_size_default"
-                        tools:ignore="LabelFor"
-                        tools:text="Mx8d008dffe2f9144a39a2094ebdedadad335e814f" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </FrameLayout>
+                android:src="@drawable/ic_drop_down_grey"
+                app:layout_constraintBottom_toBottomOf="@id/input_coin"
+                app:layout_constraintEnd_toEndOf="@id/input_coin"
+                app:layout_constraintTop_toTopOf="@id/input_coin" />
 
             <!--AMOUNT-->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_input_amount"
+
+            <TextView
+                android:id="@+id/hint_input_amount"
+                style="@style/Wallet.EditText.Hint"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges_medium"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                android:hint="@string/label_amount"
-                app:hintEnabled="true"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/tx_send_amount_hint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/row_recipient"
-                app:passwordToggleDrawable="@null"
-                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance">
+                app:layout_constraintTop_toBottomOf="@id/input_coin" />
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/input_amount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
-                    android:ellipsize="end"
-                    android:background="@drawable/bg_edittext_states"
-                    android:inputType="textMultiLine|numberDecimal"
-                    android:paddingEnd="86dp"
-                    android:tag="amount"
-                    android:textSize="@dimen/text_size_default"
-                    tools:text="1.102030405060708090102030405060708090" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <EditText
+                android:id="@+id/input_amount"
+                style="@style/Wallet.EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
+                android:hint="Amount"
+                android:inputType="textMultiLine|numberDecimal"
+                android:paddingEnd="88dp"
+                android:tag="amount"
+                android:theme="@style/Wallet"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/hint_input_amount"
+                app:passwordToggleDrawable="@null"
+                tools:text="100000000.102030405060708090" />
 
             <TextView
                 android:id="@+id/action_maximum"
                 style="@style/Wallet.Text.ButtonBorderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginEnd="10dp"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:padding="6dp"
                 android:text="@string/btn_use_max"
-                android:textSize="@dimen/text_size_default"
-                app:layout_constraintBottom_toBottomOf="@id/layout_input_amount"
-                app:layout_constraintEnd_toEndOf="@id/layout_input_amount"
-                app:layout_constraintTop_toTopOf="@id/layout_input_amount"
-                app:layout_constraintVertical_bias="0.1" />
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintBottom_toBottomOf="@id/input_amount"
+                app:layout_constraintEnd_toEndOf="@id/input_amount"
+                app:layout_constraintTop_toTopOf="@id/input_amount"
+                app:layout_constraintVertical_bias="0.5" />
 
             <TextView
-                android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="@dimen/margin_edges_medium"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_amount"
-                android:id="@+id/action_add_payload"
-                android:layout_width="wrap_content"
-                android:visibility="visible"
-                android:layout_height="wrap_content"
-                android:text="Add message"
-                style="@style/Wallet.Text.ButtonBorderless" />
-
-            <FrameLayout
-                android:visibility="gone"
-                android:id="@+id/layout_input_payload_container"
+                android:id="@+id/error_text_amount"
+                style="@style/Wallet.FieldError"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges_medium"
-                android:layout_marginEnd="@dimen/margin_edges_input"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_amount">
-                <!--PAYLOAD-->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layout_input_payload"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:hintEnabled="true"
-                    app:passwordToggleDrawable="@null"
-                    app:errorTextAppearance="@style/Wallet.ErrorTextAppearance">
+                app:layout_constraintTop_toBottomOf="@id/input_amount"
+                tools:text="Unknown Error"
+                tools:visibility="visible" />
 
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/input_payload"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:hint="@string/label_payload"
-                        android:paddingStart="4dp"
-                        android:tag="payload"
-                        android:textSize="@dimen/text_size_default"
-                        tools:text="Payload text" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </FrameLayout>
+            <!--RECIPIENT-->
+            <TextView
+                android:id="@+id/hint_input_recipient"
+                style="@style/Wallet.EditText.Hint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/tx_send_recipient_hint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/error_text_amount" />
+
+            <com.google.android.material.textview.MaterialAutoCompleteTextView
+                android:id="@+id/input_recipient"
+                style="@style/Wallet.EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:completionThreshold="1"
+                android:dropDownHeight="wrap_content"
+                android:hint="Recipient"
+                android:inputType="text|textMultiLine|textNoSuggestions"
+                android:paddingEnd="48dp"
+                android:tag="recipient"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
+                app:hintTextAppearance="@style/Wallet.EditText.Hint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/hint_input_recipient"
+                app:passwordToggleDrawable="@null"
+                tools:ignore="LabelFor"
+                tools:text="Mx8d008dffe2f91edadad335e814f8d008dffe2f91" />
+
+            <ImageView
+                android:id="@+id/action_contacts"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:src="@drawable/ic_contacts_primary"
+                app:layout_constraintBottom_toBottomOf="@id/input_recipient"
+                app:layout_constraintEnd_toEndOf="@id/input_recipient"
+                app:layout_constraintTop_toTopOf="@id/input_recipient" />
+
+            <TextView
+                android:id="@+id/error_text_recipient"
+                style="@style/Wallet.FieldError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_recipient"
+                tools:text="Unknown Error"
+                tools:visibility="visible" />
+
+
+            <TextView
+                android:id="@+id/hint_input_payload"
+                style="@style/Wallet.EditText.Hint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/tx_send_payload_hint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/error_text_recipient" />
+
+            <!--PAYLOAD-->
+            <EditText
+                android:id="@+id/input_payload"
+                style="@style/Wallet.EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:ellipsize="end"
+                android:hint="@string/label_payload"
+                android:paddingEnd="48dp"
+                android:tag="payload"
+                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/hint_input_payload" />
+
+            <ImageView
+                android:id="@+id/action_clear_payload"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:src="@drawable/ic_cancel_circle_grey"
+                app:layout_constraintBottom_toBottomOf="@id/input_payload"
+                app:layout_constraintEnd_toEndOf="@id/input_payload"
+                app:layout_constraintTop_toTopOf="@id/input_payload"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <TextView
+                android:id="@+id/error_text_payload"
+                style="@style/Wallet.FieldError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_payload"
+                tools:text="Unknown Error"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_input_payload_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_input_fake"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/input_payload"
+                app:layout_constraintEnd_toEndOf="@id/input_payload"
+                app:layout_constraintStart_toStartOf="@id/input_payload"
+                app:layout_constraintTop_toTopOf="@id/input_payload"
+                tools:visibility="visible"
+
+                >
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="@dimen/margin_edges"
+                    android:src="@drawable/ic_message_grey"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/action_add_payload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/_inter_semi_bold"
+                    android:text="Add Message"
+                    android:textAlignment="center"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/text_size_default"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+
+                    />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
             <!--LABELS-->
-            <View
+            <Space
                 android:id="@+id/label_guide"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_goneMarginTop="64dp"
-                android:layout_marginTop="24dp"
+                android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_payload_container" />
+                app:layout_constraintTop_toBottomOf="@id/error_text_payload" />
 
             <TextView
                 android:id="@+id/fee_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="@dimen/margin_edges_half"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:text="@string/tx_send_fee_hint"
-                android:textSize="@dimen/text_size_default"
+                android:textSize="@dimen/text_size_14"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/label_guide" />
@@ -275,22 +444,20 @@
                 android:id="@+id/fee_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges_half"
-                android:layout_marginEnd="@dimen/margin_edges"
-                android:fontFamily="@font/_ubuntu_medium"
-                tools:text="@string/tx_send_fee_value"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_large"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:textAlignment="textEnd"
-                android:textSize="@dimen/text_size_default"
+                android:textSize="@dimen/text_size_14"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/fee_label"
-                app:layout_constraintTop_toBottomOf="@id/label_guide" />
+                app:layout_constraintTop_toBottomOf="@id/label_guide"
+                tools:text="@string/tx_send_fee_value" />
 
-            <View
-                android:id="@+id/sep2"
+            <Space
+                android:id="@+id/button_guide"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/margin_edges_input"
-                android:background="@color/greySeparator"
+                android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/fee_label" />
@@ -302,11 +469,13 @@
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:textColor="@color/errorColor"
+                android:textSize="@dimen/text_size_14"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sep2"
+                app:layout_constraintTop_toBottomOf="@id/button_guide"
                 tools:text="Some uncaught error"
                 tools:visibility="visible" />
 

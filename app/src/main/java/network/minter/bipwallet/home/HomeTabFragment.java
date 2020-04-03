@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -66,6 +66,11 @@ public abstract class HomeTabFragment extends BaseFragment implements ErrorView,
 
     }
 
+
+    public void onTabUnselected() {
+
+    }
+
     @Override
     public void onError(Throwable t) {
         if (getActivity() instanceof ErrorView) {
@@ -102,4 +107,5 @@ public abstract class HomeTabFragment extends BaseFragment implements ErrorView,
     public void onTrimMemory(int level) {
 
     }
+
 }

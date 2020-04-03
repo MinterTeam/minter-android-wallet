@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -117,7 +117,7 @@ public class AdvancedModeTest {
         // check invalid seed error
         seedInput.check(matches(hasErrorText("Phrase is not valid")));
 
-        ViewInteraction generateMnemonicButton = onView(allOf(withId(R.id.action_generate), withText(R.string.btn_generate_address)));
+        ViewInteraction generateMnemonicButton = onView(allOf(withId(R.id.action_generate), withText(R.string.btn_generate_wallet)));
         // click on generate new seed
         generateMnemonicButton.perform(click());
 

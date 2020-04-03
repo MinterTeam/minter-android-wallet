@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) by MinterTeam. 2019
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -44,7 +44,7 @@
     <string name="advanced_using_ledger">This feature is absolutely safe, because all your private data (including mnemonic and private keys) staying on your hardware wallet and no one, except you, don\'t have access to it.
     \n\nTo activate wallet, unlock your device and open Minter application</string>
     <string name="advanced_action_generate">Generate Address</string>
-    <string name="menu_item_coins">Coins</string>
+    <string name="menu_item_wallets">Wallets</string>
     <string name="menu_item_send">Send</string>
     <string name="menu_item_receive">Receive</string>
     <string name="menu_item_settings">Settings</string>
@@ -71,7 +71,7 @@
 
     <string name="title_tab_sending">Send Coins</string>
     <string name="tx_send_coin_hint">Coin</string>
-    <string name="tx_send_recipient_hint">To (Mx Address or Public key)</string>
+    <string name="tx_send_recipient_hint">To (Mx Address, Public Key or Name)</string>
     <string name="tx_send_amount_hint">Amount</string>
     <string name="tx_send_fee_hint">Transaction Fee</string>
     <string name="tx_send_fee_value">0.00000001 BIP</string>
@@ -96,7 +96,7 @@
     <string name="btn_change_avatar">Change userpic</string>
     <string name="btn_save">Save</string>
     <string name="btn_submit">Submit</string>
-    <string name="btn_send">Send!</string>
+    <string name="btn_send">Send</string>
     <string name="btn_view_tx">View transaction</string>
     <string name="btn_close">Close</string>
     <string name="btn_explorer">Explorer</string>
@@ -120,6 +120,21 @@
     <string name="hint_change_password_new_repeat">Repeat new password</string>
     <string name="btn_change_password">Change password</string>
     <string name="hint_change_password_old">Current password</string>
+    <string name="btn_delegate">Delegate</string>
+    <string name="btn_confirm_send">Confirm and send</string>
+    <string name="btn_ok">Ok</string>
+    <string name="btn_proceed">Proceed</string>
+    <string name="btn_scan_qr">Scan QR</string>
+    <string name="btn_draggable">Drag the dialog</string>
+    <string name="btn_all_txs">All transactions</string>
+    <string name="btn_add_wallet">Add New Wallet</string>
+    <string name="input_hint_wallet_title">Up to 18 latin letters and numbers…</string>
+    <string name="input_hint_wallet_title_later">Add title to your wallet (you can do it later)</string>
+    <string name="btn_launch_wallet">Launch the wallet</string>
+    <string name="btn_generate_wallet">Generate New Wallet</string>
+    <string name="btn_activate">Activate Wallet</string>
+    <string name="btn_activate_via_ledger">Activate via Ledger</string>
+    <string name="btn_create_wallet">Create Wallet</string>
 
     <!--    PIN-->
     <string name="title_pin_set">Set PIN-code</string>
@@ -144,7 +159,7 @@
     <string name="input_register_label_username">Choose @username</string>
     <string name="input_register_label_email">Email (Optional *)</string>
     <string name="input_register_label_phone">Mobile Number (Optional *)</string>
-    <string name="btn_create_wallet">Create Wallet</string>
+
     <string name="input_register_hint_email">* Email is optional but can be very handy if you forget your password</string>
     <string name="transaction_auth_logo">img_logo</string>
     <string name="cd_choose">Choose</string>
@@ -161,10 +176,7 @@
     <string name="value_secured_by_dots">…</string>
     <string name="label_ive_saved_mnemonic">I\'ve saved the phrase!</string>
     <string name="label_ive_compared_addresses">I\'ve compared above address with the Ledger!</string>
-    <string name="btn_launch_wallet">Launch the wallet</string>
-    <string name="btn_generate_address">Generate Address</string>
-    <string name="btn_activate">Activate Wallet</string>
-    <string name="btn_activate_via_ledger">Activate via Ledger</string>
+
     <string name="or">or</string>
     <string name="label_paste_seed_phrase">Paste Seed Phrase</string>
     <string name="at">\@</string>
@@ -233,18 +245,36 @@
     <string name="dialog_show_mnemonic_description">Attention! This is sensitive information, don\'t show it anyone!</string>
     <string name="label_tx_payload">Payload</string>
     <string name="empty_data"><![CDATA[<empty>]]></string>
-    <string name="btn_delegate">Delegate</string>
+
     <string name="title_confirm_tx">Confirm Transaction</string>
-    <string name="btn_confirm_send">Confirm and send</string>
-    <string name="btn_ok">Ok</string>
-    <string name="btn_proceed">Proceed</string>
-    <string name="btn_scan_qr">Scan QR</string>
+
     <string name="hw_not_connected">Hardware wallet not connected</string>
-    <string name="btn_draggable">Drag the dialog</string>
+
     <string name="alert_copied">Copied!</string>
     <string name="hint_save_seed">⚠️ Save this seed phrase in case you plan to use this address in the future.</string>
     <string name="balance_last_updated"><![CDATA[Last updated <b>%d %s</b> ago]]></string>
     <string name="balance_last_updated_now"><![CDATA[Last updated <b>now</b>]]></string>
     <string name="balance_last_updated_never"><![CDATA[Last updated <b>never</b>]]></string>
+
+    <string name="tab_page_coins">Coins</string>
+    <string name="tab_page_txs">Transactions</string>
+    <string name="inter_zeroes">zero</string>
+    <string name="title_edit_title">Edit Title</string>
+    <string name="input_hint_seed">Seed-Phrase</string>
+    <string name="input_hint_wallet_seed">Or enter seed-phrase to yout existing wallet</string>
+    <string name="dialog_title_add_wallet">Add New Wallet</string>
+    <string name="btn_delete_wallet">Delete Wallet</string>
+    <string name="tx_send_payload_hint">You can add a message to your transaction</string>
+    <string name="title_address_book">Address Book</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Delete</string>
+    <string name="input_hint_addressbook_address">Mx Address or Public Key</string>
+    <string name="input_hint_addressbook_title">Add a title</string>
+    <string name="dialog_title_add_contact">Add New Address</string>
+    <string name="dialog_title_edit_contact">Edit Address</string>
+    <string name="hint_choose_def_wallet">Choose the wallet to open by default when you launch application</string>
+    <string name="btn_official_channel">Our Channel</string>
+    <string name="hint_help_and_support"><![CDATA[Help & Support]]></string>
+    <string name="btn_support_chat">Support Chat</string>
 
 </resources>

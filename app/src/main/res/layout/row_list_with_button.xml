@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,40 +25,40 @@
   ~ THE SOFTWARE.
   -->
 
+<!--<network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:fillViewport="true"-->
+<!--    android:background="@color/white"-->
+<!--    app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+<!--    >-->
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/white"
     >
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="@font/_ubuntu_bold"
-        android:paddingStart="@dimen/margin_inset"
-        android:gravity="bottom"
-        android:minHeight="52dp"
-        android:paddingEnd="@dimen/margin_inset"
-        android:singleLine="true"
-        android:paddingBottom="12dp"
-        android:text="@string/frag_coins_last_transactions_title"
-        android:textSize="@dimen/text_size_20"
+        android:layout_marginStart="@dimen/margin_edges_xlarge"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/margin_edges_large"
+        android:fontFamily="@font/_inter_semi_bold"
+        android:textAllCaps="true"
+        android:textColor="@color/textColorGrey"
+        android:textSize="@dimen/text_size_11"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/greySeparator"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        />
+        tools:text="My Coins" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -67,7 +67,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/separator"
+        app:layout_constraintTop_toBottomOf="@id/title"
         tools:itemCount="5"
         tools:listitem="@layout/item_list_with_image"
         tools:visibility="visible"
@@ -84,7 +84,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/separator"
+        app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="Some text"
         />
 
@@ -125,8 +125,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/action"
-        app:layout_goneMarginTop="@dimen/margin_edges_large"
-        />
+        app:layout_goneMarginTop="@dimen/margin_edges_large" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--</network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView>-->

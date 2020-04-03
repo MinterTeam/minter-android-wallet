@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -125,6 +125,15 @@ public final class WalletTxSendStartDialog extends WalletDialog {
 
         public Builder setAvatarUrl(String avatarUrl) {
             mAvatarUrl = avatarUrl;
+            return this;
+        }
+
+        public Builder setAvatarUrlFallback(String avatarUrl, @DrawableRes int avatarRes) {
+            if (avatarUrl == null) {
+                mAvatarRes = avatarRes;
+            } else {
+                mAvatarUrl = avatarUrl;
+            }
             return this;
         }
 

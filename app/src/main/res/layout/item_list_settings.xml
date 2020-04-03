@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -35,15 +35,16 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:minHeight="54dp"
+    android:minHeight="44dp"
     >
 
     <TextView
         android:id="@+id/item_key"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_inset"
+        style="@style/Wallet.SettingsRowTitle"
         android:textAlignment="viewStart"
+        android:layout_marginStart="@dimen/margin_edges"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/item_value"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -56,9 +57,8 @@
         android:id="@+id/item_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/_ubuntu_medium"
         android:textAlignment="viewEnd"
-        android:textSize="@dimen/text_size_default"
+        style="@style/Wallet.SettingsRowTitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/item_icon"
         app:layout_constraintStart_toEndOf="@id/item_key"
@@ -69,14 +69,14 @@
     <ImageView
         android:contentDescription="@string/empty"
         android:id="@+id/item_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="4dp"
+        android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/item_value"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_chevron_right_grey"
-        />
+        app:srcCompat="@drawable/ic_chevron_right_grey" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

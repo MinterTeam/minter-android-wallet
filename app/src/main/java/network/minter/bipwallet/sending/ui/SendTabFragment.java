@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,16 +33,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextWatcher;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textview.MaterialAutoCompleteTextView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,7 +52,6 @@ import javax.inject.Provider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,7 +60,8 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
+import network.minter.bipwallet.addressbook.models.AddressContact;
+import network.minter.bipwallet.addressbook.ui.AddressBookActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.Wallet;
@@ -71,9 +70,9 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.helpers.ViewHelper;
 import network.minter.bipwallet.internal.helpers.forms.DecimalInputFilter;
 import network.minter.bipwallet.internal.helpers.forms.InputGroup;
+import network.minter.bipwallet.internal.helpers.forms.validators.BaseValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.EmptyValidator;
-import network.minter.bipwallet.internal.helpers.forms.validators.MinterUsernameValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler;
@@ -81,11 +80,13 @@ import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter;
 import network.minter.bipwallet.sending.contract.SendView;
-import network.minter.bipwallet.sending.models.RecipientItem;
 import network.minter.bipwallet.sending.views.SendTabPresenter;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
+import network.minter.bipwallet.wallets.selector.WalletItem;
+import network.minter.bipwallet.wallets.selector.WalletSelector;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
+import network.minter.explorer.models.CoinBalance;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.OnShowRationale;
@@ -104,27 +105,38 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
 
     public final static int REQUEST_CODE_QR_SCAN_TX = 2001;
 
-
     @Inject IdlingManager idlingManager;
     @Inject Provider<SendTabPresenter> presenterProvider;
     @InjectPresenter SendTabPresenter presenter;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.input_coin) AppCompatEditText coinInput;
-    @BindView(R.id.layout_input_recipient) TextInputLayout recipientLayout;
-    @BindView(R.id.input_recipient) AutoCompleteTextView recipientInput;
-    @BindView(R.id.layout_input_amount) TextInputLayout amountLayout;
-    @BindView(R.id.layout_input_payload_container) View payloadContainer;
-    @BindView(R.id.input_amount) AppCompatEditText amountInput;
-    @BindView(R.id.input_payload) AppCompatEditText payloadInput;
+    @BindView(R.id.input_coin) EditText coinInput;
+    @BindView(R.id.input_recipient) MaterialAutoCompleteTextView recipientInput;
+    @BindView(R.id.input_amount) EditText amountInput;
+    @BindView(R.id.input_payload) EditText payloadInput;
+    @BindView(R.id.error_text_amount) TextView amountErrorText;
+    @BindView(R.id.error_text_recipient) TextView recipientErrorText;
+    @BindView(R.id.error_text_payload) TextView payloadErrorText;
     @BindView(R.id.action) Button actionSend;
-    @BindView(R.id.action_add_payload) View actionAddPayload;
-    //    @BindView(R.id.action_scan_qr) View actionScanQR;
+    @BindView(R.id.layout_input_payload_container) View actionAddPayload;
+    @BindView(R.id.action_clear_payload) View actionClearPayload;
     @BindView(R.id.action_maximum) View actionMaximum;
     @BindView(R.id.text_error) TextView errorView;
+
     @BindView(R.id.fee_value) TextView feeValue;
+    @BindView(R.id.wallet_selector) WalletSelector walletSelector;
+    @BindView(R.id.action_contacts) View actionContacts;
     private Unbinder mUnbinder;
     private InputGroup mInputGroup;
     private WalletDialog mCurrentDialog = null;
+    private RecipientListAdapter mAutocompleteAdapter;
+
+    @Override
+    public void onTabSelected() {
+        super.onTabSelected();
+//        setStatusBarLightness(true);
+        ViewHelper.setSystemBarsLightness(this, true);
+        ViewHelper.setStatusBarColorAnimate(this, 0xFF_FFFFFF);
+    }
 
     @Override
     public void onAttach(@NotNull Context context) {
@@ -153,31 +165,40 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         View view = inflater.inflate(R.layout.fragment_tab_send, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         mInputGroup = new InputGroup();
-        mInputGroup.addInput(recipientInput);
         mInputGroup.addInput(amountInput);
+        mInputGroup.addInput(recipientInput);
         mInputGroup.addInput(payloadInput);
-//        mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})$", "Invalid number", true));
+
+        mInputGroup.setErrorView(amountInput, amountErrorText);
+        mInputGroup.setErrorView(recipientInput, recipientErrorText);
+        mInputGroup.setErrorView(payloadInput, payloadErrorText);
+
         mInputGroup.addValidator(amountInput, new RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$", "Invalid number", true));
         mInputGroup.addValidator(amountInput, new EmptyValidator("Value can't be empty"));
         mInputGroup.addValidator(payloadInput, new ByteLengthValidator("Message too long", false));
 
+
         /* ideal case */
 
-        mInputGroup.addValidator(recipientInput,
-                new RegexValidator(
-                        // address or username with @ at begin or email
-                        String.format("%s|%s|%s", MinterAddress.ADDRESS_PATTERN + "|" + MinterPublicKey.PUB_KEY_PATTERN, MinterUsernameValidator.PATTERN, Patterns.EMAIL_ADDRESS),
-                        "Incorrect recipient format"
-                ));
+//        mInputGroup.addValidator(recipientInput,
+//                new RegexValidator(
+//                        // address or username with @ at begin or email
+//                        String.format("%s|%s|%s", MinterAddress.ADDRESS_PATTERN + "|" + MinterPublicKey.PUB_KEY_PATTERN, MinterUsernameValidator.PATTERN, Patterns.EMAIL_ADDRESS),
+//                        "Incorrect recipient format"
+//                ));
+        mInputGroup.addValidator(recipientInput, new RecipientValidator("Invalid recipient format", true));
 
         mInputGroup.addFilter(amountInput, new DecimalInputFilter(() -> amountInput));
 
-        recipientLayout.clearFocus();
-        amountLayout.clearFocus();
+        recipientInput.clearFocus();
+        amountInput.clearFocus();
 
         setHasOptionsMenu(true);
-        getActivity().getMenuInflater().inflate(R.menu.menu_tab_scan_tx, toolbar.getMenu());
+        getActivity().getMenuInflater().inflate(R.menu.menu_send_toolbar, toolbar.getMenu());
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
+        mAutocompleteAdapter = new RecipientListAdapter(getContext());
+        recipientInput.setAdapter(mAutocompleteAdapter);
 
         return view;
     }
@@ -206,6 +227,11 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
+    public void setOnClickClearPayload(View.OnClickListener listener) {
+        actionClearPayload.setOnClickListener(listener);
+    }
+
+    @Override
     public void setPayloadChangeListener(TextWatcher listener) {
         payloadInput.addTextChangedListener(listener);
     }
@@ -231,13 +257,21 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @Override
     public void showPayload() {
         actionAddPayload.setVisibility(View.GONE);
-        payloadContainer.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hidePayload() {
         actionAddPayload.setVisibility(View.VISIBLE);
-        payloadContainer.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setWallets(List<WalletItem> walletItems) {
+        walletSelector.setWallets(walletItems);
+    }
+
+    @Override
+    public void setMainWallet(WalletItem walletItem) {
+        walletSelector.setMainWallet(walletItem);
     }
 
     @Override
@@ -248,6 +282,11 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @Override
     public void setOnTextChangedListener(InputGroup.OnTextChangedListener listener) {
         mInputGroup.addTextChangedListener(listener);
+    }
+
+    @Override
+    public void setOnContactsClickListener(View.OnClickListener listener) {
+        actionContacts.setOnClickListener(listener);
     }
 
     @Override
@@ -262,7 +301,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
 
     @Override
     public void setSubmitEnabled(boolean enabled) {
-        actionSend.post(()->{
+        actionSend.post(() -> {
             actionSend.setEnabled(enabled);
         });
     }
@@ -272,8 +311,8 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
         recipientInput.setText(null);
         amountInput.setText(null);
         payloadInput.setText(null);
-        recipientLayout.clearFocus();
-        amountLayout.clearFocus();
+        recipientInput.clearFocus();
+        amountInput.clearFocus();
         mInputGroup.clearErrors();
     }
 
@@ -300,13 +339,23 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
-    public void setRecipient(CharSequence to) {
-        recipientInput.setText(to);
+    public void startAddressBook(int requestCode) {
+        new AddressBookActivity.Builder(this)
+                .start(requestCode);
+    }
+
+    @Override
+    public void setRecipient(AddressContact to) {
+        recipientInput.post(() -> {
+            recipientInput.setText(to.name);
+        });
     }
 
     @Override
     public void setRecipientError(CharSequence error) {
-        mInputGroup.setError("recipient", error);
+        recipientInput.post(() -> {
+            mInputGroup.setError("recipient", error);
+        });
     }
 
     @Override
@@ -337,17 +386,27 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
-    public void setRecipientsAutocomplete(List<RecipientItem> items, RecipientListAdapter.OnItemClickListener listener) {
-        if (items.size() > 0) {
-            final RecipientListAdapter.OnItemClickListener cl = (item, position) -> {
-                listener.onClick(item, position);
-                recipientInput.dismissDropDown();
-            };
+    public void setRecipientAutocompleteItemClickListener(RecipientListAdapter.OnItemClickListener listener) {
+        final RecipientListAdapter.OnItemClickListener cl = (item, position) -> {
+            listener.onClick(item, position);
+            recipientInput.dismissDropDown();
+        };
+        mAutocompleteAdapter.setOnItemClickListener(cl);
+    }
 
-            final RecipientListAdapter adapter = new RecipientListAdapter(getActivity(), items);
-            adapter.setOnItemClickListener(cl);
-            recipientInput.setAdapter(adapter);
-        }
+    @Override
+    public void setRecipientAutocompleteItems(List<AddressContact> items) {
+        recipientInput.post(() -> {
+            mAutocompleteAdapter.setItems(items);
+            recipientInput.showDropDown();
+        });
+    }
+
+    @Override
+    public void hideAutocomplete() {
+        recipientInput.post(() -> {
+            recipientInput.dismissDropDown();
+        });
     }
 
     @Override
@@ -362,7 +421,7 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     }
 
     @Override
-    public void startAccountSelector(List<CoinAccount> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
+    public void startAccountSelector(List<CoinBalance> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
         new WalletAccountSelectorDialog.Builder(getActivity(), "Select account")
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
@@ -412,5 +471,30 @@ public class SendTabFragment extends HomeTabFragment implements SendView {
     @ProvidePresenter
     SendTabPresenter providePresenter() {
         return presenterProvider.get();
+    }
+
+    private final static class RecipientValidator extends BaseValidator {
+        public RecipientValidator(CharSequence errorMessage, boolean required) {
+            super(errorMessage, required);
+        }
+
+        @Override
+        protected boolean getCondition(CharSequence value) {
+            if (value == null || value.length() == 0) {
+                return false;
+            }
+
+            String v = value.toString();
+            if (v.length() >= 2) {
+                final String pref = v.substring(0, 2);
+                if (pref.toLowerCase().equals("mx")) {
+                    return v.matches(MinterAddress.ADDRESS_PATTERN);
+                } else if (pref.toLowerCase().equals("mp")) {
+                    return v.matches(MinterPublicKey.PUB_KEY_PATTERN);
+                }
+            }
+
+            return true;
+        }
     }
 }

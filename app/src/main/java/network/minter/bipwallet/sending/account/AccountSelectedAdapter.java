@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -38,8 +38,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView;
+import network.minter.explorer.models.CoinBalance;
+import network.minter.profile.MinterProfileApi;
 
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
@@ -50,11 +51,11 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
  */
 public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelectedAdapter.ViewHolder> {
 
-    private List<CoinAccount> mItems;
+    private List<CoinBalance> mItems;
     private LayoutInflater mInflater;
     private OnClickListener mOnClickListener;
 
-    public AccountSelectedAdapter(List<CoinAccount> items) {
+    public AccountSelectedAdapter(List<CoinBalance> items) {
         mItems = items;
     }
 
@@ -75,9 +76,9 @@ public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelected
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final CoinAccount item = mItems.get(position);
-        holder.avatar.setImageUrlFallback(item.getAvatar(), R.drawable.img_avatar_default);
-        holder.title.setText(String.format("%s (%s)", item.coin.toUpperCase(), bdHuman(item.balance)));
+        final CoinBalance item = mItems.get(position);
+        holder.avatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(item.getCoin()), R.drawable.img_avatar_default);
+        holder.title.setText(String.format("%s (%s)", item.coin.toUpperCase(), bdHuman(item.amount)));
         holder.subtitle.setText(item.address.toShortString());
 
         holder.itemView.setOnClickListener(v -> {
@@ -93,7 +94,7 @@ public class AccountSelectedAdapter extends RecyclerView.Adapter<AccountSelected
     }
 
     public interface OnClickListener {
-        void onClick(CoinAccount item);
+        void onClick(CoinBalance item);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

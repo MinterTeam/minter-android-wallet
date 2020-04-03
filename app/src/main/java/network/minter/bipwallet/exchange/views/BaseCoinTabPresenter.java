@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,9 +50,8 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.models.SecretData;
-import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
@@ -78,6 +77,8 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.AddressBalance;
+import network.minter.explorer.models.CoinBalance;
 import network.minter.explorer.models.CoinItem;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
@@ -101,7 +102,7 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
  */
 public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends MvpBasePresenter<V> {
     protected final SecretStorage mSecretStorage;
-    protected final CachedRepository<UserAccount, AccountStorage> mAccountStorage;
+    protected final CachedRepository<AddressListBalancesTotal, AccountStorage> mAccountStorage;
     protected final CachedRepository<List<HistoryTransaction>, CacheTxRepository> mTxRepo;
     protected final ExplorerCoinsRepository mExplorerCoinsRepo;
     protected final GateEstimateRepository mEstimateRepository;
@@ -110,14 +111,14 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     protected final GateTransactionRepository mGateTxRepo;
 
     private AuthSession mSession;
-    private CoinAccount mAccount;
+    private CoinBalance mAccount;
     private String mCurrentCoin;
     private String mGetCoin = null;
     private BigDecimal mSpendAmount = new BigDecimal(0);
     private BigDecimal mGetAmount = new BigDecimal(0);
     private BehaviorSubject<Boolean> mInputChange;
     private String mGasCoin;
-    private List<CoinAccount> mAccounts = new ArrayList<>(1);
+    private List<CoinBalance> mAccounts = new ArrayList<>(1);
     private AtomicBoolean mUseMax = new AtomicBoolean(false);
     private AtomicBoolean mClickedUseMax = new AtomicBoolean(false);
     private BigInteger mGasPrice = new BigInteger("1");
@@ -126,7 +127,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     public BaseCoinTabPresenter(
             AuthSession session,
             SecretStorage secretStorage,
-            CachedRepository<UserAccount, AccountStorage> accountStorage,
+            CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CacheTxRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,
@@ -158,9 +159,10 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
 
         safeSubscribeIoToUi(mAccountStorage.observe())
                 .subscribe(res -> {
+                    AddressBalance acc = mAccountStorage.getEntity().getMainWallet();
                     if (!res.isEmpty()) {
-                        mAccounts = res.getCoinAccounts();
-                        mAccount = res.getCoinAccounts().get(0);
+                        mAccounts = acc.getCoinsList();
+                        mAccount = acc.getCoin(MinterSDK.DEFAULT_COIN);
                         if (mCurrentCoin != null) {
                             mAccount = Stream.of(mAccounts).filter(value -> value.getCoin().equals(mCurrentCoin)).findFirst().orElse(mAccount);
                         }
@@ -246,7 +248,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 }, Wallet.Rx.errorHandler(getViewState()));
     }
 
-    private Optional<CoinAccount> findAccountByCoin(String coin) {
+    private Optional<CoinBalance> findAccountByCoin(String coin) {
         return Stream.of(mAccounts)
                 .filter(item -> item.getCoin().equals(coin.toUpperCase()))
                 .findFirst();
@@ -276,7 +278,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                         BigDecimal balance = new BigDecimal("0");
 
                         if (getOperationType() == OperationType.SellCoin || getOperationType() == OperationType.SellAllCoins) {
-                            balance = mAccount.getBalance();
+                            balance = mAccount.amount;
                         }
 
                         return signSendTx(dialog, txData, initData, balance);
@@ -387,7 +389,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
             return;
         }
 
-        getViewState().setAmount(mAccount.balance.stripTrailingZeros().toPlainString());
+        getViewState().setAmount(mAccount.amount.stripTrailingZeros().toPlainString());
         mUseMax.set(true);
         mClickedUseMax.set(true);
 
@@ -399,7 +401,7 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
     }
 
     private void onClickSelectAccount(View view) {
-        getViewState().startAccountSelector(mAccountStorage.getData().getCoinAccounts(), accountItem -> {
+        getViewState().startAccountSelector(mAccountStorage.getEntity().getMainWallet().getCoinsList(), accountItem -> {
             onAccountSelected(accountItem, false);
         });
     }
@@ -424,14 +426,14 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
                 if (isAmountForGetting()) {
                     mGetAmount = am;
                 } else {
-                    if(!mClickedUseMax.get()) {
+                    if (!mClickedUseMax.get()) {
                         mUseMax.set(false);
                     }
                     mClickedUseMax.set(false);
                     mSpendAmount = am;
                 }
 
-                getViewState().setSubmitEnabled(mAccount != null && am.compareTo(mAccount.balance) <= 0);
+                getViewState().setSubmitEnabled(mAccount != null && am.compareTo(mAccount.amount) <= 0);
 
                 mInputChange.onNext(isAmountForGetting());
                 break;
@@ -526,15 +528,15 @@ public abstract class BaseCoinTabPresenter<V extends BaseCoinTabView> extends Mv
         });
     }
 
-    private void onAccountSelected(CoinAccount coinAccount, boolean initial) {
+    private void onAccountSelected(CoinBalance coinAccount, boolean initial) {
         if (coinAccount == null) return;
 
         mGasCoin = coinAccount.getCoin();
         mAccount = coinAccount;
-        getViewState().setMaximumEnabled(coinAccount.balance.compareTo(new BigDecimal(0)) > 0);
+        getViewState().setMaximumEnabled(coinAccount.amount.compareTo(new BigDecimal(0)) > 0);
 
         getViewState().setOutAccountName(String.format("%s (%s)", coinAccount.getCoin().toUpperCase(),
-                bdHuman(coinAccount.balance)));
+                bdHuman(coinAccount.amount)));
 
         mCurrentCoin = coinAccount.getCoin();
 

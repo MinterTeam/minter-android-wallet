@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -68,7 +68,7 @@ public class CacheTxRepository extends ExplorerTransactionRepository implements 
     @Override
     public Observable<List<HistoryTransaction>> getUpdatableData() {
         return rxExp(getInstantService().getTransactions(
-                Stream.of(mSecretStorage.getAddresses()).map(MinterAddress::toString).toList(),
+                Stream.of(mSecretStorage.getMainWallet()).map(MinterAddress::toString).toList(),
                 1, 5
         ))
                 .onErrorResumeNext(toExpError())

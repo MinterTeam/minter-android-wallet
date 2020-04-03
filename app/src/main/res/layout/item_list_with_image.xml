@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,22 +25,18 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="64dp"
-    >
+    android:background="@color/white"
+    android:minHeight="48dp">
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
         android:id="@+id/item_avatar"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="@dimen/margin_min"
+        style="@style/ListAvatar"
         android:background="@drawable/bg_image_round_shadow"
-        android:elevation="4dp"
         android:scaleType="centerCrop"
         app:civ_border_color="@color/white"
         app:civ_border_overlay="true"
@@ -55,13 +51,12 @@
         android:id="@+id/item_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_min"
+        style="@style/ListTitle"
         android:layout_marginEnd="@dimen/margin_min"
-        android:textSize="@dimen/text_size_default"
-        android:textStyle="bold"
+        android:layout_marginStart="@dimen/margin_edges_xlarge"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/item_amount"
-        app:layout_constraintStart_toEndOf="@id/item_avatar"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Mxfe6001...61eE99"
         />
@@ -70,12 +65,10 @@
         android:id="@+id/item_amount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/margin_min"
-        android:fontFamily="@font/_ubuntu_medium"
+        style="@style/ListTitle"
+        android:layout_marginEnd="@dimen/margin_edges_half"
         android:gravity="end"
-        android:textAlignment="viewEnd"
-        android:textColor="@color/textColorGreen"
-        android:textSize="@dimen/text_size_default"
+        android:textAlignment="textEnd"
         app:layout_constraintBottom_toTopOf="@id/item_subamount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
@@ -91,14 +84,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="@dimen/margin_min"
-        android:fontFamily="@font/_ubuntu_medium"
-        android:textColor="@color/textColorGrey"
-        android:textSize="11sp"
+        style="@style/ListSubtitle"
+        android:layout_marginEnd="@dimen/margin_edges_half"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/item_amount"
-        tools:text="STBX"
-        />
+        tools:text="GOOGL" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,16 +29,14 @@ package network.minter.bipwallet.internal.di;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
-import network.minter.bipwallet.addresses.AddressManageModule;
-import network.minter.bipwallet.addresses.ui.AddressItemActivity;
-import network.minter.bipwallet.addresses.ui.AddressListActivity;
+import network.minter.bipwallet.addressbook.ui.AddressBookActivity;
+import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog;
 import network.minter.bipwallet.advanced.AdvancedModeModule;
 import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
 import network.minter.bipwallet.advanced.ui.AdvancedLedgerActivity;
 import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.auth.ui.AuthFragment;
-import network.minter.bipwallet.auth.ui.CreateWalletDialog;
 import network.minter.bipwallet.auth.ui.SplashFragment;
 import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ExchangeModule;
@@ -53,10 +51,15 @@ import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.security.ui.PinValidationDialog;
 import network.minter.bipwallet.services.livebalance.RTMService;
-import network.minter.bipwallet.settings.ui.PasswordChangeMigrationActivity;
 import network.minter.bipwallet.tx.TransactionsModule;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog;
+import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog;
+import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog;
+import network.minter.bipwallet.wallets.dialogs.ui.SignInMnemonicDialog;
+import network.minter.bipwallet.wallets.ui.CoinsTabPageFragment;
+import network.minter.bipwallet.wallets.ui.TxsTabPageFragment;
 
 /**
  * minter-android-wallet. 2018
@@ -80,6 +83,18 @@ public interface InjectorsModule {
 
     @ContributesAndroidInjector
     @FragmentScope
+    SignInMnemonicDialog signInWalletDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    EditWalletDialog walletEditDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    AddWalletDialog walletAddDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
     AuthFragment authFragmentInjector();
 
     @ContributesAndroidInjector(modules = AdvancedModeModule.class)
@@ -93,14 +108,6 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @ActivityScope
     AdvancedGenerateActivity advancedGenerateActivity();
-
-    @ContributesAndroidInjector(modules = AddressManageModule.class)
-    @ActivityScope
-    AddressListActivity addressListActivityInjector();
-
-    @ContributesAndroidInjector(modules = AddressManageModule.class)
-    @ActivityScope
-    AddressItemActivity addressItemActivityInjector();
 
     @ContributesAndroidInjector(modules = TransactionsModule.class)
     @ActivityScope
@@ -123,10 +130,6 @@ public interface InjectorsModule {
     SpendCoinTabFragment spendCoinTabFragmentInjector();
 
     @ContributesAndroidInjector
-    @ActivityScope
-    PasswordChangeMigrationActivity passwordChangeMigrationActivityInjector();
-
-    @ContributesAndroidInjector
     @ServiceScope
     RTMService balanceUpdateService();
 
@@ -145,4 +148,22 @@ public interface InjectorsModule {
     @ContributesAndroidInjector(modules = {SecurityModule.class})
     @FragmentScope
     PinValidationDialog pinValidationDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    CoinsTabPageFragment coinsTabPageFragmentInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    TxsTabPageFragment txsTabPageFragmentInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    AddressBookActivity addressBookActivityInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    AddressContactEditDialog addressContactEditDialogInjector();
+
+
 }

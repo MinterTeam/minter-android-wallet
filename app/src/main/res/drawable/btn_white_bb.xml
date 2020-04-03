@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -34,7 +34,7 @@
             <corners android:radius="@dimen/btn_border_radius"/>
             <stroke
                 android:width="2dp"
-                android:color="@color/colorPrimary"/>
+                android:color="@color/colorPrimaryLight" />
         </shape>
     </item>
     <item>
@@ -54,14 +54,14 @@
                     <solid android:color="@color/colorPrimaryFocused"/>
                     <stroke
                         android:width="2dp"
-                        android:color="@color/colorPrimary"/>
+                        android:color="@color/colorPrimaryLight" />
                 </shape>
             </item>
             <item>
                 <shape android:shape="rectangle">
                     <stroke
                         android:width="2dp"
-                        android:color="@color/colorPrimary"/>
+                        android:color="@color/colorPrimaryLight" />
                     <corners android:radius="@dimen/btn_border_radius"/>
                     <solid android:color="@color/transparent"/>
                 </shape>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,7 +29,9 @@ package network.minter.bipwallet.internal;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ViewGroup;
 
+import androidx.appcompat.widget.Toolbar;
 import moxy.MvpAppCompatFragment;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 
@@ -43,6 +45,16 @@ public abstract class BaseFragment extends MvpAppCompatFragment {
         }
 
         return getActivity();
+    }
+
+    public BaseMvpActivity getBaseActivity() {
+        return ((BaseMvpActivity) getActivity());
+    }
+
+    protected void setupTranslucentStatusBarToolbar(Toolbar toolbar) {
+        ViewGroup.MarginLayoutParams lp = ((ViewGroup.MarginLayoutParams) toolbar.getLayoutParams());
+        lp.topMargin = getBaseActivity().getStatusBarHeight();
+        toolbar.setLayoutParams(lp);
     }
 
     @Override

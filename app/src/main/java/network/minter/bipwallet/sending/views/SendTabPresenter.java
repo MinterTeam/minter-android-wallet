@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,7 +34,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.annimon.stream.Optional;
-import com.annimon.stream.Stream;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -56,20 +55,21 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
+import network.minter.bipwallet.addressbook.db.AddressBookRepository;
+import network.minter.bipwallet.addressbook.models.AddressContact;
+import network.minter.bipwallet.addressbook.ui.AddressBookActivity;
+import network.minter.bipwallet.advanced.models.AddressBalanceTotal;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.models.SecretData;
-import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
-import network.minter.bipwallet.internal.exceptions.ProfileResponseException;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.internal.helpers.forms.validators.ByteLengthValidator;
 import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator;
@@ -77,13 +77,12 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.system.SimpleTextWatcher;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.sending.contract.SendView;
-import network.minter.bipwallet.sending.models.RecipientItem;
-import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendStartDialog;
 import network.minter.bipwallet.sending.ui.dialogs.WalletTxSendSuccessDialog;
 import network.minter.bipwallet.tx.contract.TxInitData;
+import network.minter.bipwallet.wallets.selector.WalletItem;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.TransactionSendResult;
@@ -96,19 +95,16 @@ import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.explorer.models.ExpResult;
+import network.minter.explorer.models.CoinBalance;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.models.TxCount;
-import network.minter.explorer.models.ValidatorItem;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
 import network.minter.ledger.connector.rxjava2.RxMinterLedger;
-import network.minter.profile.MinterProfileApi;
-import network.minter.profile.models.ProfileResult;
 import network.minter.profile.repo.ProfileInfoRepository;
 import timber.log.Timber;
 
@@ -117,8 +113,6 @@ import static java.lang.String.format;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.rxGate;
 import static network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError;
-import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile;
-import static network.minter.bipwallet.apis.reactive.ReactiveMyMinter.toProfileError;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdGTE;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
@@ -131,26 +125,24 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFro
 @InjectViewState
 public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private static final int REQUEST_CODE_QR_SCAN_ADDRESS = 101;
+    private static final int REQUEST_CODE_ADDRESS_BOOK_SELECT = 102;
     private static final BigDecimal PAYLOAD_FEE = BigDecimal.valueOf(0.002);
     @Inject SecretStorage secretStorage;
     @Inject AuthSession session;
     @Inject CachedRepository<List<HistoryTransaction>, CacheTxRepository> cachedTxRepo;
-    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorage;
     @Inject ExplorerCoinsRepository coinRepo;
     @Inject BlockChainTransactionRepository bcTxRepo;
     @Inject ExplorerValidatorsRepository validatorsRepo;
     @Inject ProfileInfoRepository infoRepo;
     @Inject GateGasRepository gasRepo;
-    @Inject CacheManager cache;
-    @Inject RecipientAutocompleteStorage recipientStorage;
     @Inject IdlingManager idlingManager;
     @Inject GateEstimateRepository estimateRepo;
     @Inject GateTransactionRepository gateTxRepo;
-    private CoinAccount mFromAccount = null;
+    @Inject AddressBookRepository addressBookRepo;
+    private CoinBalance mFromAccount = null;
     private BigDecimal mAmount = null;
-    private CharSequence mToMxAddress = null;
-    private CharSequence mToMpAddress = null;
-    private CharSequence mToName = null;
+    private AddressContact mRecipient;
     private String mAvatar = null;
     private @DrawableRes int mAvatarRes;
     private AtomicBoolean mUseMax = new AtomicBoolean(false);
@@ -159,7 +151,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     private BehaviorSubject<String> mAddressChange;
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private BigInteger mGasPrice = new BigInteger("1");
-    private CoinAccount mLastAccount = null;
+    private CoinBalance mLastAccount = null;
     private BigDecimal mSendFee;
     private byte[] mPayload;
     private final TextWatcher mPayloadChangeListener = new SimpleTextWatcher() {
@@ -193,10 +185,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     };
     private boolean mFormValid = false;
 
-    private enum SearchByType {
-        Address, Username, Email
-    }
-
     @Inject
     public SendTabPresenter() {
     }
@@ -209,7 +197,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         getViewState().setOnSubmit(this::onSubmit);
         getViewState().setOnClickMaximum(this::onClickMaximum);
         getViewState().setOnClickAddPayload(this::onClickAddPayload);
+        getViewState().setOnClickClearPayload(this::onClickClearPayload);
         getViewState().setPayloadChangeListener(mPayloadChangeListener);
+        getViewState().setOnContactsClickListener(this::onClickContacts);
+        getViewState().setRecipientAutocompleteItemClickListener(this::onAutocompleteSelected);
         loadAndSetFee();
         accountStorage.update();
     }
@@ -232,14 +223,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 if (result != null) {
                     boolean isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN);
                     boolean isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN);
+                    mRecipient.address = result;
                     if (isMxAddress) {
-                        mToMxAddress = new MinterAddress(result).toString();
-                        getViewState().setRecipient(mToMxAddress);
-                        mToName = mToMxAddress.toString();
+                        mRecipient.type = AddressContact.AddressType.Address;
+                        getViewState().setRecipient(mRecipient);
                     } else if (isMpAddress) {
-                        mToMpAddress = new MinterPublicKey(result).toString();
-                        getViewState().setRecipient(mToMpAddress);
-                        mToName = mToMpAddress.toString();
+                        mRecipient.type = AddressContact.AddressType.ValidatorPubKey;
+                        getViewState().setRecipient(mRecipient);
                     }
                 }
             }
@@ -264,6 +254,13 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                             .create());
                 }
             }
+        } else if (requestCode == REQUEST_CODE_ADDRESS_BOOK_SELECT) {
+            AddressContact contact = AddressBookActivity.getResult(data);
+            if (contact == null) {
+                return;
+            }
+            mRecipient = contact;
+            getViewState().setRecipient(mRecipient);
         }
     }
 
@@ -275,10 +272,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {
                     if (!res.isEmpty()) {
+                        getViewState().setWallets(WalletItem.create(secretStorage, res));
+                        getViewState().setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.getMainWallet())));
+
+                        AddressBalanceTotal acc = accountStorage.getEntity().getMainWallet();
                         if (mLastAccount != null) {
-                            onAccountSelected(res.findAccountByCoin(mLastAccount.getCoin()).orElse(res.getCoinAccounts().get(0)));
+                            onAccountSelected(acc.findCoinByName(mLastAccount.getCoin()).orElse(acc.getCoinsList().get(0)));
                         } else {
-                            onAccountSelected(res.getCoinAccounts().get(0));
+                            onAccountSelected(acc.getCoinsList().get(0));
                         }
                     }
                 }, t -> {
@@ -305,6 +306,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             Timber.d("Form is valid: %b", valid);
             checkEnableSubmit();
         });
+    }
+
+    private void onClickClearPayload(View view) {
+        getViewState().hidePayload();
+    }
+
+    private void onClickContacts(View view) {
+        getViewState().startAddressBook(REQUEST_CODE_ADDRESS_BOOK_SELECT);
     }
 
     private void onClickAddPayload(View view) {
@@ -362,16 +371,15 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         return BigDecimal.valueOf(firstNonNull(mPayload, new byte[0]).length).multiply(PAYLOAD_FEE);
     }
 
-
     private void setRecipientAutocomplete() {
         if (true) {
             // FIXME some cases working wrong, this task is low priority, so just disable it for now
             return;
         }
-        recipientStorage.getItems()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(res -> getViewState().setRecipientsAutocomplete(res, (item, position) -> getViewState().setRecipient(item.getName())));
+//        recipientStorage.getItems()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(res -> getViewState().setRecipientsAutocomplete(res, (item, position) -> getViewState().setRecipient(item.getName())));
     }
 
     private boolean checkEnoughBalance(BigDecimal amount) {
@@ -428,140 +436,30 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private void onSubmit(View view) {
-        if (mToName == null) {
+        if (mRecipient == null) {
             getViewState().setRecipientError("Recipient required");
             return;
         }
         getAnalytics().send(AppEvent.SendCoinsSendButton);
         switch (getTransactionTypeByAddress()) {
             case Delegate:
-                mToMpAddress = mToName;
                 mAvatar = null;
                 mAvatarRes = R.drawable.img_avatar_delegate;
-                mToName = mToMpAddress.toString();
                 startSendDialog();
                 break;
             case SendCoin:
-                mToMxAddress = mToName;
-                resolveUserInfo(mToName.toString(), false);
+                mAvatar = mRecipient.getAvatar();
+                startSendDialog();
                 break;
-            default:
-                resolveUserInfo(mToName.toString(), true);
         }
     }
 
     private OperationType getTransactionTypeByAddress() {
-        if (mToName == null) {
-            // send - default fee
+        if (mRecipient == null) {
             return OperationType.SendCoin;
         }
 
-        if (mToName.toString().matches(MinterPublicKey.PUB_KEY_PATTERN)) {
-            return OperationType.Delegate;
-        } else {
-            return OperationType.SendCoin;
-        }
-    }
-
-    private SearchByType getSearchByType(String input) {
-        if (MinterAddress.testString(input)) {
-            // searching data by address
-            return SearchByType.Address;
-        } else if (input.substring(0, 1).equals("@")) {
-            // searching data by username
-            return SearchByType.Username;
-        } else {
-            // searching by email
-            return SearchByType.Email;
-        }
-    }
-
-    private void resolveUserInfo(final String searchBy, final boolean failOnNotFound) {
-        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
-        getViewState().startDialog(ctx -> {
-            rxProfile(infoRepo.findAddressInfoByInput(searchBy))
-                    .delay(150, TimeUnit.MILLISECONDS)
-                    .onErrorResumeNext(toProfileError())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(result -> {
-                        if (result.isSuccess()) {
-                            mAvatar = result.data.user.getAvatar().getUrl();
-                            mToMxAddress = result.data.address.toString();
-                            final SearchByType nameType = getSearchByType(searchBy);
-                            switch (nameType) {
-                                case Email:
-                                    mToName = result.data.user.email;
-                                    break;
-                                case Username:
-                                    mToName = format("@%s", result.data.user.username);
-                                    break;
-                                case Address:
-                                    mToName = result.data.address.toString();
-                                    break;
-                            }
-
-                            getViewState().setRecipientError(null);
-                            startSendDialog();
-                        } else {
-                            if (mToMxAddress != null) {
-                                mAvatar = MinterProfileApi.getUserAvatarUrlByAddress(mToMxAddress.toString());
-                            } else {
-                                mAvatar = MinterProfileApi.getUserAvatarUrl(1);
-                            }
-
-                            if (failOnNotFound) {
-                                mToMxAddress = null;
-                                onErrorSearchUser(result);
-                                Timber.d(new ProfileResponseException(result), "Unable to find address");
-                            } else {
-                                getViewState().setRecipientError(null);
-                                startSendDialog();
-                            }
-                        }
-                    }, Wallet.Rx.errorHandler(getViewState()));
-
-            return new WalletProgressDialog.Builder(ctx, R.string.tx_address_searching)
-                    .setText(format("Please, wait, we are searching address for user \"%s\"", searchBy))
-                    .create();
-        });
-    }
-
-    private void resolveValidator(final String searchBy, final boolean failOnNotFound) {
-        idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, true);
-        getViewState().startDialog(ctx -> {
-            rxProfile(validatorsRepo.getValidators())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(result -> {
-                        if (result.isOk()) {
-                            ValidatorItem validator = Stream.of(result.result)
-                                    .filter(v -> {
-                                        if (mToMpAddress.toString().substring(0, 2).equals(MinterSDK.PREFIX_PUBLIC_KEY))
-                                            return v.pubKey.toString().equals(mToMpAddress.toString());
-                                        else
-                                            return v.pubKey.toString().substring(2).equals(mToMpAddress.toString());
-                                    })
-                                    .findFirst().orElse(null);
-
-                            if (validator != null) {
-                                mAvatar = validator.meta.iconUrl;
-                                mAvatarRes = R.drawable.img_avatar_delegate;
-                                mToName = mToMpAddress.toString();
-                                startSendDialog();
-                                getViewState().setRecipientError(null);
-                            } else {
-                                onErrorSearchValidator();
-                            }
-                        } else {
-                            onErrorSearchValidator(result);
-                        }
-                    }, Wallet.Rx.errorHandler(getViewState()));
-
-            return new WalletProgressDialog.Builder(ctx, R.string.tx_address_searching)
-                    .setText(format("Please, wait, we are searching address for validator \"%s\"", searchBy))
-                    .create();
-        });
+        return mRecipient.type == AddressContact.AddressType.ValidatorPubKey ? OperationType.Delegate : OperationType.SendCoin;
     }
 
     private void startSendDialog() {
@@ -572,10 +470,11 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 idlingManager.setNeedsWait(SendTabFragment.IDLE_SEND_CONFIRM_DIALOG, false);
                 Timber.d("Confirm dialog: IDLING");
                 getAnalytics().send(AppEvent.SendCoinPopupScreen);
-                final WalletTxSendStartDialog.Builder builder = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
+                final WalletTxSendStartDialog dialog = new WalletTxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)
-                        .setRecipientName(mToName)
+                        .setRecipientName(mRecipient.name)
                         .setCoin(mFromAccount.coin)
+                        .setAvatarUrlFallback(mAvatar, mAvatarRes)
                         .setPositiveAction(R.string.btn_send, (d, w) -> {
                             Wallet.app().sounds().play(R.raw.bip_beep_digi_octave);
                             onStartExecuteTransaction();
@@ -586,13 +485,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                             Wallet.app().sounds().play(R.raw.cancel_pop_hi);
                             getAnalytics().send(AppEvent.SendCoinPopupCancelButton);
                             d.dismiss();
-                        });
-                if (mAvatar == null) {
-                    builder.setAvatarResource(mAvatarRes);
-                } else {
-                    builder.setAvatarUrl(mAvatar);
-                }
-                final WalletTxSendStartDialog dialog = builder.create();
+                        })
+                        .create();
+
                 dialog.setCancelable(true);
                 return dialog;
             } catch (NullPointerException badState) {
@@ -622,7 +517,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
         boolean a = bdGTE(mAmount, BigDecimal.ZERO);
         boolean b = mFormValid;
-        boolean c = checkEnoughBalance(mFromAccount.getBalance());
+        boolean c = checkEnoughBalance(mFromAccount.getAmount());
         boolean formFullyValid = a && b && c;
 
         getViewState().setSubmitEnabled(formFullyValid);
@@ -635,9 +530,9 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
         mUseMax.set(true);
         mClickedUseMax.set(true);
-        mAmount = mFromAccount.getBalance();
+        mAmount = mFromAccount.getAmount();
 //        checkEnableSubmit();
-        getViewState().setAmount(mFromAccount.getBalance().stripTrailingZeros().toPlainString());
+        getViewState().setAmount(mFromAccount.getAmount().stripTrailingZeros().toPlainString());
 
         getAnalytics().send(AppEvent.SendCoinsUseMaxButton);
         if (view != null && view.getContext() instanceof Activity) {
@@ -645,8 +540,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
     }
 
-    private Optional<CoinAccount> findAccountByCoin(String coin) {
-        return accountStorage.getData().findAccountByCoin(coin);
+    private Optional<CoinBalance> findAccountByCoin(String coin) {
+        return accountStorage.getEntity().getMainWallet().findCoinByName(coin);
     }
 
     private TransactionSign createPreTx(OperationType type) throws OperationInvalidDataException {
@@ -663,7 +558,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             preTx = builder
                     .delegate()
                     .setCoin(mFromAccount.coin)
-                    .setPublicKey(mToMpAddress.toString())
+                    .setPublicKey(mRecipient.address)
                     .setStake(mAmount)
                     .build();
 
@@ -671,7 +566,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             preTx = builder
                     .sendCoin()
                     .setCoin(mFromAccount.coin)
-                    .setTo(mToMxAddress)
+                    .setTo(mRecipient.address)
                     .setValue(mAmount)
                     .build();
         }
@@ -694,14 +589,14 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             tx = builder
                     .delegate()
                     .setCoin(mFromAccount.coin)
-                    .setPublicKey(mToMpAddress.toString())
+                    .setPublicKey(mRecipient.address)
                     .setStake(amountToSend)
                     .build();
         } else {
             tx = builder
                     .sendCoin()
                     .setCoin(mFromAccount.coin)
-                    .setTo(mToMxAddress)
+                    .setTo(mRecipient.address)
                     .setValue(amountToSend)
                     .build();
         }
@@ -745,8 +640,8 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             dialog.setCancelable(false);
 
             // BIP account exists anyway, no need
-            CoinAccount baseAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN).get();
-            CoinAccount sendAccount = mFromAccount;
+            CoinBalance baseAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN).get();
+            CoinBalance sendAccount = mFromAccount;
             boolean isBaseAccount = sendAccount.getCoin().equals(MinterSDK.DEFAULT_COIN);
 
             OperationType type = getTransactionTypeByAddress();
@@ -756,7 +651,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             final GateResult<TransactionCommissionValue> txFeeValue = new GateResult<>();
             txFeeValue.result = new TransactionCommissionValue();
             txFeeValue.result.value = getFeeNormalized();
-            enoughBaseForFee = bdGTE(baseAccount.getBalance(), getFee());
+            enoughBaseForFee = bdGTE(baseAccount.getAmount(), getFee());
 
             Observable<GateResult<TransactionCommissionValue>> txFeeValueResolver = Observable.just(txFeeValue);
             Observable<GateResult<TxCount>> txNonceResolver = rxGate(estimateRepo.getTransactionCount(mFromAccount.address)).onErrorResumeNext(toGateError());
@@ -807,7 +702,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
 
                         // if balance enough to send required sum + fee, do nothing
                         // (mAmount + txInitData.commission) <= mFromAccount.getBalance()
-                        if (bdGTE(/*total*/mFromAccount.getBalance(), /*send+fee*/mAmount.add(txInitData.commission))) {
+                        if (bdGTE(/*total*/mFromAccount.getAmount(), /*send+fee*/mAmount.add(txInitData.commission))) {
                             Timber.tag("TX Send").d("Don't change sending amount - balance enough to send");
                             amountToSend = mAmount;
                         }
@@ -832,10 +727,10 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                             final BigDecimal balanceMustBe = txInitData.commission.add(mAmount);
                             // this means user sending less than his balance, but it's still not enough to pay fee
                             // mAmount < mFromAccount.getBalance()
-                            if (bdLT(mAmount, mFromAccount.getBalance())) {
+                            if (bdLT(mAmount, mFromAccount.getAmount())) {
                                 // special for humans - calculate how much balance haven't enough balance
-                                final BigDecimal notEnough = txInitData.commission.subtract(mFromAccount.getBalance().subtract(mAmount));
-                                Timber.tag("TX Send").d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(notEnough));
+                                final BigDecimal notEnough = txInitData.commission.subtract(mFromAccount.getAmount().subtract(mAmount));
+                                Timber.tag("TX Send").d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getAmount()), bdHuman(notEnough));
                                 errorRes = createGateErrorPlain(
                                         format("Insufficient funds: not enough %s %s, wanted: %s %s", bdHuman(notEnough), mFromAccount.getCoin(), bdHuman(balanceMustBe), mFromAccount.getCoin()),
                                         BCResult.ResultCode.InsufficientFunds.getValue(),
@@ -843,7 +738,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                                 );
                             } else {
                                 // sum bigger than account balance, so, just show full required sum
-                                Timber.tag("TX Send").d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getBalance()), bdHuman(balanceMustBe));
+                                Timber.tag("TX Send").d("Amount: %s, fromAcc: %s, diff: %s", bdHuman(mAmount), bdHuman(mFromAccount.getAmount()), bdHuman(balanceMustBe));
                                 errorRes = createGateErrorPlain(
                                         format("Insufficient funds: wanted %s %s", bdHuman(balanceMustBe), mFromAccount.getCoin()),
                                         BCResult.ResultCode.InsufficientFunds.getValue(),
@@ -866,14 +761,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
     }
 
     private ObservableSource<GateResult<TransactionSendResult>> signSendTx(WalletProgressDialog dialog, BigInteger nonce, OperationType type, BigDecimal amountToSend) throws OperationInvalidDataException {
-        Timber.tag("TX Send").d("Send data: gasCoin=%s, coin=%s, to=%s, from=%s, amount=%s",
-                mFromAccount.getCoin(),
-                mFromAccount.getCoin(),
-                mToName,
-                mFromAccount.getAddress().toString(),
-                amountToSend
-        );
-
         // creating tx
         final Transaction tx = createFinalTx(nonce.add(BigInteger.ONE), type, amountToSend);
 
@@ -937,29 +824,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
                 .create());
     }
 
-    private void onErrorSearchUser(ProfileResult<?> errorResult) {
-        Timber.e(errorResult.getError().message, "Unable to find address");
-        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Error")
-                .setText(format("Unable to find user address for user \"%s\": %s", mToName, errorResult.getError().message))
-                .setPositiveAction("Close")
-                .create());
-    }
-
-    private void onErrorSearchValidator(ExpResult<?> errorResult) {
-        Timber.e(errorResult.error.message, "Unable to find address");
-        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Error")
-                .setText(format("Unable to find validator for address \"%s\": %s", mToName, errorResult.error.message))
-                .setPositiveAction("Close")
-                .create());
-    }
-
-    private void onErrorSearchValidator() {
-        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Error")
-                .setText(format("Unable to find validator for address \"%s\"", mToName))
-                .setPositiveAction("Close")
-                .create());
-    }
-
     private void onErrorExecuteTransaction(GateResult<?> errorResult) {
         Timber.e(errorResult.getMessage(), "Unable to send transaction");
         getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Unable to send transaction")
@@ -974,14 +838,6 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             return;
         }
 
-        final CharSequence to;
-        if (getTransactionTypeByAddress() == OperationType.Delegate) {
-            to = mToMpAddress;
-        } else {
-            to = mToMxAddress;
-        }
-        recipientStorage.add(new RecipientItem(to, mToName), this::setRecipientAutocomplete);
-
         getViewState().hidePayload();
 
         accountStorage.update(true);
@@ -990,7 +846,7 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
             getAnalytics().send(AppEvent.SentCoinPopupScreen);
 
             WalletTxSendSuccessDialog.Builder builder = new WalletTxSendSuccessDialog.Builder(ctx, "Success!")
-                    .setRecipientName(mToName)
+                    .setRecipientName(mRecipient.name)
                     .setPositiveAction("View transaction", (d, v) -> {
                         Wallet.app().sounds().play(R.raw.click_pop_zap);
                         getViewState().startExplorer(result.result.txHash.toString());
@@ -1011,18 +867,29 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         });
 
         getViewState().clearInputs();
-        mToName = null;
-        mToMpAddress = null;
-        mToMxAddress = null;
+        mRecipient = null;
         mSendFee = null;
     }
 
     private void onInputTextChanged(EditText editText, boolean valid) {
+        final String s = editText.getText().toString();
         switch (editText.getId()) {
             case R.id.input_recipient:
-                mToName = editText.getText();
-                mToMxAddress = null;
-                mAddressChange.onNext(mToName.toString());
+                unsubscribeOnDestroy(
+                        addressBookRepo.findByNameOrAddress(s)
+                                .subscribe(res -> {
+                                    mRecipient = res;
+                                    mAddressChange.onNext(mRecipient.name);
+                                    getViewState().hideAutocomplete();
+                                }, t -> {
+                                    mRecipient = null;
+                                    getViewState().setSubmitEnabled(false);
+                                    addressBookRepo.findSuggestionsByNameOrAddress(s)
+                                            .subscribe(suggestions -> {
+                                                getViewState().setRecipientAutocompleteItems(suggestions);
+                                            }, Timber::w);
+                                }));
+
                 break;
             case R.id.input_amount:
                 mInputChange.onNext(editText.getText().toString());
@@ -1030,14 +897,18 @@ public class SendTabPresenter extends MvpBasePresenter<SendView> {
         }
     }
 
-    private void onClickAccountSelector(View view) {
-        getAnalytics().send(AppEvent.SendCoinsChooseCoinButton);
-        getViewState().startAccountSelector(accountStorage.getData().getCoinAccounts(), this::onAccountSelected);
+    private void onAutocompleteSelected(AddressContact contact, int pos) {
+        getViewState().setRecipient(contact);
     }
 
-    private void onAccountSelected(CoinAccount coinAccount) {
+    private void onClickAccountSelector(View view) {
+        getAnalytics().send(AppEvent.SendCoinsChooseCoinButton);
+        getViewState().startAccountSelector(accountStorage.getEntity().getMainWallet().getCoinsList(), this::onAccountSelected);
+    }
+
+    private void onAccountSelected(CoinBalance coinAccount) {
         mFromAccount = coinAccount;
         mLastAccount = coinAccount;
-        getViewState().setAccountName(format("%s (%s)", coinAccount.coin.toUpperCase(), bdHuman(coinAccount.getBalance())));
+        getViewState().setAccountName(format("%s (%s)", coinAccount.coin.toUpperCase(), bdHuman(coinAccount.getAmount())));
     }
 }

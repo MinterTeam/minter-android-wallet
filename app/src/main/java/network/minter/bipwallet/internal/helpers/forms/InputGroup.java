@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,6 +30,7 @@ import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -54,6 +55,7 @@ public class InputGroup {
     private List<OnTextChangedListener> mTextWatchers = new ArrayList<>();
     private Map<EditText, List<BaseValidator>> mInputValidators = new HashMap<>();
     private List<OnFormValidateListener> mValidFormListeners = new ArrayList<>();
+    private Map<String, TextView> mErrorViews = new HashMap<>();
     @SuppressLint("UseSparseArrays")
     private Map<Integer, Boolean> mValidMap = new HashMap<>();
     private List<Integer> mRequiredInputs = new ArrayList<>();
@@ -151,6 +153,19 @@ public class InputGroup {
         return this;
     }
 
+    public InputGroup setErrorView(EditText input, TextView errorView) {
+        if (input.getTag() != null && input.getTag() instanceof String) {
+            mErrorViews.put(((String) input.getTag()), errorView);
+        }
+
+        return this;
+    }
+
+    public InputGroup setErrorView(TextInputLayout inputLayout, TextView errorView) {
+        if (inputLayout == null || inputLayout.getEditText() == null) return this;
+        return setErrorView(inputLayout.getEditText(), errorView);
+    }
+
     public boolean validate(boolean withError) {
         int countValid = 0;
         for (Map.Entry<EditText, List<BaseValidator>> entry : mInputValidators.entrySet()) {
@@ -203,17 +218,22 @@ public class InputGroup {
     }
 
     public void clearErrors() {
-        for (Map.Entry<String, EditText> entry : mInputNames.entrySet()) {
-            if (entry.getValue().getParent() != null && entry.getValue().getParent().getParent() instanceof TextInputLayout) {
-                final TextInputLayout tl = ((TextInputLayout) entry.getValue().getParent().getParent());
+        for (EditText input : mInputNames.values()) {
+            if (input.getParent() != null && input.getParent().getParent() instanceof TextInputLayout) {
+                final TextInputLayout tl = ((TextInputLayout) input.getParent().getParent());
                 tl.post(() -> {
                     tl.setErrorEnabled(false);
                     tl.setError(null);
                 });
             } else {
-                entry.getValue().setError(null);
+                input.setError(null);
             }
         }
+        Stream.of(mErrorViews.values())
+                .forEach(item -> {
+                    item.setText(null);
+                    item.setVisibility(View.GONE);
+                });
     }
 
     public void setOnEditorActionListener(TextView.OnEditorActionListener listener) {
@@ -226,8 +246,7 @@ public class InputGroup {
             return;
         }
 
-        if (mInputNames.get(fieldName).getParent() != null && mInputNames.get(
-                fieldName).getParent().getParent() instanceof TextInputLayout) {
+        if (mInputNames.get(fieldName).getParent() != null && mInputNames.get(fieldName).getParent().getParent() instanceof TextInputLayout) {
             final TextInputLayout tl = ((TextInputLayout) mInputNames.get(fieldName).getParent().getParent());
 
             tl.post(() -> {
@@ -235,7 +254,10 @@ public class InputGroup {
                 tl.setErrorEnabled(message != null && message.length() > 0);
                 tl.setError(message);
             });
-
+        } else if (mErrorViews.containsKey(fieldName) && mErrorViews.get(fieldName) != null) {
+            final TextView errorView = mErrorViews.get(fieldName);
+            errorView.setText(message);
+            errorView.setVisibility(View.VISIBLE);
         } else {
             final EditText in = mInputNames.get(fieldName);
             if (in != null) {
@@ -309,6 +331,17 @@ public class InputGroup {
                                 } else {
                                     lay.setError(null);
                                     lay.setErrorEnabled(false);
+                                }
+                            });
+                        } else if (editText.getTag() != null && mErrorViews.containsKey(editText.getTag())) {
+                            final String fieldName = ((String) editText.getTag());
+                            mErrorViews.get(fieldName).post(() -> {
+                                if (!valid) {
+                                    mErrorViews.get(fieldName).setText(item.getErrorMessage());
+                                    mErrorViews.get(fieldName).setVisibility(View.VISIBLE);
+                                } else {
+                                    mErrorViews.get(fieldName).setText(null);
+                                    mErrorViews.get(fieldName).setVisibility(View.GONE);
                                 }
                             });
                         } else {

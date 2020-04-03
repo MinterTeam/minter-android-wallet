@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -28,8 +28,9 @@
 <resources>
     <color name="colorPrimary">#200B4F</color>
     <color name="colorPrimaryDark">#1C0D46</color>
-    <color name="colorPrimaryDarker">#4225A4</color>
-    <color name="colorPrimaryHalf">#60502EC2</color>
+    <color name="colorPrimaryLight">#5024C5</color>
+    <color name="colorPrimaryWarning">#DC4840</color>
+    <color name="colorPrimaryWarningDark">#AE3A34</color>
 
     <color name="colorPrimaryFocused">#19502EC2</color>
     <color name="colorPrimaryPressed">#33502EC2</color>
@@ -60,7 +61,8 @@
     <color name="btn_disabled">#929292</color>
     <color name="btn_disabled2">#FFD4D4D4</color>
     <color name="btn_disabled_transparent">#80929292</color>
-    <color name="colorInactive">#929292</color>
+    <color name="colorInactive">#8E8E8E</color>
     <color name="colorInactive2">#60000000</color>
+    <color name="colorInactive3">#222222</color>
     <color name="warning_bg">#F13C3C</color>
 </resources>

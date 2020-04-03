@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,4 +50,5 @@ public interface RemoteImageView {
     void setImageUrl(RemoteImageContainer imageUrlContainer);
     void setImageUrl(RemoteImageContainer imageUrlContainer, @Dp float size);
     void setImageUrl(RemoteImageContainer imageUrlContainer, @DimenRes int resId);
+    void setImageResource(@DrawableRes int resId);
 }

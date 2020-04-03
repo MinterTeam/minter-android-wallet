@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,14 +40,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.CoinBalance;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class WalletAccountSelectorDialog extends WalletDialog {
@@ -67,14 +66,11 @@ public class WalletAccountSelectorDialog extends WalletDialog {
         title.setText(mBuilder.getTitle());
 
         AccountSelectedAdapter adapter = new AccountSelectedAdapter(mBuilder.mItems);
-        adapter.setOnClickListener(new AccountSelectedAdapter.OnClickListener() {
-            @Override
-            public void onClick(CoinAccount item) {
-                if (mBuilder.mOnClickListener != null) {
-                    mBuilder.mOnClickListener.onClick(item);
-                }
-                dismiss();
+        adapter.setOnClickListener(item -> {
+            if (mBuilder.mOnClickListener != null) {
+                mBuilder.mOnClickListener.onClick(item);
             }
+            dismiss();
         });
 
         list.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -82,7 +78,7 @@ public class WalletAccountSelectorDialog extends WalletDialog {
     }
 
     public static final class Builder extends WalletDialogBuilder<WalletAccountSelectorDialog, WalletAccountSelectorDialog.Builder> {
-        private List<CoinAccount> mItems = new ArrayList<>();
+        private List<CoinBalance> mItems = new ArrayList<>();
         private AccountSelectedAdapter.OnClickListener mOnClickListener;
 
         public Builder(Context context) {
@@ -107,27 +103,22 @@ public class WalletAccountSelectorDialog extends WalletDialog {
             return this;
         }
 
-        public Builder addItem(String avatar, String coin, MinterAddress address, BigDecimal balance) {
-            mItems.add(new CoinAccount(avatar, coin, address, balance));
-            return this;
-        }
-
         public Builder addItem(String coin, MinterAddress address, BigDecimal balance) {
-            mItems.add(new CoinAccount(coin, address, balance));
+            mItems.add(new CoinBalance(coin, balance, address));
             return this;
         }
 
-        public Builder addItem(CoinAccount item) {
+        public Builder addItem(CoinBalance item) {
             mItems.add(item);
             return this;
         }
 
-        public Builder addItems(List<CoinAccount> items) {
+        public Builder addItems(List<CoinBalance> items) {
             mItems.addAll(items);
             return this;
         }
 
-        public Builder setItems(List<CoinAccount> items) {
+        public Builder setItems(List<CoinBalance> items) {
             mItems = new ArrayList<>(items);
             return this;
         }

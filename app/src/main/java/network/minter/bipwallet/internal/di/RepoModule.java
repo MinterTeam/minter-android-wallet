@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,9 +31,7 @@ import dagger.Provides;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainBlockRepository;
@@ -192,12 +190,6 @@ public class RepoModule {
     @WalletApp
     public BlockChainBlockRepository provideBlockChainBlockRepository() {
         return MinterBlockChainApi.getInstance().block();
-    }
-
-    @Provides
-    @WalletApp
-    public RecipientAutocompleteStorage provideRecipientStorage(@DbCache KVStorage storage) {
-        return new RecipientAutocompleteStorage(storage);
     }
 
     @Provides

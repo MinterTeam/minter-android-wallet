@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -52,6 +52,8 @@ import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.helpers.IntentHelper;
 import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
+import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog;
+import network.minter.bipwallet.wallets.dialogs.ui.SignInMnemonicDialog;
 
 /**
  * minter-android-wallet. 2018
@@ -65,6 +67,7 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
     @BindView(R.id.action_help) Button actionHelp;
     @BindView(R.id.logo) ImageView logo;
     private CallbackIdlingResource mAuthWait;
+    private BottomSheetDialogFragment mDialog;
 
     @VisibleForTesting
     public void registerIdling(CallbackIdlingResource authWaitIdlingRes) {
@@ -88,7 +91,18 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
 
     @Override
     public void startSignIn() {
+        if (mDialog != null) {
+            try {
+                mDialog.dismiss();
+            } catch (Throwable ignore) {
+            }
+            mDialog = null;
+        }
 
+        mDialog = new SignInMnemonicDialog();
+        if (getFragmentManager() != null) {
+            mDialog.show(getFragmentManager(), null);
+        }
     }
 
     @Override
@@ -97,8 +111,6 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
                 IntentHelper.newUrl("https://help.minter.network")
         );
     }
-
-    private BottomSheetDialogFragment mDialog;
 
     @Override
     public void startCreateWallet() {

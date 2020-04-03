@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,6 +25,8 @@
  */
 
 package network.minter.bipwallet.internal.helpers;
+
+import android.graphics.Color;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -284,5 +286,15 @@ public final class MathHelper {
         fmt.setDecimalFormatSymbols(symbols);
 
         return fmt.format(in);
+    }
+
+    public static int blendColors(int from, int to, float ratio) {
+        final float inverseRatio = 1f - ratio;
+
+        final float r = Color.red(to) * ratio + Color.red(from) * inverseRatio;
+        final float g = Color.green(to) * ratio + Color.green(from) * inverseRatio;
+        final float b = Color.blue(to) * ratio + Color.blue(from) * inverseRatio;
+
+        return Color.rgb((int) r, (int) g, (int) b);
     }
 }

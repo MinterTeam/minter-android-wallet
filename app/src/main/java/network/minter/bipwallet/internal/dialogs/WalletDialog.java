@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -42,6 +42,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import moxy.MvpView;
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
 import network.minter.bipwallet.R;
 
 /**
@@ -109,6 +111,7 @@ public abstract class WalletDialog extends Dialog {
         WalletDialog run(Context ctx);
     }
 
+    @StateStrategyType(AddToEndSingleStrategy.class)
     public interface DialogContractView extends MvpView {
         void startDialog(DialogExecutor executor);
     }

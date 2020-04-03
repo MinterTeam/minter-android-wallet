@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -52,7 +52,12 @@ public class AuthPresenter extends MvpBasePresenter<AuthView> {
     public void attachView(AuthView view) {
         super.attachView(view);
         getViewState().setOnClickCreateWallet(this::onClickCreateWallet);
+        getViewState().setOnClickSignIn(this::onClickSignIn);
         getViewState().setOnHelp(this::onClickHelp);
+    }
+
+    private void onClickSignIn(View view) {
+        getViewState().startSignIn();
     }
 
     private void onClickHelp(View view) {

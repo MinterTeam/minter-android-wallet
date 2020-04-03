@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,7 +37,7 @@ import java.util.List;
 import javax.inject.Named;
 
 import dagger.Component;
-import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AnalyticsManager;
@@ -59,7 +59,6 @@ import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.helpers.SoundManager;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
 import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.bipwallet.tests.data.KVStorageQueueSaveTest;
@@ -80,7 +79,6 @@ import network.minter.profile.repo.ProfileRepository;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Component(modules = {
@@ -127,8 +125,7 @@ public interface TestWalletComponent extends WalletComponent {
     // local
     SecretStorage secretStorage();
     AccountStorage accountStorage();
-    RecipientAutocompleteStorage recipientStorage();
-    CachedRepository<UserAccount, AccountStorage> accountStorageCache();
+    CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorageCache();
     CachedRepository<List<HistoryTransaction>, CacheTxRepository> explorerTransactionsRepoCache();
     CachedRepository<User.Data, CacheProfileRepository> profileCachedRepo();
     // profile

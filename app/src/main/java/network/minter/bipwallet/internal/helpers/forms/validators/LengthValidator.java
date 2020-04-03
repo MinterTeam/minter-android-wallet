@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,8 +33,9 @@ package network.minter.bipwallet.internal.helpers.forms.validators;
  */
 
 public class LengthValidator extends BaseValidator {
-    private int mMin;
+    private int mMin = -1;
     private int mMax = Integer.MAX_VALUE;
+
 
     public LengthValidator(CharSequence errorMessage, int min) {
         super(errorMessage);

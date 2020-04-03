@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) by MinterTeam. 2018
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,63 +24,53 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/greyBackground"
-    tools:context=".home.ui.HomeActivity"
-    >
+    tools:context=".home.ui.HomeActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="10dp"
-        app:layout_collapseMode="none"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        >
+        app:navigationIcon="@drawable/ic_arrow_back_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:minHeight="?android:attr/actionBarSize"
-            android:theme="@style/WalletPrimaryToolbar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:title="@string/title_tab_settings"
-            app:titleTextColor="@android:color/white"
-            />
+        <TextView
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_tab_settings" />
+    </androidx.appcompat.widget.Toolbar>
 
-        <include layout="@layout/include_testnet_warning_view"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
+    <include
+        layout="@layout/include_testnet_warning_view"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        >
+        app:layout_constraintTop_toBottomOf="@id/testnet_warning">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/greyBackground"
-            >
+            android:background="@color/greyBackground">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_security"
@@ -91,59 +80,88 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_list_settings"
-                />
+                tools:listitem="@layout/item_list_settings" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_main"
                 android:layout_width="0dp"
-                app:layout_constraintTop_toBottomOf="@id/list_security"
                 android:layout_height="wrap_content"
-                tools:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_security"
                 tools:itemCount="4"
-                tools:listitem="@layout/item_list_settings"
-                />
-
+                tools:listitem="@layout/item_list_settings" />
 
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_additional"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/list_main"
                 tools:itemCount="2"
-                tools:listitem="@layout/item_list_settings"
-                />
+                tools:listitem="@layout/item_list_settings" />
 
-            <Button
-                android:id="@+id/free_get"
+            <TextView
+                android:id="@+id/def_wallet_hint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_regular"
+                android:paddingStart="@dimen/margin_edges"
+                android:paddingEnd="@dimen/margin_edges"
+                android:text="@string/hint_choose_def_wallet"
+                android:textAlignment="center"
+                android:textColor="@color/textColorGrey"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_additional" />
+
+            <TextView
+                android:id="@+id/hint_help"
+                style="@style/Wallet.ItemHeader"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_edges"
+                android:paddingEnd="@dimen/margin_edges"
+                android:text="@string/hint_help_and_support"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/def_wallet_hint" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_our_channel"
+                style="@style/Wallet.Button.Transparent.BlueBorder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/btn_official_channel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/hint_help" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_support_chat"
                 style="@style/Wallet.Button.Transparent.BlueBorder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
-                android:text="Get 100 MNT for FREE!"
-                android:visibility="gone"
+                android:text="@string/btn_support_chat"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/list_additional"
-                tools:visibility="visible"
-                />
+                app:layout_constraintTop_toBottomOf="@id/action_our_channel" />
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/free_get"
-
-                />
+                app:layout_constraintTop_toBottomOf="@id/action_support_chat" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

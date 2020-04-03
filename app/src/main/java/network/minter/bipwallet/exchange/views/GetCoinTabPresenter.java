@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,7 +30,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import moxy.InjectViewState;
-import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CacheTxRepository;
@@ -59,7 +59,7 @@ public class GetCoinTabPresenter extends BaseCoinTabPresenter<GetCoinTabView> {
     public GetCoinTabPresenter(
             AuthSession session,
             SecretStorage secretStorage,
-            CachedRepository<UserAccount, AccountStorage> accountStorage,
+            CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorage,
             CachedRepository<List<HistoryTransaction>, CacheTxRepository> txRepo,
             ExplorerCoinsRepository explorerCoinsRepository,
             IdlingManager idlingManager,

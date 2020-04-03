@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.internal.views.list;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -37,10 +38,12 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import timber.log.Timber;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
@@ -49,6 +52,9 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
     private boolean mShowFirstDivider = false;
     private boolean mShowLastDivider = false;
+    private int mFirstElementOffset = 0;
+    private Rect mDividerOffsets = new Rect();
+    private Rect mLastDividerOffsets = null;
 
     public BorderedItemSeparator(Context context, AttributeSet attrs) {
         final TypedArray a = context
@@ -115,6 +121,28 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
         }
     }
 
+    public BorderedItemSeparator setFirstElementOffset(int offset) {
+        mFirstElementOffset = offset;
+        return this;
+    }
+
+    public BorderedItemSeparator setDividerPadding(int left, int top, int right, int bottom) {
+        mDividerOffsets.left = left;
+        mDividerOffsets.top = top;
+        mDividerOffsets.right = right;
+        mDividerOffsets.bottom = bottom;
+        return this;
+    }
+
+    public BorderedItemSeparator setLastDividerPadding(int left, int top, int right, int bottom) {
+        mLastDividerOffsets = new Rect();
+        mLastDividerOffsets.left = left;
+        mLastDividerOffsets.top = top;
+        mLastDividerOffsets.right = right;
+        mLastDividerOffsets.bottom = bottom;
+        return this;
+    }
+
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         if (mDivider == null) {
@@ -123,22 +151,30 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
         }
 
         // Initialization needed to avoid compiler warning
-        int left = 0, right = 0, top = 0, bottom = 0, size;
+        int left = mDividerOffsets.left;
+        int right = mDividerOffsets.right;
+        int top = mDividerOffsets.top;
+        int bottom = mDividerOffsets.bottom;
+        int size;
+
         int orientation = mOrientation != -1 ? mOrientation : getOrientation(parent);
         int childCount = parent.getChildCount();
 
         if (orientation == LinearLayoutManager.VERTICAL) {
             size = mDivider.getIntrinsicHeight();
-            left = parent.getPaddingLeft();
-            right = parent.getWidth() - parent.getPaddingRight();
+            left += parent.getPaddingLeft();
+            right += parent.getWidth() - parent.getPaddingRight();
         } else { //horizontal
             size = mDivider.getIntrinsicWidth();
-            top = parent.getPaddingTop();
-            bottom = parent.getHeight() - parent.getPaddingBottom();
+            top += parent.getPaddingTop();
+            bottom += parent.getHeight() - parent.getPaddingBottom();
         }
 
-        for (int i = mShowFirstDivider ? 0 : 1; i < childCount; i++) {
+        int i = mShowFirstDivider ? 0 : (mFirstElementOffset + 1);
+
+        for (; i < childCount; i++) {
             View child = parent.getChildAt(i);
+
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
             if (orientation == LinearLayoutManager.VERTICAL) {
@@ -148,8 +184,24 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
                 left = child.getLeft() - params.leftMargin;
                 right = left + size;
             }
+            Timber.d("Draw divider at: %d %d %d %d", left, top, right, bottom);
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
+        }
+
+        left = firstNonNull(mLastDividerOffsets, mDividerOffsets).left;
+        top = firstNonNull(mLastDividerOffsets, mDividerOffsets).top;
+        right = firstNonNull(mLastDividerOffsets, mDividerOffsets).right;
+        bottom = firstNonNull(mLastDividerOffsets, mDividerOffsets).bottom;
+
+        if (orientation == LinearLayoutManager.VERTICAL) {
+            size = mDivider.getIntrinsicHeight();
+            left += parent.getPaddingLeft();
+            right += parent.getWidth() - parent.getPaddingRight();
+        } else { //horizontal
+            size = mDivider.getIntrinsicWidth();
+            top += parent.getPaddingTop();
+            bottom += parent.getHeight() - parent.getPaddingBottom();
         }
 
         // show last divider
@@ -158,18 +210,20 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
             if (parent.getChildAdapterPosition(child) == (state.getItemCount() - 1)) {
                 RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
                 if (orientation == LinearLayoutManager.VERTICAL) {
-                    top = child.getBottom() + params.bottomMargin;
-                    bottom = top + size;
+                    top += child.getBottom() + params.bottomMargin;
+                    bottom += top + size;
                 } else { // horizontal
-                    left = child.getRight() + params.rightMargin;
-                    right = left + size;
+                    left += child.getRight() + params.rightMargin;
+                    right += left + size;
                 }
+                Timber.d("Draw last divider at: %d %d %d %d", left, top, right, bottom);
                 mDivider.setBounds(left, top, right, bottom);
                 mDivider.draw(c);
             }
         }
     }
 
+    @SuppressLint("WrongConstant")
     private int getOrientation(RecyclerView parent) {
         if (mOrientation == -1) {
             if (parent.getLayoutManager() instanceof LinearLayoutManager) {

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -45,7 +45,6 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
  */
 public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_type_value) TextView txType;
-    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
     public TxUnhandledViewHolder(View itemView) {
         super(itemView);
@@ -67,6 +66,6 @@ public final class TxUnhandledViewHolder extends ExpandableTxViewHolder {
             txType.setText("<unknown>");
         }
 
-        itemTitleType.setText(txType.getText());
+        type.setText(txType.getText());
     }
 }

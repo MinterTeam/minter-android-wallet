@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,6 +26,12 @@
 
 package network.minter.bipwallet.internal.helpers;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -34,13 +40,20 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DimenRes;
 import androidx.annotation.Nullable;
@@ -48,16 +61,19 @@ import androidx.annotation.Px;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.common.annotations.Dp;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterPublicKey;
 import timber.log.Timber;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
 import static network.minter.bipwallet.internal.Wallet.app;
 
 /**
  * Dogsy. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
@@ -229,5 +245,111 @@ public final class ViewHelper {
     public static void setSelectableItemBackground(View view) {
         TypedValue outValue = new TypedValue();
         view.getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+    }
+
+    public static int systemBarsLightness(boolean light) {
+        int flags = 0;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+
+        if (light && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        }
+
+        return flags;
+    }
+
+    public static void setStatusBarColorAnimate(Fragment fragment, @ColorInt int color) {
+        if (fragment == null || fragment.getActivity() == null) {
+            return;
+        }
+
+        Timber.d("Colorize status to: %s", Long.toHexString(((long) color) & 0xFF_FFFFFFL));
+
+        final int fromColor = fragment.getActivity().getWindow().getStatusBarColor();
+        if (fromColor == color) {
+            return;
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
+        animator.setDuration(200);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.addUpdateListener(animation -> {
+            int c = MathHelper.blendColors(fromColor, color, (float) animation.getAnimatedValue());
+            fragment.getActivity().getWindow().setStatusBarColor(c);
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                fragment.getActivity().getWindow().setStatusBarColor(color);
+            }
+        });
+        animator.start();
+    }
+
+
+    public static void setStatusBarColor(Fragment fragment, @ColorInt int color) {
+        if (fragment == null || fragment.getActivity() == null) return;
+        setStatusBarColor(fragment.getActivity(), color);
+    }
+
+    public static void setStatusBarColor(Activity activity, @ColorInt int color) {
+        if (activity == null) return;
+        if (activity.getWindow().getStatusBarColor() == color) return;
+        Timber.d("Colorize status to: %s", Long.toHexString(((long) color) & 0xFF_FFFFFFL));
+        activity.getWindow().setStatusBarColor(color);
+    }
+
+    public static void setSystemBarsLightness(Fragment fragment, boolean light) {
+        if (fragment == null || fragment.getActivity() == null) return;
+        setSystemBarsLightness(fragment.getActivity(), light);
+    }
+
+    public static void setSystemBarsLightness(Activity activity, boolean light) {
+        if (activity == null) return;
+        activity.getWindow().getDecorView().setSystemUiVisibility(systemBarsLightness(light));
+    }
+
+    public static void setOnImeActionListener(EditText input, int action, View.OnClickListener listener) {
+        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == action && listener != null) {
+                    listener.onClick(v);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    public static void tryToPasteMinterAddressFromCB(View view, EditText input) {
+        if (view.getContext() == null) return;
+
+        Pattern pattern = Pattern.compile(String.format("%s|%s", MinterAddress.ADDRESS_PATTERN, MinterPublicKey.PUB_KEY_PATTERN), Pattern.CASE_INSENSITIVE);
+
+        ClipboardManager cm = (ClipboardManager) view.getContext().getSystemService(CLIPBOARD_SERVICE);
+        if (cm == null) {
+            return;
+        }
+
+        ClipData cd = cm.getPrimaryClip();
+        if (cd == null) return;
+
+        for (int i = 0; i < cd.getItemCount(); i++) {
+            ClipData.Item item = cd.getItemAt(i);
+            CharSequence raw = item.getText();
+            Matcher matcher = pattern.matcher(raw.toString());
+            if (matcher.find()) {
+                String val = matcher.group();
+                input.setText(val);
+                input.setSelection(input.length());
+                break;
+            }
+
+        }
     }
 }

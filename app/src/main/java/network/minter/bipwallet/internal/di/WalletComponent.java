@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,12 +37,15 @@ import java.util.List;
 import javax.inject.Named;
 
 import dagger.Component;
-import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.addressbook.db.AddressBookRepository;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AnalyticsManager;
 import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository;
+import network.minter.bipwallet.apis.explorer.CachedRewardStatisticsRepository;
+import network.minter.bipwallet.db.WalletDatabase;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
@@ -57,7 +60,6 @@ import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.testing.IdlingManager;
-import network.minter.bipwallet.sending.repo.RecipientAutocompleteStorage;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
 import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.blockchain.repo.BlockChainAccountRepository;
@@ -67,6 +69,7 @@ import network.minter.blockchain.repo.BlockChainStatusRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.RewardStatistics;
 import network.minter.explorer.models.ValidatorItem;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
@@ -90,6 +93,7 @@ import network.minter.profile.repo.ProfileRepository;
         WalletModule.class,
         HelpersModule.class,
         RepoModule.class,
+        DbModule.class,
         InjectorsModule.class,
         CacheModule.class,
         NotificationModule.class,
@@ -134,11 +138,11 @@ public interface WalletComponent {
     // local
     SecretStorage secretStorage();
     AccountStorage accountStorage();
-    RecipientAutocompleteStorage recipientStorage();
-    CachedRepository<UserAccount, AccountStorage> accountStorageCache();
+    CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorageCache();
     CachedRepository<List<HistoryTransaction>, CacheTxRepository> explorerTransactionsRepoCache();
     CachedRepository<User.Data, CacheProfileRepository> profileCachedRepo();
     CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> validatorsRepoCache();
+    CachedRepository<RewardStatistics, CachedRewardStatisticsRepository> rewardsCacheRepo();
     // profile
     ProfileAuthRepository authRepo();
     ProfileInfoRepository infoRepo();
@@ -158,6 +162,9 @@ public interface WalletComponent {
     BlockChainTransactionRepository txRepoBlockChain();
     BlockChainStatusRepository statusRepoBlockChain();
     BlockChainBlockRepository bcBlockRepo();
+    // db
+    WalletDatabase db();
+    AddressBookRepository addressBookRepo();
 
     // test
     IdlingManager idlingManager();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,8 +40,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.joda.time.DateTime;
-import org.joda.time.Seconds;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -50,9 +53,10 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -60,26 +64,30 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.addressbook.models.AddressContact;
+import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialog;
 import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
-import network.minter.bipwallet.internal.helpers.HtmlCompat;
-import network.minter.bipwallet.internal.helpers.Plurals;
-import network.minter.bipwallet.internal.helpers.PrefKeys;
 import network.minter.bipwallet.internal.helpers.SoundManager;
-import network.minter.bipwallet.internal.system.BroadcastReceiverManager;
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler;
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
-import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
-import network.minter.bipwallet.wallets.contract.CoinsTabView;
+import network.minter.bipwallet.wallets.contract.WalletsTabView;
+import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog;
+import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog;
+import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog;
+import network.minter.bipwallet.wallets.selector.WalletItem;
+import network.minter.bipwallet.wallets.selector.WalletListAdapter;
+import network.minter.bipwallet.wallets.selector.WalletSelector;
 import network.minter.bipwallet.wallets.views.WalletsTabPresenter;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
@@ -93,30 +101,38 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @RuntimePermissions
-public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView {
+public class WalletsTabFragment extends HomeTabFragment implements WalletsTabView {
     public final static int REQUEST_CODE_QR_SCAN_TX = 2002;
 
     @Inject Provider<WalletsTabPresenter> presenterProvider;
     @Inject SoundManager soundManager;
+    @Inject SecretStorage secretStorage;
     @InjectPresenter WalletsTabPresenter presenter;
-    @BindView(R.id.bip_logo) View logo;
-    //    @BindView(R.id.user_avatar) BipCircleImageView avatar;
-//    @BindView(R.id.username) TextView username;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.balance_int) TextView balanceInt;
     @BindView(R.id.balance_fractions) TextView balanceFract;
     @BindView(R.id.balance_coin_name) TextView balanceCoinName;
-    @BindView(R.id.list) RecyclerView list;
-    @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.delegation_view) View delegationView;
-    @BindView(R.id.delegation_amount) TextView delegationAmount;
-    @BindView(R.id.balance_container) View balanceContainer;
-    @BindView(R.id.balance_title) TextView balanceTitle;
-    @BindView(R.id.last_update_time) TextView lastUpdateText;
+    @BindView(R.id.balance_today) TextView balanceRewards;
+    //    @BindView(R.id.container_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.delegated_balance) TextView delegationAmount;
+    //    @BindView(R.id.balance_title) TextView balanceTitle;
+    @BindView(R.id.wallet_selector) WalletSelector walletSelector;
+    @BindView(R.id.tabs) TabLayout tabs;
+    @BindView(R.id.tabsPager) ViewPager pager;
+    @BindView(R.id.collapsing) CollapsingToolbarLayout collapsing;
+    @BindView(R.id.appbar) AppBarLayout appbar;
+    @BindView(R.id.delegated_layout) View delegatedLayout;
+    @BindView(R.id.collapsing_content) View collapsingContent;
+    @BindView(R.id.overlay) View overlay;
+    //    @BindView(R.id.last_update_time) TextView lastUpdateText;
 
     private Unbinder mUnbinder;
     private SwipeRefreshHacker mSwipeRefreshHacker = new SwipeRefreshHacker();
     private WalletDialog mCurrentDialog = null;
+    private BaseBottomSheetDialog mBottomDialog = null;
+    @SuppressLint("ClickableViewAccessibility")
+
+    private WalletsTopRecolorHelper mRecolorHelper;
 
     @Override
     public void onAttach(Context context) {
@@ -126,19 +142,19 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
 
     @Override
     public void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
-        swipeRefreshLayout.setOnRefreshListener(listener);
-        mSwipeRefreshHacker.setOnRefreshStartListener(this::onStartRefresh);
-        mSwipeRefreshHacker.hack(swipeRefreshLayout);
+//        swipeRefreshLayout.setOnRefreshListener(listener);
+//        mSwipeRefreshHacker.setOnRefreshStartListener(this::onStartRefresh);
+//        mSwipeRefreshHacker.hack(swipeRefreshLayout);
     }
 
     @Override
     public void showRefreshProgress() {
-        swipeRefreshLayout.setRefreshing(true);
+//        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void hideRefreshProgress() {
-        swipeRefreshLayout.setRefreshing(false);
+//        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -153,18 +169,11 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
     }
 
     @Override
-    public void scrollTop() {
-
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         presenter.onActivityResult(requestCode, resultCode, data);
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    @SuppressWarnings("StringBufferReplaceableByString")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -172,13 +181,15 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
         View view = inflater.inflate(R.layout.fragment_tab_wallets, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         presenter.onRestoreInstanceState(savedInstanceState);
-        checkLastUpdate();
-        BroadcastReceiverManager bbm = new BroadcastReceiverManager(getActivity());
-        bbm.add(new RTMBlockReceiver(this::checkLastUpdate));
-        bbm.register();
+        mRecolorHelper = new WalletsTopRecolorHelper(this);
+
+//        checkLastUpdate();
+//        BroadcastReceiverManager bbm = new BroadcastReceiverManager(getActivity());
+//        bbm.add(new RTMBlockReceiver(this::checkLastUpdate));
+//        bbm.register();
 
         if (network.minter.bipwallet.BuildConfig.DEBUG) {
-            logo.setOnLongClickListener(v -> {
+            toolbar.setOnLongClickListener(v -> {
                 final StringBuilder sb = new StringBuilder();
                 sb.append("    Env: ").append(BuildConfig.FLAVOR).append("\n");
                 sb.append("  Build: ").append(BuildConfig.VERSION_CODE).append("\n");
@@ -196,29 +207,38 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
             });
         }
 
+        appbar.addOnOffsetChangedListener(mRecolorHelper);
+
         setHasOptionsMenu(true);
-        getActivity().getMenuInflater().inflate(R.menu.menu_tab_scan_tx, toolbar.getMenu());
+        getActivity().getMenuInflater().inflate(R.menu.menu_wallets_toolbar, toolbar.getMenu());
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
+        setupTabAdapter();
 
         return view;
     }
 
-    private void checkLastUpdate() {
-        if (!Wallet.app().storage().contains(PrefKeys.LAST_BLOCK_TIME)) {
-            lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated_never)));
-            return;
-        }
-        DateTime lastBlockTime = new DateTime((long) Wallet.app().storage().get(PrefKeys.LAST_BLOCK_TIME, 0L));
-        Seconds diff = Seconds.secondsBetween(lastBlockTime, new DateTime());
-        int res = diff.getSeconds();
-        Timber.d("Diff: now=%s, ts=%s", new DateTime().toString(), lastBlockTime.toString());
-        lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated, Plurals.timeValue((long) res), Plurals.time((long) res))));
+
+    @Override
+    public void onTabUnselected() {
+        super.onTabUnselected();
+        mRecolorHelper.setEnableRecolor(false);
+    }
+
+    @Override
+    public void onTabSelected() {
+        super.onTabSelected();
+        mRecolorHelper.setEnableRecolor(true);
+        if (getActivity() == null) return;
+
+        mRecolorHelper.setTabSelected();
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_scan_tx) {
             SingleCallHandler.call(item, () -> startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX));
+        } else if (item.getItemId() == R.id.menu_share) {
 
         }
         return super.onOptionsItemSelected(item);
@@ -244,7 +264,61 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
     @Override
     public void startScanQR(int requestCode) {
         Intent i = new Intent(getActivity(), QRCodeScannerActivity.class);
+        if (getActivity() == null) {
+            return;
+        }
         getActivity().startActivityForResult(i, requestCode);
+    }
+
+    @Override
+    public void startWalletEdit(WalletItem walletItem, BaseBottomSheetDialog.OnSubmitListener onSubmitListener) {
+        if (mBottomDialog != null) {
+            mBottomDialog.dismiss();
+            mBottomDialog = null;
+        }
+
+        if (getFragmentManager() == null) {
+            Timber.w("Fragment manager is NULL");
+            return;
+        }
+
+        mBottomDialog = EditWalletDialog.newInstance(walletItem);
+        mBottomDialog.setOnSubmitListener(onSubmitListener);
+        mBottomDialog.show(getFragmentManager(), "wallet_edit");
+    }
+
+    @Override
+    public void startWalletAdd(BaseBottomSheetDialog.OnSubmitListener onSubmit, BaseBottomSheetDialog.OnDismissListener onDismiss) {
+        if (mBottomDialog != null) {
+            mBottomDialog.dismiss();
+            mBottomDialog = null;
+        }
+
+        if (getFragmentManager() == null) {
+            Timber.w("Fragment manager is NULL");
+            return;
+        }
+
+        AddWalletDialog addWalletDialog = AddWalletDialog.newInstance();
+        addWalletDialog.setOnSubmitListener(onSubmit);
+        addWalletDialog.setOnDismissListener(onDismiss);
+
+        addWalletDialog.setOnGenerateNewWalletListener((submitListener, dismissListener, title) -> {
+            mBottomDialog.dismiss();
+            mBottomDialog = new CreateWalletDialog.Builder()
+                    .setEnableDescription(true)
+                    .setEnableTitleInput(true)
+                    .setWalletTitle(title)
+                    .setOnSubmitListener(submitListener)
+                    .setOnDismissListener(dismissListener)
+                    .setEnableStartHomeOnSubmit(false)
+                    .build();
+
+            mBottomDialog.show(getFragmentManager(), "wallet_generate");
+        });
+
+        mBottomDialog = addWalletDialog;
+        mBottomDialog.show(getFragmentManager(), "wallet_add");
     }
 
     @Override
@@ -252,12 +326,42 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
         runOnUiThread(() -> {
             try {
                 ((HomeActivity) getActivity()).setCurrentPage(1);
-                ((SendTabFragment) ((HomeActivity) getActivity()).getCurrentTabFragment()).setRecipient(address);
+                ((SendTabFragment) ((HomeActivity) getActivity()).getCurrentTabFragment()).setRecipient(new AddressContact(address));
             } catch (Throwable t) {
                 Timber.w("Unable to scan address directly to send tab");
             }
 
         });
+    }
+
+    @Override
+    public void setMainWallet(WalletItem mainWallet) {
+        walletSelector.setMainWallet(mainWallet);
+    }
+
+    @Override
+    public void setWallets(List<WalletItem> addresses) {
+        walletSelector.setWallets(addresses);
+    }
+
+    @Override
+    public void setOnClickWalletListener(WalletListAdapter.OnClickWalletListener listener) {
+        walletSelector.setOnClickWalletListener(listener);
+    }
+
+    @Override
+    public void setOnClickAddWalletListener(WalletListAdapter.OnClickAddWalletListener listener) {
+        walletSelector.setOnClickAddWalletListener(listener);
+    }
+
+    @Override
+    public void setOnClickEditWalletListener(WalletListAdapter.OnClickEditWalletListener listener) {
+        walletSelector.setOnClickEditWalletListener(listener);
+    }
+
+    @Override
+    public void setOnClickDelegated(View.OnClickListener listener) {
+        delegatedLayout.setOnClickListener(listener);
     }
 
     @Override
@@ -275,7 +379,7 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
     @Override
     public void onViewCreated(@NonNull View view, @javax.annotation.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        delegationView.setOnClickListener(v -> startDelegationList());
+//        delegationView.setOnClickListener(v -> startDelegationList());
     }
 
     @Override
@@ -285,19 +389,9 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
     }
 
     @Override
-    public void setAvatar(String url) {
-        if (url == null) {
-            return;
-        }
-
-//        avatar.setImageUrl(url);
-    }
-
-    @Override
     public void onLowMemory() {
         super.onLowMemory();
         presenter.onLowMemory();
-//        avatar.setImageDrawable(null);
         Timber.d("OnLowMemory");
     }
 
@@ -306,11 +400,6 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
         super.onDestroyView();
         mUnbinder.unbind();
         Timber.d("Destroy");
-    }
-
-    @Override
-    public void setUsername(CharSequence name) {
-//        username.setText(name);
     }
 
     @SuppressLint("SetTextI18n")
@@ -327,35 +416,29 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
 
     @Override
     public void setDelegationAmount(String amount) {
-        delegationView.setVisibility(View.VISIBLE);
+//        delegationView.setVisibility(View.VISIBLE);
         delegationAmount.setText(amount);
     }
 
     @Override
     public void setBalanceClickListener(View.OnClickListener listener) {
-        balanceContainer.setOnClickListener(listener);
+//        balanceContainer.setOnClickListener(listener);
     }
 
     @Override
     public void setBalanceTitle(int title) {
-        balanceTitle.setText(title);
+//        balanceTitle.setText(title);
+    }
+
+    @Override
+    public void setBalanceRewards(String rewards) {
+        balanceRewards.setText(rewards);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         presenter.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void setAdapter(RecyclerView.Adapter<?> adapter) {
-        list.setLayoutManager(new LinearLayoutManager(getActivity()));
-        list.setAdapter(adapter);
-    }
-
-    @Override
-    public void setOnAvatarClick(View.OnClickListener listener) {
-//        avatar.setOnClickListener(listener);
     }
 
     @Override
@@ -366,11 +449,6 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
     @Override
     public void startDelegationList() {
         startActivity(new Intent(getActivity(), DelegationListActivity.class));
-    }
-
-    @Override
-    public void hideAvatar() {
-//        if (avatar != null) avatar.setVisibility(View.GONE);
     }
 
     @Override
@@ -385,19 +463,15 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
         }
     }
 
-    @ProvidePresenter
-    WalletsTabPresenter providePresenter() {
-        return presenterProvider.get();
-    }
-
-    private void onStartRefresh() {
-        Wallet.app().sounds().play(R.raw.refresh_pop_down);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         WalletsTabFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @ProvidePresenter
+    WalletsTabPresenter providePresenter() {
+        return presenterProvider.get();
     }
 
     @OnShowRationale(Manifest.permission.CAMERA)
@@ -432,5 +506,47 @@ public class WalletsTabFragment extends HomeTabFragment implements CoinsTabView 
                 })
                 .create()
                 .show();
+    }
+
+    private void setupTabAdapter() {
+        pager.setAdapter(new FragmentStatePagerAdapter(getActivity().getSupportFragmentManager()) {
+
+            @Override
+            public int getCount() {
+                return 2;
+            }
+
+            @NonNull
+            @Override
+            public Fragment getItem(int position) {
+                if (position == 0) {
+                    return new CoinsTabPageFragment();
+                } else if (position == 1) {
+                    return new TxsTabPageFragment();
+                }
+                return null;
+            }
+        });
+        pager.setOffscreenPageLimit(2);
+        tabs.setupWithViewPager(pager);
+        tabs.getTabAt(0).setText(R.string.tab_page_coins);
+        tabs.getTabAt(1).setText(R.string.tab_page_txs);
+
+    }
+
+    private void checkLastUpdate() {
+//        if (!Wallet.app().storage().contains(PrefKeys.LAST_BLOCK_TIME)) {
+//            lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated_never)));
+//            return;
+//        }
+//        DateTime lastBlockTime = new DateTime((long) Wallet.app().storage().get(PrefKeys.LAST_BLOCK_TIME, 0L));
+//        Seconds diff = Seconds.secondsBetween(lastBlockTime, new DateTime());
+//        int res = diff.getSeconds();
+//        Timber.d("Diff: now=%s, ts=%s", new DateTime().toString(), lastBlockTime.toString());
+//        lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated, Plurals.timeValue((long) res), Plurals.time((long) res))));
+    }
+
+    private void onStartRefresh() {
+        Wallet.app().sounds().play(R.raw.refresh_pop_down);
     }
 }

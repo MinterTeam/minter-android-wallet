@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -74,8 +100,8 @@
         app:layout_constraintTop_toBottomOf="@id/layout_seed">
 
         <Switch
-            style="@style/Wallet.Switch"
             android:id="@+id/action_saved_seed"
+            style="@style/Wallet.Switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -97,9 +123,38 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/input_title_hint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:fontFamily="@font/_inter_semi_bold"
+        android:text="@string/input_hint_wallet_title_later"
+        android:textColor="@color/grey"
+        android:textSize="@dimen/text_size_11"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_saved_seed" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/input_title"
+        style="@style/Wallet.EditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges_half"
+        android:layout_marginEnd="@dimen/margin_edges_medium"
+        android:hint="@string/input_hint_wallet_title"
+        android:inputType="textMultiLine"
+        android:textAllCaps="false"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_title_hint" />
 
     <Button
-        android:enabled="false"
         android:id="@+id/submit"
         style="@style/Wallet.Button"
         android:layout_width="0dp"
@@ -107,17 +162,17 @@
         android:layout_marginStart="@dimen/margin_edges_medium"
         android:layout_marginTop="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges"
+        android:enabled="false"
         android:text="@string/btn_activate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_saved_seed" />
+        app:layout_constraintTop_toBottomOf="@id/input_title" />
 
     <Space
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/submit"
         android:layout_width="0dp"
         android:layout_height="@dimen/margin_edges_large"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/submit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,6 +27,7 @@
 package network.minter.bipwallet.advanced.models;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
 
 import network.minter.core.crypto.BytesData;
@@ -35,18 +36,22 @@ import network.minter.core.crypto.PrivateKey;
 import network.minter.core.crypto.PublicKey;
 import network.minter.profile.models.ProfileAddressData;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class SecretData implements Serializable {
     private String id;
+    private String mTitle;
     private String mSeedPhrase;
     private BytesData mSeed;
     private PrivateKey mPrivateKey;
     private PublicKey mPublicKey;
     private MinterAddress mMinterAddress;
+    private Date mAdded = new Date();
+    private boolean mCanSign = true;
 
     public SecretData(MinterAddress address) {
         id = UUID.randomUUID().toString();
@@ -57,13 +62,26 @@ public final class SecretData implements Serializable {
         mMinterAddress = address;
     }
 
-    public SecretData(String seedPhrase, BytesData seed, PrivateKey privateKey, PublicKey publicKey) {
+    public SecretData(String seedPhrase, BytesData seed, PrivateKey privateKey, PublicKey publicKey, String title) {
         id = UUID.randomUUID().toString();
         mSeedPhrase = seedPhrase;
         mSeed = seed;
         mPrivateKey = privateKey;
         mPublicKey = publicKey;
         mMinterAddress = publicKey.toMinter();
+        mTitle = firstNonNull(title, mMinterAddress.toShortString());
+    }
+
+    public SecretData(String seedPhrase, BytesData seed, PrivateKey privateKey, PublicKey publicKey) {
+        this(seedPhrase, seed, privateKey, publicKey, null);
+    }
+
+    public String getTitle() {
+        return firstNonNull(mTitle, mMinterAddress.toShortString());
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
     }
 
     public String getSeedPhrase() {
@@ -90,16 +108,25 @@ public final class SecretData implements Serializable {
         return new ProfileAddressData(mMinterAddress, isMain, mSeedPhrase, isServerSecured, encKey);
     }
 
+    public boolean canSign() {
+        return mCanSign;
+    }
+
     public void cleanup() {
         mSeedPhrase = "";
         mSeed.cleanup();
         if (mPrivateKey != null) {
             mPrivateKey.cleanup();
         }
+        mCanSign = false;
     }
 
     public String getId() {
         return id;
+    }
+
+    public Date getDate() {
+        return mAdded;
     }
 
     @Override

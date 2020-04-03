@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -42,24 +42,23 @@ import androidx.annotation.NonNull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.sending.models.RecipientItem;
+import network.minter.bipwallet.addressbook.models.AddressContact;
 import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class RecipientListAdapter extends ArrayAdapter<RecipientItem> implements Filterable {
-    private List<RecipientItem> mItems;
-    private List<RecipientItem> mItemsAll;
-    private List<RecipientItem> mSuggestions;
+public class RecipientListAdapter extends ArrayAdapter<AddressContact> implements Filterable {
+    private List<AddressContact> mItems = new ArrayList<>();
+    private List<AddressContact> mItemsAll = new ArrayList<>();
+    private List<AddressContact> mSuggestions = new ArrayList<>();
     private int mViewResourceId;
     private LayoutInflater mInflater;
     private OnItemClickListener mOnItemClickListener;
 
-    public RecipientListAdapter(@NonNull Context context, @NonNull List<RecipientItem> items) {
-        super(context, R.layout.search_item, items);
-        setItems(items);
+    public RecipientListAdapter(@NonNull Context context) {
+        super(context, R.layout.search_item, new ArrayList<>());
         mViewResourceId = R.layout.search_item;
     }
 
@@ -93,17 +92,17 @@ public class RecipientListAdapter extends ArrayAdapter<RecipientItem> implements
         return new Filter() {
             @Override
             public String convertResultToString(Object resultValue) {
-                return ((RecipientItem) (resultValue)).getName();
+                return ((AddressContact) (resultValue)).name;
             }
 
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 if (constraint != null) {
                     mSuggestions.clear();
-                    for (RecipientItem item : mItemsAll) {
-                        if (item.getName() != null && item.getName().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                    for (AddressContact item : mItemsAll) {
+                        if (item.name != null && item.name.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                             mSuggestions.add(item);
-                        } else if (item.getAddress() != null && item.getAddress().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                        } else if (item.address != null && item.address.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                             mSuggestions.add(item);
                         }
                     }
@@ -119,12 +118,12 @@ public class RecipientListAdapter extends ArrayAdapter<RecipientItem> implements
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 //noinspection unchecked
-                List<RecipientItem> filteredList = (List<RecipientItem>) results.values;
+                List<AddressContact> filteredList = (List<AddressContact>) results.values;
                 //noinspection ConstantConditions
                 if (results != null && results.count > 0) {
                     Timber.d("Add filter item (items: %d)", results.count);
                     clear();
-                    for (RecipientItem c : filteredList) {
+                    for (AddressContact c : filteredList) {
                         add(c);
                     }
                     notifyDataSetChanged();
@@ -133,11 +132,12 @@ public class RecipientListAdapter extends ArrayAdapter<RecipientItem> implements
         };
     }
 
-    public void setItems(List<RecipientItem> items) {
+    public void setItems(List<AddressContact> items) {
         mItems = items;
         //noinspection unchecked
-        mItemsAll = (ArrayList<RecipientItem>) ((ArrayList<RecipientItem>) mItems).clone();
+        mItemsAll = (ArrayList<AddressContact>) ((ArrayList<AddressContact>) mItems).clone();
         mSuggestions = new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     private void onBindViewHolder(ViewHolder vh, int position) {
@@ -145,20 +145,21 @@ public class RecipientListAdapter extends ArrayAdapter<RecipientItem> implements
             vh.itemView.setOnClickListener(vv -> mOnItemClickListener.onClick(mItems.get(position), position));
         }
 
-        RecipientItem item = mItems.get(position);
+        AddressContact item = mItems.get(position);
 
-        if (item.getName() == null) {
-            vh.title.setText(item.getAddress());
+        if (item.name == null) {
+            vh.title.setText(item.address);
             vh.subtitle.setVisibility(View.GONE);
+            vh.subtitle.setText(null);
         } else {
-            vh.title.setText(item.getName());
+            vh.title.setText(item.name);
             vh.subtitle.setVisibility(View.VISIBLE);
-            vh.subtitle.setText(item.getAddress());
+            vh.subtitle.setText(item.address);
         }
     }
 
     public interface OnItemClickListener {
-        void onClick(RecipientItem item, int position);
+        void onClick(AddressContact item, int position);
     }
 
     static class ViewHolder {

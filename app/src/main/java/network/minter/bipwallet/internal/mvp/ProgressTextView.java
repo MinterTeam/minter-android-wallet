@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,11 +26,14 @@
 
 package network.minter.bipwallet.internal.mvp;
 
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
+
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@StateStrategyType(AddToEndSingleStrategy.class)
 public interface ProgressTextView {
     void showProgress(CharSequence title, CharSequence message);
     void hideProgress();

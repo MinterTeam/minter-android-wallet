@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -24,211 +24,286 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container_list"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/container_list"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:animateLayoutChanges="true"
-        android:background="@color/greyBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:elevation="0dp"
+        app:statusBarForeground="@color/colorPrimary">
 
-        <com.google.android.material.appbar.AppBarLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark"
-            app:elevation="0dp">
+            android:contextClickable="true"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:scrimVisibleHeightTrigger="150dp"
+            app:statusBarScrim="@android:color/white"
+            app:titleEnabled="false"
+            app:toolbarId="@id/toolbar">
 
-            <com.google.android.material.appbar.CollapsingToolbarLayout
-                android:id="@+id/collapsing"
-                app:titleEnabled="false"
+
+            <LinearLayout
+                android:id="@+id/collapsing_content"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                app:layout_scrollFlags="scroll|enterAlways">
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                app:layout_collapseMode="pin">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@color/colorPrimary"
-                    android:minHeight="?android:attr/actionBarSize"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:popupTheme="@style/WalletPrimaryToolbar"
-                    app:theme="@style/WalletPrimaryToolbar"
-                    app:titleTextColor="@android:color/white"
-                    app:layout_collapseMode="pin">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <Spinner
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.appcompat.widget.Toolbar>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:animateLayoutChanges="true"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_collapseMode="pin">
+                    android:paddingTop="?attr/actionBarSize">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide_margin_left"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="48dp" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide_margin_right"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_end="@dimen/margin_edges" />
+
+                    <TextView
+                        android:id="@+id/balance_hint"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_edges"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:text="Available Balance"
+                        android:textColor="@color/white70"
+                        android:textSize="@dimen/text_size_13"
+                        app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
+                        app:layout_constraintStart_toStartOf="@id/guide_margin_left"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/balance_int"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:fontFeatureSettings="@string/inter_zeroes"
+                        android:text="462 308"
+                        android:textColor="@color/textColorWhite"
+                        android:textSize="@dimen/text_size_30"
+                        app:layout_constraintEnd_toStartOf="@id/balance_fractions"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="@id/guide_margin_left"
+                        app:layout_constraintTop_toBottomOf="@id/balance_hint"
+                        app:layout_constraintVertical_bias="1" />
+
+                    <TextView
+                        android:id="@+id/balance_fractions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="1dp"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:textColor="@color/textColorWhite"
+                        android:textSize="@dimen/text_size_default"
+                        app:layout_constraintBottom_toBottomOf="@id/balance_int"
+                        app:layout_constraintEnd_toStartOf="@id/balance_coin_name"
+                        app:layout_constraintStart_toEndOf="@id/balance_int"
+                        app:layout_constraintTop_toTopOf="@id/balance_int"
+                        app:layout_constraintVertical_bias=".8"
+                        tools:text=".492404" />
+
+                    <TextView
+                        android:id="@+id/balance_coin_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_edges_half"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:textAllCaps="true"
+                        android:textColor="@color/textColorWhite"
+                        android:textSize="@dimen/text_size_default"
+                        android:textStyle="normal"
+                        app:layout_constraintBottom_toBottomOf="@id/balance_int"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/balance_fractions"
+                        app:layout_constraintTop_toTopOf="@id/balance_int"
+                        app:layout_constraintVertical_bias=".8"
+                        tools:text="bip" />
+
+                    <TextView
+                        android:id="@+id/balance_today"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:fontFeatureSettings="@string/inter_zeroes"
+                        android:textColor="@color/textColorGreen"
+                        app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
+                        app:layout_constraintStart_toStartOf="@id/guide_margin_left"
+                        app:layout_constraintTop_toBottomOf="@id/balance_int"
+                        tools:text="+ 62 368.3903 BIP today" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
+                        android:id="@+id/delegated_layout"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="@color/colorPrimary"
-                        android:orientation="vertical"
-                        android:paddingStart="48dp"
-                        android:paddingEnd="@dimen/margin_edges">
-
-                        <TextView
-                            android:id="@+id/balance_hint"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_edges"
-                            android:fontFamily="@font/_inter_semi_bold"
-                            android:text="Available Balance"
-                            android:textColor="@color/white70"
-                            android:textSize="@dimen/text_size_13"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/balance_int"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/_inter_semi_bold"
-                            android:text="462 308"
-                            android:textColor="@color/textColorWhite"
-                            android:textSize="@dimen/text_size_30"
-                            app:layout_constraintEnd_toStartOf="@id/balance_fractions"
-                            app:layout_constraintHorizontal_bias="0"
-                            app:layout_constraintHorizontal_chainStyle="packed"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/balance_hint"
-                            app:layout_constraintVertical_bias="1" />
-
-                        <TextView
-                            android:id="@+id/balance_fractions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="1dp"
-                            android:fontFamily="@font/_inter_semi_bold"
-                            android:textColor="@color/textColorWhite"
-                            android:textSize="@dimen/text_size_default"
-                            app:layout_constraintBottom_toBottomOf="@id/balance_int"
-                            app:layout_constraintEnd_toStartOf="@id/balance_coin_name"
-                            app:layout_constraintStart_toEndOf="@id/balance_int"
-                            app:layout_constraintTop_toTopOf="@id/balance_int"
-                            app:layout_constraintVertical_bias=".8"
-                            tools:text=".492404" />
-
-                        <TextView
-                            android:id="@+id/balance_coin_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin_edges_half"
-                            android:fontFamily="@font/_inter_semi_bold"
-                            android:textAllCaps="true"
-                            android:textColor="@color/textColorWhite"
-                            android:textSize="@dimen/text_size_default"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="@id/balance_int"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@id/balance_fractions"
-                            app:layout_constraintTop_toTopOf="@id/balance_int"
-                            app:layout_constraintVertical_bias=".8"
-                            tools:text="bip" />
-
-                        <TextView
-                            android:id="@+id/balance_today"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/_inter_semi_bold"
-                            android:textColor="@color/textColorGreen"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/balance_int"
-                            tools:text="+ 62 368.3933 BIP today" />
+                        android:layout_marginTop="@dimen/margin_edges_medium"
+                        android:background="?attr/selectableItemBackground"
+                        app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
+                        app:layout_constraintStart_toStartOf="@id/guide_margin_left"
+                        app:layout_constraintTop_toBottomOf="@id/balance_today">
 
                         <TextView
                             android:id="@+id/delegated_hint"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_edges_medium"
                             android:fontFamily="@font/_inter_semi_bold"
                             android:text="@string/delegation_title"
                             android:textColor="@color/white70"
                             android:textSize="@dimen/text_size_13"
-                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/delegated_icon"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/balance_today" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/delegated_balance"
                             android:layout_width="0dp"
+
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/_inter_semi_bold"
+                            android:fontFeatureSettings="@string/inter_zeroes"
                             android:textColor="@color/textColorWhite"
                             android:textSize="@dimen/text_size_default"
-                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/delegated_icon"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/delegated_hint"
                             tools:text="24 462 308.3933 BIP" />
 
-                        <Space
-                            android:layout_width="0dp"
-                            android:layout_height="@dimen/margin_edges_medium"
+                        <ImageView
+                            android:id="@+id/delegated_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_chevron_right"
+                            android:tint="@color/white"
+                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/delegated_balance" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_bias="0.5" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </LinearLayout>
+                    <Space
+                        android:id="@+id/balance_space"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/margin_edges_medium"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/delegated_layout" />
 
-            </com.google.android.material.appbar.CollapsingToolbarLayout>
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/balance_space"
+                        app:tabSelectedTextColor="@color/colorPrimaryLight"
+                        app:tabTextAppearance="@style/Wallet.TabLayout.TabItem" />
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs"
+                    <View
+                        android:id="@+id/overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:alpha="0"
+                        android:background="@color/white"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabSelectedTextColor="@color/colorAccent"
-                app:tabTextAppearance="@style/Wallet.TabLayout.TabItem"
-                />
-        </com.google.android.material.appbar.AppBarLayout>
+                android:layout_height="?attr/actionBarSize"
+                android:minHeight="?android:attr/actionBarSize"
+                app:contentInsetStart="@dimen/margin_edges"
+                app:layout_collapseMode="pin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:popupTheme="@style/WalletPrimaryToolbar"
+                app:titleTextColor="@color/white">
+
+                <network.minter.bipwallet.wallets.selector.WalletSelector
+                    android:id="@+id/wallet_selector"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:ws_dropdown_tint="@color/white"
+                    app:ws_name_color="@color/white" />
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
 
-        <androidx.viewpager2.widget.ViewPager2
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+        <!--        android:id="@+id/container_swipe_refresh"-->
+        <!--        android:layout_width="match_parent"-->
+        <!--        android:layout_height="match_parent"-->
+        <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--        app:layout_constraintEnd_toEndOf="parent"-->
+
+        <!--        app:layout_constraintStart_toStartOf="parent"-->
+        <!--        app:layout_constraintTop_toBottomOf="@id/appbar">-->
+
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/tabsPager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_height="wrap_content"
+            android:background="@color/white" />
+        <!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+    </network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView>
 
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

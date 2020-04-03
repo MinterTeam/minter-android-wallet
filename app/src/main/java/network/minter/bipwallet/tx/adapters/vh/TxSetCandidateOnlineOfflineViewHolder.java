@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -46,7 +46,6 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
  */
 public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_pub_value) TextView pubKey;
-    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
     public TxSetCandidateOnlineOfflineViewHolder(View itemView) {
         super(itemView);
@@ -67,7 +66,7 @@ public final class TxSetCandidateOnlineOfflineViewHolder extends ExpandableTxVie
         }
 
         subamount.setText(MinterSDK.DEFAULT_COIN);
-        itemTitleType.setText(tx.type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
+        type.setText(tx.type == HistoryTransaction.Type.SetCandidateOnline ? "Set candidate online" : "Set candidate offline");
         if (data.getPublicKey() != null) {
             pubKey.setText(data.getPublicKey().toString());
             title.setText(data.getPublicKey().toShortString());

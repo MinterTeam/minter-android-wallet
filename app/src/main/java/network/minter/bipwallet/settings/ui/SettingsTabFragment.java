@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -58,7 +58,6 @@ import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.addresses.ui.AddressListActivity;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
@@ -74,6 +73,9 @@ import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.settings.contract.SettingsTabView;
 import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 
+import static network.minter.bipwallet.internal.helpers.ViewHelper.setStatusBarColorAnimate;
+import static network.minter.bipwallet.internal.helpers.ViewHelper.setSystemBarsLightness;
+
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
@@ -81,15 +83,17 @@ import network.minter.bipwallet.settings.views.SettingsTabPresenter;
 public class SettingsTabFragment extends HomeTabFragment implements SettingsTabView {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.list_security) RecyclerView listSecurity;
     @BindView(R.id.list_main) RecyclerView listMain;
     @BindView(R.id.list_additional) RecyclerView listAdditional;
-    @BindView(R.id.list_security) RecyclerView listSecurity;
-    @BindView(R.id.free_get) Button freeGet;
+    @BindView(R.id.action_our_channel) Button actionOurChannel;
+    @BindView(R.id.action_support_chat) Button actionSupportChat;
 
     @Inject Provider<SettingsTabPresenter> presenterProvider;
     @InjectPresenter SettingsTabPresenter presenter;
 
     private WalletDialog mDialog;
+    private BorderedItemSeparator mItemSeparator;
 
     @Override
     public void onAttach(Context context) {
@@ -105,6 +109,13 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
         }
     }
 
+    @Override
+    public void onTabSelected() {
+        super.onTabSelected();
+        setSystemBarsLightness(this, true);
+        setStatusBarColorAnimate(this, 0xFF_FFFFFF);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -115,33 +126,34 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
         getActivity().getMenuInflater().inflate(R.menu.menu_tab_settings, toolbar.getMenu());
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
+        mItemSeparator = new BorderedItemSeparator(getActivity(), R.drawable.shape_bottom_separator, false, true);
+        mItemSeparator.setFirstElementOffset(1);
+        mItemSeparator.setDividerPadding(Wallet.app().display().dpToPx(16), 0, 0, 0);
+        mItemSeparator.setLastDividerPadding(0, 0, 0, 0);
+
+        listSecurity.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
+        listSecurity.addItemDecoration(mItemSeparator);
+        listMain.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
+        listMain.addItemDecoration(mItemSeparator);
+        listAdditional.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
+        listAdditional.addItemDecoration(mItemSeparator);
+
         return view;
     }
 
     @Override
     public void setMainAdapter(RecyclerView.Adapter<?> mainAdapter) {
-        listMain.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
-        listMain.addItemDecoration(new BorderedItemSeparator(getActivity(), R.drawable.shape_bottom_separator, true, true));
         listMain.setAdapter(mainAdapter);
     }
 
     @Override
     public void setAdditionalAdapter(RecyclerView.Adapter<?> additionalAdapter) {
-        listAdditional.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
-        listAdditional.addItemDecoration(new BorderedItemSeparator(getActivity(), R.drawable.shape_bottom_separator, true, true));
         listAdditional.setAdapter(additionalAdapter);
     }
 
     @Override
     public void setSecurityAdapter(RecyclerView.Adapter<?> securityAdapter) {
-        listSecurity.setLayoutManager(new NonScrollableLinearLayoutManager(getActivity()));
-        listSecurity.addItemDecoration(new BorderedItemSeparator(getActivity(), R.drawable.shape_bottom_separator, true, true));
         listSecurity.setAdapter(securityAdapter);
-    }
-
-    @Override
-    public void startAddressList() {
-        getActivity().startActivity(new Intent(getActivity(), AddressListActivity.class));
     }
 
     @Override
@@ -161,11 +173,6 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
                 .setCropShape(CropImageView.CropShape.OVAL)
                 .setActivityMenuIconColor(getResources().getColor(R.color.white))
                 .start(getActivity());
-    }
-
-    @Override
-    public void startPasswordChange() {
-        startActivity(new Intent(getActivity(), PasswordChangeMigrationActivity.class));
     }
 
     @Override
@@ -234,14 +241,14 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        presenter.onActivityResult(requestCode, resultCode, data);
+    public void startIntent(Intent intent) {
+        startActivity(intent);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        presenter.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -259,13 +266,13 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
     }
 
     @Override
-    public void setOnFreeCoinsClickListener(View.OnClickListener listener) {
-        freeGet.setOnClickListener(listener);
+    public void setOnOurChannelClickListener(View.OnClickListener listener) {
+        actionOurChannel.setOnClickListener(listener);
     }
 
     @Override
-    public void showFreeCoinsButton(boolean show) {
-        freeGet.setVisibility(show ? View.VISIBLE : View.GONE);
+    public void setOnSupportChatClickListener(View.OnClickListener listener) {
+        actionSupportChat.setOnClickListener(listener);
     }
 
     @Override

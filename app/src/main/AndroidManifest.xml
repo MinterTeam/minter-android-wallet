@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -112,16 +112,8 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Wallet"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="adjustResize" />
 
-        <activity
-            android:name=".addresses.ui.AddressListActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Wallet" />
-        <activity
-            android:name=".addresses.ui.AddressItemActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Wallet" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:screenOrientation="portrait"
@@ -138,7 +130,7 @@
             android:name=".sending.ui.QRCodeScannerActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Wallet" />
+            android:theme="@style/Wallet.Camera" />
         <activity
             android:name=".receiving.ui.QRPreviewActivity"
             android:launchMode="singleTop"
@@ -146,10 +138,6 @@
             android:theme="@style/Wallet.FullScreen" />
         <activity
             android:name=".exchange.ui.ConvertCoinActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".settings.ui.PasswordChangeMigrationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
@@ -180,14 +168,18 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:windowSoftInputMode="stateHidden"
             android:name=".tx.ui.ExternalTransactionActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".home.ui.HomeActivity">
+            android:parentActivityName=".home.ui.HomeActivity"
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".home.ui.HomeActivity" />
         </activity>
+        <activity
+            android:name=".addressbook.ui.AddressBookActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize" />
 
         <service
             android:name=".services.livebalance.RTMService"

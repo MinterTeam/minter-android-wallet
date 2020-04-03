@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,7 +50,6 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_coin_to_value) TextView coinTo;
     public @BindView(R.id.detail_received_amount_value) TextView receivedAmount;
     public @BindView(R.id.detail_spent_amount_value) TextView spentAmount;
-    public @BindView(R.id.item_title_second) TextView titleSecond;
 
     public TxConvertCoinViewHolder(View itemView) {
         super(itemView);
@@ -61,8 +60,7 @@ public final class TxConvertCoinViewHolder extends ExpandableTxViewHolder {
     public void bind(TxItem item) {
         super.bind(item);
         final HistoryTransaction.TxConvertCoinResult data = item.getTx().getData();
-        title.setText(firstNonNull(data.getCoinToSell(), "<unknown>"));
-        titleSecond.setText(firstNonNull(data.getCoinToBuy(), "<unknown>"));
+        title.setText(String.format("%s –> %s", data.getCoinToSell(), data.getCoinToBuy()));
         avatar.setImageResource(R.drawable.img_avatar_exchange);
         if (bdNull(data.valueToBuy)) {
             amount.setText(bdHuman(data.valueToBuy));

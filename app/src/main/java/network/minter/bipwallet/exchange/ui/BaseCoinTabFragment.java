@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,7 +50,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.exchange.adapters.CoinsListAdapter;
 import network.minter.bipwallet.exchange.contract.BaseCoinTabView;
 import network.minter.bipwallet.internal.BaseInjectFragment;
@@ -62,6 +61,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.DecimalValidat
 import network.minter.bipwallet.internal.helpers.forms.validators.RegexValidator;
 import network.minter.bipwallet.sending.account.AccountSelectedAdapter;
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog;
+import network.minter.explorer.models.CoinBalance;
 import network.minter.explorer.models.CoinItem;
 import timber.log.Timber;
 
@@ -182,7 +182,7 @@ public abstract class BaseCoinTabFragment extends BaseInjectFragment implements 
     }
 
     @Override
-    public void startAccountSelector(List<CoinAccount> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
+    public void startAccountSelector(List<CoinBalance> accounts, AccountSelectedAdapter.OnClickListener clickListener) {
         new WalletAccountSelectorDialog.Builder(getActivity(), R.string.title_select_account)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)

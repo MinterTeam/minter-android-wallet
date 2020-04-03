@@ -1,3 +1,29 @@
+/*
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package network.minter.bipwallet.tx.views;
 
 import android.content.Intent;
@@ -25,9 +51,8 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.CoinAccount;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.models.SecretData;
-import network.minter.bipwallet.advanced.models.UserAccount;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CacheTxRepository;
@@ -66,6 +91,8 @@ import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.util.RLPBoxed;
+import network.minter.explorer.models.AddressBalance;
+import network.minter.explorer.models.CoinBalance;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.explorer.repo.GateEstimateRepository;
@@ -90,7 +117,7 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
     @Inject GateEstimateRepository estimateRepo;
     @Inject GateGasRepository gasRepo;
     @Inject GateTransactionRepository gateTxRepo;
-    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorage;
     @Inject
     CachedRepository<List<HistoryTransaction>, CacheTxRepository> cachedTxRepo;
     private ExternalTransaction mExtTx;
@@ -277,7 +304,8 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             }
         } else if (mExtTx.getType() == OperationType.SellAllCoins) {
             final TxCoinSellAll data = mExtTx.getData(TxCoinSellAll.class);
-            Optional<CoinAccount> acc = accountStorage.getData().findAccountByCoin(data.getCoinToSell());
+            AddressBalance mainWallet = accountStorage.getEntity().getMainWallet();
+            Optional<CoinBalance> acc = mainWallet.findCoinByName(data.getCoinToSell());
             if (acc.isEmpty()) {
                 getViewState().disableAll();
 
@@ -369,9 +397,9 @@ public class ExternalTransactionPresenter extends MvpBasePresenter<ExternalTrans
             case SellAllCoins: {
                 final TxCoinSellAll data = tx.getData(TxCoinSellAll.class);
                 getViewState().setFirstLabel("You're selling");
-                Optional<CoinAccount> acc = accountStorage.getData().findAccountByCoin(data.getCoinToSell());
+                Optional<CoinBalance> acc = accountStorage.getEntity().getMainWallet().findCoinByName(data.getCoinToSell());
                 if (acc.isPresent()) {
-                    getViewState().setFirstValue(String.format("%s %s", bdHuman(acc.get().getBalance()), data.getCoinToSell()));
+                    getViewState().setFirstValue(String.format("%s %s", bdHuman(acc.get().getAmount()), data.getCoinToSell()));
                 } else {
                     getViewState().setFirstValue(String.format("%s %s", bdHuman(0), data.getCoinToSell()));
                 }

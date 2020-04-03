@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,28 +26,33 @@
 
 package network.minter.bipwallet.advanced.repo;
 
-import com.annimon.stream.Stream;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
-import network.minter.bipwallet.advanced.models.CoinAccount;
-import network.minter.bipwallet.advanced.models.UserAccount;
+import io.reactivex.schedulers.Schedulers;
+import network.minter.bipwallet.BuildConfig;
+import network.minter.bipwallet.advanced.models.AddressBalanceTotal;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.internal.data.CachedEntity;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.bipwallet.wallets.repos.ExplorerBalanceFetcher;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.explorer.models.AddressBalance;
+import network.minter.explorer.models.BCExplorerResult;
+import network.minter.explorer.models.DelegationInfo;
+import network.minter.explorer.models.ExpResult;
 import network.minter.explorer.repo.ExplorerAddressRepository;
+import timber.log.Timber;
+
+import static network.minter.bipwallet.apis.reactive.ReactiveExplorerGate.rxExpGate;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class AccountStorage implements CachedEntity<UserAccount> {
-    private final static String KEY_BALANCE = "account_storage_balance";
+public class AccountStorage implements CachedEntity<AddressListBalancesTotal> {
+    private final static String KEY_BALANCE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance";
     private final ExplorerAddressRepository mExpAddressRepo;
     private final SecretStorage mSecretStorage;
     private final KVStorage mStorage;
@@ -58,47 +63,21 @@ public class AccountStorage implements CachedEntity<UserAccount> {
         mSecretStorage = secretStorage;
     }
 
-    /**
-     * Group AccountItems's (inside UserAccount) by coin, but reduces MinterAddress (it will be null after grouping)
-     * Map does not changes original data
-     * @return RxJava2 function
-     */
-    public static Function<UserAccount, UserAccount> groupAccountByCoin() {
-        return items -> {
-            if (true) {
-                return items;
-            }
-
-            List<CoinAccount> in = new ArrayList<>(items.size());
-            Stream.of(items.getCoinAccounts()).forEach(item -> in.add(new CoinAccount(item)));
-            List<CoinAccount> out = new ArrayList<>();
-            final Map<String, CoinAccount> tmp = new HashMap<>();
-            for (CoinAccount item : in) {
-                if (!tmp.containsKey(item.coin)) {
-                    tmp.put(item.coin, item);
-                } else {
-                    tmp.get(item.coin).balance = tmp.get(item.coin).balance.add(item.balance);
-                }
-            }
-
-            Stream.of(tmp.values())
-                    .forEach(out::add);
-
-            return new UserAccount(out);
-        };
-    }
-
     @Override
-    public UserAccount initialData() {
-        return mStorage.get(KEY_BALANCE, new UserAccount());
+    public AddressListBalancesTotal initialData() {
+        return mStorage.get(KEY_BALANCE, new AddressListBalancesTotal(mSecretStorage.getAddresses()));
     }
 
-    public UserAccount getAccount() {
+    public AddressBalanceTotal getMainWallet() {
+        return initialData().getBalance(mSecretStorage.getMainWallet());
+    }
+
+    public AddressListBalancesTotal getWallets() {
         return initialData();
     }
 
     @Override
-    public void onAfterUpdate(UserAccount result) {
+    public void onAfterUpdate(AddressListBalancesTotal result) {
         mStorage.put(KEY_BALANCE, result);
     }
 
@@ -108,16 +87,48 @@ public class AccountStorage implements CachedEntity<UserAccount> {
     }
 
     @Override
-    public Observable<UserAccount> getUpdatableData() {
-        return ExplorerBalanceFetcher
-                .create(mExpAddressRepo, mSecretStorage.getAddresses())
-                .map(item -> {
-                    if (item.size() != 0) {
-                        return item.get(0);
-                    }
+    public Observable<AddressListBalancesTotal> getUpdatableData() {
+        return Observable
+                .fromIterable(mSecretStorage.getAddresses())
+                .flatMap(mapBalances())
+                .toList()
+                .map(aggregate())
+                .subscribeOn(Schedulers.io())
+                .toObservable();
+    }
 
-                    return initialData();
-                });
+    private Function<MinterAddress, ObservableSource<BCExplorerResult<AddressBalanceTotal>>> mapBalances() {
+        return address -> rxExpGate(mExpAddressRepo.getAddressData(address, true))
+                .switchMap(mapToDelegations());
+    }
+
+    private Function<BCExplorerResult<AddressBalance>, ObservableSource<BCExplorerResult<AddressBalanceTotal>>> mapToDelegations() {
+        return res -> rxExpGate(mExpAddressRepo.getDelegations(res.result.address, 0))
+                .map(mapDelegationsToBalances(res));
+    }
+
+    private Function<ExpResult<List<DelegationInfo>>, BCExplorerResult<AddressBalanceTotal>> mapDelegationsToBalances(final BCExplorerResult<AddressBalance> res) {
+        return item -> {
+            BCExplorerResult<AddressBalanceTotal> out = new BCExplorerResult<>();
+            out.error = item.error;
+            out.result = new AddressBalanceTotal(res.result, item.meta.additional.delegatedAmount);
+            return out;
+        };
+    }
+
+    private Function<List<BCExplorerResult<AddressBalanceTotal>>, AddressListBalancesTotal> aggregate() {
+        return bcExplorerResults -> {
+            AddressListBalancesTotal out = new AddressListBalancesTotal();
+            for (BCExplorerResult<AddressBalanceTotal> balance : bcExplorerResults) {
+                if (balance.isOk()) {
+                    out.balances.add(balance.result);
+                } else {
+                    Timber.w(balance.error.getMessage());
+                }
+            }
+
+            return out;
+        };
     }
 
 }

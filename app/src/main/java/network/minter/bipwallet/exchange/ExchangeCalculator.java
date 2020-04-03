@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -38,11 +38,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import network.minter.bipwallet.advanced.models.CoinAccount;
 import network.minter.bipwallet.internal.common.Lazy;
 import network.minter.bipwallet.internal.exceptions.GateResponseException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.core.MinterSDK;
+import network.minter.explorer.models.CoinBalance;
 import network.minter.explorer.models.GateResult;
 import network.minter.explorer.repo.GateEstimateRepository;
 import timber.log.Timber;
@@ -114,17 +114,17 @@ public class ExchangeCalculator {
                         out.mCommission = res.result.getCommission();
                         errFunc.accept(null);
 
-                        final Optional<CoinAccount> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-                        final Optional<CoinAccount> getAccount = findAccountByCoin(sourceCoin);
+                        final Optional<CoinBalance> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+                        final Optional<CoinBalance> getAccount = findAccountByCoin(sourceCoin);
                         // if enough (exact) MNT ot pay fee, gas coin is MNT
-                        if (bdGTE(mntAccount.get().getBalance(), OperationType.BuyCoin.getFee())) {
+                        if (bdGTE(mntAccount.get().getAmount(), OperationType.BuyCoin.getFee())) {
                             Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = mntAccount.get().getCoin();
                             out.mEstimate = res.result.getAmount();
                             out.mCalculation = String.format("%s %s", bdHuman(res.result.getAmount()), sourceCoin);
                         }
                         // if enough selected account coin ot pay fee, gas coin is selected coin
-                        else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getAmountWithCommission())) {
+                        else if (getAccount.isPresent() && bdGTE(getAccount.get().getAmount(), res.result.getAmountWithCommission())) {
                             Timber.d("Enough %s to pay fee using instead %s", getAccount.get().getCoin(), MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = getAccount.get().getCoin();
                             out.mEstimate = res.result.getAmountWithCommission();
@@ -178,18 +178,18 @@ public class ExchangeCalculator {
                         out.mCommission = res.result.getCommission();
 
 
-                        final Optional<CoinAccount> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
-                        final Optional<CoinAccount> getAccount = findAccountByCoin(sourceCoin);
+                        final Optional<CoinBalance> mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN);
+                        final Optional<CoinBalance> getAccount = findAccountByCoin(sourceCoin);
 
                         out.mEstimate = res.result.getAmount();
 
                         // if enough (exact) MNT ot pay fee, gas coin is MNT
-                        if (bdGTE(mntAccount.get().getBalance(), OperationType.SellCoin.getFee())) {
+                        if (bdGTE(mntAccount.get().getAmount(), OperationType.SellCoin.getFee())) {
                             Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = mntAccount.get().getCoin();
                         }
                         // if enough selected account coin ot pay fee, gas coin is selected account coin
-                        else if (getAccount.isPresent() && bdGTE(getAccount.get().getBalance(), res.result.getCommission())) {
+                        else if (getAccount.isPresent() && bdGTE(getAccount.get().getAmount(), res.result.getCommission())) {
                             Timber.d("Enough %s to pay fee using instead %s", getAccount.get().getCoin(), MinterSDK.DEFAULT_COIN);
                             out.mGasCoin = getAccount.get().getCoin();
                         } else {
@@ -219,7 +219,7 @@ public class ExchangeCalculator {
         return res.statusCode == 404 || res.statusCode == 400;
     }
 
-    private Optional<CoinAccount> findAccountByCoin(String coin) {
+    private Optional<CoinBalance> findAccountByCoin(String coin) {
         return Stream.of(mBuilder.mAccounts.get())
                 .filter(item -> item.getCoin().equals(coin.toUpperCase()))
                 .findFirst();
@@ -229,8 +229,8 @@ public class ExchangeCalculator {
         private final GateEstimateRepository mCoinsRepo;
         private Action mOnCompleteListener;
         private Consumer<? super Disposable> mDisposableConsumer;
-        private Lazy<List<CoinAccount>> mAccounts;
-        private Lazy<CoinAccount> mAccount;
+        private Lazy<List<CoinBalance>> mAccounts;
+        private Lazy<CoinBalance> mAccount;
         private Lazy<BigDecimal> mGetAmount, mSpendAmount;
         private Lazy<String> mGetCoin;
 
@@ -238,7 +238,7 @@ public class ExchangeCalculator {
             mCoinsRepo = repo;
         }
 
-        public Builder setAccount(Lazy<List<CoinAccount>> accounts, Lazy<CoinAccount> account) {
+        public Builder setAccount(Lazy<List<CoinBalance>> accounts, Lazy<CoinBalance> account) {
             mAccounts = accounts;
             mAccount = account;
             return this;

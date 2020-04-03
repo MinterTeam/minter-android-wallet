@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,7 +50,6 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
     public @BindView(R.id.detail_pub_value) TextView pubKey;
     public @BindView(R.id.detail_coin_value) TextView coin;
     public @BindView(R.id.detail_stake_value) TextView stake;
-    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
     public TxDelegateUnboundViewHolder(View itemView) {
         super(itemView);
@@ -84,8 +83,6 @@ public final class TxDelegateUnboundViewHolder extends ExpandableTxViewHolder {
         subamount.setText(data.coin);
         coin.setText(data.getCoin());
         stake.setText(bdHuman(firstNonNull(data.getValue(), new BigDecimal(0))));
-
-        itemTitleType.setText(item.getTx().getType().name());
 
         title.setText(firstNonNull(item.getUsername(), data.getPublicKey().toShortString(), item.getTx().getHash().toShortString(), "<unknown>"));
 

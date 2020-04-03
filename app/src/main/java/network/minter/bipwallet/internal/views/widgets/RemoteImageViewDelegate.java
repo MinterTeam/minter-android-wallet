@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,6 +36,7 @@ import com.squareup.picasso.Callback;
 import java.lang.ref.WeakReference;
 
 import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
 import network.minter.bipwallet.internal.common.annotations.Dp;
 import timber.log.Timber;
 
@@ -134,6 +135,11 @@ final class RemoteImageViewDelegate implements RemoteImageView {
     @Override
     public void setImageUrl(RemoteImageContainer imageUrlContainer, int resId) {
         setImageUrl(imageUrlContainer.getImageUrl(), resId);
+    }
+
+    @Override
+    public void setImageResource(@DrawableRes int resId) {
+        mImage.get().setImageResource(resId);
     }
 
     private Context getContext() {

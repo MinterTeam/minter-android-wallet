@@ -1,7 +1,7 @@
 /*
- * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -46,7 +46,6 @@ import static network.minter.bipwallet.internal.helpers.MathHelper.bdNull;
  */
 public class TxEditCandidateViewHolder extends ExpandableTxViewHolder  {
     public @BindView(R.id.detail_pub_value) TextView pubKey;
-    public @BindView(R.id.item_title_type) TextView itemTitleType;
 
     public TxEditCandidateViewHolder(View itemView) {
         super(itemView);
@@ -66,7 +65,7 @@ public class TxEditCandidateViewHolder extends ExpandableTxViewHolder  {
         }
 
         subamount.setText(MinterSDK.DEFAULT_COIN);
-        itemTitleType.setText(itemTitleType.getContext().getString(R.string.tx_type_edit_candidate));
+        type.setText(type.getContext().getString(R.string.tx_type_edit_candidate));
         if (data.getPublicKey() != null) {
             pubKey.setText(data.getPublicKey().toString());
             title.setText(data.getPublicKey().toShortString());

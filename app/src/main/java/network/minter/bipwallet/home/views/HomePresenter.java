@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,7 +40,7 @@ import javax.inject.Inject;
 
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.home.HomeTabFragment;
@@ -52,6 +52,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.bipwallet.services.livebalance.ServiceConnector;
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBalanceUpdateReceiver;
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver;
 import timber.log.Timber;
 
@@ -64,17 +65,15 @@ import static network.minter.bipwallet.internal.Wallet.app;
 @InjectViewState
 public class HomePresenter extends MvpBasePresenter<HomeView> {
 
-    @Inject KVStorage storage;
-
     private final HashMap<Integer, Integer> mBottomIdPositionMap = new HashMap<Integer, Integer>() {{
         put(R.id.bottom_wallets, 0);
         put(R.id.bottom_send, 1);
         put(R.id.bottom_settings, 2);
     }};
-
+    @Inject KVStorage storage;
     @Inject @HomeTabsClasses
     List<Class<? extends network.minter.bipwallet.home.HomeTabFragment>> tabsClasses;
-    @Inject CachedRepository<UserAccount, AccountStorage> accountStorage;
+    @Inject CachedRepository<AddressListBalancesTotal, AccountStorage> accountStorage;
     private int mLastPosition = 0;
 
     @Inject
@@ -172,6 +171,7 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
                     if (channel.equals(RTMService.CHANNEL_BLOCKS)) {
                         RTMBlockReceiver.send(Wallet.app().context(), message);
                     } else {
+                        RTMBalanceUpdateReceiver.send(Wallet.app().context(), message);
                         accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message, address));
                         app().explorerTransactionsRepoCache().update(true);
                         Timber.d("WS ON MESSAGE[%s]: %s", channel, message);

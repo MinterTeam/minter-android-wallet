@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -67,7 +67,7 @@ public class HelpersModule {
     @Provides
     @WalletApp
     public SoundManager provideSoundManager(Context context, SharedPreferences prefs) {
-        return new SoundManager(() -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true), context);
+        return new SoundManager(() -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, false), context);
     }
 
     @Provides

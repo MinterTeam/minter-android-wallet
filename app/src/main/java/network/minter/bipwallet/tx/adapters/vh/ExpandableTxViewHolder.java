@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -58,6 +58,7 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.item_avatar) BipCircleImageView avatar;
     public @BindView(R.id.item_title) TextView title;
     public @BindView(R.id.item_amount) TextView amount;
+    public @BindView(R.id.item_title_type) TextView type;
     public @BindView(R.id.item_subamount) TextView subamount;
     public @BindView(R.id.detail_date_value) TextView dateValue;
     public @BindView(R.id.detail_time_value) TextView timeValue;
@@ -92,6 +93,7 @@ public class ExpandableTxViewHolder extends RecyclerView.ViewHolder {
         final DateTime dt = new DateTime(item.getTx().get().timestamp);
         dateValue.setText(dt.toString(DateTimeFormat.forPattern("dd MMMM yyyy").withLocale(Locale.US)));
         timeValue.setText(dt.toString(DateTimeFormat.forPattern("HH:mm:ss z")));
+        type.setText(item.getTx().getType().name());
 
         if (item.getTx().get().getPayload() != null && !item.getTx().get().getPayload().isEmpty()) {
             String decPayload;

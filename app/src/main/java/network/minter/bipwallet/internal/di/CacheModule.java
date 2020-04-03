@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,11 +33,12 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
-import network.minter.bipwallet.advanced.models.UserAccount;
+import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
 import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.apis.explorer.CacheTxRepository;
 import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository;
+import network.minter.bipwallet.apis.explorer.CachedRewardStatisticsRepository;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.data.CacheManager;
 import network.minter.bipwallet.internal.data.CachedRepository;
@@ -47,6 +48,7 @@ import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.settings.repo.CacheProfileRepository;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.HistoryTransaction;
+import network.minter.explorer.models.RewardStatistics;
 import network.minter.explorer.models.ValidatorItem;
 import network.minter.profile.MinterProfileApi;
 import network.minter.profile.models.User;
@@ -69,7 +71,7 @@ public abstract class CacheModule {
     // Just providing cached repositories
     @Provides
     @WalletApp
-    public static CachedRepository<UserAccount, AccountStorage> provideAccountStorage(AccountStorage accountStorage) {
+    public static CachedRepository<AddressListBalancesTotal, AccountStorage> provideAccountStorage(AccountStorage accountStorage) {
         return new CachedRepository<>(accountStorage);
     }
 
@@ -94,6 +96,13 @@ public abstract class CacheModule {
                         .setTimeToLive(60 * 10);
     }
 
+    @Provides
+    @WalletApp
+    public static CachedRepository<RewardStatistics, CachedRewardStatisticsRepository> provideCachedRewardStatsRepo(@DbCache KVStorage storage, SecretStorage secretStorage, MinterExplorerApi api) {
+        return new CachedRepository<>(new CachedRewardStatisticsRepository(storage, secretStorage, api.getApiService()))
+                .setTimeToLive(60 * 10);
+    }
+
     // Bindings for CacheManager
     @Binds
     @IntoSet
@@ -107,15 +116,21 @@ public abstract class CacheModule {
     @WalletApp
     public abstract CachedRepository provideExplorerValidatorsRepoForCache(CachedRepository<List<ValidatorItem>, CacheValidatorsRepository> cache);
 
-    @Binds
-    @IntoSet
-    @Cached
-    @WalletApp
-    public abstract CachedRepository provideMyProfileRepoForCache(CachedRepository<User.Data, CacheProfileRepository> cache);
+//    @Binds
+//    @IntoSet
+//    @Cached
+//    @WalletApp
+//    public abstract CachedRepository provideMyProfileRepoForCache(CachedRepository<User.Data, CacheProfileRepository> cache);
 
     @Binds
     @IntoSet
     @Cached
     @WalletApp
-    public abstract CachedRepository provideAccountStorageForCache(CachedRepository<UserAccount, AccountStorage> cache);
+    public abstract CachedRepository provideAccountStorageForCache(CachedRepository<AddressListBalancesTotal, AccountStorage> cache);
+
+    @Binds
+    @IntoSet
+    @Cached
+    @WalletApp
+    public abstract CachedRepository provideRewardsForCache(CachedRepository<RewardStatistics, CachedRewardStatisticsRepository> cache);
 }
