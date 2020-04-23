@@ -26,5 +26,10 @@
 
 package network.minter.bipwallet.wallets.contract;
 
+import moxy.viewstate.strategy.AddToEndSingleStrategy;
+import moxy.viewstate.strategy.StateStrategyType;
+
+@StateStrategyType(AddToEndSingleStrategy.class)
 public interface CoinsTabPageView extends BaseWalletsPageView {
+    void startConvert();
 }

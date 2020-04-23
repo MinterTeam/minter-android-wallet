@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -51,9 +51,8 @@ import io.github.centrifugal.centrifuge.Subscription;
 import io.github.centrifugal.centrifuge.SubscriptionEventListener;
 import io.reactivex.disposables.CompositeDisposable;
 import network.minter.bipwallet.BuildConfig;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.data.CacheManager;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
 
@@ -67,7 +66,6 @@ public class RTMService extends Service {
     public static String LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
 
     private final IBinder mBinder = new LocalBinder();
-    @Inject CacheManager cache;
     @Inject SecretStorage secretStorage;
     @Inject AuthSession session;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();

@@ -31,7 +31,8 @@
     android:id="@+id/container_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:background="@color/white">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -87,7 +88,7 @@
                         app:layout_constraintGuide_end="@dimen/margin_edges" />
 
                     <TextView
-                        android:id="@+id/balance_hint"
+                        android:id="@+id/balance_label"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_edges"
@@ -99,53 +100,63 @@
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/balance_int"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/balance_container"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/_inter_semi_bold"
-                        android:fontFeatureSettings="@string/inter_zeroes"
-                        android:text="462 308"
-                        android:textColor="@color/textColorWhite"
-                        android:textSize="@dimen/text_size_30"
-                        app:layout_constraintEnd_toStartOf="@id/balance_fractions"
-                        app:layout_constraintHorizontal_bias="0"
-                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
-                        app:layout_constraintTop_toBottomOf="@id/balance_hint"
-                        app:layout_constraintVertical_bias="1" />
+                        app:layout_constraintTop_toBottomOf="@id/balance_label">
 
-                    <TextView
-                        android:id="@+id/balance_fractions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="1dp"
-                        android:fontFamily="@font/_inter_semi_bold"
-                        android:textColor="@color/textColorWhite"
-                        android:textSize="@dimen/text_size_default"
-                        app:layout_constraintBottom_toBottomOf="@id/balance_int"
-                        app:layout_constraintEnd_toStartOf="@id/balance_coin_name"
-                        app:layout_constraintStart_toEndOf="@id/balance_int"
-                        app:layout_constraintTop_toTopOf="@id/balance_int"
-                        app:layout_constraintVertical_bias=".8"
-                        tools:text=".492404" />
+                        <TextView
+                            android:id="@+id/balance_first_part"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/_inter_semi_bold"
+                            android:fontFeatureSettings="@string/inter_zeroes"
+                            android:text="462 308"
+                            android:textColor="@color/textColorWhite"
+                            android:textSize="@dimen/text_size_30"
+                            app:layout_constraintEnd_toStartOf="@id/balance_middle_part"
+                            app:layout_constraintHorizontal_bias="0"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_bias="1" />
 
-                    <TextView
-                        android:id="@+id/balance_coin_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_edges_half"
-                        android:fontFamily="@font/_inter_semi_bold"
-                        android:textAllCaps="true"
-                        android:textColor="@color/textColorWhite"
-                        android:textSize="@dimen/text_size_default"
-                        android:textStyle="normal"
-                        app:layout_constraintBottom_toBottomOf="@id/balance_int"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/balance_fractions"
-                        app:layout_constraintTop_toTopOf="@id/balance_int"
-                        app:layout_constraintVertical_bias=".8"
-                        tools:text="bip" />
+                        <TextView
+                            android:id="@+id/balance_middle_part"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="1dp"
+                            android:fontFamily="@font/_inter_semi_bold"
+                            android:textColor="@color/textColorWhite"
+                            android:textSize="@dimen/text_size_default"
+                            app:layout_constraintBottom_toBottomOf="@id/balance_first_part"
+                            app:layout_constraintEnd_toStartOf="@id/balance_last_part"
+                            app:layout_constraintStart_toEndOf="@id/balance_first_part"
+                            app:layout_constraintTop_toTopOf="@id/balance_first_part"
+                            app:layout_constraintVertical_bias=".8"
+                            tools:text=".492404" />
+
+                        <TextView
+                            android:id="@+id/balance_last_part"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_edges_half"
+                            android:fontFamily="@font/_inter_semi_bold"
+                            android:textAllCaps="true"
+                            android:textColor="@color/textColorWhite"
+                            android:textSize="@dimen/text_size_default"
+                            android:textStyle="normal"
+                            app:layout_constraintBottom_toBottomOf="@id/balance_first_part"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/balance_middle_part"
+                            app:layout_constraintTop_toTopOf="@id/balance_first_part"
+                            app:layout_constraintVertical_bias=".8"
+                            tools:text="bip" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
                     <TextView
                         android:id="@+id/balance_today"
@@ -157,7 +168,7 @@
                         android:textColor="@color/textColorGreen"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
-                        app:layout_constraintTop_toBottomOf="@id/balance_int"
+                        app:layout_constraintTop_toBottomOf="@id/balance_container"
                         tools:text="+ 62 368.3903 BIP today" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -165,7 +176,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_edges_medium"
-                        android:background="?attr/selectableItemBackground"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
                         app:layout_constraintTop_toBottomOf="@id/balance_today">
@@ -281,29 +292,26 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/container_swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
-        <!--        android:id="@+id/container_swipe_refresh"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="match_parent"-->
-        <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--        app:layout_constraintEnd_toEndOf="parent"-->
-
-        <!--        app:layout_constraintStart_toStartOf="parent"-->
-        <!--        app:layout_constraintTop_toBottomOf="@id/appbar">-->
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/tabsPager"
+        <network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white" />
-        <!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
-    </network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView>
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/tabsPager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="horizontal" />
+
+        </network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

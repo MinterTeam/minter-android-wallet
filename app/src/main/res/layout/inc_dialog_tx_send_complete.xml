@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -66,11 +66,10 @@
         />
 
     <TextView
-        android:id="@+id/tx_recipient_name"
+        android:id="@+id/dialog_second_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_edges_half"
-        android:fontFamily="@font/_ubuntu_bold"
         android:textAlignment="center"
         android:textSize="@dimen/text_size_14"
         app:layout_constraintEnd_toEndOf="parent"
@@ -89,7 +88,7 @@
         android:text="@string/btn_view_tx"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tx_recipient_name"
+        app:layout_constraintTop_toBottomOf="@id/dialog_second_value"
         />
 
     <network.minter.bipwallet.internal.views.widgets.WalletButton

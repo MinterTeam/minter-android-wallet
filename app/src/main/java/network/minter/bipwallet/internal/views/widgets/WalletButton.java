@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,7 +27,6 @@
 package network.minter.bipwallet.internal.views.widgets;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -56,7 +55,6 @@ public class WalletButton extends Button {
         init(attrs, defStyleAttr, 0);
     }
 
-    @TargetApi(21)
     public WalletButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(attrs, defStyleAttr, defStyleRes);

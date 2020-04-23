@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -95,7 +95,7 @@ public final class UnzipUtil {
                 String filePath = entry.getName();
                 int separatorIndex = filePath.lastIndexOf(File.separator);
                 if (separatorIndex > -1)
-                    filePath = filePath.substring(separatorIndex + 1, filePath.length());
+                    filePath = filePath.substring(separatorIndex + 1);
                 filePath = destDirectory + File.separator + filePath;
                 extractFile(zipIn, filePath);
                 break;

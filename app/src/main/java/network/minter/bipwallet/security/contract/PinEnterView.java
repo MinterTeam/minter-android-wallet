@@ -26,10 +26,12 @@
 
 package network.minter.bipwallet.security.contract;
 
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.StringRes;
 import androidx.biometric.BiometricPrompt;
+import kotlin.jvm.functions.Function1;
 import moxy.MvpView;
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
@@ -44,7 +46,7 @@ import network.minter.bipwallet.security.SecurityModule;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy.class)
-public interface PinEnterView extends MvpView, ErrorViewWithRetry, WalletDialog.DialogContractView {
+public interface PinEnterView extends MvpView, ErrorViewWithRetry {
     void setKeypadListener(SecurityModule.KeypadListener listener);
     void setupTitle(@StringRes int title);
     void setEnableValidation(String pin);
@@ -52,6 +54,8 @@ public interface PinEnterView extends MvpView, ErrorViewWithRetry, WalletDialog.
     void setOnPinValueListener(PinCodeView.OnValueListener listener);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startConfirmation(int requestCode, String pin);
+
+    void startDialog(Function1<Context, WalletDialog> executor);
     void finishSuccess(Intent intent);
     void setOnPinValidationError(PinCodeView.OnValidationErrorListener listener);
     void setPinError(CharSequence error);

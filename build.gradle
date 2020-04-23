@@ -27,6 +27,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext.kotlin_version = "1.3.72"
     repositories {
         mavenLocal()
         google()
@@ -35,11 +36,11 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0-beta03'
+        classpath 'com.android.tools.build:gradle:4.0.0-beta04'
         classpath 'io.fabric.tools:gradle:1.31.2'
         classpath 'com.google.gms:google-services:4.3.3'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
-//        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
     }
 }
@@ -61,6 +62,7 @@ allprojects {
         maven { url "https://dl.bintray.com/minterteam/android" }
         maven { url "https://dl.bintray.com/edwardstock/android" }
         maven { url "https://oss.jfrog.org/libs-snapshot/" }
+        maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 
     }
 }
@@ -73,12 +75,12 @@ ext {
     minterMinSdk = 21
     minterMaxSdk = 29
     minterLibSupport = "28.0.0"
-    minterBuildTools = "29.0.2"
+    minterBuildTools = "29.0.3"
 
     minterExplorerSDK = "0.8.0"
-    minterProfileSDK = "0.2.5"
-    minterBlockchainSDK = "0.12.2"
-    minterCoreSDK = "0.7.0"
+    minterProfileSDK = "0.2.6"
+    minterBlockchainSDK = "0.13.0"
+    minterCoreSDK = "0.7.1"
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"
 

@@ -36,16 +36,12 @@
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
         android:id="@+id/item_avatar"
         style="@style/ListAvatar"
-        android:background="@drawable/bg_image_round_shadow"
-        android:scaleType="centerCrop"
-        app:civ_border_color="@color/white"
-        app:civ_border_overlay="true"
-        app:civ_border_width="2dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars"
-        />
+        tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/item_title"
@@ -74,7 +70,6 @@
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@id/item_title"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias=".5"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="+500000.1020"
         />

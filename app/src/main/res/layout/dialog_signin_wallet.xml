@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,69 +24,58 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shape_dialog_rounded">
+    android:orientation="vertical">
 
     <include
         android:id="@+id/dialog_top"
         layout="@layout/dialog_sheet_top" />
 
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/input_seed"
-        style="@style/Wallet.EditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:hint="Your seed phrase..."
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_top" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/error_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:textAlignment="center"
-        android:textColor="@color/errorColor"
-        android:textSize="@dimen/text_size_12"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_seed"
-        tools:text="Unknown Error"
-        tools:visibility="visible" />
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_seed"
+                style="@style/Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:hint="Your seed phrase..."
+                app:labelEnabled="false" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/submit"
+                style="@style/Wallet.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:enabled="false"
+                android:text="@string/btn_sign_in"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/error_text" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_edges_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/submit" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 
-    <Button
-        android:id="@+id/submit"
-        style="@style/Wallet.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:enabled="false"
-        android:text="@string/btn_sign_in"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/error_text" />
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="@dimen/margin_edges_large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/submit" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

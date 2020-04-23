@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <com.edwardstock.inputfield.InputFieldAutocomplete
+            android:id="@+id/input_incoming_coin"
+            style="@style/Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:dropDownHeight="wrap_content"
+            android:focusable="false"
+            android:hint="Coin Name"
+            android:inputType="textNoSuggestions"
+            android:maxLength="10"
+            android:singleLine="true"
+            android:textAllCaps="true"
+            app:fieldName="income_coin"
+            app:label="@string/label_coin_to_buy"
+            tools:text="COINCOIAAAAA" />
+
+        <!--AMOUNT-->
+        <com.edwardstock.inputfield.InputField
+            android:id="@+id/input_amount"
+            style="@style/Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
+            android:ellipsize="end"
+            android:hint="@string/label_amount"
+            android:inputType="numberDecimal|textMultiLine"
+            app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
+            app:fieldName="amount"
+            app:label="@string/label_amount"
+            tools:text="1.10203040506070809024242424242424102030405060708090" />
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:background="@color/greySeparator" />
+
+        <!--SOURCE COIN-->
+        <com.edwardstock.inputfield.InputField
+            android:id="@+id/input_outgoing_coin"
+            style="@style/Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="none"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            app:label="@string/label_coin_to_sell"
+            app:suffixImageSrc="@drawable/ic_drop_down_grey"
+            app:suffixType="image"
+            tools:text="NIOCNIOCNIAAA" />
+
+
+        <!-- CALCULATION and FEES-->
+        <include
+            android:id="@+id/calculation_container"
+            layout="@layout/include_exchange_calculation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges" />
+
+
+        <network.minter.bipwallet.internal.views.widgets.WalletButton
+            android:id="@+id/action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:text="@string/btn_exchange" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/margin_edges" />
+
+    </LinearLayout>
+</ScrollView>

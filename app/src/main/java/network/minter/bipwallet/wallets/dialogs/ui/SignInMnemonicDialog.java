@@ -35,7 +35,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.material.textfield.TextInputEditText;
+import com.edwardstock.inputfield.InputField;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -64,8 +64,7 @@ public class SignInMnemonicDialog extends BaseMvpBottomSheetDialogFragment imple
     @BindView(R.id.dialog_title) TextView title;
     @BindView(R.id.dialog_description) TextView description;
     @BindView(R.id.submit) Button submit;
-    @BindView(R.id.error_text) TextView errorText;
-    @BindView(R.id.input_seed) TextInputEditText inputMnemonic;
+    @BindView(R.id.input_seed) InputField inputMnemonic;
 
     private Unbinder mUnbinder;
 
@@ -121,7 +120,7 @@ public class SignInMnemonicDialog extends BaseMvpBottomSheetDialogFragment imple
 
     @Override
     public void setError(CharSequence error) {
-        errorText.setText(error);
+        inputMnemonic.setError(error);
     }
 
     @Override

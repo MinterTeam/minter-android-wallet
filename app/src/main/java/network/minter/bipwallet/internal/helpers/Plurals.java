@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -82,6 +82,7 @@ public class Plurals {
         return out.toString();
     }
 
+    @Deprecated
     public static String bips(Long n) {
         if (MinterSDK.DEFAULT_COIN.toUpperCase().equals(MinterSDK.DEFAULT_COIN)) {
             return MinterSDK.DEFAULT_COIN.toUpperCase();

@@ -45,8 +45,8 @@ import dagger.android.HasAndroidInjector;
 import moxy.MvpAppCompatActivity;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialog;
-import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
+import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment;
+import network.minter.bipwallet.internal.dialogs.ConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
@@ -67,16 +67,16 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
 
     @Inject DispatchingAndroidInjector<Object> androidInjector;
     private WalletProgressDialog mProgress;
-    private BaseBottomSheetDialog mBaseBottomSheetDialog;
+    private BaseBottomSheetDialogFragment mBaseBottomSheetDialogFragment;
 
-    public void startBottomDialog(BaseBottomSheetDialog dialog, String tag) {
-        if (mBaseBottomSheetDialog != null) {
-            mBaseBottomSheetDialog.dismiss();
-            mBaseBottomSheetDialog = null;
+    public void startBottomDialog(BaseBottomSheetDialogFragment dialog, String tag) {
+        if (mBaseBottomSheetDialogFragment != null) {
+            mBaseBottomSheetDialogFragment.dismiss();
+            mBaseBottomSheetDialogFragment = null;
         }
 
-        mBaseBottomSheetDialog = dialog;
-        mBaseBottomSheetDialog.show(getSupportFragmentManager(), tag);
+        mBaseBottomSheetDialogFragment = dialog;
+        mBaseBottomSheetDialogFragment.show(getSupportFragmentManager(), tag);
     }
 
     @VisibleForTesting
@@ -131,7 +131,7 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
     public void onError(Throwable t) {
         Timber.e(t);
         if (BuildConfig.DEBUG && t != null) {
-            new WalletConfirmDialog.Builder(this, "Error")
+            new ConfirmDialog.Builder(this, "Error")
                     .setPositiveAction("Ok")
                     .setText(t)
                     .create()
@@ -149,7 +149,7 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
         Timber.e(err);
         runOnUiThread(() -> {
             if (err != null) {
-                new WalletConfirmDialog.Builder(this, "Error")
+                new ConfirmDialog.Builder(this, "Error")
                         .setPositiveAction("Ok")
                         .setText(err)
                         .create()

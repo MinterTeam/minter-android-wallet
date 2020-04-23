@@ -33,29 +33,26 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.airbnb.paris.annotations.Attr;
+import com.airbnb.paris.annotations.Styleable;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 import androidx.annotation.ColorInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.sweers.barber.Barber;
-import io.sweers.barber.Kind;
-import io.sweers.barber.StyledAttr;
+import network.minter.bipwallet.Paris;
 import network.minter.bipwallet.R;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
 
+@Styleable("WalletSelector")
 public class WalletSelector extends FrameLayout {
     @BindView(R.id.icon) TextView weight;
     @BindView(R.id.title) TextView name;
     @BindView(R.id.dropdown) ImageView dropdown;
-
-    @StyledAttr(value = R.styleable.WalletSelector_ws_name_color, kind = Kind.COLOR)
-    int nameColor = -1;
-    @StyledAttr(value = R.styleable.WalletSelector_ws_dropdown_tint, kind = Kind.COLOR)
-    int dropdownColor = -1;
 
     private WalletListAdapter mAdapter;
     private WalletsPopupWindow mPopup;
@@ -120,16 +117,6 @@ public class WalletSelector extends FrameLayout {
     }
 
     private void init(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        Barber.style(this, attrs, R.styleable.WalletSelector, defStyleAttr, defStyleRes);
-        if (nameColor < 0) {
-            nameColor = 0xFF_000000;
-        }
-
-        if (dropdownColor < 0) {
-            dropdownColor = getResources().getColor(R.color.grey);
-        }
-
-
         mAdapter = new WalletListAdapter();
         mAdapter.setOnClickWalletListener(this::onClickWallet);
         mAdapter.setOnClickEditWalletListener(this::onClickEditWallet);
@@ -139,10 +126,7 @@ public class WalletSelector extends FrameLayout {
         ButterKnife.bind(this, view);
 
         view.setOnClickListener(this::openPopup);
-
-
-        setNameColor(nameColor);
-        setDropdownTint(dropdownColor);
+        Paris.style(this).apply(attrs);
     }
 
     public void setOnClickWalletListener(WalletListAdapter.OnClickWalletListener listener) {
@@ -167,10 +151,12 @@ public class WalletSelector extends FrameLayout {
         super.clearFocus();
     }
 
+    @Attr(value = R.styleable.WalletSelector_ws_name_color)
     public void setNameColor(@ColorInt int color) {
         name.setTextColor(color);
     }
 
+    @Attr(value = R.styleable.WalletSelector_ws_dropdown_tint)
     public void setDropdownTint(@ColorInt int color) {
         dropdown.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY);
     }

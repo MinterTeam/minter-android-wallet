@@ -59,7 +59,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_edges_half"
-        android:fontFamily="@font/_ubuntu_medium"
         android:textAlignment="viewEnd"
         android:textSize="@dimen/text_size_default"
         app:layout_constraintBottom_toBottomOf="parent"

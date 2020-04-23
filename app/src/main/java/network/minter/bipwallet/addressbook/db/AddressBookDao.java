@@ -55,13 +55,13 @@ public interface AddressBookDao {
      * @param nameOrAddress should be ENCLOSED with "%"
      * @return
      */
-    @Query("SELECT COUNT(id) FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress GROUP BY id")
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress")
     Single<Integer> countByNameOrAddress(String nameOrAddress);
 
     @Query("SELECT * FROM minter_contacts WHERE address = :nameOrAddress OR name = :nameOrAddress")
     Maybe<AddressContact> getByNameOrAddress(String nameOrAddress);
 
-    @Query("SELECT * FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress")
+    @Query("SELECT * FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress GROUP BY id")
     Maybe<List<AddressContact>> findByNameOrAddress(String nameOrAddress);
 
     @Insert
@@ -78,5 +78,8 @@ public interface AddressBookDao {
 
     @Delete
     void delete(AddressContact contact);
+
+    @Query("DELETE FROM minter_contacts")
+    void truncate();
 
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -152,7 +152,6 @@
                     android:layout_height="@dimen/qr_preview_size"
                     android:clickable="true"
                     android:focusable="true"
-                    android:fontFamily="@font/_ubuntu_regular"
                     android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:transitionName="qr_preview"
                     app:layout_constraintBottom_toBottomOf="parent"

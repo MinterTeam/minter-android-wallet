@@ -107,7 +107,7 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             item.applyAddressIcon(vh.avatar);
             vh.title.setText(item.name);
-            vh.subtitle.setText(item.address);
+            vh.subtitle.setText(item.getShortAddress());
             vh.actionEdit.setOnClickListener(v -> {
                 if (mOnEditContactListener != null) {
                     mOnEditContactListener.onEditContact(((AddressContact) mItems.get(holder.getAdapterPosition())));

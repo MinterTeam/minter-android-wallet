@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -186,7 +187,7 @@ public class MultiRowAdapter extends RecyclerView.Adapter<MultiRowAdapter.RowVie
     @NonNull
     @Override
     public RowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final String tag = String.format("TxSendCoinViewHolder instancing: %s", parent.getContext().getResources().getResourceEntryName(viewType));
+        final String tag = String.format("RowViewHolder instancing: %s", parent.getContext().getResources().getResourceEntryName(viewType));
 //        TimeProfiler.start(tag);
 
         if (layoutInflater == null) {
@@ -341,7 +342,7 @@ public class MultiRowAdapter extends RecyclerView.Adapter<MultiRowAdapter.RowVie
 
 
     /**
-     * Кэшированный список классов TxSendCoinViewHolder'ов чтоб итеративно каждый раз не искать
+     * Кэшированный список классов RowViewHolder чтоб итеративно каждый раз не искать
      */
     @SuppressWarnings("unchecked")
     protected void makeHoldersCache() {
@@ -354,10 +355,10 @@ public class MultiRowAdapter extends RecyclerView.Adapter<MultiRowAdapter.RowVie
             checkNotNull(item);
             if (item instanceof SortableRow) {
                 checkNotNull(item.getViewHolderClass(),
-                        "Row " + (((SortableRow) item).getRow().getClass()) + " does not have valid TxSendCoinViewHolder class");
+                        "Row " + (((SortableRow) item).getRow().getClass()) + " does not have valid RowViewHolder class");
             } else {
                 checkNotNull(item.getViewHolderClass(),
-                        "Row " + item.getClass() + " does not have valid TxSendCoinViewHolder class");
+                        "Row " + item.getClass() + " does not have valid RowViewHolder class");
             }
 
             rowsViewIdClassCache.put(item.getItemView(), item);
@@ -387,7 +388,7 @@ public class MultiRowAdapter extends RecyclerView.Adapter<MultiRowAdapter.RowVie
         }
         holderClass = holderViewIdClassCache.get(viewId);
         if (holderClass == null) {
-            throw new RuntimeException("Can't findStream TxSendCoinViewHolder for view " + viewId);
+            throw new RuntimeException("Can't findStream RowViewHolder for view " + viewId);
         }
         if (isInnerClass(holderClass)) {
             throw new RuntimeException("Class should be static!");

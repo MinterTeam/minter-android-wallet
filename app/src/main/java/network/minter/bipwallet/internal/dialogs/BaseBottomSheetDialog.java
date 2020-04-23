@@ -26,37 +26,22 @@
 
 package network.minter.bipwallet.internal.dialogs;
 
-import android.content.DialogInterface;
+import android.content.Context;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import androidx.annotation.NonNull;
-import network.minter.bipwallet.internal.BaseMvpBottomSheetDialogFragment;
 
-public abstract class BaseBottomSheetDialog extends BaseMvpBottomSheetDialogFragment {
-
-    protected OnSubmitListener mOnSubmitListener;
-    protected OnDismissListener mOnDismissListener;
-
-    public void setOnDismissListener(OnDismissListener listener) {
-        mOnDismissListener = listener;
+public class BaseBottomSheetDialog extends BottomSheetDialog {
+    public BaseBottomSheetDialog(@NonNull Context context) {
+        super(context);
     }
 
-    public void setOnSubmitListener(OnSubmitListener listener) {
-        mOnSubmitListener = listener;
+    public BaseBottomSheetDialog(@NonNull Context context, int theme) {
+        super(context, theme);
     }
 
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        super.onDismiss(dialog);
-        if (mOnDismissListener != null) {
-            mOnDismissListener.onDismiss();
-        }
-    }
-
-    public interface OnDismissListener {
-        void onDismiss();
-    }
-
-    public interface OnSubmitListener {
-        void onSubmit();
+    protected BaseBottomSheetDialog(@NonNull Context context, boolean cancelable, OnCancelListener cancelListener) {
+        super(context, cancelable, cancelListener);
     }
 }

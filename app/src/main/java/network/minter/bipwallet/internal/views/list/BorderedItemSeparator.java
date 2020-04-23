@@ -38,7 +38,6 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import timber.log.Timber;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -184,7 +183,7 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
                 left = child.getLeft() - params.leftMargin;
                 right = left + size;
             }
-            Timber.d("Draw divider at: %d %d %d %d", left, top, right, bottom);
+
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
         }
@@ -216,7 +215,7 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
                     left += child.getRight() + params.rightMargin;
                     right += left + size;
                 }
-                Timber.d("Draw last divider at: %d %d %d %d", left, top, right, bottom);
+
                 mDivider.setBounds(left, top, right, bottom);
                 mDivider.draw(c);
             }

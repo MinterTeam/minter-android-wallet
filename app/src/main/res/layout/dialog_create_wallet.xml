@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -123,38 +122,22 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/input_title_hint"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:fontFamily="@font/_inter_semi_bold"
-        android:text="@string/input_hint_wallet_title_later"
-        android:textColor="@color/grey"
-        android:textSize="@dimen/text_size_11"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_saved_seed" />
-
-    <com.google.android.material.textfield.TextInputEditText
+    <com.edwardstock.inputfield.InputField
         android:id="@+id/input_title"
-        style="@style/Wallet.EditText"
+        style="@style/Input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
         android:hint="@string/input_hint_wallet_title"
         android:inputType="textMultiLine"
-        android:textAllCaps="false"
         android:visibility="gone"
+        app:label="@string/input_hint_wallet_title_later"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_title_hint" />
+        app:layout_constraintTop_toBottomOf="@id/layout_saved_seed"
+        tools:visibility="visible" />
 
-    <Button
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
         android:id="@+id/submit"
         style="@style/Wallet.Button"
         android:layout_width="0dp"
@@ -168,11 +151,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_title" />
 
+    <network.minter.bipwallet.internal.views.widgets.WalletButton
+        android:id="@+id/action_cancel"
+        style="@style/Wallet.Button.Transparent.BlackBorder"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges"
+        android:text="@string/btn_cancel"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/submit"
+        tools:visibility="visible" />
+
     <Space
         android:layout_width="0dp"
         android:layout_height="@dimen/margin_edges_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/submit" />
+        app:layout_constraintTop_toBottomOf="@id/action_cancel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

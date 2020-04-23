@@ -49,7 +49,6 @@
         android:layout_height="24dp"
         android:contentDescription="@string/empty"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/search_item_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_search_black"
@@ -58,47 +57,45 @@
 
     <TextView
         android:id="@+id/search_item_title"
-        style="@style/Wallet.ItemTitle"
+        style="@style/ListTitle"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges_half"
-        android:layout_marginTop="1dp"
         android:layout_marginEnd="@dimen/margin_edges"
         android:ellipsize="end"
-        android:gravity="top"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/search_item_subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/search_item_icon_right"
         app:layout_constraintStart_toEndOf="@id/search_item_icon_left"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="@tools:sample/full_names" />
 
     <TextView
         android:id="@+id/search_item_subtitle"
-        style="@style/Wallet.ItemSubtitle"
+        style="@style/ListSubtitle"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:ellipsize="end"
         android:layout_marginStart="@dimen/margin_edges_half"
         android:layout_marginEnd="@dimen/margin_edges"
-        android:layout_marginBottom="@dimen/margin_edges_half"
         android:gravity="bottom"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/search_item_icon_right"
         app:layout_constraintStart_toEndOf="@id/search_item_icon_left"
         app:layout_constraintTop_toBottomOf="@id/search_item_title"
         app:layout_constraintVertical_bias="1"
         tools:text="@tools:sample/cities" />
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/search_item_icon_right"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="@string/empty"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/search_item_title"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <View

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,12 +36,12 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.helpers.TextHelper;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.receiving.contract.ReceiveTabView;
 import network.minter.bipwallet.receiving.helpers.QRAddressGenerator;
 import network.minter.bipwallet.share.ShareManager;

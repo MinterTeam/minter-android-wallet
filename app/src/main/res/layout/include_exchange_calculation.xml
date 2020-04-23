@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_calculation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges"
+        android:background="@drawable/shape_rounded_grey"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/calculation_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_inter_medium"
+            android:scrollHorizontally="false"
+            android:text="@string/label_you_will_pay_approximately"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBottom_toTopOf="@id/calculation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/calculation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:ellipsize="none"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:maxLines="100"
+            android:scrollbars="none"
+            android:singleLine="false"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/calculation_title"
+            tools:text="1500 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000  000 .3304 000  000  000  000  000  000  BLTCOIN" />
+
+        <ProgressBar
+            android:id="@+id/calculation_progress"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminateTint="@color/colorPrimaryLight"
+            android:indeterminateTintMode="src_in"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/calculation"
+            app:layout_constraintEnd_toEndOf="@id/calculation"
+            app:layout_constraintStart_toStartOf="@id/calculation"
+            app:layout_constraintTop_toTopOf="@id/calculation"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/rate_attention"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges"
+        android:fontFamily="@font/_inter_regular"
+        android:text="@string/attention_exchange_rate"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_size_14" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fee_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges"
+        android:minHeight="48dp"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges">
+
+        <TextView
+            android:id="@+id/fee_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/tx_send_fee_hint"
+            android:textSize="@dimen/text_size_14"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/fee_value"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/fee_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:paddingStart="@dimen/margin_edges_half"
+            android:text="@string/tx_send_fee_value"
+            android:textAlignment="textEnd"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/fee_label"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,6 +34,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -53,8 +55,10 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.adapter.LoadState;
+import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment;
 import network.minter.bipwallet.internal.helpers.ContextHelper;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
+import network.minter.bipwallet.tx.adapters.TransactionFacade;
 import network.minter.bipwallet.tx.contract.TransactionListView;
 import network.minter.bipwallet.tx.views.TransactionListPresenter;
 
@@ -75,11 +79,7 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Tr
     @Nullable
     @BindView(R.id.testnet_warning) View testNetWarning;
 
-    @Override
-    public void setAdapter(RecyclerView.Adapter<?> adapter) {
-        list.setLayoutManager(new LinearLayoutManager(this));
-        list.setAdapter(adapter);
-    }
+    private BaseBottomSheetDialogFragment mBottomDialog = null;
 
     @Override
     public void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
@@ -138,6 +138,24 @@ public class TransactionListActivity extends BaseMvpInjectActivity implements Tr
     @Override
     public void hideProgress() {
         progress.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setAdapter(@NotNull RecyclerView.Adapter<?> adapter) {
+        list.setLayoutManager(new LinearLayoutManager(this));
+        list.setAdapter(adapter);
+    }
+
+    @Override
+    public void startDetails(@NotNull TransactionFacade tx) {
+        if (mBottomDialog != null) {
+            mBottomDialog.dismiss();
+            mBottomDialog = null;
+        }
+        mBottomDialog = new TransactionViewDialog.Builder(tx)
+                .build();
+
+        mBottomDialog.show(getSupportFragmentManager(), "tx_view");
     }
 
     @ProvidePresenter

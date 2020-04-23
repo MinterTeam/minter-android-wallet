@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -25,41 +24,47 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="0dp"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:transitionGroup="false"
-        app:elevation="@dimen/card_elevation"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
+        app:layout_collapseMode="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        >
+        app:maxButtonHeight="?attr/actionBarSize"
+        app:navigationIcon="@drawable/ic_close_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title=" ">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="?android:attr/actionBarSize"
-            android:theme="@style/WalletPrimaryToolbar"
-            app:layout_collapseMode="none"
-            app:maxButtonHeight="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back_white_compat"
-            app:title="@string/title_convert_coins"
-            app:titleTextColor="@android:color/white"
-            />
+            android:text="@string/title_convert_coins" />
+    </androidx.appcompat.widget.Toolbar>
 
-        <include layout="@layout/include_testnet_warning_view"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        app:layout_collapseMode="none">
+
+        <include
+            layout="@layout/include_testnet_warning_view"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="?attr/actionBarSize" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
@@ -67,32 +72,25 @@
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:elevation="@dimen/card_elevation"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:tabIndicatorColor="@color/colorPrimary"
-            app:tabSelectedTextColor="@color/colorPrimary"
+            app:tabIndicatorColor="@color/colorPrimaryLight"
+            app:tabSelectedTextColor="@color/colorPrimaryLight"
             app:tabTextAppearance="@style/Wallet.TabLayout.TabItem"
-            >
+            app:tabTextColor="@color/textColorPrimary">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tab_convert_spend"></com.google.android.material.tabs.TabItem>
+                android:text="@string/tab_convert_sell" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tab_convert_get"/>
+                android:text="@string/tab_convert_buy" />
         </com.google.android.material.tabs.TabLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+    </LinearLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

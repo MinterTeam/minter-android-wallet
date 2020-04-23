@@ -1,3 +1,29 @@
+/*
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package network.minter.bipwallet.apis.reactive;
 
 import com.google.gson.Gson;
@@ -12,7 +38,6 @@ import io.reactivex.functions.Function;
 import network.minter.bipwallet.apis.dummies.ExpErrorMapped;
 import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.explorer.MinterExplorerApi;
-import network.minter.explorer.models.BCExplorerResult;
 import network.minter.explorer.models.ExpResult;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,9 +101,8 @@ public final class ReactiveExplorer {
 
     public static <T> ExpResult<T> createExpErrorPlain(final String errorMessage, int code, int statusCode) {
         ExpResult<T> errorRes = new ExpResult<>();
-        errorRes.error = new BCExplorerResult.ErrorResult();
+        errorRes.error = new ExpResult.ErrorResult();
         errorRes.error.message = errorMessage;
-        errorRes.code = statusCode;
         errorRes.error.code = code;
         return errorRes;
     }
@@ -132,10 +156,9 @@ public final class ReactiveExplorer {
 
     public static <T> ExpResult<T> createExpEmpty(int code, String message) {
         ExpResult<T> out = new ExpResult<>();
-        out.code = code;
-        out.error = new BCExplorerResult.ErrorResult();
+        out.error = new ExpResult.ErrorResult();
         out.error.message = message;
-        out.error.code = -1;
+        out.error.code = code;
         return out;
     }
 }

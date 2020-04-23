@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -71,8 +71,7 @@ public interface MultiRowContract {
 
         /**
          * Вызывается когда адаптер биндит вьюху,
-         * соответственно в этом методе заполняем TxSendCoinViewHolder
-         *
+         * соответственно в этом методе заполняем RowViewHolder
          * @param viewHolder Row view holder
          * @see MultiRowAdapter#makeHoldersCache()
          */
@@ -87,8 +86,7 @@ public interface MultiRowContract {
         void onUnbindViewHolder(@NonNull T viewHolder);
 
         /**
-         * Класс TxSendCoinViewHolder'а который отражает вьюху
-         *
+         * Класс RowViewHolder'а который отражает вьюху
          * @return Class
          * @see MultiRowAdapter.RowViewHolder
          */

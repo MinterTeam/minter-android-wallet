@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,42 +27,35 @@
 package network.minter.bipwallet.internal.views.widgets;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.airbnb.paris.Paris;
+import com.airbnb.paris.annotations.Attr;
+import com.airbnb.paris.annotations.Styleable;
+
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.sweers.barber.Barber;
-import io.sweers.barber.Kind;
-import io.sweers.barber.StyledAttr;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.helpers.ViewHelper;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Styleable("ToolbarProgress")
 public class ToolbarProgress extends Toolbar {
-
-    @StyledAttr(R.styleable.ToolbarProgress_title)
-    String titleText;
-    @StyledAttr(value = R.styleable.ToolbarProgress_titleTextColor, kind = Kind.COLOR)
-    int titleTextColor;
-    @StyledAttr(value = R.styleable.ToolbarProgress_navigationIcon, kind = Kind.RES_ID)
-    int navigationIcon;
-    @StyledAttr(R.styleable.ToolbarProgress_enableAction)
-    boolean enableAction = true;
-    @StyledAttr(value = R.styleable.ToolbarProgress_progressColor, kind = Kind.COLOR)
-    int progressColor;
-
     @BindView(R.id.tpAction) View action;
     @BindView(R.id.tpProgress) ProgressBar progress;
     @BindView(R.id.tpTitle) TextView title;
+    private boolean mEnableAction = true;
 
     public ToolbarProgress(Context context) {
         super(context);
@@ -81,29 +74,45 @@ public class ToolbarProgress extends Toolbar {
     private void init(AttributeSet attrs, int defStyleAttr) {
         inflate(getContext(), R.layout.view_toolbar_with_progress, this);
         ButterKnife.bind(this);
-        Barber.style(this, attrs, R.styleable.ToolbarProgress, defStyleAttr);
+        Paris.style(this).apply(attrs);
+    }
 
-        title.setText(titleText);
+    @Attr(R.styleable.ToolbarProgress_navigationIcon)
+    public void setNavigationIcon(@DrawableRes int navigationIcon) {
+        super.setNavigationIcon(navigationIcon);
+    }
 
-        if (!enableAction) {
-            action.setVisibility(GONE);
-        }
+    @Attr(R.styleable.ToolbarProgress_navigationIcon)
+    public void setNavigationIcon(Drawable navigationIcon) {
+        super.setNavigationIcon(navigationIcon);
+    }
 
-        if (navigationIcon != 0) {
-            setNavigationIcon(navigationIcon);
-        }
+    @Attr(R.styleable.ToolbarProgress_enableAction)
+    public void setEnableAction(boolean enableAction) {
+        mEnableAction = enableAction;
+        ViewHelper.visible(action, mEnableAction);
+    }
 
+    @Attr(R.styleable.ToolbarProgress_progressColor)
+    public void setProgressColor(int color) {
         progress.getIndeterminateDrawable().setColorFilter(
-                progressColor,
+                color,
                 android.graphics.PorterDuff.Mode.SRC_IN);
+    }
 
-        setTitleTextColor(titleTextColor);
+    @Attr(R.styleable.ToolbarProgress_title)
+    public void setTitleText(String titleText) {
+        title.setText(titleText);
+    }
 
+    @Attr(R.styleable.ToolbarProgress_titleTextColor)
+    public void setTitleTextColor(int color) {
+        super.setTitleTextColor(color);
     }
 
     public void showProgress() {
         post(() -> {
-            if (enableAction) {
+            if (mEnableAction) {
                 action.setVisibility(GONE);
                 action.setEnabled(false);
             }
@@ -114,7 +123,7 @@ public class ToolbarProgress extends Toolbar {
     public void hideProgress() {
         post(() -> {
             progress.setVisibility(GONE);
-            if (enableAction) {
+            if (mEnableAction) {
                 action.setVisibility(VISIBLE);
                 action.setEnabled(true);
             }

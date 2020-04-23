@@ -93,19 +93,6 @@
             <!--                android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"-->
             <!--                android:resource="@xml/ledger_dev" />-->
         </activity>
-        <activity
-            android:name=".advanced.ui.AdvancedMainActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".advanced.ui.AdvancedGenerateActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".advanced.ui.AdvancedLedgerActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
 
         <activity
             android:name=".home.ui.HomeActivity"
@@ -114,10 +101,6 @@
             android:theme="@style/Wallet"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity
-            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Wallet.CropImage" />
         <activity
             android:name=".tx.ui.TransactionListActivity"
             android:launchMode="singleTop"

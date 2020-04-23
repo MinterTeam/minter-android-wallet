@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,21 +26,26 @@
 
 package network.minter.bipwallet.delegation.adapter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 import androidx.paging.PageKeyedDataSource;
 import io.reactivex.disposables.CompositeDisposable;
-import network.minter.bipwallet.internal.adapter.DataSourceMeta;
 import network.minter.bipwallet.internal.adapter.LoadState;
+import network.minter.bipwallet.internal.helpers.data.CollectionsHelper;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.explorer.models.DelegationInfo;
+import network.minter.core.crypto.MinterPublicKey;
+import network.minter.explorer.models.CoinDelegation;
+import network.minter.explorer.models.DelegationList;
 import network.minter.explorer.models.ExpResult;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import timber.log.Timber;
@@ -52,117 +57,137 @@ import static network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 06-Jun-19
  */
-public class DelegationDataSource extends PageKeyedDataSource<Integer, DelegationItem> {
-
-    private ExplorerAddressRepository mRepo;
-    private List<MinterAddress> mAddressList;
+public class DelegationDataSource extends PageKeyedDataSource<Integer, DelegatedItem> {
+    private final DelegationDataSource.Factory factory;
     private CompositeDisposable mDisposables = new CompositeDisposable();
-    private MutableLiveData<LoadState> mLoadState;
-    private List<DelegationItem> data = new ArrayList<>();
+    private Map<MinterPublicKey, BigDecimal> mValidatorTotalStakes = new HashMap<>();
 
-    public DelegationDataSource(ExplorerAddressRepository repo, List<MinterAddress> addresses,
-                                MutableLiveData<LoadState> loadState) {
-        mRepo = repo;
-        mAddressList = addresses;
-        mLoadState = loadState;
+    public DelegationDataSource(DelegationDataSource.Factory factory) {
+        this.factory = factory;
     }
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params,
-                            @NonNull LoadInitialCallback<Integer, DelegationItem> callback) {
-        mLoadState.postValue(LoadState.Loading);
-        if (mAddressList == null || mAddressList.isEmpty()) {
-            Timber.w("Unanble to load transactions list(page: 1): user address list is empty");
-            mLoadState.postValue(LoadState.Loaded);
+                            @NonNull LoadInitialCallback<Integer, DelegatedItem> callback) {
+        factory.loadState.postValue(LoadState.Loading);
+        if (factory.mAddressList == null || factory.mAddressList.isEmpty()) {
+            Timber.w("Unable to load transactions list(page: 1): user address list is empty");
+            factory.loadState.postValue(LoadState.Loaded);
             callback.onResult(Collections.emptyList(), null, null);
+            factory.loadState.postValue(LoadState.Empty);
             return;
         }
 
-        rxExp(mRepo.getDelegations(mAddressList.get(0), 1))
+        rxExp(factory.mRepo.getDelegations(factory.mAddressList.get(0), 1))
                 .onErrorResumeNext(toExpError())
                 .map(this::mapToDelegationItem)
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
-                    mLoadState.postValue(LoadState.Loaded);
-                    callback.onResult(res.getItems(), null,
+                    factory.loadState.postValue(LoadState.Loaded);
+                    callback.onResult(res.result, null,
                             res.getMeta().lastPage == 1 ? null : res.getMeta().currentPage + 1);
+                    if (res.result.isEmpty()) {
+                        factory.loadState.postValue(LoadState.Empty);
+                    }
                 });
     }
 
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params,
-                           @NonNull LoadCallback<Integer, DelegationItem> callback) {
-        mLoadState.postValue(LoadState.Loading);
-        if (mAddressList == null || mAddressList.isEmpty()) {
+                           @NonNull LoadCallback<Integer, DelegatedItem> callback) {
+        factory.loadState.postValue(LoadState.Loading);
+        if (factory.mAddressList == null || factory.mAddressList.isEmpty()) {
             Timber.w("Unable to load previous transactions list (page: %s): user address list is empty", params.key);
-            mLoadState.postValue(LoadState.Loaded);
+            factory.loadState.postValue(LoadState.Loaded);
             callback.onResult(Collections.emptyList(), null);
             return;
         }
-        rxExp(mRepo.getDelegations(mAddressList.get(0), params.key))
+        rxExp(factory.mRepo.getDelegations(factory.mAddressList.get(0), params.key))
                 .onErrorResumeNext(toExpError())
                 .map(this::mapToDelegationItem)
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
-                    mLoadState.postValue(LoadState.Loaded);
-                    callback.onResult(res.getItems(), params.key == 1 ? null : params.key - 1);
+                    factory.loadState.postValue(LoadState.Loaded);
+                    callback.onResult(res.result, params.key == 1 ? null : params.key - 1);
                 });
     }
 
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params,
-                          @NonNull LoadCallback<Integer, DelegationItem> callback) {
-        mLoadState.postValue(LoadState.Loading);
-        rxExp(mRepo.getDelegations(mAddressList.get(0), params.key))
+                          @NonNull LoadCallback<Integer, DelegatedItem> callback) {
+        factory.loadState.postValue(LoadState.Loading);
+        rxExp(factory.mRepo.getDelegations(factory.mAddressList.get(0), params.key))
                 .onErrorResumeNext(toExpError())
                 .map(this::mapToDelegationItem)
                 .doOnSubscribe(d -> mDisposables.add(d))
                 .subscribe(res -> {
-                    mLoadState.postValue(LoadState.Loaded);
-                    callback.onResult(res.getItems(), params.key + 1 > res.getMeta().lastPage ? null : params.key + 1);
+                    factory.loadState.postValue(LoadState.Loaded);
+                    callback.onResult(res.result, params.key + 1 > res.getMeta().lastPage ? null : params.key + 1);
                 });
     }
 
-    private DataSourceMeta<DelegationItem> mapToDelegationItem(ExpResult<List<DelegationInfo>> res) {
-        for (DelegationInfo info : res.result) {
-            boolean isPresent = false;
-            for (DelegationItem item : data) {
-                if(item.pubKey.toString().equals(info.pubKey.toString())){
-                    isPresent = true;
-                    item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value, info.bipValue));
-                    item.delegatedBips = item.delegatedBips.add(info.bipValue);
-                    break;
-                }
-            }
-            if (isPresent) continue;
-            DelegationItem item = new DelegationItem();
-            item.pubKey = info.pubKey;
-            item.coins.add(new DelegationItem.DelegatedCoin(info.coin, info.value, info.bipValue));
-            item.delegatedBips = info.bipValue;
-            if (info.meta != null) {
-                item.name = firstNonNull(info.meta.name, item.pubKey.toShortString());
-                item.icon = info.meta.iconUrl;
-                item.description = info.meta.description;
-            }
-            data.add(item);
-        }
-
-        final DataSourceMeta<DelegationItem> meta = new DataSourceMeta<>();
-        for (DelegationItem item : data) {
-            Collections.sort(item.coins, (o1, o2) -> o2.amountBIP.compareTo(o1.amountBIP));
-        }
-        Collections.sort(data, (o1, o2) -> o2.delegatedBips.compareTo(o1.delegatedBips));
-        meta.setItems(data);
-        meta.setMeta(res.getMeta());
-
-        return meta;
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        mDisposables.dispose();
     }
 
-    public static class StableCoinSorting implements Comparator<DelegationItem.DelegatedCoin> {
+    private ExpResult<List<DelegatedItem>> mapToDelegationItem(ExpResult<DelegationList> res) {
+        ExpResult<List<DelegatedItem>> out = new ExpResult<>();
+        out.meta = res.meta;
+        out.error = res.error;
+        out.latestBlockTime = res.latestBlockTime;
+        out.links = res.links;
+        out.result = new ArrayList<>();
+
+        List<DelegatedStake> stakes = new ArrayList<>();
+
+        if (res.result != null) {
+            for (Map.Entry<MinterPublicKey, List<CoinDelegation>> info : res.result.getDelegations().entrySet()) {
+                for (CoinDelegation item : info.getValue()) {
+                    DelegatedStake stake = new DelegatedStake(item);
+                    stakes.add(stake);
+                    if (mValidatorTotalStakes.containsKey(stake.pubKey)) {
+                        BigDecimal val = firstNonNull(mValidatorTotalStakes.get(stake.pubKey), BigDecimal.ZERO);
+                        val = val.add(stake.amountBIP);
+                        mValidatorTotalStakes.put(stake.pubKey, val);
+                    } else {
+                        mValidatorTotalStakes.put(stake.pubKey, firstNonNull(stake.amountBIP, BigDecimal.ZERO));
+                    }
+                }
+            }
+        }
+
+        mValidatorTotalStakes = CollectionsHelper.sortByValue(mValidatorTotalStakes, (o1, o2) -> o2.compareTo(o1));
+
+        for (Map.Entry<MinterPublicKey, BigDecimal> validatorStake : mValidatorTotalStakes.entrySet()) {
+            List<DelegatedStake> outStakes = new ArrayList<>();
+
+            for (DelegatedStake s : stakes) {
+                if (s.pubKey.equals(validatorStake.getKey())) {
+                    outStakes.add(s);
+                }
+            }
+
+            if (outStakes.isEmpty()) {
+                continue;
+            }
+
+            Collections.sort(outStakes, (o1, o2) -> o2.amountBIP.compareTo(o1.amountBIP));
+
+            DelegatedValidator validator = new DelegatedValidator(validatorStake.getKey(), outStakes.get(0).validatorMeta);
+            out.result.add(validator);
+            out.result.addAll(outStakes);
+        }
+
+        return out;
+    }
+
+    public static class StableCoinSorting implements Comparator<DelegatedStake> {
         private final static String sStable = MinterSDK.DEFAULT_COIN.toLowerCase();
 
         @Override
-        public int compare(DelegationItem.DelegatedCoin ac, DelegationItem.DelegatedCoin bc) {
+        public int compare(DelegatedStake ac, DelegatedStake bc) {
             final String a = ac.coin.toLowerCase();
             final String b = bc.coin.toLowerCase();
 
@@ -177,27 +202,21 @@ public class DelegationDataSource extends PageKeyedDataSource<Integer, Delegatio
         }
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        mDisposables.dispose();
-    }
-
-    public static class Factory extends DataSource.Factory<Integer, DelegationItem> {
+    public static class Factory extends DataSource.Factory<Integer, DelegatedItem> {
         private ExplorerAddressRepository mRepo;
         private List<MinterAddress> mAddressList;
-        private MutableLiveData<LoadState> mLoadState;
+        private MutableLiveData<LoadState> loadState;
 
         public Factory(ExplorerAddressRepository repo, List<MinterAddress> addresses,
                        MutableLiveData<LoadState> loadState) {
             mRepo = repo;
             mAddressList = addresses;
-            mLoadState = loadState;
+            this.loadState = loadState;
         }
 
         @Override
-        public DataSource<Integer, DelegationItem> create() {
-            return new DelegationDataSource(mRepo, mAddressList, mLoadState);
+        public DataSource<Integer, DelegatedItem> create() {
+            return new DelegationDataSource(this);
         }
     }
 }

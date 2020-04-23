@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginStart="@dimen/margin_edges_half"
+    android:layout_marginEnd="@dimen/margin_edges_half"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/card_border_radius"
+    app:cardElevation="4dp"
+    app:cardPreventCornerOverlap="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/WalletDialog.Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/cities" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dialog_info_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:background="@drawable/bg_light_green_rounded"
+            android:paddingStart="@dimen/margin_edges"
+            android:paddingEnd="@dimen/margin_edges">
+
+            <TextView
+                android:id="@+id/dialog_first_label"
+                style="@style/WalletDialog.TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_medium"
+                android:text="@string/dialog_title_send_type"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/dialog_first_value"
+                style="@style/WalletDialog.TextTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialog_first_label"
+                app:layout_goneMarginTop="10dp"
+                tools:text="1000000000000000.102030405060708090 BIP" />
+
+            <TextView
+                android:id="@+id/dialog_second_label"
+                style="@style/WalletDialog.TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/tx_send_begin_dialog_recipient_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialog_first_value" />
+
+            <TextView
+                android:id="@+id/dialog_second_value"
+                style="@style/WalletDialog.TextTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="22dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialog_second_label"
+                tools:text="\@PavelDurov" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges">
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_confirm"
+                style="@style/Wallet.Button.Green"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Agree" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_decline"
+                style="@style/Wallet.Button.Transparent.BlackBorder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action_confirm"
+                tools:text="Not agree" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action_decline" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

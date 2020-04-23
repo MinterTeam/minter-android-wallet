@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) by MinterTeam. 2018
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,14 +24,12 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    >
+    android:animateLayoutChanges="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -40,28 +37,35 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:elevation="10dp"
             android:minHeight="?android:attr/actionBarSize"
-            android:theme="@style/WalletPrimaryToolbar"
-            android:transitionGroup="false"
-            app:enableAction="false"
+            android:theme="@style/WalletPrimaryToolbar.Light"
             app:layout_collapseMode="none"
-            app:navigationIcon="@drawable/ic_arrow_back_white_compat"
-            app:popupTheme="@style/WalletPrimaryToolbar"
-            app:title="@string/title_transaction_list"
-            app:titleTextColor="@android:color/white"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:maxButtonHeight="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_close_grey"
+            app:popupTheme="@style/WalletPrimaryToolbar.Light"
+            app:title=" ">
 
-        <include layout="@layout/include_testnet_warning_view"
+            <TextView
+                style="@style/Wallet.Toolbar.TitleDefault"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_transaction_list" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <include
+            layout="@layout/include_testnet_warning_view"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="?attr/actionBarSize" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -72,26 +76,23 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        >
+        app:layout_constraintTop_toBottomOf="@id/appbar">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_list_tx_send_coin_expandable"
-            />
+            tools:listitem="@layout/item_list_tx" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
         android:id="@+id/progress"
         android:layout_width="55dp"
         android:layout_height="55dp"
-        app:color="@color/colorPrimaryDark"
+        app:color="@color/colorPrimaryLight"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        />
+        app:layout_constraintTop_toBottomOf="@id/appbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

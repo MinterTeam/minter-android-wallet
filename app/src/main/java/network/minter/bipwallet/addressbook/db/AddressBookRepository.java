@@ -96,6 +96,11 @@ public class AddressBookRepository {
         });
     }
 
+    public Single<Integer> countByNameOrAddress(String nameOrAddress) {
+        final String likeArg = String.format("%%%s%%", nameOrAddress);
+        return mDb.addressBook().countByNameOrAddress(likeArg);
+    }
+
     public Single<AddressContact> findByNameOrAddress(String nameOrAddress) {
         /*
         если мы указали адрес и не нашли контакт, возвращаем адрес как имя контакта

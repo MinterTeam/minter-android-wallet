@@ -40,8 +40,6 @@ import javax.inject.Inject;
 
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.models.AddressListBalancesTotal;
-import network.minter.bipwallet.advanced.repo.AccountStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.home.HomeTabsClasses;
@@ -49,7 +47,9 @@ import network.minter.bipwallet.home.contract.HomeView;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.data.CachedRepository;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.storage.AccountStorage;
 import network.minter.bipwallet.internal.storage.KVStorage;
+import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal;
 import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.bipwallet.services.livebalance.ServiceConnector;
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBalanceUpdateReceiver;

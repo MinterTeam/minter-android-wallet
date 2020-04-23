@@ -26,11 +26,13 @@
 
 package network.minter.bipwallet.settings.contract;
 
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
 import androidx.biometric.BiometricPrompt;
 import androidx.recyclerview.widget.RecyclerView;
+import kotlin.jvm.functions.Function1;
 import moxy.MvpView;
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
@@ -56,7 +58,7 @@ public interface SettingsTabView extends MvpView {
     void startAvatarChooser();
     void showMessage(CharSequence message);
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void startDialog(WalletDialog.DialogExecutor executor);
+    void startDialog(Function1<Context, WalletDialog> executor);
     @StateStrategyType(OneExecutionStateStrategy.class)
     void startPinCodeManager(int requestCode, SecurityModule.PinMode mode);
     void startBiometricPrompt(BiometricPrompt.AuthenticationCallback callback);

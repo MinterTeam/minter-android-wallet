@@ -29,7 +29,6 @@ package network.minter.bipwallet.settings.ui;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -38,9 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -55,6 +51,7 @@ import androidx.biometric.BiometricPrompt;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import kotlin.jvm.functions.Function1;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
@@ -62,7 +59,7 @@ import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.HomeModule;
 import network.minter.bipwallet.home.HomeTabFragment;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
+import network.minter.bipwallet.internal.dialogs.ConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator;
@@ -164,15 +161,7 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
 
     @Override
     public void startAvatarChooser() {
-        CropImage.activity()
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setAspectRatio(1, 1)
-                .setAutoZoomEnabled(true)
-                .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
-                .setOutputCompressQuality(100)
-                .setCropShape(CropImageView.CropShape.OVAL)
-                .setActivityMenuIconColor(getResources().getColor(R.color.white))
-                .start(getActivity());
+
     }
 
     @Override
@@ -184,8 +173,13 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
     }
 
     @Override
-    public void startDialog(WalletDialog.DialogExecutor executor) {
-        mDialog = WalletDialog.switchDialogWithExecutor(this, mDialog, executor);
+    public void startDialog(Function1<Context, WalletDialog> executor) {
+        mDialog = WalletDialog.switchDialogWithExecutor(this, mDialog, new Function1<Context, WalletDialog>() {
+            @Override
+            public WalletDialog invoke(Context context) {
+                return executor.invoke(context);
+            }
+        });
     }
 
     @Override
@@ -230,11 +224,9 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
                 intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
                 startActivity(intent);
             } catch (Throwable wtf3) {
-                startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
+                startDialog(ctx -> new ConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
                         .setText(R.string.fingerprint_dialog_enroll_text_fix)
-                        .setPositiveAction(R.string.btn_ok, (d, w) -> {
-                            d.dismiss();
-                        })
+                        .setPositiveAction(R.string.btn_ok, null)
                         .create());
             }
         }
@@ -277,7 +269,6 @@ public class SettingsTabFragment extends HomeTabFragment implements SettingsTabV
 
     @Override
     public void startLogin() {
-        Wallet.app().cache().clear();
         Intent intent = new Intent(getActivity(), AuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 

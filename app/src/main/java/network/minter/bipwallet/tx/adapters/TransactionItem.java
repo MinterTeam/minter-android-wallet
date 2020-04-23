@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,20 +40,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public interface TransactionItem {
     int ITEM_PROGRESS = -1;
     int ITEM_HEADER = 0;
-    int TX_SEND = 1;
-    int TX_SELL_COIN = 2;
-    int TX_SELL_ALL_COINS = 3;
-    int TX_BUY_COIN = 4;
-    int TX_CREATE_COIN = 5;
-    int TX_DECLARE_CANDIDACY = 6;
-    int TX_DELEGATE = 7;
-    int TX_UNBOUND = 8;
-    int TX_REDEEM_CHECK = 9;
-    int TX_SET_CANDIDATE_ONLINE = 10;
-    int TX_SET_CANDIDATE_OFFLINE = 11;
-    int TX_CREATE_MULTISIG_ADDRESS = 12;
-    int TX_MULTISEND = 13;
-    int TX_EDIT_CANDIDATE = 14;
+    int ITEM_TX = 1;
 
 
     @ListType
@@ -66,20 +53,7 @@ public interface TransactionItem {
     @IntDef({
             ITEM_PROGRESS,
             ITEM_HEADER,
-            TX_SEND,
-            TX_SELL_COIN,
-            TX_BUY_COIN,
-            TX_SELL_ALL_COINS,
-            TX_CREATE_COIN,
-            TX_DECLARE_CANDIDACY,
-            TX_DELEGATE,
-            TX_UNBOUND,
-            TX_REDEEM_CHECK,
-            TX_SET_CANDIDATE_ONLINE,
-            TX_SET_CANDIDATE_OFFLINE,
-            TX_MULTISEND,
-            TX_EDIT_CANDIDATE,
-            TX_CREATE_MULTISIG_ADDRESS,
+            ITEM_TX
     })
     @interface ListType {
     }

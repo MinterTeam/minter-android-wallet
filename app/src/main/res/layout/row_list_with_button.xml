@@ -24,18 +24,6 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-
-<!--<network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView-->
-<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    android:fillViewport="true"-->
-<!--    android:background="@color/white"-->
-<!--    app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-<!--    >-->
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -107,16 +95,15 @@
 
     <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
         android:id="@+id/progress"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginTop="@dimen/margin_edges"
         android:visibility="visible"
-        app:color="@color/colorPrimaryDark"
+        app:color="@color/colorPrimaryLight"
         app:layout_constraintBottom_toTopOf="@id/space"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        />
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <Space
         android:id="@+id/space"

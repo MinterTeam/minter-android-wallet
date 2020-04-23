@@ -34,12 +34,9 @@
 
     <TextView
         android:id="@+id/title"
-        style="@style/Wallet.ItemHeader"
+        style="@style/Wallet.ItemHeader.Small"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="24dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

@@ -33,7 +33,7 @@
     <string name="no">No</string>
     <string name="dont_know">I don\'t know</string>
     <string name="today">Today</string>
-    <string name="please_wait">Please wait</string>
+    <string name="please_wait">Please wait a few seconds…</string>
 
     <!--crop-->
     <string name="crop_image_activity_title"></string>
@@ -76,12 +76,14 @@
     <string name="tx_send_fee_hint">Transaction Fee</string>
     <string name="tx_send_fee_value">0.00000001 BIP</string>
     <string name="bip">BIP</string>
+    <string name="bip_per_min_label">BIP per minute</string>
     <string name="tx_send_free_hint">Send for Free!</string>
     <string name="tx_send_paid_description">Too long? You can make a faster transaction for 0.00000001 BIP</string>
     <string name="tx_send_paid_action">Express transaction</string>
     <string name="tx_send_begin_dialog_recipient_label">to</string>
     <string name="tx_send_waiting_dialog_description">Coins will be received in</string>
     <string name="tx_send_success_dialog_description">Coins are received by</string>
+    <string name="tx_exchange_success_dialog_description">You\'ve received</string>
 
     <!--Advanced "secured by" popup menu values-->
     <string name="secured_by_value__you">You</string>
@@ -103,7 +105,7 @@
     <string name="title_tab_receiving">Receive Coins</string>
     <string name="btn_share_address">Share address</string>
     <string name="tab_receive_label_address">Your address</string>
-    <string name="title_convert_coins">Convert Coins</string>
+    <string name="title_convert_coins">Coin Exchange</string>
     <string name="title_address_list">My Addresses</string>
     <string name="title_address_item">Manage Address</string>
     <string name="title_advanced_generate">Generate Address</string>
@@ -112,7 +114,7 @@
     <string name="title_register">Create Wallet</string>
     <string name="title_signin">Sign In</string>
     <string name="title_transaction_list">All Transactions</string>
-    <string name="title_delegation_list">Delegated Coins</string>
+    <string name="title_delegation_list">Delegated Stakes</string>
     <string name="title_tab_settings">Settings</string>
     <string name="btn_exchange">Exchange</string>
     <string name="title_change_password">Change Password</string>
@@ -122,6 +124,7 @@
     <string name="hint_change_password_old">Current password</string>
     <string name="btn_delegate">Delegate</string>
     <string name="btn_confirm_send">Confirm and send</string>
+    <string name="btn_confirm">Confirm</string>
     <string name="btn_ok">Ok</string>
     <string name="btn_proceed">Proceed</string>
     <string name="btn_scan_qr">Scan QR</string>
@@ -152,8 +155,8 @@
     <string name="notification_balance_update_name">Balance updates</string>
     <string name="notification_balance_list_tx_label">View transactions</string>
     <string name="notification_balance_update_description">Updating balance notifications</string>
-    <string name="tab_convert_spend">Spend</string>
-    <string name="tab_convert_get">Get</string>
+    <string name="tab_convert_sell">Sell</string>
+    <string name="tab_convert_buy">Buy</string>
     <string name="input_register_label_password">Choose Password</string>
     <string name="input_register_label_password_repeat">Confirm Password</string>
     <string name="input_register_label_username">Choose @username</string>
@@ -165,7 +168,7 @@
     <string name="cd_choose">Choose</string>
     <string name="cd_qr_code">QR Code</string>
     <string name="cd_logo">Logotype</string>
-    <string name="empty"/>
+    <string name="empty" />
     <string name="cd_choose_account">Choose your account</string>
     <string name="cd_qr_scan">Scan QR code</string>
     <string name="cd_open_transactions">Open all transactions</string>
@@ -183,7 +186,7 @@
     <string name="btn_advanced_mode">Advanced mode</string>
     <string name="btn_sign_in">Sign In</string>
     <string name="btn_help">Help</string>
-    <string name="label_coin_you_want">Coin you want</string>
+    <string name="label_coin_to_buy">Coin to buy</string>
     <string name="label_amount">Amount</string>
     <string name="label_amount_received">Amount Received</string>
     <string name="label_amount_spent">Amount Spent</string>
@@ -192,7 +195,7 @@
     <string name="btn_use_max">Use max</string>
     <string name="label_you_will_pay_approximately">You will pay approximately</string>
     <string name="attention_exchange_rate">The final amount depends on the exchange rate at the moment of transaction.</string>
-    <string name="label_coin_you_have">Coin you have</string>
+    <string name="label_coin_to_sell">Coin to sell</string>
     <string name="label_you_will_get_approximately">You will get approximately</string>
     <string name="label_balance">Balance</string>
     <string name="label_set_as_main">Set as main</string>
@@ -228,11 +231,13 @@
     <string name="tx_convert_began">Please, wait a few seconds…</string>
     <string name="tx_convert_in_progress">Converting…</string>
     <string name="error">Error</string>
-    <string name="tx_send_overall_title">You\'re sending</string>
+    <string name="tx_send_overall_title">Confirm Transaction</string>
     <string name="tx_address_searching">Searching address</string>
-    <string name="title_select_account">Select account</string>
+    <string name="title_select_account">Select Account</string>
+    <string name="title_select_masternode">Select Masternode</string>
     <string name="dots">…</string>
-    <string name="multiple_coins">Multiple Coins</string>
+    <string name="label_multiple_coins">Multiple Coins</string>
+    <string name="label_no_coins">Multiple Coins</string>
     <string name="test_net_warning">This is a testnet.\nNot real money!</string>
     <string name="test_net_warning_link"><u>DOWNLOAD MAINNET APP</u></string>
     <string name="copy">Copy</string>
@@ -276,5 +281,46 @@
     <string name="btn_official_channel">Our Channel</string>
     <string name="hint_help_and_support"><![CDATA[Help & Support]]></string>
     <string name="btn_support_chat">Support Chat</string>
+    <string name="label_rewards">Rewards</string>
+    <string name="label_stakes">Stakes</string>
+    <string name="zero_amount_decimal">0.0000</string>
+    <string name="btn_unbond">Unbond</string>
+    <string name="decimal_digits">0,1,2,3,4,5,6,7,8,9,.,,</string>
+    <string name="btn_add_message">Add Message</string>
+    <string name="dialog_title_send_type">You\'re sending</string>
+    <string name="btn_save_address">Save This Address</string>
+    <string name="dialog_title_exchange_begin">Confirm Exchange</string>
+    <string name="dialog_title_delegate_begin">Confirm Delegation</string>
+    <string name="dialog_title_unbond_begin">Confirm Unbond</string>
+    <string name="dialog_label_exchange_you_will_spend">You will spend</string>
+    <string name="dialog_label_delegate_you_are_delegating">You\'re delegating</string>
+    <string name="dialog_label_unbond_you_are_unbonding">You\'re unbonding</string>
+    <string name="dialog_label_delegate_to">to</string>
+    <string name="dialog_label_delegate_result">Coins are delegated to</string>
+    <string name="dialog_label_unbond_result">Coins are unbonded from</string>
+    <string name="dialog_label_unbond_from">from</string>
+    <string name="dialog_label_exchange_to_get">to get</string>
+    <string name="dialog_title_tx_view_outgoing">Outgoing Transaction</string>
+    <string name="dialog_title_tx_view_incoming">Incoming Transaction</string>
+    <string name="label_from">From</string>
+    <string name="label_to">To</string>
+    <string name="label_payload_explicit">Payload</string>
+    <string name="label_timestamp">Timestamp</string>
+    <string name="btn_share_tx">Share Transaction</string>
+    <string name="label_fee">Fee</string>
+    <string name="label_block">Block</string>
+    <string name="label_max_supply">Max Supply</string>
+    <string name="label_reward_address">Reward Address</string>
+    <string name="label_owner_address">Owner Address</string>
+    <string name="label_multisig_address">Multisig Address</string>
+    <string name="dialog_title_delegate">Delegate</string>
+    <string name="dialog_title_unbond">Unbond</string>
+    <string name="dialog_label_delegate">Delegate your coins to validators and receive related regular payments.</string>
+    <string name="dialog_label_unbond">The process will be finalized within ~30 days after the request has been sent.</string>
+    <string name="label_masternode">Masternode</string>
+    <string name="menu_label_delegate">Delegate</string>
+    <string name="empty_delegations">You don\'t have any delegations.</string>
+    <string name="dialog_label_delegate_progress">Delegating...</string>
+    <string name="dialog_label_unbond_progress">Unbonding...</string>
 
 </resources>

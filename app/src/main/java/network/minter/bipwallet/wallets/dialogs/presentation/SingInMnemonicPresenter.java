@@ -33,10 +33,10 @@ import android.view.View;
 import javax.inject.Inject;
 
 import moxy.InjectViewState;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.auth.contract.SignInMnemonicView;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.internal.system.SimpleTextWatcher;
 import network.minter.core.bip39.NativeBip39;
 import network.minter.core.crypto.MinterAddress;

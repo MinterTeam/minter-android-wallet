@@ -29,13 +29,16 @@
     <color name="colorPrimary">#200B4F</color>
     <color name="colorPrimaryDark">#1C0D46</color>
     <color name="colorPrimaryLight">#5024C5</color>
+    <color name="colorPrimaryLighter">#502EC2</color>
     <color name="colorPrimaryWarning">#DC4840</color>
+    <color name="colorPrimaryOrange">#FFFFA055</color>
     <color name="colorPrimaryWarningDark">#AE3A34</color>
 
     <color name="colorPrimaryFocused">#19502EC2</color>
     <color name="colorPrimaryPressed">#33502EC2</color>
 
     <color name="grey">#8E8E8E</color>
+    <color name="greyLight">#F3F3F3</color>
     <color name="colorAccent">@color/colorHighlight</color>
     <color name="colorHighlight">#12C841</color>
     <color name="textColorPrimary">#191919</color>
@@ -53,6 +56,11 @@
     <color name="pinPadActive">#250C78</color>
     <color name="pinPadDisabled">#32250C78</color>
 
+    <color name="blueLight">#F7F5FF</color>
+    <color name="green">#12C841</color>
+    <color name="greenLight">#E2F4E7</color>
+    <color name="greenDarker">#0D8F2F</color>
+
     <color name="greySeparator">#FFE1E1E1</color>
     <color name="bottom_navigation_color">@color/colorPrimaryDark</color>
     <color name="textColorGrey">#929292</color>
@@ -65,4 +73,5 @@
     <color name="colorInactive2">#60000000</color>
     <color name="colorInactive3">#222222</color>
     <color name="warning_bg">#F13C3C</color>
+
 </resources>

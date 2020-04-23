@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,13 +26,11 @@
 
 package network.minter.bipwallet.tx.adapters;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -41,10 +39,8 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.AutoTransition;
-import androidx.transition.TransitionManager;
 import network.minter.bipwallet.internal.adapter.LoadState;
-import network.minter.bipwallet.tx.adapters.vh.ExpandableTxViewHolder;
+import network.minter.bipwallet.tx.adapters.vh.TxAllViewHolder;
 import network.minter.core.crypto.MinterAddress;
 
 import static network.minter.bipwallet.tx.adapters.TransactionItem.ITEM_PROGRESS;
@@ -68,20 +64,8 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
     };
     List<MinterAddress> mMyAddresses = new ArrayList<>();
     private LayoutInflater mInflater;
-    private int mExpandedPosition = -1;
-    private OnExplorerOpenClickListener mOnExplorerOpenClickListener;
     private MutableLiveData<LoadState> mLoadState;
-    private boolean mEnableExpanding = true;
-    @SuppressLint("UseSparseArrays")
-    private HashMap<Integer, Boolean> mExpandedPositions = new HashMap<>();
-    private boolean mUseMultipleExpanded = true;
     private OnExpandDetailsListener mOnExpandDetailsListener;
-
-    public TransactionListAdapter(List<MinterAddress> addresses, boolean enableExpanding) {
-        super(sDiffCallback);
-        mMyAddresses = addresses;
-        mEnableExpanding = enableExpanding;
-    }
 
     public TransactionListAdapter(List<MinterAddress> addresses) {
         super(sDiffCallback);
@@ -94,18 +78,12 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @TransactionItem.ListType int viewType) {
         if (mInflater == null) {
             mInflater = LayoutInflater.from(parent.getContext());
         }
 
-        final RecyclerView.ViewHolder out = TxItem.createViewHolder(mInflater, parent, viewType);
-
-        if (out instanceof ExpandableTxViewHolder) {
-            ((ExpandableTxViewHolder) out).setEnableExpanding(mEnableExpanding);
-        }
-
-        return out;
+        return TxItem.createViewHolder(mInflater, parent, viewType);
     }
 
     @Override
@@ -117,61 +95,17 @@ public class TransactionListAdapter extends PagedListAdapter<TransactionItem, Re
         return getItem(position).getViewType();
     }
 
-    public void setOnExplorerOpenClickListener(OnExplorerOpenClickListener listener) {
-        mOnExplorerOpenClickListener = listener;
-    }
-
-    public void setUseMultipleExpanded(boolean useMultipleExpanded) {
-        mUseMultipleExpanded = useMultipleExpanded;
-    }
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
         TxItem.bindViewHolder(mMyAddresses, holder, getItem(position));
 
-        if (holder instanceof ExpandableTxViewHolder) {
-            final ExpandableTxViewHolder h = ((ExpandableTxViewHolder) holder);
-
-            if (h.isEnableExpanding()) {
-                final TxItem item = ((TxItem) getItem(position));
-                h.action.setOnClickListener(v -> {
-                    if (mOnExplorerOpenClickListener != null) {
-                        mOnExplorerOpenClickListener.onClick(v, item.getTx());
-                    }
-                });
-
-                if (mUseMultipleExpanded) {
-                    final boolean isExpanded = mExpandedPositions.containsKey(position) && mExpandedPositions.get(position);
-                    h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-                    h.detailsLayout.setActivated(isExpanded);
-                    h.itemView.setOnClickListener(v -> {
-                        mExpandedPositions.put(position, !isExpanded);
-                        if (!isExpanded && mOnExpandDetailsListener != null) {
-                            mOnExpandDetailsListener.onExpand(v, item != null ? item.getTx() : null);
-                        }
-                        TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
-                        notifyItemChanged(holder.getAdapterPosition());
-                    });
-                } else {
-                    final boolean isExpanded = position == mExpandedPosition;
-                    h.detailsLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-                    h.detailsLayout.setActivated(isExpanded);
-                    h.itemView.setOnClickListener(v -> {
-                        if (!isExpanded && mOnExpandDetailsListener != null) {
-                            mOnExpandDetailsListener.onExpand(v, item != null ? item.getTx() : null);
-                        }
-                        int prevExp = mExpandedPosition;
-                        mExpandedPosition = isExpanded ? -1 : position;
-                        TransitionManager.beginDelayedTransition(((ViewGroup) h.itemView), new AutoTransition());
-                        notifyItemChanged(holder.getAdapterPosition());
-                        notifyItemChanged(prevExp);
-                    });
+        if (holder instanceof TxAllViewHolder) {
+            holder.itemView.setOnClickListener(v -> {
+                if (mOnExpandDetailsListener != null) {
+                    mOnExpandDetailsListener.onExpand(v, ((TxItem) getItem(holder.getAdapterPosition())).getTx());
                 }
-
-            } else {
-                h.detailsLayout.setVisibility(View.GONE);
-            }
+            });
         }
     }
 

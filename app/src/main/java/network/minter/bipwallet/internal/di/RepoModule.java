@@ -28,16 +28,10 @@ package network.minter.bipwallet.internal.di;
 
 import dagger.Module;
 import dagger.Provides;
-import network.minter.bipwallet.advanced.repo.AccountStorage;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
-import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.apis.gate.TxInitDataRepository;
+import network.minter.bipwallet.internal.storage.AccountStorage;
 import network.minter.bipwallet.internal.storage.KVStorage;
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.repo.BlockChainAccountRepository;
-import network.minter.blockchain.repo.BlockChainBlockRepository;
-import network.minter.blockchain.repo.BlockChainCoinRepository;
-import network.minter.blockchain.repo.BlockChainStatusRepository;
-import network.minter.blockchain.repo.BlockChainTransactionRepository;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
@@ -46,12 +40,6 @@ import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
-import network.minter.profile.MinterProfileApi;
-import network.minter.profile.repo.ProfileAddressRepository;
-import network.minter.profile.repo.ProfileAuthRepository;
-import network.minter.profile.repo.ProfileInfoRepository;
-import network.minter.profile.repo.ProfileRepository;
-import okhttp3.Request;
 
 /**
  * minter-android-wallet. 2017
@@ -74,12 +62,6 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public ExplorerTransactionRepository provideExplorerTransactionsRepo(MinterExplorerApi api) {
-        return api.transactions();
-    }
-
-    @Provides
-    @WalletApp
     public MinterExplorerApi provideMinterExplorerApi() {
         final MinterExplorerApi api = MinterExplorerApi.getInstance();
         api.getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
@@ -89,46 +71,14 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public ProfileAuthRepository provideAuthRepository(MinterProfileApi api) {
-        return api.auth();
-    }
-
-    @Provides
-    @WalletApp
-    public ProfileAddressRepository provideAddressRepository(MinterProfileApi api) {
-        return api.address();
+    public ExplorerTransactionRepository provideExplorerTransactionsRepo(MinterExplorerApi api) {
+        return api.transactions();
     }
 
     @Provides
     @WalletApp
     public ExplorerAddressRepository provideExplorerAddressRepository(MinterExplorerApi api) {
         return api.address();
-    }
-
-    @Provides
-    @WalletApp
-    public ProfileRepository provideProfileRepository(MinterProfileApi api) {
-        return api.profile();
-    }
-
-    @Provides
-    @WalletApp
-    public MinterProfileApi provideMinterProfileApi(AuthSession session, boolean debug) {
-        MinterProfileApi.initialize(session::getAuthToken, debug);
-        MinterProfileApi.getInstance().getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
-        MinterProfileApi.getInstance().getApiService()
-                .addHttpInterceptor(chain -> {
-                    if (chain.request().method().toLowerCase().equals("get")) {
-                        // varnish does'n want to receive content-type for GET requests
-                        final Request request = chain.request().newBuilder().removeHeader("content-type").removeHeader("Content-Type").build();
-                        return chain.proceed(request);
-                    }
-
-                    return chain.proceed(chain.request());
-
-                });
-
-        return MinterProfileApi.getInstance();
     }
 
     @Provides
@@ -161,40 +111,9 @@ public class RepoModule {
         return api.transactionsGate();
     }
 
-
     @Provides
     @WalletApp
-    public BlockChainAccountRepository provideBlockChainAccountRepo() {
-        return MinterBlockChainApi.getInstance().account();
-    }
-
-    @Provides
-    @WalletApp
-    public BlockChainCoinRepository provideBlockChainCoinRepo() {
-        return MinterBlockChainApi.getInstance().coin();
-    }
-
-    @Provides
-    @WalletApp
-    public BlockChainTransactionRepository provideBlockChainTxRepository() {
-        return MinterBlockChainApi.getInstance().transactions();
-    }
-
-    @Provides
-    @WalletApp
-    public BlockChainStatusRepository provideBlockChainStatusRepository() {
-        return MinterBlockChainApi.getInstance().status();
-    }
-
-    @Provides
-    @WalletApp
-    public BlockChainBlockRepository provideBlockChainBlockRepository() {
-        return MinterBlockChainApi.getInstance().block();
-    }
-
-    @Provides
-    @WalletApp
-    public ProfileInfoRepository provideInfoRepository(MinterProfileApi api) {
-        return api.info();
+    public TxInitDataRepository provideTxInitDataRepo(GateEstimateRepository estimateRepo, GateGasRepository gasRepo) {
+        return new TxInitDataRepository(estimateRepo, gasRepo);
     }
 }

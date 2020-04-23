@@ -79,6 +79,7 @@ import static network.minter.bipwallet.internal.Wallet.app;
 
 public final class ViewHelper {
 
+
     public static void visible(@Nullable View view, boolean cond) {
         if (view == null) {
             return;
@@ -266,8 +267,6 @@ public final class ViewHelper {
             return;
         }
 
-        Timber.d("Colorize status to: %s", Long.toHexString(((long) color) & 0xFF_FFFFFFL));
-
         final int fromColor = fragment.getActivity().getWindow().getStatusBarColor();
         if (fromColor == color) {
             return;
@@ -299,7 +298,6 @@ public final class ViewHelper {
     public static void setStatusBarColor(Activity activity, @ColorInt int color) {
         if (activity == null) return;
         if (activity.getWindow().getStatusBarColor() == color) return;
-        Timber.d("Colorize status to: %s", Long.toHexString(((long) color) & 0xFF_FFFFFFL));
         activity.getWindow().setStatusBarColor(color);
     }
 

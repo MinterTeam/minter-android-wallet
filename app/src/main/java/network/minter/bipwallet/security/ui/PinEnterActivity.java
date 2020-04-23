@@ -1,7 +1,34 @@
+/*
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package network.minter.bipwallet.security.ui;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,13 +46,13 @@ import androidx.biometric.BiometricPrompt;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import kotlin.jvm.functions.Function1;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
-import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.system.ActivityBuilder;
 import network.minter.bipwallet.internal.views.widgets.PinCodeView;
@@ -162,11 +189,8 @@ public class PinEnterActivity extends BaseMvpInjectActivity implements PinEnterV
 
     @Override
     public void startLogin() {
-
         Toast.makeText(this, R.string.pin_invalid_logout, Toast.LENGTH_LONG).show();
 
-
-        Wallet.app().cache().clear();
         Intent intent = new Intent(this, AuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -185,7 +209,7 @@ public class PinEnterActivity extends BaseMvpInjectActivity implements PinEnterV
     }
 
     @Override
-    public void startDialog(WalletDialog.DialogExecutor executor) {
+    public void startDialog(Function1<Context, WalletDialog> executor) {
         mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor);
     }
 

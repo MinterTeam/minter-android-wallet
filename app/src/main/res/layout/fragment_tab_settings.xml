@@ -42,7 +42,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_grey"
         app:popupTheme="@style/WalletPrimaryToolbar.Light">
 
         <TextView
@@ -53,6 +52,7 @@
     </androidx.appcompat.widget.Toolbar>
 
     <include
+        android:id="@+id/testnet_warning"
         layout="@layout/include_testnet_warning_view"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"

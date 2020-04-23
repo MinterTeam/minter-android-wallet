@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -48,13 +48,12 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.BaseMvpInjectActivity;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.data.CacheManager;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 
@@ -66,7 +65,6 @@ public class SplashFragment extends BaseInjectFragment {
     private final static int REQUEST_START_PIN_ENTER = 1030;
 
     @Inject AuthSession session;
-    @Inject CacheManager cache;
     @Inject SecretStorage secretStorage;
     @BindView(R.id.logo) ImageView logo;
     private AuthSwitchActivity mAuthSwitchActivity;
@@ -119,14 +117,6 @@ public class SplashFragment extends BaseInjectFragment {
                 });
     }
 
-    private void startPinEnter() {
-        new PinEnterActivity.Builder(getActivity(), SecurityModule.PinMode.Validation)
-                .startHomeOnSuccess()
-                .startClearTop();
-
-        getActivity().finish();
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -143,6 +133,14 @@ public class SplashFragment extends BaseInjectFragment {
     public void onDetach() {
         super.onDetach();
         mAuthSwitchActivity = null;
+    }
+
+    private void startPinEnter() {
+        new PinEnterActivity.Builder(getActivity(), SecurityModule.PinMode.Validation)
+                .startHomeOnSuccess()
+                .startClearTop();
+
+        getActivity().finish();
     }
 
     private void startAuth() {

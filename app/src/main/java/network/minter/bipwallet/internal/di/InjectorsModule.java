@@ -31,18 +31,15 @@ import dagger.android.ContributesAndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity;
 import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog;
-import network.minter.bipwallet.advanced.AdvancedModeModule;
-import network.minter.bipwallet.advanced.ui.AdvancedGenerateActivity;
-import network.minter.bipwallet.advanced.ui.AdvancedLedgerActivity;
-import network.minter.bipwallet.advanced.ui.AdvancedMainActivity;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.auth.ui.AuthFragment;
 import network.minter.bipwallet.auth.ui.SplashFragment;
+import network.minter.bipwallet.delegation.ui.DelegateUnbondDialog;
 import network.minter.bipwallet.delegation.ui.DelegationListActivity;
 import network.minter.bipwallet.exchange.ExchangeModule;
+import network.minter.bipwallet.exchange.ui.BuyExchangeFragment;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
-import network.minter.bipwallet.exchange.ui.GetCoinTabFragment;
-import network.minter.bipwallet.exchange.ui.SpendCoinTabFragment;
+import network.minter.bipwallet.exchange.ui.SellExchangeFragment;
 import network.minter.bipwallet.external.ui.ExternalActivity;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.di.annotations.FragmentScope;
@@ -54,6 +51,7 @@ import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.bipwallet.tx.TransactionsModule;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
+import network.minter.bipwallet.tx.ui.TransactionViewDialog;
 import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog;
 import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog;
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog;
@@ -63,7 +61,6 @@ import network.minter.bipwallet.wallets.ui.TxsTabPageFragment;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Module(includes = AndroidSupportInjectionModule.class)
@@ -97,18 +94,6 @@ public interface InjectorsModule {
     @FragmentScope
     AuthFragment authFragmentInjector();
 
-    @ContributesAndroidInjector(modules = AdvancedModeModule.class)
-    @ActivityScope
-    AdvancedMainActivity advancedMainActivity();
-
-    @ContributesAndroidInjector
-    @ActivityScope
-    AdvancedLedgerActivity advancedLedgerActivity();
-
-    @ContributesAndroidInjector
-    @ActivityScope
-    AdvancedGenerateActivity advancedGenerateActivity();
-
     @ContributesAndroidInjector(modules = TransactionsModule.class)
     @ActivityScope
     TransactionListActivity transactionListActivityInjector();
@@ -123,11 +108,11 @@ public interface InjectorsModule {
 
     @ContributesAndroidInjector
     @FragmentScope
-    GetCoinTabFragment getCoinTabFragmentInjector();
+    BuyExchangeFragment getCoinTabFragmentInjector();
 
     @ContributesAndroidInjector
     @FragmentScope
-    SpendCoinTabFragment spendCoinTabFragmentInjector();
+    SellExchangeFragment spendCoinTabFragmentInjector();
 
     @ContributesAndroidInjector
     @ServiceScope
@@ -164,6 +149,14 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @FragmentScope
     AddressContactEditDialog addressContactEditDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    TransactionViewDialog transactionViewDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    DelegateUnbondDialog delegateUnbondDialogInjector();
 
 
 }

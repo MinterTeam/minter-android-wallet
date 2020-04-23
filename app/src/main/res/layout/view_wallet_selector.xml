@@ -30,7 +30,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minWidth="200dp"
+    android:minWidth="220dp"
     android:minHeight="?attr/actionBarSize"
     tools:layout_width="248dp">
 
@@ -65,7 +65,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginEnd="@dimen/margin_edges_half"
         app:layout_goneMarginStart="48dp"
-        tools:text="Mx0b2b…7a272b" />
+        tools:text="Mx8d008d...5e81" />
 
     <ImageView
         android:id="@+id/dropdown"

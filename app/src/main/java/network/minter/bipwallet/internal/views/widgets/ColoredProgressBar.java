@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,26 +26,26 @@
 
 package network.minter.bipwallet.internal.views.widgets;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.widget.ProgressBar;
 
-import io.sweers.barber.Barber;
-import io.sweers.barber.Kind;
-import io.sweers.barber.StyledAttr;
+import com.airbnb.paris.annotations.Attr;
+import com.airbnb.paris.annotations.Styleable;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.core.content.ContextCompat;
+import network.minter.bipwallet.Paris;
 import network.minter.bipwallet.R;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Styleable("ColoredProgressBar")
 public class ColoredProgressBar extends ProgressBar {
-
-    @StyledAttr(value = R.styleable.ColoredProgressBar_color, kind = Kind.COLOR)
-    int color;
 
     public ColoredProgressBar(Context context) {
         super(context);
@@ -54,7 +54,6 @@ public class ColoredProgressBar extends ProgressBar {
     public ColoredProgressBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(attrs, 0, 0);
-
     }
 
     public ColoredProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -62,15 +61,22 @@ public class ColoredProgressBar extends ProgressBar {
         init(attrs, defStyleAttr, 0);
     }
 
-    @TargetApi(21)
     public ColoredProgressBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(attrs, defStyleAttr, defStyleRes);
     }
 
     private void init(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        Barber.style(this, attrs, R.styleable.ColoredProgressBar, defStyleAttr, defStyleRes);
+        Paris.style(this).apply(attrs);
+    }
 
+    @Attr(R.styleable.ColoredProgressBar_color)
+    public void setColor(@ColorInt int color) {
         getIndeterminateDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    }
+
+    @Attr(R.styleable.ColoredProgressBar_color)
+    public void setColorRes(@ColorRes int color) {
+        getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(getContext(), color), PorterDuff.Mode.SRC_IN);
     }
 }

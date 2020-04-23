@@ -1,0 +1,290 @@
+/*
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package network.minter.bipwallet.tx.adapters.vh
+
+import android.annotation.SuppressLint
+import androidx.recyclerview.widget.RecyclerView
+import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.ItemListTxBinding
+import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
+import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.tx.adapters.TransactionFacade.UserMeta
+import network.minter.bipwallet.tx.adapters.TxItem
+import network.minter.core.MinterSDK
+import network.minter.core.crypto.MinterAddress
+import network.minter.explorer.models.HistoryTransaction
+import network.minter.profile.MinterProfileApi
+import timber.log.Timber
+import java.math.BigDecimal
+
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+@SuppressLint("SetTextI18n")
+class TxAllViewHolder(
+        var binding: ItemListTxBinding) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(item: TxItem, myAddresses: List<MinterAddress>) {
+
+        binding.itemTitleType.text = item.tx.type.name
+
+        when (item.tx.type) {
+            HistoryTransaction.Type.Send -> bindSend(item, myAddresses)
+            HistoryTransaction.Type.SellCoin,
+            HistoryTransaction.Type.SellAllCoins,
+            HistoryTransaction.Type.BuyCoin -> bindExchange(item)
+            HistoryTransaction.Type.CreateCoin -> bindCreateCoin(item)
+            HistoryTransaction.Type.DeclareCandidacy -> bindDeclareCandidacy(item)
+            HistoryTransaction.Type.Delegate,
+            HistoryTransaction.Type.Unbond -> bindDelegateUnbond(item)
+            HistoryTransaction.Type.RedeemCheck -> bindRedeemCheck(item)
+            HistoryTransaction.Type.SetCandidateOnline,
+            HistoryTransaction.Type.SetCandidateOffline -> bindSetCandidateOnOff(item)
+            HistoryTransaction.Type.CreateMultisigAddress -> bindCreateMultisigAddress(item)
+            HistoryTransaction.Type.MultiSend -> bindMultisend(item, myAddresses)
+            HistoryTransaction.Type.EditCandidate -> bindEditCandidate(item)
+            else -> {
+
+            }
+        }
+    }
+
+    private fun bindEditCandidate(item: TxItem) {
+        val data: HistoryTransaction.TxEditCandidateResult = item.tx.getData()
+
+        binding.apply {
+            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemAmount.text = item.tx.fee.humanize()
+            itemSubamount.text = MinterSDK.DEFAULT_COIN
+        }
+    }
+
+
+    private fun mapMultisend(result: List<HistoryTransaction.TxSendCoinResult>): Map<String, BigDecimal> {
+        val out = HashMap<String, BigDecimal>()
+        result.forEach {
+            if (out.containsKey(it.coin) && out[it.coin] != null) {
+                out[it.coin] = out[it.coin]!! + it.amount
+            } else {
+                out[it.coin] = it.amount
+            }
+        }
+        return out
+    }
+
+    private fun mapIncomingMultisend(addresses: List<MinterAddress>, result: List<HistoryTransaction.TxSendCoinResult>): Map<String, BigDecimal> {
+        val out = HashMap<String, BigDecimal>()
+        result.filter { addresses.contains(it.to) }
+                .forEach {
+                    if (out.containsKey(it.coin) && out[it.coin] != null) {
+                        out[it.coin] = out[it.coin]!! + it.amount
+                    } else {
+                        out[it.coin] = it.amount
+                    }
+                }
+        return out
+    }
+
+    private fun bindMultisend(txItem: TxItem, myAddresses: List<MinterAddress>) {
+        val item = txItem.tx
+        val data: HistoryTransaction.TxMultisendResult = item.tx.getData()
+
+        val isIncoming: Boolean = !myAddresses.contains(item.from)
+
+        binding.apply {
+            itemTitle.text = txItem.username ?: item.from.toShortString()
+            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_multisend)
+
+            val coinsAmount: Map<String, BigDecimal>
+
+            if (isIncoming) {
+                coinsAmount = mapIncomingMultisend(myAddresses, data.items)
+
+                if (coinsAmount.isEmpty()) {
+                    Timber.e("NO one incoming transaction in multisend")
+                }
+                if (coinsAmount.isEmpty() || coinsAmount.size > 1) {
+                    itemAmount.setText(R.string.dots)
+                    itemSubamount.setText(R.string.label_multiple_coins)
+                } else {
+                    val entry = coinsAmount.entries.iterator().next()
+                    itemAmount.text = entry.value.humanize()
+                    itemSubamount.text = entry.key
+                }
+            } else {
+                coinsAmount = mapMultisend(data.items)
+
+                if (coinsAmount.size > 1) {
+                    itemAmount.setText(R.string.dots)
+                    itemSubamount.setText(R.string.label_multiple_coins)
+                } else {
+                    val entry = coinsAmount.entries.iterator().next()
+                    itemAmount.text = String.format("- %s", bdHuman(entry.value))
+                    itemSubamount.text = entry.key
+                }
+            }
+        }
+    }
+
+    private fun bindSetCandidateOnOff(item: TxItem) {
+        val data: HistoryTransaction.TxSetCandidateOnlineOfflineResult = item.tx.getData()
+        binding.apply {
+            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemAmount.text = item.tx.fee.humanize()
+            itemSubamount.text = MinterSDK.DEFAULT_COIN
+        }
+    }
+
+    private fun bindRedeemCheck(item: TxItem) {
+        val data: HistoryTransaction.TxRedeemCheckResult = item.tx.getData()
+        binding.apply {
+            itemAvatar.setImageResource(R.drawable.img_avatar_redeem)
+            itemTitle.text = item.tx.hash.toShortString()
+            itemAmount.text = data.check.value.humanize()
+            itemSubamount.text = data.check.coin
+        }
+    }
+
+    private fun bindDelegateUnbond(item: TxItem) {
+        val data: HistoryTransaction.TxDelegateUnbondResult = item.tx.getData()
+        binding.apply {
+            val fallbackAvatar = if (item.tx.type == HistoryTransaction.Type.Delegate) {
+                R.drawable.img_avatar_delegate
+            } else {
+                R.drawable.img_avatar_unbond
+            }
+
+            itemAvatar.setImageUrlFallback(item.avatar, fallbackAvatar)
+            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemSubamount.text = data.coin
+
+            if (item.tx.type == HistoryTransaction.Type.Delegate) {
+                itemAmount.text = "- ${data.value.humanize()}"
+            } else {
+                itemAmount.text = data.value.humanize()
+            }
+
+        }
+    }
+
+    private fun bindCreateCoin(item: TxItem) {
+        val data: HistoryTransaction.TxCreateResult = item.tx.getData()
+        binding.apply {
+            itemAvatar.setImageResource(R.drawable.img_avatar_create_coin)
+            itemAmount.text = data.initialAmount.humanize()
+            itemTitle.text = data.name
+            itemSubamount.text = data.symbol
+        }
+    }
+
+    private fun bindCreateMultisigAddress(item: TxItem) {
+        val data: HistoryTransaction.TxCreateMultisigResult = item.tx.getData()
+
+        binding.apply {
+            itemAvatar.setImageResource(R.drawable.img_avatar_multisend)
+            itemTitle.text = data.multisigAddress.toShortString()
+            itemSubamount.visible = false
+            itemAmount.setText(R.string.dots)
+        }
+    }
+
+    private fun bindDeclareCandidacy(item: TxItem) {
+        val data: HistoryTransaction.TxDeclareCandidacyResult = item.tx.getData()
+        binding.apply {
+            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemSubamount.text = data.coin
+            itemAmount.text = "- ${data.stake.humanize()}"
+        }
+    }
+
+    private fun bindSend(txItem: TxItem, myAddresses: List<MinterAddress>) {
+        val item = txItem.tx
+        val data: HistoryTransaction.TxSendCoinResult = item.tx.getData()
+
+        val isIncoming: Boolean = item.isIncoming(myAddresses)
+        val isSelfSending = item.from == data.to
+
+        if (!isIncoming) {
+            txItem.setAvatar(UserMeta(null, MinterProfileApi.getUserAvatarUrlByAddress(data.to)))
+        } else {
+            txItem.setAvatar(UserMeta(null, MinterProfileApi.getUserAvatarUrlByAddress(item.from)))
+        }
+
+        binding.apply {
+            itemAvatar.setImageUrl(txItem.avatar)
+
+            if (isSelfSending) {
+                if (txItem.username != null) {
+                    itemTitle.text = String.format("@%s", txItem.username)
+                } else {
+                    itemTitle.text = item.from.toShortString()
+                }
+                itemAmount.text = data.amount.humanize()
+            } else {
+                if (isIncoming) {
+                    if (txItem.username != null) {
+                        itemTitle.text = String.format("@%s", txItem.username)
+                    } else {
+                        itemTitle.text = item.from.toShortString()
+                    }
+                    itemAmount.text = data.amount.humanize()
+                } else {
+                    if (txItem.username != null) {
+                        itemTitle.text = String.format("@%s", txItem.username)
+                    } else {
+                        itemTitle.text = data.to.toShortString()
+                    }
+                    itemAmount.text = String.format("- %s", bdHuman(data.amount))
+                }
+            }
+
+            if (bdNull(data.amount)) {
+                itemAmount.text = data.amount.humanize()
+            }
+
+            itemSubamount.text = data.getCoin()
+        }
+    }
+
+    private fun bindExchange(item: TxItem) {
+        val data: HistoryTransaction.TxConvertCoinResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType
+            itemTitle.text = "${data.getCoinToSell()} –> ${data.getCoinToBuy()}"
+            itemAvatar.setImageResource(R.drawable.img_avatar_exchange)
+            itemAmount.text = data.valueToBuy.humanize()
+            itemSubamount.text = data.getCoinToBuy()
+        }
+    }
+}

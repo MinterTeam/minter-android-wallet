@@ -1,3 +1,29 @@
+/*
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package network.minter.bipwallet.internal.helpers;
 
 import android.content.Intent;
@@ -5,11 +31,7 @@ import android.content.Intent;
 import com.airbnb.deeplinkdispatch.DeepLink;
 
 import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction;
-import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.ExternalTransaction;
-import network.minter.blockchain.models.operational.OperationType;
-import network.minter.blockchain.models.operational.TxRedeemCheck;
-import network.minter.core.crypto.MinterAddress;
 import okhttp3.HttpUrl;
 
 public final class DeepLinkHelper {
@@ -63,37 +85,6 @@ public final class DeepLinkHelper {
         }
 
         return intent;
-    }
-
-    public static ExternalTransaction parseTransaction(MinterAddress from, String result) throws InvalidExternalTransaction {
-        if (result.startsWith("minter://")) {
-            // workaround, HttpUrl does not support custom protocols, so make it happy
-            result = result.replace("minter://", "https://bip.to/");
-        }
-
-        if (result.startsWith("http")) {
-            HttpUrl url = HttpUrl.parse(result);
-            if (url == null) {
-                throw new InvalidExternalTransaction("Unable to parse transaction url", InvalidExternalTransaction.CODE_INVALID_LINK);
-            }
-            String tx = url.queryParameter("d");
-            if (tx == null) {
-                throw new InvalidExternalTransaction("No transaction data in passed URL", InvalidExternalTransaction.CODE_INVALID_LINK);
-            }
-            String p = url.queryParameter("p");
-            if (p == null) {
-                return parseRawTransaction(tx);
-            }
-
-            ExternalTransaction ext = parseRawTransaction(tx);
-            if (ext.getType() == OperationType.RedeemCheck) {
-                ext.getData(TxRedeemCheck.class).setProof(CheckTransaction.makeProof(from, p));
-            }
-
-            return ext;
-        } else {
-            return parseRawTransaction(result);
-        }
     }
 
     public static ExternalTransaction parseRawTransaction(String rawTx) throws InvalidExternalTransaction {

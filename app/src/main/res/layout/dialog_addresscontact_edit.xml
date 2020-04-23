@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,160 +24,95 @@
   ~ THE SOFTWARE.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_dialog_rounded"
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ImageView
+        android:id="@+id/dialog_draggable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_dialog_rounded">
+        android:layout_marginTop="@dimen/margin_edges_half"
+        android:contentDescription="@string/btn_draggable"
+        android:src="@drawable/shape_draggable" />
 
-        <ImageView
-            android:id="@+id/dialog_draggable"
-            android:layout_width="0dp"
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_medium"
+        android:layout_marginTop="@dimen/margin_edges"
+        android:layout_marginEnd="@dimen/margin_edges_medium"
+        android:fontFamily="@font/_inter_semi_bold"
+        android:text="@string/dialog_title_add_contact"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_size_18" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_edges_half"
-            android:contentDescription="@string/btn_draggable"
-            android:src="@drawable/shape_draggable"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/dialog_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:layout_marginEnd="@dimen/margin_edges_medium"
-            android:fontFamily="@font/_inter_semi_bold"
-            android:text="@string/dialog_title_add_contact"
-            android:textAlignment="center"
-            android:textSize="@dimen/text_size_18"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_draggable" />
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_address"
+                style="@style/Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:hint="Address"
+                android:imeOptions="actionNext"
+                android:inputType="textNoSuggestions|textMultiLine"
+                android:maxLines="4"
+                android:nextFocusDown="@id/input_title"
+                android:tag="address"
+                android:textAllCaps="false"
+                app:label="@string/input_hint_addressbook_address"
+                tools:text="Mx1122334455667788990011223344556677889900" />
 
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_title"
+                style="@style/Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:hint="@string/input_hint_wallet_title"
+                android:inputType="textMultiLine"
+                android:tag="title"
+                android:textAllCaps="false"
+                app:label="@string/input_hint_addressbook_title" />
 
-        <TextView
-            android:id="@+id/input_seed_hint"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:fontFamily="@font/_inter_semi_bold"
-            android:text="@string/input_hint_addressbook_address"
-            android:textColor="@color/grey"
-            android:textSize="@dimen/text_size_11"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_title" />
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_submit"
+                style="@style/Wallet.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:enabled="false"
+                android:text="@string/btn_save" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/input_address"
-            style="@style/Wallet.EditText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges_half"
-            android:layout_marginEnd="@dimen/margin_edges_medium"
-            android:hint="Address"
-            android:imeOptions="actionNext"
-            android:inputType="textMultiLine"
-            android:nextFocusDown="@id/input_title"
-            android:tag="address"
-            android:textAllCaps="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_seed_hint"
-            tools:text="Mx1122334455667788990011223344556677889900" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_edges" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <TextView
-            android:id="@+id/error_text_address"
-            style="@style/Wallet.FieldError"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges_half"
-            android:layout_marginEnd="@dimen/margin_edges_medium"
-            android:textAlignment="center"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_address"
-            tools:text="Unknown Error"
-            tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/input_title_hint"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:fontFamily="@font/_inter_semi_bold"
-            android:text="@string/input_hint_addressbook_title"
-            android:textColor="@color/grey"
-            android:textSize="@dimen/text_size_11"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_text_address" />
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/input_title"
-            style="@style/Wallet.EditText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges_half"
-            android:layout_marginEnd="@dimen/margin_edges_medium"
-            android:hint="@string/input_hint_wallet_title"
-            android:inputType="textMultiLine"
-            android:tag="title"
-            android:textAllCaps="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_title_hint" />
-
-        <TextView
-            android:id="@+id/error_text_title"
-            style="@style/Wallet.FieldError"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges_half"
-            android:layout_marginEnd="@dimen/margin_edges_medium"
-            android:textAlignment="center"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_title"
-            tools:text="Unknown Error"
-            tools:visibility="visible" />
-
-        <network.minter.bipwallet.internal.views.widgets.WalletButton
-            android:id="@+id/action_submit"
-            style="@style/Wallet.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_medium"
-            android:layout_marginTop="@dimen/margin_edges"
-            android:layout_marginEnd="@dimen/margin_edges_medium"
-            android:enabled="false"
-            android:text="@string/btn_save"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_text_title" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="@dimen/margin_edges"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/action_submit" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+</LinearLayout>

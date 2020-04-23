@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,7 +39,9 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.edwardstock.secp256k1.NativeSecp256k1;
 import com.fatboyindustrial.gsonjodatime.Converters;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.orhanobut.hawk.ConcealEncryption;
 import com.orhanobut.hawk.GsonParser;
 import com.orhanobut.hawk.Hawk;
@@ -50,6 +52,7 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -74,7 +77,6 @@ import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.UnzipUtil;
-import network.minter.bipwallet.internal.system.testing.IdlingManager;
 import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.core.MinterSDK;
@@ -111,20 +113,16 @@ public class WalletModule {
     private boolean mDebug;
     private boolean mEnableExternalLog;
 
+    @SuppressWarnings("ConstantConditions")
     public WalletModule(Context context, boolean debug, boolean enableExternalLog) {
         mContext = context;
         mDebug = debug;
         mEnableExternalLog = enableExternalLog;
         initCrashlytics();
 
-        Hawk.init(mContext)
-                .setEncryption(new ConcealEncryption(mContext))
-                .build();
-
-        initCoreSdk(context);
         MinterBlockChainApi.initialize(debug);
 
-        //noinspection ConstantConditions
+
         if (BuildConfig.EXPLORER_API_URL != null) {
             MinterExplorerApi.initialize(
                     BuildConfig.EXPLORER_API_URL,
@@ -133,13 +131,22 @@ public class WalletModule {
             RTMService.LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
         } else {
             MinterExplorerApi.initialize(debug);
-
         }
+
+        WalletGsonHawkParer parser = new WalletGsonHawkParer(getGson());
+
+        Hawk.init(mContext)
+                .setParser(parser)
+                .setEncryption(new ConcealEncryption(mContext))
+                .build();
 
         Hawk.init(DB_CACHE, mContext)
                 .setEncryption(new NoEncryption())
-                .setParser(new GsonParser(getGson()))
+                .setParser(parser)
                 .build();
+
+        initCoreSdk(context);
+
 
         Timber.uprootAll();
 
@@ -152,6 +159,20 @@ public class WalletModule {
         }
 
         JodaTimeAndroid.init(context);
+    }
+
+    private GsonBuilder getGson() {
+        GsonBuilder out = new GsonBuilder();
+        out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
+        out.registerTypeAdapter(BigDecimal.class, new BigDecimalJsonConverter());
+        out.registerTypeAdapter(MinterAddress.class, new MinterAddressJsonConverter());
+        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyJsonConverter());
+        out.registerTypeAdapter(MinterHash.class, new MinterHashJsonConverter());
+        out.registerTypeAdapter(MinterCheck.class, new MinterCheckJsonConverter());
+        out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
+        out.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionsJsonConverter());
+
+        return out;
     }
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
@@ -252,12 +273,6 @@ public class WalletModule {
 
     @Provides
     @WalletApp
-    public IdlingManager provideIdlingManager() {
-        return new IdlingManager(false);
-    }
-
-    @Provides
-    @WalletApp
     public KVStorage provideSecretKVStorage() {
         return new KVStorage();
     }
@@ -273,12 +288,6 @@ public class WalletModule {
     @WalletApp
     public Context provideContext() {
         return mContext;
-    }
-
-    @Provides
-    @WalletApp
-    public boolean provideDebugMode() {
-        return mDebug;
     }
 
     @Provides
@@ -340,18 +349,25 @@ public class WalletModule {
         return new RxMinterLedger(context, (UsbManager) context.getSystemService(USB_SERVICE));
     }
 
-    private GsonBuilder getGson() {
-        GsonBuilder out = new GsonBuilder();
-        out.registerTypeAdapter(MinterAddress.class, new MinterAddressJsonConverter());
-        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyJsonConverter());
-        out.registerTypeAdapter(MinterHash.class, new MinterHashJsonConverter());
-        out.registerTypeAdapter(MinterCheck.class, new MinterCheckJsonConverter());
-        out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
-        out.registerTypeAdapter(BigDecimal.class, new BigDecimalJsonConverter());
-        out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
-        out.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionsJsonConverter());
+    private final static class WalletGsonHawkParer extends GsonParser {
 
-        return out;
+        public WalletGsonHawkParer(GsonBuilder gsonBuilder) {
+            super(gsonBuilder);
+        }
+
+        public WalletGsonHawkParer(Gson gson) {
+            super(gson);
+        }
+
+        @Override
+        public <T> T fromJson(String content, Type type) throws JsonSyntaxException {
+            try {
+                return super.fromJson(content, type);
+            } catch (Throwable t) {
+                Timber.e(t, "Unable to decode json object:\n----\n%s\n----\n", content);
+                throw t;
+            }
+        }
     }
 
     private void initCrashlytics() {

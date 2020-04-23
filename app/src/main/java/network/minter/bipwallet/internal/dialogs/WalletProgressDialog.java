@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,14 +30,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.pnikosis.materialishprogress.ProgressWheel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.common.DeferredCall;
+import network.minter.bipwallet.internal.views.widgets.ColoredProgressBar;
 
 /**
  * minter-android-wallet. 2018
@@ -45,29 +44,15 @@ import network.minter.bipwallet.internal.common.DeferredCall;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class WalletProgressDialog extends WalletDialog {
+    @BindView(R.id.title) TextView title;
     @BindView(R.id.dialog_text) TextView text;
-    @BindView(R.id.progress) ProgressWheel progress;
+    @BindView(R.id.progress) ColoredProgressBar progress;
     private DeferredCall<WalletProgressDialog> mDefer = DeferredCall.createWithSize(1);
     private Builder mBuilder;
-    private int mMaxProgress = 100;
 
     protected WalletProgressDialog(@NonNull Context context, Builder builder) {
         super(context);
         mBuilder = builder;
-    }
-
-    public void setMax(int max) {
-        mMaxProgress = max;
-    }
-
-    public void setIndeterminate(final boolean indeterminate) {
-        mDefer.call(ctx -> {
-            if (indeterminate) {
-                progress.spin();
-            } else {
-                setProgress(0);
-            }
-        });
     }
 
     public void setText(@StringRes int resId) {
@@ -86,23 +71,14 @@ public class WalletProgressDialog extends WalletDialog {
         });
     }
 
-    public void setProgress(final int current) {
-        mDefer.call(ctx -> {
-            runOnUiThread(() -> {
-                float val = current == 0F ? 1 : (float) current;
-                ctx.progress.setProgress(val / (float) ctx.mMaxProgress);
-            });
-        });
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.wallet_progress_dialog);
+        setContentView(R.layout.dialog_progress);
         ButterKnife.bind(this);
         mDefer.attach(this);
-        progress.spin();
-        title.setText(mBuilder.mTitle);
+
+        title.setText(mBuilder.title);
         if (mBuilder.mText == null) {
             text.setText(R.string.please_wait);
         } else {

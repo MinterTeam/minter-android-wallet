@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) by MinterTeam. 2018
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,78 +24,210 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/greyBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    >
+    android:background="@color/greyBackground">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/greyBackground"
+        android:theme="@style/WalletPrimaryToolbar.Light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="?android:attr/actionBarSize"
-            android:theme="@style/WalletPrimaryToolbar"
-            android:transitionGroup="false"
-            app:enableAction="false"
-            app:layout_collapseMode="none"
-            app:navigationIcon="@drawable/ic_arrow_back_white_compat"
-            app:popupTheme="@style/WalletPrimaryToolbar"
-            app:title="@string/title_delegation_list"
-            app:titleTextColor="@android:color/white"
-            />
+            app:contentScrim="@color/greyBackground"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:titleEnabled="false"
+            app:toolbarId="@id/toolbar">
 
-        <include layout="@layout/include_testnet_warning_view"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/collapsing_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="?attr/actionBarSize"
+                app:layout_collapseMode="pin">
+
+                <TextView
+                    android:id="@+id/chart_header"
+                    style="@style/Wallet.ItemHeader.Small"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_rewards"
+                    app:layout_constraintEnd_toStartOf="@id/bip_per_min"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/bip_per_min"
+                    style="@style/ListTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_edges"
+                    android:layout_marginEnd="@dimen/margin_edges"
+                    android:text="@string/zero_amount_decimal"
+                    android:textAlignment="viewEnd"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toEndOf="@id/chart_header"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/label_bip_per_min"
+                    style="@style/ListSubtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_edges"
+                    android:text="@string/bip_per_min_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/bip_per_min" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart"
+                    android:layout_width="0dp"
+                    android:layout_height="170dp"
+                    android:layout_marginTop="@dimen/margin_edges_half"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/label_bip_per_min" />
+
+                <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
+                    android:id="@+id/chart_progress"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:background="@color/transparent"
+                    android:visibility="gone"
+                    app:color="@color/colorPrimaryDark"
+                    app:layout_constraintBottom_toBottomOf="@id/chart"
+                    app:layout_constraintEnd_toEndOf="@id/chart"
+                    app:layout_constraintStart_toStartOf="@id/chart"
+                    app:layout_constraintTop_toTopOf="@id/chart"
+                    tools:visibility="visible" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="10dp"
+                android:minHeight="?android:attr/actionBarSize"
+                android:theme="@style/WalletPrimaryToolbar.Light"
+                app:layout_collapseMode="pin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationIcon="@drawable/ic_arrow_back_grey"
+                app:popupTheme="@style/WalletPrimaryToolbar.Light"
+                app:title=" ">
+
+                <TextView
+                    style="@style/Wallet.Toolbar.TitleDefault"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?android:attr/actionBarSize"
+                    android:text="@string/title_delegation_list" />
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/container_swipe_refresh"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        >
+    <!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+    <!--        android:id="@+id/container_swipe_refresh"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/toolbar">-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <include
+            android:id="@+id/testnet_warning"
+            layout="@layout/include_testnet_warning_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="@dimen/margin_edges_half"
-            android:paddingTop="@dimen/margin_edges_half"
-            android:clipToPadding="false"
-            tools:listitem="@layout/item_list_delegation"
-            />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            android:layout_height="?attr/actionBarSize" />
+
+        <TextView
+            android:id="@+id/label_stakes"
+            style="@style/Wallet.ItemHeader.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:background="@color/greyBackground"
+            android:text="@string/label_stakes" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/container_swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/parent_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_list_delegated_validator" />
+
+
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    </LinearLayout>
+
+
+    <!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 
     <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
         android:id="@+id/progress"
         android:layout_width="55dp"
         android:layout_height="55dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
         app:color="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        />
+        app:layout_constraintTop_toBottomOf="@id/appbar" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/empty_text"
+        style="@style/ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/empty_delegations"
+        android:textSize="@dimen/text_size_14"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

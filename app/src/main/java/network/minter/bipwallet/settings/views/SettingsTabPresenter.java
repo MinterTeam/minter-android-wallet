@@ -33,8 +33,6 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.Switch;
 
-import com.theartofdev.edmodo.cropper.CropImage;
-
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -45,17 +43,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.analytics.AppEvent;
 import network.minter.bipwallet.home.HomeScope;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
-import network.minter.bipwallet.internal.dialogs.WalletConfirmDialog;
+import network.minter.bipwallet.internal.dialogs.ConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.PrefKeys;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.settings.SettingsManager;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.settings.contract.SettingsTabView;
@@ -73,7 +71,7 @@ import timber.log.Timber;
 @HomeScope
 @InjectViewState
 public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
-    private final static int REQUEST_ATTACH_AVATAR = CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
+    //    private final static int REQUEST_ATTACH_AVATAR = CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE;
     private final static int REQUEST_CREATE_PIN_CODE = 1002;
     private final static int REQUEST_VERIFY_PIN_CODE = 1003;
     @Inject AuthSession session;
@@ -181,7 +179,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
     }
 
     private Boolean isSoundsEnabled() {
-        return prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, true);
+        return prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, false);
     }
 
     private Boolean isPinCodeEnabled() {
@@ -200,13 +198,14 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
         if (enabled) {
             if (!fingerHelper.hasEnrolledFingerprints()) {
                 ((Switch) view).setChecked(false);
-                getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
+                getViewState().startDialog(ctx -> new ConfirmDialog.Builder(ctx, R.string.fingerprint_dialog_enroll_title)
                         .setText(R.string.fingerprint_dialog_enroll_text)
-                        .setPositiveAction(R.string.btn_settings, (d, w) -> {
-                            d.dismiss();
+                        .setPositiveAction(R.string.btn_settings, (dialogInterface, integer) -> {
+                            dialogInterface.dismiss();
                             getViewState().startFingerprintEnrollment();
+                            return null;
                         })
-                        .setNegativeAction(R.string.btn_cancel, (d, w) -> d.dismiss())
+                        .setNegativeAction(R.string.btn_cancel)
                         .create());
 
                 return;
@@ -283,7 +282,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
     }
 
     private void onRequestFreeCoinsError(String message) {
-        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Can't get free coins")
+        getViewState().startDialog(ctx -> new ConfirmDialog.Builder(ctx, "Can't get free coins")
                 .setText(String.format("Our apologies, but we can't send to you free coins: %s", message))
                 .setPositiveAction("Close")
                 .create());
@@ -294,7 +293,7 @@ public class SettingsTabPresenter extends MvpBasePresenter<SettingsTabView> {
             onRequestFreeCoinsError(result.getError());
             return;
         }
-        getViewState().startDialog(ctx -> new WalletConfirmDialog.Builder(ctx, "Get free coins")
+        getViewState().startDialog(ctx -> new ConfirmDialog.Builder(ctx, "Get free coins")
                 .setText(String.format("We sent to you 100 %s", MinterSDK.DEFAULT_COIN))
                 .setPositiveAction("OK")
                 .create());

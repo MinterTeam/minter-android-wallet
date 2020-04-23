@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,56 +24,45 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="54dp"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    >
+    android:minHeight="48dp">
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
         android:id="@+id/item_avatar"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="@dimen/margin_min"
-        android:background="@drawable/bg_image_round_shadow"
-        android:scaleType="centerCrop"
-        app:civ_border_color="@color/white"
-        app:civ_border_overlay="true"
-        app:civ_border_width="2dp"
+        style="@style/ListAvatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars"
-        />
+        tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/item_title"
+        style="@style/ListTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_min"
-        android:layout_marginEnd="@dimen/margin_min"
-        style="@style/Wallet.ItemTitle"
+        android:layout_marginStart="@dimen/margin_edges_half"
+        android:layout_marginEnd="@dimen/margin_edges"
         app:layout_constraintBottom_toTopOf="@id/item_subtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/item_avatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="BIP (120,912.98)"
-        />
+        tools:text="BIP (120 912.98)" />
 
     <TextView
         android:id="@+id/item_subtitle"
+        style="@style/ListSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_min"
+        android:layout_marginStart="@dimen/margin_edges_half"
         android:layout_marginEnd="@dimen/margin_edges"
-        style="@style/Wallet.ItemSubtitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/item_avatar"

@@ -38,8 +38,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.wallets.contract.WalletsTabView;
-
-import static network.minter.bipwallet.internal.helpers.Plurals.bips;
+import network.minter.core.MinterSDK;
 
 @Parcel
 public final class BalanceCurrentState {
@@ -54,27 +53,27 @@ public final class BalanceCurrentState {
 
     public BalanceCurrentState() {
         cursor = Wallet.app().settings().getInt(SettingsManager.CurrentBalanceCursor);
-        items.add(new BalanceState("0", "0000", bips(0L)));
-        items.add(new BalanceState("0", "0000", bips(0L)));
+        items.add(new BalanceState("0", "0000", MinterSDK.DEFAULT_COIN));
+        items.add(new BalanceState("0", "0000", MinterSDK.DEFAULT_COIN));
         items.add(new BalanceState("$0", "00", ""));
     }
 
-    public void setAvailableBIP(String intPart, String fractPart, String amount) {
-        items.set(0, new BalanceState(intPart, fractPart, amount));
+    public void setAvailableBIP(String firstPart, String middlePart, String lastPart) {
+        items.set(0, new BalanceState(firstPart, middlePart, lastPart));
     }
 
-    public void setTotalBIP(String intPart, String fractPart, String amount) {
-        items.set(1, new BalanceState(intPart, fractPart, amount));
+    public void setTotalBIP(String firstPart, String middlePart, String lastPart) {
+        items.set(1, new BalanceState(firstPart, middlePart, lastPart));
     }
 
-    public void setTotalUSD(String intPart, String fractPart) {
-        items.set(2, new BalanceState(intPart, fractPart, ""));
+    public void setTotalUSD(String firstPart, String middlePart) {
+        items.set(2, new BalanceState(firstPart, middlePart, ""));
     }
 
     public void applyTo(WalletsTabView view) {
         BalanceState state = items.get(cursor);
         view.setBalanceTitle(sTitles[cursor]);
-        view.setBalance(state.mIntPart, state.mFractPart, state.mAmount);
+        view.setBalance(state.getFirstPart(), state.getMiddlePart(), state.getLastPart());
 
 
         view.setBalanceClickListener(v -> {

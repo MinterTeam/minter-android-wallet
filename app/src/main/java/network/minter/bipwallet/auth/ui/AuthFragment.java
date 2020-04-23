@@ -40,7 +40,6 @@ import javax.inject.Provider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import androidx.core.view.ViewCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,7 +50,6 @@ import network.minter.bipwallet.auth.contract.AuthView;
 import network.minter.bipwallet.auth.views.AuthPresenter;
 import network.minter.bipwallet.internal.BaseInjectFragment;
 import network.minter.bipwallet.internal.helpers.IntentHelper;
-import network.minter.bipwallet.internal.system.testing.CallbackIdlingResource;
 import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog;
 import network.minter.bipwallet.wallets.dialogs.ui.SignInMnemonicDialog;
 
@@ -66,13 +64,7 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
     @BindView(R.id.action_create_wallet) Button actionCreate;
     @BindView(R.id.action_help) Button actionHelp;
     @BindView(R.id.logo) ImageView logo;
-    private CallbackIdlingResource mAuthWait;
     private BottomSheetDialogFragment mDialog;
-
-    @VisibleForTesting
-    public void registerIdling(CallbackIdlingResource authWaitIdlingRes) {
-        mAuthWait = authWaitIdlingRes;
-    }
 
     @Override
     public void setOnClickSignIn(View.OnClickListener listener) {
@@ -107,9 +99,7 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
 
     @Override
     public void startHelp() {
-        getActivity().startActivity(
-                IntentHelper.newUrl("https://help.minter.network")
-        );
+        getActivity().startActivity(IntentHelper.newUrl("https://help.minter.network"));
     }
 
     @Override
@@ -122,10 +112,9 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
             mDialog = null;
         }
 
-        mDialog = new CreateWalletDialog();
-        if (getFragmentManager() != null) {
-            mDialog.show(getFragmentManager(), null);
-        }
+        mDialog = new CreateWalletDialog.Builder()
+                .build();
+        mDialog.show(getFragmentManager(), null);
     }
 
     @Nullable
@@ -137,10 +126,6 @@ public class AuthFragment extends BaseInjectFragment implements AuthView {
         ButterKnife.bind(this, view);
         ViewCompat.setTransitionName(logo, getString(R.string.transaction_auth_logo));
         startPostponedEnterTransition();
-
-        if (mAuthWait != null) {
-            mAuthWait.setIdleState(true);
-        }
 
         return view;
     }

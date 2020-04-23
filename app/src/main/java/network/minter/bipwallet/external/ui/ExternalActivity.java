@@ -1,7 +1,7 @@
-/*******************************************************************************
- * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+/*
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 
 package network.minter.bipwallet.external.ui;
 
@@ -45,11 +45,14 @@ import javax.inject.Inject;
 
 import androidx.core.app.TaskStackBuilder;
 import network.minter.bipwallet.R;
-import network.minter.bipwallet.advanced.repo.SecretStorage;
 import network.minter.bipwallet.auth.ui.AuthActivity;
+import network.minter.bipwallet.external.DeepLinkModule;
+import network.minter.bipwallet.external.DeepLinkModuleRegistry;
+import network.minter.bipwallet.external.DeepLinkModuleRegistryHelper;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.BaseInjectActivity;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.security.PauseTimer;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
@@ -69,7 +72,25 @@ public class ExternalActivity extends BaseInjectActivity {
     @Inject AuthSession session;
     @Inject SecretStorage secretStorage;
     @Inject GsonBuilder gsonBuilder;
-    private DeepLinkModuleLoader mLinkLoader;
+    private DeepLinkModuleRegistry mLinkLoader;
+    private DeepLinkModuleRegistryHelper<DeepLinkModuleRegistry> mLinkReg;
+
+    /*
+    public DeepLinkEntry parseUri(String uri) {
+    for (DeepLinkEntry entry : REGISTRY) {
+      if (entry.matches(uri)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  public boolean matches(String inputUri) {
+    DeepLinkUri deepLinkUri = DeepLinkUri.parse(inputUri);
+    return deepLinkUri != null && regex.matcher(schemeHostAndPath(deepLinkUri)).find();
+  }
+     */
+
 
     public static Intent createAction(String action, String payload) {
         Intent intent = new Intent(action);
@@ -101,7 +122,7 @@ public class ExternalActivity extends BaseInjectActivity {
     }
 
     private void startDeepLink() {
-        mLinkLoader = new DeepLinkModuleLoader();
+        mLinkLoader = new DeepLinkModuleRegistry();
         DeepLinkDelegate delegate = new DeepLinkDelegate(mLinkLoader);
         String old = getIntent().getData().toString();
         if (old.substring(old.length() - 1).equals("/")) {
@@ -123,7 +144,7 @@ public class ExternalActivity extends BaseInjectActivity {
     }
 
     private DeepLinkEntry findEntry(String uri) {
-        return mLinkLoader.parseUri(uri);
+        return mLinkReg.parseUri(uri);
     }
 
     private Intent dispatchDeeplink(Activity activity, Intent sourceIntent) {
@@ -141,7 +162,7 @@ public class ExternalActivity extends BaseInjectActivity {
         DeepLinkEntry entry = findEntry(uriString);
         if (entry != null) {
             DeepLinkUri deepLinkUri = DeepLinkUri.parse(uriString);
-            Map<String, String> parameterMap = entry.getParameters(uriString);
+            Map<String, String> parameterMap = entry.getParameters(DeepLinkUri.parse(uriString));
             for (String queryParameter : deepLinkUri.queryParameterNames()) {
                 for (String queryParameterValue : deepLinkUri.queryParameterValues(queryParameter)) {
                     if (parameterMap.containsKey(queryParameter)) {

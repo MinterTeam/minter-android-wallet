@@ -31,12 +31,16 @@
 
     <dimen name="btn_long_height">50dp</dimen>
     <dimen name="btn_border_radius">8dp</dimen>
+    <dimen name="card_border_radius">16dp</dimen>
     <dimen name="btn_min_width">180dp</dimen>
 
     <dimen name="margin_edges">16dp</dimen>
+    <dimen name="margin_edges_10">10dp</dimen>
+    <dimen name="margin_edges_14">14dp</dimen>
     <dimen name="margin_edgers_minus_padding">12dp</dimen>
     <dimen name="margin_edges_medium">24dp</dimen>
     <dimen name="margin_edges_large">32dp</dimen>
+    <dimen name="margin_edges_normal_and_medium">40dp</dimen>
     <dimen name="margin_edges_xlarge">48dp</dimen>
     <dimen name="margin_edges_input">13dp</dimen>
     <dimen name="margin_edges_input_vertical">14dp</dimen>
@@ -95,5 +99,7 @@
     <dimen name="pin_pad_margin_top">48dp</dimen>
     <dimen name="pin_pad_margin_indicator">32dp</dimen>
     <dimen name="pin_pad_top_offset">32dp</dimen>
+    <dimen name="icon_padding">4dp</dimen>
+    <dimen name="icon_wh">32dp</dimen>
 
 </resources>
