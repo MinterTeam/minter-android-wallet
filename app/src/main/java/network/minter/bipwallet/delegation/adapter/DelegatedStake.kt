@@ -25,57 +25,41 @@
  */
 package network.minter.bipwallet.delegation.adapter
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import network.minter.bipwallet.internal.views.widgets.RemoteImageContainer
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinDelegation
 import network.minter.explorer.models.ValidatorMeta
 import network.minter.profile.MinterProfileApi
 import java.math.BigDecimal
-import java.util.*
 
-class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake> {
-    @JvmField var coin: String?
-    @JvmField var amount: BigDecimal
-    @JvmField var amountBIP: BigDecimal
-    @JvmField var pubKey: MinterPublicKey?
-    @JvmField var validatorMeta: ValidatorMeta? = null
+@Parcelize
+data class DelegatedStake(
+        val coin: String,
+        val amount: BigDecimal,
+        val amountBIP: BigDecimal,
+        val publicKey: MinterPublicKey,
+        val validatorMeta: ValidatorMeta
+) : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake>, Parcelable {
 
-    constructor(info: CoinDelegation) {
-        coin = info.coin
-        amount = info.amount
-        amountBIP = info.bipValue
-        pubKey = info.publicKey
-        validatorMeta = info.meta
-    }
+    constructor(info: CoinDelegation) : this(
+            info.coin!!,
+            info.amount,
+            info.bipValue,
+            info.publicKey!!,
+            info.meta!!
+    )
 
-    internal constructor(coin: String?, amount: BigDecimal, amountBIP: BigDecimal, publicKey: MinterPublicKey?) {
-        this.coin = coin
-        this.amount = amount
-        this.amountBIP = amountBIP
-        pubKey = publicKey
-    }
-
-    override fun isSameOf(item: DelegatedItem?): Boolean {
-        return viewType == item?.viewType && coin == (item as DelegatedStake).coin && pubKey == item.pubKey
+    override fun isSameOf(item: DelegatedItem): Boolean {
+        return viewType == item.viewType && coin == (item as DelegatedStake).coin && publicKey == item.publicKey
     }
 
     override val viewType: Int
         get() = DelegatedItem.ITEM_STAKE
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DelegatedStake) return false
-        val that = other
-        return coin == that.coin && amount == that.amount &&
-                amountBIP == that.amountBIP && pubKey == that.pubKey
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hash(coin, amount, amountBIP, pubKey)
-    }
-
     override val imageUrl: String
-        get() = MinterProfileApi.getCoinAvatarUrl(coin!!)
+        get() = MinterProfileApi.getCoinAvatarUrl(coin)
 
     override fun compareTo(other: DelegatedStake): Int {
         return other.amountBIP.compareTo(amountBIP)

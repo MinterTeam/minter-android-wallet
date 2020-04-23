@@ -102,15 +102,15 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
     }
 
     override fun setOnRefreshListener(listener: OnRefreshListener) {
-        binding.containerSwipeRefresh.setOnRefreshListener(listener);
+        binding.containerSwipeRefresh.setOnRefreshListener(listener)
     }
 
     override fun showRefreshProgress() {
-        binding.containerSwipeRefresh.isRefreshing = true;
+        binding.containerSwipeRefresh.isRefreshing = true
     }
 
     override fun hideRefreshProgress() {
-        binding.containerSwipeRefresh.isRefreshing = false;
+        binding.containerSwipeRefresh.isRefreshing = false
     }
 
     override fun showProgress() {
@@ -168,15 +168,15 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
 
     override fun startDelegate(delegated: DelegatedValidator) {
         DelegateUnbondDialog.Builder(DelegateUnbondDialog.Type.Delegate)
-                .setPublicKey(delegated.pubKey!!)
+                .setPublicKey(delegated.publicKey)
                 .build()
                 .show(supportFragmentManager, "delegate_unbond")
     }
 
     override fun startUnbond(delegated: DelegatedStake) {
         DelegateUnbondDialog.Builder(DelegateUnbondDialog.Type.Unbond)
-                .setPublicKey(delegated.pubKey!!)
-                .setSelectedCoin(delegated.coin!!)
+                .setPublicKey(delegated.publicKey)
+                .setSelectedCoin(delegated.coin)
                 .build()
                 .show(supportFragmentManager, "delegate_unbond")
     }
@@ -205,7 +205,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
 
         setupToolbar(binding.toolbar)
         presenter.handleExtras(intent)
-        binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
             if (binding.list.adapter != null && abs(scrollY - oldScrollY) > 10) {
                 (binding.list.adapter as DelegationListAdapter).closeOpened()
             }
@@ -344,9 +344,9 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
     }
 
     class Builder : ActivityBuilder {
-        constructor(from: Activity) : super(from) {}
-        constructor(from: Fragment) : super(from) {}
-        constructor(from: Service) : super(from) {}
+        constructor(from: Activity) : super(from)
+        constructor(from: Fragment) : super(from)
+        constructor(from: Service) : super(from)
 
         override fun getActivityClass(): Class<*> {
             return DelegationListActivity::class.java

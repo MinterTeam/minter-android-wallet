@@ -139,7 +139,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     R.string.dialog_label_unbond
                 }
         )
-        setupFee();
+        setupFee()
 
         viewState.setOnClickUseMax(View.OnClickListener {
             clickedUseMax = true
@@ -175,7 +175,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 }
                 .subscribe {
                     fee = it
-                    viewState.setFee(it.humanize())
+                    viewState.setFee("${it.humanize()} ${MinterSDK.DEFAULT_COIN}")
                 }
     }
 
@@ -187,8 +187,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.setValidator(validator) { v ->
             val b = StubMasternodeNameBinding.bind(v)
             if (validator.meta.name.isNullOrEmpty()) {
-                b.title.text = validator.pubKey.toShortString();
-                b.subtitle.visible = false;
+                b.title.text = validator.pubKey.toShortString()
+                b.subtitle.visible = false
             } else {
                 b.title.text = validator.meta.name
                 b.subtitle.text = validator.pubKey.toShortString()
@@ -239,7 +239,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var txSender: TransactionSender? = null
 
     private fun onSubmit() {
-        setupFee();
+        setupFee()
 
         txSender = TransactionSender(secretStorage.mainWallet, initDataRepo, gateRepo)
         txSender!!.startListener = {
@@ -352,7 +352,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         if (!accOptional.isPresent) {
             return Observable.error(IllegalStateException("Balance for coin ${fromAccount!!.coin!!} not found!"))
         }
-        val acc = accOptional.get();
+        val acc = accOptional.get()
         val isBipAccount = acc.coin!! == MinterSDK.DEFAULT_COIN
 
         if (isBipAccount) {
@@ -425,7 +425,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         super.onFirstViewAttach()
         viewState.setTextChangedListener(::onInputChanged)
         viewState.setOnSubmitListener(View.OnClickListener {
-            onSubmit();
+            onSubmit()
         })
         validatorsRepo.observe()
                 .subscribeOn(Schedulers.io())
@@ -528,7 +528,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             if (!accountStorage.entity.mainWallet.hasDelegated(toValidator)) {
                 viewState.setAccountName(null)
                 viewState.setAccountSelectorError("You didn't delegated to selected validator")
-                toValidator = null;
+                toValidator = null
             } else {
                 val delegated = accountStorage.entity.mainWallet.getDelegatedListByValidator(toValidator!!)
                 val first = delegated[0]

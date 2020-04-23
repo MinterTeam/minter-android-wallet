@@ -52,11 +52,11 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.auth.contract.SignInMnemonicView;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
-import network.minter.bipwallet.internal.BaseMvpBottomSheetDialogFragment;
+import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
 import network.minter.bipwallet.wallets.dialogs.presentation.SingInMnemonicPresenter;
 
-public class SignInMnemonicDialog extends BaseMvpBottomSheetDialogFragment implements SignInMnemonicView {
+public class SignInMnemonicDialog extends BaseBottomSheetDialogFragment implements SignInMnemonicView {
 
     @Inject Provider<SingInMnemonicPresenter> presenterProvider;
     @InjectPresenter SingInMnemonicPresenter presenter;

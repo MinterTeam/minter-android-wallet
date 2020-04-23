@@ -63,7 +63,7 @@
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:enabled="false"
-                android:text="@string/btn_sign_in"
+                android:text="@string/btn_activate"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/error_text" />

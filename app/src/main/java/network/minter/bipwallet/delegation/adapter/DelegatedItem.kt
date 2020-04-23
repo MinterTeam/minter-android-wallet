@@ -29,7 +29,7 @@ import androidx.annotation.IntDef
 import network.minter.bipwallet.R
 
 interface DelegatedItem {
-    fun isSameOf(item: DelegatedItem?): Boolean
+    fun isSameOf(item: DelegatedItem): Boolean
     override fun equals(other: Any?): Boolean
     @get:DelegatedItemType val viewType: Int
 

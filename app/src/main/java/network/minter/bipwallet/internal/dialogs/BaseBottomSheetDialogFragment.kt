@@ -27,6 +27,7 @@ package network.minter.bipwallet.internal.dialogs
 
 import android.app.Dialog
 import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.FrameLayout
@@ -59,6 +60,8 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val d = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
         d.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+
         if (d.window != null) {
             val params = d.window!!.attributes
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -66,6 +69,7 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
             d.window!!.attributes = params
             d.window!!.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
             d.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            d.window!!.statusBarColor = Color.TRANSPARENT
         }
         return d
     }

@@ -140,7 +140,7 @@ object CollectionsHelper {
     }
 
     @JvmStatic
-    fun <K, V> sortByValue(map: Map<K, V>, comparator: Comparator<V>): Map<K, V> {
+    fun <K, V> sortByValue(map: MutableMap<K, V>, comparator: Comparator<V>): MutableMap<K, V> {
         val list: List<Map.Entry<K, V>> = ArrayList(map.entries)
         Collections.sort(list) { o1, o2 -> comparator.compare(o1.value, o2.value) }
         val result: MutableMap<K, V> = LinkedHashMap()
@@ -151,7 +151,7 @@ object CollectionsHelper {
     }
 
     @JvmStatic
-    fun <K, V : Comparable<V>?> sortByValue(map: Map<K, V>): Map<K, V> {
+    fun <K, V : Comparable<V>?> sortByValue(map: MutableMap<K, V>): MutableMap<K, V> {
         val list: List<Map.Entry<K, V>> = ArrayList(map.entries)
         Collections.sort(list) { o1, o2 -> o1.value!!.compareTo(o2.value) }
         val result: MutableMap<K, V> = LinkedHashMap()
