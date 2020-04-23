@@ -89,7 +89,7 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
     }
 
     override fun setTitle(resId: Int) {
-        binding.inputTitle.setText(resId)
+        binding.dialogTop.dialogTitle.setText(resId)
     }
 
     override fun setDescription(resId: Int) {

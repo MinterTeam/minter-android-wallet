@@ -26,7 +26,6 @@
 
 package network.minter.bipwallet.delegation.ui
 
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -39,7 +38,6 @@ import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.RegexValidator
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -76,27 +74,23 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
             val titleRes: Int,
             val firstLabelRes: Int,
             val secondLabelRes: Int,
-            val resultLabelRes: Int,
-            val progressTitleRes: Int
+            val progressTitleRes: Int,
+            val resultLabelRes: Int
     ) {
         Delegate(
                 R.string.dialog_title_delegate_begin,
                 R.string.dialog_label_delegate_you_are_delegating,
                 R.string.dialog_label_delegate_to,
-                R.string.dialog_label_delegate_result,
-                R.string.dialog_label_delegate_progress
+                R.string.dialog_label_delegate_progress,
+                R.string.dialog_label_delegate_result
         ),
         Unbond(
                 R.string.dialog_title_unbond_begin,
                 R.string.dialog_label_unbond_you_are_unbonding,
                 R.string.dialog_label_unbond_from,
-                R.string.dialog_label_unbond_result,
-                R.string.dialog_label_unbond_progress
+                R.string.dialog_label_unbond_progress,
+                R.string.dialog_label_unbond_result
         );
-    }
-
-    override fun startExplorer(txHash: MinterHash) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash.toString())))
     }
 
     companion object {
@@ -110,12 +104,18 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     private lateinit var binding: DialogDelegateUnbondBinding
     private val inputGroup = InputGroup()
-    private var currentPeek: Int = 0
-    private var sheetWasExpanded = false
 
     @ProvidePresenter
     fun providePresenter(): DelegateUnbondPresenter {
         return presenterProvider.get()
+    }
+
+    override fun startExplorer(txHash: MinterHash) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash.toString())))
+    }
+
+    override fun expand() {
+        super.expand(false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -242,7 +242,6 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
                 binding.textError.text = t.message
             }
         }
-
     }
 
     override fun setOnClickUseMax(listener: View.OnClickListener) {
@@ -267,36 +266,6 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     override fun dismiss() {
         super.dismiss()
-    }
-
-    override fun collapse() {
-        behavior.setPeekHeight(0, true)
-
-        if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-            sheetWasExpanded = true
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
-            sheetWasExpanded = false
-        }
-    }
-
-    override fun expand() {
-        if (sheetWasExpanded) {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-        behavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true)
-    }
-
-    private fun <T : Dialog> T.fixNestedDialogBackgrounds(): T {
-        window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        window?.setWindowAnimations(0)
-
-        collapse()
-
-        setOnDismissListener {
-            expand()
-        }
-        return this
     }
 
     class Builder(type: Type) {

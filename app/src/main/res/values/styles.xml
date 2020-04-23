@@ -75,7 +75,7 @@
     </style>
 
     <style name="Wallet.Splash" parent="Wallet">
-        <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:windowBackground">@drawable/img_welcome</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>

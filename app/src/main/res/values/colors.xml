@@ -53,7 +53,7 @@
     <color name="transparent">#00000000</color>
     <color name="textColorSelectedAddress">#9e8be4</color>
     <color name="pinPadDefault">#3E1EAA</color>
-    <color name="pinPadActive">#250C78</color>
+    <color name="pinPadActive">@color/colorPrimary</color>
     <color name="pinPadDisabled">#32250C78</color>
 
     <color name="blueLight">#F7F5FF</color>

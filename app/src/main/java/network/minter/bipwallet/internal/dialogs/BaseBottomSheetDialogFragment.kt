@@ -28,10 +28,7 @@ package network.minter.bipwallet.internal.dialogs
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.Gravity
-import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
+import android.view.*
 import android.widget.FrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -42,6 +39,7 @@ typealias ActionListener = () -> Unit
 abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment() {
     var onSubmitListener: ActionListener? = null
     var onDismissListener: ActionListener? = null
+    private var sheetWasExpanded: Boolean = false
 
     protected val behavior: BottomSheetBehavior<FrameLayout>
         get() = (dialog as BottomSheetDialog).behavior
@@ -51,6 +49,11 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         if (onDismissListener != null) {
             onDismissListener!!.invoke()
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        expand(true)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -65,5 +68,42 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
             d.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
         return d
+    }
+
+    fun collapse() {
+        behavior.setPeekHeight(0, true)
+
+        if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            sheetWasExpanded = true
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            sheetWasExpanded = false
+        }
+    }
+
+    fun expand(force: Boolean = false) {
+        if (sheetWasExpanded || force) {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+        behavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true)
+    }
+
+    protected fun <T : Dialog> T.fixNestedDialogBackgrounds(): T {
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window?.setWindowAnimations(0)
+
+        collapse()
+
+        if (this is WalletDialog) {
+            addDismissListener {
+                expand()
+            }
+        } else {
+            setOnDismissListener {
+                expand()
+            }
+        }
+
+        return this
     }
 }

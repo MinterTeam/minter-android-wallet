@@ -50,9 +50,8 @@ typealias DialogExecutor = (ctx: Context) -> WalletDialog
 
 abstract class WalletDialog protected constructor(context: Context) :
         Dialog(context, R.style.Wallet_Dialog) {
-//    @JvmField
-//    @Nullable @BindView(R.id.title)
-//    var titleView: TextView? = null
+
+    private var dismissListeners: MutableList<DialogInterface.OnDismissListener> = ArrayList(1)
 
     fun runOnUiThread(task: Runnable) {
         Handler(Looper.getMainLooper()).post(task)
@@ -69,6 +68,10 @@ abstract class WalletDialog protected constructor(context: Context) :
             window!!.setGravity(Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL)
             window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
+
+        super.setOnDismissListener {
+            dismissListeners.forEach { it.onDismiss(this) }
+        }
     }
 
     override fun onStart() {
@@ -82,6 +85,18 @@ abstract class WalletDialog protected constructor(context: Context) :
 
     interface WithPositiveAction<T> {
         fun setPositiveAction(title: CharSequence?, listener: DialogInterface.OnClickListener?): T
+    }
+
+    fun addDismissListener(listener: (DialogInterface) -> Unit) {
+        addDismissListener(DialogInterface.OnDismissListener { dialog -> listener(dialog) })
+    }
+
+    fun addDismissListener(listener: DialogInterface.OnDismissListener) {
+        dismissListeners.add(listener)
+    }
+
+    override fun setOnDismissListener(listener: DialogInterface.OnDismissListener?) {
+        throw IllegalAccessException("Use WalletDialog.addDismissListener instead")
     }
 
     companion object {
