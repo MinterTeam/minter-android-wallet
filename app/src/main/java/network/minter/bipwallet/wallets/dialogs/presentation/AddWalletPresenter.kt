@@ -47,13 +47,9 @@ class AddWalletPresenter @Inject constructor() : MvpBasePresenter<AddWalletView>
     private var mTitle: String? = null
     private var mPhrase: String? = null
 
-    override fun attachView(view: AddWalletView) {
-        super.attachView(view)
-    }
-
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.setOnSubmit(View.OnClickListener { view: View -> onSubmit(view) })
+        viewState.setOnSubmit(View.OnClickListener { onSubmit() })
         viewState.addTitleInputTextListener(object : SimpleTextWatcher() {
             override fun afterTextChanged(s: Editable) {
                 mTitle = s.toString()
@@ -77,7 +73,7 @@ class AddWalletPresenter @Inject constructor() : MvpBasePresenter<AddWalletView>
         })
     }
 
-    private fun onSubmit(view: View) {
+    private fun onSubmit() {
         secretStorage.add(mPhrase!!, mTitle)
         session.login(
                 AuthSession.AUTH_TOKEN_ADVANCED,

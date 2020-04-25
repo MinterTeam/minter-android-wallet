@@ -205,6 +205,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onInputChanged(input: InputWrapper, valid: Boolean) {
         if (!clickedUseMax) {
             useMax = false

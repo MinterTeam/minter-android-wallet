@@ -23,30 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.security.contract
 
-package network.minter.bipwallet.security.contract;
+import androidx.annotation.StringRes
+import androidx.biometric.BiometricPrompt
+import moxy.MvpView
+import moxy.viewstate.strategy.AddToEndSingleStrategy
+import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.internal.views.widgets.PinFingerprintClickListener
+import network.minter.bipwallet.internal.views.widgets.PinValidateErrorListener
+import network.minter.bipwallet.internal.views.widgets.PinValueListener
 
-import androidx.annotation.StringRes;
-import androidx.biometric.BiometricPrompt;
-import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.StateStrategyType;
-import network.minter.bipwallet.internal.views.widgets.PinCodeView;
-
-@StateStrategyType(AddToEndSingleStrategy.class)
-public interface PinValidatingView extends MvpView {
-    void setOnPinValueListener(PinCodeView.OnValueListener listener);
-    void setupTitle(@StringRes int title);
-    void setPinHint(@StringRes int resId);
-    void setFingerprintEnabled(boolean enabled);
-    void setOnFingerprintClickListener(PinCodeView.OnFingerprintClickListener listener);
-    void startBiometricPrompt(BiometricPrompt.AuthenticationCallback callback);
-    void setEnableValidation(String pin);
-    void setOnPinValidationError(PinCodeView.OnValidationErrorListener listener);
-    void finishSuccess();
-    void setPinError(CharSequence error);
-    void setPinError(@StringRes int errorRes);
-    void setPinEnabled(boolean enabled);
-    void resetPin();
-    void startLogin();
+@StateStrategyType(AddToEndSingleStrategy::class)
+interface PinValidatingView : MvpView {
+    fun setOnPinValueListener(listener: PinValueListener)
+    fun setupTitle(@StringRes title: Int)
+    fun setPinHint(@StringRes resId: Int)
+    fun setFingerprintEnabled(enabled: Boolean)
+    fun setOnFingerprintClickListener(listener: PinFingerprintClickListener)
+    fun startBiometricPrompt(callback: BiometricPrompt.AuthenticationCallback)
+    fun setEnableValidation(pin: String)
+    fun setOnPinValidationError(listener: PinValidateErrorListener)
+    fun finishSuccess()
+    fun setPinError(error: CharSequence?)
+    fun setPinError(@StringRes errorRes: Int)
+    fun setPinEnabled(enabled: Boolean)
+    fun resetPin()
+    fun startLogin()
 }

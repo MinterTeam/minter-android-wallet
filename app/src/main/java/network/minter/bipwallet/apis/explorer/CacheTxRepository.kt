@@ -78,7 +78,7 @@ class CacheTxRepository(
     }
 
     override fun onAfterUpdate(result: List<HistoryTransaction>) {
-        storage.put(KEY_TRANSACTIONS, result)
+        storage.putAsync(KEY_TRANSACTIONS, result)
     }
 
     override fun onClear() {

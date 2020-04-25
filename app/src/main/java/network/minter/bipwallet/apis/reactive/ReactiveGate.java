@@ -31,7 +31,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 
-import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
@@ -40,7 +39,6 @@ import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.GateResult;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import timber.log.Timber;
@@ -53,41 +51,41 @@ public final class ReactiveGate {
 
     @SuppressWarnings("unchecked")
     public static <T> Observable<T> rxGate(Call<T> call) {
-//        return Observable.create(emitter -> {
-//            Response<T> res;
-//            try {
-//                res = call.execute();
-//            } catch (Throwable t) {
-//                emitter.onError(NetworkException.convertIfNetworking(t));
-//                return;
-//            }
-//
-//            if (res.body() == null) {
-//                emitter.onNext((T) createGateError(res));
-//            } else {
-//                emitter.onNext(res.body());
-//            }
-//            emitter.onComplete();
-//
-//        });
-        return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
-                if (response.body() == null) {
-                    emitter.onNext((T) createGateError(response));
-                } else {
-                    emitter.onNext(response.body());
-                }
-
-                emitter.onComplete();
+        return Observable.create(emitter -> {
+            Response<T> res;
+            try {
+                res = call.execute();
+            } catch (Throwable t) {
+                emitter.onError(NetworkException.convertIfNetworking(t));
+                return;
             }
 
-            @Override
-            public void onFailure(@NonNull Call<T> call1, @NonNull Throwable t) {
-                emitter.onError(t);
+            if (res.body() == null) {
+                emitter.onNext((T) createGateError(res));
+            } else {
+                emitter.onNext(res.body());
             }
-        }));
+            emitter.onComplete();
+
+        });
+//        return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
+//            @SuppressWarnings("unchecked")
+//            @Override
+//            public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
+//                if (response.body() == null) {
+//                    emitter.onNext((T) createGateError(response));
+//                } else {
+//                    emitter.onNext(response.body());
+//                }
+//
+//                emitter.onComplete();
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<T> call1, @NonNull Throwable t) {
+//                emitter.onError(t);
+//            }
+//        }));
     }
 
     public static <T> Function<? super Throwable, ? extends ObservableSource<? extends GateResult<T>>> toGateError() {

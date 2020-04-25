@@ -87,12 +87,12 @@ open class CachedDailyRewardStatisticsRepository(
 
     override fun onAfterUpdate(result: RewardStatistics) {
         Timber.d("DAILY_REWARDS: Put data")
-        mStorage.put(KEY_REWARDS, result)
+        mStorage.putAsync(KEY_REWARDS, result)
     }
 
     override fun onClear() {
         Timber.d("DAILY_REWARDS: Clear data")
-        mStorage.delete(KEY_REWARDS)
+        mStorage.deleteAsync(KEY_REWARDS)
     }
 
     companion object {

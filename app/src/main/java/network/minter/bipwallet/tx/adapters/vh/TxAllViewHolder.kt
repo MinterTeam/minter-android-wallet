@@ -164,6 +164,7 @@ class TxAllViewHolder(
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun bindRedeemCheck(item: TxItem) {
         val data: HistoryTransaction.TxRedeemCheckResult = item.tx.getData()
         binding.apply {

@@ -48,6 +48,7 @@ import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.security.ui.PinValidationDialog;
 import network.minter.bipwallet.services.livebalance.RTMService;
+import network.minter.bipwallet.share.ShareDialog;
 import network.minter.bipwallet.tx.TransactionsModule;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
@@ -157,6 +158,10 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @FragmentScope
     DelegateUnbondDialog delegateUnbondDialogInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    ShareDialog shareDialogInjector();
 
 
 }

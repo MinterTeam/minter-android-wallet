@@ -72,7 +72,6 @@ object CollectionsHelper {
     @JvmStatic
     @SafeVarargs
     fun <C> asList(vararg items: C): List<C> {
-        if (items == null) return ArrayList()
         val arrayList: MutableList<C> = ArrayList(items.size)
         Stream.of(*items).forEach { e: C -> arrayList.add(e) }
         return arrayList

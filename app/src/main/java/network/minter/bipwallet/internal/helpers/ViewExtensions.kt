@@ -26,11 +26,16 @@
 
 package network.minter.bipwallet.internal.helpers
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.IncludeTestnetWarningViewBinding
 
 /**
  * minter-android-wallet. 2020
@@ -68,6 +73,29 @@ object ViewExtensions {
 
         setOnClickListener { v ->
             ContextHelper.copyToClipboard(v.context, toCopy ?: text.toString())
+        }
+    }
+
+    fun IncludeTestnetWarningViewBinding.visibleForTestnet() {
+        root.visibleForTestnet()
+    }
+
+    fun View?.visibleForTestnet() {
+        if (this == null) return
+
+        if (BuildConfig.FLAVOR.contains("netTest")) {
+            visible = true
+            setOnClickListener {
+                try {
+                    val goToMarket = Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"))
+                    it.context.startActivity(goToMarket)
+                } catch (e: ActivityNotFoundException) {
+                    val goToMarket = Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://play.google.com/store/apps/details?id=network.minter.bipwallet.mainnet"))
+                    it.context.startActivity(goToMarket)
+                }
+            }
+        } else {
+            visible = false
         }
     }
 

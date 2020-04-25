@@ -36,7 +36,6 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import network.minter.bipwallet.R
@@ -147,8 +146,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
             onInputChanged(input, valid)
         }
         viewState.setOnClickSelectAccount(View.OnClickListener { view: View -> onClickSelectAccount(view) })
-        viewState.setOnClickMaximum(View.OnClickListener { view: View? -> onClickMaximum(view) })
-        viewState.setOnClickSubmit(View.OnClickListener { view: View -> onClickSubmit(view) })
+        viewState.setOnClickMaximum(View.OnClickListener { onClickMaximum() })
+        viewState.setOnClickSubmit(View.OnClickListener { onClickSubmit() })
         setCoinsAutocomplete()
     }
 
@@ -186,25 +185,30 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun setCoinsAutocomplete() {
         mExplorerCoinsRepo.all.rxExp()
                 .subscribeOn(Schedulers.io())
-                .subscribe(Consumer { res: ExpResult<List<CoinItem>?> ->
-                    if (res.result != null) {
-                        res.result!!.filter {
-                            it.symbol.toUpperCase() == MinterSDK.DEFAULT_COIN
-                        }.forEach {
-                            it.reserveBalance = BigDecimal("10e9")
+                .subscribe(
+                        { res ->
+                            if (res.result != null) {
+                                res.result!!.filter {
+                                    it.symbol.toUpperCase() == MinterSDK.DEFAULT_COIN
+                                }.forEach {
+                                    it.reserveBalance = BigDecimal("10e9")
+                                }
+
+                                val resMutable = res.result!!.toMutableList()
+
+                                resMutable.sortWith(Comparator { a, b ->
+                                    b.reserveBalance.compareTo(a.reserveBalance)
+                                })
+
+                                viewState.setCoinsAutocomplete(resMutable, CoinsListAdapter.OnItemClickListener { item: CoinItem, _: Int ->
+                                    viewState.setIncomingCoin(item.symbol)
+                                })
+                            }
+                        },
+                        { t: Throwable ->
+                            Timber.w(t)
                         }
-
-                        val resMutable = res.result!!.toMutableList()
-
-                        resMutable.sortWith(Comparator { a, b ->
-                            b.reserveBalance.compareTo(a.reserveBalance)
-                        })
-
-                        viewState.setCoinsAutocomplete(resMutable, CoinsListAdapter.OnItemClickListener { item: CoinItem, _: Int ->
-                            viewState.setIncomingCoin(item.symbol)
-                        })
-                    }
-                }, Wallet.Rx.errorHandler(viewState))
+                )
                 .disposeOnDestroy()
     }
 
@@ -380,7 +384,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
-    private fun onClickMaximum(view: View?) {
+    private fun onClickMaximum() {
         if (isBuying) {
             return
         }
@@ -394,12 +398,14 @@ abstract class ExchangePresenter<V : ExchangeView>(
         analytics.send(AppEvent.ConvertSpendUseMaxButton)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onClickSelectAccount(view: View) {
         viewState.startAccountSelector(mAccountStorage.entity.mainWallet.coinsList) {
             onAccountSelected(it.data, false)
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onInputChanged(editText: InputWrapper, valid: Boolean) {
         val text = editText.text.toString()
         Timber.d("Input changed: %s", editText.text)
@@ -427,7 +433,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
-    private fun onClickSubmit(view: View) {
+    private fun onClickSubmit() {
         if (mAccount == null || mBuyCoin == null || mBuyAmount == null || mSellAmount == null) {
             return
         }

@@ -104,10 +104,6 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         balanceState.onRestoreInstanceState(savedInstanceState)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == WalletsTabFragment.REQUEST_CODE_QR_SCAN_TX) {
@@ -181,7 +177,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                             balanceState.setTotalBIP(
                                     bdIntHuman(totalBIP.intPart),
                                     totalBIP.fractionalPart,
-                                    Plurals.bips(totalBIP.intPart.toLong())
+                                    MinterSDK.DEFAULT_COIN
                             )
                             balanceState.setTotalUSD(
                                     Plurals.usd(bdIntHuman(totalUSD.intPart)),

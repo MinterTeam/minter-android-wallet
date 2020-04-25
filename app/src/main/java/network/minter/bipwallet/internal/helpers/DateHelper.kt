@@ -77,7 +77,7 @@ object DateHelper {
     const val DATE_FORMAT_SHORT = "dd/MM"
 
     @JvmStatic
-    fun getCalendar(format: String?, date: String?): Calendar? {
+    fun getCalendar(format: String, date: String): Calendar? {
         val sdf = SimpleDateFormat(format, Wallet.LC_EN)
         try {
             sdf.parse(date)
@@ -102,27 +102,19 @@ object DateHelper {
      * @return
      */
     @JvmStatic
-    fun convertFormat(date: String?, fromFormat: String?, toFormat: String?): String? {
-        if (date == null) return null
+    fun convertFormat(date: String, fromFormat: String, toFormat: String): String? {
         val cal = getCalendar(fromFormat, date) ?: return null
         val format = SimpleDateFormat(toFormat, Wallet.LC_EN)
         return format.format(cal.time)
     }
 
     @JvmStatic
-    fun format(input: DateTime?, format: String?): String? {
-        if (input == null || format == null) {
-            return null
-        }
+    fun format(input: DateTime, format: String): String {
         val fmt = DateTimeFormat.forPattern(format)
         return fmt.print(input)
     }
 
-    fun DateTime?.fmt(format: String?): String? {
-        if (this == null || format.isNullOrEmpty()) {
-            return null
-        }
-
+    fun DateTime.fmt(format: String): String {
         val fmt = DateTimeFormat.forPattern(format)
         return fmt.print(this)
     }
@@ -138,12 +130,12 @@ object DateHelper {
     }
 
     @JvmStatic
-    fun toSimpleISODate(dt: DateTime?): String? {
+    fun toSimpleISODate(dt: DateTime): String {
         return format(dt, DATE_FORMAT_SIMPLE)
     }
 
     @JvmStatic
-    fun toDateMonthOptYear(d: Date?): String {
+    fun toDateMonthOptYear(d: Date): String {
         val c = Calendar.getInstance()
         c.time = d
         return if (Calendar.getInstance()[Calendar.YEAR] == c[Calendar.YEAR]) {

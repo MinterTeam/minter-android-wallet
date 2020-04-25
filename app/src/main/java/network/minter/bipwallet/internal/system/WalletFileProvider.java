@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,14 +26,44 @@
 
 package network.minter.bipwallet.internal.system;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
+
+import java.util.List;
+
 import androidx.core.content.FileProvider;
+import network.minter.bipwallet.BuildConfig;
+import network.minter.bipwallet.internal.Wallet;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class WalletFileProvider extends FileProvider {
 
+    public static void grantUriReadPermission(Uri uri) {
+        Wallet.app().context().grantUriPermission(
+                BuildConfig.APPLICATION_ID,
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+        );
+    }
+
+    public static void grantPermissions(Context context, Intent intent, Uri uri, boolean writeAble) {
+        int flag = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+        if (writeAble) {
+            flag |= Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        }
+        intent.addFlags(flag);
+        List<ResolveInfo> resInfoList = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_ALL);
+        for (ResolveInfo resolveInfo : resInfoList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            context.grantUriPermission(packageName, uri, flag);
+        }
+        context.grantUriPermission("com.android.provider.DataSharing", uri, flag);
+    }
 
 }

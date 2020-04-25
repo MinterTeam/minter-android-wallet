@@ -31,8 +31,8 @@ import android.os.Bundle
 import android.util.Base64
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.*
-import network.minter.bipwallet.internal.helpers.DateHelper
 import network.minter.bipwallet.internal.helpers.DateHelper.DATE_FORMAT_WITH_TZ
+import network.minter.bipwallet.internal.helpers.DateHelper.fmt
 import network.minter.bipwallet.internal.helpers.IntentHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.copyOnClick
@@ -80,6 +80,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         return String(Base64.decode(this, 0))
     }
 
+    @Suppress("DEPRECATION")
     @SuppressLint("SetTextI18n")
     private fun fillData() {
 
@@ -90,7 +91,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         viewState.setToAddress(null)
 
         viewState.setPayload(tx.payload.fromBase64())
-        viewState.setTimestamp(DateHelper.format(DateTime(tx.timestamp), DATE_FORMAT_WITH_TZ)!!)
+        viewState.setTimestamp(DateTime(tx.timestamp).fmt(DATE_FORMAT_WITH_TZ))
         viewState.setFee("${tx.fee.humanize()} ${tx.gasCoin}")
         viewState.setBlockNumber(tx.block.toString())
 
@@ -272,11 +273,4 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         }
     }
 
-    override fun attachView(view: TransactionView) {
-        super.attachView(view)
-    }
-
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-    }
 }

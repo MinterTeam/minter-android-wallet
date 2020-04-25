@@ -107,7 +107,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         super.attachView(view)
         accountStorage.update()
         mFrom = secretStorage.addresses[0]
-        viewState.setOnCancelListener(View.OnClickListener { onCancel(it) })
+        viewState.setOnCancelListener(View.OnClickListener { onCancel() })
     }
 
     override fun handleExtras(intent: Intent?) {
@@ -319,7 +319,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     }
                 }) { t: Throwable? -> Timber.w(t) }
         viewState.setSecondVisible(View.VISIBLE)
-        viewState.setOnConfirmListener(View.OnClickListener { onSubmit(it) })
+        viewState.setOnConfirmListener(View.OnClickListener { onSubmit() })
         when (tx.type) {
             OperationType.SendCoin -> {
                 val data = tx.getData(TxSendCoin::class.java)
@@ -538,11 +538,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     }
 
     private fun onExecuteComplete() {}
-    private fun onSubmit(view: View) {
+    private fun onSubmit() {
         viewState.startDialog { ctx: Context? ->
             ConfirmDialog.Builder(ctx!!, "Sign transaction")
                     .setText("Press \"Confirm and send\" to sign and send transaction to the network, or Cancel to dismiss")
-                    .setPositiveAction(R.string.btn_confirm_send) { d, _ ->
+                    .setPositiveAction(R.string.btn_confirm_send) { _, _ ->
                         startExecuteTransaction()
                     }
                     .setNegativeAction(R.string.btn_cancel)
@@ -550,7 +550,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         }
     }
 
-    private fun onCancel(view: View) {
+    private fun onCancel() {
         viewState.finishCancel()
     }
 }

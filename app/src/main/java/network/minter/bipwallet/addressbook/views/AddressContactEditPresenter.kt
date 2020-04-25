@@ -73,10 +73,6 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
         }
     }
 
-    override fun attachView(view: AddressContactEditView) {
-        super.attachView(view)
-    }
-
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.setOnSubmitListener(View.OnClickListener { view: View ->
@@ -99,6 +95,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onSubmit(view: View) {
         val res: Completable = if (mIsNew) {
             repo.insert(mContact)

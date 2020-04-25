@@ -29,7 +29,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryLight">
+    android:background="@color/colorPrimary">
 
     <TextView
         android:id="@+id/pin_hint"
@@ -41,7 +41,7 @@
         android:paddingEnd="@dimen/margin_edges"
         android:text="Please confirm your 4-digit PIN"
         android:textColor="@color/textColorWhite"
-        android:textSize="@dimen/text_size_14"
+        android:textSize="@dimen/text_size_18"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -292,7 +292,7 @@
             android:layout_marginBottom="@dimen/pin_pad_key_margin"
             android:clickable="true"
             android:focusable="true"
-            android:padding="24dp"
+            android:padding="28dp"
             android:tag="key:bsp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/pin_key_0"

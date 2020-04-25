@@ -268,7 +268,7 @@
     <string name="input_hint_seed">Seed-Phrase</string>
     <string name="input_hint_wallet_seed">Or enter seed-phrase to yout existing wallet</string>
     <string name="dialog_title_add_wallet">Add New Wallet</string>
-    <string name="btn_delete_wallet">Delete Wallet</string>
+    <string name="btn_remove_wallet">Remove Wallet</string>
     <string name="tx_send_payload_hint">You can add a message to your transaction</string>
     <string name="title_address_book">Address Book</string>
     <string name="btn_edit">Edit</string>
@@ -322,5 +322,7 @@
     <string name="empty_delegations">You don\'t have any delegations.</string>
     <string name="dialog_label_delegate_progress">Delegating...</string>
     <string name="dialog_label_unbond_progress">Unbonding...</string>
+    <string name="btn_save_changes">Save Changes</string>
+    <string name="dialog_title_your_address">Your Address</string>
 
 </resources>

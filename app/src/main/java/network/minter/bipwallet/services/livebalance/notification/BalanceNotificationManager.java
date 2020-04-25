@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,6 +50,7 @@ import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
+import static network.minter.bipwallet.internal.settings.SettingsManagerKt.EnableLiveNotifications;
 
 /**
  * minter-android-wallet. 2018
@@ -71,7 +72,7 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mGsonBuilder = gsonBuilder;
         mNetwork = network;
-        mEnabledNotifications = () -> prefs.getBool(SettingsManager.EnableLiveNotifications);
+        mEnabledNotifications = () -> prefs.get(EnableLiveNotifications);
     }
 
     public void showBalanceUpdate(String json, MinterAddress address) {

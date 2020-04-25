@@ -36,9 +36,10 @@ import java.util.List;
 
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
-import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.wallets.contract.WalletsTabView;
 import network.minter.core.MinterSDK;
+
+import static network.minter.bipwallet.internal.settings.SettingsManagerKt.CurrentBalanceCursor;
 
 @Parcel
 public final class BalanceCurrentState {
@@ -52,7 +53,7 @@ public final class BalanceCurrentState {
     List<BalanceState> items = new ArrayList<>(3);
 
     public BalanceCurrentState() {
-        cursor = Wallet.app().settings().getInt(SettingsManager.CurrentBalanceCursor);
+        cursor = Wallet.app().settings().get(CurrentBalanceCursor);
         items.add(new BalanceState("0", "0000", MinterSDK.DEFAULT_COIN));
         items.add(new BalanceState("0", "0000", MinterSDK.DEFAULT_COIN));
         items.add(new BalanceState("$0", "00", ""));
@@ -81,7 +82,7 @@ public final class BalanceCurrentState {
             cursor %= items.size();
             applyTo(view);
 
-            Wallet.app().settings().putInt(SettingsManager.CurrentBalanceCursor, cursor);
+            Wallet.app().settings().set(CurrentBalanceCursor, cursor);
         });
     }
 

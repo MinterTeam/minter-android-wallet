@@ -58,7 +58,7 @@ class CacheValidatorsRepository(
     }
 
     override fun onAfterUpdate(result: List<ValidatorItem>) {
-        storage.put(KEY_VALIDATORS, result.filter { it.status == ValidatorItem.STATUS_ONLINE }.toMutableList())
+        storage.putAsync(KEY_VALIDATORS, result.filter { it.status == ValidatorItem.STATUS_ONLINE }.toMutableList())
     }
 
     override fun onClear() {

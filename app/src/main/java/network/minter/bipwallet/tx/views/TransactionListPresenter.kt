@@ -95,6 +95,7 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
         unsubscribeOnDestroy(mListDisposable)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onExpandTx(view: View, tx: TransactionFacade) {
         analytics.send(AppEvent.TransactionDetailsButton)
         viewState.startDetails(tx)
@@ -115,7 +116,7 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
                 }
     }
 
-    private fun onExplorerClick(view: View, historyTransaction: TransactionFacade) {
+    private fun onExplorerClick(historyTransaction: TransactionFacade) {
         viewState.startExplorer(historyTransaction.hash.toString())
         analytics.send(AppEvent.TransactionExplorerButton)
     }

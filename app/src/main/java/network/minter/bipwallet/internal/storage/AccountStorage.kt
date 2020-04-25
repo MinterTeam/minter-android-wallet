@@ -79,7 +79,7 @@ class AccountStorage(
         get() = getData()
 
     override fun onAfterUpdate(result: AddressListBalancesTotal) {
-        storage.put(cacheKey, result)
+        storage.putAsync(cacheKey, result)
     }
 
     override fun onClear() {

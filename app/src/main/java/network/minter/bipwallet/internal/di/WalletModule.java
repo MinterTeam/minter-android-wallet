@@ -340,8 +340,8 @@ public class WalletModule {
 
     @Provides
     @WalletApp
-    public SettingsManager provideSettingsManager(SharedPreferences prefs) {
-        return new SettingsManager(prefs);
+    public SettingsManager provideSettingsManager(@DbCache KVStorage storage) {
+        return new SettingsManager(storage);
     }
 
     @Provides

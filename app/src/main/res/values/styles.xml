@@ -84,6 +84,15 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
 
+    <style name="Wallet.PinEnter" parent="Wallet">
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+    </style>
+
     <style name="WalletBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/WalletModalStyle</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
@@ -225,9 +234,9 @@
 
     <style name="Wallet.Button.PinPad">
         <item name="android:background">@drawable/btn_pin_key</item>
-        <item name="android:fontFamily">@font/_inter_bold</item>
+        <item name="android:fontFamily">@font/_inter_regular</item>
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/textColorWhite</item>
+        <item name="android:textColor">@color/text_color_pin</item>
         <item name="android:textSize">@dimen/pin_pad_text_size</item>
         <item name="android:layout_marginTop">@dimen/pin_pad_key_margin</item>
         <item name="android:layout_marginBottom">@dimen/pin_pad_key_margin</item>
@@ -544,6 +553,10 @@
         <item name="android:textAlignment">center</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
+    </style>
+
+    <style name="Wallet.Toolbar.TitleLight" parent="Wallet.Toolbar.TitleDefault">
+        <item name="android:textColor">@color/textColorWhite</item>
     </style>
 
 

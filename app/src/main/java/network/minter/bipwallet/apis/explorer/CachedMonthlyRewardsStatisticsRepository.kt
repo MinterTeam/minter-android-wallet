@@ -78,11 +78,11 @@ class CachedMonthlyRewardsStatisticsRepository(
     }
 
     override fun onAfterUpdate(result: MutableList<RewardStatistics>) {
-        storage.put(KEY_REWARDS, result)
+        storage.putAsync(KEY_REWARDS, result)
     }
 
     override fun onClear() {
-        storage.delete(KEY_REWARDS)
+        storage.deleteAsync(KEY_REWARDS)
     }
 
     override fun isDataReady(): Boolean {

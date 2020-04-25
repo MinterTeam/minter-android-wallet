@@ -65,11 +65,15 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
         viewState.setAdapter(mTransactionsAdapter!!)
         viewState.setListTitle("Latest Transactions")
         viewState.setActionTitle(R.string.btn_all_txs)
-        viewState.setOnActionClickListener(View.OnClickListener { view: View -> onClickOpenTransactions(view) })
+        viewState.setOnActionClickListener(View.OnClickListener {
+            onClickOpenTransactions()
+        })
+
         txRepo.observe()
                 .joinToUi()
                 .switchMap { result: List<HistoryTransaction> -> TransactionDataSource.mapToFacade(result) }
-                .switchMap { items: List<TransactionFacade> -> TransactionDataSource.mapValidatorsInfo(validatorsRepo, items) } //                        .switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
+                .switchMap { items: List<TransactionFacade> -> TransactionDataSource.mapValidatorsInfo(validatorsRepo, items) }
+                //.switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
                 .subscribe(
                         { res: List<TransactionFacade> ->
                             mTransactionsAdapter!!.dispatchChanges(HistoryTransactionDiffUtil::class.java, res, true)
@@ -86,11 +90,7 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                 .disposeOnDestroy()
     }
 
-    private fun onClickOpenTransactions(view: View) {
+    private fun onClickOpenTransactions() {
         viewState.startTransactions()
-    }
-
-    private fun onExplorerClick(view: View, transactionFacade: TransactionFacade) {
-
     }
 }

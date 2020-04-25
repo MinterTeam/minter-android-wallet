@@ -36,18 +36,17 @@ import retrofit2.Call
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 
-
-public fun <T> Call<GateResult<T>>.rxGate(): Observable<GateResult<T>> {
+fun <T> Call<GateResult<T>>.rxGate(): Observable<GateResult<T>> {
     return ReactiveGate.rxGate(this)
             .onErrorResumeNext(ReactiveGate.toGateError())
 }
 
-public fun <T> Call<ExpResult<T>>.rxExp(): Observable<ExpResult<T>> {
+fun <T> Call<ExpResult<T>>.rxExp(): Observable<ExpResult<T>> {
     return ReactiveExplorer.rxExp(this)
             .onErrorResumeNext(ReactiveExplorer.toExpError())
 }
 
-public fun <T> T.toObservable(): Observable<T> {
+fun <T> T.toObservable(): Observable<T> {
     return Observable.just(this)
 }
 

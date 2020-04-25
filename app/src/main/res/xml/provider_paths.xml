@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2018 by MinterTeam
-  ~ @link https://github.com/MinterTeam
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -26,7 +27,12 @@
 
 <paths>
     <files-path
+        name="address_qr"
+        path="public/addresses/qr/" />
+
+    <files-path
         name="public_files"
-        path="public/"
-        />
+        path="public/" />
+
+
 </paths>

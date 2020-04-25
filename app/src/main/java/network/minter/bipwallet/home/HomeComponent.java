@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,14 +31,12 @@ import java.util.List;
 import dagger.Component;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.di.WalletComponent;
-import network.minter.bipwallet.receiving.ui.ReceiveTabFragment;
 import network.minter.bipwallet.sending.ui.SendTabFragment;
 import network.minter.bipwallet.settings.ui.SettingsTabFragment;
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Component(dependencies = WalletComponent.class, modules = {
@@ -50,7 +48,6 @@ public interface HomeComponent {
     void inject(HomeActivity activity);
     void inject(WalletsTabFragment fragment);
     void inject(SendTabFragment fragment);
-    void inject(ReceiveTabFragment fragment);
     void inject(SettingsTabFragment fragment);
 
     @HomeTabsClasses

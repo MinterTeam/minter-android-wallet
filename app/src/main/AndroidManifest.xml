@@ -61,9 +61,10 @@
 
         <provider
             android:name=".internal.system.WalletFileProvider"
-            android:authorities="${applicationId}.file.provider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
+
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
@@ -115,11 +116,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/Wallet.Camera" />
         <activity
-            android:name=".receiving.ui.QRPreviewActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/Wallet.FullScreen" />
-        <activity
             android:name=".exchange.ui.ConvertCoinActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -146,6 +142,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:theme="@style/Wallet.PinEnter"
             android:name=".security.ui.PinEnterActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />

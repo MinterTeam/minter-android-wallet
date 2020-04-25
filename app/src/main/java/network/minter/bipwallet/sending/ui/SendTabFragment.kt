@@ -37,14 +37,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.Unbinder
-import com.edwardstock.inputfield.InputField
-import com.edwardstock.inputfield.InputFieldAutocomplete
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
@@ -56,6 +48,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog
+import network.minter.bipwallet.databinding.FragmentTabSendBinding
 import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
@@ -63,6 +56,9 @@ import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
+import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
@@ -73,7 +69,6 @@ import network.minter.bipwallet.sending.contract.SendView
 import network.minter.bipwallet.sending.views.SendTabPresenter
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.wallets.selector.WalletItem
-import network.minter.bipwallet.wallets.selector.WalletSelector
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
 import javax.inject.Inject
@@ -88,21 +83,11 @@ class SendTabFragment : HomeTabFragment(), SendView {
     @Inject lateinit var presenterProvider: Provider<SendTabPresenter>
     @InjectPresenter lateinit var presenter: SendTabPresenter
 
-    @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
-    @BindView(R.id.input_coin) lateinit var coinInput: InputField
-    @BindView(R.id.input_recipient) lateinit var recipientInput: InputFieldAutocomplete
-    @BindView(R.id.input_amount) lateinit var amountInput: InputField
-    @BindView(R.id.input_payload) lateinit var payloadInput: InputField
-    @BindView(R.id.action) lateinit var actionSend: Button
-    @BindView(R.id.text_error) lateinit var errorView: TextView
-    @BindView(R.id.fee_value) lateinit var feeValue: TextView
-    @BindView(R.id.wallet_selector) lateinit var walletSelector: WalletSelector
-
     private val inputGroup: InputGroup = InputGroup()
-    private var unbinder: Unbinder? = null
     private var mCurrentDialog: WalletDialog? = null
     private var mAutocompleteAdapter: RecipientListAdapter? = null
     private var bottomSheetDialog: BaseBottomSheetDialogFragment? = null
+    private lateinit var binding: FragmentTabSendBinding
 
     override fun onTabSelected() {
         super.onTabSelected()
@@ -123,36 +108,39 @@ class SendTabFragment : HomeTabFragment(), SendView {
     override fun onDestroyView() {
         WalletDialog.releaseDialog(mCurrentDialog)
         super.onDestroyView()
-        unbinder!!.unbind()
     }
 
     @Suppress("UsePropertyAccessSyntax")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_tab_send, container, false)
-        unbinder = ButterKnife.bind(this, view)
 
-        coinInput.input.setFocusable(false)
+        binding = FragmentTabSendBinding.inflate(inflater, container, false)
 
-        inputGroup.setup {
-            add(amountInput, RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$").apply {
-                errorMessage = "Invalid number"
-            })
-            add(recipientInput, RecipientValidator("Invalid recipient", true))
-            add(payloadInput, PayloadValidator())
+        binding.apply {
+            testnetWarning.visibleForTestnet()
+
+            inputCoin.input.setFocusable(false)
+
+            inputGroup.setup {
+                add(inputAmount, RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$").apply {
+                    errorMessage = "Invalid number"
+                })
+                add(inputRecipient, RecipientValidator("Invalid recipient", true))
+                add(inputPayload, PayloadValidator())
+            }
+
+            inputGroup.addFilter(inputAmount, DecimalInputFilter(inputAmount))
+
+            inputRecipient.clearFocus()
+            inputAmount.clearFocus()
+
+
+            setHasOptionsMenu(true)
+            activity!!.menuInflater.inflate(R.menu.menu_tab_send, toolbar.menu)
+            toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
+            mAutocompleteAdapter = RecipientListAdapter(context!!)
+            inputRecipient.input.setAdapter(mAutocompleteAdapter)
         }
-
-        inputGroup.addFilter(amountInput, DecimalInputFilter(amountInput))
-
-        recipientInput.clearFocus()
-        amountInput.clearFocus()
-
-
-        setHasOptionsMenu(true)
-        activity!!.menuInflater.inflate(R.menu.menu_send_toolbar, toolbar.menu)
-        toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
-        mAutocompleteAdapter = RecipientListAdapter(context!!)
-        recipientInput.input.setAdapter(mAutocompleteAdapter)
-        return view
+        return binding.root
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -163,33 +151,33 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setOnClickAccountSelectedListener(listener: View.OnClickListener) {
-        coinInput.setOnClickListener(listener)
+        binding.inputCoin.setOnClickListener(listener)
     }
 
     override fun setOnClickMaximum(listener: View.OnClickListener) {
-        amountInput.setOnSuffixTextClickListener(listener)
+        binding.inputAmount.setOnSuffixTextClickListener(listener)
     }
 
     override fun setOnClickAddPayload(listener: View.OnClickListener) {
-        payloadInput.inputOverlay!!.setOnClickListener(listener)
+        binding.inputPayload.inputOverlay!!.setOnClickListener(listener)
     }
 
     override fun setOnClickClearPayload(listener: View.OnClickListener) {
-        payloadInput.setOnSuffixImageClickListener(listener)
+        binding.inputPayload.setOnSuffixImageClickListener(listener)
     }
 
     override fun setPayloadChangeListener(listener: TextWatcher) {
-        payloadInput.addTextChangedListener(listener)
+        binding.inputPayload.addTextChangedListener(listener)
     }
 
     override fun setPayload(payload: String?) {
-        payloadInput.setText(payload)
-        payloadInput.setSelection(payload?.length ?: 0)
+        binding.inputPayload.setText(payload)
+        binding.inputPayload.setSelection(payload?.length ?: 0)
     }
 
     //@TODO
     override fun setActionTitle(buttonTitle: Int) {
-        actionSend.setText(buttonTitle)
+        binding.action.setText(buttonTitle)
     }
 
     override fun startExternalTransaction(rawData: String?) {
@@ -198,20 +186,20 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun showPayload() {
-        payloadInput.inputOverlayVisible = false
+        binding.inputPayload.inputOverlayVisible = false
     }
 
     override fun hidePayload() {
-        payloadInput.text = null
-        payloadInput.inputOverlayVisible = true
+        binding.inputPayload.text = null
+        binding.inputPayload.inputOverlayVisible = true
     }
 
     override fun setWallets(walletItems: List<WalletItem>) {
-        walletSelector.setWallets(walletItems)
+        binding.walletSelector.setWallets(walletItems)
     }
 
     override fun setMainWallet(walletItem: WalletItem) {
-        walletSelector.setMainWallet(walletItem)
+        binding.walletSelector.setMainWallet(walletItem)
     }
 
     override fun setPayloadError(error: CharSequence?) {
@@ -223,25 +211,25 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setOnContactsClickListener(listener: View.OnClickListener) {
-        recipientInput.setOnSuffixImageClickListener(listener)
+        binding.inputRecipient.setOnSuffixImageClickListener(listener)
     }
 
     override fun setAccountName(accountName: CharSequence) {
-        coinInput.setText(accountName)
+        binding.inputCoin.setText(accountName)
     }
 
     override fun setOnSubmit(listener: View.OnClickListener) {
-        actionSend.setOnClickListener(listener)
+        binding.action.setOnClickListener(listener)
     }
 
     override fun setSubmitEnabled(enabled: Boolean) {
-        actionSend.post { actionSend.isEnabled = enabled }
+        binding.action.postApply { it.isEnabled = enabled }
     }
 
     override fun clearInputs() {
         inputGroup.reset()
-        recipientInput.clearFocus()
-        amountInput.clearFocus()
+        binding.inputRecipient.clearFocus()
+        binding.inputAmount.clearFocus()
         inputGroup.clearErrors()
     }
 
@@ -270,11 +258,11 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setRecipient(to: AddressContact) {
-        recipientInput.post { recipientInput.setText(to.name) }
+        binding.inputRecipient.postApply { it.setText(to.name) }
     }
 
     override fun setRecipientError(error: CharSequence?) {
-        recipientInput.post { inputGroup.setError("recipient", error) }
+        binding.inputRecipient.post { inputGroup.setError("recipient", error) }
     }
 
     override fun setAmountError(error: CharSequence?) {
@@ -282,40 +270,40 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setCommonError(error: CharSequence?) {
-        ViewHelper.visible(errorView, !error.isNullOrEmpty())
-        errorView.text = error
+        binding.textError.visible = !error.isNullOrEmpty()
+        binding.textError.text = error
     }
 
     override fun setError(error: Int) {
-        ViewHelper.visible(errorView, error != 0)
-        errorView.setText(error)
+        binding.textError.visible = error != 0
+        binding.textError.setText(error)
     }
 
     override fun setAmount(amount: CharSequence?) {
-        amountInput.setText(amount)
+        binding.inputAmount.setText(amount)
     }
 
     override fun setFee(fee: CharSequence?) {
-        feeValue.text = fee
+        binding.feeValue.text = fee
     }
 
     override fun setRecipientAutocompleteItemClickListener(listener: RecipientListAdapter.OnItemClickListener) {
         val cl = RecipientListAdapter.OnItemClickListener { item: AddressContact?, position: Int ->
             listener.onClick(item, position)
-            recipientInput.input.dismissDropDown()
+            binding.inputRecipient.input.dismissDropDown()
         }
         mAutocompleteAdapter!!.setOnItemClickListener(cl)
     }
 
     override fun setRecipientAutocompleteItems(items: List<AddressContact>) {
-        recipientInput.post {
+        binding.inputRecipient.postApply {
             mAutocompleteAdapter!!.setItems(items)
-            recipientInput.input.showDropDown()
+            it.input.showDropDown()
         }
     }
 
     override fun hideAutocomplete() {
-        recipientInput.post { recipientInput.input.dismissDropDown() }
+        binding.inputRecipient.postApply { it.input.dismissDropDown() }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

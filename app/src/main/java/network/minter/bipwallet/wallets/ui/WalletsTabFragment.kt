@@ -63,6 +63,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDi
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
 import network.minter.bipwallet.sending.ui.SendTabFragment
+import network.minter.bipwallet.share.ShareDialog
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.TransactionListActivity
 import network.minter.bipwallet.wallets.contract.WalletsTabView
@@ -109,7 +110,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     override fun setOnRefreshListener(listener: OnRefreshListener) {
         binding.containerSwipeRefresh.setOnRefreshListener(listener)
         mSwipeRefreshHacker.setOnRefreshStartListener(this::onStartRefresh)
-        mSwipeRefreshHacker.hack(binding.containerSwipeRefresh);
+        mSwipeRefreshHacker.hack(binding.containerSwipeRefresh)
     }
 
     override fun showRefreshProgress() {
@@ -117,7 +118,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun hideRefreshProgress() {
-        binding.containerSwipeRefresh.isRefreshing = false;
+        binding.containerSwipeRefresh.isRefreshing = false
     }
 
     override fun startExplorer(hash: String) {
@@ -191,6 +192,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         if (item.itemId == R.id.menu_scan_tx) {
             SingleCallHandler.call(item) { startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX) }
         } else if (item.itemId == R.id.menu_share) {
+            ShareDialog().show(fragmentManager!!, "share")
         }
         return super.onOptionsItemSelected(item)
     }
@@ -307,11 +309,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         presenter!!.onRestoreInstanceState(savedInstanceState)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //        delegationView.setOnClickListener(v -> startDelegationList());
-    }
-
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         presenter!!.onTrimMemory()
@@ -330,7 +327,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     @SuppressLint("SetTextI18n")
     override fun setBalance(firstPart: CharSequence?, middlePart: CharSequence?, lastPart: CharSequence?) {
-        runOnUiThread {
+        binding.balanceFirstPart.post {
             binding.apply {
                 balanceFirstPart.text = firstPart
                 balanceMiddlePart.text = ".$middlePart"
@@ -344,11 +341,11 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun setBalanceClickListener(listener: View.OnClickListener) {
-        binding.balanceContainer.setOnClickListener(listener);
+        binding.balanceContainer.setOnClickListener(listener)
     }
 
     override fun setBalanceTitle(title: Int) {
-        binding.balanceLabel.setText(title);
+        binding.balanceLabel.setText(title)
     }
 
     override fun setBalanceRewards(rewards: String) {
@@ -449,11 +446,11 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     private fun checkLastUpdate() {
-//        if (!Wallet.app().storage().contains(PrefKeys.LAST_BLOCK_TIME)) {
+//        if (!Wallet.app().settings().has(LastBlockTime)) {
 //            lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated_never)));
 //            return;
 //        }
-//        DateTime lastBlockTime = new DateTime((long) Wallet.app().storage().get(PrefKeys.LAST_BLOCK_TIME, 0L));
+//        DateTime lastBlockTime = new DateTime((long) Wallet.app().settings().get(LastBlockTime));
 //        Seconds diff = Seconds.secondsBetween(lastBlockTime, new DateTime());
 //        int res = diff.getSeconds();
 //        Timber.d("Diff: now=%s, ts=%s", new DateTime().toString(), lastBlockTime.toString());

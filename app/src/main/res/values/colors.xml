@@ -47,13 +47,14 @@
     <color name="textColorButton">#222222</color>
     <color name="textColorGreen">#35B65C</color>
     <color name="errorColor">#C83A3A</color>
+    <color name="errorColorLight">#FF4F4F</color>
     <color name="white">#FFFFFFFF</color>
     <color name="white70">#B2FFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="textColorSelectedAddress">#9e8be4</color>
     <color name="pinPadDefault">#3E1EAA</color>
-    <color name="pinPadActive">@color/colorPrimary</color>
+    <color name="pinPadActive">@color/white</color>
     <color name="pinPadDisabled">#32250C78</color>
 
     <color name="blueLight">#F7F5FF</color>

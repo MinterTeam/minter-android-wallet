@@ -39,25 +39,26 @@ import androidx.fragment.app.Fragment
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+
 object ContextExtensions {
 
     @ColorInt
     fun Resources.getColorCompat(context: Context, @ColorRes resId: Int): Int {
-        return ContextCompat.getColor(context, resId);
+        return ContextCompat.getColor(context, resId)
     }
 
     @ColorInt
     fun View.getColorCompat(@ColorRes resId: Int): Int {
-        return ContextCompat.getColor(context, resId);
+        return ContextCompat.getColor(context, resId)
     }
 
     @ColorInt
     fun Activity.getColorCompat(@ColorRes resId: Int): Int {
-        return ContextCompat.getColor(this, resId);
+        return ContextCompat.getColor(this, resId)
     }
 
     @ColorInt
     fun Fragment.getColorCompat(@ColorRes resId: Int): Int {
-        return ContextCompat.getColor(context!!, resId);
+        return ContextCompat.getColor(context!!, resId)
     }
 }

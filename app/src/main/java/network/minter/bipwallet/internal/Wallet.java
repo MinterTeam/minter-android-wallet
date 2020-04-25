@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,36 +26,29 @@
 
 package network.minter.bipwallet.internal;
 
-import android.os.Build;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasAndroidInjector;
-import io.reactivex.functions.Consumer;
-import io.reactivex.plugins.RxJavaPlugins;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.internal.di.DaggerWalletComponent;
 import network.minter.bipwallet.internal.di.HelpersModule;
 import network.minter.bipwallet.internal.di.RepoModule;
 import network.minter.bipwallet.internal.di.WalletComponent;
 import network.minter.bipwallet.internal.di.WalletModule;
-import network.minter.bipwallet.internal.mvp.ErrorView;
-import network.minter.bipwallet.internal.mvp.ProgressView;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
-import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
-
-import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
@@ -70,9 +63,6 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
     protected static boolean sEnableInject = true;
 
     static {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-        }
         Locale.setDefault(LC_EN);
     }
 
@@ -113,7 +103,6 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
     public void onCreate() {
         super.onCreate();
 
-
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
@@ -121,8 +110,6 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
         if (ENABLE_CRASHLYTICS) {
             Timber.plant(new CrashlyticsTree());
         }
-
-        Rx.init();
 
         Locale.setDefault(LC_EN);
 
@@ -146,120 +133,13 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
         return dispatchingAndroidInjector;
     }
 
-    public static class Rx {
-
-        public static void init() {
-            RxJavaPlugins.setErrorHandler(errorHandler("Unhandled Rx exception!"));
-        }
-
-        /**
-         * Просто пишет ошибку в лог
-         */
-        public static Consumer<Throwable> errorHandler() {
-            return throwable -> Timber
-                    .e(NetworkException.convertIfNetworking(throwable), "Unexpected error");
-        }
-
-        /**
-         * Просто пишет ошибку в лог
-         */
-        public static Consumer<Throwable> errorHandler(String message) {
-            return throwable -> Timber.e(NetworkException.convertIfNetworking(throwable), message);
-        }
-
-        /**
-         * Если контекст является ErrorView то выведет ошибку в виде попапа или в человеческом виде
-         * При этом запишет ошибку в лог
-         */
-        public static Consumer<Throwable> errorHandler(final Object viewContext) {
-            return throwable -> {
-                Throwable ex = NetworkException.convertIfNetworking(throwable);
-                if (viewContext instanceof ProgressView) {
-                    ((ProgressView) viewContext).hideProgress();
-                }
-                if (viewContext instanceof ErrorView) {
-                    if (ex instanceof NetworkException) {
-                        ((ErrorView) viewContext).onError(((NetworkException) ex).getUserMessage());
-                    } else {
-                        ((ErrorView) viewContext).onError(ex);
-                    }
-
-                }
-                Timber.e(ex, "Error occurred %s", ex.getMessage());
-            };
-        }
-
-        /**
-         * Если контекст является ErrorView то выведет ошибку в виде попапа или в человеческом виде
-         * При этом запишет ошибку в лог
-         */
-        public static Consumer<Throwable> errorChain(final Object viewContext,
-                                                     final Consumer<Throwable> tAction) {
-            return throwable -> {
-                Throwable ex = NetworkException.convertIfNetworking(throwable);
-                if (viewContext instanceof ProgressView) {
-                    ((ProgressView) viewContext).hideProgress();
-                }
-                if (viewContext instanceof ErrorView) {
-                    if (ex instanceof NetworkException) {
-                        ((ErrorView) viewContext).onError(((NetworkException) ex).getUserMessage());
-                    } else {
-                        ((ErrorView) viewContext).onError(ex);
-                    }
-                }
-
-                Timber.e(ex, "Error occurred");
-                if (tAction != null) {
-                    tAction.accept(throwable);
-                }
-            };
-        }
-
-        /**
-         * Выведет человеческую ошибку и запишет ее в лог
-         * @param message Если передать NULL то ошибка не выведется
-         */
-        public static Consumer<Throwable> errorHandler(final Object viewContext, final String message) {
-            return throwable -> {
-                Throwable ex = NetworkException.convertIfNetworking(throwable);
-                if (viewContext instanceof ProgressView) {
-                    ((ProgressView) viewContext).hideProgress();
-                }
-                if (viewContext instanceof ErrorView && message != null) {
-                    ((ErrorView) viewContext).onError(message);
-                }
-                Timber.e(ex, "Error occurred: %s", firstNonNull(message, "[suppressed message]"));
-            };
-        }
-
-        /**
-         * Выведет человеческую ошибку и запишет ее в лог
-         */
-        public static Consumer<Throwable> errorChain(final Object viewContext, final String message,
-                                                     Consumer<Throwable> tAction) {
-            return throwable -> {
-                Throwable ex = NetworkException.convertIfNetworking(throwable);
-                if (viewContext instanceof ProgressView) {
-                    ((ProgressView) viewContext).hideProgress();
-                }
-                if (viewContext instanceof ErrorView && message != null) {
-                    ((ErrorView) viewContext).onError(message);
-                }
-                Timber.e(ex, "Error occurred: %s", message);
-                if (tAction != null) {
-                    tAction.accept(throwable);
-                }
-            };
-        }
-    }
-
     public static final class CrashlyticsTree extends Timber.Tree {
         private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
         private static final String CRASHLYTICS_KEY_TAG = "tag";
         private static final String CRASHLYTICS_KEY_MESSAGE = "message";
 
         @Override
-        protected void log(int priority, String tag, String message, Throwable t) {
+        protected void log(int priority, String tag, @NotNull String message, Throwable t) {
             if (priority == Log.ERROR || priority == Log.WARN) {
                 Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
                 Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);

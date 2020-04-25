@@ -48,6 +48,7 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.DateHelper
 import network.minter.bipwallet.internal.helpers.DateHelper.day
+import network.minter.bipwallet.internal.helpers.DateHelper.toSimpleISODate
 import network.minter.bipwallet.internal.helpers.DisplayHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdGT
 import network.minter.bipwallet.internal.helpers.MathHelper.bdLT
@@ -167,7 +168,7 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
         }
 
         addressRepo
-                .getRewardStatistics(secretRepo.mainWallet, DateHelper.toSimpleISODate(pastLastDateChart), DateHelper.toSimpleISODate(futureLastDateChart))
+                .getRewardStatistics(secretRepo.mainWallet, toSimpleISODate(pastLastDateChart!!), toSimpleISODate(futureLastDateChart!!))
                 .rxExp()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

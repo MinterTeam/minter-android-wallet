@@ -316,7 +316,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
 
         val sub = Observable.timer(delay.toLong(), unit)
                 .subscribeOn(THREAD_IO)
-                .subscribe { est: Long -> updateInternal(force, onNext, onError, onComplete) }
+                .subscribe { updateInternal(force, onNext, onError, onComplete) }
         subscriptions.add(sub)
         return this
     }
@@ -361,7 +361,6 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
 
     private fun callOnNext(chain: Consumer<ResultModel>?): Consumer<ResultModel> {
         return Consumer {
-            Timber.d("Notify data: %s", it.toString())
             notifyData(it)
             chain?.accept(it)
         }

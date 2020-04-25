@@ -27,7 +27,6 @@
 package network.minter.bipwallet.internal.di;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,12 +34,13 @@ import network.minter.bipwallet.internal.helpers.DisplayHelper;
 import network.minter.bipwallet.internal.helpers.FingerprintHelper;
 import network.minter.bipwallet.internal.helpers.ImageHelper;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
-import network.minter.bipwallet.internal.helpers.PrefKeys;
 import network.minter.bipwallet.internal.helpers.SoundManager;
+import network.minter.bipwallet.internal.settings.SettingsManager;
+
+import static network.minter.bipwallet.internal.settings.SettingsManagerKt.EnableSounds;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Module
@@ -66,8 +66,8 @@ public class HelpersModule {
 
     @Provides
     @WalletApp
-    public SoundManager provideSoundManager(Context context, SharedPreferences prefs) {
-        return new SoundManager(() -> prefs.getBoolean(PrefKeys.ENABLE_SOUNDS, false), context);
+    public SoundManager provideSoundManager(Context context, SettingsManager settings) {
+        return new SoundManager(() -> settings.get(EnableSounds), context);
     }
 
     @Provides

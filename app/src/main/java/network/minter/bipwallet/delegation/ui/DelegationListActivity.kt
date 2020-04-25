@@ -64,7 +64,6 @@ import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
 import network.minter.bipwallet.delegation.contract.DelegationListView
 import network.minter.bipwallet.delegation.views.DelegationListPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
-import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextExtensions.getColorCompat
 import network.minter.bipwallet.internal.helpers.ContextHelper
@@ -205,7 +204,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
 
         setupToolbar(binding.toolbar)
         presenter.handleExtras(intent)
-        binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
+        binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (binding.list.adapter != null && abs(scrollY - oldScrollY) > 10) {
                 (binding.list.adapter as DelegationListAdapter).closeOpened()
             }
@@ -265,7 +264,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
             override fun onChartScale(me: MotionEvent, scaleX: Float, scaleY: Float) {}
             override fun onChartTranslate(me: MotionEvent, dX: Float, dY: Float) {}
         }
-        val pointXYOffset = Wallet.app().display().dpToPx(6) / 2f
+//        val pointXYOffset = Wallet.app().display().dpToPx(6) / 2f
 
 
         // set listeners

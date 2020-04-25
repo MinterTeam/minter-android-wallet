@@ -114,7 +114,6 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/_inter_semi_bold"
                             android:fontFeatureSettings="@string/inter_zeroes"
-                            android:text="462 308"
                             android:textColor="@color/textColorWhite"
                             android:textSize="@dimen/text_size_30"
                             app:layout_constraintEnd_toStartOf="@id/balance_middle_part"
@@ -122,7 +121,9 @@
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="1" />
+                            android:text="0"
+                            app:layout_constraintVertical_bias="1"
+                            tools:text="462 308" />
 
                         <TextView
                             android:id="@+id/balance_middle_part"
@@ -137,7 +138,8 @@
                             app:layout_constraintStart_toEndOf="@id/balance_first_part"
                             app:layout_constraintTop_toTopOf="@id/balance_first_part"
                             app:layout_constraintVertical_bias=".8"
-                            tools:text=".492404" />
+                            android:text=".0000"
+                            tools:text=".4924" />
 
                         <TextView
                             android:id="@+id/balance_last_part"

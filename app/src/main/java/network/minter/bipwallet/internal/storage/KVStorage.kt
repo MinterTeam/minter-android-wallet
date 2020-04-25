@@ -28,6 +28,10 @@ package network.minter.bipwallet.internal.storage
 import com.orhanobut.hawk.Hawk
 import com.orhanobut.hawk.Storage
 import com.orhanobut.hawk.StorageBatch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -41,7 +45,7 @@ open class KVStorage : Storage {
     private var mDbName = Hawk.DEFAULT_DB_TAG
     private val dataLock: MutableMap<String, Any> = ConcurrentHashMap()
 
-    constructor() {}
+    constructor()
     constructor(dbTag: String) {
         mDbName = dbTag
     }
@@ -56,6 +60,12 @@ open class KVStorage : Storage {
     override fun <T> put(key: String, value: T): Boolean {
         return synchronized(makeLock(key)) {
             Hawk.db(mDbName).put(key, value)
+        }
+    }
+
+    fun <T> putAsync(key: String, value: T): Job {
+        return CoroutineScope(Dispatchers.IO).launch {
+            put(key, value)
         }
     }
 
@@ -94,6 +104,12 @@ open class KVStorage : Storage {
     override fun delete(key: String): Boolean {
         return synchronized(makeLock(key)) {
             Hawk.db(mDbName).delete(key)
+        }
+    }
+
+    fun deleteAsync(key: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            delete(key)
         }
     }
 
