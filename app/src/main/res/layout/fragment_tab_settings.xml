@@ -56,6 +56,7 @@
         layout="@layout/include_testnet_warning_view"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <ScrollView
@@ -106,6 +107,7 @@
             <TextView
                 android:id="@+id/def_wallet_hint"
                 android:layout_width="0dp"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:fontFamily="@font/_inter_regular"

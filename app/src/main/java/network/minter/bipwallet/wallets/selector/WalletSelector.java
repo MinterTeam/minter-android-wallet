@@ -166,8 +166,10 @@ public class WalletSelector extends FrameLayout {
     }
 
     public void setWallets(List<WalletItem> addresses) {
-        mAdapter.setWallets(addresses);
-        mAdapter.notifyDataSetChanged();
+        post(() -> {
+            mAdapter.setWallets(addresses);
+            mAdapter.notifyDataSetChanged();
+        });
     }
 
     private void dismissPopup() {

@@ -66,10 +66,10 @@ import network.minter.bipwallet.delegation.views.DelegationListPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextExtensions.getColorCompat
-import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.helpers.DateHelper.toDateMonthOptYear
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
 import network.minter.explorer.models.RewardStatistics
@@ -201,6 +201,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
         super.onCreate(savedInstanceState)
         binding = ActivityDelegationListBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.testnetWarning.visibleForTestnet()
 
         setupToolbar(binding.toolbar)
         presenter.handleExtras(intent)
@@ -213,7 +214,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
         binding.list.layoutManager = LinearLayoutManager(this)
         mItemSeparator = BorderedItemSeparator(this, R.drawable.shape_bottom_separator, false, true)
         binding.list.addItemDecoration(mItemSeparator!!)
-        ContextHelper.showTestnetBanner(this, binding.testnetWarning.root)
+
         setupChart()
     }
 

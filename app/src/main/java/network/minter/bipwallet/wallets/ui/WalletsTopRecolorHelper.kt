@@ -104,6 +104,7 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
             view.overlay.alpha = overlayAlpha
         } else if (percent == 0f) {
             view.overlay.visibility = View.VISIBLE
+            view.overlay.alpha = 1.0f
         } else {
             view.overlay.visibility = View.GONE
         }

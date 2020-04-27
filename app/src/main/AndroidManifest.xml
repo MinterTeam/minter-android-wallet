@@ -59,6 +59,10 @@
             android:name="io.fabric.ApiKey"
             android:value="e0c0d96cb82d0098481845be3477bc7970f956e3" />
 
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="barcode" />
+
         <provider
             android:name=".internal.system.WalletFileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -69,6 +73,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
 
         <activity
             android:name="network.minter.bipwallet.auth.ui.AuthActivity"
