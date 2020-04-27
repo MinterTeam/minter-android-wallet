@@ -13,3 +13,4 @@ app/fabric.properties
 crashlytics-build.properties
 com_crashlytics_export_strings.xml
 centrifuge/build
+app/google-services.json
