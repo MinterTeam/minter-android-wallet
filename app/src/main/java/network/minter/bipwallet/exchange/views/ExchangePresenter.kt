@@ -245,6 +245,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         signSendTx(dialog, txData, initData, balance)
                     }
                     .onErrorResumeNext(toGateError())
+                    .joinToUi()
                     .subscribe(
                             { result: GateResult<TransactionSendResult> ->
                                 onSuccessExecuteTransaction(result)
@@ -368,8 +369,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
         Timber.e(errorResult.message, "Unable to send transaction")
         viewState.startDialog { ctx: Context ->
             ConfirmDialog.Builder(ctx, "Unable to send transaction")
-                    .setText((errorResult.message))
-                    .setNegativeAction(R.string.btn_close)
+                    .setText((errorResult.humanError()))
+                    .setPositiveAction(R.string.btn_close)
                     .create()
         }
     }
@@ -378,7 +379,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         Timber.e("Unable to send transaction: %s", errorResult.error?.message)
         viewState.startDialog { ctx: Context ->
             ConfirmDialog.Builder(ctx, "Unable to send transaction")
-                    .setText((errorResult.error?.message ?: "Caused unknown error"))
+                    .setText((errorResult.message ?: "Caused unknown error"))
                     .setPositiveAction(R.string.btn_close)
                     .create()
         }
@@ -523,10 +524,11 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     } else {
                         mBuyAmount = res.amount
                     }
+                    viewState.setError("income_coin", null)
                     viewState.showCalculationProgress(false)
                     viewState.setCalculation(res.calculation ?: "")
                 },
-                { err: String? ->
+                { err: String ->
                     viewState.showCalculationProgress(false)
                     viewState.hideCalculation()
                     viewState.setError("income_coin", err)

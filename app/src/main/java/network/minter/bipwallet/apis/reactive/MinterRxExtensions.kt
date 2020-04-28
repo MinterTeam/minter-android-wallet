@@ -27,9 +27,32 @@
 package network.minter.bipwallet.apis.reactive
 
 import io.reactivex.Observable
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.RegexReplaceData
+import network.minter.bipwallet.internal.helpers.StringsHelper
+import network.minter.blockchain.models.operational.Transaction
+import network.minter.core.MinterSDK
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.GateResult
 import retrofit2.Call
+import java.math.BigDecimal
+
+val GATE_UNHANDLED_ERRORS = listOf(
+        RegexReplaceData(
+                """(coin\s[a-zA-Z0-9]{3,10}\sreserve\sis\stoo\ssmall\s\()([0-9]+)(\,\srequired\sat\sleast\s)([0-9]+)(\))""".toRegex(),
+                listOf(2, 4)
+        ) { _, v -> BigDecimal(v).divide(Transaction.VALUE_MUL_DEC).humanize() + " " + MinterSDK.DEFAULT_COIN }
+)
+
+fun GateResult<*>.humanError(defValue: String? = "Caused unknown error"): String? {
+    for (d in GATE_UNHANDLED_ERRORS) {
+        if (d.pattern.matches(message)) {
+            return StringsHelper.replaceGroups(message, d)
+        }
+    }
+
+    return message ?: defValue
+}
 
 /**
  * minter-android-wallet. 2020

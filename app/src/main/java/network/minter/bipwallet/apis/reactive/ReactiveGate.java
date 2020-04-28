@@ -68,24 +68,6 @@ public final class ReactiveGate {
             emitter.onComplete();
 
         });
-//        return Observable.create(emitter -> call.clone().enqueue(new Callback<T>() {
-//            @SuppressWarnings("unchecked")
-//            @Override
-//            public void onResponse(@NonNull Call<T> call1, @NonNull Response<T> response) {
-//                if (response.body() == null) {
-//                    emitter.onNext((T) createGateError(response));
-//                } else {
-//                    emitter.onNext(response.body());
-//                }
-//
-//                emitter.onComplete();
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<T> call1, @NonNull Throwable t) {
-//                emitter.onError(t);
-//            }
-//        }));
     }
 
     public static <T> Function<? super Throwable, ? extends ObservableSource<? extends GateResult<T>>> toGateError() {

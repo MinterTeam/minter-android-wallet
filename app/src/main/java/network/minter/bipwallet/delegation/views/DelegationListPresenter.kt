@@ -133,7 +133,7 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
         loadState = MutableLiveData()
         viewState.syncProgress(loadState!!)
         adapter!!.setLoadState(loadState)
-        sourceFactory = DelegationDataSource.Factory(addressRepo, secretRepo.addresses, loadState!!)
+        sourceFactory = DelegationDataSource.Factory(addressRepo, secretRepo.mainWallet, loadState!!)
         val cfg = PagedList.Config.Builder()
                 .setPageSize(50)
                 .setEnablePlaceholders(false)

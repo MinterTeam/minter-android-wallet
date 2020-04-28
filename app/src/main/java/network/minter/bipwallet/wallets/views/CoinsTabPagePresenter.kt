@@ -46,20 +46,17 @@ import javax.inject.Inject
 
 @InjectViewState
 class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPageView>() {
-    @Inject
-    lateinit var accountStorage: CachedRepository<AddressListBalancesTotal, AccountStorage>
+    @Inject lateinit var accountStorage: CachedRepository<AddressListBalancesTotal, AccountStorage>
+    @Inject lateinit var secretStorage: SecretStorage
 
-    @Inject
-    lateinit var secretStorage: SecretStorage
-
-    private var mCoinsAdapter: SimpleRecyclerAdapter<CoinBalance, BaseTabPageFragment.ItemViewHolder>? = null
+    private var adapter: SimpleRecyclerAdapter<CoinBalance, BaseTabPageFragment.ItemViewHolder>? = null
 
     override fun attachView(view: CoinsTabPageView) {
         super.attachView(view)
         accountStorage.update()
     }
 
-    internal fun CoinBalance.getImageUrl(): String {
+    private fun CoinBalance.getImageUrl(): String {
         return MinterProfileApi.getCoinAvatarUrl(coin!!)
     }
 
@@ -69,7 +66,7 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
         viewState.setActionTitle(R.string.btn_exchange)
         viewState.setOnActionClickListener(View.OnClickListener { v -> onClickConvert(v) })
         viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Progress)
-        mCoinsAdapter = SimpleRecyclerAdapter.Builder<CoinBalance, BaseTabPageFragment.ItemViewHolder>()
+        adapter = SimpleRecyclerAdapter.Builder<CoinBalance, BaseTabPageFragment.ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, BaseTabPageFragment.ItemViewHolder::class.java)
                 .setBinder { vh: BaseTabPageFragment.ItemViewHolder, item: CoinBalance, _: Int ->
                     vh.title!!.text = item.coin
@@ -78,13 +75,13 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                     vh.subname!!.visibility = View.GONE
                 }.build()
 
-        viewState.setAdapter(mCoinsAdapter!!)
+        viewState.setAdapter(adapter!!)
 
         accountStorage.observe().joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
                             Timber.d("Update coins list")
-                            mCoinsAdapter!!.dispatchChanges(CoinBalanceDiffUtilImpl::class.java, res.getBalance(secretStorage.mainWallet).coinsList)
+                            adapter!!.dispatchChanges(CoinBalanceDiffUtilImpl::class.java, res.getBalance(secretStorage.mainWallet).coinsList)
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Normal)
                         },
                         { t: Throwable ->

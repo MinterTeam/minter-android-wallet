@@ -57,6 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="?attr/actionBarSize"
+                android:paddingBottom="@dimen/margin_edges"
                 app:layout_collapseMode="pin">
 
                 <TextView
@@ -123,7 +124,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="10dp"
+                android:elevation="@dimen/toolbar_elevation"
                 android:minHeight="?android:attr/actionBarSize"
                 android:theme="@style/WalletPrimaryToolbar.Light"
                 app:layout_collapseMode="pin"
@@ -162,7 +163,7 @@
             style="@style/Wallet.ItemHeader.Small"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_edges_half"
+
             android:background="@color/greyBackground"
             android:text="@string/label_stakes" />
 

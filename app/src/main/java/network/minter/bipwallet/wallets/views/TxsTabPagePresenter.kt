@@ -43,14 +43,12 @@ import javax.inject.Inject
 
 @InjectViewState
 class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageView>() {
-    lateinit var txRepo: RepoTransactions
-        @Inject set
-    lateinit var secretRepo: SecretStorage
-        @Inject set
-    lateinit var validatorsRepo: RepoValidators
-        @Inject set
+    @Inject lateinit var txRepo: RepoTransactions
+    @Inject lateinit var secretRepo: SecretStorage
+    @Inject lateinit var validatorsRepo: RepoValidators
 
-    private var mTransactionsAdapter: TransactionShortListAdapter? = null
+    private var adapter: TransactionShortListAdapter? = null
+
     override fun attachView(view: TxsTabPageView) {
         super.attachView(view)
         txRepo.update()
@@ -58,11 +56,11 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        mTransactionsAdapter = TransactionShortListAdapter(secretRepo.addresses)
-        mTransactionsAdapter!!.setOnExpandDetailsListener { _, tx ->
+        adapter = TransactionShortListAdapter(secretRepo.addresses)
+        adapter!!.setOnExpandDetailsListener { _, tx ->
             viewState.startDetails(tx)
         }
-        viewState.setAdapter(mTransactionsAdapter!!)
+        viewState.setAdapter(adapter!!)
         viewState.setListTitle("Latest Transactions")
         viewState.setActionTitle(R.string.btn_all_txs)
         viewState.setOnActionClickListener(View.OnClickListener {
@@ -73,11 +71,10 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                 .joinToUi()
                 .switchMap { result: List<HistoryTransaction> -> TransactionDataSource.mapToFacade(result) }
                 .switchMap { items: List<TransactionFacade> -> TransactionDataSource.mapValidatorsInfo(validatorsRepo, items) }
-                //.switchMap(items -> mapAddressesInfo(myAddresses, infoRepo, items))
                 .subscribe(
                         { res: List<TransactionFacade> ->
-                            mTransactionsAdapter!!.dispatchChanges(HistoryTransactionDiffUtil::class.java, res, true)
-                            if (mTransactionsAdapter!!.itemCount == 0) {
+                            adapter!!.dispatchChanges(HistoryTransactionDiffUtil::class.java, res, true)
+                            if (adapter!!.itemCount == 0) {
                                 viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Empty)
                             } else {
                                 viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Normal)

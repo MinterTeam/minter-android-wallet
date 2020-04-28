@@ -51,7 +51,7 @@ import java.math.BigDecimal
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 class ExchangeCalculator private constructor(private val mBuilder: Builder) {
-    fun calculate(opType: OperationType, onResult: (CalculationResult) -> Unit, onErrorMessage: (String?) -> Unit) {
+    fun calculate(opType: OperationType, onResult: (CalculationResult) -> Unit, onErrorMessage: (String) -> Unit) {
         val repo = mBuilder.estimateRepo
 
 
@@ -83,7 +83,6 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                         }
                         out.amount = res.result.amount
                         out.commission = res.result.getCommission()
-                        onErrorMessage(null)
 
                         val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
                         val getAccount = findAccountByCoin(sourceCoin)
@@ -135,7 +134,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                 return@subscribe
                             }
                         }
-                        onErrorMessage(null)
+
                         val out = CalculationResult()
                         out.calculation = String.format("%s %s", bdHuman(res.result.amount), targetCoin)
                         out.amount = res.result.amount

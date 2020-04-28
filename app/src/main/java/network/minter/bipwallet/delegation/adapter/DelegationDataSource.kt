@@ -29,8 +29,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import androidx.paging.PageKeyedDataSource
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Function
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer
+import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.sortByValue
 import network.minter.core.MinterSDK
@@ -39,7 +39,6 @@ import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.DelegationList
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.repo.ExplorerAddressRepository
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
@@ -52,16 +51,10 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
-        if (factory.mAddressList.isEmpty()) {
-            Timber.w("Unable to load transactions list(page: 1): user address list is empty")
-            factory.loadState.postValue(LoadState.Loaded)
-            callback.onResult(emptyList(), null, null)
-            factory.loadState.postValue(LoadState.Empty)
-            return
-        }
-        ReactiveExplorer.rxExp(factory.mRepo.getDelegations(factory.mAddressList[0], 1))
+
+        factory.mRepo.getDelegations(factory.mainWallet, 1).rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
-                .map(Function<ExpResult<DelegationList>, ExpResult<MutableList<DelegatedItem>>> { res: ExpResult<DelegationList> -> mapToDelegationItem(res) })
+                .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
                     factory.loadState.postValue(LoadState.Loaded)
@@ -75,15 +68,9 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
-        if (factory.mAddressList.isEmpty()) {
-            Timber.w("Unable to load previous transactions list (page: %s): user address list is empty", params.key)
-            factory.loadState.postValue(LoadState.Loaded)
-            callback.onResult(emptyList(), null)
-            return
-        }
-        ReactiveExplorer.rxExp(factory.mRepo.getDelegations(factory.mAddressList[0], params.key.toLong()))
+        factory.mRepo.getDelegations(factory.mainWallet, params.key.toLong()).rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
-                .map(Function<ExpResult<DelegationList>, ExpResult<MutableList<DelegatedItem>>> { res: ExpResult<DelegationList> -> mapToDelegationItem(res) })
+                .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
                     factory.loadState.postValue(LoadState.Loaded)
@@ -96,9 +83,9 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
         factory.loadState.postValue(LoadState.Loading)
 
-        ReactiveExplorer.rxExp(factory.mRepo.getDelegations(factory.mAddressList[0], params.key.toLong()))
+        factory.mRepo.getDelegations(factory.mainWallet, params.key.toLong()).rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
-                .map(Function<ExpResult<DelegationList>, ExpResult<MutableList<DelegatedItem>>> { res: ExpResult<DelegationList> -> mapToDelegationItem(res) })
+                .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
                     factory.loadState.postValue(LoadState.Loaded)
@@ -176,7 +163,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     class Factory(
             val mRepo: ExplorerAddressRepository,
-            val mAddressList: List<MinterAddress>,
+            val mainWallet: MinterAddress,
             val loadState: MutableLiveData<LoadState>
     ) : DataSource.Factory<Int, DelegatedItem>() {
 
