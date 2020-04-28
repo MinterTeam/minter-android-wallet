@@ -38,6 +38,7 @@ import network.minter.bipwallet.databinding.ActivityConvertCoinBinding
 import network.minter.bipwallet.exchange.contract.ConvertCoinView
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
@@ -60,7 +61,8 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
 
         setupToolbar(binding.toolbar)
         binding.tabs.tabGravity = TabLayout.GRAVITY_FILL
-//        ContextHelper.showTestnetBanner(this, binding.testNetWarning)
+
+        binding.testnetWarning.visibleForTestnet()
     }
 
     override fun setupTabs() {
@@ -96,10 +98,6 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
 
             override fun getItem(position: Int): Fragment {
                 return sTabs[position].newInstance()
-            }
-
-            override fun instantiateItem(container: ViewGroup, position: Int): Any {
-                return super.instantiateItem(container, position)
             }
 
             override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {

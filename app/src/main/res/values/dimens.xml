@@ -101,5 +101,6 @@
     <dimen name="pin_pad_top_offset">32dp</dimen>
     <dimen name="icon_padding">4dp</dimen>
     <dimen name="icon_wh">32dp</dimen>
+    <dimen name="toolbar_elevation">10dp</dimen>
 
 </resources>

@@ -31,7 +31,6 @@ import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp
-import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
@@ -55,21 +54,12 @@ class AccountStorage(
         private val addressRepo: ExplorerAddressRepository
 ) : CachedEntity<AddressListBalancesTotal> {
 
-    private val cacheKey: String
-        get() {
-            return if (secretStorage.hasSecrets) {
-                KEY_BALANCE + secretStorage.mainWallet.toString().toLowerCase()
-            } else {
-                KEY_BALANCE + "none"
-            }
-        }
-
     companion object {
         private const val KEY_BALANCE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance_"
     }
 
     override fun getData(): AddressListBalancesTotal {
-        return storage[cacheKey, AddressListBalancesTotal(secretStorage.addresses)]
+        return storage[KEY_BALANCE, AddressListBalancesTotal(secretStorage.addresses)]
     }
 
     val mainWallet: AddressBalanceTotal
@@ -79,19 +69,20 @@ class AccountStorage(
         get() = getData()
 
     override fun onAfterUpdate(result: AddressListBalancesTotal) {
-        storage.putAsync(cacheKey, result)
+        storage.putAsync(KEY_BALANCE, result)
     }
 
     override fun onClear() {
-        storage.delete(cacheKey)
+        storage.delete(KEY_BALANCE)
     }
 
     override fun isDataReady(): Boolean {
-        return storage.contains(cacheKey)
+        return storage.contains(KEY_BALANCE)
     }
 
     override fun getUpdatableData(): Observable<AddressListBalancesTotal> {
-        return secretStorage.mainWallet.toObservable()
+        return Observable
+                .fromIterable(secretStorage.addresses)
                 .flatMap(mapBalances())
                 .toList()
                 .map(aggregate())

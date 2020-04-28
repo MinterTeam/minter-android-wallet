@@ -34,7 +34,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="10dp"
+        android:elevation="@dimen/toolbar_elevation"
         android:minHeight="?android:attr/actionBarSize"
         android:theme="@style/WalletPrimaryToolbar.Light"
         app:layout_collapseMode="none"
@@ -62,6 +62,7 @@
         app:layout_collapseMode="none">
 
         <include
+            android:id="@+id/testnet_warning"
             layout="@layout/include_testnet_warning_view"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize" />
@@ -70,8 +71,8 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:elevation="@dimen/card_elevation"
+            android:background="@color/white"
+            android:elevation="@dimen/toolbar_elevation"
             app:tabIndicatorColor="@color/colorPrimaryLight"
             app:tabSelectedTextColor="@color/colorPrimaryLight"
             app:tabTextAppearance="@style/Wallet.TabLayout.TabItem"
