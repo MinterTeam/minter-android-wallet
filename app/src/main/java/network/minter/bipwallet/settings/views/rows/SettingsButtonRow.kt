@@ -156,7 +156,7 @@ class SettingsButtonRow : MultiRowContract.Row<SettingsButtonRow.ViewHolder> {
 //        fun onClick(view: View, sharedView: View, value: String)
 //    }
 
-    class ViewHolder(itemView: View?) : RowViewHolder(itemView) {
+    class ViewHolder(itemView: View) : RowViewHolder(itemView) {
         @JvmField @BindView(R.id.item_key)
         var key: TextView? = null
 
@@ -167,7 +167,7 @@ class SettingsButtonRow : MultiRowContract.Row<SettingsButtonRow.ViewHolder> {
         var icon: ImageView? = null
 
         init {
-            ButterKnife.bind(this, itemView!!)
+            ButterKnife.bind(this, itemView)
         }
     }
 }

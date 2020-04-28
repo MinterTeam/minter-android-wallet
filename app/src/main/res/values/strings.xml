@@ -324,5 +324,6 @@
     <string name="dialog_label_unbond_progress">Unbonding...</string>
     <string name="btn_save_changes">Save Changes</string>
     <string name="dialog_title_your_address">Your Address</string>
+    <string name="empty_address_book">No records were found</string>
 
 </resources>

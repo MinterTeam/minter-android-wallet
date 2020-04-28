@@ -25,7 +25,6 @@
  */
 package network.minter.bipwallet.addressbook.views
 
-import android.content.Intent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
@@ -55,10 +54,6 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
         mAdapter.setOnItemClickListener { contact: AddressContact -> onSelectContact(contact) }
     }
 
-    override fun handleExtras(intent: Intent?) {
-        super.handleExtras(intent)
-    }
-
     fun onAddAddress() {
         viewState.startAddContact({ updateList() }, null)
     }
@@ -85,7 +80,15 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
         addressBookRepo.findAll()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({ addressContacts: List<AddressContact> -> onDataLoaded(addressContacts) }) { t: Throwable? -> Timber.e(t) }
+                .subscribe(
+                        { addressContacts: List<AddressContact> ->
+                            viewState.showEmpty(addressContacts.isEmpty())
+                            onDataLoaded(addressContacts)
+                        },
+                        { t: Throwable ->
+                            Timber.e(t)
+                        }
+                )
     }
 
     private fun onDataLoaded(addressContacts: List<AddressContact>) {

@@ -30,30 +30,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:transitionGroup="false"
-        app:elevation="@dimen/card_elevation"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_close_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title=" ">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="?android:attr/actionBarSize"
-            android:theme="@style/WalletPrimaryToolbar"
-            app:layout_collapseMode="none"
-            app:maxButtonHeight="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back_white_compat"
-            app:title="@string/title_confirm_tx"
-            app:titleTextColor="@android:color/white" />
-    </com.google.android.material.appbar.AppBarLayout>
+            android:text="@string/title_confirm_tx" />
+    </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
         android:layout_width="0dp"
@@ -62,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar">
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -70,115 +66,35 @@
             android:focusableInTouchMode="false"
             android:paddingTop="@dimen/margin_edges_half">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_input_first"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/input_list"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="@dimen/margin_edges_medium"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                android:clipChildren="false"
-                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:passwordToggleDrawable="@null"
-                tools:hint="You\'re sending">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/input_first"
-                    style="@style/Wallet.Input.Disabled"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:enabled="false"
-                    android:inputType="textMultiLine"
-                    android:paddingStart="4dp"
-                    android:textSize="@dimen/text_size_default"
-                    tools:text="12 000.4444 HOOKAH" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_input_second"
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                android:clipChildren="false"
-                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_first"
-                app:passwordToggleDrawable="@null"
-                tools:hint="To">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/input_second"
-                    style="@style/Wallet.Input.Disabled"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:enabled="false"
-                    android:inputType="textMultiLine"
-                    android:paddingStart="4dp"
-                    android:textSize="@dimen/text_size_default"
-                    tools:text="Mx86d167ffe6c81dd83a20e3731ed66dddaac42488Mx86d167ffe6c81dd83a20e3731ed66dddaac42488" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_input_payload"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges_input"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="@dimen/margin_edges_input"
-                android:clipChildren="false"
-                android:hint="@string/label_payload_short"
-                app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
-                app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_second"
-                app:passwordToggleDrawable="@null">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/input_payload"
-                    style="@style/Wallet.Input.Disabled"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:enabled="false"
-                    android:inputType="textMultiLine"
-                    android:paddingStart="4dp"
-                    android:textSize="@dimen/text_size_default"
-                    tools:text="Mx86d167ffe6c81dd83a20e3731ed66dddaac42488"
-
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
+                tools:itemCount="3"
+                tools:listitem="@layout/row_input_field" />
 
 
             <!--LABELS-->
-            <View
+            <Space
                 android:id="@+id/label_guide"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="24dp"
+                android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_input_payload" />
+                app:layout_constraintTop_toBottomOf="@id/input_list" />
 
             <TextView
                 android:id="@+id/fee_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="@dimen/margin_edges_half"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:text="@string/tx_send_fee_hint"
-                android:textSize="@dimen/text_size_default"
+                android:textSize="@dimen/text_size_14"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/label_guide" />
@@ -187,24 +103,20 @@
                 android:id="@+id/fee_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges_half"
-                android:layout_marginEnd="@dimen/margin_edges"
-                app:layout_goneMarginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_large"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:textAlignment="textEnd"
-                android:textSize="@dimen/text_size_default"
+                android:textSize="@dimen/text_size_14"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/fee_label"
                 app:layout_constraintTop_toBottomOf="@id/label_guide"
-                android:paddingStart="@dimen/margin_edges"
-                android:paddingEnd="0dp"
                 tools:text="@string/tx_send_fee_value" />
 
-            <View
-                android:id="@+id/sep2"
+            <Space
+                android:id="@+id/button_guide"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/margin_edges_input"
-                android:background="@color/greySeparator"
+                android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/fee_value" />
@@ -216,11 +128,13 @@
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
                 android:textColor="@color/errorColor"
+                android:textSize="@dimen/text_size_14"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sep2"
+                app:layout_constraintTop_toBottomOf="@id/button_guide"
                 tools:text="Some uncaught error"
                 tools:visibility="visible" />
 

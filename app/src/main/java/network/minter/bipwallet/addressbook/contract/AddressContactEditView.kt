@@ -43,4 +43,5 @@ interface AddressContactEditView : MvpView {
     fun setInputAddress(address: String?)
     fun setInputTitle(title: String?)
     fun submitDialog()
+    fun validate()
 }

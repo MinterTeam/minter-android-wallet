@@ -27,24 +27,18 @@
 package network.minter.bipwallet.tx.ui
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.View
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.google.android.material.textfield.TextInputLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.ActivityExternalTransactionBinding
 import network.minter.bipwallet.external.*
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
@@ -54,7 +48,6 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDi
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.system.ActivityBuilder
-import network.minter.bipwallet.internal.views.widgets.WalletButton
 import network.minter.bipwallet.security.PauseTimer
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter
@@ -72,85 +65,33 @@ import javax.inject.Provider
 @TestnetWebDeepLink("tx", "tx/{data}")
 @TestnetWebDeepLinkInsecure("tx", "tx/{data}")
 class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransactionView {
-    @JvmField @Inject
-    var presenterProvider: Provider<ExternalTransactionPresenter>? = null
+    companion object {
+        const val EXTRA_RAW_DATA = "EXTRA_RAW_TX"
+    }
 
-    @JvmField @InjectPresenter
-    var presenter: ExternalTransactionPresenter? = null
+    @Inject lateinit var presenterProvider: Provider<ExternalTransactionPresenter>
+    @InjectPresenter lateinit var presenter: ExternalTransactionPresenter
 
-    @JvmField @BindView(R.id.toolbar)
-    var toolbar: Toolbar? = null
-
-    @JvmField @BindView(R.id.input_first)
-    var inputFirst: AppCompatEditText? = null
-
-    @JvmField @BindView(R.id.layout_input_first)
-    var layoutInputFirst: TextInputLayout? = null
-
-    @JvmField @BindView(R.id.input_second)
-    var inputSecond: AppCompatEditText? = null
-
-    @JvmField @BindView(R.id.layout_input_second)
-    var layoutInputSecond: TextInputLayout? = null
-
-    @JvmField @BindView(R.id.input_payload)
-    var inputPayload: AppCompatEditText? = null
-
-    @JvmField @BindView(R.id.fee_value)
-    var feeValue: TextView? = null
-
-    @JvmField @BindView(R.id.fee_label)
-    var feeLabel: TextView? = null
-
-    @JvmField @BindView(R.id.text_error)
-    var textError: TextView? = null
-
-    @JvmField @BindView(R.id.action)
-    var action: WalletButton? = null
-
-    @JvmField @BindView(R.id.cancel_action)
-    var cancelAction: WalletButton? = null
+    private lateinit var b: ActivityExternalTransactionBinding
     private var mCurrentDialog: WalletDialog? = null
-    override fun setFirstLabel(label: CharSequence) {
-        layoutInputFirst!!.hint = label
+
+    override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
+        b.inputList.adapter = adapter
     }
 
-    override fun setFirstValue(value: CharSequence) {
-        inputFirst!!.setText(value)
-    }
 
-    override fun setSecondLabel(label: CharSequence) {
-        layoutInputSecond!!.hint = label
-    }
-
-    override fun setSecondValue(value: CharSequence) {
-        inputSecond!!.setText(value)
-    }
-
-    override fun setPayload(payloadString: CharSequence) {
-        inputPayload!!.setText(payloadString)
-    }
-
-    override fun setCommission(fee: CharSequence) {
+    override fun setFee(fee: CharSequence) {
         if (fee.isEmpty()) {
             return
         }
-        feeValue!!.text = fee
+        b.feeValue.text = fee
         if (startsFromNumber(fee)) {
-            feeLabel!!.visibility = View.VISIBLE
-            feeValue!!.textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+            b.feeLabel.visibility = View.VISIBLE
+            b.feeValue.textAlignment = View.TEXT_ALIGNMENT_TEXT_END
         } else {
-            feeLabel!!.visibility = View.GONE
-            feeValue!!.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            b.feeLabel.visibility = View.GONE
+            b.feeValue.textAlignment = View.TEXT_ALIGNMENT_CENTER
         }
-    }
-
-    override fun setFirstVisible(visibility: Int) {
-        layoutInputFirst!!.visibility = visibility
-    }
-
-    override fun setSecondVisible(visibility: Int) {
-        layoutInputSecond!!.visibility = visibility
     }
 
     override fun startDialog(executor: (Context) -> WalletDialog) {
@@ -162,16 +103,12 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         mCurrentDialog!!.setCancelable(cancelable)
     }
 
-    override fun setPayloadTextChangedListener(textWatcher: TextWatcher) {
-        inputPayload!!.addTextChangedListener(textWatcher)
-    }
-
     override fun setOnConfirmListener(listener: View.OnClickListener) {
-        action!!.setOnClickListener(listener)
+        b.action.setOnClickListener(listener)
     }
 
     override fun setOnCancelListener(listener: View.OnClickListener) {
-        cancelAction!!.setOnClickListener(listener)
+        b.cancelAction.setOnClickListener(listener)
     }
 
     override fun hideProgress() {
@@ -217,22 +154,20 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         }
     }
 
-    override fun startExplorer(txHash: String?) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)))
+    override fun startExplorer(hash: String?) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)))
     }
 
     override fun disableAll() {
-        setFirstVisible(View.GONE)
-        setSecondVisible(View.GONE)
-        action!!.isEnabled = false
-        action!!.isClickable = false
-        cancelAction!!.isEnabled = true
-        cancelAction!!.isClickable = true
+        b.action.isEnabled = false
+        b.action.isClickable = false
+        b.cancelAction.isEnabled = true
+        b.cancelAction.isClickable = true
     }
 
     @ProvidePresenter
     fun providePresenter(): ExternalTransactionPresenter {
-        return presenterProvider!!.get()
+        return presenterProvider.get()
     }
 
     override fun onStop() {
@@ -242,29 +177,36 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_external_transaction)
-        ButterKnife.bind(this)
-        setupToolbar(toolbar!!)
-        presenter!!.handleExtras(intent)
+        b = ActivityExternalTransactionBinding.inflate(layoutInflater)
+        setContentView(b.root)
+
+        b.inputList.layoutManager = LinearLayoutManager(this)
+
+        setupToolbar(b.toolbar)
+        presenter.handleExtras(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        presenter!!.handleExtras(intent)
+        presenter.handleExtras(intent)
     }
 
     private fun checkIsLastActivity(): Boolean {
-        try {
-            val mngr = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-            if (mngr != null) {
-                val taskList = mngr.getRunningTasks(3)
-                return taskList[0].numActivities == 1 && taskList[0].topActivity!!.className == this.javaClass.name
-            }
-        } catch (ignore: Throwable) {
-            Timber.w(ignore, "Unable to detect left activity count")
-            return false
+        return isTaskRoot.let {
+            Timber.d("Is task root: %b", it)
+            it
         }
-        return false
+//        try {
+//            val mngr = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+//            if (mngr != null) {
+//                val taskList = mngr.getRunningTasks(3)
+//                return taskList[0].numActivities == 1 && taskList[0].topActivity!!.className == this.javaClass.name
+//            }
+//        } catch (ignore: Throwable) {
+//            Timber.w(ignore, "Unable to detect left activity count")
+//            return false
+//        }
+//        return false
     }
 
     class Builder : ActivityBuilder {
@@ -292,7 +234,4 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         }
     }
 
-    companion object {
-        const val EXTRA_RAW_DATA = "EXTRA_RAW_TX"
-    }
 }

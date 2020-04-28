@@ -30,16 +30,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.ButterKnife
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
-import com.edwardstock.inputfield.form.validators.EmptyValidator
 import com.edwardstock.inputfield.form.validators.LengthValidator
 import com.edwardstock.inputfield.form.validators.RegexValidator
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.contract.AddressContactEditView
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.views.AddressContactEditPresenter
@@ -63,7 +60,7 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
     @InjectPresenter lateinit var presenter: AddressContactEditPresenter
 
     private lateinit var binding: DialogAddresscontactEditBinding
-    private var mInputGroup: InputGroup = InputGroup()
+    private var inputGroup: InputGroup = InputGroup()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -76,21 +73,34 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.dialog_addresscontact_edit, container, false)
-        ButterKnife.bind(this, view)
-        mInputGroup = InputGroup()
-        mInputGroup.addInput(binding.inputAddress)
-        mInputGroup.addInput(binding.inputTitle)
-        val minterAddressOrPubkeyValidator = RegexValidator(String.format("%s|%s", MinterAddress.ADDRESS_PATTERN, MinterPublicKey.PUB_KEY_PATTERN))
-        minterAddressOrPubkeyValidator.errorMessage = "Incorrect recipient format"
-        mInputGroup.addValidator(binding.inputAddress, minterAddressOrPubkeyValidator)
-        mInputGroup.addValidator(binding.inputTitle, EmptyValidator("Title can't be empty"))
-        val titleValidator = LengthValidator(1, 18)
-        titleValidator.errorMessage = "Title length can't be more than 18 symbols"
-        mInputGroup.addValidator(binding.inputTitle, titleValidator)
+        binding = DialogAddresscontactEditBinding.inflate(inflater, container, false)
+
+        inputGroup.enableInputDebounce = false
+
+
+        inputGroup.addInput(binding.inputAddress)
+        inputGroup.addInput(binding.inputTitle)
+
+        val minterAddressOrPubkeyValidator = RegexValidator("${MinterAddress.ADDRESS_PATTERN}|${MinterPublicKey.PUB_KEY_PATTERN}").apply {
+            errorMessage = "Incorrect recipient format"
+            isRequired = true
+        }
+        inputGroup.addValidator(binding.inputAddress, minterAddressOrPubkeyValidator)
+
+        val titleValidator = LengthValidator(1, 18).apply {
+            errorMessage = "Title length should be from 1 to 18 symbols"
+        }
+        inputGroup.addValidator(binding.inputTitle, titleValidator)
+
         binding.inputAddress.input.setOnClickListener { ViewHelper.tryToPasteMinterAddressFromCB(it, binding.inputAddress.input) }
+
         presenter.handleExtras(arguments)
-        return view
+
+        return binding.root
+    }
+
+    override fun validate() {
+        inputGroup.validate(true).subscribe()
     }
 
     override fun setOnSubmitListener(listener: View.OnClickListener) {
@@ -98,11 +108,11 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
     }
 
     override fun addTextChangedListener(listener: (input: InputWrapper, valid: Boolean) -> Unit) {
-        mInputGroup.addTextChangedListener(listener)
+        inputGroup.addTextChangedListener(listener)
     }
 
     override fun addFormValidatorListener(listener: (Boolean) -> Unit) {
-        mInputGroup.addFormValidateListener(listener)
+        inputGroup.addFormValidateListener(listener)
     }
 
     override fun setEnableSubmit(enable: Boolean) {

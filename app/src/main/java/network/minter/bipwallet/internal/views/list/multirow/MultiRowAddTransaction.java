@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -103,8 +103,8 @@ final public class MultiRowAddTransaction {
 
         Stream.of(mItems)
                 .forEach(item -> {
-                    mAdapter.get().mItems.remove(item);
-                    mAdapter.get().mItems.add(item);
+                    mAdapter.get().getMItems().remove(item);
+                    mAdapter.get().getMItems().add(item);
                 });
 
         mAdapter.get().sort();

@@ -35,7 +35,8 @@ import network.minter.bipwallet.internal.dialogs.ActionListener
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AddressBookView : MvpView {
-    fun setAdapter(adapter: RecyclerView.Adapter<*>?)
+    fun setAdapter(adapter: RecyclerView.Adapter<*>)
+    fun showEmpty(show: Boolean)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startAddContact(onSubmit: ActionListener, onDismiss: ActionListener?)

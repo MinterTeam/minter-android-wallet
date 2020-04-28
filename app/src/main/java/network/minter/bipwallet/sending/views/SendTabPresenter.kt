@@ -187,10 +187,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         accountStorage.update()
     }
 
-    override fun detachView(view: SendView) {
-        super.detachView(view)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) {
@@ -699,6 +695,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                         return@switchMap signSendTx(dialog, txInitData.nonce!!, type, amountToSend)
                     }
                     .doFinally { onExecuteComplete() }
+                    .joinToUi()
                     .subscribe(
                             { result: GateResult<TransactionSendResult> ->
                                 onSuccessExecuteTransaction(result)

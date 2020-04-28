@@ -51,6 +51,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
 
     override fun handleExtras(bundle: Bundle?) {
         super.handleExtras(bundle)
+
         val c = getParcelExtra<AddressContact>(bundle, AddressContactEditDialog.ARG_CONTACT)
         mContact = AddressContact()
         if (c == null) {
@@ -71,10 +72,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
             viewState.setInputAddress(mContact!!.address)
             viewState.setInputTitle(mContact!!.name)
         }
-    }
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
         viewState.setOnSubmitListener(View.OnClickListener { view: View ->
             onSubmit(view)
         })

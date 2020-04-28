@@ -27,8 +27,7 @@ package network.minter.bipwallet.tx.views
 
 import android.content.Context
 import android.content.Intent
-import android.text.Editable
-import android.text.TextWatcher
+import android.content.res.Resources
 import android.view.View
 import com.airbnb.deeplinkdispatch.DeepLink
 import io.reactivex.BackpressureStrategy
@@ -44,19 +43,21 @@ import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.reactive.ReactiveGate
 import network.minter.bipwallet.apis.reactive.rxGate
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.common.Preconditions
+import network.minter.bipwallet.internal.common.Preconditions.firstNonNull
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction
 import network.minter.bipwallet.internal.helpers.DeepLinkHelper
-import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.clamp
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
+import network.minter.bipwallet.tx.ui.InputFieldRow
 import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.*
 import network.minter.blockchain.utils.Base64UrlSafe
@@ -85,24 +86,21 @@ import javax.inject.Inject
  */
 @InjectViewState
 class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<ExternalTransactionView>() {
-    lateinit var secretStorage: SecretStorage
-        @Inject set
-    lateinit var estimateRepo: GateEstimateRepository
-        @Inject set
-    lateinit var gasRepo: GateGasRepository
-        @Inject set
-    lateinit var gateTxRepo: GateTransactionRepository
-        @Inject set
-    lateinit var accountStorage: RepoAccounts
-        @Inject set
-    lateinit var cachedTxRepo: RepoTransactions
-        @Inject set
+    @Inject lateinit var secretStorage: SecretStorage
+    @Inject lateinit var estimateRepo: GateEstimateRepository
+    @Inject lateinit var gasRepo: GateGasRepository
+    @Inject lateinit var gateTxRepo: GateTransactionRepository
+    @Inject lateinit var accountStorage: RepoAccounts
+    @Inject lateinit var cachedTxRepo: RepoTransactions
+    @Inject lateinit var res: Resources
 
     private var mExtTx: ExternalTransaction? = null
     private var mFrom: MinterAddress? = null
     private var mPayload: BytesData? = null
     private var mCheckPassword: String? = null
     private var mGasPrice = BigInteger.ONE
+    private val adapter = MultiRowAdapter()
+
     override fun attachView(view: ExternalTransactionView) {
         super.attachView(view)
         accountStorage.update()
@@ -184,27 +182,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
         }
         mPayload = mExtTx?.payload
-        calculateFee(mExtTx)
+
+        if (mExtTx != null) {
+            calculateFee(mExtTx!!)
+        }
+
         try {
-            fillData(mExtTx)
+            fillData(mExtTx!!)
         } catch (t: Throwable) {
             showTxErrorDialog("Invalid transaction data: %s", t.message!!)
         }
     }
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-        viewState.setPayloadTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable) {
-                mPayload = BytesData(s.toString().toByteArray())
-                calculateFee(mExtTx)
-            }
-        })
-    }
-
-    protected fun getTxInitData(address: MinterAddress?): Observable<TxInitData> {
+    private fun getTxInitData(address: MinterAddress?): Observable<TxInitData> {
         return Observable.combineLatest(
                 estimateRepo.getTransactionCount(address!!).rxGate(),
                 gasRepo.minGas.rxGate(),
@@ -275,36 +265,47 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         return true
     }
 
-    private fun calculateFee(tx: ExternalTransaction?) {
-        val bytesLen = Preconditions.firstNonNull(mPayload, tx!!.payload, BytesData(CharArray(0))).size().toLong()
-        var baseFee = tx.type.fee
-        if (tx.type == OperationType.Multisend) {
-            val txData = tx.getData(TxMultisend::class.java)
-            if (txData.items.size == 0) {
-                onFailedExecuteTransaction(Exception("Multisend transaction must contains at least 1 target address"))
+    private fun calculateFee(tx: ExternalTransaction) {
+        val bytesLen = firstNonNull(mPayload, tx.payload, BytesData(CharArray(0))).size().toLong()
+        var baseFee: BigDecimal
+
+        when (tx.type) {
+            OperationType.Multisend -> {
+                val txData = tx.getData(TxMultisend::class.java)
+                if (txData.items.size == 0) {
+                    onFailedExecuteTransaction(Exception("Multisend transaction must contains at least 1 target address"))
+                    return
+                }
+
+                //10+(n-1)*5 units
+                baseFee = OperationType.SendCoin.fee
+                baseFee = baseFee.add(
+                        BigDecimal(clamp(txData.items.size - 1, 0)).multiply(OperationType.FEE_BASE.multiply(BigDecimal("5")))
+                )
+            }
+            OperationType.CreateCoin -> {
+                // https://docs.minter.network/#section/Commissions
+                val txData = tx.getData(TxCreateCoin::class.java)
+                baseFee = TxCreateCoin.calculateCreatingCost(txData.symbol)
+            }
+            OperationType.RedeemCheck -> {
+                viewState.setFee("You don't pay transaction fee.")
                 return
             }
-
-            //10+(n-1)*5 units
-            baseFee = OperationType.SendCoin.fee
-            baseFee = baseFee.add(
-                    BigDecimal(clamp(txData.items.size - 1, 0)).multiply(OperationType.FEE_BASE.multiply(BigDecimal("5")))
-            )
-        } else if (tx.type == OperationType.CreateCoin) {
-            // https://docs.minter.network/#section/Commissions
-            val txData = tx.getData(TxCreateCoin::class.java)
-            baseFee = TxCreateCoin.calculateCreatingCost(txData.symbol)
-        } else if (tx.type == OperationType.RedeemCheck) {
-            viewState.setCommission("You don't pay transaction fee.")
-            return
+            else -> {
+                baseFee = tx.type.fee
+            }
         }
+
         var fee = baseFee.add(BigDecimal(bytesLen).multiply(BigDecimal("0.002")))
         fee = fee.multiply(BigDecimal(mGasPrice))
-        viewState.setCommission(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
+        viewState.setFee(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
     }
 
-    private fun fillData(tx: ExternalTransaction?) {
-        viewState.setPayload(tx!!.payloadString)
+    private fun fillData(tx: ExternalTransaction) {
+
+
+//        viewState.setPayload(tx.payloadString)
         gasRepo.minGas
                 .rxGate()
                 .subscribeOn(Schedulers.io())
@@ -317,133 +318,382 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         Timber.d("Min Gas price: %s", mGasPrice.toString())
                         calculateFee(tx)
                     }
-                }) { t: Throwable? -> Timber.w(t) }
-        viewState.setSecondVisible(View.VISIBLE)
+                }) { t: Throwable -> Timber.w(t) }
+
         viewState.setOnConfirmListener(View.OnClickListener { onSubmit() })
+
         when (tx.type) {
             OperationType.SendCoin -> {
                 val data = tx.getData(TxSendCoin::class.java)
-                viewState.setFirstLabel("You're sending")
-                viewState.setFirstValue(String.format("%s %s", bdHuman(data.value), data.coin))
-                viewState.setSecondLabel("To")
-                viewState.setSecondValue(data.to.toString())
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're sending"
+                            text = data.coin
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.value.humanize()
+                        }
+                        .add {
+                            label = "To"
+                            text = data.to.toString()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
             }
             OperationType.SellCoin -> {
                 val data = tx.getData(TxCoinSell::class.java)
-                viewState.setFirstLabel("You're want selling")
-                viewState.setFirstValue(String.format("%s %s", bdHuman(data.valueToSell), data.coinToSell))
-                viewState.setSecondLabel("To")
-                viewState.setSecondValue(data.coinToBuy)
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're selling"
+                            text = data.coinToSell
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.valueToSell.humanize()
+                        }
+                        .add {
+                            label = "Coin To Buy"
+                            text = data.coinToBuy
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're want selling")
+//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.valueToSell), data.coinToSell))
+//                viewState.setSecondLabel("To")
+//                viewState.setSecondValue(data.coinToBuy)
             }
             OperationType.SellAllCoins -> {
                 val data = tx.getData(TxCoinSellAll::class.java)
-                viewState.setFirstLabel("You're selling")
                 val acc = accountStorage.entity.mainWallet.findCoinByName(data.coinToSell)
-                if (acc.isPresent) {
-                    viewState.setFirstValue(String.format("%s %s", bdHuman(acc.get().amount), data.coinToSell))
+                val amount = if (acc.isPresent) {
+                    acc.get().amount
                 } else {
-                    viewState.setFirstValue(String.format("%s %s", bdHuman(0.0), data.coinToSell))
+                    BigDecimal.ZERO
                 }
-                viewState.setSecondLabel("For")
-                viewState.setSecondValue(data.coinToBuy)
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're selling (sell all)"
+                            text = data.coinToSell
+                        }
+                        .add {
+                            label = "Amount"
+                            text = amount.humanize()
+                        }
+                        .add {
+                            label = "Coin To Buy"
+                            text = data.coinToBuy
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+
+//                viewState.setFirstLabel("You're selling")
+//                val acc = accountStorage.entity.mainWallet.findCoinByName(data.coinToSell)
+//                if (acc.isPresent) {
+//                    viewState.setFirstValue(String.format("%s %s", bdHuman(acc.get().amount), data.coinToSell))
+//                } else {
+//                    viewState.setFirstValue(String.format("%s %s", bdHuman(0.0), data.coinToSell))
+//                }
+//                viewState.setSecondLabel("For")
+//                viewState.setSecondValue(data.coinToBuy)
             }
             OperationType.BuyCoin -> {
                 val data = tx.getData(TxCoinBuy::class.java)
-                viewState.setFirstLabel("You're buying")
-                viewState.setFirstValue(String.format("%s %s", bdHuman(data.valueToBuy), data.coinToBuy))
-                viewState.setSecondLabel("For")
-                viewState.setSecondValue(data.coinToSell)
+
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're buying"
+                            text = data.coinToBuy
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.valueToBuy.humanize()
+                        }
+                        .add {
+                            label = "Coin To Sell"
+                            text = data.coinToSell
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're buying")
+//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.valueToBuy), data.coinToBuy))
+//                viewState.setSecondLabel("For")
+//                viewState.setSecondValue(data.coinToSell)
             }
             OperationType.CreateCoin -> {
                 val data = tx.getData(TxCreateCoin::class.java)
-                viewState.setFirstLabel("You're creating coin")
-                viewState.setFirstValue(String.format("%s %s", bdHuman(data.initialAmount), data.symbol))
-                viewState.setSecondLabel("Info")
-                viewState.setSecondValue(String.format("Name: %s\nCRR: %d\nReserve: %s",
-                        data.name,
-                        data.constantReserveRatio,
-                        bdHuman(data.initialReserve)
-                ))
+
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're creating coin"
+                            text = data.symbol
+                        }
+                        .add {
+                            label = "Initial Amount"
+                            text = data.initialAmount.humanize()
+                        }
+                        .add {
+                            label = "Coin Name"
+                            text = data.name
+                        }
+                        .add {
+                            label = "CRR (constant reserve ratio)"
+                            text = "${data.constantReserveRatio}%"
+                        }
+                        .add {
+                            label = "Reserve"
+                            text = data.initialReserve.humanize()
+                        }
+                        .add {
+                            label = "Max Supply"
+                            text = data.maxSupply.humanize()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're creating coin")
+//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.initialAmount), data.symbol))
+//                viewState.setSecondLabel("Info")
+//                viewState.setSecondValue(String.format("Name: %s\nCRR: %d\nReserve: %s",
+//                        data.name,
+//                        data.constantReserveRatio,
+//                        bdHuman(data.initialReserve)
+//                ))
             }
             OperationType.DeclareCandidacy -> {
                 val data = tx.getData(TxDeclareCandidacy::class.java)
-                viewState.setFirstLabel("You're declaring candidacy")
-                viewState.setFirstValue(data.publicKey.toString())
-                viewState.setSecondLabel("Info")
-                viewState.setSecondValue(String.format("Address: %s\nCoin: %s\nCommission: %d",
-                        data.address,
-                        data.coin,
-                        data.commission
-                ))
+
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're declaring candidacy"
+                            text = data.publicKey.toString()
+                        }
+                        .add {
+                            label = "Address"
+                            text = data.address.toString()
+                        }
+                        .add {
+                            label = "Coin"
+                            text = data.coin
+                        }
+                        .add {
+                            label = "Commission Percent"
+                            text = "${data.commission}%"
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're declaring candidacy")
+//                viewState.setFirstValue(data.publicKey.toString())
+//                viewState.setSecondLabel("Info")
+//                viewState.setSecondValue(String.format("Address: %s\nCoin: %s\nCommission: %d",
+//                        data.address,
+//                        data.coin,
+//                        data.commission
+//                ))
             }
             OperationType.Delegate -> {
                 val data = tx.getData(TxDelegate::class.java)
-                viewState.setFirstLabel("You're delegating")
-                viewState.setFirstValue(String.format("%s %s", bdHuman(data.stake), data.coin))
-                viewState.setSecondLabel("To")
-                viewState.setSecondValue(data.publicKey.toString())
+
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're delegating"
+                            text = data.coin
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.stake.humanize()
+                        }
+                        .add {
+                            label = "To"
+                            text = data.publicKey.toString()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're delegating")
+//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.stake), data.coin))
+//                viewState.setSecondLabel("To")
+//                viewState.setSecondValue(data.publicKey.toString())
             }
             OperationType.Unbound -> {
                 val data = tx.getData(TxUnbound::class.java)
-                viewState.setFirstLabel("You're unbonding")
-                viewState.setFirstValue(String.format("%s %s", bdHuman(data.value), data.coin))
-                viewState.setSecondLabel("From")
-                viewState.setSecondValue(data.publicKey.toString())
+
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're unbonding"
+                            text = data.coin
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.value.humanize()
+                        }
+                        .add {
+                            label = "From"
+                            text = data.publicKey.toString()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're unbonding")
+//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.value), data.coin))
+//                viewState.setSecondLabel("From")
+//                viewState.setSecondValue(data.publicKey.toString())
             }
             OperationType.RedeemCheck -> {
                 val data = tx.getData(TxRedeemCheck::class.java)
-                viewState.setFirstLabel("You're using check")
                 val check = data.decodedCheck
-                viewState.setFirstValue(String.format("%s %s", check.coin, bdHuman(check.value)))
-                viewState.setSecondVisible(View.GONE)
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're using check"
+                            text = data.rawCheck.toString()
+                        }
+                        .add {
+                            label = "Coin"
+                            text = check.coin
+                        }
+                        .add {
+                            label = "Amount"
+                            text = check.value.humanize()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're using check")
+//                val check = data.decodedCheck
+//                viewState.setFirstValue(String.format("%s %s", check.coin, bdHuman(check.value)))
+//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.SetCandidateOnline -> {
                 val data = tx.getData(TxSetCandidateOnline::class.java)
-                viewState.setFirstLabel("You're switching on candidate")
-                viewState.setFirstValue(data.publicKey.toString())
-                viewState.setSecondVisible(View.GONE)
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're switching on candidate"
+                            text = data.publicKey.toString()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're switching on candidate")
+//                viewState.setFirstValue(data.publicKey.toString())
+//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.SetCandidateOffline -> {
                 val data = tx.getData(TxSetCandidateOffline::class.java)
-                viewState.setFirstLabel("You're switching off candidate")
-                viewState.setFirstValue(data.publicKey.toString())
-                viewState.setSecondVisible(View.GONE)
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're switching off candidate"
+                            text = data.publicKey.toString()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+//                viewState.setFirstLabel("You're switching off candidate")
+//                viewState.setFirstValue(data.publicKey.toString())
+//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.Multisend -> {
                 val data = tx.getData(TxMultisend::class.java)
-                viewState.setFirstLabel("You're multi-sending")
-                val sb = StringBuilder()
+
+                val rowsBuilder = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're multi-sending"
+                            text = "To ${data.items.size} recipients"
+                        }
+
                 for (item in data.items) {
-                    sb.append(item.to.toShortString()).append(" <- ").append(bdHuman(item.value)).append('\n')
+                    rowsBuilder.add {
+                        label = "${item.to}"
+                        text = "${item.value.humanize()} ${item.coin}"
+                    }
                 }
-                viewState.setFirstValue(sb.toString())
-                viewState.setSecondVisible(View.GONE)
+
+                adapter.addRows(rowsBuilder.build())
+
+//                viewState.setFirstLabel("You're multi-sending")
+//                val sb = StringBuilder()
+//                for (item in data.items) {
+//                    sb.append(item.to.toShortString()).append(" <- ").append(bdHuman(item.value)).append('\n')
+//                }
+//                viewState.setFirstValue(sb.toString())
+//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.CreateMultisigAddress -> {
                 val data = tx.getData<TxCreateMultisigAddress>()
-                viewState.setFirstLabel("You're creating MultiSig address")
-                val sb = StringBuilder()
-                var i = 0
-                while (i < data.addresses.size) {
-                    val address = data.addresses[i]
+
+                val rowsBuilder = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're creating MultiSig address"
+                            text = "With ${data.addresses.size} addresses"
+                        }
+                        .add {
+                            label = "Threshold"
+                            text = data.threshold.toString()
+                        }
+
+                for ((i, item) in data.addresses.withIndex()) {
                     val weight = data.weights[i]
-                    sb.append("Weight: ").append(weight).append(" - ").append(address.toShortString()).append('\n')
-                    i++
+                    rowsBuilder.add {
+                        label = "$item"
+                        text = "Weight: $weight"
+                    }
                 }
-                viewState.setFirstValue(sb.toString())
-                viewState.setSecondLabel("Threshold")
-                viewState.setSecondValue(data.threshold.toString())
-                viewState.setSecondVisible(View.VISIBLE)
+
+                adapter.addRows(rowsBuilder.build())
+
+//                viewState.setFirstLabel("You're creating MultiSig address")
+//                val sb = StringBuilder()
+//                var i = 0
+//                while (i < data.addresses.size) {
+//                    val address = data.addresses[i]
+//                    val weight = data.weights[i]
+//                    sb.append("Weight: ").append(weight).append(" - ").append(address.toShortString()).append('\n')
+//                    i++
+//                }
+//                viewState.setFirstValue(sb.toString())
+//                viewState.setSecondLabel("Threshold")
+//                viewState.setSecondValue(data.threshold.toString())
+//                viewState.setSecondVisible(View.VISIBLE)
             }
             OperationType.EditCandidate -> {
                 val data = tx.getData(TxEditCandidate::class.java)
-                viewState.setFirstLabel("You're editing candidate")
-                viewState.setFirstValue(data.pubKey.toString())
-                viewState.setSecondLabel("Info")
-                viewState.setSecondValue(String.format("Owner address: %s\nReward address: %s",
-                        data.ownerAddress.toShortString(),
-                        data.rewardAddress.toShortString()
-                ))
+                val rows = InputFieldRow.MultiBuilder()
+                        .add {
+                            label = "You're editing candidate"
+                            text = data.pubKey.toString()
+                        }
+                        .add {
+                            label = "Owner address"
+                            text = data.ownerAddress.toString()
+                        }
+                        .add {
+                            label = "Reward address"
+                            text = data.rewardAddress.toString()
+                        }
+                        .build()
+
+                adapter.addRows(rows)
+
+//                viewState.setFirstLabel("You're editing candidate")
+//                viewState.setFirstValue(data.pubKey.toString())
+//                viewState.setSecondLabel("Info")
+//                viewState.setSecondValue(String.format("Owner address: %s\nReward address: %s",
+//                        data.ownerAddress.toShortString(),
+//                        data.rewardAddress.toShortString()
+//                ))
             }
             else -> {
                 viewState.startDialog(false) { ctx: Context? ->
@@ -454,6 +704,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 }
             }
         }
+
+        if (tx.payload.size() > 0) {
+            adapter.addRow(InputFieldRow.Builder().apply {
+                label = res.getString(R.string.label_payload_explicit)
+                text = tx.payload.stringValue()
+            }.build())
+        }
+
+        viewState.setAdapter(adapter)
     }
 
     private fun startExecuteTransaction() {

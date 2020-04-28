@@ -26,8 +26,8 @@
 package network.minter.bipwallet.tx.contract
 
 import android.content.Context
-import android.text.TextWatcher
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
@@ -41,27 +41,22 @@ import network.minter.bipwallet.internal.mvp.ProgressView
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface ExternalTransactionView : MvpView, ProgressView {
-    fun setFirstLabel(label: CharSequence)
-    fun setFirstValue(value: CharSequence)
-    fun setSecondLabel(label: CharSequence)
-    fun setSecondValue(value: CharSequence)
-    fun setPayload(payloadString: CharSequence)
-    fun setCommission(fee: CharSequence)
-    fun setFirstVisible(visibility: Int)
-    fun setSecondVisible(visibility: Int)
+    fun setAdapter(adapter: RecyclerView.Adapter<*>)
+    fun setFee(fee: CharSequence)
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDialog(executor: (Context) -> WalletDialog)
+    fun disableAll()
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDialog(cancelable: Boolean, executor: (Context) -> WalletDialog)
-    fun setPayloadTextChangedListener(textWatcher: TextWatcher)
     fun setOnConfirmListener(listener: View.OnClickListener)
     fun setOnCancelListener(listener: View.OnClickListener)
     fun finishSuccess()
     fun finishCancel()
 
     @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startDialog(executor: (Context) -> WalletDialog)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startDialog(cancelable: Boolean, executor: (Context) -> WalletDialog)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
     fun startExplorer(hash: String?)
-    fun disableAll()
 }

@@ -23,74 +23,75 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.internal.views.list.multirow
 
-package network.minter.bipwallet.internal.views.list.multirow;
-
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.LayoutRes
+import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter.RowViewHolder
 
 /**
  * Mds. 2017
  *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
-
-public interface MultiRowContract {
-
-
-    interface Row<T extends MultiRowAdapter.RowViewHolder> {
-        int POSITION_FIRST = -1;
-        int POSITION_LAST = 999;
-        int POSITION_ORDERED = 0;
-
+interface MultiRowContract {
+    interface Row<T : RowViewHolder> {
         /**
          * views ID
          *
          * @return int
-         * @see MultiRowAdapter#makeHoldersCache()
+         * @see MultiRowAdapter.makeHoldersCache
          */
         @LayoutRes
-        int getItemView();
+        fun getItemView(): Int
 
         /**
          * views position index
          *
          * @return int
          * @see MultiRowAdapter
+         *
          * @see MultiRowContract.Row
          */
-        int getRowPosition();
+        fun getRowPosition(): Int {
+            return 0
+        }
 
         /**
          * If view should be visible
          *
          * @return bool
          */
-        boolean isVisible();
+        fun isVisible(): Boolean {
+            return true
+        }
 
         /**
          * Вызывается когда адаптер биндит вьюху,
          * соответственно в этом методе заполняем RowViewHolder
          * @param viewHolder Row view holder
-         * @see MultiRowAdapter#makeHoldersCache()
+         * @see MultiRowAdapter.makeHoldersCache
          */
-        void onBindViewHolder(@NonNull T viewHolder);
+        fun onBindViewHolder(viewHolder: T)
 
         /**
          * Вызывается когда холдер отцепляется от окна
          *
          * @param viewHolder
-         * @see RecyclerView#onDetachedFromWindow()
+         * @see RecyclerView.onDetachedFromWindow
          */
-        void onUnbindViewHolder(@NonNull T viewHolder);
+        fun onUnbindViewHolder(viewHolder: T)
 
         /**
          * Класс RowViewHolder'а который отражает вьюху
          * @return Class
          * @see MultiRowAdapter.RowViewHolder
          */
-        @NonNull
-        Class<T> getViewHolderClass();
+        fun getViewHolderClass(): Class<T>
+
+        companion object {
+            const val POSITION_FIRST = -1
+            const val POSITION_LAST = 999
+            const val POSITION_ORDERED = 0
+        }
     }
 }

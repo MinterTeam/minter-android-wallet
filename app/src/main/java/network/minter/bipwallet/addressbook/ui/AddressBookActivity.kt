@@ -44,6 +44,7 @@ import network.minter.bipwallet.addressbook.views.AddressBookPresenter
 import network.minter.bipwallet.databinding.ActivityAddressBookBinding
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.dialogs.ActionListener
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import org.parceler.Parcels
 import javax.inject.Inject
@@ -55,8 +56,12 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
 
     private lateinit var binding: ActivityAddressBookBinding
 
-    override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
+    override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         binding.list.adapter = adapter
+    }
+
+    override fun showEmpty(show: Boolean) {
+        binding.emptyText.visible = show
     }
 
     override fun startAddContact(onSubmit: ActionListener, onDismiss: ActionListener?) {

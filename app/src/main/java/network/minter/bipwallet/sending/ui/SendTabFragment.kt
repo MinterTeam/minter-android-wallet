@@ -234,7 +234,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startDialog(executor: DialogExecutor) {
-        mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor)
+        runOnUiThread {
+            mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor)
+        }
     }
 
     override fun startExplorer(txHash: String) {

@@ -31,32 +31,27 @@
     android:layout_height="match_parent"
     android:background="@color/greyBackground">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
         android:theme="@style/WalletPrimaryToolbar.Light"
-        app:elevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title=" ">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="?android:attr/actionBarSize"
-            app:menu="@menu/menu_address_book"
-            app:navigationIcon="@drawable/ic_arrow_back_grey"
-            app:title=" ">
+            android:text="@string/title_address_book" />
 
-            <TextView
-                style="@style/Wallet.Toolbar.TitleDefault"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_address_book" />
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -65,8 +60,26 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         tools:listitem="@layout/item_list_address_book" />
+
+    <TextView
+        android:id="@+id/empty_text"
+        style="@style/ListSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges"
+        android:text="@string/empty_address_book"
+        android:textAllCaps="true"
+        android:textSize="@dimen/text_size_14"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:visibility="visible" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

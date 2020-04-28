@@ -128,7 +128,7 @@ class SettingsSwitchRow : MultiRowContract.Row<SettingsSwitchRow.ViewHolder> {
 //        fun onClick(view: View?, value: Boolean?)
 //    }
 
-    class ViewHolder(itemView: View?) : RowViewHolder(itemView) {
+    class ViewHolder(itemView: View) : RowViewHolder(itemView) {
         @JvmField @BindView(R.id.item_key)
         var key: TextView? = null
 
@@ -136,7 +136,7 @@ class SettingsSwitchRow : MultiRowContract.Row<SettingsSwitchRow.ViewHolder> {
         var value: Switch? = null
 
         init {
-            ButterKnife.bind(this, itemView!!)
+            ButterKnife.bind(this, itemView)
         }
     }
 }
