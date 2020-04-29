@@ -89,15 +89,29 @@
 
                     <TextView
                         android:id="@+id/balance_label"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_edges"
                         android:fontFamily="@font/_inter_semi_bold"
                         android:text="Available Balance"
                         android:textColor="@color/white70"
                         android:textSize="@dimen/text_size_13"
-                        app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
+                        app:layout_constraintEnd_toStartOf="@id/balance_updated_label"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/balance_updated_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_edges_half"
+                        android:layout_marginTop="@dimen/margin_edges"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:text="@string/balance_last_updated_sync_main"
+                        android:textColor="@color/white70"
+                        android:textSize="@dimen/text_size_13"
+                        app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
+                        app:layout_constraintStart_toEndOf="@id/balance_label"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -106,7 +120,7 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
-                        app:layout_constraintTop_toBottomOf="@id/balance_label">
+                        app:layout_constraintTop_toBottomOf="@id/balance_updated_label">
 
                         <TextView
                             android:id="@+id/balance_first_part"
@@ -114,6 +128,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/_inter_semi_bold"
                             android:fontFeatureSettings="@string/inter_zeroes"
+                            android:text="0"
                             android:textColor="@color/textColorWhite"
                             android:textSize="@dimen/text_size_30"
                             app:layout_constraintEnd_toStartOf="@id/balance_middle_part"
@@ -121,7 +136,6 @@
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            android:text="0"
                             app:layout_constraintVertical_bias="1"
                             tools:text="462 308" />
 
@@ -131,6 +145,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="1dp"
                             android:fontFamily="@font/_inter_semi_bold"
+                            android:text=".0000"
                             android:textColor="@color/textColorWhite"
                             android:textSize="@dimen/text_size_default"
                             app:layout_constraintBottom_toBottomOf="@id/balance_first_part"
@@ -138,7 +153,6 @@
                             app:layout_constraintStart_toEndOf="@id/balance_first_part"
                             app:layout_constraintTop_toTopOf="@id/balance_first_part"
                             app:layout_constraintVertical_bias=".8"
-                            android:text=".0000"
                             tools:text=".4924" />
 
                         <TextView

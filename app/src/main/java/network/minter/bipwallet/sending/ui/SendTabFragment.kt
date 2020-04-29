@@ -61,14 +61,17 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter
 import network.minter.bipwallet.sending.contract.SendView
 import network.minter.bipwallet.sending.views.SendTabPresenter
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.wallets.selector.WalletItem
+import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
 import javax.inject.Inject
@@ -132,6 +135,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
             inputRecipient.clearFocus()
             inputAmount.clearFocus()
+
+            LastBlockHandler.handle(binding.lastUpdated)
+            val broadcastManager = BroadcastReceiverManager(activity!!)
+            broadcastManager.add(RTMBlockReceiver {
+                LastBlockHandler.handle(binding.lastUpdated, it)
+            })
+            broadcastManager.register()
 
 
             setHasOptionsMenu(true)

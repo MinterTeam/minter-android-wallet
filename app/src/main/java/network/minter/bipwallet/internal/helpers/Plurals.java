@@ -98,8 +98,19 @@ public class Plurals {
         return String.format("$%s", n);
     }
 
+    public static String timeUnitShort(Long seconds) {
+        if (seconds < 60) {
+            return "sec";
+        } else if (seconds < 3600) {
+            return "min";
+        } else if (seconds < 86400) {
+            return "h";
+        } else {
+            return "d";
+        }
+    }
 
-    public static String time(Long seconds) {
+    public static String timeUnit(Long seconds) {
         if (seconds < 60) {
             return seconds(seconds);
         } else if (seconds < 3600) {

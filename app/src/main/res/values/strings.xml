@@ -257,9 +257,14 @@
 
     <string name="alert_copied">Copied!</string>
     <string name="hint_save_seed">⚠️ Save this seed phrase in case you plan to use this address in the future.</string>
-    <string name="balance_last_updated"><![CDATA[Last updated <b>%d %s</b> ago]]></string>
-    <string name="balance_last_updated_now"><![CDATA[Last updated <b>now</b>]]></string>
-    <string name="balance_last_updated_never"><![CDATA[Last updated <b>never</b>]]></string>
+    <string name="balance_last_updated_main">(Updated %d %s ago)</string>
+    <string name="balance_last_updated_now_main">(Updated just now)</string>
+    <string name="balance_last_updated_never_main">(Never updated)</string>
+    <string name="balance_last_updated_sync_main">(sync…)</string>
+    <string name="balance_last_updated_others"><![CDATA[Last updated <b>%d %s</b> ago]]></string>
+    <string name="balance_last_updated_now_others"><![CDATA[Last updated <b>now</b>]]></string>
+    <string name="balance_last_updated_never_others"><![CDATA[Last updated <b>never</b>]]></string>
+    <string name="balance_last_updated_sync"><![CDATA[Last updated <b>sync…</b>]]></string>
 
     <string name="tab_page_coins">Coins</string>
     <string name="tab_page_txs">Transactions</string>

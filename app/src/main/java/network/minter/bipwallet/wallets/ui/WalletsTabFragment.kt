@@ -60,9 +60,11 @@ import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
 import network.minter.bipwallet.sending.ui.SendTabFragment
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.share.ShareDialog
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.TransactionListActivity
@@ -72,7 +74,9 @@ import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
+import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.bipwallet.wallets.views.WalletsTabPresenter
+import org.joda.time.DateTime
 import permissions.dispatcher.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -144,13 +148,15 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
             override fun onStateChanged(appBarLayout: AppBarLayout?, state: State?, verticalOffset: Int, expandedPercent: Float) {
                 binding.containerSwipeRefresh.isEnabled = expandedPercent == 1.0f
             }
-
         })
 
-//        checkLastUpdate();
-//        BroadcastReceiverManager bbm = new BroadcastReceiverManager(getActivity());
-//        bbm.add(new RTMBlockReceiver(this::checkLastUpdate));
-//        bbm.register();
+        LastBlockHandler.handle(binding.balanceUpdatedLabel, null, LastBlockHandler.ViewType.Main)
+        val broadcastManager = BroadcastReceiverManager(activity!!)
+        broadcastManager.add(RTMBlockReceiver {
+            LastBlockHandler.handle(binding.balanceUpdatedLabel, it, LastBlockHandler.ViewType.Main)
+        })
+        broadcastManager.register()
+
         if (BuildConfig.DEBUG) {
             binding.toolbar.setOnLongClickListener {
                 val sb = StringBuilder()
@@ -174,6 +180,10 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         binding.toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
         setupTabAdapter()
         return binding.root
+    }
+
+    override fun notifyUpdated() {
+        RTMBlockReceiver.send(activity!!, DateTime())
     }
 
     override fun onTabUnselected() {
@@ -443,18 +453,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         binding.tabs.setupWithViewPager(binding.tabsPager)
         binding.tabs.getTabAt(0)!!.setText(R.string.tab_page_coins)
         binding.tabs.getTabAt(1)!!.setText(R.string.tab_page_txs)
-    }
-
-    private fun checkLastUpdate() {
-//        if (!Wallet.app().settings().has(LastBlockTime)) {
-//            lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated_never)));
-//            return;
-//        }
-//        DateTime lastBlockTime = new DateTime((long) Wallet.app().settings().get(LastBlockTime));
-//        Seconds diff = Seconds.secondsBetween(lastBlockTime, new DateTime());
-//        int res = diff.getSeconds();
-//        Timber.d("Diff: now=%s, ts=%s", new DateTime().toString(), lastBlockTime.toString());
-//        lastUpdateText.setText(HtmlCompat.fromHtml(getString(R.string.balance_last_updated, Plurals.timeValue((long) res), Plurals.time((long) res))));
     }
 
     private fun onStartRefresh() {

@@ -83,6 +83,10 @@ class SettingsManager(private val storage: KVStorage) {
         storage.delete(key.name)
     }
 
+    fun <T> has(key: Key<T>): Boolean {
+        return storage.contains(key.name)
+    }
+
     operator fun <T> get(key: Key<T>): T {
         return storage[key.name, key.defaultValue]
     }

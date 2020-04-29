@@ -122,12 +122,12 @@
                     android:tint="@color/grey" />
 
                 <TextView
+                    android:id="@+id/last_updated"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_edges_half"
                     android:fontFamily="@font/inter"
                     android:textSize="@dimen/text_size_12"
-                    android:textStyle="bold"
                     tools:text="Last updated 10 seconds ago" />
             </LinearLayout>
 

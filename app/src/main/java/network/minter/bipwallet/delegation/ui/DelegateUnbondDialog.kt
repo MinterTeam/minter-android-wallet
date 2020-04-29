@@ -54,8 +54,11 @@ import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
+import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterHash
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.BaseCoinValue
@@ -139,12 +142,18 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         presenter.handleExtras(arguments)
 
-        binding.inputMasternode.input.setFocusable(false)
-        binding.inputCoin.input.setFocusable(false)
+        binding.inputMasternode.input.isFocusable = false
+        binding.inputCoin.input.isFocusable = false
         binding.inputAmount.input.setOnClickListener {
             binding.inputAmount.scrollToInput()
         }
 
+        LastBlockHandler.handle(binding.lastUpdated)
+        val broadcastManager = BroadcastReceiverManager(activity!!)
+        broadcastManager.add(RTMBlockReceiver {
+            LastBlockHandler.handle(binding.lastUpdated, it)
+        })
+        broadcastManager.register()
 
         return binding.root
     }

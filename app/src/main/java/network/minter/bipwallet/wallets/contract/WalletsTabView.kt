@@ -90,4 +90,5 @@ interface WalletsTabView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?)
+    fun notifyUpdated()
 }

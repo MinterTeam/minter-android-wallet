@@ -36,6 +36,7 @@ import java.util.*
 @Parcel
 class AddressListBalancesTotal {
     @JvmField var balances: MutableList<AddressBalanceTotal> = ArrayList()
+    @JvmField var latestBlockTime: Date? = null
 
     constructor(addresses: List<MinterAddress>) {
         for (address in addresses) {

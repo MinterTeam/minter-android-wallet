@@ -91,7 +91,7 @@ class AccountStorage(
     }
 
     private fun mapBalances(): Function<MinterAddress, ObservableSource<ExpResult<AddressBalanceTotal>>> {
-        return Function { address: MinterAddress? ->
+        return Function { address: MinterAddress ->
             rxExp(addressRepo.getAddressData(address, true))
                     .switchMap(mapToDelegations())
         }
@@ -109,7 +109,7 @@ class AccountStorage(
             val out = ExpResult<AddressBalanceTotal>()
             out.error = delegatedResult.error
             out.result = AddressBalanceTotal(res.result, delegatedResult.meta.additional.delegatedAmount)
-
+            out.latestBlockTime = res.latestBlockTime
             out.result.delegatedCoins = delegatedResult.result.delegations
 
             out
@@ -120,6 +120,7 @@ class AccountStorage(
         return Function { ExpResults: List<ExpResult<AddressBalanceTotal>> ->
             val out = AddressListBalancesTotal()
             for (balance in ExpResults) {
+                out.latestBlockTime = balance.latestBlockTime
                 if (balance.isOk) {
                     out.balances.add(balance.result)
                 } else {

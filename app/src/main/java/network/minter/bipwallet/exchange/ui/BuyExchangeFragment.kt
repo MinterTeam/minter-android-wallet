@@ -34,6 +34,9 @@ import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.FragmentExchangeBuyBinding
 import network.minter.bipwallet.exchange.contract.BuyExchangeView
 import network.minter.bipwallet.exchange.views.BuyExchangePresenter
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
+import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -62,6 +65,13 @@ class BuyExchangeFragment : ExchangeFragment(), BuyExchangeView {
                     calculationContainer,
                     action
             )
+
+            LastBlockHandler.handle(lastUpdated)
+            val broadcastManager = BroadcastReceiverManager(activity!!)
+            broadcastManager.add(RTMBlockReceiver {
+                LastBlockHandler.handle(lastUpdated, it)
+            })
+            broadcastManager.register()
         }
 
         return binding.root

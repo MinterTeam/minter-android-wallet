@@ -156,9 +156,14 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                 ).disposeOnDestroy()
 
         accountStorage.observe()
+                .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
                             Timber.d("Update coins list")
+
+                            Timber.d("Notify last updated: NOW")
+                            viewState.notifyUpdated()
+
                             viewState.setWallets(WalletItem.create(secretStorage, res))
                             viewState.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
 
