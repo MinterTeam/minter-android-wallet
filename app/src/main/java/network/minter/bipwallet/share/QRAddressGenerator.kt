@@ -116,10 +116,10 @@ class QRAddressGenerator private constructor(private val size: Int, private val 
         }
 
         fun createNewFiles() {
-            if (!filePNG.createNewFile()) {
+            if (!filePNG.exists() && !filePNG.createNewFile()) {
                 throw IllegalStateException("Can't create png image file")
             }
-            if (!fileJPG.createNewFile()) {
+            if (!fileJPG.exists() && !fileJPG.createNewFile()) {
                 throw IllegalStateException("Can't create jpg image file")
             }
         }
