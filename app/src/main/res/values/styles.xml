@@ -31,7 +31,7 @@
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:navigationBarColor">#f8f8f8</item>
+        <item name="android:navigationBarColor">@color/greyBackground</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
@@ -62,10 +62,11 @@
 
     <style name="DialogTheme" parent="Wallet">
         <!--        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>-->
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/greyBackground</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
@@ -100,6 +101,7 @@
     <style name="WalletBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/WalletModalStyle</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/white</item>
@@ -338,35 +340,6 @@
         <item name="titleTextColor">@color/textColorPrimary</item>
     </style>
 
-    <!--    Theme.AppCompat.Light.Dialog-->
-    <style name="Wallet.DialogFragment" parent="Theme.MaterialComponents.Light.Dialog">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorControlHighlight">@color/colorHighlight</item>
-        <item name="colorAccent">@color/colorAccent</item>
-
-        <item name="android:textColorHint">@color/textColorPrimary</item>
-        <item name="android:textColor">@color/textColorPrimary</item>
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:textColorSecondary">@color/textColorSecondary</item>
-        <item name="android:textSize">@dimen/text_size_14</item>
-        <item name="android:fontFamily">@font/inter</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:colorBackground">@android:color/white</item>
-
-        <item name="buttonStyle">@style/Wallet.Button</item>
-        <item name="android:buttonStyle">@style/Wallet.Button</item>
-        <item name="borderlessButtonStyle">@style/Wallet.Button</item>
-        <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowBackground">@color/greyBackground</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:gravity">center</item>
-        <item name="android:windowTitleStyle">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">false</item>
-    </style>
-
 
     <style name="Wallet.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <!--COMMON THEME-->
@@ -391,18 +364,20 @@
         <item name="android:borderlessButtonStyle">@style/Wallet.Button</item>
 
         <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:navigationBarColor">@color/greyBackground</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="windowNoTitle">true</item>
+
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
-        <!--        <item name="android:windowContentOverlay">@null</item>-->
     </style>
 
-    <style name="Wallet.DialogActivity">
+    <style name="Wallet.PinDialog">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">true</item>

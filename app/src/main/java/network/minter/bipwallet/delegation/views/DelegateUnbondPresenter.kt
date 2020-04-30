@@ -57,7 +57,7 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
-import network.minter.bipwallet.sending.account.selectorDataFromAccounts
+import network.minter.bipwallet.sending.account.selectorDataFromCoins
 import network.minter.bipwallet.sending.account.selectorDataFromDelegatedAccounts
 import network.minter.bipwallet.sending.account.selectorDataFromValidators
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
@@ -496,7 +496,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
         viewState.setOnAccountSelectListener(View.OnClickListener {
             if (type == Type.Delegate) {
-                viewState.startAccountSelector(selectorDataFromAccounts(accountStorage.entity.mainWallet.coinsList)) { account ->
+                viewState.startAccountSelector(selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList)) { account ->
                     onAccountSelected(account.data)
                 }
             } else {

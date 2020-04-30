@@ -56,7 +56,7 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
             dialogSecondValue.text = builder.recipient
 
             builder.bindAction(this@TxSendStartDialog, actionConfirm, DialogInterface.BUTTON_POSITIVE)
-            builder.bindAction(this@TxSendStartDialog, actionDecline, DialogInterface.BUTTON_POSITIVE)
+            builder.bindAction(this@TxSendStartDialog, actionDecline, DialogInterface.BUTTON_NEGATIVE)
         }
     }
 
@@ -65,8 +65,8 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
         var recipient: CharSequence? = null
         var coin = MinterSDK.DEFAULT_COIN
 
-        constructor(context: Context, @StringRes title: Int) : super(context, title) {}
-        constructor(context: Context, title: CharSequence?) : super(context, title) {}
+        constructor(context: Context, @StringRes title: Int) : super(context, title)
+        constructor(context: Context, title: CharSequence?) : super(context, title)
 
         fun setAmount(decimalString: String?): Builder {
             return setAmount(BigDecimal(decimalString).setScale(18, BigDecimal.ROUND_UNNECESSARY))

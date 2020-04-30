@@ -48,12 +48,12 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
- * Stars. 2017
+ * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
     private val mSubscriptions = CompositeDisposable()
-    private var mErrorRetryNotifier: PublishSubject<Any>? = null
+    private var mErrorRetryNotifier: PublishSubject<Any> = PublishSubject.create()
     private var mIsInitialized = false
     private var mRetried = false
     private val mEventBusSubscribed = false
@@ -70,11 +70,7 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
 
     fun retry() {
         doOnErrorResolve()
-        if (mErrorRetryNotifier!!.hasComplete()) {
-            mErrorRetryNotifier = PublishSubject.create()
-            mErrorRetryNotifier!!.doOnSubscribe { subscription: Disposable? -> unsubscribeOnDestroy(subscription) }
-        }
-        mErrorRetryNotifier!!.onNext(Any())
+        mErrorRetryNotifier.onNext(Any())
         mRetried = true
     }
 
@@ -86,8 +82,8 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
 
     @CallSuper
     override fun attachView(view: V) {
-        mErrorRetryNotifier = PublishSubject.create()
-        mErrorRetryNotifier!!.doOnSubscribe { subscription: Disposable? -> unsubscribeOnDestroy(subscription) }
+        mErrorRetryNotifier.doOnSubscribe { unsubscribeOnDestroy(it) }
+
         if (!mIsInitialized) {
             mIsInitialized = true
             handleAnalytics()
@@ -161,18 +157,18 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    protected val errorResolver: Function<Observable<out Throwable?>, ObservableSource<*>>
-        get() = Function { observable: Observable<out Throwable?> ->
-            observable.flatMap { err: Throwable? ->
+    protected val errorResolver: Function<Observable<out Throwable>, ObservableSource<*>>
+        get() = Function { observable: Observable<out Throwable> ->
+            observable.flatMap { err: Throwable ->
                 val t = NetworkException.convertIfNetworking(err)
                 Timber.w(t, "Error occurred in %s", javaClass.name)
                 doOnError(t)
                 if (mErrorRetryNotifier == null) {
                     mErrorRetryNotifier = PublishSubject.create()
-                    mErrorRetryNotifier!!.onNext(Any())
+                    mErrorRetryNotifier.onNext(Any())
                 }
                 Single
-                        .fromObservable(mErrorRetryNotifier!!.take(1))
+                        .fromObservable(mErrorRetryNotifier.take(1))
                         .delay(500, TimeUnit.MILLISECONDS)
                         .toObservable()
                         .doOnSubscribe { subscription: Disposable? -> unsubscribeOnDestroy(subscription) }

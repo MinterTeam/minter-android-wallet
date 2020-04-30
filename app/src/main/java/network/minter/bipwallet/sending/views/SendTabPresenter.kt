@@ -49,6 +49,7 @@ import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.analytics.AppEvent
+import network.minter.bipwallet.apis.explorer.RepoDailyRewards
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain
 import network.minter.bipwallet.apis.reactive.rxGate
@@ -68,7 +69,7 @@ import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.internal.system.SimpleTextWatcher
-import network.minter.bipwallet.sending.account.selectorDataFromAccounts
+import network.minter.bipwallet.sending.account.selectorDataFromCoins
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter
 import network.minter.bipwallet.sending.contract.SendView
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
@@ -77,6 +78,7 @@ import network.minter.bipwallet.sending.ui.dialogs.TxSendStartDialog
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.wallets.selector.WalletItem
+import network.minter.bipwallet.wallets.selector.WalletListAdapter
 import network.minter.blockchain.models.BCResult
 import network.minter.blockchain.models.TransactionCommissionValue
 import network.minter.blockchain.models.TransactionSendResult
@@ -123,6 +125,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     @Inject lateinit var estimateRepo: GateEstimateRepository
     @Inject lateinit var gateTxRepo: GateTransactionRepository
     @Inject lateinit var addressBookRepo: AddressBookRepository
+    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
+    @Inject lateinit var txRepo: RepoTransactions
 
     private var mFromAccount: CoinBalance? = null
     private var mAmount: BigDecimal? = null
@@ -171,9 +175,16 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     override fun attachView(view: SendView) {
         super.attachView(view)
         viewState.setOnClickAccountSelectedListener(View.OnClickListener { onClickAccountSelector() })
-        viewState.setOnTextChangedListener { input, valid ->
-            onInputTextChanged(input, valid)
-        }
+
+        viewState.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->
+            onWalletSelect(walletItem)
+        })
+        viewState.setOnClickAddWalletListener(WalletListAdapter.OnClickAddWalletListener {
+            onWalletAdd()
+        })
+        viewState.setOnClickEditWalletListener(WalletListAdapter.OnClickEditWalletListener { walletItem: WalletItem ->
+            onWalletEdit(walletItem)
+        })
         viewState.setOnSubmit(View.OnClickListener { onSubmit() })
         viewState.setOnClickMaximum(View.OnClickListener { v -> onClickMaximum(v) })
         viewState.setOnClickAddPayload(View.OnClickListener { v -> onClickAddPayload(v) })
@@ -240,7 +251,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-
         accountStorage.observe()
                 .joinToUi()
                 .subscribe(
@@ -284,6 +294,40 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             Timber.d("Form is valid: %b", it)
             checkEnableSubmit()
         }
+
+        viewState.setOnTextChangedListener { input, valid ->
+            onInputTextChanged(input, valid)
+        }
+    }
+
+    private fun onWalletAdd() {
+        viewState.startWalletAdd({ onAddedWallet() }, null)
+    }
+
+    private fun onAddedWallet() {
+        forceUpdate()
+    }
+
+    private fun onWalletSelect(walletItem: WalletItem) {
+        secretStorage.setMain(walletItem.address)
+        viewState.setMainWallet(walletItem)
+        forceUpdate()
+    }
+
+    private fun onWalletEdit(walletItem: WalletItem) {
+        viewState.startWalletEdit(walletItem) {
+            onWalletUpdated()
+        }
+    }
+
+    private fun onWalletUpdated() {
+        forceUpdate()
+    }
+
+    private fun forceUpdate() {
+        accountStorage.update(true)
+        dailyRewardsRepo.update(true)
+        txRepo.update(true)
     }
 
     private fun onClickClearPayload() {
@@ -820,15 +864,19 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         val s = editText.text.toString()
         when (editText.id) {
             R.id.input_recipient -> {
+                if (!handleAutocomplete) {
+                    return
+                }
+
                 addressBookRepo
                         .findByNameOrAddress(s)
                         .subscribe(
                                 { res: AddressContact? ->
                                     mRecipient = res
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
-                                    viewState.hideAutocomplete()
+//                                    viewState.hideAutocomplete()
                                 },
-                                { t: Throwable? ->
+                                { t: Throwable ->
                                     mRecipient = null
                                     viewState.setSubmitEnabled(false)
                                     addressBookRepo
@@ -837,7 +885,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                                     { suggestions: List<AddressContact> ->
                                                         viewState.setRecipientAutocompleteItems(suggestions)
                                                     },
-                                                    { t2: Throwable? ->
+                                                    { t2: Throwable ->
                                                         Timber.w(t)
                                                         Timber.w(t2)
                                                     }
@@ -849,15 +897,20 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
+    private var handleAutocomplete: Boolean = true
+
     @Suppress("UNUSED_PARAMETER")
     private fun onAutocompleteSelected(contact: AddressContact, pos: Int) {
+        handleAutocomplete = false
         viewState.setRecipient(contact)
+        viewState.hideAutocomplete()
+        handleAutocomplete = true
     }
 
     private fun onClickAccountSelector() {
         analytics.send(AppEvent.SendCoinsChooseCoinButton)
         viewState.startAccountSelector(
-                selectorDataFromAccounts(accountStorage.entity.mainWallet.coinsList)
+                selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList)
         ) { onAccountSelected(it.data) }
     }
 

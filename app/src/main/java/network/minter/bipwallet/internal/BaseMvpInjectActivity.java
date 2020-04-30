@@ -171,7 +171,7 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
             new SnackbarBuilder(this)
                     .setMessage(errorMessage)
                     .setAction(actionName, errorResolver)
-                    .setDurationIndefinite()
+                    .setDurationInfinite()
                     .show();
         });
     }

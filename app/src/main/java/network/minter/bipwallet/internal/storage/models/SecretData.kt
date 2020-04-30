@@ -41,7 +41,6 @@ import java.util.*
 class SecretData : Serializable, Cloneable {
     var id: String
         private set
-    private var mTitle: String? = null
     var seedPhrase: String?
         private set
     var seed: BytesData
@@ -53,7 +52,11 @@ class SecretData : Serializable, Cloneable {
     var minterAddress: MinterAddress
         private set
     val date = Date()
-    private var mCanSign = true
+
+    private var mTitle: String? = null
+
+    var canSign: Boolean = true
+        private set
 
     constructor(address: MinterAddress) {
         id = UUID.randomUUID().toString()
@@ -74,6 +77,9 @@ class SecretData : Serializable, Cloneable {
         mTitle = MoreObjects.firstNonNull(title, minterAddress.toShortString())
     }
 
+    val hasTitle: Boolean
+        get() = mTitle != null
+
     var title: String?
         get() = mTitle ?: minterAddress.toShortString()
         set(title) {
@@ -84,15 +90,11 @@ class SecretData : Serializable, Cloneable {
         return ProfileAddressData(minterAddress, isMain, seedPhrase, isServerSecured, encKey)
     }
 
-    fun canSign(): Boolean {
-        return mCanSign
-    }
-
     fun cleanup() {
         seedPhrase = ""
         seed.cleanup()
         privateKey.cleanup()
-        mCanSign = false
+        canSign = false
     }
 
     @Throws(CloneNotSupportedException::class)

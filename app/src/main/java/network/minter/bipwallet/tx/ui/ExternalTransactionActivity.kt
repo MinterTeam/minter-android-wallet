@@ -42,9 +42,11 @@ import network.minter.bipwallet.databinding.ActivityExternalTransactionBinding
 import network.minter.bipwallet.external.*
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.releaseDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
+import network.minter.bipwallet.internal.dialogs.WalletDialogFragment
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.system.ActivityBuilder
@@ -73,7 +75,8 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     @InjectPresenter lateinit var presenter: ExternalTransactionPresenter
 
     private lateinit var b: ActivityExternalTransactionBinding
-    private var mCurrentDialog: WalletDialog? = null
+    private var walletDialog: WalletDialog? = null
+    private var walletDialogFragment: WalletDialogFragment? = null
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         b.inputList.adapter = adapter
@@ -95,12 +98,18 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     }
 
     override fun startDialog(executor: (Context) -> WalletDialog) {
-        mCurrentDialog = switchDialogWithExecutor(this, mCurrentDialog, executor)
+        walletDialog = switchDialogWithExecutor(this, walletDialog, executor)
+    }
+
+    override fun startDialogFragment(executor: DialogFragmentExecutor) {
+        walletDialogFragment = WalletDialogFragment.switchDialogWithExecutor(
+                this, walletDialogFragment, executor
+        )
     }
 
     override fun startDialog(cancelable: Boolean, executor: (Context) -> WalletDialog) {
-        mCurrentDialog = switchDialogWithExecutor(this, mCurrentDialog, executor)
-        mCurrentDialog!!.setCancelable(cancelable)
+        walletDialog = switchDialogWithExecutor(this, walletDialog, executor)
+        walletDialog!!.setCancelable(cancelable)
     }
 
     override fun setOnConfirmListener(listener: View.OnClickListener) {
@@ -112,12 +121,12 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     }
 
     override fun hideProgress() {
-        releaseDialog(mCurrentDialog)
-        mCurrentDialog = null
+        releaseDialog(walletDialog)
+        walletDialog = null
     }
 
     override fun showProgress() {
-        mCurrentDialog = switchDialogWithExecutor(this, mCurrentDialog, { ctx: Context? ->
+        walletDialog = switchDialogWithExecutor(this, walletDialog, { ctx: Context? ->
             WalletProgressDialog.Builder(ctx, "Please, wait")
                     .setText("We're loading required account information")
                     .create()
@@ -172,7 +181,7 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
 
     override fun onStop() {
         super.onStop()
-        releaseDialog(mCurrentDialog)
+        releaseDialog(walletDialog)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

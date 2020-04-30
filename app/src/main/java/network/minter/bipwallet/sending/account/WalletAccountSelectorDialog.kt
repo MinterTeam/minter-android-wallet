@@ -34,6 +34,7 @@ import network.minter.bipwallet.databinding.DialogAccountSelectorBinding
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.storage.models.SecretData
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinDelegation
@@ -54,7 +55,18 @@ data class SelectorData<out Data>(
         val avatarFallback: Int = R.drawable.img_avatar_default
 )
 
-fun selectorDataFromAccounts(input: List<CoinBalance>): List<SelectorData<CoinBalance>> {
+fun selectorDataFromSecrets(input: List<SecretData>): List<SelectorData<SecretData>> {
+    return input.map {
+        SelectorData(
+                it,
+                it.title!!,
+                if (!it.hasTitle) null else it.minterAddress.toShortString(),
+                MinterProfileApi.getUserAvatarUrlByAddress(it.minterAddress)
+        )
+    }
+}
+
+fun selectorDataFromCoins(input: List<CoinBalance>): List<SelectorData<CoinBalance>> {
     return input.map {
         SelectorData(
                 it,
@@ -121,10 +133,9 @@ class WalletAccountSelectorDialog<out Data> private constructor(
         var clickListener: AccountSelectedAdapter.OnClickListener<Data>? = null
 
         @JvmOverloads
-        constructor(context: Context, title: CharSequence? = null) : super(context, title) {
-        }
+        constructor(context: Context, title: CharSequence? = null) : super(context, title)
 
-        constructor(context: Context, @StringRes titleRes: Int) : super(context, titleRes) {}
+        constructor(context: Context, @StringRes titleRes: Int) : super(context, titleRes)
 
         override fun create(): WalletAccountSelectorDialog<Data> {
             return WalletAccountSelectorDialog(context, this)

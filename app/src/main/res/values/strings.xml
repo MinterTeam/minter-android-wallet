@@ -330,5 +330,6 @@
     <string name="btn_save_changes">Save Changes</string>
     <string name="dialog_title_your_address">Your Address</string>
     <string name="empty_address_book">No records were found</string>
+    <string name="dialog_title_choose_wallet">Choose Wallet</string>
 
 </resources>

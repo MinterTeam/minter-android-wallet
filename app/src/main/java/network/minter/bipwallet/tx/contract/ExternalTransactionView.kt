@@ -32,6 +32,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ProgressView
 
@@ -53,6 +54,9 @@ interface ExternalTransactionView : MvpView, ProgressView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(executor: (Context) -> WalletDialog)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startDialogFragment(executor: DialogFragmentExecutor)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(cancelable: Boolean, executor: (Context) -> WalletDialog)

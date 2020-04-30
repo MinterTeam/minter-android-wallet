@@ -99,7 +99,7 @@ class PinValidationDialog : MvpAppCompatDialogFragment(), PinValidatingView {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = Dialog(requireContext(), R.style.Wallet_DialogActivity)
+        val dialog = Dialog(requireContext(), R.style.Wallet_PinDialog)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         if (dialog.window != null) {
             val params = dialog.window!!.attributes

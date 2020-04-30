@@ -37,10 +37,8 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import androidx.fragment.app.Fragment
-import moxy.MvpView
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.R
+import network.minter.bipwallet.internal.helpers.ViewHelper
 
 /**
  * minter-android-wallet. 2018
@@ -67,24 +65,12 @@ abstract class WalletDialog protected constructor(context: Context) :
             window!!.attributes = params
             window!!.setGravity(Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL)
             window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            window!!.decorView.systemUiVisibility = ViewHelper.systemBarsLightness(false)
         }
 
         super.setOnDismissListener {
             dismissListeners.forEach { it.onDismiss(this) }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    @StateStrategyType(AddToEndSingleStrategy::class)
-    interface DialogContractView : MvpView {
-        fun startDialog(executor: (ctx: Context) -> WalletDialog)
-    }
-
-    interface WithPositiveAction<T> {
-        fun setPositiveAction(title: CharSequence?, listener: DialogInterface.OnClickListener?): T
     }
 
     fun addDismissListener(listener: (DialogInterface) -> Unit) {

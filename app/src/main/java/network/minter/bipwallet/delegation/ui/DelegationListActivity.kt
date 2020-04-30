@@ -110,6 +110,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
 
     override fun hideRefreshProgress() {
         binding.containerSwipeRefresh.isRefreshing = false
+        binding.progress.visible = false
     }
 
     override fun showProgress() {

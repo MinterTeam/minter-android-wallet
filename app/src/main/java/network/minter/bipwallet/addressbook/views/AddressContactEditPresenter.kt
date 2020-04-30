@@ -58,7 +58,9 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
             mIsNew = true
             viewState.setTitle(R.string.dialog_title_add_contact)
             if (bundle!!.containsKey(AddressContactEditDialog.ARG_ADDRESS)) {
-                viewState.setInputAddress(bundle.getString(AddressContactEditDialog.ARG_ADDRESS, null))
+                val address = bundle.getString(AddressContactEditDialog.ARG_ADDRESS, null)
+                mContact!!.address = address
+                viewState.setInputAddress(address)
             }
         } else {
             mContact!!.apply {

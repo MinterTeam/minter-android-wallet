@@ -52,10 +52,7 @@ import network.minter.bipwallet.databinding.FragmentTabSendBinding
 import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
-import network.minter.bipwallet.internal.dialogs.DialogExecutor
-import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
@@ -71,6 +68,7 @@ import network.minter.bipwallet.sending.views.SendTabPresenter
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.wallets.selector.WalletItem
+import network.minter.bipwallet.wallets.selector.WalletListAdapter
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
@@ -78,8 +76,8 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich (edward.vstock>@gmail.com)
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 @RuntimePermissions
 class SendTabFragment : HomeTabFragment(), SendView {
@@ -87,9 +85,8 @@ class SendTabFragment : HomeTabFragment(), SendView {
     @InjectPresenter lateinit var presenter: SendTabPresenter
 
     private val inputGroup: InputGroup = InputGroup()
-    private var mCurrentDialog: WalletDialog? = null
-    private var mAutocompleteAdapter: RecipientListAdapter? = null
-    private var bottomSheetDialog: BaseBottomSheetDialogFragment? = null
+    private var recipientListAdapter: RecipientListAdapter? = null
+
     private lateinit var binding: FragmentTabSendBinding
 
     override fun onTabSelected() {
@@ -108,14 +105,8 @@ class SendTabFragment : HomeTabFragment(), SendView {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onDestroyView() {
-        WalletDialog.releaseDialog(mCurrentDialog)
-        super.onDestroyView()
-    }
-
     @Suppress("UsePropertyAccessSyntax")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
         binding = FragmentTabSendBinding.inflate(inflater, container, false)
 
         binding.apply {
@@ -147,8 +138,8 @@ class SendTabFragment : HomeTabFragment(), SendView {
             setHasOptionsMenu(true)
             activity!!.menuInflater.inflate(R.menu.menu_tab_send, toolbar.menu)
             toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
-            mAutocompleteAdapter = RecipientListAdapter(context!!)
-            inputRecipient.input.setAdapter(mAutocompleteAdapter)
+            recipientListAdapter = RecipientListAdapter(context!!)
+            inputRecipient.input.setAdapter(recipientListAdapter)
         }
         return binding.root
     }
@@ -212,6 +203,18 @@ class SendTabFragment : HomeTabFragment(), SendView {
         binding.walletSelector.setMainWallet(walletItem)
     }
 
+    override fun setOnClickWalletListener(listener: WalletListAdapter.OnClickWalletListener) {
+        binding.walletSelector.setOnClickWalletListener(listener)
+    }
+
+    override fun setOnClickAddWalletListener(listener: WalletListAdapter.OnClickAddWalletListener) {
+        binding.walletSelector.setOnClickAddWalletListener(listener)
+    }
+
+    override fun setOnClickEditWalletListener(listener: WalletListAdapter.OnClickEditWalletListener) {
+        binding.walletSelector.setOnClickEditWalletListener(listener)
+    }
+
     override fun setPayloadError(error: CharSequence?) {
         inputGroup.setError("payload", error)
     }
@@ -243,12 +246,6 @@ class SendTabFragment : HomeTabFragment(), SendView {
         inputGroup.clearErrors()
     }
 
-    override fun startDialog(executor: DialogExecutor) {
-        runOnUiThread {
-            mCurrentDialog = WalletDialog.switchDialogWithExecutor(this, mCurrentDialog, executor)
-        }
-    }
-
     override fun startExplorer(txHash: String) {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)))
     }
@@ -270,7 +267,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setRecipient(to: AddressContact) {
-        binding.inputRecipient.postApply { it.setText(to.name) }
+        binding.inputRecipient.postApply {
+            it.setText(to.name)
+            if (to.name != null) {
+                it.setSelection(to.name!!.length)
+            }
+
+        }
     }
 
     override fun setRecipientError(error: CharSequence?) {
@@ -304,12 +307,12 @@ class SendTabFragment : HomeTabFragment(), SendView {
             listener.onClick(item, position)
             binding.inputRecipient.input.dismissDropDown()
         }
-        mAutocompleteAdapter!!.setOnItemClickListener(cl)
+        recipientListAdapter!!.setOnItemClickListener(cl)
     }
 
     override fun setRecipientAutocompleteItems(items: List<AddressContact>) {
         binding.inputRecipient.postApply {
-            mAutocompleteAdapter!!.setItems(items)
+            recipientListAdapter!!.setItems(items)
             it.input.showDropDown()
         }
     }

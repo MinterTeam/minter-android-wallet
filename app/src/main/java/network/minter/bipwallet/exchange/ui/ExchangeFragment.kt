@@ -33,6 +33,7 @@ import android.text.InputType
 import android.text.Spanned
 import android.view.View
 import android.widget.ScrollView
+import android.widget.TextView
 import com.edwardstock.inputfield.InputField
 import com.edwardstock.inputfield.InputFieldAutocomplete
 import com.edwardstock.inputfield.form.DecimalInputFilter
@@ -53,10 +54,13 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDi
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.widgets.WalletButton
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
-import network.minter.bipwallet.sending.account.selectorDataFromAccounts
+import network.minter.bipwallet.sending.account.selectorDataFromCoins
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
+import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinItem
 import timber.log.Timber
@@ -73,64 +77,74 @@ data class ExchangeBinding(
         val inputIncomingCoin: InputFieldAutocomplete,
         val inputAmount: InputField,
         val calculationContainer: IncludeExchangeCalculationBinding,
-        val action: WalletButton
+        val action: WalletButton,
+        val lastUpdated: TextView
 )
 
 abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
 
-    protected var mInputGroup = InputGroup()
-    private var mCurrentDialog: WalletDialog? = null
+    protected var inputGroup = InputGroup()
+    private var walletDialog: WalletDialog? = null
     protected lateinit var binding: ExchangeBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.inputOutgoingCoin.input.setFocusable(false)
+        binding.inputOutgoingCoin.input.isFocusable = false
 
-        mInputGroup.addInput(binding.inputIncomingCoin, binding.inputAmount)
-        mInputGroup.addValidator(binding.inputAmount, DecimalValidator("Invalid number"))
-        mInputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
+        inputGroup.clearErrorBeforeValidate = false
+        inputGroup.addInput(binding.inputIncomingCoin, binding.inputAmount)
+        inputGroup.addValidator(binding.inputAmount, DecimalValidator("Invalid number"))
+        inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         val coinValidator = RegexValidator("^[a-zA-Z0-9]{1,10}$").apply {
             errorMessage = "Invalid coin name"
         }
-        mInputGroup.addValidator(binding.inputIncomingCoin, coinValidator)
-        mInputGroup.addFilter(binding.inputIncomingCoin, InputFilter { source: CharSequence, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int ->
+        inputGroup.addValidator(binding.inputIncomingCoin, coinValidator)
+        inputGroup.addFilter(binding.inputIncomingCoin, InputFilter { source: CharSequence, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int ->
             Timber.d("Filter: source=%s, start=%d, end=%d, dest=%s, destStart=%d, destEnd=%d", source, start, end, dest, dstart, dend)
             source.toString().toUpperCase().replace("[^A-Z0-9]".toRegex(), "")
         })
-        mInputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
+        inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         binding.calculationContainer.calculation.inputType = InputType.TYPE_NULL
+
+
+        LastBlockHandler.handle(binding.lastUpdated)
+        val broadcastManager = BroadcastReceiverManager(activity!!)
+        broadcastManager.add(RTMBlockReceiver {
+            LastBlockHandler.handle(binding.lastUpdated, it)
+        })
+        broadcastManager.register()
     }
 
     override fun onDestroyView() {
-        releaseDialog(mCurrentDialog)
+        releaseDialog(walletDialog)
         super.onDestroyView()
     }
 
     override fun startDialog(executor: DialogExecutor) {
-        mCurrentDialog = switchDialogWithExecutor(this, mCurrentDialog, executor)
+        walletDialog = switchDialogWithExecutor(this, walletDialog, executor)
     }
 
     override fun setTextChangedListener(listener: (InputWrapper, Boolean) -> Unit) {
-        mInputGroup.addTextChangedListener(listener)
+        inputGroup.addTextChangedListener(listener)
     }
 
     override fun startAccountSelector(accounts: List<CoinBalance>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
         WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, R.string.title_select_account)
-                .setItems(selectorDataFromAccounts(accounts))
+                .setItems(selectorDataFromCoins(accounts))
                 .setOnClickListener(clickListener)
                 .create().show()
     }
 
     override fun setError(field: String, message: CharSequence?) {
-        mInputGroup.setError(field, message)
+        inputGroup.setError(field, message)
     }
 
     override fun clearErrors() {
-        mInputGroup.clearErrors()
+        inputGroup.clearErrors()
     }
 
     override fun setFormValidationListener(listener: (Boolean) -> Unit) {
-        mInputGroup.addFormValidateListener(listener)
+        inputGroup.addFormValidateListener(listener)
     }
 
     override fun startExplorer(txHash: String) {
@@ -226,6 +240,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
 
     override fun setIncomingCoin(symbol: String) {
         binding.inputIncomingCoin.setText(symbol)
+        binding.inputIncomingCoin.setSelection(symbol.length)
     }
 
     override fun setFee(commission: CharSequence) {

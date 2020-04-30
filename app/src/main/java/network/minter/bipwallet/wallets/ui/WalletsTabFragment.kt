@@ -55,11 +55,7 @@ import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.dialogs.ActionListener
-import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
-import network.minter.bipwallet.internal.dialogs.WalletDialog
-import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
@@ -69,9 +65,6 @@ import network.minter.bipwallet.share.ShareDialog
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.TransactionListActivity
 import network.minter.bipwallet.wallets.contract.WalletsTabView
-import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog
-import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog
-import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
@@ -92,19 +85,12 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         const val REQUEST_CODE_QR_SCAN_TX = 2002
     }
 
-    @JvmField @Inject
-    var presenterProvider: Provider<WalletsTabPresenter>? = null
+    @Inject lateinit var presenterProvider: Provider<WalletsTabPresenter>
+    @InjectPresenter lateinit var presenter: WalletsTabPresenter
 
-    @JvmField @InjectPresenter
-    var presenter: WalletsTabPresenter? = null
-
-    lateinit var binding: FragmentTabWalletsBinding
-    private val mSwipeRefreshHacker = SwipeRefreshHacker()
-    private var mCurrentDialog: WalletDialog? = null
-    private var mBottomDialog: BaseBottomSheetDialogFragment? = null
-
-
+    private val swipeRefreshHacker = SwipeRefreshHacker()
     private lateinit var mRecolorHelper: WalletsTopRecolorHelper
+    lateinit var binding: FragmentTabWalletsBinding
 
     override fun onAttach(context: Context) {
         HomeModule.getComponent().inject(this)
@@ -113,8 +99,8 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun setOnRefreshListener(listener: OnRefreshListener) {
         binding.containerSwipeRefresh.setOnRefreshListener(listener)
-        mSwipeRefreshHacker.setOnRefreshStartListener(this::onStartRefresh)
-        mSwipeRefreshHacker.hack(binding.containerSwipeRefresh)
+        swipeRefreshHacker.setOnRefreshStartListener(this::onStartRefresh)
+        swipeRefreshHacker.hack(binding.containerSwipeRefresh)
     }
 
     override fun showRefreshProgress() {
@@ -130,19 +116,19 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        presenter!!.onRestoreInstanceState(savedInstanceState)
+        presenter.onRestoreInstanceState(savedInstanceState)
         super.onActivityCreated(savedInstanceState)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        presenter!!.onActivityResult(requestCode, resultCode, data)
+        presenter.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentTabWalletsBinding.inflate(inflater, container, false)
-        presenter!!.onRestoreInstanceState(savedInstanceState)
+        presenter.onRestoreInstanceState(savedInstanceState)
         mRecolorHelper = WalletsTopRecolorHelper(this)
         binding.appbar.addOnOffsetChangedListener(object : AppBarOffsetChangedListener() {
             override fun onStateChanged(appBarLayout: AppBarLayout?, state: State?, verticalOffset: Int, expandedPercent: Float) {
@@ -207,10 +193,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun startDialog(executor: Function1<Context, WalletDialog>) {
-        mCurrentDialog = switchDialogWithExecutor(this, mCurrentDialog, executor)
-    }
-
     override fun startExternalTransaction(rawData: String) {
         ExternalTransactionActivity.Builder(activity!!, rawData)
                 .start()
@@ -227,51 +209,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
             return
         }
         activity!!.startActivityForResult(i, requestCode)
-    }
-
-    override fun startWalletEdit(walletItem: WalletItem, onSubmitListener: ActionListener) {
-        if (mBottomDialog != null) {
-            mBottomDialog!!.dismiss()
-            mBottomDialog = null
-        }
-        if (fragmentManager == null) {
-            Timber.w("Fragment manager is NULL")
-            return
-        }
-        mBottomDialog = EditWalletDialog.newInstance(walletItem)
-        mBottomDialog!!.onSubmitListener = onSubmitListener
-        mBottomDialog!!.show(fragmentManager!!, "wallet_edit")
-    }
-
-    override fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?) {
-        if (mBottomDialog != null) {
-            mBottomDialog!!.dismiss()
-            mBottomDialog = null
-        }
-        if (fragmentManager == null) {
-            Timber.w("Fragment manager is NULL")
-            return
-        }
-        val addWalletDialog = AddWalletDialog.newInstance()
-        addWalletDialog.onSubmitListener = onSubmit
-        addWalletDialog.onDismissListener = onDismiss
-        addWalletDialog.setOnGenerateNewWalletListener { submitListener: ActionListener?,
-                                                         dismissListener: ActionListener?,
-                                                         title: String? ->
-
-            mBottomDialog!!.dismiss()
-            mBottomDialog = CreateWalletDialog.Builder()
-                    .setEnableDescription(true)
-                    .setEnableTitleInput(true)
-                    .setWalletTitle(title)
-                    .setOnSubmitListener(submitListener)
-                    .setOnDismissListener(dismissListener)
-                    .setEnableStartHomeOnSubmit(false)
-                    .build()
-            mBottomDialog!!.show(fragmentManager!!, "wallet_generate")
-        }
-        mBottomDialog = addWalletDialog
-        mBottomDialog!!.show(fragmentManager!!, "wallet_add")
     }
 
     override fun showSendAndSetAddress(address: String) {
@@ -316,17 +253,17 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     override fun onCreate(savedInstanceState: Bundle?) {
         HomeModule.getComponent().inject(this)
         super.onCreate(savedInstanceState)
-        presenter!!.onRestoreInstanceState(savedInstanceState)
+        presenter.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        presenter!!.onTrimMemory()
+        presenter.onTrimMemory()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        presenter!!.onLowMemory()
+        presenter.onLowMemory()
         Timber.d("OnLowMemory")
     }
 
@@ -364,7 +301,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        presenter!!.onSaveInstanceState(outState)
+        presenter.onSaveInstanceState(outState)
     }
 
     override fun startTransactionList() {
@@ -392,7 +329,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     @ProvidePresenter
     fun providePresenter(): WalletsTabPresenter {
-        return presenterProvider!!.get()
+        return presenterProvider.get()
     }
 
     @OnShowRationale(Manifest.permission.CAMERA)

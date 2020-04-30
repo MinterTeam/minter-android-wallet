@@ -46,7 +46,7 @@ import java.io.IOException
  * minter-android-wallet. 2018
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class ConfirmDialog(context: Context, private val mBuilder: Builder) : WalletDialog(context) {
+class ConfirmDialog(context: Context, private val builder: Builder) : WalletDialog(context) {
 
     private lateinit var binding: DialogConfirmBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,31 +54,31 @@ class ConfirmDialog(context: Context, private val mBuilder: Builder) : WalletDia
         binding = DialogConfirmBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.title.text = mBuilder.title
-        binding.dialogDescription.visible = mBuilder.mDescription != null
-        binding.dialogDescription.text = mBuilder.mDescription
+        binding.title.text = builder.title
+        binding.dialogDescription.visible = builder.mDescription != null
+        binding.dialogDescription.text = builder.mDescription
 
-        binding.dialogText.text = mBuilder.mText
-        binding.dialogText.textAlignment = mBuilder.mTextAlignment
-        binding.dialogText.setTextIsSelectable(mBuilder.mTextIsSelectable)
+        binding.dialogText.text = builder.mText
+        binding.dialogText.textAlignment = builder.mTextAlignment
+        binding.dialogText.setTextIsSelectable(builder.mTextIsSelectable)
 
 
-        if (mBuilder.mOnTextClickListener != null) {
+        if (builder.mOnTextClickListener != null) {
             binding.dialogText.isClickable = true
             binding.dialogText.isFocusable = true
             setSelectableItemBackground(binding.dialogText)
-            binding.dialogText.setOnClickListener(mBuilder.mOnTextClickListener)
+            binding.dialogText.setOnClickListener(builder.mOnTextClickListener)
         }
-        if (mBuilder.mTypeface != null) {
-            binding.dialogText.typeface = mBuilder.mTypeface
-        }
-
-        if (mBuilder.mDescriptionTypeface != null) {
-            binding.dialogDescription.typeface = mBuilder.mDescriptionTypeface
+        if (builder.mTypeface != null) {
+            binding.dialogText.typeface = builder.mTypeface
         }
 
-        mBuilder.bindAction(this, binding.actionConfirm, DialogInterface.BUTTON_POSITIVE)
-        mBuilder.bindAction(this, binding.actionDecline, DialogInterface.BUTTON_NEGATIVE)
+        if (builder.mDescriptionTypeface != null) {
+            binding.dialogDescription.typeface = builder.mDescriptionTypeface
+        }
+
+        builder.bindAction(this, binding.actionConfirm, DialogInterface.BUTTON_POSITIVE)
+        builder.bindAction(this, binding.actionDecline, DialogInterface.BUTTON_NEGATIVE)
     }
 
     class Builder : WalletDialogBuilder<ConfirmDialog, Builder> {
@@ -90,8 +90,8 @@ class ConfirmDialog(context: Context, private val mBuilder: Builder) : WalletDia
         var mOnTextClickListener: View.OnClickListener? = null
         var mTextAlignment = View.TEXT_ALIGNMENT_INHERIT
 
-        constructor(context: Context, @StringRes title: Int) : super(context, title) {}
-        constructor(context: Context, title: CharSequence?) : super(context, title) {}
+        constructor(context: Context, @StringRes title: Int) : super(context, title)
+        constructor(context: Context, title: CharSequence?) : super(context, title)
 
         override fun create(): ConfirmDialog {
             checkArgument(hasActionTitle(DialogInterface.BUTTON_POSITIVE), "At least, positive action title should be set")

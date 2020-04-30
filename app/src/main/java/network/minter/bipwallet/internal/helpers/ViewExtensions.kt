@@ -83,7 +83,7 @@ object ViewExtensions {
     fun View?.visibleForTestnet() {
         if (this == null) return
 
-        if (BuildConfig.FLAVOR.contains("netTest")) {
+        if (BuildConfig.FLAVOR == "netTest") {
             visible = true
             setOnClickListener {
                 try {

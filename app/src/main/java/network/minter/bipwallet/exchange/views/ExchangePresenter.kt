@@ -428,7 +428,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     mClickedUseMax.set(false)
                     mSellAmount = am
                 }
-                viewState.setSubmitEnabled(mAccount != null && am <= mAccount!!.amount)
+//                viewState.setSubmitEnabled(mAccount != null && am <= mAccount!!.amount)
                 mInputChange!!.onNext(isBuying)
             }
         }

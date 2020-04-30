@@ -45,6 +45,7 @@ import network.minter.bipwallet.apis.reactive.rxGate
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.Preconditions.firstNonNull
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.dialogs.WalletDialogFragment
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction
 import network.minter.bipwallet.internal.helpers.DeepLinkHelper
@@ -54,8 +55,11 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
+import network.minter.bipwallet.sending.account.selectorDataFromSecrets
+import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.contract.TxInitData
+import network.minter.bipwallet.tx.ui.AddressSelectorDialog
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.InputFieldRow
 import network.minter.blockchain.models.TransactionSendResult
@@ -720,6 +724,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             val dialog = WalletProgressDialog.Builder(ctx, R.string.please_wait)
                     .setText(R.string.tx_send_in_progress)
                     .create()
+
             dialog.setCancelable(false)
             val initData: Observable<TxInitData>
             initData = if (mExtTx!!.nonce != null && mExtTx!!.nonce != BigInteger.ZERO) {
@@ -729,6 +734,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 getTxInitData(mFrom)
             }
             val d = initData
+                    .joinToUi()
                     .switchMap(Function<TxInitData, ObservableSource<GateResult<TransactionSendResult>>> { cntRes: TxInitData ->
                         // if in previous request we've got error, returning it
                         if (!cntRes.isSuccess) {
@@ -779,29 +785,32 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         }
         accountStorage.update(true)
         cachedTxRepo.update(true)
-        viewState.startDialog(false) { ctx: Context? ->
-            val builder = ConfirmDialog.Builder(ctx!!, "Success!")
-                    .setText("Transaction successfully sent")
-                    .setPositiveAction("View transaction") { d, _ ->
+        viewState.startDialog(false) { ctx: Context ->
+            TxSendSuccessDialog.Builder(ctx)
+                    .setLabel("Transaction successfully sent")
+                    .setValue(null)
+                    .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
                         viewState.startExplorer(result.result.txHash.toString())
                         d.dismiss()
                         viewState.finishSuccess()
                     }
-                    .setNegativeAction("Close") { d, _ ->
+                    .setNegativeAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
                         viewState.finishSuccess()
                     }
-            builder.create()
+                    .create()
         }
     }
 
     private fun onExecuteComplete() {}
+
     private fun onSubmit() {
-        viewState.startDialog { ctx: Context? ->
-            ConfirmDialog.Builder(ctx!!, "Sign transaction")
-                    .setText("Press \"Confirm and send\" to sign and send transaction to the network, or Cancel to dismiss")
-                    .setPositiveAction(R.string.btn_confirm_send) { _, _ ->
+        viewState.startDialogFragment { ctx ->
+            AddressSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
+                    .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
+                    .setPositiveAction(R.string.btn_confirm_send) { d: WalletDialogFragment, _ ->
+                        mFrom = (d as AddressSelectorDialog).item!!.data.minterAddress
                         startExecuteTransaction()
                     }
                     .setNegativeAction(R.string.btn_cancel)

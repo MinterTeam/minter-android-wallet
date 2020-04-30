@@ -47,10 +47,6 @@ import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
-import network.minter.bipwallet.internal.dialogs.DialogExecutor
-import network.minter.bipwallet.internal.dialogs.WalletDialog
-import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.dismissInstance
-import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.views.SnackbarBuilder
@@ -76,8 +72,6 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
     @InjectPresenter lateinit var presenter: SettingsTabPresenter
 
     private lateinit var binding: FragmentTabSettingsBinding
-    private var mDialog: WalletDialog? = null
-
 
     override fun onAttach(context: Context) {
         HomeModule.getComponent().inject(this)
@@ -135,11 +129,6 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
         binding.listSecurity.adapter = securityAdapter
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        dismissInstance(mDialog)
-    }
-
     override fun startAvatarChooser() {}
 
     override fun showMessage(message: CharSequence) {
@@ -147,10 +136,6 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
                 .setMessage(message)
                 .setDurationShort()
                 .show()
-    }
-
-    override fun startDialog(executor: DialogExecutor) {
-        mDialog = switchDialogWithExecutor(this, mDialog, executor)
     }
 
     override fun startPinCodeManager(requestCode: Int, mode: PinMode) {

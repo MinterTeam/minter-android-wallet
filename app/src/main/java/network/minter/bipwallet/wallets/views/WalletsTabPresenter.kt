@@ -55,6 +55,7 @@ import network.minter.core.internal.helpers.StringHelper.splitDecimalStringFract
 import network.minter.explorer.models.RewardStatistics
 import network.minter.explorer.repo.ExplorerAddressRepository
 import timber.log.Timber
+import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
 
@@ -192,8 +193,13 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
 
 
                             // show delegated
-                            val delegated = res.find(secretStorage.mainWallet).get().delegated
-                            viewState.setDelegationAmount("${delegated.humanize()} ${MinterSDK.DEFAULT_COIN}")
+                            if (res.find(secretStorage.mainWallet).isPresent) {
+                                val delegated = res.find(secretStorage.mainWallet).get().delegated
+                                viewState.setDelegationAmount("${delegated.humanize()} ${MinterSDK.DEFAULT_COIN}")
+                            } else {
+                                viewState.setDelegationAmount("${BigDecimal.ZERO.humanize()} ${MinterSDK.DEFAULT_COIN}")
+                            }
+
 
                             viewState.hideRefreshProgress()
                         },

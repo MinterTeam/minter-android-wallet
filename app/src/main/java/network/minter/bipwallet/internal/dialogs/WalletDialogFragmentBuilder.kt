@@ -34,27 +34,27 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import java.lang.ref.WeakReference
 
 /**
- * minter-android-wallet. 2018
+ * minter-android-wallet. 2020
  *
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-typealias DialogActionListener = (dialog: DialogInterface, which: Int) -> Unit
+typealias DialogFragmentActionListener = (dialog: WalletDialogFragment, which: Int) -> Unit
 
 @Suppress("UNCHECKED_CAST")
-abstract class WalletDialogBuilder<D, B : WalletDialogBuilder<D, B>>(context: Context) {
+abstract class WalletDialogFragmentBuilder<D, B : WalletDialogFragmentBuilder<D, B>>(context: Context) {
     protected val mContext: WeakReference<Context> = WeakReference(context)
 
     @JvmField
     var title: CharSequence? = null
 
-    protected val actionDataDialog = HashMap<Int, Pair<CharSequence?, DialogActionListener?>>()
+    protected val actionData = HashMap<Int, Pair<CharSequence?, DialogFragmentActionListener?>>()
 
-    fun <T : TextView> bindAction(dialog: DialogInterface, view: T, whichBtn: Int) {
-        if (!actionDataDialog.containsKey(whichBtn) || actionDataDialog[whichBtn] == null) {
+    fun <T : TextView> bindAction(dialog: WalletDialogFragment, view: T, whichBtn: Int) {
+        if (!actionData.containsKey(whichBtn) || actionData[whichBtn] == null) {
             view.visible = false
             return
         }
-        val data = actionDataDialog[whichBtn]!!
+        val data = actionData[whichBtn]!!
         if (data.first == null || data.first!!.isEmpty()) {
             view.visible = false
             return
@@ -71,7 +71,7 @@ abstract class WalletDialogBuilder<D, B : WalletDialogBuilder<D, B>>(context: Co
     }
 
     protected fun hasActionTitle(whichBtn: Int): Boolean {
-        return actionDataDialog.containsKey(whichBtn) && actionDataDialog[whichBtn]!!.first != null
+        return actionData.containsKey(whichBtn) && actionData[whichBtn]!!.first != null
     }
 
     protected val context: Context
@@ -88,11 +88,11 @@ abstract class WalletDialogBuilder<D, B : WalletDialogBuilder<D, B>>(context: Co
         setTitle(title)
     }
 
-    fun setTitle(@StringRes title: Int): WalletDialogBuilder<*, *> {
+    fun setTitle(@StringRes title: Int): WalletDialogFragmentBuilder<*, *> {
         return setTitle(mContext.get()!!.resources.getString(title))
     }
 
-    fun setTitle(title: CharSequence?): WalletDialogBuilder<*, *> {
+    fun setTitle(title: CharSequence?): WalletDialogFragmentBuilder<*, *> {
         this.title = title
         return this
     }
@@ -100,41 +100,41 @@ abstract class WalletDialogBuilder<D, B : WalletDialogBuilder<D, B>>(context: Co
     abstract fun create(): D
 
     @JvmOverloads
-    fun setPositiveAction(title: CharSequence?, listener: DialogActionListener? = null): B {
+    fun setPositiveAction(title: CharSequence?, listener: DialogFragmentActionListener? = null): B {
         return setAction(DialogInterface.BUTTON_POSITIVE, title, listener)
     }
 
     @JvmOverloads
-    fun setPositiveAction(@StringRes resId: Int, listener: DialogActionListener? = null): B {
+    fun setPositiveAction(@StringRes resId: Int, listener: DialogFragmentActionListener? = null): B {
         return setAction(DialogInterface.BUTTON_POSITIVE, resId, listener)
     }
 
     @JvmOverloads
-    fun setNegativeAction(title: CharSequence?, listener: DialogActionListener? = null): B {
+    fun setNegativeAction(title: CharSequence?, listener: DialogFragmentActionListener? = null): B {
         return setAction(DialogInterface.BUTTON_NEGATIVE, title, listener)
     }
 
     @JvmOverloads
-    fun setNegativeAction(@StringRes resId: Int, listener: DialogActionListener? = null): B {
+    fun setNegativeAction(@StringRes resId: Int, listener: DialogFragmentActionListener? = null): B {
         return setAction(DialogInterface.BUTTON_NEGATIVE, resId, listener)
     }
 
     @JvmOverloads
-    fun setNeutralAction(title: CharSequence?, listener: DialogActionListener? = null): B {
+    fun setNeutralAction(title: CharSequence?, listener: DialogFragmentActionListener? = null): B {
         return setAction(DialogInterface.BUTTON_NEUTRAL, title, listener)
     }
 
     @JvmOverloads
-    fun setNeutralAction(@StringRes resId: Int, listener: DialogActionListener? = null): B {
+    fun setNeutralAction(@StringRes resId: Int, listener: DialogFragmentActionListener? = null): B {
         return setAction(DialogInterface.BUTTON_NEUTRAL, resId, listener)
     }
 
-    protected fun setAction(whichBtn: Int, @StringRes titleRes: Int, listener: DialogActionListener? = null): B {
+    protected fun setAction(whichBtn: Int, @StringRes titleRes: Int, listener: DialogFragmentActionListener? = null): B {
         return setAction(whichBtn, context.resources.getString(titleRes), listener)
     }
 
-    protected fun setAction(whichBtn: Int, title: CharSequence?, listener: DialogActionListener? = null): B {
-        actionDataDialog[whichBtn] = Pair(title, listener)
+    protected fun setAction(whichBtn: Int, title: CharSequence?, listener: DialogFragmentActionListener? = null): B {
+        actionData[whichBtn] = Pair(title, listener)
         return this as B
     }
 

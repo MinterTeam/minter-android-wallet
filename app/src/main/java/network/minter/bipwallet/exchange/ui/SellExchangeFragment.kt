@@ -64,7 +64,8 @@ class SellExchangeFragment : ExchangeFragment(), SellExchangeView {
                     inputIncomingCoin,
                     inputAmount,
                     calculationContainer,
-                    action
+                    action,
+                    lastUpdated
             )
 
             LastBlockHandler.handle(lastUpdated)

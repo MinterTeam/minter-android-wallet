@@ -30,6 +30,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -309,6 +310,11 @@ public final class ViewHelper {
     public static void setSystemBarsLightness(Activity activity, boolean light) {
         if (activity == null) return;
         activity.getWindow().getDecorView().setSystemUiVisibility(systemBarsLightness(light));
+    }
+
+    public static void setSystemBarsLightness(Dialog dialog, boolean light) {
+        if (dialog == null || dialog.getWindow() == null) return;
+        dialog.getWindow().getDecorView().setSystemUiVisibility(systemBarsLightness(light));
     }
 
     public static void setOnImeActionListener(EditText input, int action, View.OnClickListener listener) {

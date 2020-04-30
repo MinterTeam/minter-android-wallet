@@ -38,6 +38,7 @@ import network.minter.bipwallet.databinding.DialogTxSendCompleteBinding
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder
 import network.minter.bipwallet.internal.helpers.MathHelper
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 
 /**
  * minter-android-wallet. 2018
@@ -55,6 +56,8 @@ private constructor(context: Context, private val builder: Builder) : WalletDial
 
         binding.apply {
             txDescription.text = builder.mLabel
+
+            dialogSecondValue.visible = builder.mValue != null
             dialogSecondValue.text = builder.mValue
 
             builder.bindAction(this@TxSendSuccessDialog, actionViewTx, DialogInterface.BUTTON_POSITIVE)
