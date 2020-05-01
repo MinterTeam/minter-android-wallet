@@ -31,11 +31,10 @@ plugins {
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
     id 'com.google.gms.google-services'
+    id 'com.google.firebase.appdistribution'
 
 //    id 'firebase.test.lab'
 }
-
-//apply plugin: 'firebase.test.lab'
 
 Properties localProps = new Properties()
 localProps.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -125,6 +124,10 @@ android {
             shrinkResources false
             testCoverageEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-test-rules.pro', 'proguard-release-rules.pro'
+
+            firebaseAppDistribution {
+                groups="internal"
+            }
         }
     }
 
@@ -342,6 +345,5 @@ dependencies {
 //    androidTestAnnotationProcessor 'com.google.dagger:dagger-android-processor:2.26'
 
 }
-repositories {
-    mavenCentral()
-}
+
+apply plugin: 'com.google.gms.google-services'
