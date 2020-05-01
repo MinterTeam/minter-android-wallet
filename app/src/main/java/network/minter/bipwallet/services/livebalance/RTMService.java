@@ -119,6 +119,10 @@ public class RTMService extends Service {
     public IBinder onBind(Intent intent) {
         try {
             connect();
+            secretStorage.addOnMainWalletChangeListener(minterAddress -> {
+                reconnect();
+                return null;
+            });
         } catch (Exception e) {
             Timber.w(e);
         }
@@ -132,6 +136,12 @@ public class RTMService extends Service {
 
     public Client getClient() {
         return mClient;
+    }
+
+    private void reconnect() {
+        Timber.d("Reconnecting, as main wallet has been changed");
+        disconnect();
+        connect();
     }
 
     private void connect() {
@@ -184,7 +194,8 @@ public class RTMService extends Service {
             mClient = new Client(BuildConfig.LIVE_BALANCE_URL + "?format=protobuf", opts, listener);
             mClient.connect();
 
-            mAddress = secretStorage.getAddresses().get(0);
+            mAddress = secretStorage.getMainWallet();
+            Timber.d("Subscribe to address balance: %s", mAddress.toString());
             Subscription balanceSubscription = mClient.newSubscription(mAddress.toString(), new SubscriptionEventListener() {
                 @Override
                 public void onPublish(Subscription subscription, PublishEvent publishEvent) {

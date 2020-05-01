@@ -34,13 +34,11 @@ import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.addressbook.models.AddressContact
-import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter
-import network.minter.bipwallet.wallets.selector.WalletItem
-import network.minter.bipwallet.wallets.selector.WalletListAdapter
+import network.minter.bipwallet.wallets.contract.WalletSelectorControllerView
 import network.minter.explorer.models.CoinBalance
 
 /**
@@ -48,7 +46,7 @@ import network.minter.explorer.models.CoinBalance
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface SendView : MvpView, ErrorViewWithRetry {
+interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun setOnClickAccountSelectedListener(listener: View.OnClickListener)
     fun setOnClickMaximum(listener: View.OnClickListener)
     fun setOnClickAddPayload(listener: View.OnClickListener)
@@ -102,16 +100,6 @@ interface SendView : MvpView, ErrorViewWithRetry {
     fun hidePayload()
 
 
-    fun setWallets(walletItems: List<WalletItem>)
-    fun setMainWallet(walletItem: WalletItem)
-    fun setOnClickWalletListener(listener: WalletListAdapter.OnClickWalletListener)
-    fun setOnClickAddWalletListener(listener: WalletListAdapter.OnClickAddWalletListener)
-    fun setOnClickEditWalletListener(listener: WalletListAdapter.OnClickEditWalletListener)
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startWalletEdit(walletItem: WalletItem, onSubmitListener: ActionListener)
-
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?)
 
 }

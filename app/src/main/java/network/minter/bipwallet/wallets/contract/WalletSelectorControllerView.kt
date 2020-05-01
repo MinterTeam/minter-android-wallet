@@ -24,42 +24,29 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.tx.contract
+package network.minter.bipwallet.wallets.contract
 
-import android.content.Intent
-import android.view.View
-import androidx.annotation.DrawableRes
-import androidx.annotation.LayoutRes
-import androidx.annotation.StringRes
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
+import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.internal.dialogs.ActionListener
+import network.minter.bipwallet.wallets.selector.WalletItem
+import network.minter.bipwallet.wallets.selector.WalletListAdapter
 
-/**
- * minter-android-wallet. 2020
- * @author Eduard Maximovich (edward.vstock@gmail.com)
- */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface TransactionView : MvpView {
-    fun setTitle(@StringRes resId: Int)
-    fun setTitle(title: CharSequence)
-    fun inflateDetails(@LayoutRes layoutRes: Int, l: (View) -> Unit)
-    fun setFromAddress(address: String?)
-    fun setFromName(name: String?)
-    fun setFromAvatar(fromAvatar: String)
-    fun setFromAvatar(@DrawableRes resId: Int)
-    fun setToAddress(recipient: String?)
-    fun setToName(name: String?)
-    fun setToAvatar(toAvatar: String?)
-    fun setToAvatar(toAvatar: String?, fallback: Int)
-    fun setToAvatar(@DrawableRes resId: Int)
-    fun showTo(show: Boolean)
-    fun setPayload(payload: String?)
-    fun setTimestamp(format: String)
-    fun setFee(fee: String)
-    fun setBlockNumber(blockNum: String)
-    fun startIntent(intent: Intent)
-    fun setOnClickShare(listener: View.OnClickListener)
+interface WalletSelectorControllerView : MvpView {
 
+    fun setWallets(walletItems: List<WalletItem>)
+    fun setMainWallet(walletItem: WalletItem)
+    fun setOnClickWalletListener(listener: WalletListAdapter.OnClickWalletListener)
+    fun setOnClickAddWalletListener(listener: WalletListAdapter.OnClickAddWalletListener)
+    fun setOnClickEditWalletListener(listener: WalletListAdapter.OnClickEditWalletListener)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startWalletEdit(walletItem: WalletItem, enableRemove: Boolean, submitListener: (WalletItem) -> Unit, deleteListener: (WalletItem) -> Unit)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?)
 
 }

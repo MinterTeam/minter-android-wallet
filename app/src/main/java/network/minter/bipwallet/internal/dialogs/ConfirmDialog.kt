@@ -30,7 +30,11 @@ import android.content.DialogInterface
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.FontRes
 import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
+import androidx.core.content.res.ResourcesCompat
+import com.airbnb.paris.extensions.style
 import network.minter.bipwallet.apis.reactive.ReactiveMyMinter
 import network.minter.bipwallet.databinding.DialogConfirmBinding
 import network.minter.bipwallet.internal.common.Preconditions.checkArgument
@@ -62,6 +66,12 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
         binding.dialogText.textAlignment = builder.mTextAlignment
         binding.dialogText.setTextIsSelectable(builder.mTextIsSelectable)
 
+        if (builder.mDescriptionTypeface > 0) {
+            binding.dialogDescription.typeface = ResourcesCompat.getFont(context, builder.mDescriptionTypeface)
+        }
+        if (builder.mButtonStyleRes > 0) {
+            binding.actionConfirm.style(builder.mButtonStyleRes)
+        }
 
         if (builder.mOnTextClickListener != null) {
             binding.dialogText.isClickable = true
@@ -73,9 +83,6 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
             binding.dialogText.typeface = builder.mTypeface
         }
 
-        if (builder.mDescriptionTypeface != null) {
-            binding.dialogDescription.typeface = builder.mDescriptionTypeface
-        }
 
         builder.bindAction(this, binding.actionConfirm, DialogInterface.BUTTON_POSITIVE)
         builder.bindAction(this, binding.actionDecline, DialogInterface.BUTTON_NEGATIVE)
@@ -86,9 +93,12 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
         var mDescription: CharSequence? = null
         var mTextIsSelectable = false
         var mTypeface: Typeface? = null
-        var mDescriptionTypeface: Typeface? = null
+        var mDescriptionTypeface: Int = -1
         var mOnTextClickListener: View.OnClickListener? = null
         var mTextAlignment = View.TEXT_ALIGNMENT_INHERIT
+
+        @get:StyleRes
+        var mButtonStyleRes = -1
 
         constructor(context: Context, @StringRes title: Int) : super(context, title)
         constructor(context: Context, title: CharSequence?) : super(context, title)
@@ -96,6 +106,16 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
         override fun create(): ConfirmDialog {
             checkArgument(hasActionTitle(DialogInterface.BUTTON_POSITIVE), "At least, positive action title should be set")
             return ConfirmDialog(context, this)
+        }
+
+        fun setPositiveActionStyle(@StyleRes resId: Int): Builder {
+            mButtonStyleRes = resId
+            return this
+        }
+
+        fun setDescriptionTypeface(@FontRes resId: Int): Builder {
+            mDescriptionTypeface = resId
+            return this
         }
 
         fun setText(text: CharSequence?): Builder {
@@ -119,6 +139,11 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
 
         fun setDescription(@StringRes resId: Int): Builder {
             return setDescription(context.getString(resId))
+        }
+
+        fun setDescription(@StringRes resId: Int, vararg args: Any): Builder {
+            mDescription = context.getString(resId, *args)
+            return this
         }
 
         fun setOnTextClickListener(listener: View.OnClickListener?): Builder {
@@ -175,11 +200,6 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
                     ${ExceptionHelper.getStackTrace(t)}
                     """.trimIndent()
             }
-            return this
-        }
-
-        fun setDescriptionTypeface(typeface: Typeface?): Builder {
-            mDescriptionTypeface = typeface
             return this
         }
 

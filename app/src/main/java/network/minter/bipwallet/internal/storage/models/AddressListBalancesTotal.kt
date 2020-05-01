@@ -27,6 +27,7 @@ package network.minter.bipwallet.internal.storage.models
 
 import com.annimon.stream.Optional
 import com.annimon.stream.Stream
+import network.minter.bipwallet.internal.helpers.data.CollectionsHelper
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.AddressBalance
 import org.parceler.Parcel
@@ -60,9 +61,22 @@ class AddressListBalancesTotal {
                 .findFirst()
     }
 
+    fun remove(address: MinterAddress) {
+        if (!find(address).isPresent) {
+            return
+        }
+
+        balances = CollectionsHelper.removeCopy(balances) {
+            it.address == address
+        }.toMutableList()
+    }
+
     val isEmpty: Boolean
         get() = size() == 0
 
+    /**
+     * Find balance by address. Never returns null. If address not found, function fill it with zero values
+     */
     fun getBalance(address: MinterAddress): AddressBalanceTotal {
         for (balance in balances) {
             if (balance.address == address) {

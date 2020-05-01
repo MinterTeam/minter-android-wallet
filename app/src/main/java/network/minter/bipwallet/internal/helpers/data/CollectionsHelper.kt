@@ -123,6 +123,16 @@ object CollectionsHelper {
         return res
     }
 
+    fun <R> removeCopy(list: List<R>, applier: (R) -> Boolean): List<R> {
+        return list.filter {
+            !applier(it)
+        }
+    }
+
+    fun <R> removeMutableCopy(list: MutableList<R>, applier: (R) -> Boolean): MutableList<R> {
+        return removeCopy(list, applier).toMutableList()
+    }
+
     @JvmStatic
     fun <K, V> topValue(map: HashMap<K, V>): V {
         if (map.size == 0) throw IndexOutOfBoundsException("Trying to get sw value from empty map")

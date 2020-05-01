@@ -32,17 +32,14 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.WalletDialog
-import network.minter.bipwallet.wallets.selector.WalletItem
-import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
 
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface WalletsTabView : MvpView {
+interface WalletsTabView : MvpView, WalletSelectorControllerView {
     fun showSendAndSetAddress(address: String)
     fun showRefreshProgress()
     fun hideRefreshProgress()
@@ -53,11 +50,7 @@ interface WalletsTabView : MvpView {
     fun setBalanceTitle(title: Int)
     fun setBalanceRewards(rewards: String)
     fun setOnClickScanQR(listener: View.OnClickListener)
-    fun setMainWallet(mainWallet: WalletItem)
-    fun setWallets(addresses: List<WalletItem>)
-    fun setOnClickWalletListener(listener: OnClickWalletListener)
-    fun setOnClickAddWalletListener(listener: OnClickAddWalletListener)
-    fun setOnClickEditWalletListener(listener: OnClickEditWalletListener)
+
     fun setOnClickDelegated(listener: View.OnClickListener)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
@@ -85,10 +78,5 @@ interface WalletsTabView : MvpView {
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startScanQR(requestCode: Int)
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startWalletEdit(walletItem: WalletItem, onSubmitListener: ActionListener)
-
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?)
     fun notifyUpdated()
 }

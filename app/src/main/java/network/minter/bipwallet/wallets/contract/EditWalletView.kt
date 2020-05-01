@@ -30,14 +30,22 @@ import android.view.View
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.internal.dialogs.DialogExecutor
+import network.minter.bipwallet.wallets.selector.WalletItem
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface EditWalletView : MvpView {
     fun setEnableSubmit(enable: Boolean)
+    fun setEnableRemove(enableRemove: Boolean)
     fun setOnSubmitClickListener(listener: View.OnClickListener)
     fun addInputTextWatcher(textWatcher: TextWatcher)
     fun setError(error: CharSequence?)
     fun close()
     fun setTitle(title: CharSequence?)
-    fun setOnDeleteClickListener(listener: View.OnClickListener)
+    fun setOnDeleteClickListener(listener: View.OnClickListener, walletItem: WalletItem)
+    fun startDialog(executor: DialogExecutor)
+    fun callOnDelete(walletItem: WalletItem)
+    fun callOnSave(walletItem: WalletItem)
+    fun setDeleteActionVisible(visible: Boolean)
+    fun expand()
 }

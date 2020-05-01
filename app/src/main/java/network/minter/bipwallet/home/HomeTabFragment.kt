@@ -96,7 +96,7 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
         walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, executor)
     }
 
-    fun startWalletEdit(walletItem: WalletItem, onSubmitListener: ActionListener) {
+    fun startWalletEdit(walletItem: WalletItem, enableRemove: Boolean, submitListener: (WalletItem) -> Unit, deleteListener: (WalletItem) -> Unit) {
         if (bottomSheetDialog != null) {
             bottomSheetDialog!!.dismiss()
             bottomSheetDialog = null
@@ -105,8 +105,9 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
             Timber.w("Fragment manager is NULL")
             return
         }
-        bottomSheetDialog = EditWalletDialog.newInstance(walletItem)
-        bottomSheetDialog!!.onSubmitListener = onSubmitListener
+        bottomSheetDialog = EditWalletDialog.newInstance(walletItem, enableRemove)
+        (bottomSheetDialog!! as EditWalletDialog).onSaveListener = submitListener
+        (bottomSheetDialog!! as EditWalletDialog).onDeleteListener = deleteListener
         bottomSheetDialog!!.show(fragmentManager!!, "wallet_edit")
     }
 

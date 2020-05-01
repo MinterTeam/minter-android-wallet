@@ -27,6 +27,7 @@
 package network.minter.bipwallet.tx.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,8 +56,7 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
         const val ARG_TX = "ARG_TX"
     }
 
-    lateinit var presenterProvider: Provider<TransactionViewPresenter>
-        @Inject set
+    @Inject lateinit var presenterProvider: Provider<TransactionViewPresenter>
 
     @InjectPresenter
     lateinit var presenter: TransactionViewPresenter
@@ -150,6 +150,14 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
 
     override fun setBlockNumber(blockNum: String) {
         binding.valueBlock.text = blockNum
+    }
+
+    override fun startIntent(intent: Intent) {
+        activity?.startActivity(intent)
+    }
+
+    override fun setOnClickShare(listener: View.OnClickListener) {
+        binding.action.setOnClickListener(listener)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

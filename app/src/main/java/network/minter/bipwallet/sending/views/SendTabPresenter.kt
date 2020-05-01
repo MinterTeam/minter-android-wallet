@@ -77,8 +77,7 @@ import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.sending.ui.dialogs.TxSendStartDialog
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
-import network.minter.bipwallet.wallets.selector.WalletItem
-import network.minter.bipwallet.wallets.selector.WalletListAdapter
+import network.minter.bipwallet.wallets.views.WalletSelectorController
 import network.minter.blockchain.models.BCResult
 import network.minter.blockchain.models.TransactionCommissionValue
 import network.minter.blockchain.models.TransactionSendResult
@@ -127,6 +126,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     @Inject lateinit var addressBookRepo: AddressBookRepository
     @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
     @Inject lateinit var txRepo: RepoTransactions
+    @Inject lateinit var walletSelectorController: WalletSelectorController
 
     private var mFromAccount: CoinBalance? = null
     private var mAmount: BigDecimal? = null
@@ -144,6 +144,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private var mLastAccount: CoinBalance? = null
     private var mSendFee: BigDecimal? = null
     private var mPayload: ByteArray? = null
+
     private val mPayloadChangeListener: TextWatcher = object : SimpleTextWatcher() {
         override fun afterTextChanged(s: Editable) {
             var tmpPayload = s.toString().toByteArray(StandardCharsets.UTF_8)
@@ -172,19 +173,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
     private var mFormValid = false
+
     override fun attachView(view: SendView) {
+        walletSelectorController.attachView(view)
         super.attachView(view)
         viewState.setOnClickAccountSelectedListener(View.OnClickListener { onClickAccountSelector() })
 
-        viewState.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->
-            onWalletSelect(walletItem)
-        })
-        viewState.setOnClickAddWalletListener(WalletListAdapter.OnClickAddWalletListener {
-            onWalletAdd()
-        })
-        viewState.setOnClickEditWalletListener(WalletListAdapter.OnClickEditWalletListener { walletItem: WalletItem ->
-            onWalletEdit(walletItem)
-        })
         viewState.setOnSubmit(View.OnClickListener { onSubmit() })
         viewState.setOnClickMaximum(View.OnClickListener { v -> onClickMaximum(v) })
         viewState.setOnClickAddPayload(View.OnClickListener { v -> onClickAddPayload(v) })
@@ -196,6 +190,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         })
         loadAndSetFee()
         accountStorage.update()
+    }
+
+    override fun detachView(view: SendView) {
+        super.detachView(view)
+        walletSelectorController.detachView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -251,13 +250,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        walletSelectorController.onFirstViewAttach()
         accountStorage.observe()
                 .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
                             if (!res.isEmpty) {
-                                viewState.setWallets(WalletItem.create(secretStorage, res))
-                                viewState.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
                                 val acc = accountStorage.entity.mainWallet
                                 if (mLastAccount != null) {
                                     onAccountSelected(acc.findCoinByName(mLastAccount!!.coin).orElse(acc.coinsList[0]))
@@ -300,29 +298,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
-    private fun onWalletAdd() {
-        viewState.startWalletAdd({ onAddedWallet() }, null)
-    }
 
-    private fun onAddedWallet() {
-        forceUpdate()
-    }
-
-    private fun onWalletSelect(walletItem: WalletItem) {
-        secretStorage.setMain(walletItem.address)
-        viewState.setMainWallet(walletItem)
-        forceUpdate()
-    }
-
-    private fun onWalletEdit(walletItem: WalletItem) {
-        viewState.startWalletEdit(walletItem) {
-            onWalletUpdated()
-        }
-    }
-
-    private fun onWalletUpdated() {
-        forceUpdate()
-    }
 
     private fun forceUpdate() {
         accountStorage.update(true)

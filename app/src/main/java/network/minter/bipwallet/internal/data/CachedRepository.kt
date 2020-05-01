@@ -327,11 +327,11 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
             onSuccess: Consumer<ResultModel>? = null,
             onError: Consumer<Throwable>? = null,
             onComplete: Action? = null
-    ): CachedRepository<ResultModel, Entity> {
+    ) {
         val observable: Observable<ResultModel>
         if (!force && !isExpired && isDataReady) {
             if (notifyStrategy == NOTIFY_ONLY_ON_UPDATE) {
-                return this
+                return
             }
             observable = Observable.just(entity.getData())
         } else {
@@ -344,7 +344,6 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
                         callOnError(onError),
                         callOnComplete(onComplete)
                 )
-        return this
     }
 
     protected fun notifyOnSuccess(isNew: Boolean) {

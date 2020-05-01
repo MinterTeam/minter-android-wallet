@@ -29,6 +29,7 @@ package network.minter.bipwallet.tx.views
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Base64
+import android.view.View
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.*
 import network.minter.bipwallet.internal.helpers.DateHelper.DATE_FORMAT_WITH_TZ
@@ -38,10 +39,13 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.copyOnClick
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.share.ShareManager
+import network.minter.bipwallet.share.SharingText
 import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionView
 import network.minter.bipwallet.tx.ui.TransactionViewDialog
 import network.minter.core.crypto.MinterAddress
+import network.minter.explorer.MinterExplorerApi
 import network.minter.explorer.models.HistoryTransaction
 import network.minter.profile.MinterProfileApi
 import org.joda.time.DateTime
@@ -52,11 +56,9 @@ import javax.inject.Inject
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<TransactionView>() {
-    lateinit var secretStorage: SecretStorage
-        @Inject set
+    @Inject lateinit var secretStorage: SecretStorage
 
     private var _tx: TransactionFacade? = null
-
     private val tx: HistoryTransaction
         get() = _tx!!.tx
 
@@ -83,7 +85,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
     @Suppress("DEPRECATION")
     @SuppressLint("SetTextI18n")
     private fun fillData() {
-
+        viewState.setOnClickShare(View.OnClickListener {
+            startShare()
+        })
         viewState.setFromName(null)
         viewState.setFromAddress(tx.from.toString())
         viewState.setFromAvatar(tx.fromAvatar())
@@ -271,6 +275,15 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 // nothing to do
             }
         }
+    }
+
+    private fun startShare() {
+        val text = SharingText()
+        text.title = "Transaction " + tx.hash.toShortString()
+        text.url = MinterExplorerApi.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
+
+        val shareIntent = ShareManager.getInstance().createCommonIntent(text, "Share transaction")
+        viewState.startIntent(shareIntent)
     }
 
 }

@@ -40,7 +40,9 @@ import android.widget.PopupWindow;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.databinding.PopupWalletSelectorBinding;
 import network.minter.bipwallet.internal.Wallet;
+import network.minter.bipwallet.internal.views.widgets.ColoredProgressBar;
 
 public class WalletsPopupWindow extends PopupWindow {
 
@@ -79,23 +81,18 @@ public class WalletsPopupWindow extends PopupWindow {
         super(contentView, width, height, focusable);
     }
 
+    private PopupWalletSelectorBinding binding;
+
     public static WalletsPopupWindow create(ViewGroup parent, WalletListAdapter adapter) {
-        // Inflate the popup_layout.xml
+        WalletsPopupWindow win = new WalletsPopupWindow(parent.getContext());
+        win.binding = PopupWalletSelectorBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
 
-
-        WalletsPopupWindow win;
-
-        LayoutInflater layoutInflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = layoutInflater.inflate(R.layout.popup_wallet_selector, parent, false);
-
-        RecyclerView list = layout.findViewById(R.id.list);
-        list.setLayoutManager(new LinearLayoutManager(parent.getContext()));
-        list.setAdapter(adapter);
+        win.getList().setLayoutManager(new LinearLayoutManager(parent.getContext()));
+        win.getList().setAdapter(adapter);
 
 
         // Creating the PopupWindow
-        win = new WalletsPopupWindow(parent.getContext());
-        win.setContentView(layout);
+        win.setContentView(win.binding.getRoot());
         win.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
         win.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
         win.setFocusable(true);
@@ -114,8 +111,16 @@ public class WalletsPopupWindow extends PopupWindow {
 
         // Displaying the popup at the specified location, + offsets.
 //        win.showAtLocation(layout, Gravity.NO_GRAVITY, p.x + OFFSET_X, p.y + OFFSET_Y);
-        win.showAtLocation(layout, Gravity.NO_GRAVITY, OFFSET_X, OFFSET_Y);
+        win.showAtLocation(win.binding.getRoot(), Gravity.NO_GRAVITY, OFFSET_X, OFFSET_Y);
 
         return win;
+    }
+
+    public ColoredProgressBar getProgressBar() {
+        return binding.progress;
+    }
+
+    public RecyclerView getList() {
+        return binding.list;
     }
 }

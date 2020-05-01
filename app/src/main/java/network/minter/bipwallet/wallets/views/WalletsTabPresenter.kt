@@ -45,8 +45,6 @@ import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
 import network.minter.bipwallet.wallets.contract.WalletsTabView
 import network.minter.bipwallet.wallets.data.BalanceCurrentState
-import network.minter.bipwallet.wallets.selector.WalletItem
-import network.minter.bipwallet.wallets.selector.WalletListAdapter
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
@@ -70,21 +68,58 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
     @Inject lateinit var addressRepo: ExplorerAddressRepository
     @Inject lateinit var secretStorage: SecretStorage
     @Inject lateinit var txRepo: RepoTransactions
+    @Inject lateinit var walletSelectorController: WalletSelectorController
 
     private val balanceState = BalanceCurrentState()
 
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        walletSelectorController.onFirstViewAttach()
+
+        Timber.d("DAILY_REWARDS begin observe")
+        if (dailyRewardsRepo.isDataReady) {
+            Timber.d("DAILY_REWARDS ready from cache")
+            onDailyRewardsReady(dailyRewardsRepo.data)
+        }
+        if (accountStorage.isDataReady) {
+            try {
+                Timber.d("BALANCE ready from cache")
+                onBalanceReady(accountStorage.data)
+            } catch (t: Throwable) {
+            }
+        }
+        dailyRewardsRepo
+                .observe()
+                .subscribe(
+                        { res: RewardStatistics ->
+                            Timber.d("DAILY_REWARDS loaded")
+                            onDailyRewardsReady(res)
+                        },
+                        { Timber.w(it) }
+                ).disposeOnDestroy()
+
+        accountStorage.observe()
+                .joinToUi()
+                .subscribe(
+                        { res: AddressListBalancesTotal ->
+                            Timber.d("Update coins list")
+                            viewState.notifyUpdated()
+                            onBalanceReady(res)
+                            viewState.hideRefreshProgress()
+                        },
+                        {
+                            Timber.e(it)
+                        }
+                ).disposeOnDestroy()
+
+        dailyRewardsRepo.update()
+        accountStorage.update()
+    }
+
     override fun attachView(view: WalletsTabView) {
+        walletSelectorController.attachView(view)
         super.attachView(view)
-        viewState.setMainWallet(WalletItem.create(secretStorage, accountStorage.entity.mainWallet))
-        viewState.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->
-            onWalletSelect(walletItem)
-        })
-        viewState.setOnClickAddWalletListener(WalletListAdapter.OnClickAddWalletListener {
-            onWalletAdd()
-        })
-        viewState.setOnClickEditWalletListener(WalletListAdapter.OnClickEditWalletListener { walletItem: WalletItem ->
-            onWalletEdit(walletItem)
-        })
+
         viewState.setOnClickDelegated(View.OnClickListener {
             onClickStartDelegationList(it)
         })
@@ -93,6 +128,45 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
             onRefresh()
         })
         balanceState.applyTo(viewState)
+    }
+
+    override fun detachView(view: WalletsTabView) {
+        super.detachView(view)
+        walletSelectorController.detachView()
+    }
+
+    private fun onBalanceReady(res: AddressListBalancesTotal) {
+        val mainWallet = accountStorage.entity.mainWallet
+
+        val availableBIP = splitDecimalStringFractions(mainWallet.availableBalanceBIP.setScale(4, RoundingMode.DOWN))
+        val totalBIP = splitDecimalStringFractions(mainWallet.totalBalance.setScale(4, RoundingMode.DOWN))
+        val totalUSD = splitDecimalStringFractions(mainWallet.totalBalanceUSD.setScale(2, RoundingMode.DOWN))
+
+        balanceState.setAvailableBIP(
+                bdIntHuman(availableBIP.intPart),
+                availableBIP.fractionalPart,
+                MinterSDK.DEFAULT_COIN
+        )
+
+        balanceState.setTotalBIP(
+                bdIntHuman(totalBIP.intPart),
+                totalBIP.fractionalPart,
+                MinterSDK.DEFAULT_COIN
+        )
+        balanceState.setTotalUSD(
+                Plurals.usd(bdIntHuman(totalUSD.intPart)),
+                totalUSD.fractionalPart
+        )
+        balanceState.applyTo(viewState)
+
+
+        // show delegated
+        if (res.find(secretStorage.mainWallet).isPresent) {
+            val delegated = res.find(secretStorage.mainWallet).get().delegated
+            viewState.setDelegationAmount("${delegated.humanize()} ${MinterSDK.DEFAULT_COIN}")
+        } else {
+            viewState.setDelegationAmount("${BigDecimal.ZERO.humanize()} ${MinterSDK.DEFAULT_COIN}")
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -139,107 +213,11 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         viewState.setBalanceRewards("+ ${res.amount.humanize()} ${MinterSDK.DEFAULT_COIN} today")
     }
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-        Timber.d("DAILY_REWARDS begin observe")
-        if (dailyRewardsRepo.isDataReady) {
-            Timber.d("DAILY_REWARDS ready from cache")
-            onDailyRewardsReady(dailyRewardsRepo.data)
-        }
-        dailyRewardsRepo
-                .observe()
-                .subscribe(
-                        { res: RewardStatistics ->
-                            Timber.d("DAILY_REWARDS loaded")
-                            onDailyRewardsReady(res)
-                        },
-                        { Timber.w(it) }
-                ).disposeOnDestroy()
-
-        accountStorage.observe()
-                .joinToUi()
-                .subscribe(
-                        { res: AddressListBalancesTotal ->
-                            Timber.d("Update coins list")
-
-                            Timber.d("Notify last updated: NOW")
-                            viewState.notifyUpdated()
-
-                            viewState.setWallets(WalletItem.create(secretStorage, res))
-                            viewState.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
-
-                            val mainWallet = accountStorage.entity.mainWallet
-
-                            val availableBIP = splitDecimalStringFractions(mainWallet.availableBalanceBIP.setScale(4, RoundingMode.DOWN))
-                            val totalBIP = splitDecimalStringFractions(mainWallet.totalBalance.setScale(4, RoundingMode.DOWN))
-                            val totalUSD = splitDecimalStringFractions(mainWallet.totalBalanceUSD.setScale(2, RoundingMode.DOWN))
-
-                            balanceState.setAvailableBIP(
-                                    bdIntHuman(availableBIP.intPart),
-                                    availableBIP.fractionalPart,
-                                    MinterSDK.DEFAULT_COIN
-                            )
-
-                            balanceState.setTotalBIP(
-                                    bdIntHuman(totalBIP.intPart),
-                                    totalBIP.fractionalPart,
-                                    MinterSDK.DEFAULT_COIN
-                            )
-                            balanceState.setTotalUSD(
-                                    Plurals.usd(bdIntHuman(totalUSD.intPart)),
-                                    totalUSD.fractionalPart
-                            )
-                            balanceState.applyTo(viewState)
-
-
-                            // show delegated
-                            if (res.find(secretStorage.mainWallet).isPresent) {
-                                val delegated = res.find(secretStorage.mainWallet).get().delegated
-                                viewState.setDelegationAmount("${delegated.humanize()} ${MinterSDK.DEFAULT_COIN}")
-                            } else {
-                                viewState.setDelegationAmount("${BigDecimal.ZERO.humanize()} ${MinterSDK.DEFAULT_COIN}")
-                            }
-
-
-                            viewState.hideRefreshProgress()
-                        },
-                        {
-                            Timber.e(it)
-                        }
-                ).disposeOnDestroy()
-
-        dailyRewardsRepo.update()
-        accountStorage.update()
-    }
-
-    private fun onWalletSelect(walletItem: WalletItem) {
-        secretStorage.setMain(walletItem.address)
-        viewState.setMainWallet(walletItem)
-        forceUpdate()
-    }
-
-    private fun onWalletEdit(walletItem: WalletItem) {
-        viewState.startWalletEdit(walletItem) {
-            onWalletUpdated()
-        }
-    }
-
-    private fun onWalletUpdated() {
-        forceUpdate()
-    }
 
     private fun forceUpdate() {
         accountStorage.update(true)
         dailyRewardsRepo.update(true)
         txRepo.update(true)
-    }
-
-    private fun onWalletAdd() {
-        viewState.startWalletAdd({ onAddedWallet() }, null)
-    }
-
-    private fun onAddedWallet() {
-        forceUpdate()
     }
 
     private fun onRefresh() {

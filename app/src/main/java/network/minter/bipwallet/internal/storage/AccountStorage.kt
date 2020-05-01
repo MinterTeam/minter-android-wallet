@@ -131,4 +131,12 @@ class AccountStorage(
         }
     }
 
+    fun remove(address: MinterAddress) {
+        val data = getData()
+        if (data.find(address).isPresent) {
+            data.remove(address)
+            storage.put(KEY_BALANCE, data)
+        }
+    }
+
 }

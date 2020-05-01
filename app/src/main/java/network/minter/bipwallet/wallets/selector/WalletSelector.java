@@ -44,6 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.Paris;
 import network.minter.bipwallet.R;
+import network.minter.bipwallet.internal.common.DeferredCall;
 
 import static network.minter.bipwallet.internal.common.Preconditions.firstNonNull;
 import static network.minter.bipwallet.internal.helpers.MathHelper.bdLT;
@@ -59,6 +60,7 @@ public class WalletSelector extends FrameLayout {
     private WalletListAdapter.OnClickWalletListener mOnClickWallet;
     private WalletListAdapter.OnClickAddWalletListener mOnClickAddWallet;
     private WalletListAdapter.OnClickEditWalletListener mOnClickEditWallet;
+    private DeferredCall<WalletsPopupWindow> mPopupDefer = DeferredCall.create();
 
     public enum WalletWeight {
         Shrimp("\uD83E\uDD90"),
@@ -161,8 +163,24 @@ public class WalletSelector extends FrameLayout {
         dropdown.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
+    public void showPopupProgress(boolean show) {
+        mPopupDefer.call(t -> {
+            if (show) {
+                t.getProgressBar().setVisibility(VISIBLE);
+                t.getList().setClickable(false);
+                t.getList().setAlpha(0.3f);
+            } else {
+                t.getProgressBar().setVisibility(GONE);
+                t.getList().setAlpha(1.0f);
+                t.getList().setClickable(true);
+            }
+
+        });
+    }
+
     public void openPopup(View view) {
         mPopup = WalletsPopupWindow.create(this, mAdapter);
+        mPopupDefer.attach(mPopup);
     }
 
     public void setWallets(List<WalletItem> addresses) {
@@ -174,6 +192,7 @@ public class WalletSelector extends FrameLayout {
 
     private void dismissPopup() {
         if (mPopup != null && mPopup.isShowing()) {
+            mPopupDefer.detach();
             mPopup.dismiss();
             mPopup = null;
         }

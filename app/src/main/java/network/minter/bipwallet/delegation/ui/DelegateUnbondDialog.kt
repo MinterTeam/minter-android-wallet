@@ -49,7 +49,6 @@ import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
-import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
@@ -162,11 +161,9 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         inputGroup.addTextChangedListener(listener)
     }
 
-    private var dialog: WalletDialog? = null
-
     override fun startDialog(executor: DialogExecutor) {
         collapse()
-        dialog = WalletDialog.switchDialogWithExecutor(this, dialog) {
+        super.startDialog {
             val d = executor(it)
             d.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             d.window?.setWindowAnimations(0)

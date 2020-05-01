@@ -31,12 +31,14 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogEditWalletBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
+import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.wallets.contract.EditWalletView
 import network.minter.bipwallet.wallets.dialogs.presentation.EditWalletPresenter
@@ -49,10 +51,13 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
 
     companion object {
         const val EXTRA_WALLET_ITEM = "EXTRA_WALLET_ITEM"
-        fun newInstance(walletItem: WalletItem): EditWalletDialog {
+        const val EXTRA_ENABLE_REMOVE = "EXTRA_ENABLE_REMOVE"
+
+        fun newInstance(walletItem: WalletItem, enableRemove: Boolean): EditWalletDialog {
             val dialog = EditWalletDialog()
             val extras = Bundle()
             extras.putParcelable(EXTRA_WALLET_ITEM, Parcels.wrap(walletItem))
+            extras.putBoolean(EXTRA_ENABLE_REMOVE, enableRemove)
             dialog.arguments = extras
             return dialog
         }
@@ -62,6 +67,9 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
     @InjectPresenter lateinit var presenter: EditWalletPresenter
 
     private lateinit var binding: DialogEditWalletBinding
+
+    var onDeleteListener: ((WalletItem) -> Unit)? = null
+    var onSaveListener: ((WalletItem) -> Unit)? = null
 
     @ProvidePresenter
     fun providePresenter(): EditWalletPresenter {
@@ -78,6 +86,20 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         super.onAttach(context)
     }
 
+    override fun startDialog(executor: DialogExecutor) {
+        collapse()
+        super.startDialog {
+            val d = executor(it)
+            d.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            d.window?.setWindowAnimations(0)
+            d
+        }
+    }
+
+    override fun expand() {
+        super.expand(false)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DialogEditWalletBinding.inflate(inflater, container, false)
 
@@ -92,15 +114,16 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         return binding.root
     }
 
+    override fun setEnableRemove(enableRemove: Boolean) {
+        binding.actionDelete.visible = enableRemove
+    }
+
     override fun setEnableSubmit(enable: Boolean) {
         binding.submit.isEnabled = enable
     }
 
     override fun setOnSubmitClickListener(listener: View.OnClickListener) {
         binding.submit.setOnClickListener {
-            if (onSubmitListener != null) {
-                onSubmitListener!!.invoke()
-            }
             listener.onClick(it)
         }
     }
@@ -121,12 +144,21 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         binding.inputTitle.setText(title)
     }
 
-    override fun setOnDeleteClickListener(listener: View.OnClickListener) {
+    override fun setDeleteActionVisible(visible: Boolean) {
+        binding.actionDelete.visible = visible
+    }
+
+    override fun callOnDelete(walletItem: WalletItem) {
+        onDeleteListener?.invoke(walletItem)
+    }
+
+    override fun callOnSave(walletItem: WalletItem) {
+        onSaveListener?.invoke(walletItem)
+    }
+
+    override fun setOnDeleteClickListener(listener: View.OnClickListener, walletItem: WalletItem) {
         binding.actionDelete.setOnClickListener { v: View? ->
             listener.onClick(v)
-            if (onSubmitListener != null) {
-                onSubmitListener!!.invoke()
-            }
         }
     }
 }

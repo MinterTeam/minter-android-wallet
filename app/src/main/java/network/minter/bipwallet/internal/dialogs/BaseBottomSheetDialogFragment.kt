@@ -41,6 +41,7 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
     var onSubmitListener: ActionListener? = null
     var onDismissListener: ActionListener? = null
     private var sheetWasExpanded: Boolean = false
+    protected var walletDialog: WalletDialog? = null
 
     protected val behavior: BottomSheetBehavior<FrameLayout>
         get() = (dialog as BottomSheetDialog).behavior
@@ -74,7 +75,7 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         return d
     }
 
-    fun collapse() {
+    open fun collapse() {
         behavior.setPeekHeight(0, true)
 
         if (behavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -85,11 +86,15 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         }
     }
 
-    fun expand(force: Boolean = false) {
+    open fun expand(force: Boolean = false) {
         if (sheetWasExpanded || force) {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
         behavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true)
+    }
+
+    open fun startDialog(executor: DialogExecutor) {
+        walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, executor)
     }
 
     protected fun <T : Dialog> T.fixNestedDialogBackgrounds(): T {

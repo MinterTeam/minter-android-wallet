@@ -37,11 +37,14 @@ import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
 import java.security.SecureRandom
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+typealias OnMainWalletChangeListener = (MinterAddress) -> Unit
+
 class SecretStorage(private val mStorage: KVStorage) {
     companion object {
         private const val KEY_SECRETS = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_mnemonic_secret_list"
@@ -63,8 +66,18 @@ class SecretStorage(private val mStorage: KVStorage) {
         }
     }
 
+    private val mainWalletChangedListeners: MutableList<OnMainWalletChangeListener> = ArrayList()
+
     fun hasPinCode(): Boolean {
         return mStorage.contains(KEY_PIN_CODE)
+    }
+
+    fun addOnMainWalletChangeListener(listener: OnMainWalletChangeListener) {
+        mainWalletChangedListeners.add(listener)
+    }
+
+    fun removeOnMainWalletChangeListener(listener: OnMainWalletChangeListener) {
+        mainWalletChangedListeners.remove(listener)
     }
 
     var pinCode: String?
@@ -79,6 +92,7 @@ class SecretStorage(private val mStorage: KVStorage) {
 
     fun setMain(mainWallet: MinterAddress) {
         mStorage.put(KEY_MAIN_WALLET, mainWallet)
+        mainWalletChangedListeners.forEach { it(mainWallet) }
     }
 
     @JvmOverloads
@@ -215,5 +229,6 @@ class SecretStorage(private val mStorage: KVStorage) {
         }
         return mStorage.put(KEY_SECRETS, secrets)
     }
+
 
 }
