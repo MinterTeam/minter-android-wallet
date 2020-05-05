@@ -27,6 +27,8 @@
 package network.minter.bipwallet.tx.views
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.view.View
@@ -98,6 +100,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         viewState.setTimestamp(DateTime(tx.timestamp).fmt(DATE_FORMAT_WITH_TZ))
         viewState.setFee("${tx.fee.humanize()} ${tx.gasCoin}")
         viewState.setBlockNumber(tx.block.toString())
+        viewState.setBlockClickListener(View.OnClickListener {
+            onClickBlockNumber()
+        })
 
         val isIncoming = tx.isIncoming(secretStorage.addresses)
 
@@ -275,6 +280,13 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 // nothing to do
             }
         }
+    }
+
+    private fun onClickBlockNumber() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                MinterExplorerApi.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
+        ))
+        viewState.startIntent(intent)
     }
 
     private fun startShare() {

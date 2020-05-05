@@ -152,6 +152,10 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
         binding.valueBlock.text = blockNum
     }
 
+    override fun setBlockClickListener(listener: View.OnClickListener) {
+        binding.valueBlock.setOnClickListener(listener)
+    }
+
     override fun startIntent(intent: Intent) {
         activity?.startActivity(intent)
     }

@@ -58,6 +58,7 @@ interface TransactionView : MvpView {
     fun setTimestamp(format: String)
     fun setFee(fee: String)
     fun setBlockNumber(blockNum: String)
+    fun setBlockClickListener(listener: View.OnClickListener)
     fun startIntent(intent: Intent)
     fun setOnClickShare(listener: View.OnClickListener)
 
