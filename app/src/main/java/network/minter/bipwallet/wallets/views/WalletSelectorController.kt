@@ -81,6 +81,7 @@ class WalletSelectorController @Inject constructor() {
         accountStorage.update(true)
         txRepo.update(true)
         dailyRewardsRepo.update(true)
+        fillWalletSelector(accountStorage.data)
     }
 
     private fun onSelectWallet(walletItem: WalletItem) {
@@ -106,6 +107,10 @@ class WalletSelectorController @Inject constructor() {
     private fun onWalletDeleted(walletItem: WalletItem) {
         accountStorage.entity.remove(walletItem.address)
         fillWalletSelector(accountStorage.data)
+        accountStorage.update(true)
+        txRepo.update(true)
+        dailyRewardsRepo.update(true)
+
     }
 
     private fun onWalletUpdated(walletItem: WalletItem) {

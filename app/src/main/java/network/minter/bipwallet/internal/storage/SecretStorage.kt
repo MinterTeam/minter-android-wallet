@@ -227,7 +227,12 @@ class SecretStorage(private val mStorage: KVStorage) {
             val it: Map.Entry<String?, SecretData?> = secrets.entries.iterator().next()
             setMain(MinterAddress(it.key))
         }
-        return mStorage.put(KEY_SECRETS, secrets)
+        var ret = mStorage.put(KEY_SECRETS, secrets)
+
+        val newAddressList = addresses.filterNot { it == address }.toMutableList()
+        ret = ret && mStorage.put(KEY_ADDRESSES, newAddressList)
+
+        return ret
     }
 
 
