@@ -331,7 +331,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startAccountSelector(accounts: List<SelectorData<CoinBalance>>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, "Select account")
+        WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
                 .create()

@@ -48,7 +48,7 @@
             style="@style/WalletDialog.Header"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:elevation="8dp"
+            android:elevation="0dp"
             tools:text="@tools:sample/cities" />
 
         <androidx.recyclerview.widget.RecyclerView

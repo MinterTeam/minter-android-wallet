@@ -334,5 +334,6 @@
     <string name="dialog_title_remote_wallet">Remove Wallet</string>
     <string name="dialog_description_remove_wallet"><![CDATA[Are you sure, you want to remove wallet <b>%s</b> from this application?]]></string>
     <string name="dialog_text_remove_wallet"><![CDATA[<b>Attention!</b> The wallet will not be deleted from blockchain. You\'ll be able to readd it later with the saved seed-phrase.]]></string>
+    <string name="dialog_title_choose_coin">Choose Coin</string>
 
 </resources>

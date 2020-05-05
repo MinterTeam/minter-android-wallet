@@ -36,6 +36,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.storage.models.SecretData
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScroll
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinDelegation
 import network.minter.explorer.models.ValidatorItem
@@ -71,7 +72,7 @@ fun selectorDataFromCoins(input: List<CoinBalance>): List<SelectorData<CoinBalan
         SelectorData(
                 it,
                 "${it.coin!!.toUpperCase()} (${it.amount.humanize()})",
-                it.address!!.toShortString(),
+                null,
                 MinterProfileApi.getCoinAvatarUrl(it.coin!!)
         )
     }
@@ -125,6 +126,8 @@ class WalletAccountSelectorDialog<out Data> private constructor(
             list.layoutManager = LinearLayoutManager(context)
             list.addItemDecoration(BorderedItemSeparator(context, R.drawable.shape_bottom_separator, false, false))
             list.adapter = adapter
+
+            list.addOnScrollListener(ViewElevationOnScroll(title))
         }
     }
 
