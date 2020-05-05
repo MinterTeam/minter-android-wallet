@@ -110,6 +110,7 @@ class WalletSelectorController @Inject constructor() {
 
     private fun onWalletUpdated(walletItem: WalletItem) {
         accountStorage.update(true)
+        fillWalletSelector(accountStorage.data)
     }
 
     fun detachView() {
