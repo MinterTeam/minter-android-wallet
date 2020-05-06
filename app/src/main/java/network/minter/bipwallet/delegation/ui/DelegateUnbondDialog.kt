@@ -211,7 +211,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
     }
 
     override fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<BaseCoinValue>(activity!!, R.string.title_select_account)
+        WalletAccountSelectorDialog.Builder<BaseCoinValue>(activity!!, R.string.dialog_title_choose_coin)
                 .setItems(items)
                 .setOnClickListener(listener)
                 .create()

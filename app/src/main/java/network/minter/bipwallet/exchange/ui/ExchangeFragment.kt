@@ -129,7 +129,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun startAccountSelector(accounts: List<CoinBalance>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, R.string.title_select_account)
+        WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
                 .setItems(selectorDataFromCoins(accounts))
                 .setOnClickListener(clickListener)
                 .create().show()
