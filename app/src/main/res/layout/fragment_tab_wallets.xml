@@ -175,6 +175,7 @@
 
 
                     <TextView
+                        android:visibility="gone"
                         android:id="@+id/balance_today"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -192,6 +193,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_edges_medium"
+                        app:layout_goneMarginTop="20dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
