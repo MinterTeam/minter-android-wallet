@@ -89,16 +89,23 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
             }
         }
         dailyRewardsRepo
+                .retryWhen(errorResolver)
                 .observe()
+                .joinToUi()
                 .subscribe(
                         { res: RewardStatistics ->
                             Timber.d("DAILY_REWARDS loaded")
                             onDailyRewardsReady(res)
                         },
-                        { Timber.w(it) }
+                        {
+                            viewState.hideProgress()
+                            Timber.w(it)
+                        }
                 ).disposeOnDestroy()
 
-        accountStorage.observe()
+        accountStorage
+                .retryWhen(errorResolver)
+                .observe()
                 .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
@@ -109,6 +116,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                         },
                         {
                             Timber.e(it)
+                            viewState.hideProgress()
                         }
                 ).disposeOnDestroy()
 

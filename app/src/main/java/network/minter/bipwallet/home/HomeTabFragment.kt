@@ -74,11 +74,14 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
             errorMessage: String, actionName: String,
             errorResolver: View.OnClickListener
     ) {
-        snackbar()
-                .setMessage(errorMessage)
-                .setAction(actionName, errorResolver)
-                .setDurationInfinite()
-                .show()
+        runOnUiThread {
+            snackbar()
+                    .setMessage(errorMessage)
+                    .setAction(actionName, errorResolver)
+                    .setDurationInfinite()
+                    .show()
+        }
+
     }
 
     override fun onDestroyView() {

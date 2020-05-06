@@ -77,7 +77,10 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
 
         viewState.setAdapter(adapter!!)
 
-        accountStorage.observe().joinToUi()
+        accountStorage
+                .retryWhen(errorResolver)
+                .observe()
+                .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
                             Timber.d("Update coins list")

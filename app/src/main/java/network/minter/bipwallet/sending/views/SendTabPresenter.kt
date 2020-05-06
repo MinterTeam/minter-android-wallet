@@ -251,7 +251,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         walletSelectorController.onFirstViewAttach()
-        accountStorage.observe()
+        accountStorage
+                .retryWhen(errorResolver)
+                .observe()
                 .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->

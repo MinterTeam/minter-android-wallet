@@ -35,6 +35,7 @@ import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.wallets.contract.WalletSelectorControllerView
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.bipwallet.wallets.selector.WalletListAdapter
+import timber.log.Timber
 import javax.inject.Inject
 
 class WalletSelectorController @Inject constructor() {
@@ -49,9 +50,14 @@ class WalletSelectorController @Inject constructor() {
     fun onFirstViewAttach() {
         fillWalletSelector(accountStorage.data)
         disposable = accountStorage.observe()
-                .subscribe {
-                    fillWalletSelector(it)
-                }
+                .subscribe(
+                        {
+                            fillWalletSelector(it)
+                        },
+                        {
+                            Timber.w(it)
+                        }
+                )
     }
 
     fun attachView(view: WalletSelectorControllerView) {

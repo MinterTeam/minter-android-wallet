@@ -33,13 +33,14 @@ import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.WalletDialog
+import network.minter.bipwallet.internal.mvp.ProgressView
 
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface WalletsTabView : MvpView, WalletSelectorControllerView {
+interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
     fun showSendAndSetAddress(address: String)
     fun showRefreshProgress()
     fun hideRefreshProgress()

@@ -117,18 +117,26 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        mAccountStorage.observe().joinToUi()
-                .subscribe { res: AddressListBalancesTotal ->
-                    val acc: AddressBalance = mAccountStorage.entity.mainWallet
-                    if (!res.isEmpty) {
-                        mAccounts = acc.coinsList
-                        mAccount = acc.getCoin(MinterSDK.DEFAULT_COIN)
-                        if (mCurrentCoin != null) {
-                            mAccount = Stream.of(mAccounts).filter { value: CoinBalance -> (value.coin == mCurrentCoin) }.findFirst().orElse(mAccount)
+        mAccountStorage
+                .retryWhen(errorResolver)
+                .observe()
+                .joinToUi()
+                .subscribe(
+                        { res: AddressListBalancesTotal ->
+                            val acc: AddressBalance = mAccountStorage.entity.mainWallet
+                            if (!res.isEmpty) {
+                                mAccounts = acc.coinsList
+                                mAccount = acc.getCoin(MinterSDK.DEFAULT_COIN)
+                                if (mCurrentCoin != null) {
+                                    mAccount = Stream.of(mAccounts).filter { value: CoinBalance -> (value.coin == mCurrentCoin) }.findFirst().orElse(mAccount)
+                                }
+                                onAccountSelected(mAccount, true)
+                            }
+                        },
+                        {
+                            Timber.w(it)
                         }
-                        onAccountSelected(mAccount, true)
-                    }
-                }
+                )
                 .disposeOnDestroy()
 
         mInputChange = BehaviorSubject.create()
@@ -502,12 +510,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
             return
         }
         val calculator = ExchangeCalculator.Builder(
-                estimateRepository,
-                { mAccounts },
-                { mAccount!! },
-                { mBuyCoin!! },
-                { mBuyAmount ?: BigDecimal.ZERO },
-                { mSellAmount ?: BigDecimal.ZERO })
+                        estimateRepository,
+                        { mAccounts },
+                        { mAccount!! },
+                        { mBuyCoin!! },
+                        { mBuyAmount ?: BigDecimal.ZERO },
+                        { mSellAmount ?: BigDecimal.ZERO })
                 .doOnSubscribe { it.disposeOnDestroy() }
                 .build()
 

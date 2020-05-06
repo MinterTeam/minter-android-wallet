@@ -27,12 +27,15 @@ package network.minter.bipwallet.internal.data
 
 import androidx.annotation.CallSuper
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.functions.Action
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Consumer
+import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import network.minter.bipwallet.BuildConfig
@@ -100,10 +103,26 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      * @return Raw observable data
      */
     val updateObservable: Observable<ResultModel>
-        get() = entity.getUpdatableData()
-                .doOnError { t: Throwable -> notifyOnError(t) }
-                .subscribeOn(THREAD_IO)
-//                .observeOn(THREAD_MAIN)
+        get() {
+            var observable = entity.getUpdatableData()
+
+            if (retryWhenHandler != null) {
+                observable = observable.retryWhen(retryWhenHandler)
+            }
+
+            observable = observable
+                    .doOnError { t: Throwable -> notifyOnError(t) }
+                    .subscribeOn(THREAD_IO)
+
+            return observable
+        }
+
+    private var retryWhenHandler: Function<Observable<out Throwable>, ObservableSource<*>>? = null
+
+    fun retryWhen(handler: Function<Observable<out Throwable>, ObservableSource<*>>): CachedRepository<ResultModel, Entity> {
+        retryWhenHandler = handler
+        return this
+    }
 
     /**
      * Called after data updated
@@ -354,7 +373,10 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     protected fun notifyOnError(t: Throwable) {
         mMetaNotifier.onError(t)
         mMetaNotifier = BehaviorSubject.create()
-        mNotifier.onError(t)
+        try {
+            mNotifier.onError(t)
+        } catch (e: UndeliverableException) {
+        }
         mNotifier = BehaviorSubject.create()
     }
 

@@ -67,7 +67,9 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
             onClickOpenTransactions()
         })
 
-        txRepo.observe()
+        txRepo
+                .retryWhen(errorResolver)
+                .observe()
                 .joinToUi()
                 .switchMap { result: List<HistoryTransaction> -> TransactionDataSource.mapToFacade(result) }
                 .switchMap { items: List<TransactionFacade> -> TransactionDataSource.mapValidatorsInfo(validatorsRepo, items) }

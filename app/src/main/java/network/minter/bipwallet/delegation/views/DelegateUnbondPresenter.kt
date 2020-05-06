@@ -428,7 +428,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.setOnSubmitListener(View.OnClickListener {
             onSubmit()
         })
-        validatorsRepo.observe()
+        validatorsRepo
+                .retryWhen(errorResolver)
+                .observe()
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
@@ -449,7 +451,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         }
                 )
 
-        accountStorage.observe()
+        accountStorage
+                .retryWhen(errorResolver)
+                .observe()
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         { res: AddressListBalancesTotal ->

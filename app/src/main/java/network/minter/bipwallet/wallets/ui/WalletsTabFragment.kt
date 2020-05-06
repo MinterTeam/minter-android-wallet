@@ -56,6 +56,7 @@ import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
@@ -103,12 +104,24 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         swipeRefreshHacker.hack(binding.containerSwipeRefresh)
     }
 
+    override fun showProgress() {
+        showRefreshProgress()
+    }
+
+    override fun hideProgress() {
+        hideRefreshProgress()
+    }
+
     override fun showRefreshProgress() {
-        binding.containerSwipeRefresh.isRefreshing = true
+        binding.containerSwipeRefresh.postApply {
+            it.isRefreshing = true
+        }
     }
 
     override fun hideRefreshProgress() {
-        binding.containerSwipeRefresh.isRefreshing = false
+        binding.containerSwipeRefresh.postApply {
+            it.isRefreshing = false
+        }
     }
 
     override fun startExplorer(hash: String) {

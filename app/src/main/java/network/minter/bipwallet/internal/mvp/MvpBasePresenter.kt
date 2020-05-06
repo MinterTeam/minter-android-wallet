@@ -31,7 +31,6 @@ import android.view.View
 import androidx.annotation.CallSuper
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -52,26 +51,26 @@ import java.util.concurrent.TimeUnit
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
-    private val mSubscriptions = CompositeDisposable()
-    private var mErrorRetryNotifier: PublishSubject<Any> = PublishSubject.create()
-    private var mIsInitialized = false
-    private var mRetried = false
-    private val mEventBusSubscribed = false
+    private val subscriptions = CompositeDisposable()
+    private var errorRetrySubject: PublishSubject<Any> = PublishSubject.create()
+    private var isInitialized = false
+    private var retriedAfterError = false
+    private var isErrorWithRetryShown: Boolean = false
 
     internal fun Disposable.disposeOnDestroy(): Disposable {
-        mSubscriptions.add(this)
+        subscriptions.add(this)
         return this
     }
 
     fun unsubscribeOnDestroy(subscription: Disposable?): MvpBasePresenter<V> {
-        mSubscriptions.add(subscription!!)
+        subscriptions.add(subscription!!)
         return this
     }
 
     fun retry() {
         doOnErrorResolve()
-        mErrorRetryNotifier.onNext(Any())
-        mRetried = true
+        errorRetrySubject.onNext(Any())
+        retriedAfterError = true
     }
 
     open fun onSaveInstanceState(outState: Bundle?) {}
@@ -82,10 +81,13 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
 
     @CallSuper
     override fun attachView(view: V) {
-        mErrorRetryNotifier.doOnSubscribe { unsubscribeOnDestroy(it) }
+        errorRetrySubject.doOnSubscribe { unsubscribeOnDestroy(it) }
+        errorRetrySubject.doOnNext {
+            Timber.d("Retry reactive")
+        }
 
-        if (!mIsInitialized) {
-            mIsInitialized = true
+        if (!isInitialized) {
+            isInitialized = true
             handleAnalytics()
         }
         super.attachView(view)
@@ -99,8 +101,8 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
     @CallSuper
     override fun onDestroy() {
         super.onDestroy()
-        if (!mSubscriptions.isDisposed) {
-            mSubscriptions.dispose()
+        if (!subscriptions.isDisposed) {
+            subscriptions.dispose()
         }
     }
 
@@ -113,6 +115,7 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
         get() = Wallet.app().analytics()
 
     protected fun doOnErrorResolve() {
+        isErrorWithRetryShown = false
         if (viewState is ProgressView) {
             (viewState as ProgressView).showProgress()
         }
@@ -120,20 +123,19 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
 
     protected fun doOnError(t: Throwable) {
         if (viewState is ProgressView) {
-            Observable.just(t)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { (viewState as ProgressView).hideProgress() }
+            (viewState as ProgressView).hideProgress()
         }
         if (viewState is ErrorViewWithRetry) {
-            Observable.just(t)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        var exceptionMessage = t.message
-                        if (t is NetworkException) {
-                            exceptionMessage = t.userMessage
-                        }
-                        (viewState as ErrorViewWithRetry).onErrorWithRetry(String.format("%s", exceptionMessage), retryOnClick())
-                    }
+            var exceptionMessage = t.message
+            if (t is NetworkException) {
+                exceptionMessage = t.userMessage
+            }
+
+            if (!isErrorWithRetryShown) {
+                isErrorWithRetryShown = true
+                (viewState as ErrorViewWithRetry).onErrorWithRetry(String.format("%s", exceptionMessage), retryOnClick())
+            }
+
         }
     }
 
@@ -142,7 +144,7 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
     }
 
     protected fun <T> safeSubscribeComputeToUi(input: Observable<T>): Observable<T> {
-        return input.retryWhen(errorResolver)
+        return input
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -152,7 +154,7 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
     }
 
     protected fun <T> safeSubscribeIoToUi(input: Observable<T>): Observable<T> {
-        return input.retryWhen(errorResolver)
+        return input
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -163,15 +165,7 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
                 val t = NetworkException.convertIfNetworking(err)
                 Timber.w(t, "Error occurred in %s", javaClass.name)
                 doOnError(t)
-                if (mErrorRetryNotifier == null) {
-                    mErrorRetryNotifier = PublishSubject.create()
-                    mErrorRetryNotifier.onNext(Any())
-                }
-                Single
-                        .fromObservable(mErrorRetryNotifier.take(1))
-                        .delay(500, TimeUnit.MILLISECONDS)
-                        .toObservable()
-                        .doOnSubscribe { subscription: Disposable? -> unsubscribeOnDestroy(subscription) }
+                errorRetrySubject.delay(500, TimeUnit.MILLISECONDS)
             }
         }
 
