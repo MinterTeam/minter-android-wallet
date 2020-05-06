@@ -28,10 +28,9 @@ package network.minter.bipwallet.wallets.views
 import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
-import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
-import network.minter.bipwallet.internal.storage.AccountStorage
+import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter
@@ -46,7 +45,7 @@ import javax.inject.Inject
 
 @InjectViewState
 class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPageView>() {
-    @Inject lateinit var accountStorage: CachedRepository<AddressListBalancesTotal, AccountStorage>
+    @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var secretStorage: SecretStorage
 
     private var adapter: SimpleRecyclerAdapter<CoinBalance, BaseTabPageFragment.ItemViewHolder>? = null

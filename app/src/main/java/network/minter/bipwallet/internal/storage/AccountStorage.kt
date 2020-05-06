@@ -30,7 +30,7 @@ import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
-import network.minter.bipwallet.apis.reactive.ReactiveExplorer.rxExp
+import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
@@ -92,14 +92,16 @@ class AccountStorage(
 
     private fun mapBalances(): Function<MinterAddress, ObservableSource<ExpResult<AddressBalanceTotal>>> {
         return Function { address: MinterAddress ->
-            rxExp(addressRepo.getAddressData(address, true))
+            addressRepo.getAddressData(address, true)
+                    .rxExp()
                     .switchMap(mapToDelegations())
         }
     }
 
     private fun mapToDelegations(): Function<ExpResult<AddressBalance>, ObservableSource<ExpResult<AddressBalanceTotal>>> {
         return Function { res: ExpResult<AddressBalance> ->
-            rxExp(addressRepo.getDelegations(res.result.address, 0))
+            addressRepo.getDelegations(res.result.address, 0)
+                    .rxExp()
                     .map(mapDelegationsToBalances(res))
         }
     }

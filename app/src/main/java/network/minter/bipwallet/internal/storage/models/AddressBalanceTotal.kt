@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.internal.storage.models
 
+import network.minter.bipwallet.internal.helpers.data.CollectionsHelper
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.AddressBalance
@@ -53,6 +54,7 @@ class AddressBalanceTotal : AddressBalance {
     constructor(source: AddressBalance, delegated: BigDecimal) {
         address = source.address
         coins = source.coins
+        coins = CollectionsHelper.sortByValue(coins, CollectionsHelper.StableCoinSorting())
         totalBalanceInBase = source.totalBalanceInBase
         totalBalanceInUSD = source.totalBalanceInUSD
         availableBalanceInBase = source.availableBalanceInBase
