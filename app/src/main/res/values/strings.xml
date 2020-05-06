@@ -129,7 +129,7 @@
     <string name="btn_proceed">Proceed</string>
     <string name="btn_scan_qr">Scan QR</string>
     <string name="btn_draggable">Drag the dialog</string>
-    <string name="btn_all_txs">All transactions</string>
+    <string name="btn_all_txs">All Transactions</string>
     <string name="btn_add_wallet">Add New Wallet</string>
     <string name="input_hint_wallet_title">Up to 18 latin letters and numbers…</string>
     <string name="input_hint_wallet_title_later">Add title to your wallet (you can do it later)</string>
