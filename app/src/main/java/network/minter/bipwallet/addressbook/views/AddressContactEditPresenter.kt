@@ -75,6 +75,9 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
             viewState.setInputTitle(mContact!!.name)
         }
 
+        viewState.setUniqueValidatorForAddress(mContact?.address)
+        viewState.setUniqueValidatorForTitle(mContact?.name)
+
         viewState.setOnSubmitListener(View.OnClickListener { view: View ->
             onSubmit(view)
         })

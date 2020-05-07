@@ -48,6 +48,7 @@ import network.minter.bipwallet.internal.helpers.TextHelper.humanReadableBytes
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.system.WalletFileProvider
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.core.crypto.MinterAddress
 import timber.log.Timber
 import java.io.File
@@ -73,6 +74,7 @@ class ShareDialog : BaseBottomSheetDialogFragment() {
         b.address.text = address.toString()
         b.address.setOnClickListener(::copyAddress)
         b.actionCopy.setOnClickListener(::copyAddress)
+        b.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(b.dialogTop))
 
 
         // 74% of screen is qr code image

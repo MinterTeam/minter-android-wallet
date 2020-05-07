@@ -81,6 +81,7 @@
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_title"
                 style="@style/Input"
+                android:layout_marginTop="0dp"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:maxLength="18"
                 android:layout_width="match_parent"

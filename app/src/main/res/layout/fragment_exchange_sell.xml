@@ -155,7 +155,7 @@
             android:layout_marginStart="@dimen/margin_edges"
             android:layout_marginTop="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges"
-            android:text="@string/btn_exchange" />
+            android:text="@string/btn_continue" />
 
         <Space
             android:layout_width="match_parent"

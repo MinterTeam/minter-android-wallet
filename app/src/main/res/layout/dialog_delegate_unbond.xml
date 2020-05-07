@@ -32,27 +32,83 @@
     android:background="@drawable/shape_dialog_rounded"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/dialog_draggable"
+    <LinearLayout
+        android:id="@+id/dialog_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:contentDescription="@string/btn_draggable"
-        android:src="@drawable/shape_draggable" />
+        android:background="@drawable/shape_dialog_rounded"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_edges">
 
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:fontFamily="@font/_inter_semi_bold"
-        android:text="@string/dialog_title_delegate"
-        android:textAlignment="center"
-        android:textSize="@dimen/text_size_18" />
+        <ImageView
+            android:id="@+id/dialog_draggable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:contentDescription="@string/btn_draggable"
+            android:src="@drawable/shape_draggable" />
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/dialog_title_delegate"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18" />
+
+        <LinearLayout
+            android:id="@+id/sync_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_watch_later"
+                android:tint="@color/grey" />
+
+            <TextView
+                android:id="@+id/last_updated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_half"
+                android:fontFamily="@font/inter"
+                android:text="sync..."
+                android:textSize="@dimen/text_size_12" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:paddingStart="@dimen/margin_edges_medium"
+            android:paddingEnd="@dimen/margin_edges_medium"
+            android:text="@string/dialog_label_delegate"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_14"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sync_container" />
+    </LinearLayout>
+
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -61,57 +117,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:id="@+id/sync_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_edges"
-                android:layout_marginTop="6dp"
-                android:layout_marginEnd="@dimen/margin_edges"
-                android:gravity="center"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_watch_later"
-                    android:tint="@color/grey" />
-
-                <TextView
-                    android:id="@+id/last_updated"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_edges_half"
-                    android:fontFamily="@font/inter"
-                    android:textSize="@dimen/text_size_12"
-                    android:text="sync..." />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/subtitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_edges"
-                android:paddingStart="@dimen/margin_edges_medium"
-                android:paddingEnd="@dimen/margin_edges_medium"
-                android:text="@string/dialog_label_delegate"
-                android:textAlignment="center"
-                android:textSize="@dimen/text_size_14"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sync_container" />
-
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_masternode"
                 style="@style/Input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="0dp"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="Choose masternode"
                 android:inputType="none"
@@ -121,7 +133,7 @@
                 app:label="@string/label_masternode"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/subtitle"
+                app:layout_constraintTop_toTopOf="parent"
                 app:suffixImageSrc="@drawable/ic_drop_down_grey"
                 app:suffixType="image"
                 tools:inputOverlayVisible="true" />
@@ -238,7 +250,7 @@
                 android:layout_marginStart="@dimen/margin_edges_medium"
                 android:layout_marginTop="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
-                android:text="@string/btn_delegate"
+                android:text="@string/btn_continue"
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -91,7 +91,25 @@ class AddressBookRepository(
     }
 
     @JvmOverloads
-    fun countByNameOrAddress(nameOrAddress: String, exclude: String? = null): Single<Int> {
+    fun countByName(name: String, exclude: String? = null): Single<Int> {
+        if (exclude != null) {
+            return db.addressBook().countByName(name, exclude)
+        }
+
+        return db.addressBook().countByName(name)
+    }
+
+    @JvmOverloads
+    fun countByAddress(address: String, exclude: String? = null): Single<Int> {
+        if (exclude != null) {
+            return db.addressBook().countByAddress(address, exclude)
+        }
+
+        return db.addressBook().countByAddress(address)
+    }
+
+    @JvmOverloads
+    fun countLikeByNameOrAddress(nameOrAddress: String, exclude: String? = null): Single<Int> {
         val likeArg = String.format("%%%s%%", nameOrAddress)
 
         if (exclude != null) {

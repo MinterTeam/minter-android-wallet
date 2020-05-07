@@ -338,5 +338,6 @@
     <string name="image_cd_wallet_selector_dropdown">Wallet Selector Dropdown</string>
     <string name="dialog_title_generate_new_wallet">Generate New Wallet</string>
     <string name="dialog_title_edit_wallet">Edit Wallet</string>
+    <string name="dialog_title_signin">Sign In</string>
 
 </resources>

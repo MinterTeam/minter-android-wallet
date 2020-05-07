@@ -45,7 +45,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.explorer.models.CoinItem;
-import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
@@ -122,19 +121,15 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 List<CoinItem> filteredList = (List<CoinItem>) results.values;
-                Timber.d("Publish results: %d", results.count);
                 //noinspection ConstantConditions
                 if (results != null && results.count > 0) {
-                    Timber.d("Add filter item (items: %d)", results.count);
                     clear();
                     for (CoinItem c : filteredList) {
                         add(c);
                     }
-                    Timber.d("Notify changed");
                     notifyDataSetChanged();
                 } else {
                     clear();
-                    Timber.d("Invalidate changed");
                     notifyDataSetInvalidated();
                 }
             }

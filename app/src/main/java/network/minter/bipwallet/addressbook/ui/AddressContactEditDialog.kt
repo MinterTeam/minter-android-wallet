@@ -33,7 +33,6 @@ import android.view.ViewGroup
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.LengthValidator
-import com.edwardstock.inputfield.form.validators.RegexValidator
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -43,9 +42,10 @@ import network.minter.bipwallet.addressbook.views.AddressContactEditPresenter
 import network.minter.bipwallet.databinding.DialogAddresscontactEditBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.ViewHelper
-import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
-import network.minter.core.crypto.MinterAddress
-import network.minter.core.crypto.MinterPublicKey
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterAddressOrPubKeyValidator
+import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
+import network.minter.bipwallet.internal.helpers.forms.validators.UniqueContactNameValidator
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import org.parceler.Parcels
 import javax.inject.Inject
 import javax.inject.Provider
@@ -78,27 +78,35 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
 
         inputGroup.enableInputDebounce = false
 
+        binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 
         inputGroup.addInput(binding.inputAddress)
+        inputGroup.addValidator(binding.inputAddress, MinterAddressOrPubKeyValidator())
+
         inputGroup.addInput(binding.inputTitle)
-        inputGroup.addFilter(binding.inputTitle, NewLineInputFilter())
+        inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
 
-        val minterAddressOrPubkeyValidator = RegexValidator("${MinterAddress.ADDRESS_PATTERN}|${MinterPublicKey.PUB_KEY_PATTERN}").apply {
-            errorMessage = "Incorrect recipient format"
-            isRequired = true
-        }
-        inputGroup.addValidator(binding.inputAddress, minterAddressOrPubkeyValidator)
-
-        val titleValidator = LengthValidator(1, 18).apply {
+        inputGroup.addValidator(binding.inputTitle, LengthValidator(1, 18).apply {
             errorMessage = "Title length should be from 1 to 18 symbols"
-        }
-        inputGroup.addValidator(binding.inputTitle, titleValidator)
+        })
 
         binding.inputAddress.input.setOnClickListener { ViewHelper.tryToPasteMinterAddressFromCB(it, binding.inputAddress.input) }
 
         presenter.handleExtras(arguments)
 
         return binding.root
+    }
+
+    override fun setUniqueValidatorForAddress(exclude: String?) {
+        inputGroup.addValidator(binding.inputAddress, UniqueContactNameValidator(exclude, UniqueContactNameValidator.FindBy.Address).apply {
+            errorMessage = "Contact with this address already exist"
+        })
+    }
+
+    override fun setUniqueValidatorForTitle(exclude: String?) {
+        inputGroup.addValidator(binding.inputTitle, UniqueContactNameValidator(exclude, UniqueContactNameValidator.FindBy.Name).apply {
+            errorMessage = "Contact with this title already exist"
+        })
     }
 
     override fun validate() {

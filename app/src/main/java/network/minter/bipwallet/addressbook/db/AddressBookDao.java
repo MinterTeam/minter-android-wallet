@@ -63,8 +63,36 @@ public interface AddressBookDao {
      * @param nameOrAddress should be ENCLOSED with "%"
      * @return
      */
-    @Query("SELECT COUNT(*) FROM minter_contacts WHERE name != :excludeName AND (address LIKE :nameOrAddress OR name LIKE :nameOrAddress)")
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE (name != :excludeName OR address != :excludeName) AND (address LIKE :nameOrAddress OR name LIKE :nameOrAddress)")
     Single<Integer> countByNameOrAddress(String nameOrAddress, String excludeName);
+
+    /**
+     * Get the count of contacts like passed name
+     * @param name should be ENCLOSED with "%"
+     * @return
+     */
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE (name != :excludeName) AND (name = :name)")
+    Single<Integer> countByName(String name, String excludeName);
+
+    /**
+     * Get the count of contacts like passed name
+     * @param name should be ENCLOSED with "%"
+     * @return
+     */
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE (name = :name)")
+    Single<Integer> countByName(String name);
+
+    /**
+     * Get the count of contacts like passed address
+     * @param address should be ENCLOSED with "%"
+     * @return
+     */
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE (address != :excludeAddress) AND (address = :address)")
+    Single<Integer> countByAddress(String address, String excludeAddress);
+
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE (address = :address)")
+    Single<Integer> countByAddress(String address);
+
 
     @Query("SELECT * FROM minter_contacts WHERE address = :nameOrAddress OR name = :nameOrAddress")
     Maybe<AddressContact> getByNameOrAddress(String nameOrAddress);

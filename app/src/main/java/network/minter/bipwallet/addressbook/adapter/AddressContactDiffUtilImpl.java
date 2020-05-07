@@ -30,7 +30,6 @@ import java.util.List;
 
 import androidx.recyclerview.widget.DiffUtil;
 import network.minter.bipwallet.addressbook.models.AddressBookItem;
-import timber.log.Timber;
 
 public class AddressContactDiffUtilImpl extends DiffUtil.Callback {
     private List<AddressBookItem> mOldItems, mNewItems;
@@ -55,9 +54,7 @@ public class AddressContactDiffUtilImpl extends DiffUtil.Callback {
         final AddressBookItem oldItem = mOldItems.get(oldItemPosition);
         final AddressBookItem newItem = mNewItems.get(newItemPosition);
 
-        boolean isSame = oldItem.isSameOf(newItem);
-        Timber.d("Compare is the same: %s && %s = %b", oldItem.toString(), newItem.toString(), isSame);
-        return isSame;
+        return oldItem.isSameOf(newItem);
     }
 
     @Override
@@ -65,8 +62,6 @@ public class AddressContactDiffUtilImpl extends DiffUtil.Callback {
         final AddressBookItem oldItem = mOldItems.get(oldItemPosition);
         final AddressBookItem newItem = mNewItems.get(newItemPosition);
 
-        boolean isEqual = oldItem.equals(newItem);
-        Timber.d("Compare is equals: %s && %s = %b", oldItem.toString(), newItem.toString(), isEqual);
-        return isEqual;
+        return oldItem.equals(newItem);
     }
 }

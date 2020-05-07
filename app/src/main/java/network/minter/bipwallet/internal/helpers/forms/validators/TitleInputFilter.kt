@@ -30,4 +30,4 @@ package network.minter.bipwallet.internal.helpers.forms.validators
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class TitleInputFilter : RegexInputFilter("[^\\w\\d\\s_\\-]".toRegex())
+class TitleInputFilter : RegexInputFilter("[^\\w\\d _\\-]+".toRegex())

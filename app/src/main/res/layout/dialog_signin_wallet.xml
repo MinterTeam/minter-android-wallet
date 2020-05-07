@@ -30,11 +30,37 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include
+    <LinearLayout
         android:id="@+id/dialog_top"
-        layout="@layout/dialog_sheet_top" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_dialog_rounded"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_edges">
+
+        <ImageView
+            android:id="@+id/dialog_draggable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:contentDescription="@string/btn_draggable"
+            android:src="@drawable/shape_draggable" />
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/dialog_title_signin"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18" />
+    </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -50,6 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="0dp"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="Your seed phrase..."
                 app:labelEnabled="false" />
@@ -70,7 +97,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/margin_edges_large"
+                android:layout_height="@dimen/margin_edges_medium"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/submit" />

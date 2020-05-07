@@ -32,28 +32,37 @@
     android:background="@drawable/shape_dialog_rounded"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/dialog_draggable"
+    <LinearLayout
+        android:id="@+id/dialog_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:contentDescription="@string/btn_draggable"
-        android:src="@drawable/shape_draggable" />
+        android:background="@drawable/shape_dialog_rounded"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_edges">
 
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:fontFamily="@font/_inter_semi_bold"
-        android:text="@string/dialog_title_add_contact"
-        android:textAlignment="center"
-        android:textSize="@dimen/text_size_18" />
+        <ImageView
+            android:id="@+id/dialog_draggable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:contentDescription="@string/btn_draggable"
+            android:src="@drawable/shape_draggable" />
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/dialog_title_add_contact"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18" />
+    </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/form"
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -71,6 +80,7 @@
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_address"
                 style="@style/Input"
+                android:layout_marginTop="0dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"

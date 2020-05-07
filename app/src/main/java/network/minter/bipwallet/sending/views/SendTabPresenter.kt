@@ -848,6 +848,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
                 addressBookRepo
                         .findByNameOrAddress(s)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
                         .subscribe(
                                 { res: AddressContact? ->
                                     mRecipient = res
@@ -859,6 +861,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     viewState.setSubmitEnabled(false)
                                     addressBookRepo
                                             .findSuggestionsByNameOrAddress(s)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeOn(Schedulers.io())
                                             .subscribe(
                                                     { suggestions: List<AddressContact> ->
                                                         viewState.setRecipientAutocompleteItems(suggestions)

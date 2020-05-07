@@ -43,7 +43,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.addressbook.models.AddressContact;
-import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
@@ -68,7 +67,6 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
 
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        Timber.d("Get view %d", position);
         View v = convertView;
         ViewHolder holder;
         if (mInflater == null) {
@@ -99,7 +97,6 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 if (constraint != null) {
-                    Timber.d("Filtering %s", constraint);
                     mSuggestions.clear();
                     for (AddressContact item : mItemsAll) {
                         if (item.name != null && item.name.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
@@ -121,19 +118,15 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 //noinspection unchecked
                 List<AddressContact> filteredList = (List<AddressContact>) results.values;
-                Timber.d("Publish results: %d", results.count);
                 //noinspection ConstantConditions
                 if (results != null && results.count > 0) {
-                    Timber.d("Add filter item (items: %d)", results.count);
                     clear();
                     for (AddressContact c : filteredList) {
                         add(c);
                     }
-                    Timber.d("Notify changed");
                     notifyDataSetChanged();
                 } else {
                     clear();
-                    Timber.d("Invalidate changed");
                     notifyDataSetInvalidated();
                 }
             }
@@ -141,7 +134,6 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
     }
 
     public void setItems(List<AddressContact> items) {
-        Timber.d("Set autocomplete items: %d", items.size());
         mItems = items;
         //noinspection unchecked
         mItemsAll = (ArrayList<AddressContact>) ((ArrayList<AddressContact>) mItems).clone();

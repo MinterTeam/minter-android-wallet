@@ -54,6 +54,7 @@ import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
@@ -140,6 +141,8 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         }
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         presenter.handleExtras(arguments)
+
+        binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 
         binding.inputMasternode.input.isFocusable = false
         binding.inputCoin.input.isFocusable = false

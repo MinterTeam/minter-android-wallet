@@ -34,7 +34,7 @@ import network.minter.bipwallet.R
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class ViewElevationOnScrollNestedScrollView(
+class ViewElevationOnScrollNestedScrollView @JvmOverloads constructor(
         private val view: View,
         var elevation: Float = 0.0f
 ) : NestedScrollView.OnScrollChangeListener {

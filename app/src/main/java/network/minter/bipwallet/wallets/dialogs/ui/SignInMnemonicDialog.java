@@ -42,6 +42,7 @@ import javax.inject.Provider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -54,6 +55,7 @@ import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.home.ui.HomeActivity;
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment;
 import network.minter.bipwallet.internal.helpers.KeyboardHelper;
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView;
 import network.minter.bipwallet.wallets.dialogs.presentation.SingInMnemonicPresenter;
 
 public class SignInMnemonicDialog extends BaseBottomSheetDialogFragment implements SignInMnemonicView {
@@ -65,6 +67,8 @@ public class SignInMnemonicDialog extends BaseBottomSheetDialogFragment implemen
     @BindView(R.id.dialog_description) TextView description;
     @BindView(R.id.submit) Button submit;
     @BindView(R.id.input_seed) InputField inputMnemonic;
+    @BindView(R.id.scroll) NestedScrollView scroll;
+    @BindView(R.id.dialog_top) View dialogTop;
 
     private Unbinder mUnbinder;
 
@@ -92,6 +96,8 @@ public class SignInMnemonicDialog extends BaseBottomSheetDialogFragment implemen
         mUnbinder = ButterKnife.bind(this, view);
         title.setText(R.string.btn_sign_in);
         description.setVisibility(View.GONE);
+
+        scroll.setOnScrollChangeListener(new ViewElevationOnScrollNestedScrollView(dialogTop));
 
 
         return view;

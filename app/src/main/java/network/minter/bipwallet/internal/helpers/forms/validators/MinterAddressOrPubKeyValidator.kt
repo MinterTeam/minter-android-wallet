@@ -23,27 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.addressbook.contract
 
-import android.view.View
-import androidx.annotation.StringRes
-import com.edwardstock.inputfield.form.InputWrapper
-import moxy.MvpView
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.StateStrategyType
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-@StateStrategyType(AddToEndSingleStrategy::class)
-interface AddressContactEditView : MvpView {
-    fun setTitle(@StringRes titleRes: Int)
-    fun setOnSubmitListener(listener: View.OnClickListener)
-    fun addTextChangedListener(listener: (input: InputWrapper, valid: Boolean) -> Unit)
-    fun addFormValidatorListener(listener: (Boolean) -> Unit)
-    fun setEnableSubmit(enable: Boolean)
-    fun close()
-    fun setInputAddress(address: String?)
-    fun setInputTitle(title: String?)
-    fun submitDialog()
-    fun validate()
-    fun setUniqueValidatorForAddress(exclude: String? = null)
-    fun setUniqueValidatorForTitle(exclude: String? = null)
+import com.edwardstock.inputfield.form.validators.RegexValidator
+import network.minter.core.crypto.MinterAddress
+import network.minter.core.crypto.MinterPublicKey
+
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+class MinterAddressOrPubKeyValidator(
+        errorMessage: CharSequence = "Incorrect recipient format",
+        required: Boolean = true
+) : RegexValidator("${MinterAddress.ADDRESS_PATTERN}|${MinterPublicKey.PUB_KEY_PATTERN}") {
+
+    init {
+        _errorMessage = errorMessage
+        _isRequired = required
+    }
 }

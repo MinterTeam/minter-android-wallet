@@ -36,9 +36,15 @@ import network.minter.bipwallet.internal.Wallet
  */
 class UniqueContactNameValidator(
         private val exclude: String? = null,
-        errorMessage: CharSequence = "Contact with this name already exists",
+        private val findBy: FindBy,
+        errorMessage: CharSequence = "Contact with this title already exists",
         required: Boolean = true
 ) : BaseValidator(errorMessage, required) {
+
+    enum class FindBy {
+        Name,
+        Address
+    }
 
     override fun validate(value: CharSequence?): Single<Boolean> {
         if (!isRequired && (value == null || value.isEmpty())) {
@@ -47,8 +53,17 @@ class UniqueContactNameValidator(
 
         if (value == null || value.isEmpty()) return Single.just(false)
 
-        return Wallet.app().addressBookRepo().countByNameOrAddress(value.toString(), exclude).map {
-            it == 0
+        return when (findBy) {
+            FindBy.Name -> {
+                Wallet.app().addressBookRepo().countByName(value.toString(), exclude).map {
+                    it == 0
+                }
+            }
+            FindBy.Address -> {
+                Wallet.app().addressBookRepo().countByAddress(value.toString(), exclude).map {
+                    it == 0
+                }
+            }
         }
     }
 }
