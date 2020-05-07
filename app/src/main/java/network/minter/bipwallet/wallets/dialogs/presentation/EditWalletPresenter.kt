@@ -26,7 +26,6 @@
 package network.minter.bipwallet.wallets.dialogs.presentation
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
@@ -35,7 +34,6 @@ import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.IntentHelper.getParcelExtraOrError
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.internal.system.SimpleTextWatcher
 import network.minter.bipwallet.wallets.contract.EditWalletView
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
@@ -50,35 +48,45 @@ class EditWalletPresenter @Inject constructor() : MvpBasePresenter<EditWalletVie
     override fun handleExtras(bundle: Bundle?) {
         super.handleExtras(bundle)
 
-        viewState.setEnableRemove(
-                bundle?.getBoolean(EditWalletDialog.EXTRA_ENABLE_REMOVE, false) ?: false
-        )
-
         walletItem = getParcelExtraOrError<WalletItem>(bundle, EditWalletDialog.EXTRA_WALLET_ITEM, "WalletItem required")
         if (walletItem!!.title != walletItem!!.addressShort) {
             title = walletItem!!.title
             viewState.setTitle(walletItem!!.title)
+            viewState.setUniqueTitleExclude(walletItem!!.title)
+        } else {
+            viewState.setUniqueTitleExclude(null)
         }
     }
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.setEnableSubmit(true)
-        viewState.setOnSubmitClickListener(View.OnClickListener { view: View -> onSubmit(view) })
-        viewState.setDeleteActionVisible(secretStorage.addresses.size > 1)
-        viewState.setOnDeleteClickListener(View.OnClickListener { view: View -> onDeleteWallet(view) }, walletItem!!)
-        viewState.addInputTextWatcher(object : SimpleTextWatcher() {
-            override fun afterTextChanged(s: Editable) {
-                super.afterTextChanged(s)
-                title = s.toString()
-                if (title!!.isEmpty()) {
-                    title = null
+        viewState.setEnableRemove(secretStorage.addresses.size > 1)
+
+        viewState.setOnSubmitClickListener(View.OnClickListener {
+            onSubmit()
+        })
+        viewState.setOnRemoveClickListener(View.OnClickListener {
+            onDeleteWallet()
+        })
+
+        viewState.addInputTextWatcher { inputWrapper, valid ->
+            when (inputWrapper.fieldName) {
+                "title" -> {
+                    viewState.setEnableSubmit(valid)
+                    if (valid) {
+                        title = if (inputWrapper.text?.isEmpty() == true) {
+                            null
+                        } else {
+                            inputWrapper.text.toString()
+                        }
+                    }
                 }
             }
-        })
+        }
     }
 
-    private fun onDeleteWallet(view: View) {
+    private fun onDeleteWallet() {
         viewState.startDialog {
             ConfirmDialog.Builder(it, R.string.dialog_title_remote_wallet)
                     .setDescription(HtmlCompat.fromHtml(it.getString(R.string.dialog_description_remove_wallet, walletItem!!.address.toShortString())))
@@ -101,7 +109,7 @@ class EditWalletPresenter @Inject constructor() : MvpBasePresenter<EditWalletVie
         }
     }
 
-    private fun onSubmit(view: View) {
+    private fun onSubmit() {
         val sd = secretStorage.getSecret(walletItem!!.address)
         sd.title = title
         secretStorage.update(sd)

@@ -25,8 +25,8 @@
  */
 package network.minter.bipwallet.wallets.contract
 
-import android.text.TextWatcher
 import android.view.View
+import com.edwardstock.inputfield.form.InputWrapper
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
@@ -36,16 +36,15 @@ import network.minter.bipwallet.wallets.selector.WalletItem
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface EditWalletView : MvpView {
     fun setEnableSubmit(enable: Boolean)
-    fun setEnableRemove(enableRemove: Boolean)
+    fun setEnableRemove(enable: Boolean)
     fun setOnSubmitClickListener(listener: View.OnClickListener)
-    fun addInputTextWatcher(textWatcher: TextWatcher)
-    fun setError(error: CharSequence?)
+    fun setOnRemoveClickListener(listener: View.OnClickListener)
+    fun addInputTextWatcher(listener: (InputWrapper, Boolean) -> Unit)
     fun close()
     fun setTitle(title: CharSequence?)
-    fun setOnDeleteClickListener(listener: View.OnClickListener, walletItem: WalletItem)
     fun startDialog(executor: DialogExecutor)
     fun callOnDelete(walletItem: WalletItem)
     fun callOnSave(walletItem: WalletItem)
-    fun setDeleteActionVisible(visible: Boolean)
     fun expand()
+    fun setUniqueTitleExclude(title: String?)
 }

@@ -123,7 +123,7 @@ public class WalletListAdapter extends RecyclerView.Adapter<WalletListAdapter.Vi
 
     @Override
     public int getItemCount() {
-        if (mAddresses.size() == 10) {
+        if (mAddresses.size() == 5) {
             return mAddresses.size();
         }
         return mAddresses.size() + 1;

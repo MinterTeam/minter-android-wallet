@@ -25,10 +25,10 @@
  */
 package network.minter.bipwallet.auth.contract
 
-import android.text.TextWatcher
 import android.view.View
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
+import com.edwardstock.inputfield.form.InputWrapper
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
@@ -36,7 +36,7 @@ import moxy.viewstate.strategy.StateStrategyType
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface CreateWalletView : MvpView {
-    fun setTitle(@StringRes resId: Int)
+
     fun setDescription(@StringRes resId: Int)
     fun setSeed(seedPhrase: CharSequence)
     fun setOnSeedClickListener(listener: View.OnClickListener)
@@ -44,11 +44,13 @@ interface CreateWalletView : MvpView {
     fun setOnSubmit(listener: View.OnClickListener)
     fun showCopiedAlert()
     fun setSubmitEnabled(enabled: Boolean)
-    fun addInputTextWatcher(textWatcher: TextWatcher)
+    fun addInputTextWatcher(listener: (InputWrapper, Boolean) -> Unit)
     fun setEnableTitleInput(enable: Boolean)
     fun setEnableDescription(enable: Boolean)
     fun setWalletTitle(title: String?)
     fun showCancelAction(show: Boolean)
+    fun setDialogTitle(title: String?)
+    fun setDialogTitle(@StringRes resId: Int)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startHome()

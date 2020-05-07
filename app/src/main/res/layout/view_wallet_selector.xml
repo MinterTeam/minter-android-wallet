@@ -53,7 +53,9 @@
         android:ellipsize="end"
         android:fontFamily="@font/_inter_semi_bold"
         android:gravity="center_vertical|start"
-
+        android:maxLength="18"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textAlignment="viewStart"
         android:textColor="@color/textColorWhite"
         android:textSize="18sp"
@@ -63,7 +65,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginEnd="@dimen/margin_edges_half"
         app:layout_goneMarginStart="48dp"
-        tools:text="Mx8d008d...8d00ab"
+        tools:text="Mx8d008dffe2f9144a39a2094ebdedadad335e814f"
         tools:textColor="@color/textColorPrimary" />
 
     <ImageView

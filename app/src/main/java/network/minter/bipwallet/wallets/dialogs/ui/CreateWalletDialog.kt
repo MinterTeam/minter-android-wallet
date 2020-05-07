@@ -30,11 +30,12 @@ import android.animation.AnimatorSet
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import com.edwardstock.inputfield.form.InputGroup
+import com.edwardstock.inputfield.form.InputWrapper
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -46,6 +47,9 @@ import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
+import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.wallets.dialogs.presentation.CreateWalletPresenter
 import javax.inject.Inject
 import javax.inject.Provider
@@ -57,13 +61,15 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         const val EXTRA_ENABLE_DESCRIPTION = "EXTRA_ENABLE_DESCRIPTION"
         const val EXTRA_ENABLE_START_HOME_ON_SUBMIT = "EXTRA_ENABLE_START_HOME_ON_SUBMIT"
         const val EXTRA_ENABLE_CANCEL = "EXTRA_ENABLE_CANCEL"
-        const val EXTRA_TITLE = "EXTRA_TITLE"
+        const val EXTRA_WALLET_TITLE = "EXTRA_WALLET_TITLE"
+        const val EXTRA_DIALOG_TITLE = "EXTRA_TITLE"
     }
 
     @Inject lateinit var presenterProvider: Provider<CreateWalletPresenter>
     @InjectPresenter lateinit var presenter: CreateWalletPresenter
 
     private lateinit var binding: DialogCreateWalletBinding
+    private val inputGroup = InputGroup()
 
     @ProvidePresenter
     fun providePresenter(): CreateWalletPresenter {
@@ -85,15 +91,27 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
 
         presenter.handleExtras(arguments)
 
+        binding.apply {
+            scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(dialogTop))
+
+            inputGroup.addInput(inputTitle)
+            inputGroup.addFilter(inputTitle, TitleInputFilter())
+            inputGroup.addValidator(inputTitle, UniqueWalletTitleValidator())
+        }
+
         return binding.root
     }
 
-    override fun setTitle(resId: Int) {
-        binding.dialogTop.dialogTitle.setText(resId)
+    override fun setDialogTitle(resId: Int) {
+        binding.dialogTitle.setText(resId)
+    }
+
+    override fun setDialogTitle(title: String?) {
+        binding.dialogTitle.text = title
     }
 
     override fun setDescription(resId: Int) {
-        binding.dialogTop.dialogDescription.setText(resId)
+        binding.dialogDescription.setText(resId)
     }
 
     override fun setSeed(seedPhrase: CharSequence) {
@@ -143,8 +161,8 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         binding.actionSavedSeed.setOnCheckedChangeListener(checkedChangeListener)
     }
 
-    override fun addInputTextWatcher(textWatcher: TextWatcher) {
-        binding.inputTitle.addTextChangedListener(textWatcher)
+    override fun addInputTextWatcher(listener: (InputWrapper, Boolean) -> Unit) {
+        inputGroup.addTextChangedListener(listener)
     }
 
     override fun setEnableTitleInput(enable: Boolean) {
@@ -152,7 +170,7 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
     }
 
     override fun setEnableDescription(enable: Boolean) {
-        binding.dialogTop.dialogDescription.visible = enable
+        binding.dialogDescription.visible = enable
     }
 
     override fun setWalletTitle(title: String?) {
@@ -184,7 +202,12 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         }
 
         fun setWalletTitle(title: String?): Builder {
-            args.putString(EXTRA_TITLE, title)
+            args.putString(EXTRA_WALLET_TITLE, title)
+            return this
+        }
+
+        fun setTitle(title: String): Builder {
+            args.putString(EXTRA_DIALOG_TITLE, title)
             return this
         }
 

@@ -97,6 +97,14 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, executor)
     }
 
+    protected fun <T : BaseBottomSheetDialogFragment> T.fixNestedDialogBackgrounds(): T {
+        if (dialog != null) {
+            dialog!!.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            dialog!!.window?.setWindowAnimations(0)
+        }
+        return this
+    }
+
     protected fun <T : Dialog> T.fixNestedDialogBackgrounds(): T {
         window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window?.setWindowAnimations(0)

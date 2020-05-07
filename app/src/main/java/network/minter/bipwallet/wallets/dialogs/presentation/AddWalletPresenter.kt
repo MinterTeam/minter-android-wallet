@@ -25,16 +25,13 @@
  */
 package network.minter.bipwallet.wallets.dialogs.presentation
 
-import android.text.Editable
 import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.di.annotations.FragmentScope
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.internal.system.SimpleTextWatcher
 import network.minter.bipwallet.wallets.contract.AddWalletView
-import network.minter.core.bip39.NativeBip39
 import network.minter.profile.models.User
 import javax.inject.Inject
 
@@ -49,28 +46,30 @@ class AddWalletPresenter @Inject constructor() : MvpBasePresenter<AddWalletView>
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.setOnSubmit(View.OnClickListener { onSubmit() })
-        viewState.addTitleInputTextListener(object : SimpleTextWatcher() {
-            override fun afterTextChanged(s: Editable) {
-                mTitle = s.toString()
-                if (mTitle!!.isEmpty()) {
-                    mTitle = null
+        viewState.setOnSubmitClickListener(View.OnClickListener {
+            onSubmit()
+        })
+        viewState.setOnGenerateClickListener(View.OnClickListener {
+            viewState.startGenerate()
+        })
+        viewState.addFormValidListener {
+            viewState.setEnableSubmit(it)
+        }
+
+        viewState.addTextChangedListener { input, valid ->
+            when (input.fieldName) {
+                "title" -> {
+                    if (valid) {
+                        mTitle = input.text.toString()
+                    }
+                }
+                "seed" -> {
+                    if (valid) {
+                        mPhrase = input.text.toString()
+                    }
                 }
             }
-        })
-        viewState.addSeedInputTextListener(object : SimpleTextWatcher() {
-            override fun afterTextChanged(s: Editable) {
-                super.afterTextChanged(s)
-                val res = s.toString()
-                if (res.isEmpty()) {
-                    viewState.setError("Mnemonic can't be empty")
-                    viewState.setEnableSubmit(false)
-                    return
-                }
-                mPhrase = res
-                viewState.setEnableSubmit(NativeBip39.validateMnemonic(mPhrase, NativeBip39.LANG_DEFAULT))
-            }
-        })
+        }
     }
 
     private fun onSubmit() {

@@ -55,7 +55,5 @@ internal class RecipientValidator(
 
         return Wallet.app().addressBookRepo().countByNameOrAddress(v)
                 .map { cnt -> cnt > 0 }
-
-//        return Single.just(true)
     }
 }

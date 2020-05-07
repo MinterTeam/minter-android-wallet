@@ -26,7 +26,6 @@
 package network.minter.bipwallet.wallets.dialogs.presentation
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import android.widget.CompoundButton
 import moxy.InjectViewState
@@ -37,7 +36,6 @@ import network.minter.bipwallet.internal.di.annotations.FragmentScope
 import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.internal.system.SimpleTextWatcher
 import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog
 import network.minter.core.bip39.MnemonicResult
 import network.minter.core.bip39.NativeBip39
@@ -51,43 +49,57 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
     @Inject lateinit var session: AuthSession
     @Inject lateinit var secretStorage: SecretStorage
 
-    private val mRandom = SecureRandom()
-    private var mMnemonicResult: MnemonicResult? = null
-    private var mEnableDescription = true
-    private var mEnableTitleInput = false
-    private var mStartHomeOnSubmit = true
-    private var mTitle: String? = null
+    private val randomDev = SecureRandom()
+    private var mnemonicResult: MnemonicResult? = null
+    private var enableDescription = true
+    private var enableTitleInput = false
+    private var startHomeOnSubmit = true
+    private var walletTitle: String? = null
+    private var formValid = true
+    private var savedSeed = false
 
     override fun handleExtras(bundle: Bundle?) {
         super.handleExtras(bundle)
-        mEnableDescription = bundle!!.getBoolean(CreateWalletDialog.EXTRA_ENABLE_DESCRIPTION, true)
-        viewState.setEnableDescription(mEnableDescription)
-        mEnableTitleInput = bundle.getBoolean(CreateWalletDialog.EXTRA_ENABLE_TITLE_INPUT, false)
-        viewState.setEnableTitleInput(mEnableTitleInput)
-        mTitle = bundle.getString(CreateWalletDialog.EXTRA_TITLE, null)
-        viewState.setWalletTitle(mTitle)
+        enableDescription = bundle!!.getBoolean(CreateWalletDialog.EXTRA_ENABLE_DESCRIPTION, true)
+        viewState.setEnableDescription(enableDescription)
+        enableTitleInput = bundle.getBoolean(CreateWalletDialog.EXTRA_ENABLE_TITLE_INPUT, false)
+        viewState.setEnableTitleInput(enableTitleInput)
+        walletTitle = bundle.getString(CreateWalletDialog.EXTRA_WALLET_TITLE, null)
+
+
+        if (bundle.containsKey(CreateWalletDialog.EXTRA_DIALOG_TITLE)) {
+            viewState.setDialogTitle(bundle.getString(CreateWalletDialog.EXTRA_DIALOG_TITLE, null))
+        } else {
+            viewState.setDialogTitle(R.string.btn_create_wallet)
+        }
+
+        viewState.setWalletTitle(walletTitle)
         if (bundle.getBoolean(CreateWalletDialog.EXTRA_ENABLE_CANCEL, false)) {
             viewState.showCancelAction(true)
         }
-        mStartHomeOnSubmit = bundle.getBoolean(CreateWalletDialog.EXTRA_ENABLE_START_HOME_ON_SUBMIT, true)
-        if (mEnableTitleInput) {
-            viewState.addInputTextWatcher(object : SimpleTextWatcher() {
-                override fun afterTextChanged(s: Editable) {
-                    super.afterTextChanged(s)
+        startHomeOnSubmit = bundle.getBoolean(CreateWalletDialog.EXTRA_ENABLE_START_HOME_ON_SUBMIT, true)
+        if (enableTitleInput) {
+            viewState.addInputTextWatcher { input, valid ->
+                formValid = valid
+                viewState.setSubmitEnabled(valid)
+                if (valid) {
+                    walletTitle = input.text.toString()
 
-                    if (s.toString().isNotEmpty()) {
-                        mTitle = s.toString()
+                    if (walletTitle?.isEmpty() == true) {
+                        walletTitle = null
                     }
+
+                    viewState.setSubmitEnabled(canSubmit)
                 }
-            })
+            }
         }
     }
 
     override fun attachView(view: CreateWalletView) {
         super.attachView(view)
-        viewState.setTitle(R.string.btn_create_wallet)
+
         viewState.setDescription(R.string.hint_save_seed)
-        viewState.setSeed(mMnemonicResult!!.mnemonic)
+        viewState.setSeed(mnemonicResult!!.mnemonic)
         viewState.setOnSeedClickListener(View.OnClickListener { onCopySeed(it) })
         viewState.setOnSavedClickListener(CompoundButton.OnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->
             onSavedSeed(compoundButton, checked)
@@ -97,7 +109,7 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        mMnemonicResult = NativeBip39.encodeBytes(mRandom.generateSeed(16))
+        mnemonicResult = NativeBip39.encodeBytes(randomDev.generateSeed(16))
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -107,8 +119,8 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
                 User(AuthSession.AUTH_TOKEN_ADVANCED),
                 AuthSession.AuthType.Advanced
         )
-        secretStorage.add(mMnemonicResult!!, mTitle)
-        if (mStartHomeOnSubmit) {
+        secretStorage.add(mnemonicResult!!, walletTitle)
+        if (startHomeOnSubmit) {
             viewState.startHome()
         } else {
             viewState.close()
@@ -117,11 +129,15 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
 
     @Suppress("UNUSED_PARAMETER")
     private fun onSavedSeed(compoundButton: CompoundButton, checked: Boolean) {
-        viewState.setSubmitEnabled(checked)
+        savedSeed = checked
+        viewState.setSubmitEnabled(canSubmit)
     }
+
+    val canSubmit: Boolean
+        get() = savedSeed && formValid
 
     private fun onCopySeed(view: View) {
         viewState.showCopiedAlert()
-        ContextHelper.copyToClipboardNoAlert(view.context, mMnemonicResult!!.mnemonic)
+        ContextHelper.copyToClipboardNoAlert(view.context, mnemonicResult!!.mnemonic)
     }
 }

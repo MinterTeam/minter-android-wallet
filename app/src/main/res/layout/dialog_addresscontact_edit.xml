@@ -80,8 +80,8 @@
                 android:inputType="textNoSuggestions|textMultiLine"
                 android:maxLines="4"
                 android:nextFocusDown="@id/input_title"
-                android:tag="address"
                 android:textAllCaps="false"
+                app:fieldName="address"
                 app:label="@string/input_hint_addressbook_address"
                 tools:text="Mx1122334455667788990011223344556677889900" />
 
@@ -94,8 +94,9 @@
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="@string/input_hint_wallet_title"
                 android:inputType="textMultiLine"
-                android:tag="title"
+                android:maxLength="18"
                 android:textAllCaps="false"
+                app:fieldName="title"
                 app:label="@string/input_hint_addressbook_title" />
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton

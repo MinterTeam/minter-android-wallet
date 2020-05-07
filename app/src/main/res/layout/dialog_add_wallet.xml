@@ -32,27 +32,38 @@
     android:background="@drawable/shape_dialog_rounded"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/dialog_draggable"
+    <LinearLayout
+        android:id="@+id/dialog_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:contentDescription="@string/btn_draggable"
-        android:src="@drawable/shape_draggable" />
+        android:background="@drawable/shape_dialog_rounded"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_edges">
 
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:fontFamily="@font/_inter_semi_bold"
-        android:text="@string/dialog_title_add_wallet"
-        android:textAlignment="center"
-        android:textSize="@dimen/text_size_18" />
+        <ImageView
+            android:id="@+id/dialog_draggable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:contentDescription="@string/btn_draggable"
+            android:src="@drawable/shape_draggable" />
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/dialog_title_add_wallet"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18" />
+
+    </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -68,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
-                android:layout_marginTop="@dimen/margin_edges"
+
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:text="@string/btn_generate_wallet" />
 
@@ -79,8 +90,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
                 android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="@string/input_hint_seed"
                 android:inputType="textMultiLine"
+                app:fieldName="seed"
                 app:label="@string/input_hint_wallet_seed"
                 tools:text="wasp fantasy drive twenty lady dose demise arrange tiny solar now horn" />
 
@@ -90,8 +103,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="@string/input_hint_wallet_title"
                 android:inputType="textMultiLine"
+                app:fieldName="title"
                 app:label="@string/input_hint_wallet_title_later" />
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton

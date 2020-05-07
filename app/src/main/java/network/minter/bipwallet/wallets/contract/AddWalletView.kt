@@ -25,19 +25,25 @@
  */
 package network.minter.bipwallet.wallets.contract
 
-import android.text.TextWatcher
 import android.view.View
+import com.edwardstock.inputfield.form.InputWrapper
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
+import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AddWalletView : MvpView {
-    fun setOnSubmit(listener: View.OnClickListener)
+    fun setOnSubmitClickListener(listener: View.OnClickListener)
     fun setSubmitEnabled(enabled: Boolean)
-    fun addSeedInputTextListener(textWatcher: TextWatcher)
-    fun addTitleInputTextListener(textWatcher: TextWatcher)
-    fun setError(error: CharSequence?)
     fun close()
     fun setEnableSubmit(enable: Boolean)
+    fun setInputError(fieldName: String, error: CharSequence?)
+    fun addFormValidListener(listener: (Boolean) -> Unit)
+    fun addTextChangedListener(listener: (InputWrapper, Boolean) -> Unit)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startGenerate()
+
+    fun setOnGenerateClickListener(listener: View.OnClickListener)
 }

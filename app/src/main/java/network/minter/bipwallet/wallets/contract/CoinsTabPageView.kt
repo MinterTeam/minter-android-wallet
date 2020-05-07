@@ -28,13 +28,9 @@ package network.minter.bipwallet.wallets.contract
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.tx.adapters.TransactionFacade
 
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface TxsTabPageView : BaseWalletsPageView {
+interface CoinsTabPageView : BaseWalletsPageView {
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startTransactions()
-
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDetails(tx: TransactionFacade)
+    fun startConvert()
 }

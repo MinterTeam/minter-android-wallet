@@ -84,10 +84,10 @@ class WalletSelectorController @Inject constructor() {
     }
 
     private fun onAddedWallet() {
+        fillWalletSelector(accountStorage.data)
         accountStorage.update(true)
         txRepo.update(true)
         dailyRewardsRepo.update(true)
-        fillWalletSelector(accountStorage.data)
     }
 
     private fun onSelectWallet(walletItem: WalletItem) {
@@ -120,8 +120,8 @@ class WalletSelectorController @Inject constructor() {
     }
 
     private fun onWalletUpdated(walletItem: WalletItem) {
-        accountStorage.update(true)
         fillWalletSelector(accountStorage.data)
+        accountStorage.update(true)
     }
 
     fun detachView() {

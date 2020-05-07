@@ -23,18 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.contract
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.OneExecutionStateStrategy
-import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.tx.adapters.TransactionFacade
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-@StateStrategyType(AddToEndSingleStrategy::class)
-interface TxsTabPageView : BaseWalletsPageView {
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startTransactions()
+import com.edwardstock.inputfield.form.validators.BaseValidator
+import io.reactivex.Single
+import network.minter.bipwallet.internal.Wallet
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDetails(tx: TransactionFacade)
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+class UniqueWalletTitleValidator(
+        private val exclude: String? = null,
+        errorMessage: CharSequence = "Wallet with this title already exists",
+        required: Boolean = false
+) : BaseValidator(errorMessage, required) {
+
+    override fun validate(value: CharSequence?): Single<Boolean> {
+        if (!isRequired && value?.length == 0) return Single.just(true)
+
+        val secrets = Wallet.app().secretStorage().secretsListSafe
+        for (s in secrets) {
+            if (exclude != null && s.title.equals(exclude)) continue
+
+            if (s.title.equals(value.toString())) {
+                return Single.just(false)
+            }
+        }
+
+        return Single.just(true)
+
+    }
+
 }

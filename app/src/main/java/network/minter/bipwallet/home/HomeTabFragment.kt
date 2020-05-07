@@ -135,6 +135,7 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
                     .setEnableDescription(true)
                     .setEnableTitleInput(true)
                     .setWalletTitle(title)
+                    .setTitle(getString(R.string.dialog_title_generate_new_wallet))
                     .setOnSubmitListener(submitListener)
                     .setOnDismissListener(dismissListener)
                     .setEnableStartHomeOnSubmit(false)

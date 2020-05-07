@@ -58,6 +58,14 @@ public interface AddressBookDao {
     @Query("SELECT COUNT(*) FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress")
     Single<Integer> countByNameOrAddress(String nameOrAddress);
 
+    /**
+     * Get the count of contacts like passed name or address
+     * @param nameOrAddress should be ENCLOSED with "%"
+     * @return
+     */
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE name != :excludeName AND (address LIKE :nameOrAddress OR name LIKE :nameOrAddress)")
+    Single<Integer> countByNameOrAddress(String nameOrAddress, String excludeName);
+
     @Query("SELECT * FROM minter_contacts WHERE address = :nameOrAddress OR name = :nameOrAddress")
     Maybe<AddressContact> getByNameOrAddress(String nameOrAddress);
 

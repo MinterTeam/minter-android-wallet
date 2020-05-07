@@ -32,12 +32,43 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include
+    <LinearLayout
         android:id="@+id/dialog_top"
-        layout="@layout/dialog_sheet_top" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_dialog_rounded"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_edges">
 
+        <ImageView
+            android:id="@+id/dialog_draggable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:contentDescription="@string/btn_draggable"
+            android:src="@drawable/shape_draggable"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:text="@string/dialog_title_edit_wallet"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_draggable" />
+    </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -50,11 +81,15 @@
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_title"
                 style="@style/Input"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:maxLength="18"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
+                app:fieldName="title"
                 android:hint="@string/input_hint_wallet_title"
                 android:inputType="textMultiLine"
+                tools:text="ABc afaafa efakefaelfaefae faefaekfaef aefakefnalef"
                 app:label="@string/input_hint_wallet_title_later"
                 app:labelEnabled="false" />
 

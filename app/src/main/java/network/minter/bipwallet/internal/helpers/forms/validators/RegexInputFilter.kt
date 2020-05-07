@@ -23,18 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.contract
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.OneExecutionStateStrategy
-import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.tx.adapters.TransactionFacade
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-@StateStrategyType(AddToEndSingleStrategy::class)
-interface TxsTabPageView : BaseWalletsPageView {
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startTransactions()
+import android.text.InputFilter
+import android.text.Spanned
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDetails(tx: TransactionFacade)
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+open class RegexInputFilter(
+        private val regex: Regex
+) : InputFilter {
+    override fun filter(source: CharSequence?, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int): CharSequence {
+        return source.toString().replace(regex, "")
+    }
 }

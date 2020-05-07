@@ -144,8 +144,13 @@ public class WalletSelector extends FrameLayout {
     }
 
     public void setMainWallet(WalletItem wallet) {
-        name.setText(firstNonNull(wallet.getTitle(), wallet.getAddressShort()));
-        weight.setText(wallet.getWeight().getEmoji());
+        name.post(() -> {
+            name.setText(firstNonNull(wallet.getTitle(), wallet.getAddressShort()));
+        });
+
+        weight.post(() -> {
+            weight.setText(wallet.getWeight().getEmoji());
+        });
     }
 
     @Override

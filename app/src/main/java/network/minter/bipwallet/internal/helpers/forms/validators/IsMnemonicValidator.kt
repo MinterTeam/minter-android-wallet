@@ -23,18 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.contract
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.OneExecutionStateStrategy
-import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.tx.adapters.TransactionFacade
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-@StateStrategyType(AddToEndSingleStrategy::class)
-interface TxsTabPageView : BaseWalletsPageView {
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startTransactions()
+import com.edwardstock.inputfield.form.validators.BaseValidator
+import io.reactivex.Single
+import network.minter.core.bip39.NativeBip39
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDetails(tx: TransactionFacade)
+class IsMnemonicValidator(
+        errorMessage: CharSequence,
+        required: Boolean = true
+) : BaseValidator(errorMessage, required) {
+
+    override fun validate(value: CharSequence?): Single<Boolean> {
+        if (!isRequired && value.isNullOrEmpty()) {
+            return Single.just(true)
+        }
+
+        return Single.fromCallable {
+            NativeBip39.validateMnemonic(value?.toString() ?: "", NativeBip39.LANG_DEFAULT)
+        }
+    }
 }

@@ -27,19 +27,22 @@ package network.minter.bipwallet.wallets.dialogs.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import com.edwardstock.inputfield.form.InputGroup
+import com.edwardstock.inputfield.form.InputWrapper
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogEditWalletBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
+import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.wallets.contract.EditWalletView
 import network.minter.bipwallet.wallets.dialogs.presentation.EditWalletPresenter
 import network.minter.bipwallet.wallets.selector.WalletItem
@@ -66,6 +69,7 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
     @Inject lateinit var presenterProvider: Provider<EditWalletPresenter>
     @InjectPresenter lateinit var presenter: EditWalletPresenter
 
+    private val inputGroup = InputGroup()
     private lateinit var binding: DialogEditWalletBinding
 
     var onDeleteListener: ((WalletItem) -> Unit)? = null
@@ -75,6 +79,7 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
     fun providePresenter(): EditWalletPresenter {
         return presenterProvider.get()
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -103,19 +108,25 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DialogEditWalletBinding.inflate(inflater, container, false)
 
-        binding.dialogTop.dialogTitle.setText(R.string.title_edit_title)
-        binding.dialogTop.dialogDescription.visible = false
+        binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 
         if (arguments == null) {
             throw IllegalStateException("Don't show this dialog without newInstance method")
         }
         presenter.handleExtras(arguments)
 
+        inputGroup.addInput(binding.inputTitle)
+        inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
+
         return binding.root
     }
 
-    override fun setEnableRemove(enableRemove: Boolean) {
-        binding.actionDelete.visible = enableRemove
+    override fun setUniqueTitleExclude(title: String?) {
+        inputGroup.addValidator(binding.inputTitle, UniqueWalletTitleValidator(title))
+    }
+
+    override fun setEnableRemove(enable: Boolean) {
+        binding.actionDelete.visible = enable
     }
 
     override fun setEnableSubmit(enable: Boolean) {
@@ -128,12 +139,8 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         }
     }
 
-    override fun addInputTextWatcher(textWatcher: TextWatcher) {
-        binding.inputTitle.addTextChangedListener(textWatcher)
-    }
-
-    override fun setError(error: CharSequence?) {
-        binding.errorText.text = error
+    override fun addInputTextWatcher(listener: (InputWrapper, Boolean) -> Unit) {
+        inputGroup.addTextChangedListener(listener)
     }
 
     override fun close() {
@@ -144,10 +151,6 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         binding.inputTitle.setText(title)
     }
 
-    override fun setDeleteActionVisible(visible: Boolean) {
-        binding.actionDelete.visible = visible
-    }
-
     override fun callOnDelete(walletItem: WalletItem) {
         onDeleteListener?.invoke(walletItem)
     }
@@ -156,7 +159,7 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         onSaveListener?.invoke(walletItem)
     }
 
-    override fun setOnDeleteClickListener(listener: View.OnClickListener, walletItem: WalletItem) {
+    override fun setOnRemoveClickListener(listener: View.OnClickListener) {
         binding.actionDelete.setOnClickListener { v: View? ->
             listener.onClick(v)
         }

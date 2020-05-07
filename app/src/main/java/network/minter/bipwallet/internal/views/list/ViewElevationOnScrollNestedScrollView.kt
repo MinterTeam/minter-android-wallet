@@ -23,18 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.contract
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.OneExecutionStateStrategy
-import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.tx.adapters.TransactionFacade
+package network.minter.bipwallet.internal.views.list
 
-@StateStrategyType(AddToEndSingleStrategy::class)
-interface TxsTabPageView : BaseWalletsPageView {
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startTransactions()
+import android.view.View
+import androidx.core.widget.NestedScrollView
+import network.minter.bipwallet.R
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startDetails(tx: TransactionFacade)
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+class ViewElevationOnScrollNestedScrollView(
+        private val view: View,
+        var elevation: Float = 0.0f
+) : NestedScrollView.OnScrollChangeListener {
+
+    init {
+        view.elevation = 0f
+        if (elevation == 0.0f) {
+            elevation = view.context.resources.getDimension(R.dimen.title_elevation)
+        }
+    }
+
+    private var elevated = false
+
+    override fun onScrollChange(v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
+        if (scrollY > 0 && !elevated) {
+            elevated = true
+            view.elevation = elevation
+        } else if (scrollY == 0) {
+            elevated = false
+            view.elevation = 0f
+        }
+    }
 }

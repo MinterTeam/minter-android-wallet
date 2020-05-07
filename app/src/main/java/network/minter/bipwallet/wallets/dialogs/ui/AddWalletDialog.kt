@@ -27,16 +27,24 @@ package network.minter.bipwallet.wallets.dialogs.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.edwardstock.inputfield.form.InputGroup
+import com.edwardstock.inputfield.form.InputWrapper
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogAddWalletBinding
 import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
+import network.minter.bipwallet.internal.helpers.forms.validators.IsMnemonicValidator
+import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
+import network.minter.bipwallet.internal.helpers.forms.validators.UniqueMnemonicValidator
+import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
+import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.wallets.contract.AddWalletView
 import network.minter.bipwallet.wallets.dialogs.presentation.AddWalletPresenter
 import javax.inject.Inject
@@ -47,12 +55,19 @@ typealias OnGenerateNewWalletListener = (submitListener: ActionListener?, dismis
 class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
     @Inject lateinit var presenterProvider: Provider<AddWalletPresenter>
     @InjectPresenter lateinit var presenter: AddWalletPresenter
+    @Inject lateinit var secretStorage: SecretStorage
 
     private var mOnGenerateNewWalletListener: OnGenerateNewWalletListener? = null
+    private var inputGroup = InputGroup()
     private lateinit var binding: DialogAddWalletBinding
+    private var childDialog: BaseBottomSheetDialogFragment? = null
 
     fun setOnGenerateNewWalletListener(listener: OnGenerateNewWalletListener) {
         mOnGenerateNewWalletListener = listener
+    }
+
+    override fun setInputError(fieldName: String, error: CharSequence?) {
+        inputGroup.setError(fieldName, error)
     }
 
     @ProvidePresenter
@@ -70,23 +85,61 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
         super.onAttach(context)
     }
 
+    override fun setOnGenerateClickListener(listener: View.OnClickListener) {
+        binding.actionGenerate.setOnClickListener(listener)
+    }
+
+    override fun startGenerate() {
+        if (fragmentManager == null) return
+
+        collapse()
+        childDialog = CreateWalletDialog.Builder()
+                .setTitle(getString(R.string.dialog_title_generate_new_wallet))
+                .setEnableDescription(true)
+                .setEnableTitleInput(true)
+                .setEnableStartHomeOnSubmit(false)
+                .setWalletTitle(binding.inputTitle.text.toString())
+                .setOnSubmitListener {
+                    onSubmitListener?.invoke()
+                    dismiss()
+                }
+                .setOnDismissListener {
+                    onDismissListener?.invoke()
+                    expand()
+                }
+                .build()
+                .fixNestedDialogBackgrounds()
+
+        childDialog!!.show(fragmentManager!!, "wallet_generate")
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DialogAddWalletBinding.inflate(inflater, container, false)
 
         binding.apply {
-            actionGenerate.setOnClickListener {
-                close()
-                if (mOnGenerateNewWalletListener != null) {
-                    val s = inputTitle.text
-                    val title = if (s != null && s.isNotEmpty()) s.toString() else null
-                    mOnGenerateNewWalletListener!!.invoke(onSubmitListener, onDismissListener, title)
-                }
-            }
+
+            scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(dialogTop))
+
+            inputGroup.addInput(inputSeed)
+            inputGroup.addValidator(inputSeed, IsMnemonicValidator("Invalid mnemonic"))
+            inputGroup.addValidator(inputSeed, UniqueMnemonicValidator())
+
+            inputGroup.addInput(inputTitle)
+            inputGroup.addFilter(inputTitle, TitleInputFilter())
+            inputGroup.addValidator(inputTitle, UniqueWalletTitleValidator())
         }
         return binding.root
     }
 
-    override fun setOnSubmit(listener: View.OnClickListener) {
+    override fun addTextChangedListener(listener: (InputWrapper, Boolean) -> Unit) {
+        inputGroup.addTextChangedListener(listener)
+    }
+
+    override fun addFormValidListener(listener: (Boolean) -> Unit) {
+        inputGroup.addFormValidateListener(listener)
+    }
+
+    override fun setOnSubmitClickListener(listener: View.OnClickListener) {
         binding.actionSubmit.setOnClickListener { v: View? ->
             listener.onClick(v)
             if (onSubmitListener != null) {
@@ -97,18 +150,6 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
 
     override fun setSubmitEnabled(enabled: Boolean) {
         binding.actionSubmit.isEnabled = enabled
-    }
-
-    override fun addSeedInputTextListener(textWatcher: TextWatcher) {
-        binding.inputSeed.addTextChangedListener(textWatcher)
-    }
-
-    override fun addTitleInputTextListener(textWatcher: TextWatcher) {
-        binding.inputTitle.addTextChangedListener(textWatcher)
-    }
-
-    override fun setError(error: CharSequence?) {
-        binding.inputSeed.error = error
     }
 
     override fun close() {

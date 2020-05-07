@@ -43,6 +43,7 @@ import network.minter.bipwallet.addressbook.views.AddressContactEditPresenter
 import network.minter.bipwallet.databinding.DialogAddresscontactEditBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.ViewHelper
+import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import org.parceler.Parcels
@@ -80,6 +81,7 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
 
         inputGroup.addInput(binding.inputAddress)
         inputGroup.addInput(binding.inputTitle)
+        inputGroup.addFilter(binding.inputTitle, NewLineInputFilter())
 
         val minterAddressOrPubkeyValidator = RegexValidator("${MinterAddress.ADDRESS_PATTERN}|${MinterPublicKey.PUB_KEY_PATTERN}").apply {
             errorMessage = "Incorrect recipient format"

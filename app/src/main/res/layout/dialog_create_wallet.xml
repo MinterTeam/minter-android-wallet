@@ -24,153 +24,221 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shape_dialog_rounded">
+    android:background="@drawable/shape_dialog_rounded"
+    android:orientation="vertical">
 
-    <include
+    <LinearLayout
         android:id="@+id/dialog_top"
-        layout="@layout/dialog_sheet_top" />
-
-
-    <FrameLayout
-        android:id="@+id/layout_seed"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:background="@drawable/bg_input_grey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_top">
+        android:background="@drawable/shape_dialog_rounded"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/margin_edges">
 
-        <TextView
-            android:id="@+id/seed"
+        <ImageView
+            android:id="@+id/dialog_draggable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/_inter_medium"
-            android:paddingStart="@dimen/margin_edges"
-            android:paddingTop="@dimen/margin_edges_input_vertical"
-            android:paddingEnd="@dimen/margin_edges"
-            android:paddingBottom="@dimen/margin_edges_input_vertical"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="@dimen/text_size_default"
-            tools:text="wasp fantasy drive twenty lady dose demise arrange tiny solar now horn" />
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/layout_seed_alert"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0"
-        android:background="@drawable/bg_input_green"
-        app:layout_constraintBottom_toBottomOf="@id/layout_seed"
-        app:layout_constraintEnd_toEndOf="@id/layout_seed"
-        app:layout_constraintStart_toStartOf="@id/layout_seed"
-        app:layout_constraintTop_toTopOf="@id/layout_seed"
-        tools:alpha="0.7">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:fontFamily="@font/_inter_semi_bold"
-            android:text="@string/alert_copied"
-            android:textColor="@color/textColorWhite"
-            android:textSize="@dimen/text_size_default" />
-    </FrameLayout>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_saved_seed"
-        android:layout_width="0dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges_medium"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_seed">
-
-        <Switch
-            android:id="@+id/action_saved_seed"
-            style="@style/Wallet.Switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:contentDescription="@string/btn_draggable"
+            android:src="@drawable/shape_draggable"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:checked="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/margin_edges"
-            android:fontFamily="@font/_inter_medium"
-            android:text="@string/label_ive_saved_mnemonic"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="@dimen/text_size_default"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.edwardstock.inputfield.InputField
-        android:id="@+id/input_title"
-        style="@style/Input"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:hint="@string/input_hint_wallet_title"
-        android:inputType="textMultiLine"
-        android:visibility="gone"
-        app:label="@string/input_hint_wallet_title_later"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_saved_seed"
-        tools:visibility="visible" />
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_18"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_draggable"
+            tools:text="@string/btn_create_wallet" />
 
-    <network.minter.bipwallet.internal.views.widgets.WalletButton
-        android:id="@+id/submit"
-        style="@style/Wallet.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges"
-        android:enabled="false"
-        android:text="@string/btn_activate"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_title" />
+        <TextView
+            android:id="@+id/dialog_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_edges_medium"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:layout_marginEnd="@dimen/margin_edges_medium"
+            android:fontFamily="@font/_inter_bold"
+            android:lineHeight="20sp"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_14"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_title"
+            tools:text="⚠️ Save this seed phrase in case you plan to use this address in the future."
+            tools:visibility="visible" />
+    </LinearLayout>
 
-    <network.minter.bipwallet.internal.views.widgets.WalletButton
-        android:id="@+id/action_cancel"
-        style="@style/Wallet.Button.Transparent.BlackBorder"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_medium"
-        android:layout_marginTop="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges"
-        android:text="@string/btn_cancel"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/submit"
-        tools:visibility="visible" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="@dimen/margin_edges_large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/action_cancel" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <FrameLayout
+                    android:id="@+id/layout_seed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_edges_medium"
+
+                    android:layout_marginEnd="@dimen/margin_edges_medium"
+                    android:background="@drawable/bg_input_grey"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/seed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/_inter_medium"
+                        android:paddingStart="@dimen/margin_edges"
+                        android:paddingTop="@dimen/margin_edges_input_vertical"
+                        android:paddingEnd="@dimen/margin_edges"
+                        android:paddingBottom="@dimen/margin_edges_input_vertical"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="@dimen/text_size_default"
+                        tools:text="wasp fantasy drive twenty lady dose demise arrange tiny solar now horn" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/layout_seed_alert"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:alpha="0"
+                    android:background="@drawable/bg_input_green"
+                    app:layout_constraintBottom_toBottomOf="@id/layout_seed"
+                    app:layout_constraintEnd_toEndOf="@id/layout_seed"
+                    app:layout_constraintStart_toStartOf="@id/layout_seed"
+                    app:layout_constraintTop_toTopOf="@id/layout_seed"
+                    tools:alpha="0.7">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/_inter_semi_bold"
+                        android:text="@string/alert_copied"
+                        android:textColor="@color/textColorWhite"
+                        android:textSize="@dimen/text_size_default" />
+                </FrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_saved_seed"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_seed">
+
+                <Switch
+                    android:id="@+id/action_saved_seed"
+                    style="@style/Wallet.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:checked="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/margin_edges"
+                    android:fontFamily="@font/_inter_medium"
+                    android:text="@string/label_ive_saved_mnemonic"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/text_size_default"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_title"
+                style="@style/Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:hint="@string/input_hint_wallet_title"
+                android:inputType="textMultiLine"
+                android:visibility="gone"
+                app:fieldName="title"
+                app:label="@string/input_hint_wallet_title_later"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_saved_seed"
+                tools:visibility="visible" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/submit"
+                style="@style/Wallet.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:enabled="false"
+                android:text="@string/btn_activate"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_title" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action_cancel"
+                style="@style/Wallet.Button.Transparent.BlackBorder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_medium"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/btn_cancel"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/submit"
+                tools:visibility="visible" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_edges_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action_cancel" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

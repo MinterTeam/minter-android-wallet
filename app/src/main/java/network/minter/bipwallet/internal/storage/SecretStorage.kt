@@ -35,6 +35,7 @@ import network.minter.core.bip39.NativeBip39
 import network.minter.core.bip39.NativeHDKeyEncoder
 import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
+import network.minter.core.crypto.PrivateKey
 import java.security.SecureRandom
 import java.util.*
 import kotlin.collections.ArrayList
@@ -93,6 +94,22 @@ class SecretStorage(private val mStorage: KVStorage) {
     fun setMain(mainWallet: MinterAddress) {
         mStorage.put(KEY_MAIN_WALLET, mainWallet)
         mainWalletChangedListeners.forEach { it(mainWallet) }
+    }
+
+    fun contains(mnemonicPhrase: String): Boolean {
+        if (!NativeBip39.validateMnemonic(mnemonicPhrase, NativeBip39.LANG_DEFAULT)) {
+            return false
+        }
+
+        val address = PrivateKey.fromMnemonic(mnemonicPhrase).publicKey.toMinter()
+
+        for (item in addresses) {
+            if (item == address) {
+                return true
+            }
+        }
+
+        return false
     }
 
     @JvmOverloads

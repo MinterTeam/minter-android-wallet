@@ -24,12 +24,10 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.wallets.contract;
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.StateStrategyType;
-
-@StateStrategyType(AddToEndSingleStrategy.class)
-public interface CoinsTabPageView extends BaseWalletsPageView {
-    void startConvert();
-}
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+class NewLineInputFilter : RegexInputFilter("[\n]".toRegex())
