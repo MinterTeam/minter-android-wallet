@@ -69,7 +69,7 @@ public class WalletListAdapter extends RecyclerView.Adapter<WalletListAdapter.Vi
             mInflater = LayoutInflater.from(parent.getContext());
         }
 
-        View view = mInflater.inflate(R.layout.item_wallet, parent, false);
+        View view = mInflater.inflate(R.layout.item_list_wallet, parent, false);
         return new ViewHolder(view);
     }
 

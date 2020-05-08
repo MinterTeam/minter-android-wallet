@@ -238,7 +238,7 @@
     <string name="dots">…</string>
     <string name="label_multiple_coins">Multiple Coins</string>
     <string name="label_no_coins">Multiple Coins</string>
-    <string name="test_net_warning">This is a testnet.\nNot real money!</string>
+    <string name="test_net_warning">This is a testnet.\nNot real Minter tokens!</string>
     <string name="test_net_warning_link"><u>DOWNLOAD MAINNET APP</u></string>
     <string name="copy">Copy</string>
     <string name="fingerprint_dialog_enroll_title">Enroll your fingerprints</string>
@@ -339,5 +339,7 @@
     <string name="dialog_title_generate_new_wallet">Generate New Wallet</string>
     <string name="dialog_title_edit_wallet">Edit Wallet</string>
     <string name="dialog_title_signin">Sign In</string>
+    <string name="btn_exchange_coins">Exchange Coins</string>
+    <string name="description_external_not_enough_coins">Not enough coins. Please buy %s %s to finish transaction.</string>
 
 </resources>

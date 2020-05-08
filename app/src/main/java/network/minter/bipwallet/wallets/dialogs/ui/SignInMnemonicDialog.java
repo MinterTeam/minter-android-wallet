@@ -64,7 +64,6 @@ public class SignInMnemonicDialog extends BaseBottomSheetDialogFragment implemen
     @InjectPresenter SingInMnemonicPresenter presenter;
 
     @BindView(R.id.dialog_title) TextView title;
-    @BindView(R.id.dialog_description) TextView description;
     @BindView(R.id.submit) Button submit;
     @BindView(R.id.input_seed) InputField inputMnemonic;
     @BindView(R.id.scroll) NestedScrollView scroll;
@@ -95,7 +94,6 @@ public class SignInMnemonicDialog extends BaseBottomSheetDialogFragment implemen
         View view = inflater.inflate(R.layout.dialog_signin_wallet, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         title.setText(R.string.btn_sign_in);
-        description.setVisibility(View.GONE);
 
         scroll.setOnScrollChangeListener(new ViewElevationOnScrollNestedScrollView(dialogTop));
 

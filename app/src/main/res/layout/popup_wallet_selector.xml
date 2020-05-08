@@ -49,7 +49,7 @@
         tools:itemCount="3"
         tools:layout_height="183dp"
         tools:layout_width="248dp"
-        tools:listitem="@layout/item_wallet" />
+        tools:listitem="@layout/item_list_wallet" />
 
     <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
         android:id="@+id/progress"

@@ -66,13 +66,44 @@
             android:focusableInTouchMode="false"
             android:paddingTop="@dimen/margin_edges_half">
 
+            <LinearLayout
+                android:id="@+id/sync_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_watch_later"
+                    android:tint="@color/grey" />
+
+                <TextView
+                    android:id="@+id/last_updated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_edges_half"
+                    android:fontFamily="@font/inter"
+                    android:text="sync..."
+                    android:textSize="@dimen/text_size_12" />
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/input_list"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sync_container"
                 tools:itemCount="3"
                 tools:listitem="@layout/row_input_field" />
 
@@ -138,6 +169,51 @@
                 tools:text="Some uncaught error"
                 tools:visibility="visible" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/exchange_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:background="@drawable/shape_rounded_red"
+                android:paddingBottom="@dimen/margin_edges"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_error"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/exchange_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_edges"
+                    android:fontFamily="@font/_inter_medium"
+                    android:paddingStart="@dimen/margin_edges"
+                    android:paddingEnd="@dimen/margin_edges"
+                    android:textAlignment="center"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="@dimen/text_size_14"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@string/description_external_not_enough_coins" />
+
+                <TextView
+                    style="@style/Wallet.Text.ButtonBorderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_edges"
+                    android:padding="4dp"
+                    android:text="@string/btn_exchange_coins"
+                    android:textColor="#ff4f4f"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/exchange_text" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/action"
                 android:layout_width="0dp"
@@ -148,7 +224,7 @@
                 android:text="@string/btn_proceed"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_error" />
+                app:layout_constraintTop_toBottomOf="@id/exchange_container" />
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/cancel_action"

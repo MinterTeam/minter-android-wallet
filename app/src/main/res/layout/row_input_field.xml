@@ -33,6 +33,7 @@
     <com.edwardstock.inputfield.InputField
         android:id="@+id/row_input"
         style="@style/Input"
+        android:enabled="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges"

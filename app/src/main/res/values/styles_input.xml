@@ -27,6 +27,7 @@
 <resources>
 
     <style name="Input" parent="WalletBase">
+        <item name="android:textColor">@color/text_input_stateful</item>
         <item name="inputMinHeight">48dp</item>
         <item name="android:layout_marginTop">14dp</item>
         <item name="android:textColorHint">@color/grey</item>
@@ -82,7 +83,6 @@
     <style name="Input.EditTextTextAppearance" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/_inter_medium</item>
         <item name="android:textSize">17sp</item>
-        <item name="android:textColor">@color/textColorPrimary</item>
     </style>
 
     <style name="Input.LabelTextAppearance" parent="TextAppearance.AppCompat">
