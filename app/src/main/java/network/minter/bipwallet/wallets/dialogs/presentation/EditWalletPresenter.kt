@@ -29,7 +29,7 @@ import android.os.Bundle
 import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
-import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.dialogs.ConfirmDialogFragment
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.IntentHelper.getParcelExtraOrError
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -87,17 +87,18 @@ class EditWalletPresenter @Inject constructor() : MvpBasePresenter<EditWalletVie
     }
 
     private fun onDeleteWallet() {
-        viewState.startDialog {
-            ConfirmDialog.Builder(it, R.string.dialog_title_remote_wallet)
+        viewState.startDialogFragment {
+            ConfirmDialogFragment.Builder(it, R.string.dialog_title_remote_wallet)
                     .setDescription(HtmlCompat.fromHtml(it.getString(R.string.dialog_description_remove_wallet, walletItem!!.address.toShortString())))
                     .setDescriptionTypeface(R.font._inter_regular)
                     .setText(HtmlCompat.fromHtml(it.getString(R.string.dialog_text_remove_wallet)))
                     .setPositiveActionStyle(R.style.Wallet_Button_Green)
                     .setPositiveAction(R.string.btn_confirm) { d, _ ->
                         secretStorage.delete(walletItem!!.address)
+                        viewState.callOnDelete(walletItem!!)
                         d.dismiss()
                         viewState.close()
-                        viewState.callOnDelete(walletItem!!)
+
                     }
                     .setNegativeAction(R.string.btn_cancel) { d, _ ->
                         d.dismiss()

@@ -33,7 +33,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
@@ -48,7 +47,6 @@ import network.minter.bipwallet.delegation.contract.DelegateUnbondView
 import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
-import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
@@ -118,7 +116,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
     }
 
     override fun expand() {
-        super.expand(false)
+        super.expand(false, null)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -164,16 +162,6 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         inputGroup.addTextChangedListener(listener)
     }
 
-    override fun startDialog(executor: DialogExecutor) {
-        collapse()
-        super.startDialog {
-            val d = executor(it)
-            d.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            d.window?.setWindowAnimations(0)
-            d
-        }
-    }
-
     override fun setEnableSubmit(enable: Boolean) {
         binding.action.postApply { it.isEnabled = enable }
     }
@@ -205,21 +193,21 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
     }
 
     override fun startValidatorSelector(items: List<SelectorData<ValidatorItem>>, listener: (SelectorData<ValidatorItem>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<ValidatorItem>(context!!, R.string.title_select_masternode)
-                .setItems(items)
-                .setOnClickListener(listener)
-                .create()
-                .fixNestedDialogBackgrounds()
-                .show()
+        startDialog {
+            WalletAccountSelectorDialog.Builder<ValidatorItem>(context!!, R.string.title_select_masternode)
+                    .setItems(items)
+                    .setOnClickListener(listener)
+                    .create()
+        }
     }
 
     override fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<BaseCoinValue>(activity!!, R.string.dialog_title_choose_coin)
-                .setItems(items)
-                .setOnClickListener(listener)
-                .create()
-                .fixNestedDialogBackgrounds()
-                .show()
+        startDialog {
+            WalletAccountSelectorDialog.Builder<BaseCoinValue>(activity!!, R.string.dialog_title_choose_coin)
+                    .setItems(items)
+                    .setOnClickListener(listener)
+                    .create()
+        }
     }
 
     override fun setAccountName(accountName: CharSequence?) {

@@ -58,7 +58,11 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
 
         @JvmStatic
         fun <T : WalletDialogFragment> switchDialogWithExecutor(fragment: Fragment, dialog: T?, executor: DialogFragmentExecutor): T {
-            return switchDialogWithExecutor(fragment.activity!! as AppCompatActivity, dialog, executor)
+            releaseDialog(dialog)
+            val newDialog: T = executor(fragment.context!!) as T
+
+            newDialog.show(fragment.childFragmentManager, newDialog.javaClass.simpleName)
+            return newDialog
         }
 
         @JvmStatic
@@ -79,8 +83,11 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
         }
     }
 
-    val window: Window?
-        get() = activity?.window
+    private var disableAnimations: Boolean = false
+
+    fun fixBlinkChildDialog() {
+        disableAnimations = true
+    }
 
     private var dismissListeners: MutableList<DialogInterface.OnDismissListener> = ArrayList(1)
 
@@ -95,6 +102,10 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
             d.window!!.setGravity(Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL)
             d.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             d.window!!.navigationBarColor = ContextCompat.getColor(context!!, R.color.white)
+            if (disableAnimations) {
+                d.window!!.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                d.window!!.setWindowAnimations(0)
+            }
         }
 
         return d
@@ -103,6 +114,10 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         dismissListeners.forEach { it.onDismiss(dialog) }
+    }
+
+    fun addOnDismissListener(listener: (DialogInterface) -> Unit) {
+        addOnDismissListener(DialogInterface.OnDismissListener { dialog -> listener(dialog) })
     }
 
     fun addOnDismissListener(listener: DialogInterface.OnDismissListener) {

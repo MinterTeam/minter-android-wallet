@@ -30,7 +30,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import dagger.android.support.AndroidSupportInjection
@@ -38,7 +37,6 @@ import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.DialogEditWalletBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
-import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
@@ -91,18 +89,8 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         super.onAttach(context)
     }
 
-    override fun startDialog(executor: DialogExecutor) {
-        collapse()
-        super.startDialog {
-            val d = executor(it)
-            d.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            d.window?.setWindowAnimations(0)
-            d
-        }
-    }
-
     override fun expand() {
-        super.expand(false)
+        super.expand(false, null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -31,6 +31,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
+import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.wallets.selector.WalletItem
 
 @StateStrategyType(AddToEndSingleStrategy::class)
@@ -43,6 +44,7 @@ interface EditWalletView : MvpView {
     fun close()
     fun setTitle(title: CharSequence?)
     fun startDialog(executor: DialogExecutor)
+    fun startDialogFragment(executor: DialogFragmentExecutor)
     fun callOnDelete(walletItem: WalletItem)
     fun callOnSave(walletItem: WalletItem)
     fun expand()
