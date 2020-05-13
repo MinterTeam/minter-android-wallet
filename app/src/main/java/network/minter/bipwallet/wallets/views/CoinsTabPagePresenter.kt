@@ -29,6 +29,7 @@ import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -38,6 +39,7 @@ import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.CoinsTabPageView
 import network.minter.bipwallet.wallets.data.CoinBalanceDiffUtilImpl
 import network.minter.bipwallet.wallets.ui.BaseTabPageFragment
+import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinBalance
 import network.minter.profile.MinterProfileApi
 import timber.log.Timber
@@ -71,7 +73,13 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                     vh.title!!.text = item.coin
                     vh.amount!!.text = item.amount.humanize()
                     vh.avatar!!.setImageUrlFallback(item.getImageUrl(), R.drawable.img_avatar_default)
-                    vh.subname!!.visibility = View.GONE
+                    if (item.coin != MinterSDK.DEFAULT_COIN) {
+                        vh.subname!!.text = "${item.bipValue.humanize()} ${MinterSDK.DEFAULT_COIN}"
+                        vh.subname!!.visible = true
+                    } else {
+                        vh.subname!!.visible = false
+                    }
+
                 }.build()
 
         viewState.setAdapter(adapter!!)
