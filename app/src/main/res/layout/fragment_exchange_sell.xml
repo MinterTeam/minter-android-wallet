@@ -89,7 +89,7 @@
             app:label="@string/label_coin_to_sell"
             app:suffixImageSrc="@drawable/ic_drop_down_grey"
             app:suffixType="image"
-            tools:text="NIOCNIOCNIAAA (22)" />
+            tools:text="NIOCNIOCNI (22)" />
 
 
         <!--AMOUNT-->
@@ -100,8 +100,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges"
-            android:digits="0,1,2,3,4,5,6,7,8,9,.,\,"
-            android:ellipsize="end"
             android:hint="@string/label_amount"
             android:inputType="numberDecimal|textMultiLine"
             app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
