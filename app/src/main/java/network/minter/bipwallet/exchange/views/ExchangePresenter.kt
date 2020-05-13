@@ -548,7 +548,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         if (coinAccount == null) return
         mGasCoin = coinAccount.coin
         mAccount = coinAccount
-        viewState.setOutAccountName("${coinAccount.coin} ${coinAccount.amount.humanize()}")
+        viewState.setOutAccountName("${coinAccount.coin} (${coinAccount.amount.humanize()})")
         mCurrentCoin = coinAccount.coin
 
         if (!initial) {
