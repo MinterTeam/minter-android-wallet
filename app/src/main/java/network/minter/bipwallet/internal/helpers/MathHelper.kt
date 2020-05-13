@@ -159,7 +159,15 @@ object MathHelper {
         if (bdLT(num, BigDecimal(1))) {
             return if (num.stripTrailingZeros().scale() <= 4) {
                 formatDecimalCurrency(num.setScale(4, BigDecimal.ROUND_DOWN), 4, true)
-            } else formatDecimalCurrency(num.setScale(8, BigDecimal.ROUND_UP), 8, false)
+            } else {
+                val v = formatDecimalCurrency(num.setScale(8, BigDecimal.ROUND_UP), 8, false)
+                val test = BigDecimal(v)
+                if (bdLT(test, BigDecimal.ONE)) {
+                    v
+                } else {
+                    formatDecimalCurrency(test.setScale(4, BigDecimal.ROUND_DOWN), 4, true)
+                }
+            }
         }
         val out = num.setScale(4, RoundingMode.DOWN)
         return formatDecimalCurrency(out, 4, true)
