@@ -62,7 +62,7 @@ public class TransactionFacade {
         if (userMeta != null) {
             return firstNonNull(userMeta.avatarUrl, getUserAvatarUrl(1));
         } else if (validatorMeta != null) {
-            return validatorMeta.getIconUrl();
+            return validatorMeta.iconUrl;
         } else {
             return getUserAvatarUrl(1);
         }
@@ -72,7 +72,7 @@ public class TransactionFacade {
         if (userMeta != null) {
             return userMeta.username;
         } else if (validatorMeta != null) {
-            return validatorMeta.getName();
+            return validatorMeta.name;
         }
 
         return null;

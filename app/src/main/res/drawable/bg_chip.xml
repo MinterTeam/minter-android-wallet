@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,35 +24,23 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <declare-styleable name="PrefixEditText">
-        <attr name="prefix" format="string"/>
-        <attr name="prefixOnEmpty" format="boolean" />
-    </declare-styleable>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <declare-styleable name="ToolbarProgress">
-        <attr name="navigationIcon"/>
-        <attr name="title" />
-        <attr name="titleTextColor" />
-        <attr name="actionIcon" format="integer" />
-        <attr name="enableAction" format="boolean" />
-        <attr name="progressColor" format="color" />
-    </declare-styleable>
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#F7F5FF" />
+            <corners android:radius="16dp" />
+            <stroke android:width="1dp" android:color="#E0DAF4" />
+            <padding android:bottom="8dp" android:left="16dp" android:right="16dp" android:top="8dp" />
+        </shape>
+    </item>
 
-    <declare-styleable name="ColoredProgressBar">
-        <attr name="color" format="color" />
-    </declare-styleable>
-
-    <declare-styleable name="WalletSelector">
-        <attr name="ws_name_color" format="color" />
-        <attr name="ws_dropdown_tint" format="color" />
-    </declare-styleable>
-
-    <declare-styleable name="TransactionFilter">
-        <attr name="tf_def_value" format="enum">
-            <enum name="all" value="0" />
-            <enum name="incoming" value="1" />
-            <enum name="outgoing" value="2" />
-        </attr>
-    </declare-styleable>
-</resources>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <stroke android:width="1dp" android:color="#E5E5E5" />
+            <solid android:color="#FFFFFF" />
+            <padding android:bottom="8dp" android:left="16dp" android:right="16dp" android:top="8dp" />
+        </shape>
+    </item>
+</selector>

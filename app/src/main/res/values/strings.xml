@@ -341,5 +341,8 @@
     <string name="dialog_title_signin">Sign In</string>
     <string name="btn_exchange_coins">Exchange Coins</string>
     <string name="description_external_not_enough_coins">Not enough coins. Please buy %s %s to finish transaction.</string>
+    <string name="filter_tx_all">All</string>
+    <string name="filter_tx_incoming">Incoming</string>
+    <string name="filter_tx_outgoing">Outgoing</string>
 
 </resources>

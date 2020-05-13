@@ -49,7 +49,7 @@ class CacheValidatorsRepository(
     }
 
     override fun getData(): List<ValidatorItem> {
-        return storage[KEY_VALIDATORS, emptyList()]
+        return storage[KEY_VALIDATORS, ArrayList(0)]
     }
 
     override fun getUpdatableData(): Observable<List<ValidatorItem>> {

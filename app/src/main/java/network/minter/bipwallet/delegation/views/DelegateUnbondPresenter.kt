@@ -186,12 +186,12 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun setValidator(validator: ValidatorItem) {
         viewState.setValidator(validator) { v ->
             val b = StubMasternodeNameBinding.bind(v)
-            if (validator.meta.name.isNullOrEmpty()) {
-                b.title.text = validator.pubKey.toShortString()
+            if (validator.meta?.name.isNullOrEmpty()) {
+                b.title.text = validator.pubKey?.toShortString()
                 b.subtitle.visible = false
             } else {
-                b.title.text = validator.meta.name
-                b.subtitle.text = validator.pubKey.toShortString()
+                b.title.text = validator.meta?.name
+                b.subtitle.text = validator.pubKey?.toShortString()
             }
 
         }
@@ -354,7 +354,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             return Observable.error(IllegalStateException("Balance for coin ${fromAccount!!.coin!!} not found!"))
         }
         val acc = accOptional.get()
-        val isBipAccount = acc.coin!! == MinterSDK.DEFAULT_COIN
+        val isBipAccount = acc!!.coin!! == MinterSDK.DEFAULT_COIN
 
         if (isBipAccount) {
             return prepareTx(initData, fee, amount, acc)
@@ -365,10 +365,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 .subscribeOn(Schedulers.io())
                 .switchMap {
                     if (!it.isOk) {
-                        return@switchMap Observable.error<TransactionSign>(IllegalStateException(it.error.message))
+                        return@switchMap Observable.error<TransactionSign>(IllegalStateException(it.error!!.message))
                     }
 
-                    prepareTx(initData, it.result.getValue(), amount, acc)
+                    prepareTx(initData, it.result!!.getValue(), amount, acc)
                             .map { tx -> tx.signSingle(secretStorage.mainSecret.privateKey) }
                 }
     }
@@ -385,7 +385,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setValue(validatorFullName)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
-                        viewState.startExplorer(result.result.txHash)
+                        viewState.startExplorer(result.result!!.txHash)
                         viewState.dismiss()
                     }
                     .setNegativeAction(R.string.btn_close) { d, _ ->
@@ -477,7 +477,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 }
             } else {
                 if (fromAccount == null && selectAccount != null) {
-                    fromAccount = acc.getCoin(selectAccount)
+                    fromAccount = acc.getCoin(selectAccount!!)
                 }
                 if (fromAccount != null && toValidator != null) {
                     onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin)!!)

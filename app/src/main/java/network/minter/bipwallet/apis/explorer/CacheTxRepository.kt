@@ -57,7 +57,7 @@ class CacheTxRepository(
     }
 
     override fun getData(): List<HistoryTransaction> {
-        return storage[KEY_TRANSACTIONS, emptyList()]
+        return storage[KEY_TRANSACTIONS, ArrayList(0)]
     }
 
     override fun getUpdatableData(): Observable<List<HistoryTransaction>> {
@@ -68,9 +68,9 @@ class CacheTxRepository(
                 )
                 .rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
-                .map { res: ExpResult<List<HistoryTransaction>> ->
+                .map { res: ExpResult<MutableList<HistoryTransaction>?> ->
                     if (res.result != null) {
-                        return@map res.result
+                        return@map res.result!!
                     }
                     getData()
                 }

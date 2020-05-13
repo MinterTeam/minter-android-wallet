@@ -30,22 +30,19 @@ import com.annimon.stream.Stream
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.AddressBalance
-import org.parceler.Parcel
 import java.math.BigDecimal
 import java.util.*
 
-@Parcel
-class AddressListBalancesTotal {
-    @JvmField var balances: MutableList<AddressBalanceTotal> = ArrayList()
-    @JvmField var latestBlockTime: Date? = null
+class AddressListBalancesTotal(
+        var balances: MutableList<AddressBalanceTotal> = ArrayList(),
+        var latestBlockTime: Date? = null
+) {
 
-    constructor(addresses: List<MinterAddress>) {
+    constructor(addresses: List<MinterAddress>) : this() {
         for (address in addresses) {
             balances.add(AddressBalanceTotal(address))
         }
     }
-
-    constructor()
 
     fun size(): Int {
         return balances.size
@@ -89,7 +86,7 @@ class AddressListBalancesTotal {
         return balance
     }
 
-    fun getCoinBalance(address: MinterAddress, coin: String?): BigDecimal {
-        return getBalance(address).getCoin(coin).amount
+    fun getCoinBalance(address: MinterAddress, coin: String): BigDecimal {
+        return getBalance(address).getCoin(coin)?.amount ?: BigDecimal.ZERO
     }
 }

@@ -539,5 +539,20 @@
         <item name="android:textColor">@color/textColorWhite</item>
     </style>
 
+    <style name="ChipGroup">
+        <item name="android:background">@color/white</item>
+        <item name="android:paddingStart">@dimen/margin_edges_half</item>
+        <item name="android:paddingEnd">@dimen/margin_edges</item>
+    </style>
+
+    <style name="ChipFilter">
+        <item name="android:minHeight">32dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_edges_half</item>
+        <item name="android:minWidth">50dp</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
 
 </resources>

@@ -46,7 +46,7 @@ val GATE_UNHANDLED_ERRORS = listOf(
 
 fun GateResult<*>.humanError(defValue: String? = "Caused unknown error"): String? {
     for (d in GATE_UNHANDLED_ERRORS) {
-        if (d.pattern.matches(message)) {
+        if (d.pattern.matches(message!!)) {
             return StringsHelper.replaceGroups(message, d)
         }
     }

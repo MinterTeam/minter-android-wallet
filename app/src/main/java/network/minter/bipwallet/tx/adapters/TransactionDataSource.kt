@@ -33,6 +33,7 @@ import io.reactivex.ObservableSource
 import io.reactivex.disposables.CompositeDisposable
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository
+import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError
 import network.minter.bipwallet.apis.reactive.ReactiveMyMinter
 import network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile
@@ -51,13 +52,13 @@ import network.minter.explorer.models.HistoryTransaction
 import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.models.ValidatorMeta
 import network.minter.explorer.repo.ExplorerTransactionRepository
+import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
 import network.minter.profile.models.AddressInfoResult
 import network.minter.profile.models.ProfileResult
 import network.minter.profile.repo.ProfileInfoRepository
 import okhttp3.internal.toImmutableList
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -65,56 +66,43 @@ import javax.inject.Inject
  * minter-android-wallet. 2018
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<Long, TransactionItem>() {
+class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<Int, TransactionItem>() {
     private val mDisposables = CompositeDisposable()
     private var mLastDate: DateTime? = null
 
-    override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, TransactionItem?>) {
+    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
 
-        if (factory.addressList.isEmpty()) {
-            Timber.w("Unanble to load transactions list(page: 1): user address list is empty")
-            factory.loadState?.postValue(LoadState.Loaded)
-            callback.onResult(emptyList(), null, null)
-            return
-        }
-
-        resolveInfo(factory.repo.getTransactions(factory.addressList, 1).rxExp())
+        resolveInfo(factory.repo.getTransactions(factory.address, 1, factory.txFilter).rxExp())
                 .map { groupByDate(it) }
                 .doOnSubscribe { mDisposables.add(it) }
                 .subscribe {
                     factory.loadState?.postValue(LoadState.Loaded)
-                    callback.onResult(it.items, null, if (it.meta.lastPage == 1) null else it.meta.currentPage + 1L)
+                    callback.onResult(it.items, null, if (it.meta.lastPage == 1) null else it.meta.currentPage + 1)
                 }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, TransactionItem>) {
+    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
-        if (factory.addressList.isEmpty()) {
-            Timber.w("Unable to load previous transactions list (page: %s): user address list is empty", params.key)
-            factory.loadState?.postValue(LoadState.Loaded)
-            callback.onResult(emptyList(), null)
-            return
-        }
 
-        resolveInfo(factory.repo.getTransactions(factory.addressList, params.key).rxExp())
+        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter).rxExp())
                 .map { groupByDate(it) }
                 .doOnSubscribe { mDisposables.add(it) }
                 .subscribe {
                     factory.loadState?.postValue(LoadState.Loaded)
-                    callback.onResult(it.items, if (params.key == 1L) null else params.key - 1)
+                    callback.onResult(it.items, if (params.key == 1) null else params.key - 1)
                 }
     }
 
-    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, TransactionItem?>) {
+    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
 
-        resolveInfo(factory.repo.getTransactions(factory.addressList, params.key).rxExp())
+        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter).rxExp())
                 .map { res: ExpResult<List<TransactionFacade>> -> groupByDate(res) }
                 .doOnSubscribe { mDisposables.add(it) }
                 .subscribe { res: DataSourceMeta<TransactionItem> ->
                     factory.loadState?.postValue(LoadState.Loaded)
-                    callback.onResult(res.items, if (params.key + 1L > res.meta.lastPage) null else params.key + 1)
+                    callback.onResult(res.items, if (params.key + 1 > res.meta.lastPage) null else params.key + 1)
                 }
     }
 
@@ -160,20 +148,15 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
         return meta
     }
 
-    class Factory @Inject constructor(secretStorage: SecretStorage) : DataSource.Factory<Long, TransactionItem>() {
-        lateinit var repo: ExplorerTransactionRepository
-            @Inject set
-        lateinit var validatorsRepo: CachedRepository<List<ValidatorItem>, CacheValidatorsRepository>
-            @Inject set
+    class Factory @Inject constructor(secretStorage: SecretStorage) : DataSource.Factory<Int, TransactionItem>() {
+        @Inject lateinit var repo: ExplorerTransactionRepository
+        @Inject lateinit var validatorsRepo: RepoValidators
 
-        val addressList: List<MinterAddress>
+        val address: MinterAddress = secretStorage.mainWallet
         var loadState: MutableLiveData<LoadState>? = null
+        var txFilter: TxFilter = TxFilter.None
 
-        init {
-            addressList = secretStorage.addresses
-        }
-
-        override fun create(): DataSource<Long, TransactionItem> {
+        override fun create(): DataSource<Int, TransactionItem> {
             return TransactionDataSource(this)
         }
 

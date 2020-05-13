@@ -212,7 +212,7 @@ class TxAllViewHolder(
 
         binding.apply {
             itemAvatar.setImageResource(R.drawable.img_avatar_multisend)
-            itemTitle.text = data.multisigAddress.toShortString()
+            itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
             itemSubamount.visible = false
             itemAmount.setText(R.string.dots)
         }

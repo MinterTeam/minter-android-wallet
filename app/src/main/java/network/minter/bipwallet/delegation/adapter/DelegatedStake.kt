@@ -25,31 +25,40 @@
  */
 package network.minter.bipwallet.delegation.adapter
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
 import network.minter.bipwallet.internal.views.widgets.RemoteImageContainer
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinDelegation
 import network.minter.explorer.models.ValidatorMeta
 import network.minter.profile.MinterProfileApi
+import org.parceler.Parcel
 import java.math.BigDecimal
 
-@Parcelize
-data class DelegatedStake(
-        val coin: String,
-        val amount: BigDecimal,
-        val amountBIP: BigDecimal,
-        val publicKey: MinterPublicKey,
-        val validatorMeta: ValidatorMeta
-) : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake>, Parcelable {
+@Parcel
+class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake> {
+    @JvmField
+    var coin: String? = null
 
-    constructor(info: CoinDelegation) : this(
-            info.coin!!,
-            info.amount,
-            info.bipValue,
-            info.publicKey!!,
-            info.meta!!
-    )
+    @JvmField
+    var amount: BigDecimal = BigDecimal.ZERO
+
+    @JvmField
+    var amountBIP: BigDecimal = BigDecimal.ZERO
+
+    @JvmField
+    var publicKey: MinterPublicKey? = null
+
+    @JvmField
+    var validatorMeta: ValidatorMeta? = null
+
+    constructor()
+
+    constructor(info: CoinDelegation) {
+        coin = info.coin!!
+        amount = info.amount
+        amountBIP = info.bipValue
+        publicKey = info.publicKey!!
+        validatorMeta = info.meta!!
+    }
 
     override fun isSameOf(item: DelegatedItem): Boolean {
         return viewType == item.viewType && coin == (item as DelegatedStake).coin && publicKey == item.publicKey
@@ -59,9 +68,31 @@ data class DelegatedStake(
         get() = DelegatedItem.ITEM_STAKE
 
     override val imageUrl: String
-        get() = MinterProfileApi.getCoinAvatarUrl(coin)
+        get() = MinterProfileApi.getCoinAvatarUrl(coin!!)
 
     override fun compareTo(other: DelegatedStake): Int {
         return other.amountBIP.compareTo(amountBIP)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DelegatedStake) return false
+
+        if (coin != other.coin) return false
+        if (amount != other.amount) return false
+        if (amountBIP != other.amountBIP) return false
+        if (publicKey != other.publicKey) return false
+        if (validatorMeta != other.validatorMeta) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = coin.hashCode()
+        result = 31 * result + amount.hashCode()
+        result = 31 * result + amountBIP.hashCode()
+        result = 31 * result + publicKey.hashCode()
+        result = 31 * result + validatorMeta.hashCode()
+        return result
     }
 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,35 +24,37 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <declare-styleable name="PrefixEditText">
-        <attr name="prefix" format="string"/>
-        <attr name="prefixOnEmpty" format="boolean" />
-    </declare-styleable>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/filter_group"
+    style="@style/ChipGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:gravity="center_vertical"
+    android:minHeight="?attr/actionBarSize"
+    android:orientation="horizontal">
 
-    <declare-styleable name="ToolbarProgress">
-        <attr name="navigationIcon"/>
-        <attr name="title" />
-        <attr name="titleTextColor" />
-        <attr name="actionIcon" format="integer" />
-        <attr name="enableAction" format="boolean" />
-        <attr name="progressColor" format="color" />
-    </declare-styleable>
+    <TextView
+        style="@style/ChipFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chip"
+        android:tag="0"
+        android:text="@string/filter_tx_all" />
 
-    <declare-styleable name="ColoredProgressBar">
-        <attr name="color" format="color" />
-    </declare-styleable>
+    <TextView
+        style="@style/ChipFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chip"
+        android:tag="1"
+        android:text="@string/filter_tx_incoming" />
 
-    <declare-styleable name="WalletSelector">
-        <attr name="ws_name_color" format="color" />
-        <attr name="ws_dropdown_tint" format="color" />
-    </declare-styleable>
-
-    <declare-styleable name="TransactionFilter">
-        <attr name="tf_def_value" format="enum">
-            <enum name="all" value="0" />
-            <enum name="incoming" value="1" />
-            <enum name="outgoing" value="2" />
-        </attr>
-    </declare-styleable>
-</resources>
+    <TextView
+        style="@style/ChipFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_chip"
+        android:tag="2"
+        android:text="@string/filter_tx_outgoing" />
+</LinearLayout>

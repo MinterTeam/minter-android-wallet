@@ -175,8 +175,8 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
 
     override fun startUnbond(delegated: DelegatedStake) {
         DelegateUnbondDialog.Builder(DelegateUnbondDialog.Type.Unbond)
-                .setPublicKey(delegated.publicKey)
-                .setSelectedCoin(delegated.coin)
+                .setPublicKey(delegated.publicKey!!)
+                .setSelectedCoin(delegated.coin!!)
                 .build()
                 .show(supportFragmentManager, "delegate_unbond")
     }
@@ -339,7 +339,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
         override fun refreshContent(e: Entry, highlight: Highlight) {
             val data = e.data as RewardStatistics
             amount.text = bdHuman(data.amount)
-            date.text = toDateMonthOptYear(data.time)
+            date.text = toDateMonthOptYear(data.time!!)
             super.refreshContent(e, highlight)
         }
     }

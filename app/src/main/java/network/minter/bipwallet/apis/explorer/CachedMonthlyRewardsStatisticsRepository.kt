@@ -73,7 +73,7 @@ class CachedMonthlyRewardsStatisticsRepository(
                 startTime.fmt(DateHelper.DATE_FORMAT_SIMPLE),
                 endTime.fmt(DateHelper.DATE_FORMAT_SIMPLE))
                 .rxExp()
-                .map { it.result }
+                .map { it.result?.toMutableList() ?: ArrayList(0) }
                 .subscribeOn(Schedulers.io())
     }
 

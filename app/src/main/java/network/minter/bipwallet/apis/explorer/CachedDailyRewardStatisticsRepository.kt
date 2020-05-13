@@ -72,7 +72,7 @@ open class CachedDailyRewardStatisticsRepository(
                 endTime.toString(fmt)
         )
                 .rxExp()
-                .map { res: ExpResult<List<RewardStatistics>> ->
+                .map { res: ExpResult<MutableList<RewardStatistics>?> ->
                     Timber.d("DAILY_REWARDS Load remote data")
                     if (!res.isOk || res.result?.isEmpty() == true) {
                         val empty = RewardStatistics()
@@ -80,7 +80,7 @@ open class CachedDailyRewardStatisticsRepository(
                         empty.time = Date()
                         return@map empty
                     }
-                    res.result[0]
+                    res.result!![0]
                 }
                 .subscribeOn(Schedulers.io())
     }

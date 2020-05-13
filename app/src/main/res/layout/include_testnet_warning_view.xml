@@ -28,7 +28,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/warning_bg">
+    android:background="@color/warning_bg"
+    android:theme="@style/Wallet"
+    android:visibility="gone">
 
     <TextView
         android:id="@+id/desc"

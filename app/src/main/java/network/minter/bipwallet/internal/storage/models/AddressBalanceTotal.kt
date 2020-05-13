@@ -30,35 +30,27 @@ import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.AddressBalance
 import network.minter.explorer.models.CoinDelegation
-import org.parceler.Parcel
 import java.math.BigDecimal
 
+class AddressBalanceTotal(
+        var delegated: BigDecimal = BigDecimal.ZERO,
+        var delegatedCoins: MutableMap<MinterPublicKey, MutableList<CoinDelegation>> = HashMap()
+) : AddressBalance() {
 
-@Parcel
-class AddressBalanceTotal : AddressBalance {
-    @JvmField
-    var delegated: BigDecimal = BigDecimal.ZERO
-
-    @JvmField
-    var delegatedCoins: MutableMap<MinterPublicKey, MutableList<CoinDelegation>> = HashMap()
-
-    constructor(address: MinterAddress?) {
-        this.address = address
+    constructor(address: MinterAddress) : this() {
+        super.address = address
         fillDefaultsOnEmpty()
     }
 
-    constructor() {
-        fillDefaultsOnEmpty()
-    }
-
-    constructor(source: AddressBalance, delegated: BigDecimal) {
-        address = source.address
+    constructor(source: AddressBalance, delegated: BigDecimal) : this() {
+        super.address = source.address
         coins = source.coins
         coins = CollectionsHelper.sortByValue(coins, CollectionsHelper.StableCoinSorting())
-        totalBalanceInBase = source.totalBalanceInBase
-        totalBalanceInUSD = source.totalBalanceInUSD
-        availableBalanceInBase = source.availableBalanceInBase
-        availableBalanceInUSD = source.availableBalanceInUSD
+
+        totalBalance = source.totalBalance
+        totalBalanceUSD = source.totalBalanceUSD
+        availableBalanceBIP = source.availableBalanceBIP
+        availableBalanceUSD = source.availableBalanceUSD
         this.delegated = delegated
     }
 

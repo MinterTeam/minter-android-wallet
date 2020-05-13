@@ -41,6 +41,7 @@ import network.minter.explorer.models.DelegationList
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.repo.ExplorerAddressRepository
 import timber.log.Timber
+import java.math.BigDecimal
 
 /**
  * minter-android-wallet. 2018
@@ -110,7 +111,8 @@ class AccountStorage(
         return Function { delegatedResult: ExpResult<DelegationList> ->
             val out = ExpResult<AddressBalanceTotal>()
             out.error = delegatedResult.error
-            out.result = AddressBalanceTotal(res.result, delegatedResult.meta.additional.delegatedAmount)
+            out.result = AddressBalanceTotal(res.result, delegatedResult.meta?.additional?.delegatedAmount
+                    ?: BigDecimal.ZERO)
             out.latestBlockTime = res.latestBlockTime
             out.result.delegatedCoins = delegatedResult.result.delegations
 

@@ -58,9 +58,9 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
                     factory.loadState.postValue(LoadState.Loaded)
-                    callback.onResult(res.result, null,
-                            if (res.getMeta().lastPage == 1) null else res.getMeta().currentPage + 1)
-                    if (res.result.isEmpty()) {
+                    callback.onResult(res.result!!, null,
+                            if (res.meta!!.lastPage == 1) null else res.meta!!.currentPage + 1)
+                    if (res.result?.isEmpty() == true) {
                         factory.loadState.postValue(LoadState.Empty)
                     }
                 }
@@ -68,13 +68,13 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
-        factory.mRepo.getDelegations(factory.mainWallet, params.key.toLong()).rxExp()
+        factory.mRepo.getDelegations(factory.mainWallet, params.key).rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
                     factory.loadState.postValue(LoadState.Loaded)
-                    callback.onResult(res.result, if (params.key == 1) null else params.key - 1)
+                    callback.onResult(res.result!!, if (params.key == 1) null else params.key - 1)
                 }
     }
 
@@ -83,13 +83,13 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
         factory.loadState.postValue(LoadState.Loading)
 
-        factory.mRepo.getDelegations(factory.mainWallet, params.key.toLong()).rxExp()
+        factory.mRepo.getDelegations(factory.mainWallet, params.key).rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
                     factory.loadState.postValue(LoadState.Loaded)
-                    callback.onResult(res.result, if (params.key + 1 > res.getMeta().lastPage) null else params.key + 1)
+                    callback.onResult(res.result!!, if (params.key + 1 > res.meta!!.lastPage) null else params.key + 1)
                 }
     }
 
@@ -98,7 +98,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
         disposables.dispose()
     }
 
-    private fun mapToDelegationItem(res: ExpResult<DelegationList>): ExpResult<MutableList<DelegatedItem>> {
+    private fun mapToDelegationItem(res: ExpResult<DelegationList?>): ExpResult<MutableList<DelegatedItem>> {
         val out = ExpResult<MutableList<DelegatedItem>>()
         out.meta = res.meta
         out.error = res.error
@@ -114,9 +114,9 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                     if (validatorTotalStakes.containsKey(stake.publicKey)) {
                         var stakeValue = validatorTotalStakes[stake.publicKey] ?: BigDecimal.ZERO
                         stakeValue += stake.amountBIP
-                        validatorTotalStakes[stake.publicKey] = stakeValue
+                        validatorTotalStakes[stake.publicKey!!] = stakeValue
                     } else {
-                        validatorTotalStakes[stake.publicKey] = stake.amountBIP
+                        validatorTotalStakes[stake.publicKey!!] = stake.amountBIP
                     }
                 }
             }
@@ -139,17 +139,17 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
              */
             outStakes.sortByDescending { it.amountBIP }
 
-            val validator = DelegatedValidator(key, outStakes[0].validatorMeta)
-            out.result.add(validator)
-            out.result.addAll(outStakes)
+            val validator = DelegatedValidator(key, outStakes[0].validatorMeta!!)
+            out.result!!.add(validator)
+            out.result!!.addAll(outStakes)
         }
         return out
     }
 
     class StableCoinSorting : Comparator<DelegatedStake> {
         override fun compare(ac: DelegatedStake, bc: DelegatedStake): Int {
-            val a = ac.coin.toLowerCase()
-            val b = bc.coin.toLowerCase()
+            val a = ac.coin!!.toLowerCase()
+            val b = bc.coin!!.toLowerCase()
             if (a == b) // update to make it stable
                 return 0
             if (a == sStable) return -1

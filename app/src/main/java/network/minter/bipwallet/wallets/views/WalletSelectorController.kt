@@ -119,6 +119,7 @@ class WalletSelectorController @Inject constructor() {
 
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun onWalletUpdated(walletItem: WalletItem) {
         fillWalletSelector(accountStorage.data)
         accountStorage.update(true)

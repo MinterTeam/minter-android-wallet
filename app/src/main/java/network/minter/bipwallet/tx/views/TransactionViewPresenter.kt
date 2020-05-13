@@ -270,7 +270,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_create_multisig_address) {
                     val data: HistoryTransaction.TxCreateMultisigResult = tx.getData()
                     val b = TxDetailsCreateMultisigAddressBinding.bind(it)
-                    b.valueMultisigAddress.text = data.multisigAddress.toString()
+                    b.valueMultisigAddress.text = data.multisigAddress?.toString() ?: "<none>"
                     b.valueMultisigAddress.copyOnClick()
                 }
 

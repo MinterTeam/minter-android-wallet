@@ -32,6 +32,7 @@ import com.crashlytics.android.Crashlytics;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -49,6 +50,8 @@ import network.minter.bipwallet.internal.di.WalletModule;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.explorer.MinterExplorerApi;
 import timber.log.Timber;
+
+import static network.minter.bipwallet.internal.helpers.MathHelper.bdHuman;
 
 /**
  * minter-android-wallet. 2018
@@ -110,6 +113,8 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
         if (ENABLE_CRASHLYTICS) {
             Timber.plant(new CrashlyticsTree());
         }
+
+        Timber.d("Formatter: %s", bdHuman(new BigDecimal("0.000100000")));
 
         Locale.setDefault(LC_EN);
 

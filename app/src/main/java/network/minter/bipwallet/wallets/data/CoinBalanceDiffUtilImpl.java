@@ -54,10 +54,10 @@ public class CoinBalanceDiffUtilImpl extends DiffUtil.Callback {
         CoinBalance oldItem = mOldList.get(oldItemPosition);
         CoinBalance newItem = mNewList.get(newItemPosition);
 
-        if (oldItem.getAddress() == null || newItem.getAddress() == null) {
+        if (oldItem.address == null || newItem.address == null) {
             return false;
         }
-        return oldItem.getAddress().equals(newItem.getAddress()) && oldItem.getCoin().equals(newItem.getCoin());
+        return oldItem.address.equals(newItem.address) && oldItem.coin.equals(newItem.coin);
     }
 
     @Override

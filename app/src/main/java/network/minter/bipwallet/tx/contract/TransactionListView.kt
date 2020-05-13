@@ -35,6 +35,7 @@ import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.mvp.ProgressView
 import network.minter.bipwallet.tx.adapters.TransactionFacade
+import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
 
 /**
  * minter-android-wallet. 2019
@@ -52,4 +53,6 @@ interface TransactionListView : MvpView, ProgressView {
     fun startExplorer(hash: String?)
     fun syncProgress(loadState: MutableLiveData<LoadState>)
     fun startDetails(tx: TransactionFacade)
+    fun setFilterObserver(filterState: MutableLiveData<TxFilter>)
+    fun lifecycle(state: MutableLiveData<TxFilter>, cb: (TxFilter) -> Unit)
 }

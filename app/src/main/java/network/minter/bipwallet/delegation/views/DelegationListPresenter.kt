@@ -160,7 +160,7 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
         if (firstRewardsLoad && cachedRewards.isNotEmpty()) {
             Timber.d("Getting rewards from cache")
             firstRewardsLoad = false
-            val tmp = ExpResult<MutableList<RewardStatistics>>()
+            val tmp = ExpResult<List<RewardStatistics>>()
             tmp.result = cachedRewards
 
             onRewardsLoaded(tmp)
@@ -172,14 +172,14 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
                 .rxExp()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({ rewardsRes: ExpResult<MutableList<RewardStatistics>> -> onRewardsLoaded(rewardsRes) }) { t: Throwable? -> Timber.w(t) }
+                .subscribe({ rewardsRes: ExpResult<List<RewardStatistics>> -> onRewardsLoaded(rewardsRes) }) { t: Throwable? -> Timber.w(t) }
                 .disposeOnDestroy()
 
     }
 
     private fun rewardsToEntry(stats: List<RewardStatistics>): List<Entry> {
         return Stream.of(stats)
-                .map { item: RewardStatistics -> Entry(item.time.time.toFloat(), item.amount.setScale(4, RoundingMode.HALF_DOWN).toFloat(), item) }
+                .map { item: RewardStatistics -> Entry(item.time!!.time.toFloat(), item.amount.setScale(4, RoundingMode.HALF_DOWN).toFloat(), item) }
                 .toList()
     }
 
@@ -197,19 +197,19 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
         return floatArrayOf(minVal.toFloat(), maxVal.toFloat())
     }
 
-    private fun calcRewardsPerMinutes(rewardsRes: ExpResult<MutableList<RewardStatistics>>) {
+    private fun calcRewardsPerMinutes(rewardsRes: ExpResult<List<RewardStatistics>>) {
         if (rewardsPerMinuteSettled) {
             return
         }
 
         var hours = 24.0f
         // using past day, because today we don't have enough data
-        val last: RewardStatistics = if (rewardsRes.result.size >= 2) {
-            rewardsRes.result[rewardsRes.result.size - 2]
+        val last: RewardStatistics = if (rewardsRes.result!!.size >= 2) {
+            rewardsRes.result!![rewardsRes.result!!.size - 2]
         } else {
             hours = DateTime().hourOfDay.toFloat()
             hours += ((DateTime().minuteOfHour * 100.0f / 60.0f) / 100.0f)
-            rewardsRes.result[rewardsRes.result.size - 1]
+            rewardsRes.result!![rewardsRes.result!!.size - 1]
         }
         val secondsDivider = BigDecimal("60") * BigDecimal(hours.toString())
 
@@ -219,7 +219,7 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
 
     }
 
-    private fun onRewardsLoaded(rewardsRes: ExpResult<MutableList<RewardStatistics>>) {
+    private fun onRewardsLoaded(rewardsRes: ExpResult<List<RewardStatistics>>) {
         if (!rewardsRes.isOk || rewardsRes.result.isEmpty()) {
             viewState.setBipsPerMinute("0")
             viewState.hideChartProgress()
@@ -231,7 +231,7 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
         calcRewardsPerMinutes(rewardsRes)
 
         if (rewardsSet == null) {
-            rewardsSet = LineDataSet(rewardsToEntry(rewardsRes.result), null)
+            rewardsSet = LineDataSet(rewardsToEntry(rewardsRes.result!!), null)
             rewardsSet!!.lineWidth = 2f
             rewardsSet!!.color = Wallet.app().res().getColor(R.color.colorPrimaryOrange)
             rewardsSet!!.setDrawVerticalHighlightIndicator(true)
@@ -244,15 +244,15 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
             rewardsSet!!.setDrawFilled(true)
             rewardsSet!!.fillDrawable = Wallet.app().res().getDrawable(R.drawable.fade_orange)
             val dataSets = LineData(rewardsSet)
-            viewState!!.setChartData(getMinMaxRewardAmount(rewardsRes.result), dataSets)
+            viewState!!.setChartData(getMinMaxRewardAmount(rewardsRes.result!!), dataSets)
         } else {
-            if (rewardsRes.result.isEmpty()) {
+            if (rewardsRes.result!!.isEmpty()) {
                 noMoreRewards = true
                 viewState!!.hideChartProgress()
                 return
             }
             val oldVals = rewardsSet!!.values
-            val newVals = rewardsToEntry(rewardsRes.result)
+            val newVals = rewardsToEntry(rewardsRes.result!!)
             oldVals.addAll(newVals)
             Collections.sort(oldVals) { o1, o2 -> java.lang.Float.compare(o1.x, o2.x) }
             rewardsSet!!.values = oldVals

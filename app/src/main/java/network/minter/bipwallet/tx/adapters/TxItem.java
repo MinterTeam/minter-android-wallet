@@ -127,6 +127,9 @@ public class TxItem implements TransactionItem {
 
     @Override
     public boolean isSameOf(TransactionItem item) {
+        if (item.getViewType() != ITEM_TX) {
+            return false;
+        }
         return ((TxItem) item).getTx().get().hash.equals(mTx.get().hash);
     }
 }

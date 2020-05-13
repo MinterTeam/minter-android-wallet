@@ -49,6 +49,7 @@ import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionListView
 import network.minter.bipwallet.tx.views.TransactionListPresenter
+import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -73,7 +74,6 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
         super.onCreate(savedInstanceState)
         b = ActivityTransactionListBinding.inflate(layoutInflater)
         setContentView(b.root)
-
 
         b.apply {
             setupToolbar(toolbar)
@@ -129,6 +129,12 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
         })
     }
 
+    override fun lifecycle(state: MutableLiveData<TxFilter>, cb: (TxFilter) -> Unit) {
+        state.observe(this, Observer {
+            cb(it)
+        })
+    }
+
     override fun showProgress() {
         b.progress.visible = true
     }
@@ -150,6 +156,10 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
         bottomDialog = TransactionViewDialog.Builder(tx)
                 .build()
         bottomDialog!!.show(supportFragmentManager, "tx_view")
+    }
+
+    override fun setFilterObserver(filterState: MutableLiveData<TxFilter>) {
+        b.txFilter.setSelectObserver(filterState)
     }
 
     class Builder : ActivityBuilder {

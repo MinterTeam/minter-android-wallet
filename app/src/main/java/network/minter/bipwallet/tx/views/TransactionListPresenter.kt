@@ -43,6 +43,7 @@ import network.minter.bipwallet.tx.adapters.TransactionItem
 import network.minter.bipwallet.tx.adapters.TransactionListAdapter
 import network.minter.bipwallet.tx.contract.TransactionListView
 import network.minter.explorer.repo.ExplorerTransactionRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -51,23 +52,24 @@ import javax.inject.Inject
  */
 @InjectViewState
 class TransactionListPresenter @Inject constructor() : MvpBasePresenter<TransactionListView>(), HasAnalyticsEvent {
-    lateinit var transactionRepo: ExplorerTransactionRepository
-        @Inject set
-    lateinit var secretRepo: SecretStorage
-        @Inject set
-    lateinit var sourceFactory: TransactionDataSource.Factory
-        @Inject set
+    @Inject lateinit var transactionRepo: ExplorerTransactionRepository
+    @Inject lateinit var secretRepo: SecretStorage
+    @Inject lateinit var sourceFactory: TransactionDataSource.Factory
 
     private var mAdapter: TransactionListAdapter? = null
     private var mListDisposable: Disposable? = null
-    private var listBuilder: RxPagedListBuilder<Long, TransactionItem>? = null
+    private var listBuilder: RxPagedListBuilder<Int, TransactionItem>? = null
     private var mLastPosition = 0
     private var mLoadState: MutableLiveData<LoadState>? = null
+    private val filterState: MutableLiveData<ExplorerTransactionRepository.TxFilter> = MutableLiveData()
+
     override fun attachView(view: TransactionListView) {
         super.attachView(view)
         viewState.setAdapter(mAdapter!!)
         viewState.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener { onRefresh() })
         viewState.scrollTo(mLastPosition)
+        viewState.setFilterObserver(filterState)
+
     }
 
     fun onScrolledTo(position: Int) {
@@ -80,6 +82,15 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+
+        viewState.lifecycle(filterState) {
+            Timber.d("Changed filter to: %s", it.name)
+            sourceFactory.txFilter = it
+            mListDisposable!!.dispose()
+            viewState.scrollTo(0)
+            refresh()
+        }
+
         mAdapter = TransactionListAdapter(secretRepo.addresses)
         mAdapter!!.setOnExpandDetailsListener { view: View, tx: TransactionFacade -> onExpandTx(view, tx) }
         mLoadState = MutableLiveData()
