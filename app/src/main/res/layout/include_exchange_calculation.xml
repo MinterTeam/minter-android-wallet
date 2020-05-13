@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginEnd="@dimen/margin_edges"
-        android:background="@drawable/shape_rounded_grey"
+        android:background="@drawable/shape_rounded_green"
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
