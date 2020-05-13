@@ -153,6 +153,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     override fun setOnClickAccountSelectedListener(listener: View.OnClickListener) {
         binding.inputCoin.setOnClickListener(listener)
+        binding.inputCoin.setOnSuffixImageClickListener(listener)
     }
 
     override fun setOnClickMaximum(listener: View.OnClickListener) {
