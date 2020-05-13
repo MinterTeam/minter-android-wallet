@@ -29,6 +29,9 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.material.appbar.AppBarLayout
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.FragmentTabWalletsBinding
@@ -37,7 +40,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.clamp
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import java.lang.ref.WeakReference
 
-class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment) : AppBarOffsetChangedListener() {
+class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment) : AppBarOffsetChangedListener(), LifecycleObserver {
     private val mCollapsedStatusColor = -0x1
     private val mCollapsedTextColor = -0x1000000
     private val mCollapsedDropdownColor: Int
@@ -58,7 +61,7 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
         mCollapsedToolbarIconsColor = ContextCompat.getColor(mRef.get()!!.activity!!, R.color.colorPrimaryLight)
         mStatusColor = mExpandedStatusColor
         mCollapsedDropdownColor = ContextCompat.getColor(mRef.get()!!.activity!!, R.color.grey)
-        mElevation = fragment.resources.getDimension(R.dimen.card_elevation)
+        mElevation = fragment.resources.getDimension(R.dimen.toolbar_elevation)
         fragment.binding.appbar.setLiftable(true)
     }
 
@@ -66,32 +69,39 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
         mRef.get()!!.binding
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    internal fun onDestroy() {
+        mRef.clear()
+    }
+
+    private fun recolorToolbarMenu() {
+        for (i in 0 until view.toolbar.menu.size()) {
+            view.toolbar.menu.getItem(i).icon.colorFilter = PorterDuffColorFilter(mToolbarIconsColor, PorterDuff.Mode.SRC_IN)
+        }
+    }
 
     override fun onStateChanged(appbar: AppBarLayout, state: State, verticalOffset: Int, percent: Float) {
-        if (!mEnableRecolor || mRef.get() == null) {
+        val ctx = mRef.get()
+        if (!mEnableRecolor || ctx == null || ctx.activity == null) {
             return
         }
         val textColor = blendColors(mCollapsedStatusColor, mCollapsedTextColor, 1.0f - percent)
         val dropdownColor = blendColors(mCollapsedStatusColor, mCollapsedDropdownColor, 1.0f - percent)
         mStatusColor = blendColors(mCollapsedStatusColor, mExpandedStatusColor, percent)
         mLightStatus = percent < 0.5f
-        ViewHelper.setSystemBarsLightness(mRef.get()!!.activity, mLightStatus)
-        ViewHelper.setStatusBarColor(mRef.get()!!.activity, mStatusColor)
+        ViewHelper.setSystemBarsLightness(ctx.activity, mLightStatus)
+        ViewHelper.setStatusBarColor(ctx.activity, mStatusColor)
         view.walletSelector.setNameColor(textColor)
         view.walletSelector.setDropdownTint(dropdownColor)
         if (mLightStatus) {
             if (mToolbarIconsColor != mExpandedStatusColor) {
                 mToolbarIconsColor = mCollapsedToolbarIconsColor
-                for (i in 0 until view.toolbar.menu.size()) {
-                    view.toolbar.menu.getItem(i).icon.colorFilter = PorterDuffColorFilter(mToolbarIconsColor, PorterDuff.Mode.SRC_IN)
-                }
+                recolorToolbarMenu()
             }
         } else {
             if (mToolbarIconsColor != mCollapsedStatusColor) {
                 mToolbarIconsColor = mExpandedToolbarIconsColor
-                for (i in 0 until view.toolbar.menu.size()) {
-                    view.toolbar.menu.getItem(i).icon.colorFilter = PorterDuffColorFilter(mToolbarIconsColor, PorterDuff.Mode.SRC_IN)
-                }
+                recolorToolbarMenu()
             }
         }
         if (percent < 1.0f && percent > 0.0f) {

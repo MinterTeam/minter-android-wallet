@@ -89,6 +89,8 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
         return v;
     }
 
+    private final Object publishLock = new Object();
+
     @NonNull
     @Override
     public Filter getFilter() {
@@ -122,15 +124,17 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 List<CoinItem> filteredList = (List<CoinItem>) results.values;
                 //noinspection ConstantConditions
-                if (results != null && results.count > 0) {
-                    clear();
-                    for (CoinItem c : filteredList) {
-                        add(c);
+                synchronized (publishLock) {
+                    if (results != null && results.count > 0) {
+                        clear();
+                        for (CoinItem c : filteredList) {
+                            add(c);
+                        }
+                        notifyDataSetChanged();
+                    } else {
+                        clear();
+                        notifyDataSetInvalidated();
                     }
-                    notifyDataSetChanged();
-                } else {
-                    clear();
-                    notifyDataSetInvalidated();
                 }
             }
         };

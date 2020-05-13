@@ -31,20 +31,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import dagger.android.support.AndroidSupportInjection
 import network.minter.bipwallet.R
-import network.minter.bipwallet.databinding.RowListWithButtonBinding
+import network.minter.bipwallet.databinding.FragmentPageWalletsBinding
 import network.minter.bipwallet.internal.BaseFragment
-import network.minter.bipwallet.internal.views.list.NonScrollableLinearLayoutManager
+import network.minter.bipwallet.internal.views.list.ViewElevationOnScroll
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView.ViewStatus
 
 abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
-    private lateinit var binding: RowListWithButtonBinding
+    private lateinit var binding: FragmentPageWalletsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -57,15 +58,12 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = RowListWithButtonBinding.inflate(inflater, container, false)
+        binding = FragmentPageWalletsBinding.inflate(inflater, container, false)
 
-        binding.list.layoutManager = NonScrollableLinearLayoutManager(context)
-        binding.list.isNestedScrollingEnabled = false
+        binding.list.layoutManager = LinearLayoutManager(context)
+        binding.list.addOnScrollListener(ViewElevationOnScroll(binding.top))
+//        binding.list.isNestedScrollingEnabled = false
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
     }
 
     override fun setViewStatus(status: ViewStatus) {

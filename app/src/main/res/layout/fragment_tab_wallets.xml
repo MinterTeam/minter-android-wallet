@@ -50,10 +50,8 @@
             android:background="@android:color/transparent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:contextClickable="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:scrimVisibleHeightTrigger="150dp"
-            app:statusBarScrim="@android:color/white"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:statusBarScrim="@color/white"
             app:titleEnabled="false"
             app:toolbarId="@id/toolbar">
 
@@ -70,8 +68,14 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="?attr/actionBarSize">
+                    android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guide_margin_top"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_begin="?attr/actionBarSize" />
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guide_margin_left"
@@ -98,7 +102,7 @@
                         android:textSize="@dimen/text_size_13"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
                         app:layout_constraintEnd_toStartOf="@id/balance_updated_label"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="@id/guide_margin_top" />
 
                     <TextView
                         android:id="@+id/balance_updated_label"
@@ -112,7 +116,7 @@
                         android:textSize="@dimen/text_size_13"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toEndOf="@id/balance_label"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="@id/guide_margin_top" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/balance_container"
@@ -172,7 +176,6 @@
                             app:layout_constraintVertical_bias=".8"
                             tools:text="bip" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
                     <TextView
                         android:visibility="gone"
@@ -264,11 +267,13 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:alpha="0"
+                        tools:alpha="0.5"
                         android:background="@color/white"
                         android:clickable="false"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:visibility="gone"
+                        tools:visibility="visible"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -316,7 +321,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -324,11 +329,11 @@
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/tabsPager"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@color/white"
                 android:orientation="horizontal" />
 
-        </network.minter.bipwallet.internal.views.widgets.SmartNestedScrollView>
+        </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
