@@ -474,7 +474,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     .setSecondLabel(R.string.dialog_label_exchange_to_get)
                     .setSecondValue(mBuyAmount!!)
                     .setSecondCoin(mBuyCoin!!)
-                    .setPositiveAction(R.string.btn_confirm_send) { _, _ ->
+                    .setPositiveAction(R.string.btn_confirm) { _, _ ->
                         val type: ConvertTransactionData.Type = when {
                             mUseMax.get() -> ConvertTransactionData.Type.SellAll
                             isBuying -> ConvertTransactionData.Type.Buy
