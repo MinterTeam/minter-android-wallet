@@ -99,6 +99,9 @@ public interface AddressBookDao {
     @Query("SELECT * FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress OR name = :nameOrAddress or address = :nameOrAddress GROUP BY id")
     Maybe<List<AddressContact>> findByNameOrAddress(String nameOrAddress);
 
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE id=:id")
+    Single<Integer> exists(int id);
+
     @Insert
     void insert(AddressContact contact);
 

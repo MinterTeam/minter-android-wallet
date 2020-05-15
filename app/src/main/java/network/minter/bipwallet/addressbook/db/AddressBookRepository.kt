@@ -147,4 +147,13 @@ class AddressBookRepository(
                 .subscribeOn(Schedulers.io())
     }
 
+    fun exist(contact: AddressContact): Single<Boolean> {
+        if (contact.id == 0) {
+            return Single.just(false)
+        }
+
+        return db.addressBook().exists(contact.id)
+                .map { it == 1 }
+    }
+
 }

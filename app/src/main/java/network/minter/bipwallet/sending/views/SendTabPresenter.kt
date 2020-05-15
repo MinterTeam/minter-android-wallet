@@ -195,6 +195,39 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         })
         loadAndSetFee()
         accountStorage.update()
+
+        checkRecipientContactExists()
+    }
+
+    /**
+     * Check contact exists in database (it can be deleted by user)
+     * If it was an address book contact and it not exist more, then convert contact to dummy with name=address
+     * and change input
+     */
+    private fun checkRecipientContactExists() {
+        if (mRecipient == null || mRecipient?.id == 0) {
+            return
+        }
+
+        addressBookRepo.exist(mRecipient!!)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        {
+                            if (!it) {
+                                val contact = mRecipient!!
+                                contact.id = 0
+                                contact.name = contact.address
+                                handleAutocomplete = false
+                                viewState.setRecipientAutocompleteItems(ArrayList(0))
+                                mRecipient = contact
+                                viewState.setRecipient(mRecipient!!)
+                                handleAutocomplete = true
+                            }
+                        },
+                        { t -> Timber.e(t) }
+                )
+
     }
 
     override fun detachView(view: SendView) {
