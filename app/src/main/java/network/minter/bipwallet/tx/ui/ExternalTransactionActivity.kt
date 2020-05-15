@@ -50,9 +50,12 @@ import network.minter.bipwallet.internal.dialogs.WalletDialogFragment
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.system.ActivityBuilder
+import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.security.PauseTimer
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter
+import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -193,6 +196,13 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
 
         setupToolbar(b.toolbar)
         presenter.handleExtras(intent)
+
+        LastBlockHandler.handle(b.lastUpdated)
+        val broadcastManager = BroadcastReceiverManager(this)
+        broadcastManager.add(RTMBlockReceiver {
+            LastBlockHandler.handle(b.lastUpdated, it)
+        })
+        broadcastManager.register()
     }
 
     override fun onNewIntent(intent: Intent) {

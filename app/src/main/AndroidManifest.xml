@@ -155,6 +155,7 @@
         <activity
             android:name=".tx.ui.ExternalTransactionActivity"
             android:launchMode="singleTop"
+            android:theme="@style/Wallet"
             android:parentActivityName=".home.ui.HomeActivity"
             android:windowSoftInputMode="stateHidden">
             <meta-data
