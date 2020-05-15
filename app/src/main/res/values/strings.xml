@@ -99,7 +99,7 @@
     <string name="btn_save">Save</string>
     <string name="btn_submit">Submit</string>
     <string name="btn_send">Send</string>
-    <string name="btn_view_tx">View transaction</string>
+    <string name="btn_view_tx">View Transaction</string>
     <string name="btn_close">Close</string>
     <string name="btn_explorer">Explorer</string>
     <string name="title_tab_receiving">Receive Coins</string>
@@ -132,7 +132,7 @@
     <string name="btn_all_txs">All Transactions</string>
     <string name="btn_add_wallet">Add New Wallet</string>
     <string name="input_hint_wallet_title">Up to 18 symbols…</string>
-    <string name="input_hint_wallet_title_later">Add title to your wallet (you can do it later)</string>
+    <string name="input_hint_wallet_title_later">Add a title to your wallet (you can do it later)</string>
     <string name="btn_launch_wallet">Launch the wallet</string>
     <string name="btn_generate_wallet">Generate New Wallet</string>
     <string name="btn_activate">Activate Wallet</string>
