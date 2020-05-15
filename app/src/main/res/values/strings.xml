@@ -330,7 +330,7 @@
     <string name="dialog_label_unbond_progress">Unbonding...</string>
     <string name="btn_save_changes">Save Changes</string>
     <string name="dialog_title_your_address">Your Address</string>
-    <string name="empty_address_book">No records were found</string>
+    <string name="empty_address_book">No contacts yet</string>
     <string name="dialog_title_choose_wallet">Choose Wallet</string>
     <string name="dialog_title_remote_wallet">Remove Wallet</string>
     <string name="dialog_description_remove_wallet"><![CDATA[Are you sure, you want to remove wallet <b>%s</b> from this application?]]></string>
