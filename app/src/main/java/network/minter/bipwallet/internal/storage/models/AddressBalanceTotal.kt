@@ -49,8 +49,7 @@ class AddressBalanceTotal(
 
         totalBalance = source.totalBalance
         totalBalanceUSD = source.totalBalanceUSD
-        availableBalanceBIP = source.availableBalanceBIP
-        availableBalanceUSD = source.availableBalanceUSD
+        availableBalanceBIP = coins.map { it.value.bipValue }.reduce { a, b -> a + b } - delegated
         this.delegated = delegated
     }
 
