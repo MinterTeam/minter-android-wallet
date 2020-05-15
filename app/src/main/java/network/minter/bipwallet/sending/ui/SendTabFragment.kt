@@ -40,7 +40,7 @@ import android.view.ViewGroup
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
-import com.edwardstock.inputfield.form.validators.RegexValidator
+import com.edwardstock.inputfield.form.validators.EmptyValidator
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.BuildConfig
@@ -57,6 +57,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
+import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
@@ -115,14 +116,14 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputCoin.input.setFocusable(false)
 
             inputGroup.setup {
-                add(inputAmount, RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$").apply {
-                    errorMessage = "Invalid number"
-                })
                 add(inputRecipient, RecipientValidator("Invalid recipient", true))
                 add(inputPayload, PayloadValidator())
             }
-
+            inputGroup.addInput(inputAmount)
+            inputGroup.addValidator(inputAmount, EmptyValidator().apply { errorMessage = "Amount can't be empty" })
             inputGroup.addFilter(inputAmount, DecimalInputFilter(inputAmount))
+            inputGroup.addFilter(inputRecipient, NewLineInputFilter())
+            inputRecipient.input.threshold = 1
 
             inputRecipient.clearFocus()
             inputAmount.clearFocus()

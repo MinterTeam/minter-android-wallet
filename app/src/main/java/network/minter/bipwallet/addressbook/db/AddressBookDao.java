@@ -93,11 +93,10 @@ public interface AddressBookDao {
     @Query("SELECT COUNT(*) FROM minter_contacts WHERE (address = :address)")
     Single<Integer> countByAddress(String address);
 
-
     @Query("SELECT * FROM minter_contacts WHERE address = :nameOrAddress OR name = :nameOrAddress")
     Maybe<AddressContact> getByNameOrAddress(String nameOrAddress);
 
-    @Query("SELECT * FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress GROUP BY id")
+    @Query("SELECT * FROM minter_contacts WHERE address LIKE :nameOrAddress OR name LIKE :nameOrAddress OR name = :nameOrAddress or address = :nameOrAddress GROUP BY id")
     Maybe<List<AddressContact>> findByNameOrAddress(String nameOrAddress);
 
     @Insert

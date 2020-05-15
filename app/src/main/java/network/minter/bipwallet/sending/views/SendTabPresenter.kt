@@ -144,6 +144,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private var mLastAccount: CoinBalance? = null
     private var mSendFee: BigDecimal? = null
     private var mPayload: ByteArray? = null
+    private var handleAutocomplete: Boolean = true
+    private var mFormValid = false
 
     private val mPayloadChangeListener: TextWatcher = object : SimpleTextWatcher() {
         override fun afterTextChanged(s: Editable) {
@@ -172,7 +174,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             setupFee()
         }
     }
-    private var mFormValid = false
+
 
     override fun attachView(view: SendView) {
         walletSelectorController.attachView(view)
@@ -243,8 +245,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             }
         } else if (requestCode == REQUEST_CODE_ADDRESS_BOOK_SELECT) {
             val contact = AddressBookActivity.getResult(data!!) ?: return
+            handleAutocomplete = false
+            viewState.setRecipientAutocompleteItems(ArrayList(0))
             mRecipient = contact
             viewState.setRecipient(mRecipient!!)
+            handleAutocomplete = true
         }
     }
 
@@ -361,26 +366,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
         val enough = MathHelper.bdGTE(amount, OperationType.SendCoin.fee)
         if (!enough) {
-            viewState.setAmountError("Insufficient balance")
+            viewState.setCommonError("Insufficient balance")
         } else {
-            viewState.setAmountError(null)
+            viewState.setCommonError(null)
         }
         return enough
-    }
-
-    /**
-     * Checks input amount is not empty and not negative number
-     * @param amount
-     * @return
-     */
-    private fun checkAmountIsValid(amount: String?): Boolean {
-        if (amount == null || amount.isEmpty()) {
-            viewState.setAmountError("Amount can't be empty")
-            return false
-        }
-        val valid = amount.parseBigDecimal() > ZERO
-        viewState.setAmountError(if (!valid) "Amount must be greater or equals to 0" else null)
-        return valid
     }
 
     private fun onAmountChanged(amount: String?) {
@@ -391,23 +381,25 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
 
         mClickedUseMax.set(false)
-        checkAmountIsValid(amount)
-        //        checkEnableSubmit();
         loadAndSetFee()
         checkEnableSubmit()
     }
 
     private fun onAddressChanged(address: String) {
-        if (address.isEmpty()) viewState.setFee("") else setupFee()
+        if (address.isEmpty()) {
+            viewState.setFee("")
+        } else {
+            setupFee()
+            if (mRecipient != null) {
+                viewState.setRecipientError(null)
+            }
+
+        }
     }
 
     private fun onSubmit() {
         if (mRecipient == null) {
             viewState.setRecipientError("Recipient required")
-            return
-        }
-        if (mAmount == null) {
-            viewState.setAmountError("Amount must be set")
             return
         }
         analytics.send(AppEvent.SendCoinsSendButton)
@@ -444,7 +436,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                         .setAmount(mAmount)
                         .setRecipientName(mRecipient!!.name)
                         .setCoin(mFromAccount!!.coin)
-                        .setPositiveAction(R.string.btn_send) { d, _ ->
+                        .setPositiveAction(R.string.btn_confirm) { d, _ ->
                             Wallet.app().sounds().play(R.raw.bip_beep_digi_octave)
                             onStartExecuteTransaction()
                             analytics.send(AppEvent.SendCoinPopupSendButton)
@@ -804,35 +796,42 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             onErrorExecuteTransaction(result)
             return
         }
-        viewState.hidePayload()
+
+        // update data
         accountStorage.update(true)
         cachedTxRepo.update(true)
+
+        // show dialog
         viewState.startDialog { ctx ->
             analytics.send(AppEvent.SentCoinPopupScreen)
             val builder = TxSendSuccessDialog.Builder(ctx)
                     .setLabel(R.string.tx_send_success_dialog_description)
                     .setValue(mRecipient!!.name)
-                    .setPositiveAction("View transaction") { d, _ ->
+                    .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
                         viewState.startExplorer(result.result.txHash.toString())
                         d.dismiss()
                         analytics.send(AppEvent.SentCoinPopupViewTransactionButton)
                     }
-                    .setNegativeAction("Close") { d: DialogInterface, _: Int ->
+                    .setNegativeAction(R.string.btn_close) { d: DialogInterface, _: Int ->
                         d.dismiss()
                         analytics.send(AppEvent.SentCoinPopupCloseButton)
                     }
 
             if (mRecipient != null && mRecipient!!.id == 0 && mRecipient!!.address != null) {
                 val recipientAddress = mRecipient!!.address!!
-                builder.setNeutralAction("Save This Address") { d, _ ->
+                builder.setNeutralAction(R.string.btn_save_address) { d, _ ->
                     viewState.startAddContact(recipientAddress)
                     d.dismiss()
                 }
             }
             builder.create()
         }
+
+        // clear form
+        viewState.hidePayload()
         viewState.clearInputs()
+        viewState.setSubmitEnabled(false)
         mRecipient = null
         mSendFee = null
     }
@@ -854,7 +853,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                 { res: AddressContact? ->
                                     mRecipient = res
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
-//                                    viewState.hideAutocomplete()
                                 },
                                 { t: Throwable ->
                                     mRecipient = null
@@ -878,8 +876,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             R.id.input_amount -> mInputChange!!.onNext(editText.text.toString())
         }
     }
-
-    private var handleAutocomplete: Boolean = true
 
     @Suppress("UNUSED_PARAMETER")
     private fun onAutocompleteSelected(contact: AddressContact, pos: Int) {
