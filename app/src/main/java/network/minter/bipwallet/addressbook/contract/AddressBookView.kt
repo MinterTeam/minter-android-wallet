@@ -32,17 +32,20 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.internal.dialogs.ActionListener
+import network.minter.bipwallet.internal.dialogs.DialogExecutor
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AddressBookView : MvpView {
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
     fun showEmpty(show: Boolean)
 
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startAddContact(onSubmit: ActionListener, onDismiss: ActionListener?)
+    fun startDialog(executor: DialogExecutor)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startEditContact(contact: AddressContact, onSubmit: ActionListener, onDismiss: ActionListener?)
+    fun startAddContact(onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startEditContact(contact: AddressContact, onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun finishSuccess(contact: AddressContact)

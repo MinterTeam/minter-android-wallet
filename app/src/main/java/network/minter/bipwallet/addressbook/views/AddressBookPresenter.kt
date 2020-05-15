@@ -28,6 +28,7 @@ package network.minter.bipwallet.addressbook.views
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
+import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.adapter.AddressBookAdapter
 import network.minter.bipwallet.addressbook.adapter.AddressContactDiffUtilImpl
 import network.minter.bipwallet.addressbook.contract.AddressBookView
@@ -35,7 +36,10 @@ import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.addressbook.models.AddressBookItem
 import network.minter.bipwallet.addressbook.models.AddressBookItemHeader
 import network.minter.bipwallet.addressbook.models.AddressContact
+import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
+import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -55,7 +59,16 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
     }
 
     fun onAddAddress() {
-        viewState.startAddContact({ updateList() }, null)
+        viewState.startAddContact({ contact ->
+            viewState.startDialog { ctx ->
+                TxSendSuccessDialog.Builder(ctx)
+                        .setLabel(R.string.dialog_description_success_add_address)
+                        .setValue(contact.name)
+                        .setNegativeAction(R.string.btn_close)
+                        .create()
+            }
+            updateList()
+        }, null)
     }
 
     override fun onFirstViewAttach() {
@@ -68,8 +81,27 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
     }
 
     private fun onDeleteContact(contact: AddressContact) {
-        addressBookRepo.delete(contact)
-        updateList()
+        viewState.startDialog { ctx ->
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_remove_address)
+                    .setText(HtmlCompat.fromHtml(ctx.getString(R.string.dialog_description_remove_address, contact.shortAddress)))
+                    .setTextTypeface(R.font._inter_regular)
+                    .setPositiveAction(R.string.btn_confirm) { d, _ ->
+                        addressBookRepo.delete(contact)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe(
+                                        {
+                                            updateList()
+                                            d.dismiss()
+                                        },
+                                        { t ->
+                                            Timber.e(t)
+                                        }
+                                )
+                    }
+                    .setNegativeAction(R.string.btn_cancel)
+                    .create()
+        }
     }
 
     private fun onEditContact(contact: AddressContact) {

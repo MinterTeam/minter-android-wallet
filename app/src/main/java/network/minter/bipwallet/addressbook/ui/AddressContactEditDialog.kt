@@ -62,6 +62,7 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
 
     private lateinit var binding: DialogAddresscontactEditBinding
     private var inputGroup: InputGroup = InputGroup()
+    var onContactAddedOrUpdated: ((AddressContact) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -141,10 +142,8 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
         binding.inputTitle.setText(title)
     }
 
-    override fun submitDialog() {
-        if (onSubmitListener != null) {
-            onSubmitListener!!.invoke()
-        }
+    override fun submitDialog(contact: AddressContact) {
+        onContactAddedOrUpdated?.invoke(contact)
     }
 
     override fun setTitle(titleRes: Int) {

@@ -31,6 +31,7 @@ import com.edwardstock.inputfield.form.InputWrapper
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.addressbook.models.AddressContact
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AddressContactEditView : MvpView {
@@ -42,7 +43,7 @@ interface AddressContactEditView : MvpView {
     fun close()
     fun setInputAddress(address: String?)
     fun setInputTitle(title: String?)
-    fun submitDialog()
+    fun submitDialog(contact: AddressContact)
     fun validate()
     fun setUniqueValidatorForAddress(exclude: String? = null)
     fun setUniqueValidatorForTitle(exclude: String? = null)

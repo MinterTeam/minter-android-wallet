@@ -40,6 +40,7 @@ import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.recyclerview.widget.RecyclerView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.auth.ui.AuthActivity
 import network.minter.bipwallet.databinding.FragmentTabSettingsBinding
@@ -112,6 +113,23 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
 
             listAdditional.layoutManager = NonScrollableLinearLayoutManager(activity)
             listAdditional.addItemDecoration(itemSeparator)
+
+
+            toolbar.setOnLongClickListener {
+                val sb = StringBuilder()
+                sb.append("    Env: ").append(BuildConfig.FLAVOR).append("\n")
+                sb.append("  Build: ").append(BuildConfig.VERSION_CODE).append("\n")
+                sb.append("Version: ").append(BuildConfig.VERSION_NAME).append("\n")
+                sb.append("  URole: ").append(Wallet.app().session().role.name).append("\n")
+                ConfirmDialog.Builder(activity!!, "About")
+                        .setText(sb.toString())
+                        .setTextTypeface(R.font._ubuntu_mono_bold)
+                        .setTextIsSelectable(true)
+                        .setPositiveAction("OK")
+                        .create()
+                        .show()
+                false
+            }
         }
 
         return binding.root

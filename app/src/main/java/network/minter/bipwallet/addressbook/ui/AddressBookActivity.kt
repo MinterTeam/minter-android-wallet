@@ -44,6 +44,8 @@ import network.minter.bipwallet.addressbook.views.AddressBookPresenter
 import network.minter.bipwallet.databinding.ActivityAddressBookBinding
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.dialogs.ActionListener
+import network.minter.bipwallet.internal.dialogs.DialogExecutor
+import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import org.parceler.Parcels
@@ -55,6 +57,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
     @InjectPresenter lateinit var presenter: AddressBookPresenter
 
     private lateinit var binding: ActivityAddressBookBinding
+    private var walletDialog: WalletDialog? = null
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         binding.list.adapter = adapter
@@ -64,16 +67,20 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
         binding.emptyText.visible = show
     }
 
-    override fun startAddContact(onSubmit: ActionListener, onDismiss: ActionListener?) {
+    override fun startDialog(executor: DialogExecutor) {
+        walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, executor)
+    }
+
+    override fun startAddContact(onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?) {
         val dialog = AddressContactEditDialog.Builder().build()
-        dialog.onSubmitListener = onSubmit
+        dialog.onContactAddedOrUpdated = onSubmit
         dialog.onDismissListener = onDismiss
         startBottomDialog(dialog, "add_contact")
     }
 
-    override fun startEditContact(contact: AddressContact, onSubmit: ActionListener, onDismiss: ActionListener?) {
+    override fun startEditContact(contact: AddressContact, onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?) {
         val dialog = AddressContactEditDialog.Builder().setContact(contact).build()
-        dialog.onSubmitListener = onSubmit
+        dialog.onContactAddedOrUpdated = onSubmit
         dialog.onDismissListener = onDismiss
         startBottomDialog(dialog, "edit_contact")
     }

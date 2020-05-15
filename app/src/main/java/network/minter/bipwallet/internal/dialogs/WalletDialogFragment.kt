@@ -107,6 +107,7 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
                 d.window!!.setWindowAnimations(0)
             }
         }
+        d.window!!.setDimAmount(0.5f)
 
         return d
     }

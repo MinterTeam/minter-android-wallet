@@ -109,7 +109,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
         res.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    viewState.submitDialog()
+                    viewState.submitDialog(mContact!!)
                     viewState.close()
                 }) { t: Throwable? -> Timber.e(t) }
     }

@@ -30,7 +30,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -156,23 +155,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         })
         broadcastManager.register()
 
-        if (BuildConfig.DEBUG) {
-            binding.toolbar.setOnLongClickListener {
-                val sb = StringBuilder()
-                sb.append("    Env: ").append(BuildConfig.FLAVOR).append("\n")
-                sb.append("  Build: ").append(BuildConfig.VERSION_CODE).append("\n")
-                sb.append("Version: ").append(BuildConfig.VERSION_NAME).append("\n")
-                sb.append("  URole: ").append(Wallet.app().session().role.name).append("\n")
-                ConfirmDialog.Builder(activity!!, "About")
-                        .setText(sb.toString())
-                        .setTextTypeface(Typeface.MONOSPACE)
-                        .setTextIsSelectable(true)
-                        .setPositiveAction("OK")
-                        .create()
-                        .show()
-                false
-            }
-        }
         binding.appbar.addOnOffsetChangedListener(mRecolorHelper)
         setHasOptionsMenu(true)
         activity!!.menuInflater.inflate(R.menu.menu_wallets_toolbar, binding.toolbar.menu)

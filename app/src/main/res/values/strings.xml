@@ -334,6 +334,7 @@
     <string name="dialog_title_choose_wallet">Choose Wallet</string>
     <string name="dialog_title_remote_wallet">Remove Wallet</string>
     <string name="dialog_description_remove_wallet"><![CDATA[Are you sure, you want to remove wallet <b>%s</b> from this application?]]></string>
+
     <string name="dialog_text_remove_wallet"><![CDATA[<b>Attention!</b> The wallet will not be deleted from blockchain. You\'ll be able to readd it later with the saved seed-phrase.]]></string>
     <string name="dialog_title_choose_coin">Choose Coin</string>
     <string name="image_cd_wallet_selector_dropdown">Wallet Selector Dropdown</string>
@@ -345,5 +346,8 @@
     <string name="filter_tx_all">All</string>
     <string name="filter_tx_incoming">Incoming</string>
     <string name="filter_tx_outgoing">Outgoing</string>
+    <string name="dialog_title_remove_address">Remove Address</string>
+    <string name="dialog_description_remove_address"><![CDATA[Are you sure, you want to remove address <b>%s</b>?]]></string>
+    <string name="dialog_description_success_add_address">Successfully added address</string>
 
 </resources>

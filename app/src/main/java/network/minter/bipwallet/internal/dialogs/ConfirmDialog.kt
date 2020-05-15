@@ -27,7 +27,6 @@ package network.minter.bipwallet.internal.dialogs
 
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.FontRes
@@ -59,15 +58,19 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
         setContentView(binding.root)
 
         binding.title.text = builder.title
-        binding.dialogDescription.visible = builder.mDescription != null
+        binding.dialogDescription.visible = builder.mDescription != null && builder.mDescription?.isNotEmpty() == true
         binding.dialogDescription.text = builder.mDescription
 
+        binding.dialogText.visible = builder.mText != null && builder.mText?.isNotEmpty() == true
         binding.dialogText.text = builder.mText
         binding.dialogText.textAlignment = builder.mTextAlignment
         binding.dialogText.setTextIsSelectable(builder.mTextIsSelectable)
 
         if (builder.mDescriptionTypeface > 0) {
             binding.dialogDescription.typeface = ResourcesCompat.getFont(context, builder.mDescriptionTypeface)
+        }
+        if (builder.mTextTypeface > 0) {
+            binding.dialogText.typeface = ResourcesCompat.getFont(context, builder.mTextTypeface)
         }
         if (builder.mButtonStyleRes > 0) {
             binding.actionConfirm.style(builder.mButtonStyleRes)
@@ -79,9 +82,6 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
             setSelectableItemBackground(binding.dialogText)
             binding.dialogText.setOnClickListener(builder.mOnTextClickListener)
         }
-        if (builder.mTypeface != null) {
-            binding.dialogText.typeface = builder.mTypeface
-        }
 
 
         builder.bindAction(this, binding.actionConfirm, DialogInterface.BUTTON_POSITIVE)
@@ -92,8 +92,8 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
         var mText: CharSequence? = null
         var mDescription: CharSequence? = null
         var mTextIsSelectable = false
-        var mTypeface: Typeface? = null
         var mDescriptionTypeface: Int = -1
+        var mTextTypeface: Int = -1
         var mOnTextClickListener: View.OnClickListener? = null
         var mTextAlignment = View.TEXT_ALIGNMENT_INHERIT
 
@@ -115,6 +115,11 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
 
         fun setDescriptionTypeface(@FontRes resId: Int): Builder {
             mDescriptionTypeface = resId
+            return this
+        }
+
+        fun setTextTypeface(@FontRes resId: Int): Builder {
+            mTextTypeface = resId
             return this
         }
 
@@ -200,11 +205,6 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
                     ${ExceptionHelper.getStackTrace(t)}
                     """.trimIndent()
             }
-            return this
-        }
-
-        fun setTextTypeface(typeface: Typeface?): Builder {
-            mTypeface = typeface
             return this
         }
 

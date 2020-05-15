@@ -72,6 +72,11 @@ class ConfirmDialogFragment(private val builder: Builder) : WalletDialogFragment
             if (builder.mDescriptionTypeface > 0) {
                 dialogDescription.typeface = ResourcesCompat.getFont(context!!, builder.mDescriptionTypeface)
             }
+
+            if (builder.mTextTypeface > 0) {
+                dialogText.typeface = ResourcesCompat.getFont(context!!, builder.mTextTypeface)
+            }
+
             if (builder.mButtonStyleRes > 0) {
                 actionConfirm.style(builder.mButtonStyleRes)
             }
@@ -101,6 +106,7 @@ class ConfirmDialogFragment(private val builder: Builder) : WalletDialogFragment
         var mTextIsSelectable = false
         var mTypeface: Typeface? = null
         var mDescriptionTypeface: Int = -1
+        var mTextTypeface: Int = -1
         var mOnTextClickListener: View.OnClickListener? = null
         var mTextAlignment = View.TEXT_ALIGNMENT_INHERIT
 
@@ -122,6 +128,11 @@ class ConfirmDialogFragment(private val builder: Builder) : WalletDialogFragment
 
         fun setDescriptionTypeface(@FontRes resId: Int): Builder {
             mDescriptionTypeface = resId
+            return this
+        }
+
+        fun setTextTypeface(@FontRes resId: Int): Builder {
+            mTextTypeface = resId
             return this
         }
 

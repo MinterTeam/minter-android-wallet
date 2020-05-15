@@ -32,6 +32,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.widget.FrameLayout
 import androidx.core.view.postOnAnimationDelayed
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -123,26 +124,10 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         }
         KeyboardHelper.hideKeyboard(this)
 
-//        root!!.animate()
-//                .alpha(0f)
-//                .setDuration(120)
-//                .setInterpolator(AccelerateInterpolator())
-//                .setListener(object : Animator.AnimatorListener {
-//                    override fun onAnimationRepeat(animation: Animator?) {}
-//                    override fun onAnimationCancel(animation: Animator?) {}
-//                    override fun onAnimationStart(animation: Animator?) {}
-//
-//                    override fun onAnimationEnd(animation: Animator?) {
-//
-//                    }
-//
-//                })
-//                .start()
-
         root!!.animate()
-                .translationYBy(maxHeight.coerceAtLeast(root!!.height.toFloat()))
-                .setDuration(100)
-                .setInterpolator(AccelerateDecelerateInterpolator())
+                .alpha(0f)
+                .setDuration(120)
+                .setInterpolator(AccelerateInterpolator())
                 .setListener(object : Animator.AnimatorListener {
                     override fun onAnimationRepeat(animation: Animator?) {}
                     override fun onAnimationCancel(animation: Animator?) {}
@@ -154,6 +139,22 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
 
                 })
                 .start()
+
+//        root!!.animate()
+//                .translationYBy(maxHeight.coerceAtLeast(root!!.height.toFloat()))
+//                .setDuration(100)
+//                .setInterpolator(AccelerateDecelerateInterpolator())
+//                .setListener(object : Animator.AnimatorListener {
+//                    override fun onAnimationRepeat(animation: Animator?) {}
+//                    override fun onAnimationCancel(animation: Animator?) {}
+//                    override fun onAnimationStart(animation: Animator?) {}
+//
+//                    override fun onAnimationEnd(animation: Animator?) {
+//                        onCollapsed?.invoke()
+//                    }
+//
+//                })
+//                .start()
     }
 
     open fun expand(force: Boolean = false, onExpanded: (() -> Unit)? = null) {
@@ -161,9 +162,24 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
             return
         }
         internalState = BottomSheetBehavior.STATE_EXPANDED
+//        root!!.animate()
+//                .translationYBy(-root!!.translationY)
+//                .setDuration(100)
+//                .setInterpolator(AccelerateDecelerateInterpolator())
+//                .setListener(object : Animator.AnimatorListener {
+//                    override fun onAnimationRepeat(animation: Animator?) {}
+//                    override fun onAnimationCancel(animation: Animator?) {}
+//                    override fun onAnimationStart(animation: Animator?) {}
+//
+//                    override fun onAnimationEnd(animation: Animator?) {
+//                        onExpanded?.invoke()
+//                    }
+//
+//                })
+//                .start()
         root!!.animate()
-                .translationYBy(-root!!.translationY)
-                .setDuration(100)
+                .alpha(1f)
+                .setDuration(120)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .setListener(object : Animator.AnimatorListener {
                     override fun onAnimationRepeat(animation: Animator?) {}
@@ -176,21 +192,6 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
 
                 })
                 .start()
-//        root!!.animate()
-//                .alpha(1f)
-//                .setDuration(120)
-//                .setInterpolator(AccelerateInterpolator())
-//                .setListener(object : Animator.AnimatorListener {
-//                    override fun onAnimationRepeat(animation: Animator?) {}
-//                    override fun onAnimationCancel(animation: Animator?) {}
-//                    override fun onAnimationStart(animation: Animator?) {}
-//
-//                    override fun onAnimationEnd(animation: Animator?) {
-//                        onExpanded?.invoke()
-//                    }
-//
-//                })
-//                .start()
     }
 
     protected fun postRoot(r: () -> Unit) {
