@@ -44,6 +44,8 @@ class WalletSelectorController @Inject constructor() {
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
 
+    var onWalletSelected: ((WalletItem) -> Unit)? = null
+
     private var viewState: WalletSelectorControllerView? = null
     private var disposable: Disposable? = null
 
@@ -97,6 +99,8 @@ class WalletSelectorController @Inject constructor() {
         accountStorage.update(true)
         txRepo.update(true)
         dailyRewardsRepo.update(true)
+
+        onWalletSelected?.invoke(walletItem)
     }
 
     private fun onClickWalletEdit(walletItem: WalletItem) {

@@ -178,6 +178,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     override fun attachView(view: SendView) {
         walletSelectorController.attachView(view)
+        walletSelectorController.onWalletSelected = {
+            viewState.clearAmount()
+        }
         super.attachView(view)
         viewState.setOnClickAccountSelectedListener(View.OnClickListener { onClickAccountSelector() })
 

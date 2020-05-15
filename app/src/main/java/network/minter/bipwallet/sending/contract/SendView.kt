@@ -61,6 +61,7 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun setOnSubmit(listener: View.OnClickListener)
     fun setSubmitEnabled(enabled: Boolean)
     fun clearInputs()
+    fun clearAmount()
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(executor: DialogExecutor)
@@ -98,8 +99,6 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun startExternalTransaction(rawData: String?)
     fun showPayload()
     fun hidePayload()
-
-
 
 
 }
