@@ -158,12 +158,23 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/action_our_channel" />
 
-            <Space
+            <TextView
+                android:id="@+id/app_version"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/margin_edges"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/action_support_chat" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_medium"
+                android:textAlignment="center"
+                android:textColor="@color/grey"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action_support_chat"
+                tools:text="2.0.0-alpha03 (145)"
+
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
