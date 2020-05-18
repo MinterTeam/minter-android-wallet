@@ -31,6 +31,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.wallets.selector.WalletItem
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AddWalletView : MvpView {
@@ -46,4 +47,5 @@ interface AddWalletView : MvpView {
     fun startGenerate()
 
     fun setOnGenerateClickListener(listener: View.OnClickListener)
+    fun callOnAdd(wallet: WalletItem)
 }

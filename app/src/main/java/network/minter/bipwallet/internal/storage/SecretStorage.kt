@@ -237,17 +237,15 @@ class SecretStorage(private val mStorage: KVStorage) {
     }
 
     fun delete(address: MinterAddress): Boolean {
-        checkNotNull(address, "Address required")
         val secrets = secrets
         check(secrets.size != 1) { "Can't delete last wallet" }
         if (!secrets.containsKey(address.toString())) {
             return false
         }
         secrets.remove(address.toString())
-        if (secrets.size == 1) {
-            val it: Map.Entry<String?, SecretData?> = secrets.entries.iterator().next()
-            setMain(MinterAddress(it.key))
-        }
+        val nextOne: Map.Entry<String?, SecretData?> = secrets.entries.iterator().next()
+        setMain(MinterAddress(nextOne.key))
+
         var ret = mStorage.put(KEY_SECRETS, secrets)
 
         val newAddressList = addresses.filterNot { it == address }.toMutableList()

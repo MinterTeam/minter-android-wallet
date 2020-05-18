@@ -84,10 +84,11 @@ class WalletSelectorController @Inject constructor() {
     }
 
     private fun onClickWalletAdd() {
-        viewState!!.startWalletAdd({ onAddedWallet() }, null)
+        viewState!!.startWalletAdd({ onAddedWallet(it) }, null)
     }
 
-    private fun onAddedWallet() {
+    private fun onAddedWallet(walletItem: WalletItem) {
+        viewState?.setMainWallet(walletItem)
         fillWalletSelector(accountStorage.data)
         accountStorage.update(true)
         txRepo.update(true)
@@ -97,9 +98,7 @@ class WalletSelectorController @Inject constructor() {
     private fun onSelectWallet(walletItem: WalletItem) {
         secretStorage.setMain(walletItem.address)
         viewState!!.setMainWallet(walletItem)
-        if (latestBalances != null) {
-            viewState!!.setWallets(WalletItem.create(secretStorage, latestBalances!!))
-        }
+        viewState!!.setWallets(WalletItem.create(secretStorage, accountStorage.data))
 
         accountStorage.update(true)
         txRepo.update(true)

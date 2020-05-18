@@ -47,6 +47,6 @@ interface WalletSelectorControllerView : MvpView {
     fun startWalletEdit(walletItem: WalletItem, enableRemove: Boolean, submitListener: (WalletItem) -> Unit, deleteListener: (WalletItem) -> Unit)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?)
+    fun startWalletAdd(onSubmit: (WalletItem) -> Unit, onDismiss: ActionListener?)
 
 }

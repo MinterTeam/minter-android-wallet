@@ -51,6 +51,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilt
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.wallets.dialogs.presentation.CreateWalletPresenter
+import network.minter.bipwallet.wallets.selector.WalletItem
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -70,6 +71,8 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
 
     private lateinit var binding: DialogCreateWalletBinding
     private val inputGroup = InputGroup()
+
+    var onAddListener: ((WalletItem) -> Unit)? = null
 
     @ProvidePresenter
     fun providePresenter(): CreateWalletPresenter {
@@ -177,6 +180,10 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         binding.inputTitle.setText(title)
     }
 
+    override fun callOnAdd(walletItem: WalletItem) {
+        onAddListener?.invoke(walletItem)
+    }
+
     override fun showCancelAction(show: Boolean) {
         binding.actionCancel.visibility = View.VISIBLE
         binding.actionCancel.setOnClickListener { dismiss() }
@@ -186,6 +193,7 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         private val args = Bundle()
         private var onSubmitListener: ActionListener? = null
         private var onDismissListener: ActionListener? = null
+        private var onAddListener: ((WalletItem) -> Unit)? = null
         fun setOnSubmitListener(listener: ActionListener?): Builder {
             onSubmitListener = listener
             return this
@@ -193,6 +201,11 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
 
         fun setOnDismissListener(listener: ActionListener?): Builder {
             onDismissListener = listener
+            return this
+        }
+
+        fun setOnAddListener(onAdd: ((WalletItem) -> Unit)?): Builder {
+            onAddListener = onAdd
             return this
         }
 
@@ -224,6 +237,7 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         fun build(): CreateWalletDialog {
             val dialog = CreateWalletDialog()
             dialog.arguments = args
+            dialog.onAddListener = onAddListener
             dialog.onSubmitListener = onSubmitListener
             dialog.onDismissListener = onDismissListener
             return dialog

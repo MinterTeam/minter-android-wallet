@@ -36,7 +36,9 @@ import network.minter.bipwallet.internal.di.annotations.FragmentScope
 import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
 import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog
+import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.core.bip39.MnemonicResult
 import network.minter.core.bip39.NativeBip39
 import network.minter.profile.models.User
@@ -119,11 +121,15 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
                 User(AuthSession.AUTH_TOKEN_ADVANCED),
                 AuthSession.AuthType.Advanced
         )
-        secretStorage.add(mnemonicResult!!, walletTitle)
+        val address = secretStorage.add(mnemonicResult!!, walletTitle)
         if (startHomeOnSubmit) {
             viewState.startHome()
         } else {
+            secretStorage.setMain(address)
             viewState.close()
+            viewState.callOnAdd(
+                    WalletItem.create(secretStorage, AddressBalanceTotal(address))
+            )
         }
     }
 

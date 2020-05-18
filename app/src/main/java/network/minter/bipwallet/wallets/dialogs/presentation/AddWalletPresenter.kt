@@ -31,7 +31,9 @@ import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.di.annotations.FragmentScope
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
 import network.minter.bipwallet.wallets.contract.AddWalletView
+import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.profile.models.User
 import javax.inject.Inject
 
@@ -73,12 +75,14 @@ class AddWalletPresenter @Inject constructor() : MvpBasePresenter<AddWalletView>
     }
 
     private fun onSubmit() {
-        secretStorage.add(mPhrase!!, mTitle)
+        val address = secretStorage.add(mPhrase!!, mTitle)
+        secretStorage.setMain(address)
         session.login(
                 AuthSession.AUTH_TOKEN_ADVANCED,
                 User(AuthSession.AUTH_TOKEN_ADVANCED),
                 AuthSession.AuthType.Advanced
         )
         viewState.close()
+        viewState.callOnAdd(WalletItem.create(secretStorage, AddressBalanceTotal(address)))
     }
 }

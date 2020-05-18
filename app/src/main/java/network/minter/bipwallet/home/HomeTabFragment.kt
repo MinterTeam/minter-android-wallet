@@ -36,7 +36,6 @@ import network.minter.bipwallet.internal.mvp.ErrorView
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.internal.views.snackbar
 import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog
-import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
 import timber.log.Timber
@@ -114,7 +113,7 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
         bottomSheetDialog!!.show(fragmentManager!!, "wallet_edit")
     }
 
-    fun startWalletAdd(onSubmit: ActionListener, onDismiss: ActionListener?) {
+    fun startWalletAdd(onSubmit: (WalletItem) -> Unit, onDismiss: ActionListener?) {
         if (bottomSheetDialog != null) {
             bottomSheetDialog!!.dismiss()
             bottomSheetDialog = null
@@ -124,25 +123,26 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
             return
         }
         val addWalletDialog = AddWalletDialog.newInstance()
-        addWalletDialog.onSubmitListener = onSubmit
+        addWalletDialog.onAddListener = onSubmit
         addWalletDialog.onDismissListener = onDismiss
-        addWalletDialog.setOnGenerateNewWalletListener { submitListener: ActionListener?,
-                                                         dismissListener: ActionListener?,
-                                                         title: String? ->
-
-            bottomSheetDialog!!.dismiss()
-            bottomSheetDialog = CreateWalletDialog.Builder()
-                    .setEnableDescription(true)
-                    .setEnableTitleInput(true)
-                    .setWalletTitle(title)
-                    .setTitle(getString(R.string.dialog_title_generate_new_wallet))
-                    .setOnSubmitListener(submitListener)
-                    .setOnDismissListener(dismissListener)
-                    .setEnableStartHomeOnSubmit(false)
-                    .build()
-            bottomSheetDialog!!.show(fragmentManager!!, "wallet_generate")
-        }
         bottomSheetDialog = addWalletDialog
         bottomSheetDialog!!.show(fragmentManager!!, "wallet_add")
+//        addWalletDialog.setOnGenerateNewWalletListener { submitListener: (WalletItem) -> Unit,
+//                                                         dismissListener: ActionListener?,
+//                                                         title: String? ->
+//
+//            bottomSheetDialog!!.dismiss()
+//            bottomSheetDialog = CreateWalletDialog.Builder()
+//                    .setEnableDescription(true)
+//                    .setEnableTitleInput(true)
+//                    .setWalletTitle(title)
+//                    .setTitle(getString(R.string.dialog_title_generate_new_wallet))
+//                    .setOnAddListener(submitListener)
+//                    .setOnDismissListener(dismissListener)
+//                    .setEnableStartHomeOnSubmit(false)
+//                    .build()
+//            bottomSheetDialog!!.show(fragmentManager!!, "wallet_generate")
+//        }
+
     }
 }

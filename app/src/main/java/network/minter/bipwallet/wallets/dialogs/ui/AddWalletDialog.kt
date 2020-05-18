@@ -47,10 +47,11 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.wallets.contract.AddWalletView
 import network.minter.bipwallet.wallets.dialogs.presentation.AddWalletPresenter
+import network.minter.bipwallet.wallets.selector.WalletItem
 import javax.inject.Inject
 import javax.inject.Provider
 
-typealias OnGenerateNewWalletListener = (submitListener: ActionListener?, dismissListener: ActionListener?, title: String?) -> Unit
+typealias OnGenerateNewWalletListener = (submitListener: (WalletItem) -> Unit, dismissListener: ActionListener?, title: String?) -> Unit
 
 class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
     @Inject lateinit var presenterProvider: Provider<AddWalletPresenter>
@@ -61,6 +62,7 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
     private var inputGroup = InputGroup()
     private lateinit var binding: DialogAddWalletBinding
     private var childDialog: BaseBottomSheetDialogFragment? = null
+    var onAddListener: ((WalletItem) -> Unit)? = null
 
     fun setOnGenerateNewWalletListener(listener: OnGenerateNewWalletListener) {
         mOnGenerateNewWalletListener = listener
@@ -99,6 +101,7 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
                 .setEnableTitleInput(true)
                 .setEnableStartHomeOnSubmit(false)
                 .setWalletTitle(binding.inputTitle.text.toString())
+                .setOnAddListener(onAddListener)
                 .setOnSubmitListener {
                     onSubmitListener?.invoke()
                     dismiss()
@@ -137,6 +140,10 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
 
     override fun addFormValidListener(listener: (Boolean) -> Unit) {
         inputGroup.addFormValidateListener(listener)
+    }
+
+    override fun callOnAdd(wallet: WalletItem) {
+        onAddListener?.invoke(wallet)
     }
 
     override fun setOnSubmitClickListener(listener: View.OnClickListener) {

@@ -33,6 +33,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.wallets.selector.WalletItem
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface CreateWalletView : MvpView {
@@ -57,4 +58,5 @@ interface CreateWalletView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun close()
+    fun callOnAdd(walletItem: WalletItem)
 }
