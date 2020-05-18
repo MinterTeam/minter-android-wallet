@@ -865,11 +865,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
 
         // clear form
+        mAmount = null
+        mRecipient = null
+        mSendFee = null
         viewState.hidePayload()
         viewState.clearInputs()
         viewState.setSubmitEnabled(false)
-        mRecipient = null
-        mSendFee = null
     }
 
     @Suppress("UNUSED_PARAMETER")

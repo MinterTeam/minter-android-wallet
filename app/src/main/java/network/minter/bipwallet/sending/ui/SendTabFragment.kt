@@ -244,13 +244,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
     override fun clearInputs() {
         binding.inputRecipient.clearFocus()
         binding.inputAmount.clearFocus()
-        inputGroup.clearData()
         inputGroup.clearErrors()
+        inputGroup.clearData()
     }
 
     override fun clearAmount() {
-        binding.inputAmount.text = null
         binding.inputAmount.clearFocus()
+        binding.inputAmount.text = null
         inputGroup.clearErrors()
     }
 
