@@ -74,7 +74,7 @@ open class CachedDailyRewardStatisticsRepository(
                 .rxExp()
                 .map { res: ExpResult<MutableList<RewardStatistics>?> ->
                     Timber.d("DAILY_REWARDS Load remote data")
-                    if (!res.isOk || res.result?.isEmpty() == true) {
+                    if (res.result == null || !res.isOk || res.result?.isEmpty() == true) {
                         val empty = RewardStatistics()
                         empty.amount = BigDecimal.ZERO
                         empty.time = Date()

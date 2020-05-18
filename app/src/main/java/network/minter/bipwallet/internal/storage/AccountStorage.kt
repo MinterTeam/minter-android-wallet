@@ -30,6 +30,7 @@ import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
+import network.minter.bipwallet.apis.reactive.ReactiveExplorer
 import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
@@ -101,6 +102,11 @@ class AccountStorage(
 
     private fun mapToDelegations(): Function<ExpResult<AddressBalance>, ObservableSource<ExpResult<AddressBalanceTotal>>> {
         return Function { res: ExpResult<AddressBalance> ->
+            if (res.result == null || !res.isOk) {
+                return@Function Observable.just(
+                        ReactiveExplorer.createExpErrorPlain<AddressBalanceTotal>(res.message, res.error?.code ?: 0, 0)
+                )
+            }
             addressRepo.getDelegations(res.result.address, 0)
                     .rxExp()
                     .map(mapDelegationsToBalances(res))
