@@ -52,15 +52,6 @@ import network.minter.core.MinterSDK
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 06-Jun-19
  */
-
-//    interface OnDelegatedClickListener {
-//        fun onDelegateClick(validator: DelegatedValidator?)
-//    }
-//
-//    interface OnUnbondItemClickListener {
-//        fun onUnbondClick(stake: DelegatedStake?)
-//    }
-
 typealias OnDelegatedClickListener = (DelegatedValidator) -> Unit
 typealias OnUnbondItemClickListener = (DelegatedStake) -> Unit
 

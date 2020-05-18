@@ -38,6 +38,7 @@ import butterknife.ButterKnife
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.R
+import network.minter.bipwallet.addressbook.adapter.AddressBookAdapter
 import network.minter.bipwallet.addressbook.contract.AddressBookView
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.views.AddressBookPresenter
@@ -96,6 +97,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
         if (item.itemId == R.id.menu_add_address) {
             presenter.onAddAddress()
         }
+        (binding.list.adapter as AddressBookAdapter).closeOpened()
         return super.onOptionsItemSelected(item)
     }
 
@@ -119,6 +121,12 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
 
         setResult(Activity.RESULT_CANCELED)
         binding.list.layoutManager = LinearLayoutManager(this)
+        binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                (binding.list.adapter as AddressBookAdapter).closeOpened()
+            }
+        })
+
         presenter.handleExtras(intent)
         binding.toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
     }
