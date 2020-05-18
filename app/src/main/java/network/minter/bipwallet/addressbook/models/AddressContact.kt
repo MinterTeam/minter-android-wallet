@@ -57,6 +57,9 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
     @TypeConverters(AddressTypeConverter::class)
     var type: AddressType = AddressType.Address
 
+    @Transient
+    var extAvatar: String? = null
+
     enum class AddressType(var type: String) {
         Address("address"),
         ValidatorPubKey("validator");
@@ -74,7 +77,7 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
         }
     }
 
-    constructor() {}
+    constructor()
 
     constructor(nameOrAddress: String) {
         name = nameOrAddress
@@ -107,12 +110,23 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
         if (type == AddressType.Address) {
             remoteImageView.setImageUrlFallback(avatar, R.drawable.img_avatar_default)
         } else {
-            remoteImageView.setImageResource(R.drawable.img_avatar_delegate)
+            if (extAvatar != null) {
+                remoteImageView.setImageUrlFallback(extAvatar, R.drawable.img_avatar_delegate)
+            } else {
+                remoteImageView.setImageResource(R.drawable.img_avatar_delegate)
+            }
+
         }
     }
 
     val avatar: String
-        get() = MinterProfileApi.getUserAvatarUrlByAddress(address)
+        get() {
+            if (extAvatar != null) {
+                return extAvatar!!
+            }
+
+            return MinterProfileApi.getUserAvatarUrlByAddress(address)
+        }
 
     val minterAddress: MinterAddress
         get() = MinterAddress(address)

@@ -25,21 +25,37 @@
  */
 package network.minter.bipwallet.addressbook.db
 
-import io.reactivex.Completable
-import io.reactivex.CompletableEmitter
-import io.reactivex.Maybe
-import io.reactivex.Single
+import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.addressbook.models.AddressContact
+import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.db.WalletDatabase
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 
 class AddressBookRepository(
-        private val db: WalletDatabase
+        private val db: WalletDatabase,
+        private val validatorsRepo: RepoValidators
 ) {
-    fun findAll(): Maybe<List<AddressContact>> {
+    fun findAll(): Observable<List<AddressContact>> {
         return db.addressBook().findAll()
+                .toObservable()
+                .flatMap { contacts ->
+                    validatorsRepo.fetch()
+                            .map { validators ->
+                                contacts
+                                        .filter { it.type == AddressContact.AddressType.ValidatorPubKey }
+                                        .forEach { contact ->
+                                            validators.forEach { validator ->
+                                                if (contact.address.equals(validator.pubKey.toString())) {
+                                                    contact.extAvatar = validator.meta.iconUrl
+                                                }
+                                            }
+                                        }
+
+                                contacts
+                            }
+                }
     }
 
     fun findById(id: Int): Maybe<AddressContact> {

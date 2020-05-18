@@ -36,6 +36,7 @@ import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.addressbook.models.AddressBookItem
 import network.minter.bipwallet.addressbook.models.AddressBookItemHeader
 import network.minter.bipwallet.addressbook.models.AddressContact
+import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -47,6 +48,7 @@ import javax.inject.Inject
 @InjectViewState
 class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookView>() {
     @Inject lateinit var addressBookRepo: AddressBookRepository
+    @Inject lateinit var validatorsRepo: RepoValidators
 
     private val mAdapter: AddressBookAdapter = AddressBookAdapter()
 

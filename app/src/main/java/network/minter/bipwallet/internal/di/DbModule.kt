@@ -23,25 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.internal.di
 
-package network.minter.bipwallet.internal.di;
-
-import android.content.Context;
-
-import androidx.room.Room;
-import dagger.Module;
-import dagger.Provides;
-import network.minter.bipwallet.addressbook.db.AddressBookRepository;
-import network.minter.bipwallet.db.WalletDatabase;
+import android.content.Context
+import androidx.room.Room
+import dagger.Module
+import dagger.Provides
+import network.minter.bipwallet.addressbook.db.AddressBookRepository
+import network.minter.bipwallet.apis.explorer.RepoValidators
+import network.minter.bipwallet.db.WalletDatabase
 
 @Module
-public class DbModule {
-    public static final String DB_NAME = "minter.db";
-    public static final int DB_VERSION = 1;
-
+class DbModule {
     @Provides
     @WalletApp
-    public WalletDatabase provideWalletDB(Context context /*, @DbMigration Set<Migration> migrationSet*/) {
+    fun provideWalletDB(context: Context? /*, @DbMigration Set<Migration> migrationSet*/): WalletDatabase {
         /* Enable when migrations will be required
         final Migration[] migrations = new Migration[migrationSet.size()];
         int i = 0;
@@ -49,17 +45,19 @@ public class DbModule {
             migrations[i] = m;
         }
          */
-
-        return Room.databaseBuilder(context, WalletDatabase.class, DB_NAME)
-//                .addMigrations(migrations)
+        return Room.databaseBuilder(context!!, WalletDatabase::class.java, DB_NAME) //                .addMigrations(migrations)
                 .fallbackToDestructiveMigration()
-                .build();
+                .build()
     }
-
 
     @Provides
     @WalletApp
-    public AddressBookRepository provideAddressBookRepository(WalletDatabase db) {
-        return new AddressBookRepository(db);
+    fun provideAddressBookRepository(db: WalletDatabase, validatorsRepo: RepoValidators): AddressBookRepository {
+        return AddressBookRepository(db, validatorsRepo)
+    }
+
+    companion object {
+        const val DB_NAME = "minter.db"
+        const val DB_VERSION = 1
     }
 }
