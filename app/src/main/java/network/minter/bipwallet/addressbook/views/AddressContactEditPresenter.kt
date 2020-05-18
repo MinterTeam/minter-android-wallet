@@ -86,14 +86,17 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
         }
         viewState.addTextChangedListener { input, valid ->
             if (!valid) return@addTextChangedListener
-            val s = input.text.toString()
+            val s: String? = input.text?.toString()
             when (input.id) {
                 R.id.input_address -> {
+                    if (s == null) {
+                        return@addTextChangedListener
+                    }
                     val isPubKey = s.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
                     mContact!!.address = s
                     mContact!!.type = if (isPubKey) AddressContact.AddressType.ValidatorPubKey else AddressContact.AddressType.Address
                 }
-                R.id.input_title -> mContact!!.name = s
+                R.id.input_title -> mContact!!.name = s?.trim()
             }
         }
     }

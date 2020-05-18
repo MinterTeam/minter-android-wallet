@@ -83,9 +83,9 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
                 formValid = valid
                 viewState.setSubmitEnabled(valid)
                 if (valid) {
-                    walletTitle = input.text.toString()
+                    walletTitle = input.text?.toString()
 
-                    if (walletTitle?.isEmpty() == true) {
+                    if (walletTitle?.trim()?.isEmpty() == true) {
                         walletTitle = null
                     }
 

@@ -75,7 +75,7 @@ class EditWalletPresenter @Inject constructor() : MvpBasePresenter<EditWalletVie
                 "title" -> {
                     viewState.setEnableSubmit(valid)
                     if (valid) {
-                        title = if (inputWrapper.text?.isEmpty() == true) {
+                        title = if (inputWrapper.text?.trim()?.isEmpty() == true) {
                             null
                         } else {
                             inputWrapper.text.toString()

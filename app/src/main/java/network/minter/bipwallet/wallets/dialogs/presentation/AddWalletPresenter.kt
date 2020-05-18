@@ -60,7 +60,7 @@ class AddWalletPresenter @Inject constructor() : MvpBasePresenter<AddWalletView>
             when (input.fieldName) {
                 "title" -> {
                     if (valid) {
-                        mTitle = input.text.toString()
+                        mTitle = input.text?.trim().toString()
                     }
                 }
                 "seed" -> {
