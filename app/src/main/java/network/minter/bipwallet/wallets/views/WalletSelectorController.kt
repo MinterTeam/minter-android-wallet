@@ -48,6 +48,7 @@ class WalletSelectorController @Inject constructor() {
 
     private var viewState: WalletSelectorControllerView? = null
     private var disposable: Disposable? = null
+    private var latestBalances: AddressListBalancesTotal? = null
 
     fun onFirstViewAttach() {
         fillWalletSelector(accountStorage.data)
@@ -77,6 +78,7 @@ class WalletSelectorController @Inject constructor() {
     }
 
     private fun fillWalletSelector(res: AddressListBalancesTotal) {
+        latestBalances = res
         viewState!!.setWallets(WalletItem.create(secretStorage, res))
         viewState!!.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
     }
@@ -95,6 +97,9 @@ class WalletSelectorController @Inject constructor() {
     private fun onSelectWallet(walletItem: WalletItem) {
         secretStorage.setMain(walletItem.address)
         viewState!!.setMainWallet(walletItem)
+        if (latestBalances != null) {
+            viewState!!.setWallets(WalletItem.create(secretStorage, latestBalances!!))
+        }
 
         accountStorage.update(true)
         txRepo.update(true)

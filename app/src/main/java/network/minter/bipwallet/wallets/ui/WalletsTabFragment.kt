@@ -67,6 +67,7 @@ import network.minter.bipwallet.tx.ui.TransactionListActivity
 import network.minter.bipwallet.wallets.contract.WalletsTabView
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
+import network.minter.bipwallet.wallets.selector.WalletSelectorBroadcastReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.bipwallet.wallets.views.WalletsTabPresenter
 import org.joda.time.DateTime
@@ -147,6 +148,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 binding.containerSwipeRefresh.isEnabled = expandedPercent == 1.0f
             }
         })
+        binding.walletSelector.registerLifecycle(activity!!)
 
         LastBlockHandler.handle(binding.balanceUpdatedLabel, null, LastBlockHandler.ViewType.Main)
         val broadcastManager = BroadcastReceiverManager(activity!!)
@@ -218,11 +220,15 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun setMainWallet(mainWallet: WalletItem) {
-        binding.walletSelector.setMainWallet(mainWallet)
+        activity?.let {
+            WalletSelectorBroadcastReceiver.setMainWallet(activity!!, mainWallet)
+        }
     }
 
     override fun setWallets(addresses: List<WalletItem>) {
-        binding.walletSelector.setWallets(addresses)
+        activity?.let {
+            WalletSelectorBroadcastReceiver.setWallets(activity!!, addresses)
+        }
     }
 
     override fun setOnClickWalletListener(listener: OnClickWalletListener) {

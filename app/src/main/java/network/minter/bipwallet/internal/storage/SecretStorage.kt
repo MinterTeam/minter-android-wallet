@@ -93,6 +93,9 @@ class SecretStorage(private val mStorage: KVStorage) {
 
     fun setMain(mainWallet: MinterAddress) {
         mStorage.put(KEY_MAIN_WALLET, mainWallet)
+        val sec = getSecret(mainWallet)
+        sec.date = Date()
+        update(sec)
         mainWalletChangedListeners.forEach { it(mainWallet) }
     }
 
@@ -146,13 +149,14 @@ class SecretStorage(private val mStorage: KVStorage) {
             val src = secretsSafe
             val main = getSecret(mainWallet)
             val out = Stream.of(src.values).toList()
-            Collections.sort(out, Comparator { `as`, bs ->
-                val a = `as`.date
-                val b = bs.date
+
+            Collections.sort(out, Comparator { av, bv ->
+                val a = av.date
+                val b = bv.date
                 if (a == b) // update to make it stable
                     return@Comparator 0
                 if (a == main.date) return@Comparator -1
-                if (b == main.date) 1 else a.compareTo(b)
+                if (b == main.date) 1 else b.compareTo(a)
             })
             return out
         }

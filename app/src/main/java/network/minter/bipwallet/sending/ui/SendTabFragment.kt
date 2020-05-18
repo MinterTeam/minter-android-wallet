@@ -70,6 +70,7 @@ import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.bipwallet.wallets.selector.WalletListAdapter
+import network.minter.bipwallet.wallets.selector.WalletSelectorBroadcastReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
@@ -112,6 +113,8 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
         binding.apply {
             testnetWarning.visibleForTestnet()
+
+            walletSelector.registerLifecycle(activity!!)
 
             inputCoin.input.setFocusable(false)
 
@@ -198,11 +201,15 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setWallets(walletItems: List<WalletItem>) {
-        binding.walletSelector.setWallets(walletItems)
+        activity?.let {
+            WalletSelectorBroadcastReceiver.setWallets(activity!!, walletItems)
+        }
     }
 
     override fun setMainWallet(walletItem: WalletItem) {
-        binding.walletSelector.setMainWallet(walletItem)
+        activity?.let {
+            WalletSelectorBroadcastReceiver.setMainWallet(activity!!, walletItem)
+        }
     }
 
     override fun setOnClickWalletListener(listener: WalletListAdapter.OnClickWalletListener) {

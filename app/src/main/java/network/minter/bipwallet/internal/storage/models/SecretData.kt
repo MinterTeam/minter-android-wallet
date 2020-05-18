@@ -51,7 +51,7 @@ class SecretData : Serializable, Cloneable {
         private set
     var minterAddress: MinterAddress
         private set
-    val date = Date()
+    var date = Date()
 
     private var mTitle: String? = null
 
