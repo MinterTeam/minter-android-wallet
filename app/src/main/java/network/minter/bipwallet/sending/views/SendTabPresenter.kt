@@ -248,7 +248,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 if (result != null) {
                     val isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
                     val isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
-                    mRecipient!!.address = result
+                    mRecipient = AddressContact(result)
                     if (isMxAddress) {
                         mRecipient!!.type = AddressContact.AddressType.Address
                         viewState.setRecipient(mRecipient!!)

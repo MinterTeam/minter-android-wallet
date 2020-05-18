@@ -357,6 +357,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
         // get transaction from explorer to show exact value what we've got after sell
         mTxRepo.entity.getTransaction(result.result.txHash.toString()).rxExp().joinToUi()
+                .delay(3, TimeUnit.SECONDS)
                 .subscribe(
                         { r ->
                             if (r.isOk) {
