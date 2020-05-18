@@ -139,6 +139,21 @@ public final class ReactiveExplorer {
         return out;
     }
 
+    public static <T> ExpResult<T> createExpErrorRes(final Response<ExpResult<T>> response) {
+        final String errorBodyString;
+        try {
+            // нельзя после этой строки пытаться вытащить body из ошибки,
+            // потому что retrofit по какой-то причине не хранит у себя это значение
+            // а держит в буффере до момента первого доступа
+            errorBodyString = response.errorBody().string();
+        } catch (IOException e) {
+            Timber.e(e, "Unable to resolve http exception response");
+            return createExpEmpty(response.code(), response.message());
+        }
+
+        return createExpError(errorBodyString, response.code(), response.message());
+    }
+
     public static <T> ExpResult<T> createExpError(final Response<T> response) {
         final String errorBodyString;
         try {

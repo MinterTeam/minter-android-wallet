@@ -35,9 +35,11 @@ import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.core.internal.api.ApiService
+import network.minter.core.internal.exceptions.NetworkException
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.HistoryTransaction
 import network.minter.explorer.repo.ExplorerTransactionRepository
+import retrofit2.Response
 
 /**
  * minter-android-wallet. 2018
@@ -75,6 +77,52 @@ class CacheTxRepository(
                     getData()
                 }
                 .subscribeOn(Schedulers.io())
+    }
+
+    fun waitTransactionUntilUncommitted(txHash: String): Observable<ExpResult<HistoryTransaction>> {
+        return Observable.create { emitter ->
+            var run = true
+            var i: Int = 0
+
+            do {
+                if (i == 30) {
+                    emitter.onError(RuntimeException("Unable to get transaction after 30 seconds"))
+                    return@create
+                }
+
+                val call = getTransaction(txHash)
+
+                var res: Response<ExpResult<HistoryTransaction>?>
+                res = try {
+                    call.execute()
+                } catch (t: Throwable) {
+                    emitter.onError(NetworkException.convertIfNetworking(t))
+                    return@create
+                }
+
+                if (res.body() == null) {
+                    val body = ReactiveExplorer.createExpErrorRes(res)
+                    if (body.error.code != 404) {
+                        run = false
+                        emitter.onNext(body)
+                        emitter.onComplete()
+                    } else {
+                        Thread.sleep(1000)
+                    }
+                } else {
+                    val body = res.body()
+                    if (body?.result != null) {
+                        run = false
+                        emitter.onNext(body)
+                        emitter.onComplete()
+                    } else {
+                        Thread.sleep(1000)
+                    }
+                }
+
+                i++
+            } while (run)
+        }
     }
 
     override fun onAfterUpdate(result: List<HistoryTransaction>) {

@@ -330,11 +330,11 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
                         viewState.startExplorer(txHash)
-                        viewState.finish()
+//                        viewState.finish()
                     }
                     .setNegativeAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-                        viewState.finish()
+//                        viewState.finish()
                     }
                     .create()
         }
@@ -356,8 +356,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
 
         // get transaction from explorer to show exact value what we've got after sell
-        mTxRepo.entity.getTransaction(result.result.txHash.toString()).rxExp().joinToUi()
-                .delay(3, TimeUnit.SECONDS)
+        mTxRepo.entity.waitTransactionUntilUncommitted(result.result.txHash.toString())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         { r ->
                             if (r.isOk) {

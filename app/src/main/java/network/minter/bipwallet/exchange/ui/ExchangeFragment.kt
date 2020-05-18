@@ -121,7 +121,9 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun startDialog(executor: DialogExecutor) {
-        walletDialog = switchDialogWithExecutor(this, walletDialog, executor)
+        runOnUiThread {
+            walletDialog = switchDialogWithExecutor(this, walletDialog, executor)
+        }
     }
 
     override fun setTextChangedListener(listener: (InputWrapper, Boolean) -> Unit) {
