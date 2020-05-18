@@ -126,6 +126,10 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
                 (binding.list.adapter as AddressBookAdapter).closeOpened()
             }
         })
+        binding.list.setOnTouchListener { v, event ->
+            (binding.list.adapter as AddressBookAdapter).closeOpened()
+            false
+        }
 
         presenter.handleExtras(intent)
         binding.toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }

@@ -212,6 +212,10 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
             }
             presenter.onScrolledTo(scrollY)
         })
+        binding.list.setOnTouchListener { v, event ->
+            (binding.list.adapter as DelegationListAdapter).closeOpened()
+            false
+        }
         binding.list.layoutManager = LinearLayoutManager(this)
         mItemSeparator = BorderedItemSeparator(this, R.drawable.shape_bottom_separator, false, true)
         binding.list.addItemDecoration(mItemSeparator!!)
