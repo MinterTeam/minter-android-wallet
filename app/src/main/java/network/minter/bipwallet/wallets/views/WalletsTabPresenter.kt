@@ -77,10 +77,10 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         walletSelectorController.onFirstViewAttach()
 
         Timber.d("DAILY_REWARDS begin observe")
-        if (dailyRewardsRepo.isDataReady) {
-            Timber.d("DAILY_REWARDS ready from cache")
-            onDailyRewardsReady(dailyRewardsRepo.data)
-        }
+//        if (dailyRewardsRepo.isDataReady) {
+//            Timber.d("DAILY_REWARDS ready from cache")
+//            onDailyRewardsReady(dailyRewardsRepo.data)
+//        }
         if (accountStorage.isDataReady) {
             try {
                 Timber.d("BALANCE ready from cache")
@@ -88,20 +88,20 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
             } catch (t: Throwable) {
             }
         }
-        dailyRewardsRepo
-                .retryWhen(errorResolver)
-                .observe()
-                .joinToUi()
-                .subscribe(
-                        { res: RewardStatistics ->
-                            Timber.d("DAILY_REWARDS loaded")
-                            onDailyRewardsReady(res)
-                        },
-                        {
-                            viewState.hideProgress()
-                            Timber.w(it)
-                        }
-                ).disposeOnDestroy()
+//        dailyRewardsRepo
+//                .retryWhen(errorResolver)
+//                .observe()
+//                .joinToUi()
+//                .subscribe(
+//                        { res: RewardStatistics ->
+//                            Timber.d("DAILY_REWARDS loaded")
+//                            onDailyRewardsReady(res)
+//                        },
+//                        {
+//                            viewState.hideProgress()
+//                            Timber.w(it)
+//                        }
+//                ).disposeOnDestroy()
 
         accountStorage
                 .retryWhen(errorResolver)
@@ -120,7 +120,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                         }
                 ).disposeOnDestroy()
 
-        dailyRewardsRepo.update()
+//        dailyRewardsRepo.update()
         accountStorage.update()
     }
 
@@ -224,7 +224,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
 
     private fun forceUpdate() {
         accountStorage.update(true)
-        dailyRewardsRepo.update(true)
+//        dailyRewardsRepo.update(true)
         txRepo.update(true)
     }
 

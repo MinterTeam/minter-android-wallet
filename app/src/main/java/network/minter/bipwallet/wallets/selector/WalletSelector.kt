@@ -64,6 +64,7 @@ class WalletSelector : FrameLayout {
     private var mOnClickAddWallet: OnClickAddWalletListener? = null
     private var mOnClickEditWallet: OnClickEditWalletListener? = null
     private val mPopupDefer = DeferredCall.create<WalletsPopupWindow?>()
+    private var mPopupOpened = false
 
     enum class WalletWeight(val emoji: String) {
         Shrimp("\uD83E\uDD90"),
@@ -180,8 +181,14 @@ class WalletSelector : FrameLayout {
     }
 
     fun openPopup(view: View?) {
-        mPopup = WalletsPopupWindow.create(this, mAdapter)
-        mPopupDefer.attach(mPopup)
+        if (!mPopupOpened) {
+            mPopupOpened = true
+            mPopup = WalletsPopupWindow.create(this, mAdapter)
+            mPopup!!.setOnDismissListener {
+                mPopupOpened = false
+            }
+            mPopupDefer.attach(mPopup)
+        }
     }
 
     internal fun setMainWallet(wallet: WalletItem) {

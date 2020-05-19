@@ -103,7 +103,11 @@ open class KVStorage : Storage {
 
     override fun delete(key: String): Boolean {
         return synchronized(makeLock(key)) {
-            Hawk.db(mDbName).delete(key)
+            if (!contains(key)) {
+                false
+            } else {
+                Hawk.db(mDbName).delete(key)
+            }
         }
     }
 

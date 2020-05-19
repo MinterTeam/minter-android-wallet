@@ -58,6 +58,38 @@ class AccountStorage(
 
     companion object {
         private const val KEY_BALANCE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance_"
+        private const val KEY_BALANCE_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance_inactive_"
+        private const val KEY_DELEGATIONS_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_delegations_inactive_"
+    }
+
+    private fun inactiveBalanceKey(address: MinterAddress): String {
+        return "${KEY_BALANCE_INACTIVE}$address"
+    }
+
+    private fun inactiveDelegationsKey(address: MinterAddress): String {
+        return "${KEY_DELEGATIONS_INACTIVE}$address"
+    }
+
+    private fun getBalanceData(address: MinterAddress): Observable<ExpResult<AddressBalance>> {
+        return if (secretStorage.mainWallet == address || !storage.contains(inactiveBalanceKey(address))) {
+            addressRepo.getAddressData(address, true).rxExp()
+        } else {
+            val out = ExpResult<AddressBalance>()
+            out.result = storage.get(inactiveBalanceKey(address))
+            Observable.just(out)
+        }
+    }
+
+    private fun getDelegationsData(address: MinterAddress): Observable<ExpResult<DelegationList>> {
+        return if (secretStorage.mainWallet == address || !storage.contains(inactiveDelegationsKey(address))) {
+            Timber.d("ACCOUNT: %s Main or inactive; loading delegations from server", address.toString())
+            addressRepo.getDelegations(address, 0).rxExp()
+        } else {
+            Timber.d("ACCOUNT: %s loading delegations from storage", address.toString())
+            val out = ExpResult<DelegationList>()
+            out.result = storage.get(inactiveDelegationsKey(address))
+            Observable.just(out)
+        }
     }
 
     override fun getData(): AddressListBalancesTotal {
@@ -94,8 +126,13 @@ class AccountStorage(
 
     private fun mapBalances(): Function<MinterAddress, ObservableSource<ExpResult<AddressBalanceTotal>>> {
         return Function { address: MinterAddress ->
-            addressRepo.getAddressData(address, true)
-                    .rxExp()
+            getBalanceData(address)
+                    .map {
+                        if (!storage.contains(inactiveBalanceKey(address))) {
+                            storage.putAsync(inactiveBalanceKey(address), it.result)
+                        }
+                        it
+                    }
                     .switchMap(mapToDelegations())
         }
     }
@@ -107,8 +144,14 @@ class AccountStorage(
                         ReactiveExplorer.createExpErrorPlain<AddressBalanceTotal>(res.message, res.error?.code ?: 0, 0)
                 )
             }
-            addressRepo.getDelegations(res.result.address, 0)
-                    .rxExp()
+            val address = res.result.address
+            getDelegationsData(address)
+                    .map {
+                        if (!storage.contains(inactiveDelegationsKey(address))) {
+                            storage.putAsync(inactiveDelegationsKey(address), it.result)
+                        }
+                        it
+                    }
                     .map(mapDelegationsToBalances(res))
         }
     }
