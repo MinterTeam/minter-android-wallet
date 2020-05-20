@@ -28,6 +28,7 @@ package network.minter.bipwallet.wallets.utils
 
 import android.widget.TextView
 import network.minter.bipwallet.R
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.Plurals
 import org.joda.time.DateTime
@@ -59,7 +60,7 @@ object LastBlockHandler {
         }
 
 
-        val diff = Seconds.secondsBetween(timestamp, DateTime())
+        val diff = Seconds.secondsBetween(timestamp, DateTime().plusSeconds(Wallet.timeOffset()))
         val res = 0.coerceAtLeast(diff.seconds - 5)
 
 

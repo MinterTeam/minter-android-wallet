@@ -733,7 +733,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                 createGateErrorPlain(
                                         String.format("Insufficient funds: wanted %s %s",
                                                 balanceMustBe.humanize(),
-                                                mFromAccount!!.amount
+                                                mFromAccount!!.coin
                                         ),
                                         BCResult.ResultCode.InsufficientFunds.value,
                                         400

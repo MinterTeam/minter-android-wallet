@@ -31,7 +31,9 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.Seconds;
 
+import java.util.Iterator;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -41,6 +43,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasAndroidInjector;
 import network.minter.bipwallet.BuildConfig;
+import network.minter.bipwallet.internal.data.CircularFifoBuffer;
 import network.minter.bipwallet.internal.di.DaggerWalletComponent;
 import network.minter.bipwallet.internal.di.HelpersModule;
 import network.minter.bipwallet.internal.di.RepoModule;
@@ -78,6 +81,27 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
         }
 
         return MinterExplorerApi.FRONT_URL;
+    }
+
+    private static CircularFifoBuffer<Integer> sTimeOffsets = new CircularFifoBuffer<>(5);
+
+    public static int timeOffset() {
+        if (sTimeOffsets.size() == 0) {
+            return 0;
+        }
+
+        Iterator<Integer> it = sTimeOffsets.iterator();
+        float avgValue = (float) it.next();
+        while (it.hasNext()) {
+            float v = (float) it.next();
+            avgValue = (avgValue + v) / 2f;
+        }
+
+        return Seconds.seconds(Math.round(avgValue)).getSeconds();
+    }
+
+    public static void setTimeOffset(int diff) {
+        sTimeOffsets.push(diff);
     }
 
     /**

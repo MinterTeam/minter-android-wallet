@@ -29,12 +29,17 @@ package network.minter.bipwallet.apis.reactive;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
+
 import java.io.IOException;
+import java.util.Date;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.apis.dummies.ExpErrorMapped;
+import network.minter.bipwallet.internal.Wallet;
 import network.minter.core.internal.exceptions.NetworkException;
 import network.minter.explorer.MinterExplorerApi;
 import network.minter.explorer.models.ExpResult;
@@ -57,6 +62,14 @@ public final class ReactiveExplorer {
             } catch (Throwable t) {
                 emitter.onError(NetworkException.convertIfNetworking(t));
                 return;
+            }
+
+            Date serverDate = res.headers().getDate("Date");
+            if (serverDate != null) {
+                DateTime d1 = new DateTime(serverDate);
+                DateTime d2 = new DateTime();
+                Seconds diff = Seconds.secondsBetween(d2, d1);
+                Wallet.setTimeOffset(diff.getSeconds());
             }
 
             if (res.body() == null) {
