@@ -26,6 +26,7 @@
 package network.minter.bipwallet.internal.storage.models
 
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper
+import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.AddressBalance
@@ -49,7 +50,7 @@ class AddressBalanceTotal(
 
         totalBalance = source.totalBalance
         totalBalanceUSD = source.totalBalanceUSD
-        availableBalanceBIP = coins.map { it.value.bipValue }.reduce { a, b -> a + b } - delegated
+        availableBalanceBIP = coins.filter { it.value.coin == MinterSDK.DEFAULT_COIN }.map { it.value.bipValue }.reduce { a, b -> a + b }
         this.delegated = delegated
     }
 
