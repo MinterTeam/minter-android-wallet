@@ -61,6 +61,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
                 val address = bundle.getString(AddressContactEditDialog.ARG_ADDRESS, null)
                 mContact!!.address = address
                 viewState.setInputAddress(address)
+                viewState.validate()
             }
         } else {
             mContact!!.apply {
@@ -73,6 +74,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
             viewState.setTitle(R.string.dialog_title_edit_contact)
             viewState.setInputAddress(mContact!!.address)
             viewState.setInputTitle(mContact!!.name)
+            viewState.validate()
         }
 
         viewState.setUniqueValidatorForAddress(mContact?.address)
