@@ -43,8 +43,10 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.helpers.MathHelper.bdLT
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
+import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
@@ -77,7 +79,7 @@ class WalletSelector : FrameLayout {
 
         companion object {
             fun detect(balance: BigDecimal?): WalletWeight {
-                return when {
+                val ret = when {
                     bdLT(balance, BigDecimal("1000")) -> {
                         Shrimp
                     }
@@ -100,6 +102,8 @@ class WalletSelector : FrameLayout {
                         Dolphin
                     }
                 }
+                Timber.d("Balance weight: %s %s", balance?.humanize(), ret.name)
+                return ret
             }
         }
 

@@ -902,7 +902,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
                                 },
                                 { t: Throwable ->
-                                    Timber.w(t)
+                                    Timber.d(t.message)
                                     mRecipient = null
                                     viewState.setSubmitEnabled(false)
 

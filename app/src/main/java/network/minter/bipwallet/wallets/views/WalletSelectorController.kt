@@ -51,6 +51,11 @@ class WalletSelectorController @Inject constructor() {
 
     fun onFirstViewAttach() {
         fillWalletSelector(accountStorage.data)
+    }
+
+    fun attachView(view: WalletSelectorControllerView) {
+        viewState = view
+
         disposable = accountStorage.observe()
                 .subscribe(
                         {
@@ -60,10 +65,6 @@ class WalletSelectorController @Inject constructor() {
                             Timber.w(it)
                         }
                 )
-    }
-
-    fun attachView(view: WalletSelectorControllerView) {
-        viewState = view
 
         viewState!!.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->
             onSelectWallet(walletItem)

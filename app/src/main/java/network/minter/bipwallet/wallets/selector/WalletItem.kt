@@ -49,7 +49,7 @@ data class WalletItem(
         fun create(secretStorage: SecretStorage, balance: AddressBalanceTotal): WalletItem {
             val isMain = secretStorage.isMainWallet(balance.address)
             val data = secretStorage.getSecret(balance.address)
-            val weight = WalletWeight.detect(balance.totalBalance.add(balance.delegated))
+            val weight = WalletWeight.detect(balance.totalBalance + balance.delegated)
             return WalletItem(data.minterAddress, data.title, weight, isMain)
         }
 
@@ -60,7 +60,7 @@ data class WalletItem(
                 val balance = balances.find(data.minterAddress)
                 isMain = secretStorage.isMainWallet(data.minterAddress)
                 if (balance.isPresent) {
-                    val total = balance.get().totalBalance.add(balance.get().delegated)
+                    val total = balance.get().totalBalance + balance.get().delegated
                     val weight = WalletWeight.detect(total)
                     out.add(WalletItem(data.minterAddress, data.title, weight, isMain))
                 } else {

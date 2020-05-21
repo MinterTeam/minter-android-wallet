@@ -50,7 +50,12 @@ class AddressBalanceTotal(
 
         totalBalance = source.totalBalance
         totalBalanceUSD = source.totalBalanceUSD
-        availableBalanceBIP = coins.filter { it.value.coin == MinterSDK.DEFAULT_COIN }.map { it.value.bipValue }.reduce { a, b -> a + b }
+        if (coins.containsKey(MinterSDK.DEFAULT_COIN)) {
+            availableBalanceBIP = coins[MinterSDK.DEFAULT_COIN]?.amount ?: BigDecimal.ZERO
+        } else {
+            availableBalanceBIP = BigDecimal.ZERO
+        }
+
         this.delegated = delegated
     }
 
