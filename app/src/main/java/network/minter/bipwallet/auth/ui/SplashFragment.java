@@ -56,6 +56,7 @@ import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
+import timber.log.Timber;
 
 /**
  * minter-android-wallet. 2018
@@ -114,7 +115,7 @@ public class SplashFragment extends BaseInjectFragment {
                     }
 
                     startHome();
-                });
+                }, t -> Timber.w(t, "Interrupted auth"));
     }
 
     @Override

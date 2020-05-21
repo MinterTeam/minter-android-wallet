@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -48,6 +48,10 @@ public class AuthActivity extends BaseMvpInjectActivity implements SplashFragmen
     @SuppressWarnings("ConstantConditions")
     @Override
     public void showAuth(View sharedView) {
+        if (getSupportFragmentManager() == null) {
+            return;
+        }
+
         TransitionSet sharedSet = new TransitionSet();
         sharedSet.addTransition(new ChangeBounds());
         sharedSet.addTransition(new ChangeClipBounds());
