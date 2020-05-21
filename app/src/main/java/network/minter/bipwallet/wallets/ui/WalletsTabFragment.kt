@@ -166,7 +166,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun notifyUpdated() {
-        RTMBlockReceiver.send(activity!!, DateTime())
+        RTMBlockReceiver.send(activity!!, DateTime().plusSeconds(Wallet.timeOffset()))
     }
 
     override fun onTabUnselected() {
