@@ -160,10 +160,14 @@ class AccountStorage(
         return Function { delegatedResult: ExpResult<DelegationList> ->
             val out = ExpResult<AddressBalanceTotal>()
             out.error = delegatedResult.error
+
+            if (res.result == null) {
+                return@Function out
+            }
             out.result = AddressBalanceTotal(res.result, delegatedResult.meta?.additional?.delegatedAmount
                     ?: BigDecimal.ZERO)
             out.latestBlockTime = res.latestBlockTime
-            out.result.delegatedCoins = delegatedResult.result.delegations
+            out.result.delegatedCoins = delegatedResult.result?.delegations ?: HashMap()
 
             out
         }

@@ -49,7 +49,6 @@ import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.analytics.AppEvent
-import network.minter.bipwallet.apis.explorer.RepoDailyRewards
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain
 import network.minter.bipwallet.apis.reactive.rxGate
@@ -124,7 +123,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     @Inject lateinit var estimateRepo: GateEstimateRepository
     @Inject lateinit var gateTxRepo: GateTransactionRepository
     @Inject lateinit var addressBookRepo: AddressBookRepository
-    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
+//    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var walletSelectorController: WalletSelectorController
 
@@ -195,6 +194,19 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         })
         loadAndSetFee()
         accountStorage.update()
+
+        addressBookRepo
+                .findAll()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        { suggestions: List<AddressContact> ->
+                            viewState.setRecipientAutocompleteItems(suggestions)
+                        },
+                        { t2: Throwable ->
+                            Timber.w(t2)
+                        }
+                )
 
         checkRecipientContactExists()
     }
@@ -339,13 +351,17 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         viewState.setOnTextChangedListener { input, valid ->
             onInputTextChanged(input, valid)
         }
+
+        viewState.setMaxAmountValidator {
+            mFromAccount
+        }
     }
 
 
 
     private fun forceUpdate() {
         accountStorage.update(true)
-        dailyRewardsRepo.update(true)
+//        dailyRewardsRepo.update(true)
         txRepo.update(true)
     }
 
@@ -400,13 +416,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         if (mFromAccount!!.coin!!.toLowerCase() != DEFAULT_COIN.toLowerCase()) {
             return true
         }
-        val enough = MathHelper.bdGTE(amount, OperationType.SendCoin.fee)
-        if (!enough) {
-            viewState.setCommonError("Insufficient balance")
-        } else {
-            viewState.setCommonError(null)
-        }
-        return enough
+        return amount >= fee
     }
 
     private fun onAmountChanged(amount: String?) {
@@ -892,21 +902,10 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
                                 },
                                 { t: Throwable ->
+                                    Timber.w(t)
                                     mRecipient = null
                                     viewState.setSubmitEnabled(false)
-                                    addressBookRepo
-                                            .findSuggestionsByNameOrAddress(s)
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribeOn(Schedulers.io())
-                                            .subscribe(
-                                                    { suggestions: List<AddressContact> ->
-                                                        viewState.setRecipientAutocompleteItems(suggestions)
-                                                    },
-                                                    { t2: Throwable ->
-                                                        Timber.w(t)
-                                                        Timber.w(t2)
-                                                    }
-                                            )
+
                                 })
                         .disposeOnDestroy()
             }

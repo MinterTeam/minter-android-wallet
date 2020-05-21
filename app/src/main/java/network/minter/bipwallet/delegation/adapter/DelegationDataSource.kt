@@ -39,8 +39,10 @@ import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.DelegationList
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.repo.ExplorerAddressRepository
+import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 06-Jun-19
@@ -56,14 +58,21 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
-                .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
-                    factory.loadState.postValue(LoadState.Loaded)
-                    callback.onResult(res.result!!, null,
-                            if (res.meta!!.lastPage == 1) null else res.meta!!.currentPage + 1)
-                    if (res.result?.isEmpty() == true) {
-                        factory.loadState.postValue(LoadState.Empty)
-                    }
-                }
+                .subscribe(
+                        { res: ExpResult<MutableList<DelegatedItem>> ->
+                            factory.loadState.postValue(LoadState.Loaded)
+                            callback.onResult(res.result!!, null,
+                                    if (res.meta!!.lastPage == 1) null else res.meta!!.currentPage + 1)
+                            if (res.result?.isEmpty() == true) {
+                                factory.loadState.postValue(LoadState.Empty)
+                            }
+                        },
+                        { t ->
+                            Timber.w(t, "Unable to load delegations")
+                            factory.loadState.postValue(LoadState.Failed)
+                            callback.onResult(ArrayList(), null, null)
+                        }
+                )
     }
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DelegatedItem>) {
@@ -72,10 +81,17 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
-                .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
-                    factory.loadState.postValue(LoadState.Loaded)
-                    callback.onResult(res.result!!, if (params.key == 1) null else params.key - 1)
-                }
+                .subscribe(
+                        { res: ExpResult<MutableList<DelegatedItem>> ->
+                            factory.loadState.postValue(LoadState.Loaded)
+                            callback.onResult(res.result!!, if (params.key == 1) null else params.key - 1)
+                        },
+                        { t ->
+                            Timber.w(t, "Unable to load delegations")
+                            factory.loadState.postValue(LoadState.Failed)
+                            callback.onResult(ArrayList(), null)
+                        }
+                )
     }
 
     override fun loadAfter(params: LoadParams<Int>,
@@ -87,10 +103,17 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
-                .subscribe { res: ExpResult<MutableList<DelegatedItem>> ->
-                    factory.loadState.postValue(LoadState.Loaded)
-                    callback.onResult(res.result!!, if (params.key + 1 > res.meta!!.lastPage) null else params.key + 1)
-                }
+                .subscribe(
+                        { res: ExpResult<MutableList<DelegatedItem>> ->
+                            factory.loadState.postValue(LoadState.Loaded)
+                            callback.onResult(res.result!!, if (params.key + 1 > res.meta!!.lastPage) null else params.key + 1)
+                        },
+                        { t ->
+                            Timber.w(t, "Unable to load delegations")
+                            factory.loadState.postValue(LoadState.Failed)
+                            callback.onResult(ArrayList(), null)
+                        }
+                )
     }
 
     override fun invalidate() {

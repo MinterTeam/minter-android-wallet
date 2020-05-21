@@ -49,7 +49,7 @@ import network.minter.bipwallet.addressbook.models.AddressContact;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class RecipientListAdapter extends ArrayAdapter<AddressContact> implements Filterable {
-    private List<AddressContact> mItems = new ArrayList<>();
+//    private List<AddressContact> mItems = new ArrayList<>();
     private List<AddressContact> mItemsAll = new ArrayList<>();
     private List<AddressContact> mSuggestions = new ArrayList<>();
     private int mViewResourceId;
@@ -134,19 +134,17 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
     }
 
     public void setItems(List<AddressContact> items) {
-        mItems = items;
-        //noinspection unchecked
-        mItemsAll = (ArrayList<AddressContact>) ((ArrayList<AddressContact>) mItems).clone();
+        mItemsAll = items;
         mSuggestions = new ArrayList<>();
         notifyDataSetChanged();
     }
 
     private void onBindViewHolder(ViewHolder vh, int position) {
         if (mOnItemClickListener != null) {
-            vh.itemView.setOnClickListener(vv -> mOnItemClickListener.onClick(mItems.get(position), position));
+            vh.itemView.setOnClickListener(vv -> mOnItemClickListener.onClick(getItem(position), position));
         }
 
-        AddressContact item = mItems.get(position);
+        AddressContact item = getItem(position);
 
         if (item.name == null) {
             vh.title.setText(item.address);

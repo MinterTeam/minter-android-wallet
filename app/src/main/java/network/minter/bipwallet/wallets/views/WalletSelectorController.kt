@@ -27,7 +27,6 @@
 package network.minter.bipwallet.wallets.views
 
 import io.reactivex.disposables.Disposable
-import network.minter.bipwallet.apis.explorer.RepoDailyRewards
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -42,7 +41,7 @@ class WalletSelectorController @Inject constructor() {
     @Inject lateinit var secretStorage: SecretStorage
     @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var txRepo: RepoTransactions
-    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
+//    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
 
     var onWalletSelected: ((WalletItem) -> Unit)? = null
 
@@ -88,11 +87,12 @@ class WalletSelectorController @Inject constructor() {
     }
 
     private fun onAddedWallet(walletItem: WalletItem) {
+        onWalletSelected?.invoke(walletItem)
         viewState?.setMainWallet(walletItem)
         fillWalletSelector(accountStorage.data)
         accountStorage.update(true)
         txRepo.update(true)
-        dailyRewardsRepo.update(true)
+//        dailyRewardsRepo.update(true)
     }
 
     private fun onSelectWallet(walletItem: WalletItem) {
@@ -102,7 +102,7 @@ class WalletSelectorController @Inject constructor() {
 
         accountStorage.update(true)
         txRepo.update(true)
-        dailyRewardsRepo.update(true)
+//        dailyRewardsRepo.update(true)
 
         onWalletSelected?.invoke(walletItem)
     }
@@ -123,7 +123,7 @@ class WalletSelectorController @Inject constructor() {
         fillWalletSelector(accountStorage.data)
         accountStorage.update(true)
         txRepo.update(true)
-        dailyRewardsRepo.update(true)
+//        dailyRewardsRepo.update(true)
 
     }
 

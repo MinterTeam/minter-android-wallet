@@ -40,6 +40,7 @@ import android.view.ViewGroup
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
+import com.edwardstock.inputfield.form.validators.CustomValidator
 import com.edwardstock.inputfield.form.validators.EmptyValidator
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -53,6 +54,7 @@ import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
@@ -126,7 +128,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputGroup.addValidator(inputAmount, EmptyValidator().apply { errorMessage = "Amount can't be empty" })
             inputGroup.addFilter(inputAmount, DecimalInputFilter(inputAmount))
             inputGroup.addFilter(inputRecipient, NewLineInputFilter())
-            inputRecipient.input.threshold = 1
+            inputRecipient.input.threshold = 0
 
             inputRecipient.clearFocus()
             inputAmount.clearFocus()
@@ -146,6 +148,17 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputRecipient.input.setAdapter(recipientListAdapter)
         }
         return binding.root
+    }
+
+    override fun setMaxAmountValidator(coinSupplier: () -> CoinBalance?) {
+        inputGroup.addValidator(binding.inputAmount, CustomValidator {
+            if (it.isNullOrEmpty() || coinSupplier() == null) {
+                return@CustomValidator true
+            }
+
+            val num = it.parseBigDecimal()
+            num <= coinSupplier()!!.amount
+        }.apply { errorMessage = "Not enough coins" })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -300,13 +313,17 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setCommonError(error: CharSequence?) {
-        binding.textError.visible = !error.isNullOrEmpty()
-        binding.textError.text = error
+        binding.textError.post {
+            binding.textError.visible = !error.isNullOrEmpty()
+            binding.textError.text = error
+        }
     }
 
     override fun setError(error: Int) {
-        binding.textError.visible = error != 0
-        binding.textError.setText(error)
+        binding.textError.post {
+            binding.textError.visible = error != 0
+            binding.textError.setText(error)
+        }
     }
 
     override fun setAmount(amount: CharSequence?) {
@@ -391,12 +408,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startAddContact(address: String) {
+        if (fragmentManager == null) {
+            return
+        }
+
         if (bottomSheetDialog != null) {
             bottomSheetDialog!!.dismiss()
             bottomSheetDialog = null
-        }
-        if (fragmentManager == null) {
-            return
         }
         bottomSheetDialog = AddressContactEditDialog.Builder()
                 .setAddress(address)

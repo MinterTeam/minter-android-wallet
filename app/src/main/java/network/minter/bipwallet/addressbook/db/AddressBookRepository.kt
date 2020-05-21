@@ -126,7 +126,7 @@ class AddressBookRepository(
 
     @JvmOverloads
     fun countLikeByNameOrAddress(nameOrAddress: String, exclude: String? = null): Single<Int> {
-        val likeArg = String.format("%%%s%%", nameOrAddress)
+        val likeArg = String.format("%s%%", nameOrAddress)
 
         if (exclude != null) {
             return db.addressBook().countByNameOrAddress(likeArg, exclude)
@@ -158,7 +158,7 @@ class AddressBookRepository(
     }
 
     fun findSuggestionsByNameOrAddress(nameOrAddress: String?): Maybe<List<AddressContact>> {
-        val likeArg = String.format("%%%s%%", nameOrAddress)
+        val likeArg = String.format("%s%%", nameOrAddress)
         return db.addressBook().findByNameOrAddress(likeArg)
                 .subscribeOn(Schedulers.io())
     }

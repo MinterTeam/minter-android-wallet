@@ -60,7 +60,10 @@ public final class ReactiveExplorer {
             try {
                 res = call.execute();
             } catch (Throwable t) {
-                emitter.onError(NetworkException.convertIfNetworking(t));
+                if (!emitter.isDisposed()) {
+                    emitter.onError(NetworkException.convertIfNetworking(t));
+                }
+
                 return;
             }
 

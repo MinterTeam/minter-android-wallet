@@ -32,7 +32,6 @@ import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import moxy.InjectViewState
 import network.minter.bipwallet.R
-import network.minter.bipwallet.apis.explorer.RepoDailyRewards
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman
@@ -64,7 +63,7 @@ import javax.inject.Inject
 @InjectViewState
 class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabView>() {
     @Inject lateinit var accountStorage: RepoAccounts
-    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
+//    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
     @Inject lateinit var addressRepo: ExplorerAddressRepository
     @Inject lateinit var secretStorage: SecretStorage
     @Inject lateinit var txRepo: RepoTransactions
