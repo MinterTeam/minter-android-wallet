@@ -61,7 +61,6 @@ import network.minter.bipwallet.internal.helpers.MathHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.normalize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
-import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -157,19 +156,15 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 tmpPayload = tmp
             }
             mPayload = tmpPayload
-            val validator = IsNotMnemonicValidator("""
-    ATTENTION: You are about to send seed phrase in the message attached to this transaction.
 
-    If you do this, anyone will be able to see it and access your funds!
-    """.trimIndent(), false)
-            validator.validate(String(mPayload!!))
-                    .subscribe { res: Boolean? ->
-                        if (!res!!) {
-                            viewState.setPayloadError(validator.errorMessage)
-                        } else {
-                            viewState.setPayloadError(null)
-                        }
-                    }
+//            validator.validate(String(mPayload!!))
+//                    .subscribe { res: Boolean? ->
+//                        if (!res!!) {
+//                            viewState.setCommonError(validator.errorMessage)
+//                        } else {
+//                            viewState.setCommonError(null)
+//                        }
+//                    }
             setupFee()
         }
     }

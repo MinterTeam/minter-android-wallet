@@ -59,6 +59,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
+import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
@@ -128,6 +129,15 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputGroup.addValidator(inputAmount, EmptyValidator().apply { errorMessage = "Amount can't be empty" })
             inputGroup.addFilter(inputAmount, DecimalInputFilter(inputAmount))
             inputGroup.addFilter(inputRecipient, NewLineInputFilter())
+
+            val payloadMnemonicValidator = IsNotMnemonicValidator("""
+    ATTENTION: You are about to send seed phrase in the message attached to this transaction.
+
+    If you do this, anyone will be able to see it and access your funds!
+    """.trimIndent())
+            inputGroup.addValidator(inputPayload, payloadMnemonicValidator)
+
+
             inputRecipient.input.threshold = 0
 
             inputRecipient.clearFocus()

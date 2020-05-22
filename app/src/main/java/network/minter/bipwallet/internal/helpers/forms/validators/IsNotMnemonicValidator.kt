@@ -31,9 +31,8 @@ import io.reactivex.Single
 import network.minter.core.bip39.NativeBip39
 
 class IsNotMnemonicValidator(
-        errorMessage: CharSequence,
-        required: Boolean = true
-) : BaseValidator(errorMessage, required) {
+        errorMessage: CharSequence
+) : BaseValidator(errorMessage, true, true) {
 
     override fun validate(value: CharSequence?): Single<Boolean> {
         if (!isRequired && value.isNullOrEmpty()) {

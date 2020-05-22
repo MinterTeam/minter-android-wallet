@@ -89,7 +89,7 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
         inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
         inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s](.{1,18})$").apply {
             errorMessage = "Invalid title format"
-            isRequired = false
+            isRequired = true
         })
 
         inputGroup.addValidator(binding.inputTitle, LengthValidator(1, 18).apply {
