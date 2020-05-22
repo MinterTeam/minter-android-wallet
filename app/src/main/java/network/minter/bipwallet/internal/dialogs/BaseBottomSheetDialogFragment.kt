@@ -84,6 +84,7 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
             }
 
         })
+        d.behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         if (d.window != null) {
             val params = d.window!!.attributes
