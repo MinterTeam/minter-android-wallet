@@ -40,6 +40,7 @@ import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.HistoryTransaction
 import network.minter.explorer.repo.ExplorerTransactionRepository
 import retrofit2.Response
+import timber.log.Timber
 
 /**
  * minter-android-wallet. 2018
@@ -63,6 +64,7 @@ class CacheTxRepository(
     }
 
     override fun getUpdatableData(): Observable<List<HistoryTransaction>> {
+        Timber.d("Get transactions for %s", secretStorage.mainWallet)
         return instantService
                 .getTransactions(
                         listOf(secretStorage.mainWallet).map { it.toString() }.toList(),
@@ -72,7 +74,12 @@ class CacheTxRepository(
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { res: ExpResult<MutableList<HistoryTransaction>?> ->
                     if (res.result != null) {
+                        Timber.d("Transactions count: %d", res.result!!.size)
                         return@map res.result!!
+                    }
+                    Timber.w("Result is null")
+                    if (res.error != null) {
+                        Timber.e(res.error.message)
                     }
                     getData()
                 }
@@ -126,7 +133,7 @@ class CacheTxRepository(
     }
 
     override fun onAfterUpdate(result: List<HistoryTransaction>) {
-        storage.putAsync(KEY_TRANSACTIONS, result)
+        storage.put(KEY_TRANSACTIONS, result)
     }
 
     override fun onClear() {

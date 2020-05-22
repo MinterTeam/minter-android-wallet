@@ -103,7 +103,7 @@ class AccountStorage(
         get() = getData()
 
     override fun onAfterUpdate(result: AddressListBalancesTotal) {
-        storage.putAsync(KEY_BALANCE, result)
+        storage.put(KEY_BALANCE, result)
     }
 
     override fun onClear() {
@@ -128,9 +128,7 @@ class AccountStorage(
         return Function { address: MinterAddress ->
             getBalanceData(address)
                     .map {
-                        if (!storage.contains(inactiveBalanceKey(address))) {
-                            storage.putAsync(inactiveBalanceKey(address), it.result)
-                        }
+                        storage.putAsync(inactiveBalanceKey(address), it.result)
                         it
                     }
                     .switchMap(mapToDelegations())
@@ -147,9 +145,7 @@ class AccountStorage(
             val address = res.result.address
             getDelegationsData(address)
                     .map {
-                        if (!storage.contains(inactiveDelegationsKey(address))) {
-                            storage.putAsync(inactiveDelegationsKey(address), it.result)
-                        }
+                        storage.putAsync(inactiveDelegationsKey(address), it.result)
                         it
                     }
                     .map(mapDelegationsToBalances(res))

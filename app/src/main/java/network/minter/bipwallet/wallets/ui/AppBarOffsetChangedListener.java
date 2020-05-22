@@ -39,6 +39,11 @@ public abstract class AppBarOffsetChangedListener implements AppBarLayout.OnOffs
 
     @Override
     public final void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        if (appBarLayout.getTotalScrollRange() == 0) {
+            onStateChanged(appBarLayout, State.EXPANDED, verticalOffset, 1f);
+            return;
+        }
+
         float percent = 1.0f - (((float) Math.abs(verticalOffset)) / ((float) appBarLayout.getTotalScrollRange()));
 
         if (verticalOffset == 0) {

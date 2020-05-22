@@ -80,4 +80,6 @@ interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
     fun startScanQR(requestCode: Int)
 
     fun notifyUpdated()
+
+    fun showBalanceProgress(show: Boolean)
 }

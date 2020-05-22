@@ -91,6 +91,17 @@
                         android:orientation="vertical"
                         app:layout_constraintGuide_end="@dimen/margin_edges" />
 
+                    <ProgressBar
+                        android:id="@+id/balance_progress"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/white"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/guide_margin_top" />
+
                     <TextView
                         android:id="@+id/balance_label"
                         android:layout_width="wrap_content"
@@ -100,8 +111,8 @@
                         android:text="Available Balance"
                         android:textColor="@color/white70"
                         android:textSize="@dimen/text_size_13"
-                        app:layout_constraintStart_toStartOf="@id/guide_margin_left"
                         app:layout_constraintEnd_toStartOf="@id/balance_updated_label"
+                        app:layout_constraintStart_toStartOf="@id/guide_margin_left"
                         app:layout_constraintTop_toTopOf="@id/guide_margin_top" />
 
                     <TextView
@@ -178,7 +189,6 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <TextView
-                        android:visibility="gone"
                         android:id="@+id/balance_today"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -186,6 +196,7 @@
                         android:fontFamily="@font/_inter_semi_bold"
                         android:fontFeatureSettings="@string/inter_zeroes"
                         android:textColor="@color/textColorGreen"
+                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
                         app:layout_constraintTop_toBottomOf="@id/balance_container"
@@ -196,11 +207,11 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_edges_medium"
-                        app:layout_goneMarginTop="20dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         app:layout_constraintEnd_toEndOf="@id/guide_margin_right"
                         app:layout_constraintStart_toStartOf="@id/guide_margin_left"
-                        app:layout_constraintTop_toBottomOf="@id/balance_today">
+                        app:layout_constraintTop_toBottomOf="@id/balance_today"
+                        app:layout_goneMarginTop="20dp">
 
                         <TextView
                             android:id="@+id/delegated_hint"
@@ -267,17 +278,17 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:alpha="0"
-                        tools:alpha="0.5"
                         android:background="@color/white"
                         android:clickable="false"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:visibility="gone"
-                        tools:visibility="visible"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:alpha="0.5"
+                        tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

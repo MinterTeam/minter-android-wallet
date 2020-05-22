@@ -39,6 +39,7 @@ import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.TxsTabPageView
 import network.minter.bipwallet.wallets.utils.HistoryTransactionDiffUtil
 import network.minter.explorer.models.HistoryTransaction
+import timber.log.Timber
 import javax.inject.Inject
 
 @InjectViewState
@@ -62,6 +63,7 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
         }
         viewState.setAdapter(adapter!!)
         viewState.setListTitle("Latest Transactions")
+        viewState.setEmptyTitle("No transactions yet")
         viewState.setActionTitle(R.string.btn_all_txs)
         viewState.setOnActionClickListener(View.OnClickListener {
             onClickOpenTransactions()
@@ -75,6 +77,7 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                 .switchMap { items: List<TransactionFacade> -> TransactionDataSource.mapValidatorsInfo(validatorsRepo, items) }
                 .subscribe(
                         { res: List<TransactionFacade> ->
+                            Timber.d("Updated txs")
                             adapter!!.dispatchChanges(HistoryTransactionDiffUtil::class.java, res, true)
                             if (adapter!!.itemCount == 0) {
                                 viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Empty)

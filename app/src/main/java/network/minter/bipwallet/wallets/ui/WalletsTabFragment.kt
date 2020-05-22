@@ -26,6 +26,7 @@
 package network.minter.bipwallet.wallets.ui
 
 import android.Manifest
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
@@ -56,6 +57,7 @@ import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
@@ -149,6 +151,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
             }
         })
         binding.walletSelector.registerLifecycle(activity!!)
+        CollapsingToolbarScrollDisabler(binding)
 
         LastBlockHandler.handle(binding.balanceUpdatedLabel, null, LastBlockHandler.ViewType.Main)
         val broadcastManager = BroadcastReceiverManager(activity!!)
@@ -163,6 +166,30 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         binding.toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
         setupTabAdapter()
         return binding.root
+    }
+
+    override fun showBalanceProgress(show: Boolean) {
+        binding.balanceProgress.postApply {
+
+            it.animate()
+                    .alpha(if (show) 1f else 0f)
+                    .setListener(object : Animator.AnimatorListener {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            it.visible = show
+                        }
+
+                        override fun onAnimationRepeat(animation: Animator?) {}
+                        override fun onAnimationCancel(animation: Animator?) {
+                            it.visible = show
+                        }
+
+                        override fun onAnimationStart(animation: Animator?) {}
+                    })
+                    .setDuration(150)
+                    .start()
+
+        }
+        binding.balanceProgress.visible = show
     }
 
     override fun notifyUpdated() {

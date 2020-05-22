@@ -88,12 +88,11 @@ class WalletSelectorController @Inject constructor() {
     }
 
     private fun onAddedWallet(walletItem: WalletItem) {
-        onWalletSelected?.invoke(walletItem)
         viewState?.setMainWallet(walletItem)
         fillWalletSelector(accountStorage.data)
         accountStorage.update(true)
         txRepo.update(true)
-//        dailyRewardsRepo.update(true)
+        onWalletSelected?.invoke(walletItem)
     }
 
     private fun onSelectWallet(walletItem: WalletItem) {
@@ -103,8 +102,6 @@ class WalletSelectorController @Inject constructor() {
 
         accountStorage.update(true)
         txRepo.update(true)
-//        dailyRewardsRepo.update(true)
-
         onWalletSelected?.invoke(walletItem)
     }
 

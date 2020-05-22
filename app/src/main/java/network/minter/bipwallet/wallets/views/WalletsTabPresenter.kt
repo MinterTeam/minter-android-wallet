@@ -74,6 +74,9 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         walletSelectorController.onFirstViewAttach()
+        walletSelectorController.onWalletSelected = {
+            viewState.showBalanceProgress(true)
+        }
 
         Timber.d("DAILY_REWARDS begin observe")
 //        if (dailyRewardsRepo.isDataReady) {
@@ -87,20 +90,6 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
             } catch (t: Throwable) {
             }
         }
-//        dailyRewardsRepo
-//                .retryWhen(errorResolver)
-//                .observe()
-//                .joinToUi()
-//                .subscribe(
-//                        { res: RewardStatistics ->
-//                            Timber.d("DAILY_REWARDS loaded")
-//                            onDailyRewardsReady(res)
-//                        },
-//                        {
-//                            viewState.hideProgress()
-//                            Timber.w(it)
-//                        }
-//                ).disposeOnDestroy()
 
         accountStorage
                 .retryWhen(errorResolver)
@@ -112,14 +101,15 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                             viewState.notifyUpdated()
                             onBalanceReady(res)
                             viewState.hideRefreshProgress()
+                            viewState.showBalanceProgress(false)
                         },
                         {
                             Timber.e(it)
                             viewState.hideProgress()
+                            viewState.showBalanceProgress(false)
                         }
                 ).disposeOnDestroy()
 
-//        dailyRewardsRepo.update()
         accountStorage.update()
     }
 
@@ -228,6 +218,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
     }
 
     private fun onRefresh() {
+        viewState.showBalanceProgress(true)
         forceUpdate()
     }
 

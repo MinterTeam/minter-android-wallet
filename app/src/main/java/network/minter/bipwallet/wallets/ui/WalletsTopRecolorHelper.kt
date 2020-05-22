@@ -44,7 +44,7 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
     private val mCollapsedStatusColor = -0x1
     private val mCollapsedTextColor = -0x1000000
     private val mCollapsedDropdownColor: Int
-    private val mElevation: Float
+    private var mElevation: Float = 0.0f
     private val mExpandedToolbarIconsColor = -0x1
     private val mCollapsedToolbarIconsColor: Int
     private val mRef: WeakReference<WalletsTabFragment> = WeakReference(fragment)

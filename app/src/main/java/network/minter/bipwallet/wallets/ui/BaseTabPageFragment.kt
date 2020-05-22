@@ -57,12 +57,12 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
         super.onAttach(context)
     }
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPageWalletsBinding.inflate(inflater, container, false)
 
         binding.list.layoutManager = LinearLayoutManager(context)
         binding.list.addOnScrollListener(ViewElevationOnScroll(binding.top))
-//        binding.list.isNestedScrollingEnabled = false
         return binding.root
     }
 
@@ -83,6 +83,8 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
                 binding.action.visibility = View.GONE
                 binding.emptyTitle.visibility = View.VISIBLE
                 binding.progress.visibility = View.GONE
+                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
+
             }
             ViewStatus.Error -> {
                 binding.list.visibility = View.GONE
@@ -90,14 +92,18 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
                 binding.emptyTitle.visibility = View.VISIBLE
                 binding.emptyTitle.text = error ?: "Unexpected error"
                 binding.progress.visibility = View.GONE
+                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
             }
             ViewStatus.Normal -> {
                 binding.list.visibility = View.VISIBLE
                 binding.action.visibility = View.VISIBLE
                 binding.emptyTitle.visibility = View.GONE
                 binding.progress.visibility = View.GONE
+                CollapsingToolbarScrollDisabler.bindRecycler(binding.list, javaClass)
             }
         }
+
+
     }
 
     override fun setListTitle(title: CharSequence) {
