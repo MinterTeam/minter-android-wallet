@@ -173,7 +173,10 @@ object MathHelper {
         return formatDecimalCurrency(out, 4, true)
     }
 
-    fun BigDecimal.humanize(): String {
+    fun BigDecimal.humanize(enable: Boolean = true): String {
+        if (!enable) {
+            return toPlainString()
+        }
         return bdHuman(this)
     }
 

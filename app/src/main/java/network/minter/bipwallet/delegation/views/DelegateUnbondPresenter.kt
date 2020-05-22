@@ -247,7 +247,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             viewState.startDialog {
                 TxConfirmStartDialog.Builder(it, type.titleRes)
                         .setFirstLabel(type.firstLabelRes)
-                        .setFirstValue(amount)
+                        .setFirstValue(amount.humanize(!useMax))
                         .setFirstCoin(fromAccount!!.coin!!)
                         .setSecondLabel(type.secondLabelRes)
                         .setSecondValueText(validatorFullName)

@@ -53,13 +53,13 @@ private constructor(context: Context, private val builder: Builder) : WalletDial
 
         binding.apply {
             dialogFirstLabel.text = builder.firstLabel
-            dialogFirstValue.text = String.format("%s %s", builder.firstValue!!.humanize(), builder.firstCoin)
+            dialogFirstValue.text = String.format("%s %s", builder.firstValue, builder.firstCoin)
             dialogSecondLabel.text = builder.secondLabel
 
             if (builder.secondValueText != null) {
                 dialogSecondValue.text = builder.secondValueText
             } else {
-                dialogSecondValue.text = String.format("%s %s", builder.secondValue!!.humanize(), builder.secondCoin)
+                dialogSecondValue.text = String.format("%s %s", builder.secondValue!!, builder.secondCoin)
             }
 
             builder.bindAction(this@TxConfirmStartDialog, actionConfirm, DialogInterface.BUTTON_POSITIVE)
@@ -70,10 +70,10 @@ private constructor(context: Context, private val builder: Builder) : WalletDial
 
     class Builder : WalletDialogBuilder<TxConfirmStartDialog, Builder> {
         var firstLabel: CharSequence? = null
-        var firstValue: BigDecimal? = null
+        var firstValue: String? = null
         var firstCoin: String? = null
         var secondLabel: CharSequence? = null
-        var secondValue: BigDecimal? = null
+        var secondValue: String? = null
         var secondValueText: CharSequence? = null
         var secondCoin: String? = null
 
@@ -109,21 +109,22 @@ private constructor(context: Context, private val builder: Builder) : WalletDial
         }
 
         fun setFirstValue(decimal: String): Builder {
-            return setFirstValue(BigDecimal(decimal))
+            firstValue = decimal
+            return this
         }
 
         fun setFirstValue(amount: BigDecimal): Builder {
-            firstValue = amount
+            firstValue = amount.humanize()
             return this
         }
 
         fun setSecondValue(value: BigDecimal): Builder {
-            secondValue = value
+            secondValue = value.humanize()
             return this
         }
 
         fun setSecondValue(decimal: String): Builder {
-            secondValue = BigDecimal(decimal)
+            secondValue = decimal
             return this
         }
 

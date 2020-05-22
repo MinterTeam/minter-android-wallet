@@ -478,7 +478,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 analytics.send(AppEvent.SendCoinPopupScreen)
 
                 val dialog = TxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
-                        .setAmount(mAmount)
+                        .setAmount(mAmount, !mUseMax.get())
                         .setRecipientName(mRecipient!!.name)
                         .setCoin(mFromAccount!!.coin)
                         .setPositiveAction(R.string.btn_confirm) { d, _ ->

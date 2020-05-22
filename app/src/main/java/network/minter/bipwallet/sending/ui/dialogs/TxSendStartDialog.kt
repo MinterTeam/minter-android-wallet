@@ -33,9 +33,10 @@ import network.minter.bipwallet.databinding.DialogTxSendStartBinding
 import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder
-import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.core.MinterSDK
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 
 /**
  * minter-android-wallet. 2018
@@ -52,7 +53,8 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
 
         binding.apply {
             title.text = builder.title
-            dialogFirstValue.text = String.format("%s %s", bdHuman(builder.amount!!), builder.coin)
+            dialogFirstValue.text = String.format("%s %s", (builder.amount
+                    ?: ZERO).humanize(builder.humanize), builder.coin)
             dialogSecondValue.text = builder.recipient
 
             builder.bindAction(this@TxSendStartDialog, actionConfirm, DialogInterface.BUTTON_POSITIVE)
@@ -62,6 +64,7 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
 
     class Builder : WalletDialogBuilder<TxSendStartDialog, Builder> {
         var amount: BigDecimal? = null
+        var humanize = true
         var recipient: CharSequence? = null
         var coin = MinterSDK.DEFAULT_COIN
 
@@ -72,8 +75,9 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
             return setAmount(BigDecimal(decimalString).setScale(18, BigDecimal.ROUND_UNNECESSARY))
         }
 
-        fun setAmount(amount: BigDecimal?): Builder {
+        fun setAmount(amount: BigDecimal?, humanize: Boolean = true): Builder {
             this.amount = amount
+            this.humanize = humanize
             return this
         }
 

@@ -155,7 +155,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
         viewState.setOnClickSelectAccount(View.OnClickListener { view: View -> onClickSelectAccount(view) })
         viewState.setOnClickMaximum(View.OnClickListener { onClickMaximum() })
-        viewState.setOnClickSubmit(View.OnClickListener { onClickSubmit() })
+        viewState.setOnClickSubmit(View.OnClickListener { onSubmit() })
         setCoinsAutocomplete()
     }
 
@@ -444,7 +444,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
-    private fun onClickSubmit() {
+    private fun onSubmit() {
         if (mAccount == null || mBuyCoin == null || mBuyAmount == null || mSellAmount == null) {
             return
         }
@@ -471,7 +471,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.startDialog { ctx ->
             TxConfirmStartDialog.Builder(ctx, R.string.dialog_title_exchange_begin)
                     .setFirstLabel(R.string.dialog_label_exchange_you_will_spend)
-                    .setFirstValue(mSellAmount!!)
+                    .setFirstValue(mSellAmount!!.humanize(!mUseMax.get()))
                     .setFirstCoin(mAccount!!.coin!!)
                     .setSecondLabel(R.string.dialog_label_exchange_to_get)
                     .setSecondValue(mBuyAmount!!)
