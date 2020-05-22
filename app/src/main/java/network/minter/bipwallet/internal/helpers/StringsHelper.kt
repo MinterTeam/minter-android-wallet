@@ -27,6 +27,7 @@ package network.minter.bipwallet.internal.helpers
 
 import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.Wallet
+import java.nio.charset.StandardCharsets
 
 data class RegexReplaceData(
         val pattern: Regex,
@@ -90,5 +91,27 @@ object StringsHelper {
             return sb.toString()
         }
         return null
+    }
+
+    fun utfStringSliceToBytes(s: String, rend: Int): ByteArray {
+        var tmpPayload = s.toByteArray(StandardCharsets.UTF_8)
+        val totalBytes = tmpPayload.size
+
+        if (totalBytes <= rend) {
+            return tmpPayload
+        }
+
+        if (totalBytes > rend) {
+            val tmp: ByteArray = tmpPayload.sliceArray(IntRange(0, rend - 1))
+            val resString = String(tmp, StandardCharsets.UTF_8)
+
+            if (resString.toByteArray(StandardCharsets.UTF_8).size > rend) {
+                return utfStringSliceToBytes(resString, rend - 1)
+            }
+
+            tmpPayload = tmp
+        }
+
+        return tmpPayload
     }
 }

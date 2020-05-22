@@ -61,6 +61,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.normalize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
+import network.minter.bipwallet.internal.helpers.StringsHelper.utfStringSliceToBytes
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -94,7 +95,6 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
 import java.math.BigInteger
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -145,27 +145,17 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private var handleAutocomplete: Boolean = true
     private var mFormValid = false
 
+    private var handlePayloadChanges = true
     private val mPayloadChangeListener: TextWatcher = object : SimpleTextWatcher() {
         override fun afterTextChanged(s: Editable) {
-            var tmpPayload = s.toString().toByteArray(StandardCharsets.UTF_8)
-            val totalBytes = tmpPayload.size
-            if (totalBytes > PayloadValidator.MAX_PAYLOAD_LENGTH) {
-                val tmp = ByteArray(1024)
-                System.arraycopy(tmpPayload, 0, tmp, 0, 1024)
-                viewState.setPayload(String(tmp, StandardCharsets.UTF_8))
-                tmpPayload = tmp
-            }
-            mPayload = tmpPayload
+            if (!handlePayloadChanges) return
+            handlePayloadChanges = false
 
-//            validator.validate(String(mPayload!!))
-//                    .subscribe { res: Boolean? ->
-//                        if (!res!!) {
-//                            viewState.setCommonError(validator.errorMessage)
-//                        } else {
-//                            viewState.setCommonError(null)
-//                        }
-//                    }
+            mPayload = utfStringSliceToBytes(s.toString(), PayloadValidator.MAX_PAYLOAD_LENGTH)
+            viewState.setPayload(String(mPayload!!))
+
             setupFee()
+            handlePayloadChanges = true
         }
     }
 
