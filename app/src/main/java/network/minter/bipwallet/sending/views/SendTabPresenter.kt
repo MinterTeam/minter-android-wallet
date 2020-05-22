@@ -174,7 +174,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
-
     override fun attachView(view: SendView) {
         walletSelectorController.attachView(view)
         walletSelectorController.onWalletSelected = {
