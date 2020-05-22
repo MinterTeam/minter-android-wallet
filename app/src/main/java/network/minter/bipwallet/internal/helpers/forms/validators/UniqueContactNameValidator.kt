@@ -47,11 +47,9 @@ class UniqueContactNameValidator(
     }
 
     override fun validate(value: CharSequence?): Single<Boolean> {
-        if (!isRequired && (value == null || value.isEmpty())) {
+        if (value.isNullOrEmpty()) {
             return Single.just(true)
         }
-
-        if (value == null || value.isEmpty()) return Single.just(false)
 
         return when (findBy) {
             FindBy.Name -> {

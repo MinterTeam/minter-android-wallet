@@ -33,6 +33,7 @@ import android.view.ViewGroup
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.LengthValidator
+import com.edwardstock.inputfield.form.validators.RegexValidator
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -82,10 +83,14 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
         binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 
         inputGroup.addInput(binding.inputAddress)
-        inputGroup.addValidator(binding.inputAddress, MinterAddressOrPubKeyValidator())
+        inputGroup.addValidator(binding.inputAddress, MinterAddressOrPubKeyValidator("Incorrect address format"))
 
         inputGroup.addInput(binding.inputTitle)
         inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
+        inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s](.{1,18})$").apply {
+            errorMessage = "Invalid title format"
+            isRequired = false
+        })
 
         inputGroup.addValidator(binding.inputTitle, LengthValidator(1, 18).apply {
             errorMessage = "Title length should be from 1 to 18 symbols"

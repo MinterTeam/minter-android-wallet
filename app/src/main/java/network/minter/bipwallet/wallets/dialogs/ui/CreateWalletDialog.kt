@@ -36,6 +36,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
+import com.edwardstock.inputfield.form.validators.RegexValidator
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -99,6 +100,10 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
 
             inputGroup.addInput(inputTitle)
             inputGroup.addFilter(inputTitle, TitleInputFilter())
+            inputGroup.addValidator(inputTitle, RegexValidator("^[^\\s](.{0,18})$").apply {
+                errorMessage = "Invalid title format"
+                isRequired = false
+            })
             inputGroup.addValidator(inputTitle, UniqueWalletTitleValidator())
         }
 
