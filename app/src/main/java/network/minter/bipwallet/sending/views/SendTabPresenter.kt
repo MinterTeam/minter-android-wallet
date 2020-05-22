@@ -162,6 +162,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     override fun attachView(view: SendView) {
         walletSelectorController.attachView(view)
         walletSelectorController.onWalletSelected = {
+            viewState.showBalanceProgress(true)
             viewState.clearAmount()
         }
         super.attachView(view)
@@ -287,6 +288,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        viewState.showBalanceProgress(true)
         walletSelectorController.onFirstViewAttach()
         accountStorage
                 .retryWhen(errorResolver)
@@ -302,9 +304,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     onAccountSelected(acc.coinsList[0])
                                 }
                             }
+                            viewState.showBalanceProgress(false)
                         },
                         { t: Throwable ->
                             viewState.onError(t)
+                            viewState.showBalanceProgress(false)
                         }
                 )
                 .disposeOnDestroy()

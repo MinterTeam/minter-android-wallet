@@ -100,6 +100,7 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun showPayload()
     fun hidePayload()
     fun setMaxAmountValidator(coinSupplier: () -> CoinBalance?)
+    fun showBalanceProgress(show: Boolean)
 
 
 }

@@ -26,6 +26,7 @@
 package network.minter.bipwallet.sending.ui
 
 import android.Manifest
+import android.animation.Animator
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -357,6 +358,30 @@ class SendTabFragment : HomeTabFragment(), SendView {
             recipientListAdapter!!.setItems(items)
             it.input.showDropDown()
         }
+    }
+
+    override fun showBalanceProgress(show: Boolean) {
+        binding.balanceProgress.postApply {
+
+            it.animate()
+                    .alpha(if (show) 1f else 0f)
+                    .setListener(object : Animator.AnimatorListener {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            it.visible = show
+                        }
+
+                        override fun onAnimationRepeat(animation: Animator?) {}
+                        override fun onAnimationCancel(animation: Animator?) {
+                            it.visible = show
+                        }
+
+                        override fun onAnimationStart(animation: Animator?) {}
+                    })
+                    .setDuration(150)
+                    .start()
+
+        }
+        binding.balanceProgress.visible = show
     }
 
     override fun hideAutocomplete() {
