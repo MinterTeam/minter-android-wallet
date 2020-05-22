@@ -87,6 +87,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
             ConfirmDialog.Builder(ctx, R.string.dialog_title_remove_address)
                     .setText(HtmlCompat.fromHtml(ctx.getString(R.string.dialog_description_remove_address, contact.shortAddress)))
                     .setTextTypeface(R.font._inter_regular)
+                    .setPositiveActionStyle(R.style.Wallet_Button_Green)
                     .setPositiveAction(R.string.btn_confirm) { d, _ ->
                         addressBookRepo.delete(contact)
                                 .observeOn(AndroidSchedulers.mainThread())
