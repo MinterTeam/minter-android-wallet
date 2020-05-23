@@ -48,6 +48,11 @@ import network.minter.bipwallet.R
 
 typealias DialogFragmentExecutor = (ctx: Context) -> WalletDialogFragment
 
+fun <T : WalletDialogFragment?> T?.isVisible(): Boolean {
+    if (this == null) return false
+    return isAdded
+}
+
 abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
     companion object {
         @JvmStatic
@@ -125,5 +130,9 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
         dismissListeners.add(listener)
     }
 
-
+    fun removeOnDismissListener(listener: DialogInterface.OnDismissListener) {
+        if (dismissListeners.contains(listener)) {
+            dismissListeners.remove(listener)
+        }
+    }
 }

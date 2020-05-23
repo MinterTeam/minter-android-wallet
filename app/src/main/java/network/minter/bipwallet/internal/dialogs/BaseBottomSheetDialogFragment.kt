@@ -98,10 +98,6 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         return d
     }
 
-    open fun collapse() {
-        collapse(true)
-    }
-
     protected var internalState = BottomSheetBehavior.STATE_EXPANDED
 
     protected val root: ViewGroup?
@@ -109,10 +105,15 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
             return view?.parent as ViewGroup
         }
 
+    open fun collapse() {
+        collapse(true)
+    }
+
     open fun collapse(animate: Boolean = true, onCollapsed: (() -> Unit)? = null) {
         Timber.d("Sheet COLLAPSE(anim=%b)", animate)
 
         if (internalState != BottomSheetBehavior.STATE_EXPANDED || root == null) {
+            onCollapsed?.invoke()
             return
         }
         internalState = BottomSheetBehavior.STATE_COLLAPSED
@@ -160,6 +161,7 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
 
     open fun expand(force: Boolean = false, onExpanded: (() -> Unit)? = null) {
         if (internalState != BottomSheetBehavior.STATE_COLLAPSED || root == null) {
+            onExpanded?.invoke()
             return
         }
         internalState = BottomSheetBehavior.STATE_EXPANDED
@@ -209,32 +211,37 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
 
     open fun startDialogFragment(executor: DialogFragmentExecutor) {
         collapse(true) {
-            Timber.d("Sheet START_DIALOG_FRAGMENT")
+            // disable parent dismissing if we're opening second dialog
+            if (walletDialogFragment.isVisible()) {
+                walletDialogFragment!!.removeOnDismissListener(nestedDialogParentExpandHandler)
+            }
             walletDialogFragment = WalletDialogFragment.switchDialogWithExecutor(this, walletDialogFragment) {
                 val d = executor(it)
                 d.fixBlinkChildDialog()
-                d.addOnDismissListener {
-                    expand()
-                }
+                d.addOnDismissListener(nestedDialogParentExpandHandler)
                 d
             }
-            Timber.d("Sheet DIALOG_FRAGMENT_STARTED")
         }
+    }
+
+    private val nestedDialogParentExpandHandler = DialogInterface.OnDismissListener {
+        expand()
     }
 
     open fun startDialog(executor: DialogExecutor) {
         collapse(true) {
-            Timber.d("Sheet START_DIALOG")
+
+            // disable parent dismissing if we're opening second dialog
+            if (walletDialog.isVisible()) {
+                walletDialog!!.removeOnDismissListener(nestedDialogParentExpandHandler)
+            }
             walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog) {
                 val d = executor(it)
                 d.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
                 d.window?.setWindowAnimations(0)
-                d.addDismissListener {
-                    expand()
-                }
+                d.addOnDismissListener(nestedDialogParentExpandHandler)
                 d
             }
-            Timber.d("Sheet DIALOG_STARTED")
         }
     }
 
@@ -253,7 +260,7 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
         collapse()
 
         if (this is WalletDialog) {
-            addDismissListener {
+            addOnDismissListener {
                 expand()
             }
         } else {

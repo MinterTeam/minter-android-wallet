@@ -46,6 +46,11 @@ import network.minter.bipwallet.internal.helpers.ViewHelper
  */
 typealias DialogExecutor = (ctx: Context) -> WalletDialog
 
+fun <T : WalletDialog?> T?.isVisible(): Boolean {
+    if (this == null) return false
+    return isShowing
+}
+
 abstract class WalletDialog protected constructor(context: Context) :
         Dialog(context, R.style.Wallet_Dialog) {
 
@@ -73,12 +78,18 @@ abstract class WalletDialog protected constructor(context: Context) :
         }
     }
 
-    fun addDismissListener(listener: (DialogInterface) -> Unit) {
-        addDismissListener(DialogInterface.OnDismissListener { dialog -> listener(dialog) })
+    fun addOnDismissListener(listener: (DialogInterface) -> Unit) {
+        addOnDismissListener(DialogInterface.OnDismissListener { dialog -> listener(dialog) })
     }
 
-    fun addDismissListener(listener: DialogInterface.OnDismissListener) {
+    fun addOnDismissListener(listener: DialogInterface.OnDismissListener) {
         dismissListeners.add(listener)
+    }
+
+    fun removeOnDismissListener(listener: DialogInterface.OnDismissListener) {
+        if (dismissListeners.contains(listener)) {
+            dismissListeners.remove(listener)
+        }
     }
 
     override fun setOnDismissListener(listener: DialogInterface.OnDismissListener?) {
