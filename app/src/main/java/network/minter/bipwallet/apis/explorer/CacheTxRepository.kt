@@ -56,11 +56,16 @@ class CacheTxRepository(
 ) : ExplorerTransactionRepository(apiBuilder), CachedEntity<@JvmSuppressWildcards List<HistoryTransaction>> {
 
     companion object {
-        private const val KEY_TRANSACTIONS = BuildConfig.MINTER_STORAGE_VERS + "cached_explorer_transaction_repository_transactions"
+        private const val KEY_TRANSACTIONS = BuildConfig.MINTER_STORAGE_VERS + "cached_explorer_transaction_repository_transactions_"
     }
 
+    private val cacheKey: String
+        get() {
+            return KEY_TRANSACTIONS + "${secretStorage.mainWallet}"
+        }
+
     override fun getData(): List<HistoryTransaction> {
-        return storage[KEY_TRANSACTIONS, ArrayList(0)]
+        return storage[cacheKey, ArrayList(0)]
     }
 
     override fun getUpdatableData(): Observable<List<HistoryTransaction>> {
@@ -133,14 +138,18 @@ class CacheTxRepository(
     }
 
     override fun onAfterUpdate(result: List<HistoryTransaction>) {
-        storage.put(KEY_TRANSACTIONS, result)
+        storage.put(cacheKey, result)
+    }
+
+    override fun getDataKey(): String {
+        return javaClass.name + "_txs_${secretStorage.mainWallet}"
     }
 
     override fun onClear() {
-        storage.delete(KEY_TRANSACTIONS)
+        storage.delete(cacheKey)
     }
 
     override fun isDataReady(): Boolean {
-        return storage.contains(KEY_TRANSACTIONS)
+        return storage.contains(cacheKey)
     }
 }

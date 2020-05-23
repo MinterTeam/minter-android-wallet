@@ -480,7 +480,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     fromAccount = acc.getCoin(selectAccount!!)
                 }
                 if (fromAccount != null && toValidator != null) {
-                    onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin)!!)
+                    onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin))
                 }
             }
         }

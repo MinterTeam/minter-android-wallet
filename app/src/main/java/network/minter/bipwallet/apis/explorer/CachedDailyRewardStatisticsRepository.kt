@@ -42,24 +42,31 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Days
 import org.joda.time.format.DateTimeFormat
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
 typealias RepoDailyRewards = CachedRepository<RewardStatistics, CachedDailyRewardStatisticsRepository>
 
 open class CachedDailyRewardStatisticsRepository(
-        protected val mStorage: KVStorage,
-        protected val mSecretStorage: SecretStorage,
+        protected val storage: KVStorage,
+        protected val secretStorage: SecretStorage,
         apiBuilder: ApiService.Builder
 ) : ExplorerAddressRepository(apiBuilder), CachedEntity<RewardStatistics> {
+
+    companion object {
+        private const val KEY_REWARDS = BuildConfig.MINTER_STORAGE_VERS + "cached_reward_stats_today_"
+    }
+
+    private val cacheKey: String
+        get() {
+            return KEY_REWARDS + "${secretStorage.mainWallet}"
+        }
 
     override fun getData(): RewardStatistics {
         val empty = RewardStatistics()
         empty.amount = BigDecimal.ZERO
         empty.time = Date()
-        Timber.d("DAILY_REWARDS: Get data")
-        return mStorage[KEY_REWARDS, empty]
+        return storage[cacheKey, empty]
     }
 
     override fun getUpdatableData(): Observable<RewardStatistics> {
@@ -67,13 +74,12 @@ open class CachedDailyRewardStatisticsRepository(
         val endTime = DateTime().plus(Days.days(1))
         val fmt = DateTimeFormat.forPattern(DateHelper.DATE_FORMAT_SIMPLE).withZone(DateTimeZone.forID("UTC"))
         return getRewardStatistics(
-                mSecretStorage.mainWallet,
+                secretStorage.mainWallet,
                 startTime.toString(fmt),
                 endTime.toString(fmt)
         )
                 .rxExp()
                 .map { res: ExpResult<MutableList<RewardStatistics>?> ->
-                    Timber.d("DAILY_REWARDS Load remote data")
                     if (res.result == null || !res.isOk || res.result?.isEmpty() == true) {
                         val empty = RewardStatistics()
                         empty.amount = BigDecimal.ZERO
@@ -86,22 +92,15 @@ open class CachedDailyRewardStatisticsRepository(
     }
 
     override fun onAfterUpdate(result: RewardStatistics) {
-        Timber.d("DAILY_REWARDS: Put data")
-        mStorage.putAsync(KEY_REWARDS, result)
+        storage.putAsync(cacheKey, result)
     }
 
     override fun onClear() {
-        Timber.d("DAILY_REWARDS: Clear data")
-        mStorage.deleteAsync(KEY_REWARDS)
-    }
-
-    companion object {
-        private const val KEY_REWARDS = BuildConfig.MINTER_STORAGE_VERS + "cached_reward_stats_today"
+        storage.deleteAsync(cacheKey)
     }
 
     override fun isDataReady(): Boolean {
-        Timber.d("DAILY_REWARDS: Check data exists: ${mStorage.contains(KEY_REWARDS)}")
-        return mStorage.contains(KEY_REWARDS)
+        return storage.contains(cacheKey)
     }
 
     override fun getDataKey(): String {

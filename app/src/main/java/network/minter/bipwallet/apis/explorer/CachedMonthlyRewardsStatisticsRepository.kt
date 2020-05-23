@@ -57,11 +57,16 @@ class CachedMonthlyRewardsStatisticsRepository(
 ) : ExplorerAddressRepository(apiBuilder), CachedEntity<MutableList<RewardStatistics>> {
 
     companion object {
-        private const val KEY_REWARDS = BuildConfig.MINTER_STORAGE_VERS + "cached_reward_stats_monthly"
+        private const val KEY_REWARDS = BuildConfig.MINTER_STORAGE_VERS + "cached_reward_stats_monthly_"
     }
 
+    private val cacheKey: String
+        get() {
+            return KEY_REWARDS + "${secretStorage.mainWallet}"
+        }
+
     override fun getData(): MutableList<RewardStatistics> {
-        return storage[KEY_REWARDS, ArrayList(0)]
+        return storage[cacheKey, ArrayList(0)]
     }
 
     override fun getUpdatableData(): Observable<MutableList<RewardStatistics>> {
@@ -78,18 +83,18 @@ class CachedMonthlyRewardsStatisticsRepository(
     }
 
     override fun onAfterUpdate(result: MutableList<RewardStatistics>) {
-        storage.putAsync(KEY_REWARDS, result)
+        storage.putAsync(cacheKey, result)
     }
 
     override fun onClear() {
-        storage.deleteAsync(KEY_REWARDS)
+        storage.deleteAsync(cacheKey)
     }
 
     override fun isDataReady(): Boolean {
-        return storage.contains(KEY_REWARDS)
+        return storage.contains(cacheKey)
     }
 
     override fun getDataKey(): String {
-        return javaClass.name + "_monthly"
+        return javaClass.name + "_monthly_${secretStorage.mainWallet}"
     }
 }
