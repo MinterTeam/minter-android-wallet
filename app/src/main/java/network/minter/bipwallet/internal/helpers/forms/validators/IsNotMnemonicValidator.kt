@@ -32,7 +32,7 @@ import network.minter.core.bip39.NativeBip39
 
 class IsNotMnemonicValidator(
         errorMessage: CharSequence
-) : BaseValidator(errorMessage, true, true) {
+) : BaseValidator(errorMessage, false, true) {
 
     override fun validate(value: CharSequence?): Single<Boolean> {
         if (!isRequired && value.isNullOrEmpty()) {

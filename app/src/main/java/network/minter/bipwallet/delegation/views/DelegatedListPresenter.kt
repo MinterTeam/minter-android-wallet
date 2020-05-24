@@ -43,7 +43,7 @@ import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.delegation.adapter.DelegatedItem
 import network.minter.bipwallet.delegation.adapter.DelegationDataSource
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
-import network.minter.bipwallet.delegation.contract.DelegationListView
+import network.minter.bipwallet.delegation.contract.DelegatedListView
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.DateHelper
@@ -73,7 +73,7 @@ import kotlin.collections.ArrayList
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 @InjectViewState
-class DelegationListPresenter @Inject constructor() : MvpBasePresenter<DelegationListView>() {
+class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedListView>() {
     @Inject lateinit var addressRepo: ExplorerAddressRepository
     @Inject lateinit var rewardsMonthlyRepo: RepoMonthlyRewards
     @Inject lateinit var secretRepo: SecretStorage
@@ -93,7 +93,7 @@ class DelegationListPresenter @Inject constructor() : MvpBasePresenter<Delegatio
     private var firstRewardsLoad = true
     private var rewardsPerMinuteSettled = false
 
-    override fun attachView(view: DelegationListView) {
+    override fun attachView(view: DelegatedListView) {
         super.attachView(view)
         viewState.setAdapter(adapter!!)
         viewState.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {

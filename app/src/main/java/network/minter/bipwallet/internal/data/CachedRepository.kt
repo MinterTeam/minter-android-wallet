@@ -105,13 +105,13 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     val updateObservable: Observable<ResultModel>
         get() {
             var observable = entity.getUpdatableData()
+            observable = observable.doOnError { t: Throwable -> notifyOnError(t) }
 
             if (retryWhenHandler != null) {
                 observable = observable.retryWhen(retryWhenHandler)
             }
 
             observable = observable
-                    .doOnError { t: Throwable -> notifyOnError(t) }
                     .subscribeOn(THREAD_IO)
 
             return observable
@@ -164,7 +164,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     val isExpired: Boolean
         get() {
             if (_expiredAt == null) {
-                Timber.d("Entity %s is expired=true", entity.javaClass.name)
+                Timber.d("Entity %s is expired=true", expiredEntityStorageKey)
                 return true
             }
             val now = Date()
@@ -173,7 +173,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
             if (expired) {
                 onExpired()
             }
-            Timber.d("Entity %s is expired=%b", entity.javaClass.name, expired)
+            Timber.d("Entity %s is expired=%b", expiredEntityStorageKey, expired)
             return expired
         }
 
@@ -370,7 +370,11 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         mNotifier.onNext(entity.getData())
     }
 
-    protected fun notifyOnError(t: Throwable) {
+    protected fun notifyOnError(t: Throwable?) {
+        if (t == null) {
+            Timber.w("Throwable after error is null")
+            return
+        }
         mMetaNotifier.onError(t)
         mMetaNotifier = BehaviorSubject.create()
         try {

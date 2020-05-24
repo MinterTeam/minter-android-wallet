@@ -61,8 +61,8 @@ import network.minter.bipwallet.databinding.ActivityDelegationListBinding
 import network.minter.bipwallet.delegation.adapter.DelegatedStake
 import network.minter.bipwallet.delegation.adapter.DelegatedValidator
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
-import network.minter.bipwallet.delegation.contract.DelegationListView
-import network.minter.bipwallet.delegation.views.DelegationListPresenter
+import network.minter.bipwallet.delegation.contract.DelegatedListView
+import network.minter.bipwallet.delegation.views.DelegatedListPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextExtensions.getColorCompat
@@ -83,9 +83,9 @@ import kotlin.math.abs
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
-    @Inject lateinit var presenterProvider: Provider<DelegationListPresenter>
-    @InjectPresenter lateinit var presenter: DelegationListPresenter
+class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
+    @Inject lateinit var mPresenterProvider: Provider<DelegatedListPresenter>
+    @InjectPresenter lateinit var mPresenter: DelegatedListPresenter
     private lateinit var binding: ActivityDelegationListBinding
     private var mItemSeparator: BorderedItemSeparator? = null
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
@@ -131,14 +131,23 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
         binding.emptyText.visible = true
     }
 
+    fun showEmpty(msg: CharSequence?) {
+        binding.emptyText.visible = msg != null
+        binding.emptyText.text = msg
+    }
+
     override fun syncProgress(loadState: MutableLiveData<LoadState>) {
         loadState.observe(this, Observer { s: LoadState ->
             when (s) {
                 LoadState.Loaded,
-                LoadState.Failed -> {
+                LoadState.Failed
+                -> {
                     hideRefreshProgress()
                     hideProgress()
                     hideEmpty()
+                    if (s == LoadState.Failed) {
+                        showEmpty(resources.getString(R.string.error_unable_load_delegations))
+                    }
                 }
                 LoadState.Loading -> showProgress()
                 LoadState.Empty -> {
@@ -194,8 +203,8 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
     }
 
     @ProvidePresenter
-    fun providePresenter(): DelegationListPresenter {
-        return presenterProvider.get()
+    fun providePresenter(): DelegatedListPresenter {
+        return mPresenterProvider.get()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -205,12 +214,12 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
         binding.testnetWarning.visibleForTestnet()
 
         setupToolbar(binding.toolbar)
-        presenter.handleExtras(intent)
+        mPresenter.handleExtras(intent)
         binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (binding.list.adapter != null && abs(scrollY - oldScrollY) > 10) {
                 (binding.list.adapter as DelegationListAdapter).closeOpened()
             }
-            presenter.onScrolledTo(scrollY)
+            mPresenter.onScrolledTo(scrollY)
         })
         binding.list.setOnTouchListener { v, event ->
             (binding.list.adapter as DelegationListAdapter).closeOpened()
@@ -252,7 +261,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
             override fun onChartGestureStart(me: MotionEvent, lastPerformedGesture: ChartGesture) {}
             override fun onChartGestureEnd(me: MotionEvent, lastPerformedGesture: ChartGesture) {
                 if (lastPerformedGesture == ChartGesture.DRAG) {
-                    presenter.onChartDraggedTo(DateTime(binding.chart.lowestVisibleX.toLong()))
+                    mPresenter.onChartDraggedTo(DateTime(binding.chart.lowestVisibleX.toLong()))
                     //                    Timber.d("OnChartGestureEnd: %s, %s", me.toString(), lastPerformedGesture.name());
 //                    Timber.d("XChartMin %f", chart.getXChartMin());
 //                    Timber.d("YChartMin %f", chart.getYChartMin());
@@ -354,7 +363,7 @@ class DelegationListActivity : BaseMvpInjectActivity(), DelegationListView {
         constructor(from: Service) : super(from)
 
         override fun getActivityClass(): Class<*> {
-            return DelegationListActivity::class.java
+            return DelegatedListActivity::class.java
         }
     }
 }

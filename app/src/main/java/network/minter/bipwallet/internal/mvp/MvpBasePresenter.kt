@@ -114,14 +114,14 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
     protected val analytics: AnalyticsManager
         get() = Wallet.app().analytics()
 
-    protected fun doOnErrorResolve() {
+    protected open fun doOnErrorResolve() {
         isErrorWithRetryShown = false
         if (viewState is ProgressView) {
             (viewState as ProgressView).showProgress()
         }
     }
 
-    protected fun doOnError(t: Throwable) {
+    protected open fun doOnError(t: Throwable) {
         if (viewState is ProgressView) {
             (viewState as ProgressView).hideProgress()
         }
@@ -139,27 +139,27 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
         }
     }
 
-    protected fun <T> safeSubscribe(input: Observable<T>): Observable<T> {
+    protected open fun <T> safeSubscribe(input: Observable<T>): Observable<T> {
         return input.retryWhen(errorResolver)
     }
 
-    protected fun <T> safeSubscribeComputeToUi(input: Observable<T>): Observable<T> {
+    protected open fun <T> safeSubscribeComputeToUi(input: Observable<T>): Observable<T> {
         return input
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    protected fun <T> Observable<T>.joinToUi(): Observable<T> {
+    protected open fun <T> Observable<T>.joinToUi(): Observable<T> {
         return safeSubscribeIoToUi(this)
     }
 
-    protected fun <T> safeSubscribeIoToUi(input: Observable<T>): Observable<T> {
+    protected open fun <T> safeSubscribeIoToUi(input: Observable<T>): Observable<T> {
         return input
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    protected val errorResolver: Function<Observable<out Throwable>, ObservableSource<*>>
+    protected open val errorResolver: Function<Observable<out Throwable>, ObservableSource<*>>
         get() = Function { observable: Observable<out Throwable> ->
             observable.flatMap { err: Throwable ->
                 val t = NetworkException.convertIfNetworking(err)
@@ -168,6 +168,18 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
                 errorRetrySubject.delay(500, TimeUnit.MILLISECONDS)
             }
         }
+
+    protected open fun errorResolverWithCallback(cb: (Throwable) -> Unit): Function<Observable<out Throwable>, ObservableSource<*>> {
+        return Function { observable: Observable<out Throwable> ->
+            observable.flatMap { err: Throwable ->
+                val t = NetworkException.convertIfNetworking(err)
+                Timber.w(t, "Error occurred in %s", javaClass.name)
+                doOnError(t)
+                cb.invoke(t)
+                errorRetrySubject.delay(500, TimeUnit.MILLISECONDS)
+            }
+        }
+    }
 
     private fun handleAnalytics() {
         val analytics = analytics

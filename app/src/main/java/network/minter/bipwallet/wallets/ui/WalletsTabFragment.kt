@@ -49,7 +49,7 @@ import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.databinding.FragmentTabWalletsBinding
-import network.minter.bipwallet.delegation.ui.DelegationListActivity
+import network.minter.bipwallet.delegation.ui.DelegatedListActivity
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
@@ -112,6 +112,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun hideProgress() {
         hideRefreshProgress()
+        showBalanceProgress(false)
     }
 
     override fun showRefreshProgress() {
@@ -337,7 +338,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun startDelegationList() {
-        startActivity(Intent(activity, DelegationListActivity::class.java))
+        startActivity(Intent(activity, DelegatedListActivity::class.java))
     }
 
     override fun startConvertCoins() {

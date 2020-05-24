@@ -42,7 +42,7 @@ import network.minter.bipwallet.internal.mvp.ProgressView
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface DelegationListView : MvpView, ProgressView {
+interface DelegatedListView : MvpView, ProgressView {
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
     fun setOnRefreshListener(listener: OnRefreshListener)
     fun showRefreshProgress()

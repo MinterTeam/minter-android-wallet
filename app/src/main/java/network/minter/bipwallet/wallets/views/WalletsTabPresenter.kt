@@ -92,7 +92,6 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         }
 
         accountStorage
-                .retryWhen(errorResolver)
                 .observe()
                 .joinToUi()
                 .subscribe(
@@ -111,6 +110,11 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                 ).disposeOnDestroy()
 
         accountStorage.update()
+    }
+
+    override fun doOnError(t: Throwable) {
+        super.doOnError(t)
+        Timber.d("DoOnError WALLETS")
     }
 
     override fun attachView(view: WalletsTabView) {

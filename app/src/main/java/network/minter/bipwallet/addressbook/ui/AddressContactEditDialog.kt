@@ -48,6 +48,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilt
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueContactNameValidator
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import org.parceler.Parcels
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -116,7 +117,14 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
     }
 
     override fun validate() {
-        inputGroup.validate(true).subscribe()
+        inputGroup.validate(true).subscribe(
+                { res ->
+
+                },
+                { t ->
+                    Timber.e(t, "Unable to validate form")
+                }
+        )
     }
 
     override fun setOnSubmitListener(listener: View.OnClickListener) {

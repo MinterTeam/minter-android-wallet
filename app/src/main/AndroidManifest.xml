@@ -112,7 +112,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".delegation.ui.DelegationListActivity"
+            android:name=".delegation.ui.DelegatedListActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity

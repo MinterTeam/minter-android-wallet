@@ -27,6 +27,7 @@ package network.minter.bipwallet.internal.storage
 
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.Single
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
@@ -82,10 +83,8 @@ class AccountStorage(
 
     private fun getDelegationsData(address: MinterAddress): Observable<ExpResult<DelegationList>> {
         return if (secretStorage.mainWallet == address || !storage.contains(inactiveDelegationsKey(address))) {
-            Timber.d("ACCOUNT: %s Main or inactive; loading delegations from server", address.toString())
             addressRepo.getDelegations(address, 0).rxExp()
         } else {
-            Timber.d("ACCOUNT: %s loading delegations from storage", address.toString())
             val out = ExpResult<DelegationList>()
             out.result = storage.get(inactiveDelegationsKey(address))
             Observable.just(out)
@@ -115,11 +114,11 @@ class AccountStorage(
     }
 
     override fun getUpdatableData(): Observable<AddressListBalancesTotal> {
-        return Observable
-                .fromIterable(secretStorage.addresses)
-                .flatMap(mapBalances())
+        val addresses = Observable.fromIterable(secretStorage.addresses)
+
+        return addresses.flatMap(mapBalances())
                 .toList()
-                .map(aggregate())
+                .flatMap(aggregate())
                 .subscribeOn(Schedulers.io())
                 .toObservable()
     }
@@ -128,7 +127,9 @@ class AccountStorage(
         return Function { address: MinterAddress ->
             getBalanceData(address)
                     .map {
-                        storage.putAsync(inactiveBalanceKey(address), it.result)
+                        if (it.isOk && it.error == null) {
+                            storage.putAsync(inactiveBalanceKey(address), it.result)
+                        }
                         it
                     }
                     .switchMap(mapToDelegations())
@@ -169,18 +170,27 @@ class AccountStorage(
         }
     }
 
-    private fun aggregate(): Function<List<ExpResult<AddressBalanceTotal>>, AddressListBalancesTotal> {
+    private fun aggregate(): Function<List<ExpResult<AddressBalanceTotal>>, Single<AddressListBalancesTotal>> {
         return Function { ExpResults: List<ExpResult<AddressBalanceTotal>> ->
-            val out = AddressListBalancesTotal()
+            val data = AddressListBalancesTotal()
+            var error: ExpResult.ErrorResult? = null
             for (balance in ExpResults) {
-                out.latestBlockTime = balance.latestBlockTime
+                if (balance.error != null && error == null) {
+                    error = balance.error
+                }
+                data.latestBlockTime = balance.latestBlockTime
                 if (balance.isOk) {
-                    out.balances.add(balance.result)
+                    data.balances.add(balance.result)
                 } else {
                     Timber.w(balance.error.getMessage())
                 }
             }
-            out
+
+//            if(error != null) {
+//                return@Function Single.error<AddressListBalancesTotal>(NetworkException(error.code, error.message, error.message))
+//            }
+
+            Single.just(data)
         }
     }
 

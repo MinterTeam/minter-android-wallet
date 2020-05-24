@@ -349,5 +349,6 @@
     <string name="dialog_title_remove_address">Remove Address</string>
     <string name="dialog_description_remove_address"><![CDATA[Are you sure, you want to remove address <b>%s</b>?]]></string>
     <string name="dialog_description_success_add_address">Successfully added address</string>
+    <string name="error_unable_load_delegations">Unable to load delegations</string>
 
 </resources>

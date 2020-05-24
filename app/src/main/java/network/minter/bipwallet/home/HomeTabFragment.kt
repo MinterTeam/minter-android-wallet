@@ -34,7 +34,7 @@ import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ErrorView
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
-import network.minter.bipwallet.internal.views.snackbar
+import network.minter.bipwallet.internal.views.SnackbarBuilder
 import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
@@ -74,7 +74,7 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
             errorResolver: View.OnClickListener
     ) {
         runOnUiThread {
-            snackbar()
+            SnackbarBuilder(this)
                     .setMessage(errorMessage)
                     .setAction(actionName, errorResolver)
                     .setDurationInfinite()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -51,6 +51,10 @@ public class ExpErrorMapped<Result> extends ExpResult<Result> implements ResultE
 
         NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
         result = null;
+        error = new ErrorResult();
+        error.message = e.getUserMessage();
+        error.code = e.getStatusCode();
+
         statusCode = e.getStatusCode();
         errorMessage = e.getUserMessage();
 
