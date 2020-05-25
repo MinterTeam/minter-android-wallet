@@ -124,11 +124,11 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
             viewState.startUnbond(it)
         }
 
-        if (rewardsMonthlyRepo.isDataReady) {
-            cachedRewards = rewardsMonthlyRepo.data
-        } else {
-            rewardsMonthlyRepo.update()
-        }
+//        if (rewardsMonthlyRepo.isDataReady) {
+//            cachedRewards = rewardsMonthlyRepo.data
+//        } else {
+//            rewardsMonthlyRepo.update()
+//        }
 
         loadState = MutableLiveData()
         viewState.syncProgress(loadState!!)
@@ -141,7 +141,7 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
         listBuilder = RxPagedListBuilder(sourceFactory!!, cfg)
         refresh()
         unsubscribeOnDestroy(listDisposable)
-        loadRewards()
+//        loadRewards()
     }
 
     private fun loadRewards() {

@@ -157,6 +157,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
             toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
             recipientListAdapter = RecipientListAdapter(context!!)
             inputRecipient.input.setAdapter(recipientListAdapter)
+            inputRecipient.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
         }
         return binding.root
     }

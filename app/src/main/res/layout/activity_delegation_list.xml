@@ -156,6 +156,7 @@
             android:layout_height="?attr/actionBarSize" />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/label_stakes"
             style="@style/Wallet.ItemHeader.Small"
             android:layout_width="match_parent"

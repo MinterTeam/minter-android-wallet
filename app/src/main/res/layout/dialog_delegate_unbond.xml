@@ -117,17 +117,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.edwardstock.inputfield.InputField
+            <com.edwardstock.inputfield.InputFieldAutocomplete
                 android:id="@+id/input_masternode"
-                style="@style/Input"
+                style="@style/InputAC"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"
                 android:layout_marginTop="0dp"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
-                android:hint="Choose masternode"
-                android:inputType="none"
-                app:errorEnabled="false"
+                android:dropDownHeight="wrap_content"
+                android:hint="@string/input_hint_public_key_or_name"
+                android:inputType="text|textMultiLine"
+                app:fieldName="masternode"
                 app:inputOverlay="@layout/stub_masternode_name"
                 app:inputOverlayVisible="false"
                 app:label="@string/label_masternode"
@@ -135,8 +136,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:suffixImageSrc="@drawable/ic_drop_down_grey"
-                app:suffixType="image"
-                tools:inputOverlayVisible="true" />
+                app:suffixType="image" />
 
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_coin"

@@ -28,6 +28,8 @@ package network.minter.bipwallet.delegation.views
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import com.edwardstock.inputfield.form.InputWrapper
 import io.reactivex.Observable
@@ -148,13 +150,11 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 viewState.setAmount(fromAccount!!.amount.toPlainString())
             } else {
                 if (accountStorage.entity.mainWallet.hasDelegated(toValidator, selectAccount)) {
-                    viewState.setAmount(
-                            accountStorage
-                                    .entity
-                                    .mainWallet
-                                    .getDelegatedByValidatorAndCoin(toValidator, selectAccount)!!
-                                    .amount
-                                    .toPlainString()
+                    viewState.setAmount((
+                            accountStorage.entity.mainWallet
+                                    .getDelegatedByValidatorAndCoin(toValidator, selectAccount)?.amount
+                                    ?: BigDecimal.ZERO
+                            ).toPlainString()
                     )
                 }
             }
@@ -183,7 +183,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         return validators.first { it.pubKey == publicKey }
     }
 
-    private fun setValidator(validator: ValidatorItem) {
+    private fun viewSetValidator(validator: ValidatorItem) {
+        viewState.setMasternodeError(null)
         viewState.setValidator(validator) { v ->
             val b = StubMasternodeNameBinding.bind(v)
             if (validator.meta?.name.isNullOrEmpty()) {
@@ -197,7 +198,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
     }
 
-    private fun setValidator(validator: MinterPublicKey) {
+    private fun viewSetValidator(validator: MinterPublicKey) {
         viewState.setValidator(validator) { v ->
             val b = StubMasternodeNameBinding.bind(v)
             b.title.text = validator.toShortString()
@@ -215,6 +216,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         when (input.id) {
             R.id.input_amount -> {
                 amount = (input.text ?: "").toString().parseBigDecimal()
+            }
+            R.id.input_masternode -> {
+
             }
         }
         checkEnableSubmit()
@@ -428,6 +432,37 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.setOnSubmitListener(View.OnClickListener {
             onSubmit()
         })
+        viewState.addMasternodeInputTextChangeListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if ((s == null || s.isEmpty())) {
+                    if (toValidator == null) {
+                        viewState.setMasternodeError("Public key required")
+                    } else {
+                        viewState.setMasternodeError(null)
+                    }
+                    checkEnableSubmit()
+                    return
+                }
+                if (!s.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())) {
+                    viewState.setMasternodeError("Invalid public key format")
+                    checkEnableSubmit()
+                    return
+                }
+
+                toValidator = MinterPublicKey(s.toString())
+                toValidatorName = null
+                viewState.setMasternodeError(null)
+                checkEnableSubmit()
+            }
+
+        })
         validatorsRepo
                 .retryWhen(errorResolver)
                 .observe()
@@ -439,9 +474,15 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
                             if (toValidator != null) {
                                 try {
-                                    setValidator(findValidator(toValidator!!))
+                                    viewSetValidator(findValidator(toValidator!!))
                                 } catch (e: NoSuchElementException) {
-                                    setValidator(toValidator!!)
+                                    viewSetValidator(toValidator!!)
+                                }
+                            }
+
+                            if (type == Type.Delegate) {
+                                viewState.setValidatorsAutocomplete(validators) { validator, _ ->
+                                    onValidatorSelected(validator)
                                 }
                             }
                         },
@@ -492,6 +533,15 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         accountStorage.update()
         validatorsRepo.update()
 
+        if (type == Type.Delegate) {
+            viewState.setOnInputMasternodeClickListener {
+                if (toValidator != null) {
+                    toValidator = null
+                    viewState.hideValidatorOverlay()
+                    checkEnableSubmit()
+                }
+            }
+        }
         viewState.setOnValidatorSelectListener(View.OnClickListener {
             viewState.startValidatorSelector(selectorDataFromValidators(validators)) { validator ->
                 onValidatorSelected(validator.data)
@@ -525,9 +575,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     }
 
     private fun onValidatorSelected(validator: ValidatorItem) {
-        setValidator(validator)
         toValidatorName = validator.meta?.name
         toValidator = validator.pubKey
+        viewSetValidator(validator)
 
         if (type == Type.Unbond) {
             if (!accountStorage.entity.mainWallet.hasDelegated(toValidator)) {

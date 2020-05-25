@@ -37,8 +37,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import butterknife.BindView;
@@ -95,8 +93,6 @@ public class CoinsListAdapter extends ArrayAdapter<CoinItem> implements Filterab
     @Override
     public Filter getFilter() {
         return new Filter() {
-            private Lock mLock = new ReentrantLock();
-
             @Override
             public String convertResultToString(Object resultValue) {
                 return ((CoinItem) (resultValue)).symbol;

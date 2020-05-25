@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.delegation.contract
 
+import android.text.TextWatcher
 import android.view.View
 import androidx.annotation.StringRes
 import com.edwardstock.inputfield.form.InputWrapper
@@ -52,6 +53,7 @@ interface DelegateUnbondView : MvpView {
     fun setValidator(validator: MinterPublicKey, onInflated: (View) -> Unit)
     fun setOnValidatorSelectListener(listener: View.OnClickListener)
     fun setOnAccountSelectListener(listener: View.OnClickListener)
+
     fun startValidatorSelector(items: List<SelectorData<ValidatorItem>>, listener: (SelectorData<ValidatorItem>) -> Unit)
     fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit)
     fun setAccountName(accountName: CharSequence?)
@@ -64,6 +66,7 @@ interface DelegateUnbondView : MvpView {
     fun setEnableSubmit(enable: Boolean)
     fun setAccountSelectorError(error: CharSequence?)
     fun setOnSubmitListener(listener: View.OnClickListener)
+    fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(executor: DialogExecutor)
@@ -73,5 +76,9 @@ interface DelegateUnbondView : MvpView {
     fun expand()
     fun collapse()
     fun dismiss()
+    fun setOnInputMasternodeClickListener(listener: (View) -> Unit)
+    fun hideValidatorOverlay()
+    fun addMasternodeInputTextChangeListener(textWatcher: TextWatcher)
+    fun setMasternodeError(message: CharSequence?)
 
 }

@@ -30,6 +30,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,9 +44,11 @@ import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogDelegateUnbondBinding
+import network.minter.bipwallet.delegation.adapter.ValidatorsAcAdapter
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
 import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.adapter.AutocompleteListAdapter
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
@@ -105,6 +108,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     private lateinit var binding: DialogDelegateUnbondBinding
     private val inputGroup = InputGroup()
+    private var type: Type = Type.Delegate
 
     @ProvidePresenter
     fun providePresenter(): DelegateUnbondPresenter {
@@ -139,10 +143,11 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         }
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         presenter.handleExtras(arguments)
+        type = arguments!!.getSerializable(ARG_TYPE) as Type
 
         binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 
-        binding.inputMasternode.input.isFocusable = false
+        binding.inputMasternode.input.isFocusable = type != Type.Unbond
         binding.inputCoin.input.isFocusable = false
         binding.inputAmount.input.setOnClickListener {
             binding.inputAmount.scrollToInput()
@@ -156,6 +161,10 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         broadcastManager.register()
 
         return binding.root
+    }
+
+    override fun hideValidatorOverlay() {
+        binding.inputMasternode.inputOverlayVisible = false
     }
 
     override fun setTextChangedListener(listener: (input: InputWrapper, valid: Boolean) -> Unit) {
@@ -172,6 +181,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     override fun setValidator(validator: ValidatorItem, onInflated: (View) -> Unit) {
         binding.apply {
+            inputMasternode.text = null
             inputMasternode.inputOverlayVisible = true
             onInflated(inputMasternode.inputOverlay!!)
         }
@@ -184,17 +194,33 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         }
     }
 
+    override fun setOnInputMasternodeClickListener(listener: (View) -> Unit) {
+        binding.inputMasternode.setOnClickListener {
+            if (binding.inputMasternode.inputOverlayVisible) {
+                binding.inputMasternode.inputOverlayVisible = false
+            }
+            listener(it)
+        }
+    }
+
     override fun setOnValidatorSelectListener(listener: View.OnClickListener) {
-        binding.inputMasternode.setOnClickListener(listener)
+        // both cases - open validators dialog by clicking on dropdown icon
+        binding.inputMasternode.setOnSuffixImageClickListener(listener)
+
+        // and only if unbonding,
+        if (type == Type.Unbond) {
+            binding.inputMasternode.setOnClickListener(listener)
+        }
     }
 
     override fun setOnAccountSelectListener(listener: View.OnClickListener) {
         binding.inputCoin.setOnClickListener(listener)
+        binding.inputCoin.setOnSuffixImageClickListener(listener)
     }
 
     override fun startValidatorSelector(items: List<SelectorData<ValidatorItem>>, listener: (SelectorData<ValidatorItem>) -> Unit) {
         startDialog {
-            WalletAccountSelectorDialog.Builder<ValidatorItem>(context!!, R.string.title_select_masternode)
+            WalletAccountSelectorDialog.Builder<ValidatorItem>(context!!, R.string.title_choose_masternode)
                     .setItems(items)
                     .setOnClickListener(listener)
                     .create()
@@ -259,6 +285,35 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     override fun setOnSubmitListener(listener: View.OnClickListener) {
         binding.action.setOnClickListener(listener)
+    }
+
+    override fun addMasternodeInputTextChangeListener(textWatcher: TextWatcher) {
+        binding.inputMasternode.addTextChangedListener(textWatcher)
+    }
+
+    override fun setMasternodeError(message: CharSequence?) {
+        binding.inputMasternode.error = message
+    }
+
+    override fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit) {
+        if (items.isNotEmpty()) {
+            val adapter = ValidatorsAcAdapter(context!!)
+            adapter.setItems(items)
+            adapter.setOnItemClickListener(object : AutocompleteListAdapter.OnItemClickListener<ValidatorItem> {
+                override fun onClick(item: ValidatorItem, position: Int) {
+                    listener.invoke(item, position)
+                    binding.inputMasternode.input.dismissDropDown()
+                }
+            })
+            adapter.notifyDataSetChanged()
+            binding.inputMasternode.post {
+                binding.inputMasternode.input.setAdapter(adapter)
+                binding.inputMasternode.input.threshold = 0
+                binding.inputMasternode.input.dropDownHeight = -2
+
+                binding.inputMasternode.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
+            }
+        }
     }
 
     override fun dismiss() {

@@ -235,7 +235,7 @@
     <string name="tx_send_overall_title">Confirm Transaction</string>
     <string name="tx_address_searching">Searching address</string>
     <string name="title_select_account">Select Account</string>
-    <string name="title_select_masternode">Select Masternode</string>
+    <string name="title_choose_masternode">Choose Masternode</string>
     <string name="dots">…</string>
     <string name="label_multiple_coins">Multiple Coins</string>
     <string name="label_no_coins">Multiple Coins</string>
@@ -350,5 +350,6 @@
     <string name="dialog_description_remove_address"><![CDATA[Are you sure, you want to remove address <b>%s</b>?]]></string>
     <string name="dialog_description_success_add_address">Successfully added address</string>
     <string name="error_unable_load_delegations">Unable to load delegations</string>
+    <string name="input_hint_public_key_or_name">Public key or name…</string>
 
 </resources>
