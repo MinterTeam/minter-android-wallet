@@ -30,6 +30,7 @@ import android.util.SparseArray
 import com.annimon.stream.Optional
 import com.annimon.stream.Stream
 import network.minter.core.MinterSDK
+import network.minter.explorer.models.BaseCoinValue
 import network.minter.explorer.models.CoinBalance
 import java.util.*
 
@@ -221,7 +222,22 @@ object CollectionsHelper {
         fun apply(input: Input): Output
     }
 
-    class StableCoinSorting : Comparator<CoinBalance> {
+    class StableCoinSorting<T : BaseCoinValue> : Comparator<T> {
+        override fun compare(ac: T, bc: T): Int {
+            val a = ac.coin!!.toLowerCase()
+            val b = bc.coin!!.toLowerCase()
+            if (a == b) // update to make it stable
+                return 0
+            if (a == sStable) return -1
+            return if (b == sStable) 1 else a.compareTo(b)
+        }
+
+        companion object {
+            private val sStable = MinterSDK.DEFAULT_COIN.toLowerCase()
+        }
+    }
+
+    class StableCoinSortingCoinBalance : Comparator<CoinBalance> {
         override fun compare(ac: CoinBalance, bc: CoinBalance): Int {
             val a = ac.coin!!.toLowerCase()
             val b = bc.coin!!.toLowerCase()

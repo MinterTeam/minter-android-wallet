@@ -32,6 +32,9 @@ import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.AddressBalance
 import network.minter.explorer.models.CoinDelegation
 import java.math.BigDecimal
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class AddressBalanceTotal(
         var delegated: BigDecimal = BigDecimal.ZERO,
@@ -50,10 +53,10 @@ class AddressBalanceTotal(
 
         totalBalance = source.totalBalance
         totalBalanceUSD = source.totalBalanceUSD
-        if (coins.containsKey(MinterSDK.DEFAULT_COIN)) {
-            availableBalanceBIP = coins[MinterSDK.DEFAULT_COIN]?.amount ?: BigDecimal.ZERO
+        availableBalanceBIP = if (coins.containsKey(MinterSDK.DEFAULT_COIN)) {
+            coins[MinterSDK.DEFAULT_COIN]?.amount ?: BigDecimal.ZERO
         } else {
-            availableBalanceBIP = BigDecimal.ZERO
+            BigDecimal.ZERO
         }
 
         this.delegated = delegated
@@ -64,7 +67,13 @@ class AddressBalanceTotal(
             return ArrayList(0)
         }
 
-        return delegatedCoins[publicKey] ?: ArrayList(0)
+        val stakes = delegatedCoins[publicKey] ?: ArrayList(0)
+        if (stakes.isEmpty()) {
+            return stakes
+        }
+
+        Collections.sort(stakes, CollectionsHelper.StableCoinSorting())
+        return stakes
     }
 
     fun getDelegatedByValidatorAndCoin(publicKey: MinterPublicKey?, coin: String?): CoinDelegation? {
