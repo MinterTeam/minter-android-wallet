@@ -41,7 +41,6 @@ import com.zerobranch.layout.SwipeLayout
 import com.zerobranch.layout.SwipeLayout.SwipeActionsListener
 import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.adapter.LoadState
-import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -99,11 +98,10 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
 
             if (item.name.isNullOrEmpty()) {
                 vh.title.text = item.publicKey.toShortString()
-                vh.publicKey.visible = false
+                vh.publicKey.text = item.publicKey.toString()
             } else {
-                vh.title.text = Preconditions.firstNonNull(item.name, vh.title.context.getString(R.string.label_public_key))
-                vh.publicKey.text = item.publicKey.toShortString()
-                vh.publicKey.visible = true
+                vh.title.text = item.name
+                vh.publicKey.text = item.publicKey.toString()
             }
 
             if (item.description != null) {
