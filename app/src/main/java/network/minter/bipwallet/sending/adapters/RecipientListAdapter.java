@@ -74,7 +74,7 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
         }
 
         if (v == null) {
-            v = mInflater.inflate(mViewResourceId, null);
+            v = mInflater.inflate(mViewResourceId, parent, false);
             holder = new ViewHolder(v);
             v.setTag(holder);
         } else {
@@ -146,6 +146,12 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
 
         AddressContact item = getItem(position);
 
+        if (getCount() == 1 || position == getCount() - 1) {
+            vh.separator.setVisibility(View.GONE);
+        } else {
+            vh.separator.setVisibility(View.VISIBLE);
+        }
+
         if (item.name == null) {
             vh.title.setText(item.address);
             vh.subtitle.setVisibility(View.GONE);
@@ -165,6 +171,7 @@ public class RecipientListAdapter extends ArrayAdapter<AddressContact> implement
         View itemView;
         @BindView(R.id.search_item_title) TextView title;
         @BindView(R.id.search_item_subtitle) TextView subtitle;
+        @BindView(R.id.separator) View separator;
 
         public ViewHolder(View itemView) {
             this.itemView = itemView;

@@ -164,6 +164,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     override fun setCoinsAutocomplete(items: List<CoinItem>, listener: CoinsListAdapter.OnItemClickListener) {
         if (items.isNotEmpty()) {
             binding.inputIncomingCoin.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
+            binding.inputIncomingCoin.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
             val cl = CoinsListAdapter.OnItemClickListener { item: CoinItem?, position: Int ->
                 listener.onClick(item, position)
                 binding.inputIncomingCoin.input.dismissDropDown()

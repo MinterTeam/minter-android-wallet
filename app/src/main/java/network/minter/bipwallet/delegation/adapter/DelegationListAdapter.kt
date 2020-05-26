@@ -42,9 +42,9 @@ import com.zerobranch.layout.SwipeLayout.SwipeActionsListener
 import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.common.Preconditions
+import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder
 import network.minter.core.MinterSDK
@@ -95,7 +95,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         if (getItemViewType(i) == DelegatedItem.ITEM_VALIDATOR) {
             val vh = viewHolder as ValidatorViewHolder
             val item = getItem(i) as DelegatedValidator
-            ViewHelper.visible(vh.fakeHeader, i > 0)
+            vh.fakeHeader.visible = i > 0
 
             if (item.name.isNullOrEmpty()) {
                 vh.title.text = item.publicKey.toShortString()
@@ -113,6 +113,9 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
                 vh.icon.setImageUrlFallback(item.imageUrl, R.drawable.img_avatar_default)
             } else {
                 vh.icon.setImageResource(R.drawable.img_avatar_delegate)
+            }
+            vh.actionCopy.setOnClickListener {
+                ContextHelper.copyToClipboard(it.context, item.publicKey.toString())
             }
             vh.actionDelegate.setOnClickListener {
                 if (mOnDelegatedClickListener != null) {
@@ -211,6 +214,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         @BindView(R.id.item_title) lateinit var title: TextView
         @BindView(R.id.item_public_key) lateinit var publicKey: TextView
         @BindView(R.id.action_delegate) lateinit var actionDelegate: View
+        @BindView(R.id.action_copy) lateinit var actionCopy: View
         @BindView(R.id.item_avatar) lateinit var icon: BipCircleImageView
 
         init {

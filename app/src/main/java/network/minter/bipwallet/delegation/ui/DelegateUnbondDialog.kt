@@ -30,30 +30,36 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AutoCompleteTextView
+import android.widget.ListPopupWindow
+import androidx.core.content.ContextCompat
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.RegexValidator
+import com.otaliastudios.autocomplete.Autocomplete
+import com.otaliastudios.autocomplete.AutocompleteCallback
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogDelegateUnbondBinding
-import network.minter.bipwallet.delegation.adapter.ValidatorsAcAdapter
+import network.minter.bipwallet.delegation.adapter.autocomplete.ValidatorsAcPresenter
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
 import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.adapter.AutocompleteListAdapter
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.sending.account.SelectorData
@@ -109,6 +115,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
     private lateinit var binding: DialogDelegateUnbondBinding
     private val inputGroup = InputGroup()
     private var type: Type = Type.Delegate
+    private var autocomplete: Autocomplete<ValidatorItem>? = null
 
     @ProvidePresenter
     fun providePresenter(): DelegateUnbondPresenter {
@@ -133,6 +140,14 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         super.onAttach(context)
     }
 
+    internal fun AutoCompleteTextView.getPopup(): ListPopupWindow {
+        val popupField = AutoCompleteTextView::class.java.getDeclaredField("mPopup")
+        popupField.isAccessible = true
+        val it = this
+        val popup = popupField.get(it) as ListPopupWindow
+        return popup
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DialogDelegateUnbondBinding.inflate(inflater, container, false)
 
@@ -142,6 +157,10 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
             })
         }
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
+
+        inputGroup.addInput(binding.inputMasternode)
+        inputGroup.addFilter(binding.inputMasternode, NewLineInputFilter())
+
         presenter.handleExtras(arguments)
         type = arguments!!.getSerializable(ARG_TYPE) as Type
 
@@ -296,24 +315,28 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
     }
 
     override fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit) {
-        if (items.isNotEmpty()) {
-            val adapter = ValidatorsAcAdapter(context!!)
-            adapter.setItems(items)
-            adapter.setOnItemClickListener(object : AutocompleteListAdapter.OnItemClickListener<ValidatorItem> {
-                override fun onClick(item: ValidatorItem, position: Int) {
-                    listener.invoke(item, position)
-                    binding.inputMasternode.input.dismissDropDown()
-                }
-            })
-            adapter.notifyDataSetChanged()
-            binding.inputMasternode.post {
-                binding.inputMasternode.input.setAdapter(adapter)
-                binding.inputMasternode.input.threshold = 0
-                binding.inputMasternode.input.dropDownHeight = -2
+        if (items.isEmpty()) {
+            return
+        }
 
-                binding.inputMasternode.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
+        val presenter = ValidatorsAcPresenter(context!!)
+        presenter.setItems(items)
+        val callback: AutocompleteCallback<ValidatorItem> = object : AutocompleteCallback<ValidatorItem> {
+            override fun onPopupItemClicked(editable: Editable, item: ValidatorItem): Boolean {
+                listener(item, 0)
+                return true
+            }
+
+            override fun onPopupVisibilityChanged(shown: Boolean) {
             }
         }
+
+        autocomplete = Autocomplete.on<ValidatorItem>(binding.inputMasternode.input)
+                .with(callback)
+                .with(presenter)
+                .with(6f)
+                .with(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
+                .build()
     }
 
     override fun dismiss() {

@@ -24,13 +24,13 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.delegation.adapter
+package network.minter.bipwallet.delegation.adapter.autocomplete
 
-import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ItemListDialogAccountSelectorSearchViewBinding
-import network.minter.bipwallet.internal.adapter.AutocompleteListAdapter
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.explorer.models.ValidatorItem
 
@@ -39,42 +39,48 @@ import network.minter.explorer.models.ValidatorItem
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class ValidatorsAcAdapter(
-        context: Context
-) : AutocompleteListAdapter<ValidatorItem, ValidatorsAcAdapter.ViewHolder>(context) {
+        val presenter: ValidatorsAcPresenter
+) : RecyclerView.Adapter<ValidatorsAcAdapter.ViewHolder>() {
+    private var items: List<ValidatorItem> = ArrayList()
+    private var inflater: LayoutInflater? = null
 
-    class ViewHolder(itemView: View) : AutocompleteListAdapter.ViewHolder(itemView) {
-        val b = ItemListDialogAccountSelectorSearchViewBinding.bind(itemView)
-    }
+    class ViewHolder(
+            val b: ItemListDialogAccountSelectorSearchViewBinding
+    ) : RecyclerView.ViewHolder(b.root)
 
-    override val layoutItemId: Int
-        get() = R.layout.item_list_dialog_account_selector_search_view
 
-    override fun viewHolderClass(): Class<ViewHolder> {
-        return ViewHolder::class.java
-    }
-
-    override fun onBindViewHolder(item: ValidatorItem, holder: ViewHolder, position: Int) {
-        super.onBindViewHolder(item, holder, position)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = items[position]
         val name = item.meta?.name ?: item.pubKey.toShortString()
         val subtitle = if (item.meta?.name.isNullOrEmpty()) null else item.pubKey.toShortString()
 
+        holder.b.root.setOnClickListener {
+            presenter.dispatchClick(items[holder.adapterPosition])
+        }
         holder.b.searchItemTitle.text = name
         holder.b.searchItemIconLeft.setImageUrlFallback(item.meta?.iconUrl, R.drawable.img_avatar_delegate)
         holder.b.searchItemSubtitle.visible = subtitle != null
         holder.b.searchItemSubtitle.text = subtitle
     }
 
-    override fun isItemMatchesConstraint(item: ValidatorItem, constraint: CharSequence?): Boolean {
-        if (constraint == null) return false
-
-        if (item.meta == null || item.meta.name.isNullOrEmpty()) {
-            return item.pubKey.toString().toLowerCase().startsWith(constraint.toString().toLowerCase())
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        if (inflater == null) {
+            inflater = LayoutInflater.from(parent.context)
         }
 
-        return item.meta.name.toLowerCase().startsWith(constraint.toString().toLowerCase())
+        val b = ItemListDialogAccountSelectorSearchViewBinding.inflate(inflater!!, parent, false)
+        return ViewHolder(b)
     }
 
-    override fun resultToString(item: ValidatorItem): String {
-        return item.meta?.name ?: item.pubKey.toShortString()
+    override fun getItemCount(): Int {
+        return items.size
+    }
+
+    fun setItems(data: List<ValidatorItem>) {
+        if (items.size == data.size && items == data) {
+            return
+        }
+        items = data
+        notifyDataSetChanged()
     }
 }

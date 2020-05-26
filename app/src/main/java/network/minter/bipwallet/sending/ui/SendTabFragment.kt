@@ -140,6 +140,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
 
             inputRecipient.input.threshold = 0
+            inputRecipient.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
 
             inputRecipient.clearFocus()
             inputAmount.clearFocus()

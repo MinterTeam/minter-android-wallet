@@ -31,19 +31,16 @@
     android:id="@+id/search_view_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@drawable/shape_rounded_white"
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
     android:gravity="start|center_vertical"
     android:minHeight="48dp"
-    android:orientation="horizontal"
-    android:paddingStart="@dimen/margin_edges"
-    android:paddingLeft="@dimen/margin_edges"
-    android:paddingEnd="@dimen/margin_edges"
-    android:paddingRight="@dimen/margin_edges">
+    android:orientation="horizontal">
 
     <ImageView
+        android:layout_marginStart="@dimen/margin_edges"
         android:id="@+id/search_item_icon_left"
         android:layout_width="24dp"
         android:layout_height="24dp"

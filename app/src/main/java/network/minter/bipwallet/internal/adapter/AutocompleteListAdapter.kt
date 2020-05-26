@@ -97,7 +97,7 @@ abstract class AutocompleteListAdapter<Item, VH : AutocompleteListAdapter.ViewHo
             mInflater = LayoutInflater.from(parent.context)
         }
         if (v == null) {
-            v = mInflater!!.inflate(mViewResourceId, null)
+            v = mInflater!!.inflate(mViewResourceId, parent, false)
             try {
                 holder = viewHolderClass().getConstructor(View::class.java).newInstance(v)
                 v.tag = holder

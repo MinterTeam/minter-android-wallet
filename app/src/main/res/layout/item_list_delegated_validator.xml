@@ -57,10 +57,15 @@
         <TextView
             android:id="@+id/item_title"
             style="@style/Wallet.ItemTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges_half"
+            android:layout_marginEnd="@dimen/margin_edges_half"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
             app:layout_constraintBottom_toTopOf="@id/item_public_key"
+            app:layout_constraintEnd_toStartOf="@id/action_copy"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
@@ -69,13 +74,29 @@
         <TextView
             android:id="@+id/item_public_key"
             style="@style/ListSubtitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges_half"
+            android:layout_marginEnd="@dimen/margin_edges_half"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/action_copy"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toBottomOf="@id/item_title"
             tools:text="Mpaaa...bbb" />
+
+        <ImageView
+            android:id="@+id/action_copy"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:src="@drawable/ic_copy_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/action_delegate"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/action_delegate"
