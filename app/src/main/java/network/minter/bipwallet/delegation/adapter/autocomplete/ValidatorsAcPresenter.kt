@@ -70,7 +70,7 @@ class ValidatorsAcPresenter(
                 }
             }
 
-            if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase())) {
+            if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
                 filtered.add(item)
             }
         }
