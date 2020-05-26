@@ -385,8 +385,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
         viewState.startDialog {
             TxSendSuccessDialog.Builder(it)
-                    .setLabel(type.resultLabelRes)
-                    .setValue(validatorFullName)
+                    .setValue(type.resultLabelRes)
+//                    .setValue(validatorFullName)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
                         viewState.startExplorer(result.result!!.txHash)

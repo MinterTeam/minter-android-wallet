@@ -56,6 +56,7 @@ private constructor(context: Context, private val builder: Builder) : WalletDial
 
         binding.apply {
             txDescription.text = builder.mLabel
+            txDescription.visible = !builder.mLabel.isNullOrEmpty()
 
             dialogSecondValue.visible = builder.mValue != null
             dialogSecondValue.text = builder.mValue
@@ -105,6 +106,11 @@ private constructor(context: Context, private val builder: Builder) : WalletDial
 
         fun setValue(value: CharSequence?): Builder {
             mValue = value
+            return this
+        }
+
+        fun setValue(@StringRes resId: Int): Builder {
+            mValue = resources.getString(resId)
             return this
         }
 
