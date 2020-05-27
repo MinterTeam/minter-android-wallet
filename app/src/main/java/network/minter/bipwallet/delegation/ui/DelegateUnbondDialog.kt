@@ -316,6 +316,10 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         binding.inputMasternode.error = message
     }
 
+    override fun setCoinLabel(labelRes: Int) {
+        binding.inputCoin.label = getString(labelRes)
+    }
+
     override fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit) {
         if (items.isEmpty()) {
             return

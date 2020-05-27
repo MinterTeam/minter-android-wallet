@@ -80,5 +80,6 @@ interface DelegateUnbondView : MvpView {
     fun hideValidatorOverlay()
     fun addMasternodeInputTextChangeListener(textWatcher: TextWatcher)
     fun setMasternodeError(message: CharSequence?)
+    fun setCoinLabel(labelRes: Int)
 
 }

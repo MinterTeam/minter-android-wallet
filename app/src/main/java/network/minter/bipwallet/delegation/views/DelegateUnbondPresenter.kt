@@ -141,6 +141,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     R.string.dialog_label_unbond
                 }
         )
+        if (type == Type.Unbond) {
+            viewState.setCoinLabel(R.string.label_coin_you_want_unbond)
+        }
         setupFee()
 
         viewState.setOnClickUseMax(View.OnClickListener {
