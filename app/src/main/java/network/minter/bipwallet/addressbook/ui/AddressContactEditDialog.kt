@@ -43,7 +43,7 @@ import network.minter.bipwallet.addressbook.views.AddressContactEditPresenter
 import network.minter.bipwallet.databinding.DialogAddresscontactEditBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.ViewHelper
-import network.minter.bipwallet.internal.helpers.forms.validators.MinterAddressOrPubKeyValidator
+import network.minter.bipwallet.internal.helpers.forms.validators.MinterAddressValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueContactNameValidator
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
@@ -84,13 +84,13 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
         binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 
         inputGroup.addInput(binding.inputAddress)
-        inputGroup.addValidator(binding.inputAddress, MinterAddressOrPubKeyValidator("Incorrect address format"))
+        inputGroup.addValidator(binding.inputAddress, MinterAddressValidator())
 
         inputGroup.addInput(binding.inputTitle)
         inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
-        inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s](.{1,18})$").apply {
-            errorMessage = "Invalid title format"
-            isRequired = true
+        inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s].*$").apply {
+            errorMessage = "Title can't starts from whitespace"
+            isRequired = false
         })
 
         inputGroup.addValidator(binding.inputTitle, LengthValidator(1, 18).apply {

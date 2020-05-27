@@ -106,8 +106,8 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
 
         inputGroup.addInput(binding.inputTitle)
         inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
-        inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s](.{0,18})$").apply {
-            errorMessage = "Invalid title format"
+        inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s].*$").apply {
+            errorMessage = "Title can't starts from whitespace"
             isRequired = false
         })
 

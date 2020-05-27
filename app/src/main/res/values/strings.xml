@@ -279,7 +279,7 @@
     <string name="title_address_book">Address Book</string>
     <string name="btn_edit">Edit</string>
     <string name="btn_delete">Delete</string>
-    <string name="input_hint_addressbook_address">Mx Address or Public Key</string>
+    <string name="input_hint_addressbook_address">Mx Address</string>
     <string name="input_hint_addressbook_title">Add a title to the address</string>
     <string name="dialog_title_add_contact">Add New Address</string>
     <string name="dialog_title_edit_contact">Edit Address</string>
