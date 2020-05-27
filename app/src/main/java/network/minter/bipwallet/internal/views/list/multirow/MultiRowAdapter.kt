@@ -63,6 +63,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
     }
 
 
+    @Suppress("UNCHECKED_CAST")
     constructor (items: MutableList<Row<*>>) {
         mItems = items as MutableList<Row<RowViewHolder>>
         makeHoldersCache()
@@ -76,6 +77,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
     }
 
 
+    @Suppress("UNCHECKED_CAST")
     fun <R : RowViewHolder, T : Row<R>> addRow(row: T, position: Int): MultiRowAdapter {
         if (!row.isVisible()) {
             return this
@@ -103,6 +105,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
         return this
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun addRowsTop(rows: Collection<Row<*>>) {
         if (rows.isEmpty()) return
 
@@ -120,6 +123,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
         notifyItemRangeInserted(0, targets.size)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun addRows(rows: Collection<Row<*>>) {
         if (rows.isEmpty()) return
 
@@ -134,6 +138,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
         notifyItemRangeInserted(beforeSize, targets.size)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun addRowTop(row: Row<*>?) {
         if (row == null || !row.isVisible()) {
             return
@@ -146,6 +151,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
         notifyItemInserted(mItems.size)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun addRow(row: Row<*>) {
         if (!row.isVisible()) {
             return
@@ -163,7 +169,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RowViewHolder {
-        val tag = String.format("RowViewHolder instancing: %s", parent.context.resources.getResourceEntryName(viewType))
+//        val tag = String.format("RowViewHolder instancing: %s", parent.context.resources.getResourceEntryName(viewType))
         //        TimeProfiler.start(tag);
         if (layoutInflater == null) {
             layoutInflater = LayoutInflater.from(parent.context)

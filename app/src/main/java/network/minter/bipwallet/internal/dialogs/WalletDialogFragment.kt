@@ -61,6 +61,7 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
             inputDialog.dismiss()
         }
 
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
         fun <T : WalletDialogFragment> switchDialogWithExecutor(fragment: Fragment, dialog: T?, executor: DialogFragmentExecutor): T {
             releaseDialog(dialog)

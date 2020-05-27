@@ -30,12 +30,9 @@
         <item name="android:colorPrimary">@color/white</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:navigationBarColor">@color/greyBackground</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/text_size_default</item>
@@ -61,13 +58,16 @@
     </style>
 
     <style name="DialogTheme" parent="Wallet">
-        <!--        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>-->
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">@color/greyBackground</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="WalletBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/WalletModalStyle</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="Wallet.Camera" parent="Wallet">
@@ -97,17 +97,6 @@
         <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
-    </style>
-
-    <style name="WalletBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/WalletModalStyle</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:windowSoftInputMode">adjustResize</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">@color/white</item>
-        <item name="android:windowTranslucentStatus">true</item>
-
     </style>
 
     <style name="WalletModalStyle" parent="Widget.Design.BottomSheet.Modal">

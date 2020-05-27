@@ -221,7 +221,7 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
             }
             mPresenter.onScrolledTo(scrollY)
         })
-        binding.list.setOnTouchListener { v, event ->
+        binding.list.setOnTouchListener { _, _ ->
             (binding.list.adapter as DelegationListAdapter).closeOpened()
             false
         }

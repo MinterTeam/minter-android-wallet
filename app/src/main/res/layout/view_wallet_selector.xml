@@ -33,18 +33,29 @@
     android:orientation="horizontal"
     android:weightSum="10">
 
-    <TextView
-        android:id="@+id/icon"
+    <FrameLayout
         android:layout_width="24dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="0dp"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_weight="1"
-        tools:text="🐠" />
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:gravity="center"
+            tools:text="🐠" />
+
+        <ImageView
+            android:id="@+id/icon_support"
+            android:layout_width="18dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:src="@drawable/emoji_tropical_fish"
+            tools:visibility="visible" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/title"

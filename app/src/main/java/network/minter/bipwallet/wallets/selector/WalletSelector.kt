@@ -27,6 +27,7 @@ package network.minter.bipwallet.wallets.selector
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -43,6 +44,8 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.helpers.MathHelper.bdLT
+import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
 import java.math.BigDecimal
@@ -50,13 +53,20 @@ import java.util.*
 
 @Styleable("WalletSelector")
 class WalletSelector : FrameLayout {
-    @JvmField @BindView(R.id.icon)
+    @JvmField
+    @BindView(R.id.icon)
     var weight: TextView? = null
 
-    @JvmField @BindView(R.id.title)
+    @JvmField
+    @BindView(R.id.icon_support)
+    var weightSupport: ImageView? = null
+
+    @JvmField
+    @BindView(R.id.title)
     var name: TextView? = null
 
-    @JvmField @BindView(R.id.dropdown)
+    @JvmField
+    @BindView(R.id.dropdown)
     var dropdown: ImageView? = null
     private var mAdapter: WalletListAdapter? = null
     private var mPopup: WalletsPopupWindow? = null
@@ -66,16 +76,21 @@ class WalletSelector : FrameLayout {
     private val mPopupDefer = DeferredCall.create<WalletsPopupWindow?>()
     private var mPopupOpened = false
 
-    enum class WalletWeight(val emoji: String) {
-        Shrimp("\uD83E\uDD90"),
-        Shell("\uD83D\uDC1A"),
-        Crab("\uD83E\uDD80"),
-        TropicalFish("\uD83D\uDC20"),
-        Shark("\uD83E\uDD88"),
-        Whale("\uD83D\uDC0B"),
-        Dolphin("\uD83D\uDC2C");
+    enum class WalletWeight(val emoji: String, val fallback: Int) {
+        Shrimp("\uD83E\uDD90", R.drawable.emoji_shrimp),
+        Shell("\uD83D\uDC1A", R.drawable.emoji_shell),
+        Crab("\uD83E\uDD80", R.drawable.emoji_crab),
+        TropicalFish("\uD83D\uDC20", R.drawable.emoji_tropical_fish),
+        Shark("\uD83E\uDD88", R.drawable.emoji_shark),
+        Whale("\uD83D\uDC0B", R.drawable.emoji_whale),
+        Dolphin("\uD83D\uDC2C", R.drawable.emoji_dolphin);
 
         companion object {
+            @JvmStatic
+            fun supportsNativeEmoji(): Boolean {
+                return Build.VERSION.SDK_INT >= 24
+            }
+
             fun detect(balance: BigDecimal?): WalletWeight {
                 val ret = when {
                     bdLT(balance, BigDecimal("1000")) -> {
@@ -108,26 +123,31 @@ class WalletSelector : FrameLayout {
 
     constructor(context: Context?) : super(context!!)
     constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {
-        init(attrs, 0, 0)
+        init(attrs)
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context!!, attrs, defStyleAttr) {
-        init(attrs, defStyleAttr, 0)
+        init(attrs)
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context!!, attrs, defStyleAttr, defStyleRes) {
-        init(attrs, defStyleAttr, defStyleRes)
+        init(attrs)
     }
 
-    private fun init(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
+    private fun init(attrs: AttributeSet?) {
         mAdapter = WalletListAdapter()
         mAdapter!!.setOnClickWalletListener { addressBalance: WalletItem -> onClickWallet(addressBalance) }
         mAdapter!!.setOnClickEditWalletListener { addressBalance: WalletItem -> onClickEditWallet(addressBalance) }
         mAdapter!!.setOnClickAddWalletListener { onClickAddWallet() }
         val view = View.inflate(context, R.layout.view_wallet_selector, this)
         ButterKnife.bind(this, view)
-        view.setOnClickListener { openPopup(it) }
+        view.setOnClickListener { openPopup() }
         Paris.style(this).apply(attrs)
+
+        if (!WalletWeight.supportsNativeEmoji()) {
+            weight?.visible = false
+            weightSupport?.visible = true
+        }
     }
 
     fun <T> registerLifecycle(ctx: T) where T : Context, T : LifecycleOwner {
@@ -181,7 +201,7 @@ class WalletSelector : FrameLayout {
         }
     }
 
-    fun openPopup(view: View?) {
+    fun openPopup() {
         if (!mPopupOpened) {
             mPopupOpened = true
             mPopup = WalletsPopupWindow.create(this, mAdapter)
@@ -194,7 +214,16 @@ class WalletSelector : FrameLayout {
 
     internal fun setMainWallet(wallet: WalletItem) {
         name!!.post { name!!.text = Preconditions.firstNonNull(wallet.title, wallet.addressShort) }
-        weight!!.post { weight!!.text = wallet.weight.emoji }
+
+        if (WalletWeight.supportsNativeEmoji()) {
+            weight?.postApply {
+                it.text = wallet.weight.emoji
+            }
+        } else {
+            weightSupport?.postApply {
+                it.setImageResource(wallet.weight.fallback)
+            }
+        }
     }
 
     internal fun setWallets(addresses: List<WalletItem?>?) {

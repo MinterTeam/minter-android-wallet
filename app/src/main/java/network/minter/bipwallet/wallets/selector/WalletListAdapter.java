@@ -91,9 +91,17 @@ public class WalletListAdapter extends RecyclerView.Adapter<WalletListAdapter.Vi
         } else {
             final WalletItem item = mAddresses.get(position);
 
-            holder.iconAdd.setVisibility(View.GONE);
-            holder.weight.setVisibility(View.VISIBLE);
-            holder.weight.setText(item.getWeight().getEmoji());
+            if (WalletSelector.WalletWeight.supportsNativeEmoji()) {
+                holder.iconAdd.setVisibility(View.GONE);
+                holder.weight.setVisibility(View.VISIBLE);
+                holder.weight.setText(item.getWeight().getEmoji());
+            } else {
+                holder.weight.setVisibility(View.GONE);
+                holder.weight.setText(null);
+                holder.iconAdd.setVisibility(View.VISIBLE);
+                holder.iconAdd.setImageResource(item.getWeight().getFallback());
+            }
+
             holder.name.setText(firstNonNull(item.getTitle(), item.getAddressShort()));
             holder.action.setVisibility(View.VISIBLE);
             holder.action.setOnClickListener(v -> {

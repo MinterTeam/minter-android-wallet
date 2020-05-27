@@ -49,9 +49,9 @@ object ViewExtensions {
             this.visibility = if (v) View.VISIBLE else View.GONE
         }
 
-    fun <T : View> T.postApply(cb: (T) -> Unit) {
+    fun <T : View?> T.postApply(cb: (T) -> Unit) {
         val _this = this
-        this.post {
+        this?.post {
             cb(_this)
         }
     }

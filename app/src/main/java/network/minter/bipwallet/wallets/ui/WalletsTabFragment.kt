@@ -247,15 +247,15 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         }
     }
 
-    override fun setMainWallet(mainWallet: WalletItem) {
+    override fun setMainWallet(walletItem: WalletItem) {
         activity?.let {
-            WalletSelectorBroadcastReceiver.setMainWallet(activity!!, mainWallet)
+            WalletSelectorBroadcastReceiver.setMainWallet(activity!!, walletItem)
         }
     }
 
-    override fun setWallets(addresses: List<WalletItem>) {
+    override fun setWallets(walletItems: List<WalletItem>) {
         activity?.let {
-            WalletSelectorBroadcastReceiver.setWallets(activity!!, addresses)
+            WalletSelectorBroadcastReceiver.setWallets(activity!!, walletItems)
         }
     }
 

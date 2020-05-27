@@ -27,6 +27,7 @@ package network.minter.bipwallet.wallets.ui
 
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -80,6 +81,12 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
         }
     }
 
+    companion object {
+        fun enableRecolorSystemUI(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        }
+    }
+
     override fun onStateChanged(appbar: AppBarLayout, state: State, verticalOffset: Int, percent: Float) {
         val ctx = mRef.get()
         if (!mEnableRecolor || ctx == null || ctx.activity == null) {
@@ -89,8 +96,11 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
         val dropdownColor = blendColors(mCollapsedStatusColor, mCollapsedDropdownColor, 1.0f - percent)
         mStatusColor = blendColors(mCollapsedStatusColor, mExpandedStatusColor, percent)
         mLightStatus = percent < 0.5f
-        ViewHelper.setSystemBarsLightness(ctx.activity, mLightStatus)
-        ViewHelper.setStatusBarColor(ctx.activity, mStatusColor)
+        if (enableRecolorSystemUI()) {
+            ViewHelper.setSystemBarsLightness(ctx.activity, mLightStatus)
+            ViewHelper.setStatusBarColor(ctx.activity, mStatusColor)
+        }
+
         view.walletSelector.setNameColor(textColor)
         view.walletSelector.setDropdownTint(dropdownColor)
         if (mLightStatus) {
@@ -148,8 +158,11 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
 
     fun setTabSelected() {
         if (mRef.get() == null) return
-        ViewHelper.setSystemBarsLightness(mRef.get(), mLightStatus)
-        ViewHelper.setStatusBarColorAnimate(mRef.get(), mStatusColor)
+        if (enableRecolorSystemUI()) {
+            ViewHelper.setSystemBarsLightness(mRef.get(), mLightStatus)
+            ViewHelper.setStatusBarColorAnimate(mRef.get(), mStatusColor)
+        }
+
     }
 
 

@@ -50,6 +50,8 @@ abstract class AutocompleteListAdapter<Item, VH : AutocompleteListAdapter.ViewHo
     private val mViewResourceId: Int
     private var mInflater: LayoutInflater? = null
     private var mOnItemClickListener: OnItemClickListener<Item>? = null
+
+    @Suppress("UNCHECKED_CAST")
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun convertResultToString(resultValue: Any): String {
@@ -128,6 +130,8 @@ abstract class AutocompleteListAdapter<Item, VH : AutocompleteListAdapter.ViewHo
     protected abstract fun viewHolderClass(): Class<VH>
     protected abstract fun isItemMatchesConstraint(item: Item, constraint: CharSequence?): Boolean
     protected abstract fun resultToString(item: Item): String
+
+    @Suppress("UNCHECKED_CAST")
     protected open fun onBindViewHolder(item: Item, holder: VH, position: Int) {
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener { mOnItemClickListener?.onClick(getItem(position) as Item, position) }

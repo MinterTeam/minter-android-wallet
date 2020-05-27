@@ -58,6 +58,7 @@ import network.minter.bipwallet.security.SecurityModule.PinMode
 import network.minter.bipwallet.security.ui.PinEnterActivity
 import network.minter.bipwallet.settings.contract.SettingsTabView
 import network.minter.bipwallet.settings.views.SettingsTabPresenter
+import network.minter.bipwallet.wallets.ui.WalletsTopRecolorHelper
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -86,8 +87,10 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
 
     override fun onTabSelected() {
         super.onTabSelected()
-        ViewHelper.setSystemBarsLightness(this, true)
-        ViewHelper.setStatusBarColorAnimate(this, -0x1)
+        if (WalletsTopRecolorHelper.enableRecolorSystemUI()) {
+            ViewHelper.setSystemBarsLightness(this, true)
+            ViewHelper.setStatusBarColorAnimate(this, -0x1)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

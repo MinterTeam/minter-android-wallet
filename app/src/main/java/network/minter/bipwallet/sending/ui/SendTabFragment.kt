@@ -75,6 +75,7 @@ import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.bipwallet.wallets.selector.WalletListAdapter
 import network.minter.bipwallet.wallets.selector.WalletSelectorBroadcastReceiver
+import network.minter.bipwallet.wallets.ui.WalletsTopRecolorHelper
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
@@ -97,8 +98,10 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     override fun onTabSelected() {
         super.onTabSelected()
-        ViewHelper.setSystemBarsLightness(this, true)
-        ViewHelper.setStatusBarColorAnimate(this, 0xFF_FFFFFF.toInt())
+        if (WalletsTopRecolorHelper.enableRecolorSystemUI()) {
+            ViewHelper.setSystemBarsLightness(this, true)
+            ViewHelper.setStatusBarColorAnimate(this, 0xFF_FFFFFF.toInt())
+        }
     }
 
     override fun onAttach(context: Context) {

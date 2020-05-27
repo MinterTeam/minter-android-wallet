@@ -37,6 +37,7 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import network.minter.bipwallet.R
@@ -83,11 +84,6 @@ class SnackbarBuilder {
     }
 
     constructor(fragment: Fragment) {
-        mContext = fragment.activity
-        mContainerView = fragment.view
-    }
-
-    constructor(fragment: android.app.Fragment) {
         mContext = fragment.activity
         mContainerView = fragment.view
     }
@@ -150,7 +146,7 @@ class SnackbarBuilder {
     }
 
     fun setActionTextColorRes(@ColorRes resId: Int): SnackbarBuilder {
-        mActionColor = mContext!!.resources.getColor(resId)
+        mActionColor = ContextCompat.getColor(mContext!!, resId)
         mActionColorSet = true
         return this
     }
@@ -168,13 +164,13 @@ class SnackbarBuilder {
     }
 
     fun setMessageTextColorRes(@ColorRes colorRes: Int): SnackbarBuilder {
-        mMessageColor = mContext!!.resources.getColor(colorRes)
+        mMessageColor = ContextCompat.getColor(mContext!!, colorRes)
         mMessageColorSet = true
         return this
     }
 
     fun setBackgroundColorRes(@ColorRes backgroundColorRes: Int): SnackbarBuilder {
-        mBackgroundColor = mContext!!.resources.getColor(backgroundColorRes)
+        mBackgroundColor = ContextCompat.getColor(mContext!!, backgroundColorRes)
         mBackgroundColorSet = true
         return this
     }
@@ -200,7 +196,7 @@ class SnackbarBuilder {
                 mOnClickListener!!.onClick(v)
             }
             if (!mActionColorSet) {
-                mSnackbar!!.setActionTextColor(mContext!!.resources.getColor(R.color.errorColor))
+                mSnackbar!!.setActionTextColor(ContextCompat.getColor(mContext!!, R.color.errorColor))
             } else {
                 mSnackbar!!.setActionTextColor(mActionColor)
             }
@@ -216,7 +212,7 @@ class SnackbarBuilder {
         if (mMessageColorSet) {
             mTextView!!.setTextColor(mMessageColor)
         } else {
-            mTextView!!.setTextColor(mContext!!.resources.getColor(android.R.color.white))
+            mTextView!!.setTextColor(ContextCompat.getColor(mContext!!, R.color.white))
         }
         if (mMessageTextSizeRes > 0) {
             mTextView!!.setTextSize(TypedValue.COMPLEX_UNIT_PX, mMessageTextSizeRes)

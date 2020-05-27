@@ -126,7 +126,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
                 (binding.list.adapter as AddressBookAdapter).closeOpened()
             }
         })
-        binding.list.setOnTouchListener { v, event ->
+        binding.list.setOnTouchListener { _, _ ->
             (binding.list.adapter as AddressBookAdapter).closeOpened()
             false
         }

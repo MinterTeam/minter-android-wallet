@@ -28,11 +28,11 @@ package network.minter.bipwallet.settings.views.rows
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import butterknife.BindView
 import butterknife.ButterKnife
 import network.minter.bipwallet.R
-import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.common.Lazy
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter.RowViewHolder
@@ -134,20 +134,21 @@ class SettingsButtonRow : MultiRowContract.Row<SettingsButtonRow.ViewHolder> {
         vh.value!!.text = mValue.get()
         if (mDefValue == null) {
             if (mInactive) {
-                vh.value!!.setTextColor(Wallet.app().res().getColor(R.color.textColorGrey))
+
+                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorGrey))
             } else {
-                vh.value!!.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary))
+                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorPrimary))
             }
         } else {
             if (mValue.get() != null && mValue.get()!!.isEmpty()) {
-                vh.value!!.setTextColor(Wallet.app().res().getColor(R.color.textColorGrey))
+                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorGrey))
                 vh.value!!.text = mDefValue
             } else {
-                vh.value!!.setTextColor(Wallet.app().res().getColor(R.color.textColorPrimary))
+                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorPrimary))
                 vh.value!!.text = mValue.get()
             }
         }
-        vh.itemView.setOnClickListener { v: View? ->
+        vh.itemView.setOnClickListener {
             mListener?.invoke(vh.itemView, vh.key!!, mValue.get())
         }
     }

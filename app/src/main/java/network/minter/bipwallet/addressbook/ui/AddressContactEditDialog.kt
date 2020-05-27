@@ -118,7 +118,7 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
 
     override fun validate() {
         inputGroup.validate(true).subscribe(
-                { res ->
+                { _ ->
 
                 },
                 { t ->

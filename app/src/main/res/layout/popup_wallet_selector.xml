@@ -25,7 +25,7 @@
   ~ THE SOFTWARE.
   -->
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
     app:cardElevation="@dimen/card_elevation"
-    app:cardUseCompatPadding="false">
+    app:cardUseCompatPadding="@bool/use_card_compat">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -45,7 +45,7 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:minWidth="248dp"
-        tools:alpha=".3"
+
         tools:itemCount="3"
         tools:layout_height="183dp"
         tools:layout_width="248dp"
@@ -57,7 +57,6 @@
         android:layout_height="32dp"
         android:layout_gravity="center"
         android:visibility="gone"
-        app:color="@color/colorPrimaryLight"
-        tools:visibility="visible" />
+        app:color="@color/colorPrimaryLight" />
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

@@ -125,6 +125,8 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
                     hideProgress()
                 }
                 LoadState.Loading -> showProgress()
+                else -> {
+                }
             }
         })
     }

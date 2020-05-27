@@ -252,12 +252,12 @@ public final class ViewHelper {
     public static int systemBarsLightness(boolean light) {
         int flags = 0;
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-        }
-
         if (light && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
         }
 
         return flags;
