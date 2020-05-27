@@ -44,6 +44,8 @@ import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.RegexValidator
 import com.otaliastudios.autocomplete.Autocomplete
 import com.otaliastudios.autocomplete.AutocompleteCallback
+import com.otaliastudios.autocomplete.AutocompletePolicy
+import com.otaliastudios.autocomplete.AutocompletePresenter
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -319,8 +321,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
             return
         }
 
-        val presenter = ValidatorsAcPresenter(context!!)
-        presenter.setItems(items)
+        val presenter = ValidatorsAcPresenter(context!!, items)
         val callback: AutocompleteCallback<ValidatorItem> = object : AutocompleteCallback<ValidatorItem> {
             override fun onPopupItemClicked(editable: Editable, item: ValidatorItem): Boolean {
                 listener(item, 0)
@@ -333,7 +334,8 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
         autocomplete = Autocomplete.on<ValidatorItem>(binding.inputMasternode.input)
                 .with(callback)
-                .with(presenter)
+                .with(presenter as AutocompletePresenter<ValidatorItem>)
+                .with(presenter as AutocompletePolicy)
                 .with(6f)
                 .with(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
                 .build()

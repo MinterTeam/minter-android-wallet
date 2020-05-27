@@ -481,7 +481,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                             }
 
                             if (type == Type.Delegate) {
-                                viewState.setValidatorsAutocomplete(validators) { validator, _ ->
+                                viewState.setValidatorsAutocomplete(validators.filterOnline()) { validator, _ ->
                                     onValidatorSelected(validator)
                                 }
                             }
@@ -543,8 +543,14 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             }
         }
         viewState.setOnValidatorSelectListener(View.OnClickListener {
-            viewState.startValidatorSelector(selectorDataFromValidators(validators)) { validator ->
-                onValidatorSelected(validator.data)
+            if (type == Type.Delegate) {
+                viewState.startValidatorSelector(selectorDataFromValidators(validators.filterOnline())) { validator ->
+                    onValidatorSelected(validator.data)
+                }
+            } else {
+                viewState.startValidatorSelector(selectorDataFromValidators(validators.filterDelegated())) { validator ->
+                    onValidatorSelected(validator.data)
+                }
             }
         })
 
@@ -564,6 +570,16 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 }
             }
         })
+    }
+
+    internal fun MutableList<ValidatorItem>.filterOnline(): List<ValidatorItem> {
+        return filter { it.status == ValidatorItem.STATUS_ONLINE }
+    }
+
+    internal fun MutableList<ValidatorItem>.filterDelegated(): List<ValidatorItem> {
+        return filter {
+            accountStorage.entity.mainWallet.hasDelegated(it.pubKey)
+        }
     }
 
     private fun onAccountSelected(account: BaseCoinValue?) {

@@ -27,8 +27,9 @@
 package network.minter.bipwallet.delegation.adapter.autocomplete
 
 import android.content.Context
-import android.view.ViewGroup
+import android.text.Spannable
 import androidx.recyclerview.widget.RecyclerView
+import com.otaliastudios.autocomplete.AutocompletePolicy
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
 import network.minter.explorer.models.ValidatorItem
 
@@ -38,12 +39,17 @@ import network.minter.explorer.models.ValidatorItem
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class ValidatorsAcPresenter(
-        context: Context
-) : RecyclerAcPresenter<ValidatorItem>(context) {
+        context: Context,
+        private var items: List<ValidatorItem> = ArrayList()
+) : RecyclerAcPresenter<ValidatorItem>(context), AutocompletePolicy {
 
-    private var items: List<ValidatorItem> = ArrayList()
     private val itemsLock = Any()
-    private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this)
+    private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this, items)
+    private var onEmptyResult: (() -> Unit)? = null
+
+    fun setOnEmptyResult(listener: () -> Unit) {
+        onEmptyResult = listener
+    }
 
     fun setItems(items: List<ValidatorItem>) {
         synchronized(itemsLock) {
@@ -57,6 +63,7 @@ class ValidatorsAcPresenter(
 
     override fun onQuery(query: CharSequence?) {
         if (query.isNullOrEmpty()) {
+            onEmptyResult?.invoke()
             adapter.setItems(ArrayList(0))
             return
         }
@@ -74,14 +81,32 @@ class ValidatorsAcPresenter(
                 filtered.add(item)
             }
         }
+
+        if (filtered.isEmpty()) {
+            onEmptyResult?.invoke()
+        }
         adapter.setItems(filtered)
 
     }
 
     override fun getPopupDimensions(): PopupDimensions {
         val dims = PopupDimensions()
-        dims.width = ViewGroup.LayoutParams.WRAP_CONTENT
-        dims.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        dims.calculateHeight = false
         return dims
+    }
+
+    override fun shouldShowPopup(text: Spannable, cursorPos: Int): Boolean {
+        return text.length > 0
+    }
+
+    override fun shouldDismissPopup(text: Spannable, cursorPos: Int): Boolean {
+        return text.length == 0 || adapter.itemCount == 0
+    }
+
+    override fun getQuery(text: Spannable): CharSequence {
+        return text
+    }
+
+    override fun onDismiss(text: Spannable) {
     }
 }

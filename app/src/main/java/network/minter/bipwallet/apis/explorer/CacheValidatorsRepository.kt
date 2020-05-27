@@ -36,7 +36,6 @@ import network.minter.core.internal.api.ApiService
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.repo.ExplorerValidatorsRepository
-import timber.log.Timber
 
 typealias RepoValidators = CachedRepository<@JvmSuppressWildcards List<ValidatorItem>, CacheValidatorsRepository>
 
@@ -59,8 +58,7 @@ class CacheValidatorsRepository(
     }
 
     override fun onAfterUpdate(result: List<ValidatorItem>) {
-        Timber.d("Save online validators")
-        storage.putAsync(KEY_VALIDATORS, result.filter { it.status == ValidatorItem.STATUS_ONLINE }.toMutableList())
+        storage.putAsync(KEY_VALIDATORS, result)
     }
 
     override fun onClear() {

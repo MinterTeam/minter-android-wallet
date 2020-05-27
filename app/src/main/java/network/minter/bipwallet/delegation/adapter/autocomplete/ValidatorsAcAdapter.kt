@@ -39,9 +39,10 @@ import network.minter.explorer.models.ValidatorItem
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class ValidatorsAcAdapter(
-        val presenter: ValidatorsAcPresenter
+        val presenter: ValidatorsAcPresenter,
+        private var items: List<ValidatorItem> = ArrayList()
 ) : RecyclerView.Adapter<ValidatorsAcAdapter.ViewHolder>() {
-    private var items: List<ValidatorItem> = ArrayList()
+
     private var inflater: LayoutInflater? = null
 
     class ViewHolder(
@@ -53,6 +54,9 @@ class ValidatorsAcAdapter(
         val item = items[position]
         val name = item.meta?.name ?: item.pubKey.toShortString()
         val subtitle = if (item.meta?.name.isNullOrEmpty()) null else item.pubKey.toShortString()
+
+
+        holder.b.separator.visible = items.isNotEmpty() && position < items.size - 1
 
         holder.b.root.setOnClickListener {
             presenter.dispatchClick(items[holder.adapterPosition])

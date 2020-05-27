@@ -87,7 +87,7 @@ abstract class RecyclerAcPresenter<T>(
 
     private class Observer(private val root: DataSetObserver) : RecyclerView.AdapterDataObserver() {
         override fun onChanged() {
-            root.onChanged()
+//            root.onChanged()
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
