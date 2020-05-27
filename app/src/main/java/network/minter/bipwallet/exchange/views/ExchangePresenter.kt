@@ -330,11 +330,11 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
                         viewState.startExplorer(txHash)
-//                        viewState.finish()
+                        viewState.finish()
                     }
                     .setNegativeAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-//                        viewState.finish()
+                        viewState.finish()
                     }
                     .create()
         }
