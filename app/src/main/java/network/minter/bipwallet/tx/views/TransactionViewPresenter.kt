@@ -104,7 +104,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             onClickBlockNumber()
         })
 
-        val isIncoming = tx.isIncoming(secretStorage.addresses)
+        val isIncoming = tx.isIncoming(listOf(secretStorage.mainWallet))
 
         if (tx.type == HistoryTransaction.Type.Send || tx.type == HistoryTransaction.Type.MultiSend) {
             if (isIncoming) {
@@ -116,11 +116,12 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             viewState.setTitle("${tx.type.name} Transaction")
         }
 
-
         when (tx.type) {
             HistoryTransaction.Type.Send -> {
                 val data: HistoryTransaction.TxSendCoinResult = tx.getData()
-                viewState.setToName(null)
+                viewState.setToName(_tx!!.toName)
+                viewState.setFromName(_tx!!.fromName)
+
                 viewState.setToAddress(data.to.toString())
                 viewState.setToAvatar(data.to.avatar())
 
@@ -202,13 +203,13 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             HistoryTransaction.Type.Unbond -> {
                 val data: HistoryTransaction.TxDelegateUnbondResult = tx.getData()
 
-                viewState.setToName(_tx?.name)
+                viewState.setToName(_tx?.toName)
                 viewState.setToAddress(data.publicKey.toString())
 
                 if (tx.type == HistoryTransaction.Type.Delegate) {
-                    viewState.setToAvatar(_tx?.avatar, R.drawable.img_avatar_delegate)
+                    viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_delegate)
                 } else {
-                    viewState.setToAvatar(_tx?.avatar, R.drawable.img_avatar_unbond)
+                    viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_unbond)
                 }
 
                 viewState.inflateDetails(R.layout.tx_details_delegate_unbond) {
@@ -222,11 +223,14 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             }
             HistoryTransaction.Type.RedeemCheck -> {
                 viewState.showTo(false)
+                viewState.setFromName(_tx?.fromName)
 
                 viewState.inflateDetails(R.layout.tx_details_redeem_check) {
                     val b = TxDetailsRedeemCheckBinding.bind(it)
                     val data: HistoryTransaction.TxRedeemCheckResult = tx.getData()
                     val check = data.getCheck()
+
+
                     b.valueAmount.text = check.value.humanize()
                     b.valueCoin.text = check.coin
                 }

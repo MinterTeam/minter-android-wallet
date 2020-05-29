@@ -28,6 +28,7 @@ package network.minter.bipwallet.wallets.views
 import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
+import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -38,7 +39,6 @@ import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.TxsTabPageView
 import network.minter.bipwallet.wallets.utils.HistoryTransactionDiffUtil
-import network.minter.explorer.models.HistoryTransaction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,6 +47,7 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var secretRepo: SecretStorage
     @Inject lateinit var validatorsRepo: RepoValidators
+    @Inject lateinit var addressBookRepo: AddressBookRepository
 
     private var adapter: TransactionShortListAdapter? = null
 
@@ -57,7 +58,9 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        adapter = TransactionShortListAdapter(secretRepo.addresses)
+        adapter = TransactionShortListAdapter {
+            secretRepo.mainWallet
+        }
         adapter!!.setOnExpandDetailsListener { _, tx ->
             viewState.startDetails(tx)
         }
@@ -73,8 +76,10 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                 .retryWhen(errorResolver)
                 .observe()
                 .joinToUi()
-                .switchMap { result: List<HistoryTransaction> -> TransactionDataSource.mapToFacade(result) }
-                .switchMap { items: List<TransactionFacade> -> TransactionDataSource.mapValidatorsInfo(validatorsRepo, items) }
+                .switchMap { TransactionDataSource.mapToFacade(it) }
+                .switchMap { TransactionDataSource.mapValidatorsInfo(validatorsRepo, it) }
+                .switchMap { TransactionDataSource.mapAddressBook(addressBookRepo, it) }
+                .switchMap { TransactionDataSource.mapAvatar(it) }
                 .subscribe(
                         { res: List<TransactionFacade> ->
                             Timber.d("Updated txs")
@@ -86,6 +91,7 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                             }
                         },
                         {
+                            Timber.w(it)
                             viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Error)
                         }
                 )

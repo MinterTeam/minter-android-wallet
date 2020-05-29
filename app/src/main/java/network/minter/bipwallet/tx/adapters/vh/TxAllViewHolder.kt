@@ -34,12 +34,10 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.bipwallet.tx.adapters.TransactionFacade.UserMeta
 import network.minter.bipwallet.tx.adapters.TxItem
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.HistoryTransaction
-import network.minter.profile.MinterProfileApi
 import timber.log.Timber
 import java.math.BigDecimal
 
@@ -51,7 +49,7 @@ import java.math.BigDecimal
 class TxAllViewHolder(
         var binding: ItemListTxBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: TxItem, myAddresses: List<MinterAddress>) {
+    fun bind(item: TxItem, myAddresses: () -> MinterAddress) {
 
         binding.itemTitleType.text = item.tx.type.name
 
@@ -80,8 +78,8 @@ class TxAllViewHolder(
         val data: HistoryTransaction.TxEditCandidateResult = item.tx.getData()
 
         binding.apply {
-            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemAmount.text = item.tx.fee.humanize()
             itemSubamount.text = MinterSDK.DEFAULT_COIN
         }
@@ -100,9 +98,9 @@ class TxAllViewHolder(
         return out
     }
 
-    private fun mapIncomingMultisend(addresses: List<MinterAddress>, result: List<HistoryTransaction.TxSendCoinResult>): Map<String, BigDecimal> {
+    private fun mapIncomingMultisend(myAddress: () -> MinterAddress, result: List<HistoryTransaction.TxSendCoinResult>): Map<String, BigDecimal> {
         val out = HashMap<String, BigDecimal>()
-        result.filter { addresses.contains(it.to) }
+        result.filter { it.to == myAddress() }
                 .forEach {
                     if (out.containsKey(it.coin) && out[it.coin] != null) {
                         out[it.coin] = out[it.coin]!! + it.amount
@@ -113,20 +111,20 @@ class TxAllViewHolder(
         return out
     }
 
-    private fun bindMultisend(txItem: TxItem, myAddresses: List<MinterAddress>) {
+    private fun bindMultisend(txItem: TxItem, myAddress: () -> MinterAddress) {
         val item = txItem.tx
         val data: HistoryTransaction.TxMultisendResult = item.tx.getData()
 
-        val isIncoming: Boolean = !myAddresses.contains(item.from)
+        val isIncoming: Boolean = myAddress() != item.from
 
         binding.apply {
-            itemTitle.text = txItem.username ?: item.from.toShortString()
-            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_multisend)
+            itemTitle.text = txItem.tx.fromName ?: item.from.toShortString()
+            itemAvatar.setImageUrlFallback(item.toAvatar, R.drawable.img_avatar_multisend)
 
             val coinsAmount: Map<String, BigDecimal>
 
             if (isIncoming) {
-                coinsAmount = mapIncomingMultisend(myAddresses, data.items)
+                coinsAmount = mapIncomingMultisend(myAddress, data.items)
 
                 if (coinsAmount.isEmpty()) {
                     Timber.e("NO one incoming transaction in multisend")
@@ -157,8 +155,8 @@ class TxAllViewHolder(
     private fun bindSetCandidateOnOff(item: TxItem) {
         val data: HistoryTransaction.TxSetCandidateOnlineOfflineResult = item.tx.getData()
         binding.apply {
-            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemAmount.text = item.tx.fee.humanize()
             itemSubamount.text = MinterSDK.DEFAULT_COIN
         }
@@ -184,8 +182,8 @@ class TxAllViewHolder(
                 R.drawable.img_avatar_unbond
             }
 
-            itemAvatar.setImageUrlFallback(item.avatar, fallbackAvatar)
-            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, fallbackAvatar)
+            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemSubamount.text = data.coin
 
             if (item.tx.type == HistoryTransaction.Type.Delegate) {
@@ -221,50 +219,36 @@ class TxAllViewHolder(
     private fun bindDeclareCandidacy(item: TxItem) {
         val data: HistoryTransaction.TxDeclareCandidacyResult = item.tx.getData()
         binding.apply {
-            itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.username ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemSubamount.text = data.coin
             itemAmount.text = "- ${data.stake.humanize()}"
         }
     }
 
-    private fun bindSend(txItem: TxItem, myAddresses: List<MinterAddress>) {
+    private fun bindSend(txItem: TxItem, myAddress: () -> MinterAddress) {
         val item = txItem.tx
         val data: HistoryTransaction.TxSendCoinResult = item.tx.getData()
 
-        val isIncoming: Boolean = item.isIncoming(myAddresses)
+        val isIncoming: Boolean = item.isIncoming(listOf(myAddress()))
         val isSelfSending = item.from == data.to
 
-        if (!isIncoming) {
-            txItem.setAvatar(UserMeta(null, MinterProfileApi.getUserAvatarUrlByAddress(data.to)))
-        } else {
-            txItem.setAvatar(UserMeta(null, MinterProfileApi.getUserAvatarUrlByAddress(item.from)))
-        }
-
         binding.apply {
-            itemAvatar.setImageUrl(txItem.avatar)
+            if (isIncoming) {
+                itemAvatar.setImageUrlFallback(txItem.tx.fromAvatar, R.drawable.img_avatar_default)
+            } else {
+                itemAvatar.setImageUrlFallback(txItem.tx.toAvatar, R.drawable.img_avatar_default)
+            }
 
             if (isSelfSending) {
-                if (txItem.username != null) {
-                    itemTitle.text = String.format("@%s", txItem.username)
-                } else {
-                    itemTitle.text = item.from.toShortString()
-                }
+                itemTitle.text = txItem.tx.fromName ?: item.from.toShortString()
                 itemAmount.text = data.amount.humanize()
             } else {
                 if (isIncoming) {
-                    if (txItem.username != null) {
-                        itemTitle.text = String.format("@%s", txItem.username)
-                    } else {
-                        itemTitle.text = item.from.toShortString()
-                    }
+                    itemTitle.text = txItem.tx.fromName ?: item.from.toShortString()
                     itemAmount.text = data.amount.humanize()
                 } else {
-                    if (txItem.username != null) {
-                        itemTitle.text = String.format("@%s", txItem.username)
-                    } else {
-                        itemTitle.text = data.to.toShortString()
-                    }
+                    itemTitle.text = txItem.tx.toName ?: data.to.toShortString()
                     itemAmount.text = String.format("- %s", bdHuman(data.amount))
                 }
             }

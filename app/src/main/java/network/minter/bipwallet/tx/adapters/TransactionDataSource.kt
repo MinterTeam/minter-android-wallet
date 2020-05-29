@@ -30,8 +30,11 @@ import androidx.paging.DataSource
 import androidx.paging.PageKeyedDataSource
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.R
+import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError
@@ -44,7 +47,6 @@ import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.helpers.DateHelper
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.tx.adapters.TransactionFacade.UserMeta
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.ExpResult
@@ -53,6 +55,7 @@ import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.models.ValidatorMeta
 import network.minter.explorer.repo.ExplorerTransactionRepository
 import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
+import network.minter.profile.MinterProfileApi
 import network.minter.profile.models.AddressInfoResult
 import network.minter.profile.models.ProfileResult
 import network.minter.profile.repo.ProfileInfoRepository
@@ -111,6 +114,9 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                 .onErrorResumeNext(toExpError())
                 .switchMap { mapToFacade(it) }
                 .switchMap { mapValidatorsInfo(factory.validatorsRepo, it) }
+                .switchMap { mapAddressBook(factory.addressBookRepo, it) }
+                .switchMap { mapAvatar(it) }
+
         // .switchMap(items -> mapAddressesInfo(factory.addressList, factory.infoRepo, items))
 
     }
@@ -151,10 +157,17 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
     class Factory @Inject constructor(secretStorage: SecretStorage) : DataSource.Factory<Int, TransactionItem>() {
         @Inject lateinit var repo: ExplorerTransactionRepository
         @Inject lateinit var validatorsRepo: RepoValidators
+        @Inject lateinit var addressBookRepo: AddressBookRepository
+        @Inject lateinit var secretStorage: SecretStorage
 
         val address: MinterAddress = secretStorage.mainWallet
         var loadState: MutableLiveData<LoadState>? = null
         var txFilter: TxFilter = TxFilter.None
+
+        val myAddress: MinterAddress
+            get() {
+                return secretStorage.mainWallet
+            }
 
         override fun create(): DataSource<Int, TransactionItem> {
             return TransactionDataSource(this)
@@ -227,10 +240,87 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                         }
                         for (info in listInfoResult.data) {
                             for (t in toFetchAddresses[info.address]!!) {
-                                t.setUserMeta(info.user.username, info.user.getAvatar().url)
+
+//                                t.setUserMeta(info.user.username, info.user.getAvatar().url)
                             }
                         }
                         items
+                    }
+        }
+
+        fun mapAvatar(
+                result: List<TransactionFacade>
+        ): Observable<List<TransactionFacade>> {
+            return Observable.just(result)
+                    .map {
+                        it.forEach { tx ->
+                            tx.fromAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.from)
+                            if (tx.type == HistoryTransaction.Type.Send) {
+                                val d = tx.getData<HistoryTransaction.TxSendCoinResult>()
+                                tx.toAvatar = MinterProfileApi.getUserAvatarUrlByAddress(d.to)
+                            }
+                        }
+                        it
+                    }
+        }
+
+        fun mapAvatar(
+                result: ExpResult<List<TransactionFacade>>
+        ): Observable<ExpResult<List<TransactionFacade>>> {
+            return mapAvatar(result.result)
+                    .map {
+                        val expResult = result
+                        expResult.result = it
+                        expResult
+                    }
+        }
+
+        fun mapAddressBook(
+                addressBookRepo: AddressBookRepository,
+                result: List<TransactionFacade>
+        ): Observable<List<TransactionFacade>> {
+            return addressBookRepo.findAll()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .map { addresses ->
+
+                        for (tx in result) {
+                            for (address in addresses) {
+
+                                if (tx.from.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                    tx.fromName = address.name
+                                }
+
+                                when (tx.type) {
+                                    HistoryTransaction.Type.Send -> {
+                                        val d = tx.getData<HistoryTransaction.TxSendCoinResult>()
+                                        if (d.to.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                            tx.toName = address.name
+                                        }
+                                    }
+                                    HistoryTransaction.Type.RedeemCheck -> {
+                                        val d = tx.getData<HistoryTransaction.TxRedeemCheckResult>()
+                                        if (d.getCheck().sender.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                            tx.fromName = address.name
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        result
+                    }
+        }
+
+        fun mapAddressBook(
+                addressBookRepo: AddressBookRepository,
+                result: ExpResult<List<TransactionFacade>>
+        ): ObservableSource<ExpResult<List<TransactionFacade>>> {
+            return mapAddressBook(addressBookRepo, result.result)
+                    .map {
+                        val expResult = result
+                        expResult.result = it
+                        expResult
                     }
         }
 
@@ -322,9 +412,9 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                         }
                         for (info in listInfoResult.data!!) {
                             for (t in toFetchAddresses[info.address]!!) {
-                                t.userMeta = UserMeta()
-                                t.userMeta.username = info.user.username
-                                t.userMeta.avatarUrl = info.user.getAvatar().url
+//                                t.userMeta = UserMeta()
+//                                t.userMeta.username = info.user.username
+//                                t.userMeta.avatarUrl = info.user.getAvatar().url
                             }
                         }
                         items

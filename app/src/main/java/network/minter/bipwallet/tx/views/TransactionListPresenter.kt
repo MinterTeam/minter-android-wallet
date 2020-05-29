@@ -91,8 +91,8 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
             refresh()
         }
 
-        mAdapter = TransactionListAdapter(secretRepo.addresses)
-        mAdapter!!.setOnExpandDetailsListener { view: View, tx: TransactionFacade -> onExpandTx(view, tx) }
+        mAdapter = TransactionListAdapter { secretRepo.mainWallet }
+        mAdapter!!.setOnExpandDetailsListener { v, tx -> onExpandTx(v, tx) }
         mLoadState = MutableLiveData()
         viewState.syncProgress(mLoadState!!)
         mAdapter!!.setLoadState(mLoadState)
