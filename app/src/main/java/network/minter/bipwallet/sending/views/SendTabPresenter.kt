@@ -49,7 +49,6 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
-import network.minter.bipwallet.apis.reactive.ReactiveGate.createGateErrorPlain
 import network.minter.bipwallet.apis.reactive.rxGate
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
@@ -75,7 +74,6 @@ import network.minter.bipwallet.sending.ui.dialogs.TxSendStartDialog
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.wallets.views.WalletSelectorController
-import network.minter.blockchain.models.BCResult
 import network.minter.blockchain.models.TransactionCommissionValue
 import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.*
@@ -633,57 +631,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             }
                             amountToSend = mAmount!! - txInitData.commission!!
                             Timber.tag("TX Send").d("Subtracting sending amount (-%s): balance not enough to send", txInitData.commission)
-                        }
-
-
-                        // if after subtracting fee from sending sum has become less than account balance at all, returning error with message "insufficient funds"
-                        // although, this case must handles the blockchain node, nevertheless we handle it to show user more friendly error
-                        // amountToSend < 0
-                        //bdLT(amountToSend, 0.0)
-
-                        if (amountToSend < 0) {
-                            // follow the my guideline, return result instead of throwing error, it's easily to handle errors
-                            // creating error result, in it we'll write error message with required sum
-                            val errorRes: GateResult<TransactionSendResult>
-                            val balanceMustBe = mAmount!! + txInitData.commission!!
-                            // this means user sending less than his balance, but it's still not enough to pay fee
-                            // mAmount < mFromAccount.getAmount()
-                            // if (bdLT(mAmount, mFromAccount!!.getAmount()))
-                            errorRes = if (mAmount!! < mFromAccount!!.amount) {
-                                // special for humans - calculate how much balance haven't enough balance
-                                val notEnough = txInitData.commission!! - (mFromAccount!!.amount - mAmount!!)
-                                Timber.tag("TX Send").d("Amount: %s, fromAcc: %s, diff: %s",
-                                        mAmount!!.humanize(),
-                                        mFromAccount!!.amount.humanize(),
-                                        notEnough.humanize()
-                                )
-                                createGateErrorPlain(
-                                        String.format("Insufficient funds: not enough %s %s, wanted: %s %s",
-                                                notEnough.humanize(),
-                                                mFromAccount!!.coin,
-                                                balanceMustBe.humanize(),
-                                                mFromAccount!!.coin
-                                        ),
-                                        BCResult.ResultCode.InsufficientFunds.value,
-                                        400
-                                )
-                            } else {
-                                // sum bigger than account balance, so, just show full required sum
-                                Timber.tag("TX Send").d("Amount: %s, fromAcc: %s, diff: %s",
-                                        mAmount!!.humanize(),
-                                        mFromAccount!!.amount.humanize(),
-                                        balanceMustBe.humanize()
-                                )
-                                createGateErrorPlain(
-                                        String.format("Insufficient funds: wanted %s %s",
-                                                balanceMustBe.humanize(),
-                                                mFromAccount!!.coin
-                                        ),
-                                        BCResult.ResultCode.InsufficientFunds.value,
-                                        400
-                                )
-                            }
-                            return@switchMap Observable.just(errorRes)
                         }
 
                         return@switchMap signSendTx(dialog, txInitData.nonce!!, amountToSend)
