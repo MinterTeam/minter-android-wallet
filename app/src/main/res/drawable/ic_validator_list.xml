@@ -1,0 +1,35 @@
+<!--
+  ~ Copyright (C) by MinterTeam. 2020
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/colorPrimaryLight"
+        android:pathData="M3 4.5C2.17 4.5 1.5 5.17 1.5 6S2.17 7.5 3 7.5S4.5 6.83 4.5 6S3.83 4.5 3 4.5zM7 5v2h15V5H7zm-4 5.5c-0.83 0-1.5 0.67-1.5 1.5s0.67 1.5 1.5 1.5s1.5-0.67 1.5-1.5s-0.67-1.5-1.5-1.5zM7 11v2h6.1c1.27-1.24 3-2 4.9-2H7zm11 2c-2.8 0-5 2.2-5 5s2.2 5 5 5c1 0 2-0.3 2.8-0.8l1.8 1.8l1.4-1.4l-1.8-1.8C22.7 20 23 19 23 18c0-2.8-2.2-5-5-5zm0 2c1.7 0 3 1.3 3 3s-1.3 3-3 3s-3-1.3-3-3s1.3-3 3-3zM3 16.5c-0.83 0-1.5 0.67-1.5 1.5s0.67 1.5 1.5 1.5s1.5-0.67 1.5-1.5s-0.67-1.5-1.5-1.5zM7 17v2h4.08C11.03 18.67 11 18.34 11 18c0-0.34 0.03-0.67 0.08-1H7z" />
+</vector>

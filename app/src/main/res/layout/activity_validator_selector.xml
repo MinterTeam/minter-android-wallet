@@ -29,54 +29,67 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_input_fake">
+    android:background="@color/greyBackground">
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/Wallet.ItemTitle"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:paddingStart="@dimen/margin_edges"
-        android:paddingEnd="@dimen/margin_edges"
-        android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/subtitle"
-        app:layout_constraintEnd_toStartOf="@id/dropdown"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Enlighment Node" />
+        app:navigationIcon="@drawable/ic_arrow_back_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title=" ">
 
-    <TextView
-        android:id="@+id/subtitle"
-        style="@style/Wallet.ItemSubtitle"
+        <TextView
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_choose_validator" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:paddingStart="@dimen/margin_edges"
-        android:paddingEnd="@dimen/margin_edges"
-        android:singleLine="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/dropdown"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="Mp123f...101010" />
-
-    <ImageView
-        android:id="@+id/dropdown"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="4dp"
-        android:padding="4dp"
-        android:background="@drawable/ripple_suffix"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/ic_drop_down_grey"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:listitem="@layout/item_list_address_book" />
+
+    <TextView
+        android:id="@+id/empty_text"
+        style="@style/ListSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges"
+        android:text="@string/empty_address_book"
+        android:textAllCaps="true"
+        android:textSize="@dimen/text_size_14"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:visibility="visible" />
+
+    <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
+        android:id="@+id/progress"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        app:color="@color/colorPrimaryLight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

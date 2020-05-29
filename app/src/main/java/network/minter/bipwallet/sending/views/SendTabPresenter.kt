@@ -32,7 +32,6 @@ import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.annotation.DrawableRes
 import com.annimon.stream.Optional
 import com.edwardstock.inputfield.form.InputWrapper
 import com.google.common.base.MoreObjects.firstNonNull
@@ -69,7 +68,6 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.internal.system.SimpleTextWatcher
 import network.minter.bipwallet.sending.account.selectorDataFromCoins
-import network.minter.bipwallet.sending.adapters.RecipientListAdapter
 import network.minter.bipwallet.sending.contract.SendView
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
 import network.minter.bipwallet.sending.ui.SendTabFragment
@@ -122,7 +120,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     @Inject lateinit var estimateRepo: GateEstimateRepository
     @Inject lateinit var gateTxRepo: GateTransactionRepository
     @Inject lateinit var addressBookRepo: AddressBookRepository
-//    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var walletSelectorController: WalletSelectorController
 
@@ -131,8 +128,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private var mRecipient: AddressContact? = null
     private var mAvatar: String? = null
 
-    @DrawableRes
-    private var mAvatarRes = 0
     private val mUseMax = AtomicBoolean(false)
     private val mClickedUseMax = AtomicBoolean(false)
     private var mInputChange: BehaviorSubject<String>? = null
@@ -144,8 +139,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private var mPayload: ByteArray? = null
     private var handleAutocomplete: Boolean = true
     private var mFormValid = false
-
     private var handlePayloadChanges = true
+
     private val mPayloadChangeListener: TextWatcher = object : SimpleTextWatcher() {
         override fun afterTextChanged(s: Editable) {
             if (!handlePayloadChanges) return
@@ -174,9 +169,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         viewState.setOnClickClearPayload(View.OnClickListener { onClickClearPayload() })
         viewState.setPayloadChangeListener(mPayloadChangeListener)
         viewState.setOnContactsClickListener(View.OnClickListener { onClickContacts() })
-        viewState.setRecipientAutocompleteItemClickListener(RecipientListAdapter.OnItemClickListener { contact: AddressContact, pos: Int ->
+        viewState.setRecipientAutocompleteItemClickListener { contact: AddressContact, pos: Int ->
             onAutocompleteSelected(contact, pos)
-        })
+        }
         loadAndSetFee()
         accountStorage.update()
 
@@ -250,8 +245,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                         mRecipient!!.type = AddressContact.AddressType.Address
                         viewState.setRecipient(mRecipient!!)
                     } else if (isMpAddress) {
-                        mRecipient!!.type = AddressContact.AddressType.ValidatorPubKey
-                        viewState.setRecipient(mRecipient!!)
+                        viewState.startDelegate(
+                                MinterPublicKey(result)
+                        )
                     }
                 }
             }
@@ -345,14 +341,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
-
-
-    private fun forceUpdate() {
-        accountStorage.update(true)
-//        dailyRewardsRepo.update(true)
-        txRepo.update(true)
-    }
-
     private fun onClickClearPayload() {
         viewState.hidePayload()
     }
@@ -387,11 +375,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     private fun setupFee() {
-        mSendFee = when (transactionTypeByAddress) {
-            OperationType.Delegate -> OperationType.Delegate.fee.multiply(BigDecimal(mGasPrice))
-            OperationType.SendCoin -> OperationType.SendCoin.fee.multiply(BigDecimal(mGasPrice))
-            else -> ZERO
-        }
+        mSendFee = OperationType.SendCoin.fee.multiply(BigDecimal(mGasPrice))
         mSendFee = mSendFee!! + payloadFee
         val fee: String = String.format("%s %s", mSendFee!!.humanize(), DEFAULT_COIN)
         viewState.setFee(fee)
@@ -437,31 +421,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             return
         }
         analytics.send(AppEvent.SendCoinsSendButton)
-        when (transactionTypeByAddress) {
-            OperationType.Delegate -> {
-                mAvatar = null
-                mAvatarRes = R.drawable.img_avatar_delegate
-                startSendDialog()
-            }
-            OperationType.SendCoin -> {
-                mAvatar = mRecipient!!.avatar
-                startSendDialog()
-            }
-            else -> {
-            }
-        }
+        mAvatar = mRecipient!!.avatar
+        startSendDialog()
     }
 
-    private val transactionTypeByAddress: OperationType
-        get() {
-            if (mRecipient == null) {
-                return OperationType.SendCoin
-            }
-            return if (mRecipient!!.type == AddressContact.AddressType.ValidatorPubKey) OperationType.Delegate else OperationType.SendCoin
-        }
-
     private fun startSendDialog() {
-
         viewState.startDialog { ctx ->
             try {
                 analytics.send(AppEvent.SendCoinPopupScreen)
@@ -517,7 +481,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         mUseMax.set(true)
         mClickedUseMax.set(true)
         mAmount = mFromAccount!!.amount
-        //        checkEnableSubmit();
         viewState.setAmount(mFromAccount!!.amount.stripTrailingZeros().toPlainString())
         analytics.send(AppEvent.SendCoinsUseMaxButton)
         if (view != null && view.context is Activity) {
@@ -530,7 +493,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     @Throws(OperationInvalidDataException::class)
-    private fun createPreTx(type: OperationType): TransactionSign {
+    private fun createPreTx(): TransactionSign {
         val preTx: Transaction
         val builder = Transaction.Builder(BigInteger("1"))
                 .setGasCoin(mGasCoin)
@@ -539,27 +502,19 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         if (mPayload != null && mPayload!!.isNotEmpty()) {
             builder.setPayload(mPayload)
         }
-        preTx = if (type == OperationType.Delegate) {
-            builder
-                    .delegate()
-                    .setCoin(mFromAccount!!.coin)
-                    .setPublicKey(mRecipient!!.address)
-                    .setStake(mAmount)
-                    .build()
-        } else {
-            builder
-                    .sendCoin()
-                    .setCoin(mFromAccount!!.coin)
-                    .setTo(mRecipient!!.address)
-                    .setValue(mAmount)
-                    .build()
-        }
+        preTx = builder
+                .sendCoin()
+                .setCoin(mFromAccount!!.coin)
+                .setTo(mRecipient!!.address)
+                .setValue(mAmount)
+                .build()
+
         val dummyPrivate = PrivateKey("F000000000000000000000000000000000000000000000000000000000000000")
         return preTx.signSingle(dummyPrivate)
     }
 
     @Throws(OperationInvalidDataException::class)
-    private fun createFinalTx(nonce: BigInteger, type: OperationType, amountToSend: BigDecimal?): Transaction {
+    private fun createFinalTx(nonce: BigInteger, amountToSend: BigDecimal?): Transaction {
         val tx: Transaction
         val builder = Transaction.Builder(nonce)
                 .setGasCoin(mGasCoin)
@@ -567,26 +522,18 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         if (mPayload != null && mPayload!!.isNotEmpty()) {
             builder.setPayload(mPayload)
         }
-        tx = if (type == OperationType.Delegate) {
-            builder
-                    .delegate()
-                    .setCoin(mFromAccount!!.coin)
-                    .setPublicKey(mRecipient!!.address)
-                    .setStake(amountToSend)
-                    .build()
-        } else {
-            builder
-                    .sendCoin()
-                    .setCoin(mFromAccount!!.coin)
-                    .setTo(mRecipient!!.address)
-                    .setValue(amountToSend)
-                    .build()
-        }
+        tx = builder
+                .sendCoin()
+                .setCoin(mFromAccount!!.coin)
+                .setTo(mRecipient!!.address)
+                .setValue(amountToSend)
+                .build()
+
         return tx
     }
 
     private val fee: BigDecimal
-        get() = transactionTypeByAddress.fee + payloadFee
+        get() = OperationType.SendCoin.fee + payloadFee
 
     private val feeNormalized: BigInteger
         get() = (fee * Transaction.VALUE_MUL_DEC).normalize()
@@ -627,7 +574,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             val baseAccount = findAccountByCoin(DEFAULT_COIN).get()
             val sendAccount = mFromAccount
             val isBaseAccount = sendAccount!!.coin == DEFAULT_COIN
-            val type = transactionTypeByAddress
             val enoughBaseForFee: Boolean
 
             // default coin for pay fee - MNT (base coin)
@@ -650,7 +596,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 // resolving fee currency for custom currency
                 // creating tx
                 try {
-                    val preSign = createPreTx(type)
+                    val preSign = createPreTx()
                     txFeeValueResolver = estimateRepo.getTransactionCommission(preSign).rxGate()
                 } catch (e: OperationInvalidDataException) {
                     Timber.w(e)
@@ -740,7 +686,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             return@switchMap Observable.just(errorRes)
                         }
 
-                        return@switchMap signSendTx(dialog, txInitData.nonce!!, type, amountToSend)
+                        return@switchMap signSendTx(dialog, txInitData.nonce!!, amountToSend)
                     }
                     .doFinally { onExecuteComplete() }
                     .joinToUi()
@@ -759,9 +705,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     @Throws(OperationInvalidDataException::class)
-    private fun signSendTx(dialog: WalletProgressDialog, nonce: BigInteger, type: OperationType, amountToSend: BigDecimal?): ObservableSource<GateResult<TransactionSendResult>> {
+    private fun signSendTx(dialog: WalletProgressDialog, nonce: BigInteger, amountToSend: BigDecimal?): ObservableSource<GateResult<TransactionSendResult>> {
         // creating tx
-        val tx = createFinalTx(nonce.add(BigInteger.ONE), type, amountToSend)
+        val tx = createFinalTx(nonce.add(BigInteger.ONE), amountToSend)
 
         // if user created account with ledger, use it to sign tx
         return if (session.role == AuthSession.AuthType.Hardware) {
@@ -890,7 +836,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
                                 },
                                 { t: Throwable ->
-                                    Timber.d(t.message)
+                                    Timber.d(t)
                                     mRecipient = null
                                     viewState.setSubmitEnabled(false)
 

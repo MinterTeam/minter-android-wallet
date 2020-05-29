@@ -361,14 +361,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             label = "Coin To Buy"
                             text = data.coinToBuy
                         }
+                        .add {
+                            label = "Minimum Value To Buy"
+                            text = data.minValueToBuy.humanize()
+                        }
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're want selling")
-//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.valueToSell), data.coinToSell))
-//                viewState.setSecondLabel("To")
-//                viewState.setSecondValue(data.coinToBuy)
             }
             OperationType.SellAllCoins -> {
                 val data = tx.getData(TxCoinSellAll::class.java)
@@ -391,21 +390,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             label = "Coin To Buy"
                             text = data.coinToBuy
                         }
+                        .add {
+                            label = "Minimum Value To Buy"
+                            text = data.minValueToBuy.humanize()
+                        }
                         .build()
 
                 adapter.addRows(rows)
-
-
-//                viewState.setFirstLabel("You're selling")
-//                val acc = accountStorage.entity.mainWallet.findCoinByName(data.coinToSell)
-//                if (acc.isPresent) {
-//                    viewState.setFirstValue(String.format("%s %s", bdHuman(acc.get().amount), data.coinToSell))
-//                } else {
-//                    viewState.setFirstValue(String.format("%s %s", bdHuman(0.0), data.coinToSell))
-//                }
-//                viewState.setSecondLabel("For")
-//                viewState.setSecondValue(data.coinToBuy)
             }
+
             OperationType.BuyCoin -> {
                 val data = tx.getData(TxCoinBuy::class.java)
 
@@ -422,14 +415,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             label = "Coin To Sell"
                             text = data.coinToSell
                         }
+                        .add {
+                            label = "Maximum Value To Sell"
+                            text = data.maxValueToSell.humanize()
+                        }
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're buying")
-//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.valueToBuy), data.coinToBuy))
-//                viewState.setSecondLabel("For")
-//                viewState.setSecondValue(data.coinToSell)
             }
             OperationType.CreateCoin -> {
                 val data = tx.getData(TxCreateCoin::class.java)
@@ -462,15 +454,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're creating coin")
-//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.initialAmount), data.symbol))
-//                viewState.setSecondLabel("Info")
-//                viewState.setSecondValue(String.format("Name: %s\nCRR: %d\nReserve: %s",
-//                        data.name,
-//                        data.constantReserveRatio,
-//                        bdHuman(data.initialReserve)
-//                ))
             }
             OperationType.DeclareCandidacy -> {
                 val data = tx.getData(TxDeclareCandidacy::class.java)
@@ -495,15 +478,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're declaring candidacy")
-//                viewState.setFirstValue(data.publicKey.toString())
-//                viewState.setSecondLabel("Info")
-//                viewState.setSecondValue(String.format("Address: %s\nCoin: %s\nCommission: %d",
-//                        data.address,
-//                        data.coin,
-//                        data.commission
-//                ))
             }
             OperationType.Delegate -> {
                 val data = tx.getData(TxDelegate::class.java)
@@ -524,11 +498,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're delegating")
-//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.stake), data.coin))
-//                viewState.setSecondLabel("To")
-//                viewState.setSecondValue(data.publicKey.toString())
             }
             OperationType.Unbound -> {
                 val data = tx.getData(TxUnbound::class.java)
@@ -549,11 +518,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're unbonding")
-//                viewState.setFirstValue(String.format("%s %s", bdHuman(data.value), data.coin))
-//                viewState.setSecondLabel("From")
-//                viewState.setSecondValue(data.publicKey.toString())
             }
             OperationType.RedeemCheck -> {
                 val data = tx.getData(TxRedeemCheck::class.java)
@@ -574,11 +538,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're using check")
-//                val check = data.decodedCheck
-//                viewState.setFirstValue(String.format("%s %s", check.coin, bdHuman(check.value)))
-//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.SetCandidateOnline -> {
                 val data = tx.getData(TxSetCandidateOnline::class.java)
@@ -590,10 +549,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're switching on candidate")
-//                viewState.setFirstValue(data.publicKey.toString())
-//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.SetCandidateOffline -> {
                 val data = tx.getData(TxSetCandidateOffline::class.java)
@@ -605,9 +560,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-//                viewState.setFirstLabel("You're switching off candidate")
-//                viewState.setFirstValue(data.publicKey.toString())
-//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.Multisend -> {
                 val data = tx.getData(TxMultisend::class.java)
@@ -626,14 +578,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 }
 
                 adapter.addRows(rowsBuilder.build())
-
-//                viewState.setFirstLabel("You're multi-sending")
-//                val sb = StringBuilder()
-//                for (item in data.items) {
-//                    sb.append(item.to.toShortString()).append(" <- ").append(bdHuman(item.value)).append('\n')
-//                }
-//                viewState.setFirstValue(sb.toString())
-//                viewState.setSecondVisible(View.GONE)
             }
             OperationType.CreateMultisigAddress -> {
                 val data = tx.getData<TxCreateMultisigAddress>()
@@ -657,20 +601,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 }
 
                 adapter.addRows(rowsBuilder.build())
-
-//                viewState.setFirstLabel("You're creating MultiSig address")
-//                val sb = StringBuilder()
-//                var i = 0
-//                while (i < data.addresses.size) {
-//                    val address = data.addresses[i]
-//                    val weight = data.weights[i]
-//                    sb.append("Weight: ").append(weight).append(" - ").append(address.toShortString()).append('\n')
-//                    i++
-//                }
-//                viewState.setFirstValue(sb.toString())
-//                viewState.setSecondLabel("Threshold")
-//                viewState.setSecondValue(data.threshold.toString())
-//                viewState.setSecondVisible(View.VISIBLE)
             }
             OperationType.EditCandidate -> {
                 val data = tx.getData(TxEditCandidate::class.java)
@@ -690,14 +620,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 adapter.addRows(rows)
-
-//                viewState.setFirstLabel("You're editing candidate")
-//                viewState.setFirstValue(data.pubKey.toString())
-//                viewState.setSecondLabel("Info")
-//                viewState.setSecondValue(String.format("Owner address: %s\nReward address: %s",
-//                        data.ownerAddress.toShortString(),
-//                        data.rewardAddress.toShortString()
-//                ))
             }
             else -> {
                 viewState.startDialog(false) { ctx: Context? ->

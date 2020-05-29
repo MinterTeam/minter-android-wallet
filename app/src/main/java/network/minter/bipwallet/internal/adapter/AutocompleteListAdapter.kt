@@ -92,6 +92,7 @@ abstract class AutocompleteListAdapter<Item, VH : AutocompleteListAdapter.ViewHo
         mOnItemClickListener = listener
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var v = convertView
         val holder: VH

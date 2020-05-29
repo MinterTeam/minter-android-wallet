@@ -24,32 +24,44 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.delegation.adapter.autocomplete
+package network.minter.bipwallet.exchange.adapters
 
 import android.content.Context
 import android.text.Spannable
 import androidx.recyclerview.widget.RecyclerView
 import com.otaliastudios.autocomplete.AutocompletePolicy
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import network.minter.bipwallet.apis.explorer.RepoCoins
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
-import network.minter.explorer.models.ValidatorItem
+import network.minter.explorer.models.CoinItem
+import timber.log.Timber
 
 
 /**
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class ValidatorsAcPresenter(
+class CoinsAcPresenter(
         context: Context,
-        private var items: List<ValidatorItem> = ArrayList()
-) : RecyclerAcPresenter<ValidatorItem>(context), AutocompletePolicy {
+        coinsRepo: RepoCoins
+) : RecyclerAcPresenter<CoinItem>(context), AutocompletePolicy {
+    private val adapter: CoinsAcAdapter = CoinsAcAdapter(this)
+    private var items: List<CoinItem> = ArrayList()
 
-    private val itemsLock = Any()
-    private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this, items)
-
-    fun setItems(items: List<ValidatorItem>) {
-        synchronized(itemsLock) {
-            this.items = items
-        }
+    init {
+        coinsRepo.observe()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        { res ->
+                            items = res
+                        },
+                        { t ->
+                            Timber.e(t)
+                        }
+                )
+        coinsRepo.update()
     }
 
     override fun instantiateAdapter(): RecyclerView.Adapter<*> {
@@ -62,22 +74,11 @@ class ValidatorsAcPresenter(
             return
         }
 
-        val filtered = ArrayList<ValidatorItem>()
-
-        for (item in items) {
-            if (item.meta != null && item.meta?.name != null) {
-                if (item.meta!!.name!!.toLowerCase().startsWith(query.toString().toLowerCase())) {
-                    filtered.add(item)
-                }
-            }
-
-            if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
-                filtered.add(item)
-            }
+        val filtered = items.filter {
+            it.symbol.toLowerCase().startsWith(query) || it.name.startsWith(query)
         }
 
         adapter.setItems(filtered)
-
     }
 
     override fun getPopupDimensions(): PopupDimensions {
@@ -91,7 +92,7 @@ class ValidatorsAcPresenter(
     }
 
     override fun shouldDismissPopup(text: Spannable, cursorPos: Int): Boolean {
-        return text.length == 0 || adapter.itemCount == 0
+        return text.length == 0 || (adapter.itemCount == 0)
     }
 
     override fun getQuery(text: Spannable): CharSequence {

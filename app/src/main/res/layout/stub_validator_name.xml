@@ -27,60 +27,56 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/search_view_item"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_ripple_white_rounded"
-    android:clickable="true"
-    android:focusable="true"
-    android:gravity="start|center_vertical"
-    android:minHeight="48dp"
-    android:orientation="horizontal">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_input_fake">
 
-    <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-        android:id="@+id/search_item_icon_left"
-        style="@style/ListAvatar"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <TextView
+        android:id="@+id/title"
+        style="@style/Wallet.ItemTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges"
+        android:singleLine="true"
+        app:layout_constraintBottom_toTopOf="@id/subtitle"
+        app:layout_constraintEnd_toStartOf="@id/dropdown"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/search_item_title"
-        style="@style/ListTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_half"
-        android:layout_marginEnd="@dimen/margin_edges"
-        app:layout_constraintBottom_toTopOf="@id/search_item_subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/search_item_icon_left"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="BIP (120 912.98)" />
+        tools:text="Enlighment Node" />
 
     <TextView
-        android:id="@+id/search_item_subtitle"
-        style="@style/ListSubtitle"
+        android:id="@+id/subtitle"
+        style="@style/Wallet.ItemSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges_half"
-        android:layout_marginEnd="@dimen/margin_edges"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="@dimen/margin_edges"
+        android:paddingEnd="@dimen/margin_edges"
+        android:singleLine="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dropdown"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="Mp123f...101010" />
+
+    <ImageView
+        android:id="@+id/dropdown"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="4dp"
+        android:padding="4dp"
+        android:background="@drawable/ripple_suffix"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_cancel_circle_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/search_item_icon_left"
-        app:layout_constraintTop_toBottomOf="@id/search_item_title"
-        tools:text="Mx4ec2ac...2e866b"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        />
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="#FFE0E0E0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

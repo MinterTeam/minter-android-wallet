@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.delegation.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Service
 import android.content.Context
@@ -84,10 +85,10 @@ import kotlin.math.abs
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
-    @Inject lateinit var mPresenterProvider: Provider<DelegatedListPresenter>
-    @InjectPresenter lateinit var mPresenter: DelegatedListPresenter
+    @Inject lateinit var presenterProvider: Provider<DelegatedListPresenter>
+    @InjectPresenter lateinit var presenter: DelegatedListPresenter
     private lateinit var binding: ActivityDelegationListBinding
-    private var mItemSeparator: BorderedItemSeparator? = null
+    private var itemSeparator: BorderedItemSeparator? = null
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         binding.list.adapter = adapter
     }
@@ -176,18 +177,16 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
     }
 
     override fun startDelegate(delegated: DelegatedValidator) {
-        DelegateUnbondDialog.Builder(DelegateUnbondDialog.Type.Delegate)
+        DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
                 .setPublicKey(delegated.publicKey)
-                .build()
-                .show(supportFragmentManager, "delegate_unbond")
+                .start()
     }
 
     override fun startUnbond(delegated: DelegatedStake) {
-        DelegateUnbondDialog.Builder(DelegateUnbondDialog.Type.Unbond)
+        DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Unbond)
                 .setPublicKey(delegated.publicKey!!)
                 .setSelectedCoin(delegated.coin!!)
-                .build()
-                .show(supportFragmentManager, "delegate_unbond")
+                .start()
     }
 
     override fun hideChart() {
@@ -204,9 +203,10 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
 
     @ProvidePresenter
     fun providePresenter(): DelegatedListPresenter {
-        return mPresenterProvider.get()
+        return presenterProvider.get()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDelegationListBinding.inflate(layoutInflater)
@@ -214,20 +214,20 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
         binding.testnetWarning.visibleForTestnet()
 
         setupToolbar(binding.toolbar)
-        mPresenter.handleExtras(intent)
+        presenter.handleExtras(intent)
         binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (binding.list.adapter != null && abs(scrollY - oldScrollY) > 10) {
                 (binding.list.adapter as DelegationListAdapter).closeOpened()
             }
-            mPresenter.onScrolledTo(scrollY)
+            presenter.onScrolledTo(scrollY)
         })
         binding.list.setOnTouchListener { _, _ ->
             (binding.list.adapter as DelegationListAdapter).closeOpened()
             false
         }
         binding.list.layoutManager = LinearLayoutManager(this)
-        mItemSeparator = BorderedItemSeparator(this, R.drawable.shape_bottom_separator, false, true)
-        binding.list.addItemDecoration(mItemSeparator!!)
+        itemSeparator = BorderedItemSeparator(this, R.drawable.shape_bottom_separator, false, true)
+        binding.list.addItemDecoration(itemSeparator!!)
 
         setupChart()
     }
@@ -239,9 +239,8 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_delegate) {
-            DelegateUnbondDialog.Builder(DelegateUnbondDialog.Type.Delegate)
-                    .build()
-                    .show(supportFragmentManager, "delegate_unbond")
+            DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
+                    .start()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -261,7 +260,7 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
             override fun onChartGestureStart(me: MotionEvent, lastPerformedGesture: ChartGesture) {}
             override fun onChartGestureEnd(me: MotionEvent, lastPerformedGesture: ChartGesture) {
                 if (lastPerformedGesture == ChartGesture.DRAG) {
-                    mPresenter.onChartDraggedTo(DateTime(binding.chart.lowestVisibleX.toLong()))
+                    presenter.onChartDraggedTo(DateTime(binding.chart.lowestVisibleX.toLong()))
                     //                    Timber.d("OnChartGestureEnd: %s, %s", me.toString(), lastPerformedGesture.name());
 //                    Timber.d("XChartMin %f", chart.getXChartMin());
 //                    Timber.d("YChartMin %f", chart.getYChartMin());

@@ -35,6 +35,11 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,6 +59,7 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
     private int mFirstElementOffset = 0;
     private Rect mDividerOffsets = new Rect();
     private Rect mLastDividerOffsets = null;
+    private List<Integer> mSkipDrawOnIndex = new ArrayList<>(0);
 
     public BorderedItemSeparator(Context context, AttributeSet attrs) {
         final TypedArray a = context
@@ -125,6 +131,10 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
         return this;
     }
 
+    public void setSkipElements(@NotNull List<Integer> skipped) {
+        mSkipDrawOnIndex = skipped;
+    }
+
     public BorderedItemSeparator setDividerPadding(int left, int top, int right, int bottom) {
         mDividerOffsets.left = left;
         mDividerOffsets.top = top;
@@ -185,7 +195,9 @@ public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
             }
 
             mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(c);
+            if (mSkipDrawOnIndex.isEmpty() || !mSkipDrawOnIndex.contains(i)) {
+                mDivider.draw(c);
+            }
         }
 
         left = firstNonNull(mLastDividerOffsets, mDividerOffsets).left;

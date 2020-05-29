@@ -24,59 +24,62 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.delegation.adapter.autocomplete
+package network.minter.bipwallet.sending.adapters
 
 import android.content.Context
 import android.text.Spannable
 import androidx.recyclerview.widget.RecyclerView
 import com.otaliastudios.autocomplete.AutocompletePolicy
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
-import network.minter.explorer.models.ValidatorItem
-
 
 /**
  * minter-android-wallet. 2020
- * @author Eduard Maximovich (edward.vstock@gmail.com)
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-class ValidatorsAcPresenter(
+
+class SearchAcPresenter<T>(
         context: Context,
-        private var items: List<ValidatorItem> = ArrayList()
-) : RecyclerAcPresenter<ValidatorItem>(context), AutocompletePolicy {
-
+        private var items: List<T> = ArrayList(),
+        val filterFun: (String, T) -> Boolean,
+        binderFun: (T, SearchAcAdapter.ViewHolder, Int, Int) -> Unit
+) : RecyclerAcPresenter<T>(context), AutocompletePolicy {
     private val itemsLock = Any()
-    private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this, items)
+    private val mAdapter: SearchAcAdapter<T> = SearchAcAdapter(items, { dispatchClick(it) }, binderFun)
 
-    fun setItems(items: List<ValidatorItem>) {
+    fun setItems(items: List<T>) {
         synchronized(itemsLock) {
             this.items = items
         }
     }
 
     override fun instantiateAdapter(): RecyclerView.Adapter<*> {
-        return adapter
+        return mAdapter
     }
 
     override fun onQuery(query: CharSequence?) {
         if (query.isNullOrEmpty()) {
-            adapter.setItems(ArrayList(0))
+            mAdapter.setItems(ArrayList(0))
             return
         }
 
-        val filtered = ArrayList<ValidatorItem>()
+        val filtered = ArrayList<T>()
 
         for (item in items) {
-            if (item.meta != null && item.meta?.name != null) {
-                if (item.meta!!.name!!.toLowerCase().startsWith(query.toString().toLowerCase())) {
-                    filtered.add(item)
-                }
-            }
-
-            if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
+            if (filterFun(query.toString(), item)) {
                 filtered.add(item)
             }
+//            if (item.meta != null && item.meta?.name != null) {
+//                if (item.meta!!.name!!.toLowerCase().startsWith(query.toString().toLowerCase())) {
+//                    filtered.add(item)
+//                }
+//            }
+//
+//            if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
+//                filtered.add(item)
+//            }
         }
 
-        adapter.setItems(filtered)
+        mAdapter.setItems(filtered)
 
     }
 
@@ -91,7 +94,7 @@ class ValidatorsAcPresenter(
     }
 
     override fun shouldDismissPopup(text: Spannable, cursorPos: Int): Boolean {
-        return text.length == 0 || adapter.itemCount == 0
+        return text.length == 0 || mAdapter.itemCount == 0
     }
 
     override fun getQuery(text: Spannable): CharSequence {

@@ -37,8 +37,8 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.sending.account.SelectorData
-import network.minter.bipwallet.sending.adapters.RecipientListAdapter
 import network.minter.bipwallet.wallets.contract.WalletSelectorControllerView
+import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinBalance
 
 /**
@@ -88,7 +88,7 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun setError(@StringRes error: Int)
     fun setAmount(amount: CharSequence?)
     fun setFee(fee: CharSequence?)
-    fun setRecipientAutocompleteItemClickListener(listener: RecipientListAdapter.OnItemClickListener)
+    fun setRecipientAutocompleteItemClickListener(listener: (AddressContact, Int) -> Unit)
     fun setRecipientAutocompleteItems(items: List<AddressContact>)
     fun hideAutocomplete()
     fun setPayloadChangeListener(listener: TextWatcher)
@@ -101,6 +101,9 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun hidePayload()
     fun setMaxAmountValidator(coinSupplier: () -> CoinBalance?)
     fun showBalanceProgress(show: Boolean)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startDelegate(publicKey: MinterPublicKey)
 
 
 }

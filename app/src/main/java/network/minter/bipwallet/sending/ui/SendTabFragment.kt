@@ -51,6 +51,7 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog
 import network.minter.bipwallet.databinding.FragmentTabSendBinding
+import network.minter.bipwallet.delegation.ui.DelegateUnbondActivity
 import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
@@ -77,6 +78,7 @@ import network.minter.bipwallet.wallets.selector.WalletListAdapter
 import network.minter.bipwallet.wallets.selector.WalletSelectorBroadcastReceiver
 import network.minter.bipwallet.wallets.ui.WalletsTopRecolorHelper
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
+import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
 import javax.inject.Inject
@@ -301,7 +303,6 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startScanQRWithPermissions(requestCode: Int) {
-//        SendTabFra
         startScanQRWithPermissionCheck(requestCode)
     }
 
@@ -350,12 +351,17 @@ class SendTabFragment : HomeTabFragment(), SendView {
         binding.feeValue.text = fee
     }
 
-    override fun setRecipientAutocompleteItemClickListener(listener: RecipientListAdapter.OnItemClickListener) {
-        val cl = RecipientListAdapter.OnItemClickListener { item: AddressContact?, position: Int ->
-            listener.onClick(item, position)
+    override fun startDelegate(publicKey: MinterPublicKey) {
+        DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
+                .setPublicKey(publicKey)
+                .start()
+    }
+
+    override fun setRecipientAutocompleteItemClickListener(listener: (AddressContact, Int) -> Unit) {
+        recipientListAdapter!!.setOnItemClickListener { item, position ->
+            listener.invoke(item, position)
             binding.inputRecipient.input.dismissDropDown()
         }
-        recipientListAdapter!!.setOnItemClickListener(cl)
     }
 
     override fun setRecipientAutocompleteItems(items: List<AddressContact>) {

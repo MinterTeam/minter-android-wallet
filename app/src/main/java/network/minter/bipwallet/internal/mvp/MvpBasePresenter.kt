@@ -100,10 +100,10 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
 
     @CallSuper
     override fun onDestroy() {
-        super.onDestroy()
         if (!subscriptions.isDisposed) {
             subscriptions.dispose()
         }
+        super.onDestroy()
     }
 
     fun onTrimMemory() {}

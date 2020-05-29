@@ -26,18 +26,17 @@
 
 package network.minter.bipwallet.delegation.ui
 
-import android.content.Context
+import android.app.Activity
+import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.AutoCompleteTextView
-import android.widget.ListPopupWindow
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.edwardstock.inputfield.InputField
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
@@ -46,24 +45,23 @@ import com.otaliastudios.autocomplete.Autocomplete
 import com.otaliastudios.autocomplete.AutocompleteCallback
 import com.otaliastudios.autocomplete.AutocompletePolicy
 import com.otaliastudios.autocomplete.AutocompletePresenter
-import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
-import network.minter.bipwallet.databinding.DialogDelegateUnbondBinding
+import network.minter.bipwallet.databinding.ActivityDelegateUnbondBinding
 import network.minter.bipwallet.delegation.adapter.autocomplete.ValidatorsAcPresenter
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
 import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
+import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
+import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
-import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
@@ -75,12 +73,11 @@ import network.minter.explorer.models.ValidatorItem
 import javax.inject.Inject
 import javax.inject.Provider
 
-
 /**
  * minter-android-wallet. 2020
- * @author Eduard Maximovich (edward.vstock@gmail.com)
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView {
+class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     enum class Type(
             val titleRes: Int,
@@ -113,8 +110,8 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     @Inject lateinit var presenterProvider: Provider<DelegateUnbondPresenter>
     @InjectPresenter lateinit var presenter: DelegateUnbondPresenter
+    private lateinit var binding: ActivityDelegateUnbondBinding
 
-    private lateinit var binding: DialogDelegateUnbondBinding
     private val inputGroup = InputGroup()
     private var type: Type = Type.Delegate
     private var autocomplete: Autocomplete<ValidatorItem>? = null
@@ -124,34 +121,13 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         return presenterProvider.get()
     }
 
-    override fun startExplorer(txHash: MinterHash) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash.toString())))
-    }
-
-    override fun expand() {
-        super.expand(false, null)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-    }
+        binding = ActivityDelegateUnbondBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setResult(Activity.RESULT_CANCELED)
 
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
-    internal fun AutoCompleteTextView.getPopup(): ListPopupWindow {
-        val popupField = AutoCompleteTextView::class.java.getDeclaredField("mPopup")
-        popupField.isAccessible = true
-        val it = this
-        val popup = popupField.get(it) as ListPopupWindow
-        return popup
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DialogDelegateUnbondBinding.inflate(inflater, container, false)
+        setupToolbar(binding.toolbar)
 
         inputGroup.setup {
             add(binding.inputAmount, RegexValidator("^(\\d*)(\\.)?(\\d{1,18})?$").apply {
@@ -160,32 +136,34 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         }
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
 
-        inputGroup.addInput(binding.inputMasternode)
-        inputGroup.addFilter(binding.inputMasternode, NewLineInputFilter())
+        inputGroup.addInput(binding.inputValidator)
+        inputGroup.addFilter(binding.inputValidator, NewLineInputFilter())
 
-        presenter.handleExtras(arguments)
-        type = arguments!!.getSerializable(ARG_TYPE) as Type
+        presenter.handleExtras(intent)
+        type = intent.extras!!.getSerializable(ARG_TYPE) as Type
 
-        binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
-
-        binding.inputMasternode.input.isFocusable = type != Type.Unbond
+        binding.inputValidator.input.isFocusable = type != Type.Unbond
         binding.inputCoin.input.isFocusable = false
         binding.inputAmount.input.setOnClickListener {
             binding.inputAmount.scrollToInput()
         }
 
         LastBlockHandler.handle(binding.lastUpdated)
-        val broadcastManager = BroadcastReceiverManager(activity!!)
+        val broadcastManager = BroadcastReceiverManager(this)
         broadcastManager.add(RTMBlockReceiver {
             LastBlockHandler.handle(binding.lastUpdated, it)
         })
         broadcastManager.register()
 
-        return binding.root
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presenter.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun hideValidatorOverlay() {
-        binding.inputMasternode.inputOverlayVisible = false
+        binding.inputValidator.inputOverlayVisible = false
     }
 
     override fun setTextChangedListener(listener: (input: InputWrapper, valid: Boolean) -> Unit) {
@@ -196,29 +174,40 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         binding.action.postApply { it.isEnabled = enable }
     }
 
-    override fun setAccountSelectorError(error: CharSequence?) {
+    override fun setAccountError(error: CharSequence?) {
         binding.inputCoin.error = error
+        binding.inputCoin.errorEnabled = !error.isNullOrEmpty()
     }
 
     override fun setValidator(validator: ValidatorItem, onInflated: (View) -> Unit) {
         binding.apply {
-            inputMasternode.text = null
-            inputMasternode.inputOverlayVisible = true
-            onInflated(inputMasternode.inputOverlay!!)
+            inputValidator.text = null
+            inputValidator.inputOverlayVisible = true
+            onInflated(inputValidator.inputOverlay!!)
         }
     }
 
     override fun setValidator(validator: MinterPublicKey, onInflated: (View) -> Unit) {
         binding.apply {
-            inputMasternode.inputOverlayVisible = true
-            onInflated(inputMasternode.inputOverlay!!)
+            inputValidator.inputOverlayVisible = true
+            onInflated(inputValidator.inputOverlay!!)
         }
     }
 
-    override fun setOnInputMasternodeClickListener(listener: (View) -> Unit) {
-        binding.inputMasternode.setOnClickListener {
-            if (binding.inputMasternode.inputOverlayVisible) {
-                binding.inputMasternode.inputOverlayVisible = false
+    override fun setOnValidatorSelectListener(onClick: (View) -> Unit) {
+        binding.inputValidator.isEnabled = true
+        binding.inputValidator.setOnSuffixImageClickListener(onClick)
+    }
+
+    override fun setValidatorSelectDisabled() {
+        binding.inputValidator.isEnabled = false
+        binding.inputValidator.setSuffixType(InputField.SuffixType.None)
+    }
+
+    override fun setOnValidatorOverlayClickListener(listener: (View) -> Unit) {
+        binding.inputValidator.setOnClickListener {
+            if (binding.inputValidator.inputOverlayVisible) {
+                binding.inputValidator.inputOverlayVisible = false
             }
             listener(it)
         }
@@ -226,11 +215,11 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
 
     override fun setOnValidatorSelectListener(listener: View.OnClickListener) {
         // both cases - open validators dialog by clicking on dropdown icon
-        binding.inputMasternode.setOnSuffixImageClickListener(listener)
+        binding.inputValidator.setOnSuffixImageClickListener(listener)
 
         // and only if unbonding,
         if (type == Type.Unbond) {
-            binding.inputMasternode.setOnClickListener(listener)
+            binding.inputValidator.setOnClickListener(listener)
         }
     }
 
@@ -239,25 +228,26 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
         binding.inputCoin.setOnSuffixImageClickListener(listener)
     }
 
-    override fun startValidatorSelector(items: List<SelectorData<ValidatorItem>>, listener: (SelectorData<ValidatorItem>) -> Unit) {
-        startDialog {
-            WalletAccountSelectorDialog.Builder<ValidatorItem>(context!!, R.string.title_choose_masternode)
-                    .setItems(items)
-                    .setOnClickListener(listener)
-                    .create()
-        }
+    override fun setEnableValidator(enable: Boolean) {
+        binding.inputValidator.isEnabled = enable
+    }
+
+    override fun startValidatorSelector(requestCode: Int, filter: ValidatorSelectorActivity.Filter) {
+        ValidatorSelectorActivity.Builder(this)
+                .setFilter(filter)
+                .start(requestCode)
     }
 
     override fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit) {
         startDialog {
-            WalletAccountSelectorDialog.Builder<BaseCoinValue>(activity!!, R.string.dialog_title_choose_coin)
+            WalletAccountSelectorDialog.Builder<BaseCoinValue>(this, R.string.dialog_title_choose_coin)
                     .setItems(items)
                     .setOnClickListener(listener)
                     .create()
         }
     }
 
-    override fun setAccountName(accountName: CharSequence?) {
+    override fun setAccountTitle(accountName: CharSequence?) {
         binding.inputCoin.postApply { it.setText(accountName) }
     }
 
@@ -301,19 +291,20 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
     }
 
     override fun setTitle(resId: Int) {
-        binding.dialogTitle.setText(resId)
+        binding.toolbarTitle.setText(resId)
     }
 
     override fun setOnSubmitListener(listener: View.OnClickListener) {
         binding.action.setOnClickListener(listener)
     }
 
-    override fun addMasternodeInputTextChangeListener(textWatcher: TextWatcher) {
-        binding.inputMasternode.addTextChangedListener(textWatcher)
+    override fun addValidatorTextChangeListener(textWatcher: TextWatcher) {
+        binding.inputValidator.addTextChangedListener(textWatcher)
     }
 
-    override fun setMasternodeError(message: CharSequence?) {
-        binding.inputMasternode.error = message
+    override fun setValidatorError(message: CharSequence?) {
+        binding.inputValidator.error = message
+        binding.inputValidator.errorEnabled = !message.isNullOrEmpty()
     }
 
     override fun setCoinLabel(labelRes: Int) {
@@ -325,7 +316,7 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
             return
         }
 
-        val presenter = ValidatorsAcPresenter(context!!, items)
+        val presenter = ValidatorsAcPresenter(this, items)
         val callback: AutocompleteCallback<ValidatorItem> = object : AutocompleteCallback<ValidatorItem> {
             override fun onPopupItemClicked(editable: Editable, item: ValidatorItem): Boolean {
                 listener(item, 0)
@@ -336,40 +327,70 @@ class DelegateUnbondDialog : BaseBottomSheetDialogFragment(), DelegateUnbondView
             }
         }
 
-        autocomplete = Autocomplete.on<ValidatorItem>(binding.inputMasternode.input)
+        autocomplete = Autocomplete.on<ValidatorItem>(binding.inputValidator.input)
                 .with(callback)
                 .with(presenter as AutocompletePresenter<ValidatorItem>)
                 .with(presenter as AutocompletePolicy)
                 .with(6f)
-                .with(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
+                .with(ContextCompat.getDrawable(this, R.drawable.shape_rounded_white))
                 .build()
     }
 
-    override fun dismiss() {
-        super.dismiss()
+    override fun startExplorer(txHash: MinterHash) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash.toString())))
     }
 
-    class Builder(type: Type) {
-        private val args = Bundle()
+    override fun finishSuccess() {
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
 
-        init {
-            args.putSerializable(ARG_TYPE, type)
+    class Builder : ActivityBuilder {
+        private var publicKey: MinterPublicKey? = null
+        private var coin: String? = null
+        private var type: Type = Type.Delegate
+
+        constructor(from: Activity, type: Type) : super(from) {
+            this.type = type
+        }
+
+        constructor(from: Fragment, type: Type) : super(from) {
+            this.type = type
+        }
+
+        constructor(from: Service, type: Type) : super(from) {
+            this.type = type
+        }
+
+        override fun getActivityClass(): Class<*> {
+            return DelegateUnbondActivity::class.java
         }
 
         fun setPublicKey(pubKey: MinterPublicKey): Builder {
-            args.putParcelable(ARG_PUB_KEY, pubKey.toParcel())
+            publicKey = pubKey
             return this
         }
 
         fun setSelectedCoin(coin: String): Builder {
-            args.putString(ARG_COIN, coin)
+            this.coin = coin
             return this
         }
 
-        fun build(): DelegateUnbondDialog {
-            val dialog = DelegateUnbondDialog()
-            dialog.arguments = args
-            return dialog
+        override fun onBeforeStart(intent: Intent) {
+            super.onBeforeStart(intent)
+            intent.putExtra(ARG_TYPE, type)
+            if (publicKey != null) {
+                intent.putExtra(ARG_PUB_KEY, publicKey.toParcel())
+            }
+            if (coin != null) {
+                intent.putExtra(ARG_COIN, coin)
+            }
+
         }
     }
+
+    override fun finishCancel() {
+        finish()
+    }
+
 }

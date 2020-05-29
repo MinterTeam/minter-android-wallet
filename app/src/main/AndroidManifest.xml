@@ -166,6 +166,8 @@
             android:name=".addressbook.ui.AddressBookActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".delegation.ui.DelegateUnbondActivity" />
+        <activity android:name=".delegation.ui.ValidatorSelectorActivity" />
 
         <service
             android:name=".services.livebalance.RTMService"

@@ -28,6 +28,7 @@ package network.minter.bipwallet.internal;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -42,11 +43,14 @@ import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasAndroidInjector;
+import kotlin.jvm.functions.Function1;
 import moxy.MvpAppCompatActivity;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment;
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog;
+import network.minter.bipwallet.internal.dialogs.WalletDialog;
+import network.minter.bipwallet.internal.dialogs.WalletDialogFragment;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
 import network.minter.bipwallet.internal.mvp.ErrorView;
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
@@ -68,6 +72,24 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
     @Inject DispatchingAndroidInjector<Object> androidInjector;
     private WalletProgressDialog mProgress;
     private BaseBottomSheetDialogFragment mBaseBottomSheetDialogFragment;
+    protected WalletDialog walletDialog = null;
+    protected WalletDialogFragment walletDialogFragment = null;
+
+    public void startDialog(Function1<Context, WalletDialog> dialogExecutor) {
+        if (walletDialogFragment != null && walletDialogFragment.isAdded()) {
+            walletDialogFragment.dismiss();
+            walletDialogFragment = null;
+        }
+        walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, dialogExecutor);
+    }
+
+    public void startDialogFragment(Function1<Context, WalletDialogFragment> dialogExecutor) {
+        if (walletDialog != null && walletDialog.isShowing()) {
+            walletDialog.dismiss();
+            walletDialog = null;
+        }
+        walletDialogFragment = WalletDialogFragment.switchDialogWithExecutor(this, walletDialogFragment, dialogExecutor);
+    }
 
     public void startBottomDialog(BaseBottomSheetDialogFragment dialog, String tag) {
         if (mBaseBottomSheetDialogFragment != null) {
@@ -90,6 +112,12 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        getMvpDelegate().onDestroy();
+        super.onBackPressed();
     }
 
     public void startActivityClearTop(Activity from, Intent intent) {
@@ -162,12 +190,6 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
     public void onErrorWithRetry(String errorMessage, String actionName,
                                  View.OnClickListener errorResolver) {
         runOnUiThread(() -> {
-//            if (mStatusView != null) {
-//                mStatusView
-//                        .withText(errorMessage)
-//                        .withRetryButton(actionName, errorResolver)
-//                        .showStatus();
-//            } else {
             new SnackbarBuilder(this)
                     .setMessage(errorMessage)
                     .setAction(actionName, errorResolver)

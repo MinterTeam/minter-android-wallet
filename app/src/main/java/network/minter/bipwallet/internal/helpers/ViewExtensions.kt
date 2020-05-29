@@ -99,4 +99,20 @@ object ViewExtensions {
         }
     }
 
+    fun listItemBackgroundRippleRounded(view: View, position: Int, size: Int) {
+        val isFirst = position == 0
+        val isLast = position == size - 1
+        val isMiddle = !isFirst && !isLast
+
+        if (isFirst && isLast) {
+            view.setBackgroundResource(R.drawable.bg_ripple_white_rounded)
+        } else if (isFirst && !isLast) {
+            view.setBackgroundResource(R.drawable.bg_ripple_white_top_rounded)
+        } else if (isMiddle) {
+            view.setBackgroundResource(R.drawable.bg_ripple_white)
+        } else if (!isFirst && isLast) {
+            view.setBackgroundResource(R.drawable.bg_ripple_white_bot_rounded)
+        }
+    }
+
 }

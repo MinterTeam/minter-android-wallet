@@ -28,12 +28,14 @@ package network.minter.bipwallet.exchange.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
 import android.view.View
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.edwardstock.inputfield.InputField
 import com.edwardstock.inputfield.InputFieldAutocomplete
 import com.edwardstock.inputfield.form.DecimalInputFilter
@@ -41,9 +43,13 @@ import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.DecimalValidator
 import com.edwardstock.inputfield.form.validators.RegexValidator
+import com.otaliastudios.autocomplete.Autocomplete
+import com.otaliastudios.autocomplete.AutocompleteCallback
+import com.otaliastudios.autocomplete.AutocompletePolicy
+import com.otaliastudios.autocomplete.AutocompletePresenter
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.IncludeExchangeCalculationBinding
-import network.minter.bipwallet.exchange.adapters.CoinsListAdapter
+import network.minter.bipwallet.exchange.adapters.CoinsAcPresenter
 import network.minter.bipwallet.exchange.contract.ExchangeView
 import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.Wallet
@@ -87,6 +93,10 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     private var walletDialog: WalletDialog? = null
     protected lateinit var binding: ExchangeBinding
 
+    private var autocomplete: Autocomplete<CoinItem>? = null
+    private var onCoinSelected: ((CoinItem, Int) -> Unit)? = null
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.inputOutgoingCoin.input.isFocusable = false
@@ -105,6 +115,25 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         })
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         binding.calculationContainer.calculation.inputType = InputType.TYPE_NULL
+
+
+        val coinsAutocompletePresenter = CoinsAcPresenter(context!!, Wallet.app().coinsCacheRepo())
+        val coinsAutocompleteCallback: AutocompleteCallback<CoinItem> = object : AutocompleteCallback<CoinItem> {
+            override fun onPopupItemClicked(editable: Editable, item: CoinItem): Boolean {
+                onCoinSelected?.invoke(item, 0)
+                return true
+            }
+
+            override fun onPopupVisibilityChanged(shown: Boolean) {}
+        }
+
+        autocomplete = Autocomplete.on<CoinItem>(binding.inputIncomingCoin.input)
+                .with(coinsAutocompleteCallback)
+                .with(coinsAutocompletePresenter as AutocompletePresenter<CoinItem>)
+                .with(coinsAutocompletePresenter as AutocompletePolicy)
+                .with(6f)
+                .with(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
+                .build()
 
 
         LastBlockHandler.handle(binding.lastUpdated)
@@ -161,20 +190,21 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         KeyboardHelper.hideKeyboard(this)
     }
 
-    override fun setCoinsAutocomplete(items: List<CoinItem>, listener: CoinsListAdapter.OnItemClickListener) {
-        if (items.isNotEmpty()) {
-            binding.inputIncomingCoin.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
-            binding.inputIncomingCoin.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
-            val cl = CoinsListAdapter.OnItemClickListener { item: CoinItem?, position: Int ->
-                listener.onClick(item, position)
-                binding.inputIncomingCoin.input.dismissDropDown()
-            }
-            val adapter = CoinsListAdapter(activity!!, items)
-            adapter.setOnItemClickListener(cl)
-            binding.inputIncomingCoin.post {
-                binding.inputIncomingCoin.input.setAdapter(adapter)
-            }
-        }
+    override fun setCoinsAutocomplete(items: List<CoinItem>, listener: (CoinItem, Int) -> Unit) {
+        onCoinSelected = listener
+
+//        if (items.isNotEmpty()) {
+//            binding.inputIncomingCoin.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
+//
+//            val adapter = CoinsListAdapter(activity!!, items)
+//            adapter.setOnItemClickListener { item, position ->
+//                listener(item, position)
+//                binding.inputIncomingCoin.input.dismissDropDown()
+//            }
+//            binding.inputIncomingCoin.post {
+//                binding.inputIncomingCoin.input.setAdapter(adapter)
+//            }
+//        }
     }
 
     override fun setCalculationTitle(calcTitle: Int) {

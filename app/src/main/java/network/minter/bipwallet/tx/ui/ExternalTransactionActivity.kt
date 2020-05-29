@@ -42,11 +42,9 @@ import network.minter.bipwallet.databinding.ActivityExternalTransactionBinding
 import network.minter.bipwallet.external.*
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.releaseDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
-import network.minter.bipwallet.internal.dialogs.WalletDialogFragment
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.system.ActivityBuilder
@@ -78,8 +76,6 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     @InjectPresenter lateinit var presenter: ExternalTransactionPresenter
 
     private lateinit var b: ActivityExternalTransactionBinding
-    private var walletDialog: WalletDialog? = null
-    private var walletDialogFragment: WalletDialogFragment? = null
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         b.inputList.adapter = adapter
@@ -98,16 +94,6 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
             b.feeLabel.visibility = View.GONE
             b.feeValue.textAlignment = View.TEXT_ALIGNMENT_CENTER
         }
-    }
-
-    override fun startDialog(executor: (Context) -> WalletDialog) {
-        walletDialog = switchDialogWithExecutor(this, walletDialog, executor)
-    }
-
-    override fun startDialogFragment(executor: DialogFragmentExecutor) {
-        walletDialogFragment = WalletDialogFragment.switchDialogWithExecutor(
-                this, walletDialogFragment, executor
-        )
     }
 
     override fun startDialog(cancelable: Boolean, executor: (Context) -> WalletDialog) {

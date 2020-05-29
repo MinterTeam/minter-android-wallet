@@ -46,6 +46,7 @@ class CacheValidatorsRepository(
 
     companion object {
         private const val KEY_VALIDATORS = BuildConfig.MINTER_STORAGE_VERS + "cached_explorer_validators_repository_list"
+        private const val KEY_LAST_USED = BuildConfig.MINTER_STORAGE_VERS + "cached_last_used_validators"
     }
 
     override fun getData(): List<ValidatorItem> {
@@ -68,4 +69,18 @@ class CacheValidatorsRepository(
     override fun isDataReady(): Boolean {
         return storage.contains(KEY_VALIDATORS)
     }
+
+    fun writeLastUsed(item: ValidatorItem?) {
+        if (item == null) return
+        storage.putAsync(KEY_LAST_USED, mutableListOf(item))
+    }
+
+    val lastUsed: MutableList<ValidatorItem>
+        get() {
+            if (!storage.contains(KEY_LAST_USED)) {
+                return ArrayList(0)
+            }
+
+            return storage.get(KEY_LAST_USED)!!
+        }
 }

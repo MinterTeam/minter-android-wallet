@@ -41,9 +41,9 @@ abstract class RecyclerAcPresenter<T>(
         context: Context
 ) : AutocompletePresenter<T>(context) {
 
-    private var observer: Observer? = null
-    private var recycler: RecyclerView? = null
-    private var clicks: ClickProvider<T>? = null
+    protected open var observer: Observer? = null
+    protected open var recycler: RecyclerView? = null
+    protected open var clicks: ClickProvider<T>? = null
 
     protected val recyclerView: RecyclerView
         get() = recycler!!
@@ -85,7 +85,7 @@ abstract class RecyclerAcPresenter<T>(
         observer = null
     }
 
-    private class Observer(private val root: DataSetObserver) : RecyclerView.AdapterDataObserver() {
+    class Observer(private val root: DataSetObserver) : RecyclerView.AdapterDataObserver() {
         override fun onChanged() {
 //            root.onChanged()
         }

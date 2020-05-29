@@ -26,8 +26,9 @@
 
 package network.minter.bipwallet.delegation.views
 
+import android.app.Activity
 import android.content.Context
-import android.os.Bundle
+import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -43,10 +44,11 @@ import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.apis.reactive.rxGate
 import network.minter.bipwallet.apis.reactive.toObservable
-import network.minter.bipwallet.databinding.StubMasternodeNameBinding
+import network.minter.bipwallet.databinding.StubValidatorNameBinding
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
-import network.minter.bipwallet.delegation.ui.DelegateUnbondDialog
-import network.minter.bipwallet.delegation.ui.DelegateUnbondDialog.Type
+import network.minter.bipwallet.delegation.ui.DelegateUnbondActivity
+import network.minter.bipwallet.delegation.ui.DelegateUnbondActivity.Type
+import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity
 import network.minter.bipwallet.exchange.ui.dialogs.TxConfirmStartDialog
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
@@ -61,7 +63,6 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.account.selectorDataFromCoins
 import network.minter.bipwallet.sending.account.selectorDataFromDelegatedAccounts
-import network.minter.bipwallet.sending.account.selectorDataFromValidators
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.TransactionSender
 import network.minter.bipwallet.tx.contract.TxInitData
@@ -83,6 +84,9 @@ import javax.inject.Inject
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+
+private const val REQUEST_CODE_SELECT_VALIDATOR = 4000
+
 @InjectViewState
 class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateUnbondView>() {
     @Inject lateinit var validatorsRepo: RepoValidators
@@ -96,6 +100,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
     private var selectAccount: String? = null
     private var validators: MutableList<ValidatorItem> = ArrayList()
+    private var toValidatorItem: ValidatorItem? = null
     private var toValidator: MinterPublicKey? = null
     private var toValidatorName: String? = null
     private var fromAccount: BaseCoinValue? = null
@@ -107,31 +112,34 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var fee = BigDecimal.ZERO
     private var clickedUseMax: Boolean = false
 
-    override fun handleExtras(bundle: Bundle?) {
-        super.handleExtras(bundle)
-        if (bundle == null) {
+    private val BaseCoinValue.title: String
+        get() = "$coin (${amount.humanize()})"
+
+    override fun handleExtras(intent: Intent?) {
+        super.handleExtras(intent)
+        if (intent == null) {
             throw IllegalStateException("Can't start view without arguments")
         }
 
-        if (!bundle.containsKey(DelegateUnbondDialog.ARG_TYPE)) {
+        if (!intent.hasExtra(DelegateUnbondActivity.ARG_TYPE)) {
             throw IllegalStateException("View type must be set: Type.Delete or Type.Unbond")
         }
 
-        type = bundle.getSerializable(DelegateUnbondDialog.ARG_TYPE) as Type
+        type = intent.getSerializableExtra(DelegateUnbondActivity.ARG_TYPE) as Type
 
-        if (bundle.containsKey(DelegateUnbondDialog.ARG_PUB_KEY)) {
-            toValidator = IntentHelper.getParcelExtra(bundle, DelegateUnbondDialog.ARG_PUB_KEY)
+        if (intent.hasExtra(DelegateUnbondActivity.ARG_PUB_KEY)) {
+            toValidator = IntentHelper.getParcelExtra(intent, DelegateUnbondActivity.ARG_PUB_KEY)
         }
 
-        if (bundle.containsKey(DelegateUnbondDialog.ARG_COIN)) {
-            selectAccount = bundle.getString(DelegateUnbondDialog.ARG_COIN)
+        if (intent.hasExtra(DelegateUnbondActivity.ARG_COIN)) {
+            selectAccount = intent.getStringExtra(DelegateUnbondActivity.ARG_COIN)
         }
 
         viewState.setTitle(
                 if (type == Type.Delegate) {
-                    R.string.dialog_title_delegate
+                    R.string.title_delegate
                 } else {
-                    R.string.dialog_title_unbond
+                    R.string.title_unbond
                 }
         )
         viewState.setSubtitle(
@@ -143,7 +151,17 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         )
         if (type == Type.Unbond) {
             viewState.setCoinLabel(R.string.label_coin_you_want_unbond)
+            viewState.setValidatorSelectDisabled()
+        } else {
+            viewState.setOnValidatorSelectListener(::startValidatorSelector)
+            if (toValidator != null) {
+                onValidatorSelected(ValidatorItem().apply {
+                    pubKey = toValidator
+                    status = 0
+                })
+            }
         }
+
         setupFee()
 
         viewState.setOnClickUseMax(View.OnClickListener {
@@ -162,6 +180,35 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 }
             }
         })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        if (requestCode == REQUEST_CODE_SELECT_VALIDATOR && data != null) {
+            val validator = ValidatorSelectorActivity.getResult(data)
+            if (validator != null) {
+                onValidatorSelected(validator)
+            }
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun startValidatorSelector(v: View) {
+        viewState.startValidatorSelector(REQUEST_CODE_SELECT_VALIDATOR, ValidatorSelectorActivity.Filter.Online)
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun clearSelectedValidator(v: View) {
+        toValidatorName = null
+        toValidator = null
+        toValidatorItem = null
+        viewState.hideValidatorOverlay()
+        viewState.setOnValidatorSelectListener(::startValidatorSelector)
     }
 
     private fun setupFee() {
@@ -187,9 +234,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     }
 
     private fun viewSetValidator(validator: ValidatorItem) {
-        viewState.setMasternodeError(null)
+        viewState.setValidatorError(null)
         viewState.setValidator(validator) { v ->
-            val b = StubMasternodeNameBinding.bind(v)
+            val b = StubValidatorNameBinding.bind(v)
             if (validator.meta?.name.isNullOrEmpty()) {
                 b.title.text = validator.pubKey?.toShortString()
                 b.subtitle.visible = false
@@ -197,13 +244,19 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 b.title.text = validator.meta?.name
                 b.subtitle.text = validator.pubKey?.toShortString()
             }
+            b.dropdown.setOnClickListener(::clearSelectedValidator)
+
+            if (type == Type.Unbond) {
+                b.root.background.state = intArrayOf(-android.R.attr.state_enabled)
+                b.dropdown.visible = false
+            }
 
         }
     }
 
     private fun viewSetValidator(validator: MinterPublicKey) {
         viewState.setValidator(validator) { v ->
-            val b = StubMasternodeNameBinding.bind(v)
+            val b = StubValidatorNameBinding.bind(v)
             b.title.text = validator.toShortString()
             b.subtitle.visible = false
         }
@@ -263,7 +316,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         }
                         .setNegativeAction(R.string.btn_cancel) { d, _ ->
                             d.dismiss()
-                            viewState.expand()
+                            viewState.finishCancel()
                         }
                         .create()
             }
@@ -385,19 +438,19 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         txRepo.update(true)
         rewardsDailyRepo.update(true)
         rewardsMonthlyRepo.update(true)
+        validatorsRepo.entity.writeLastUsed(toValidatorItem)
 
         viewState.startDialog {
             TxSendSuccessDialog.Builder(it)
                     .setValue(type.resultLabelRes)
-//                    .setValue(validatorFullName)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
                         viewState.startExplorer(result.result!!.txHash)
-                        viewState.dismiss()
+                        viewState.finishSuccess()
                     }
                     .setNegativeAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-                        viewState.dismiss()
+                        viewState.finishSuccess()
                     }
                     .create()
         }
@@ -410,7 +463,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setText((errorResult.message))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-                        viewState.expand()
+                        viewState.finishCancel()
                     }
                     .create()
         }
@@ -423,7 +476,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setText((errorResult.error?.message ?: "Caused unknown error"))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-                        viewState.expand()
+                        viewState.finishCancel()
                     }
                     .create()
         }
@@ -435,9 +488,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.setOnSubmitListener(View.OnClickListener {
             onSubmit()
         })
-        viewState.addMasternodeInputTextChangeListener(object : TextWatcher {
+        viewState.addValidatorTextChangeListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -446,25 +498,27 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if ((s == null || s.isEmpty())) {
                     if (toValidator == null) {
-                        viewState.setMasternodeError("Public key required")
+                        viewState.setValidatorError("Public key required")
                     } else {
-                        viewState.setMasternodeError(null)
+                        viewState.setValidatorError(null)
                     }
                     checkEnableSubmit()
                     return
                 }
                 if (!s.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())) {
-                    viewState.setMasternodeError("Invalid public key format")
+                    viewState.setValidatorError("Invalid public key format")
                     checkEnableSubmit()
                     return
                 }
 
                 toValidator = MinterPublicKey(s.toString())
                 toValidatorName = null
-                viewState.setMasternodeError(null)
+                toValidatorItem = ValidatorItem().apply {
+                    pubKey = toValidator
+                }
+                viewState.setValidatorError(null)
                 checkEnableSubmit()
             }
-
         })
         validatorsRepo
                 .retryWhen(errorResolver)
@@ -484,7 +538,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                             }
 
                             if (type == Type.Delegate) {
-                                viewState.setValidatorsAutocomplete(validators.filterOnline()) { validator, _ ->
+                                viewState.setValidatorsAutocomplete(validators.filter { it.status == ValidatorItem.STATUS_ONLINE }) { validator, _ ->
                                     onValidatorSelected(validator)
                                 }
                             }
@@ -530,32 +584,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
     }
 
-
     override fun attachView(view: DelegateUnbondView) {
         super.attachView(view)
         accountStorage.update()
         validatorsRepo.update()
-
-        if (type == Type.Delegate) {
-            viewState.setOnInputMasternodeClickListener {
-                if (toValidator != null) {
-                    toValidator = null
-                    viewState.hideValidatorOverlay()
-                    checkEnableSubmit()
-                }
-            }
-        }
-        viewState.setOnValidatorSelectListener(View.OnClickListener {
-            if (type == Type.Delegate) {
-                viewState.startValidatorSelector(selectorDataFromValidators(validators.filterOnline())) { validator ->
-                    onValidatorSelected(validator.data)
-                }
-            } else {
-                viewState.startValidatorSelector(selectorDataFromValidators(validators.filterDelegated())) { validator ->
-                    onValidatorSelected(validator.data)
-                }
-            }
-        })
 
         viewState.setOnAccountSelectListener(View.OnClickListener {
             if (type == Type.Delegate) {
@@ -575,39 +607,30 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         })
     }
 
-    internal fun MutableList<ValidatorItem>.filterOnline(): List<ValidatorItem> {
-        return filter { it.status == ValidatorItem.STATUS_ONLINE }
-    }
-
-    internal fun MutableList<ValidatorItem>.filterDelegated(): List<ValidatorItem> {
-        return filter {
-            accountStorage.entity.mainWallet.hasDelegated(it.pubKey)
-        }
-    }
-
     private fun onAccountSelected(account: BaseCoinValue?) {
         if (account == null) return
         fromAccount = account
-        viewState.setAccountName("${account.coin} (${account.amount.humanize()})")
+        viewState.setAccountTitle(account.title)
         lastAccount = account
         checkEnableSubmit()
     }
 
     private fun onValidatorSelected(validator: ValidatorItem) {
+        toValidatorItem = validator
         toValidatorName = validator.meta?.name
         toValidator = validator.pubKey
         viewSetValidator(validator)
 
         if (type == Type.Unbond) {
             if (!accountStorage.entity.mainWallet.hasDelegated(toValidator)) {
-                viewState.setAccountName(null)
-                viewState.setAccountSelectorError("You didn't delegated to selected validator")
+                viewState.setAccountTitle(null)
+                viewState.setAccountError("You didn't delegated to selected validator")
                 toValidator = null
             } else {
                 val delegated = accountStorage.entity.mainWallet.getDelegatedListByValidator(toValidator!!)
                 val first = delegated[0]
-                viewState.setAccountSelectorError(null)
-                viewState.setAccountName("${first.coin} (${first.amount.humanize()})")
+                viewState.setAccountError(null)
+                viewState.setAccountTitle(first.title)
             }
         }
         checkEnableSubmit()

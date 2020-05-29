@@ -23,34 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.sending.ui
 
-import com.edwardstock.inputfield.form.validators.BaseValidator
-import io.reactivex.Single
-import network.minter.bipwallet.internal.Wallet
-import network.minter.core.crypto.MinterAddress
+package network.minter.bipwallet.delegation.contract
+
+import androidx.recyclerview.widget.RecyclerView
+import moxy.MvpView
+import moxy.viewstate.strategy.AddToEndSingleStrategy
+import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.internal.mvp.ErrorView
+import network.minter.bipwallet.internal.mvp.ProgressView
+import network.minter.explorer.models.ValidatorItem
 
 /**
  * minter-android-wallet. 2020
- * @author Eduard Maximovich (edward.vstock@gmail.com)
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-internal class RecipientValidator(
-        errorMessage: CharSequence = "Invalid recipient",
-        required: Boolean = true) : BaseValidator(errorMessage, required) {
-    override fun validate(value: CharSequence?): Single<Boolean> {
-        if (value.isNullOrEmpty()) {
-            return Single.just(isRequired)
-        }
+@StateStrategyType(AddToEndSingleStrategy::class)
+interface ValidatorSelectorView : MvpView, ErrorView, ProgressView {
 
-        val v = value.toString()
-        if (v.length >= 2) {
-            val pref = v.substring(0, 2)
-            if (pref.toLowerCase() == "mx") {
-                return Single.just(v.matches(MinterAddress.ADDRESS_PATTERN.toRegex()))
-            }
-        }
-
-        return Wallet.app().addressBookRepo().countLikeByNameOrAddress(v)
-                .map { cnt -> cnt > 0 }
-    }
+    fun setAdapter(adapter: RecyclerView.Adapter<*>)
+    fun finishCancel()
+    fun finishSuccess(validator: ValidatorItem)
+    fun createItemSeparator(haveLastUsedHeader: Boolean)
 }

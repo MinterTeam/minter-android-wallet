@@ -34,8 +34,9 @@ import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog;
 import network.minter.bipwallet.auth.ui.AuthActivity;
 import network.minter.bipwallet.auth.ui.AuthFragment;
 import network.minter.bipwallet.auth.ui.SplashFragment;
-import network.minter.bipwallet.delegation.ui.DelegateUnbondDialog;
+import network.minter.bipwallet.delegation.ui.DelegateUnbondActivity;
 import network.minter.bipwallet.delegation.ui.DelegatedListActivity;
+import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity;
 import network.minter.bipwallet.exchange.ExchangeModule;
 import network.minter.bipwallet.exchange.ui.BuyExchangeFragment;
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity;
@@ -156,8 +157,12 @@ public interface InjectorsModule {
     TransactionViewDialog transactionViewDialogInjector();
 
     @ContributesAndroidInjector
-    @FragmentScope
-    DelegateUnbondDialog delegateUnbondDialogInjector();
+    @ActivityScope
+    DelegateUnbondActivity delegateUnbondActivityInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    ValidatorSelectorActivity validatorSelectorActivityInjector();
 
     @ContributesAndroidInjector
     @FragmentScope

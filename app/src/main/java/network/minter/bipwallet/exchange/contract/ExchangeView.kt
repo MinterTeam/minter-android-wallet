@@ -32,7 +32,6 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.exchange.adapters.CoinsListAdapter
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.explorer.models.CoinBalance
@@ -64,7 +63,7 @@ interface ExchangeView : MvpView {
     fun setCalculation(calculation: String)
     fun setOutAccountName(accountName: CharSequence)
     fun setAmount(amount: CharSequence)
-    fun setCoinsAutocomplete(items: List<CoinItem>, listener: CoinsListAdapter.OnItemClickListener)
+    fun setCoinsAutocomplete(items: List<CoinItem>, listener: (CoinItem, Int) -> Unit)
     fun setIncomingCoin(symbol: String)
     fun setFee(commission: CharSequence)
     fun showCalculationProgress(show: Boolean)

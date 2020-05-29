@@ -34,6 +34,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.core.crypto.MinterHash
@@ -54,9 +55,9 @@ interface DelegateUnbondView : MvpView {
     fun setOnValidatorSelectListener(listener: View.OnClickListener)
     fun setOnAccountSelectListener(listener: View.OnClickListener)
 
-    fun startValidatorSelector(items: List<SelectorData<ValidatorItem>>, listener: (SelectorData<ValidatorItem>) -> Unit)
+    fun startValidatorSelector(requestCode: Int, filter: ValidatorSelectorActivity.Filter = ValidatorSelectorActivity.Filter.Online)
     fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit)
-    fun setAccountName(accountName: CharSequence?)
+    fun setAccountTitle(accountName: CharSequence?)
     fun setTitle(@StringRes resId: Int)
     fun setSubtitle(@StringRes resId: Int)
     fun setFee(fee: CharSequence)
@@ -64,7 +65,7 @@ interface DelegateUnbondView : MvpView {
     fun setAmount(amount: String)
     fun setTextChangedListener(listener: (input: InputWrapper, valid: Boolean) -> Unit)
     fun setEnableSubmit(enable: Boolean)
-    fun setAccountSelectorError(error: CharSequence?)
+    fun setAccountError(error: CharSequence?)
     fun setOnSubmitListener(listener: View.OnClickListener)
     fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit)
 
@@ -73,13 +74,17 @@ interface DelegateUnbondView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startExplorer(txHash: MinterHash)
-    fun expand()
-    fun collapse()
-    fun dismiss()
-    fun setOnInputMasternodeClickListener(listener: (View) -> Unit)
+
+    fun finishSuccess()
+    fun finishCancel()
+
+    fun setOnValidatorOverlayClickListener(listener: (View) -> Unit)
     fun hideValidatorOverlay()
-    fun addMasternodeInputTextChangeListener(textWatcher: TextWatcher)
-    fun setMasternodeError(message: CharSequence?)
+    fun addValidatorTextChangeListener(textWatcher: TextWatcher)
+    fun setValidatorError(message: CharSequence?)
+    fun setOnValidatorSelectListener(onClick: (View) -> Unit)
+    fun setValidatorSelectDisabled()
     fun setCoinLabel(labelRes: Int)
+    fun setEnableValidator(enable: Boolean)
 
 }

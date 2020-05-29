@@ -45,7 +45,6 @@ import network.minter.bipwallet.apis.reactive.*
 import network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError
 import network.minter.bipwallet.exchange.ExchangeCalculator
 import network.minter.bipwallet.exchange.ExchangeCalculator.CalculationResult
-import network.minter.bipwallet.exchange.adapters.CoinsListAdapter
 import network.minter.bipwallet.exchange.contract.ExchangeView
 import network.minter.bipwallet.exchange.models.ConvertTransactionData
 import network.minter.bipwallet.exchange.ui.dialogs.TxConfirmStartDialog
@@ -208,9 +207,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                     b.reserveBalance.compareTo(a.reserveBalance)
                                 })
 
-                                viewState.setCoinsAutocomplete(resMutable, CoinsListAdapter.OnItemClickListener { item: CoinItem, _: Int ->
+                                viewState.setCoinsAutocomplete(resMutable) { item, _ ->
                                     viewState.setIncomingCoin(item.symbol)
-                                })
+                                }
                             }
                         },
                         { t: Throwable ->

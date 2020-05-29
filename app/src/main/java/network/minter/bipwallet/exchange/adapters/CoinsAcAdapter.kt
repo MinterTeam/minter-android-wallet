@@ -24,49 +24,43 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.delegation.adapter.autocomplete
+package network.minter.bipwallet.exchange.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
-import network.minter.bipwallet.databinding.ItemListDialogAccountSelectorSearchViewBinding
+import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
 import network.minter.bipwallet.internal.helpers.ViewExtensions.listItemBackgroundRippleRounded
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.explorer.models.ValidatorItem
+import network.minter.explorer.models.CoinItem
+import network.minter.profile.MinterProfileApi
+import timber.log.Timber
 
 /**
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class ValidatorsAcAdapter(
-        val presenter: ValidatorsAcPresenter,
-        private var items: List<ValidatorItem> = ArrayList()
-) : RecyclerView.Adapter<ValidatorsAcAdapter.ViewHolder>() {
-
+class CoinsAcAdapter(
+        val presenter: CoinsAcPresenter
+) : RecyclerView.Adapter<CoinsAcAdapter.ViewHolder>() {
+    private var items: List<CoinItem> = ArrayList()
     private var inflater: LayoutInflater? = null
 
     class ViewHolder(
-            val b: ItemListDialogAccountSelectorSearchViewBinding
+            val b: ItemListValidatorSelectorBinding
     ) : RecyclerView.ViewHolder(b.root)
-
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        val name = item.meta?.name ?: item.pubKey.toShortString()
-        val subtitle = if (item.meta?.name.isNullOrEmpty()) null else item.pubKey.toShortString()
 
         listItemBackgroundRippleRounded(holder.itemView, position, items.size)
-
-        holder.b.separator.visible = items.isNotEmpty() && position < items.size - 1
-
         holder.b.root.setOnClickListener {
             presenter.dispatchClick(items[holder.adapterPosition])
         }
-        holder.b.searchItemTitle.text = name
-        holder.b.searchItemIconLeft.setImageUrlFallback(item.meta?.iconUrl, R.drawable.img_avatar_delegate)
-        holder.b.searchItemSubtitle.visible = subtitle != null
-        holder.b.searchItemSubtitle.text = subtitle
+
+        holder.b.itemTitle.text = item.symbol
+        holder.b.itemSubtitle.text = item.name
+        holder.b.itemAvatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(item.symbol), R.drawable.img_avatar_default)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -74,15 +68,16 @@ class ValidatorsAcAdapter(
             inflater = LayoutInflater.from(parent.context)
         }
 
-        val b = ItemListDialogAccountSelectorSearchViewBinding.inflate(inflater!!, parent, false)
+        val b = ItemListValidatorSelectorBinding.inflate(inflater!!, parent, false)
         return ViewHolder(b)
     }
 
     override fun getItemCount(): Int {
+        Timber.d("Coins adapter check items count: %d", items.size)
         return items.size
     }
 
-    fun setItems(data: List<ValidatorItem>) {
+    fun setItems(data: List<CoinItem>) {
         if (items.size == data.size && items == data) {
             return
         }

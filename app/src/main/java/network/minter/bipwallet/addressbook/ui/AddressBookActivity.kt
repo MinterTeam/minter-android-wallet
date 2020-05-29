@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.addressbook.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Service
 import android.content.Intent
@@ -45,8 +46,6 @@ import network.minter.bipwallet.addressbook.views.AddressBookPresenter
 import network.minter.bipwallet.databinding.ActivityAddressBookBinding
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.dialogs.ActionListener
-import network.minter.bipwallet.internal.dialogs.DialogExecutor
-import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import org.parceler.Parcels
@@ -58,7 +57,6 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
     @InjectPresenter lateinit var presenter: AddressBookPresenter
 
     private lateinit var binding: ActivityAddressBookBinding
-    private var walletDialog: WalletDialog? = null
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         binding.list.adapter = adapter
@@ -66,10 +64,6 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
 
     override fun showEmpty(show: Boolean) {
         binding.emptyText.visible = show
-    }
-
-    override fun startDialog(executor: DialogExecutor) {
-        walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, executor)
     }
 
     override fun startAddContact(onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?) {
@@ -111,6 +105,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
         return presenterProvider.get()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddressBookBinding.inflate(layoutInflater)

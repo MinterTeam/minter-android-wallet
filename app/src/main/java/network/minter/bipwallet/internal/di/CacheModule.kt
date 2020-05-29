@@ -68,6 +68,14 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
+    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, api: MinterExplorerApi): RepoCoins {
+        return RepoCoins(storage, CachedCoinsRepository(storage, api.apiService))
+                .setTimeToLive(/*3  minutes */ 60 * 3)
+    }
+
+    @JvmStatic
+    @Provides
+    @WalletApp
     fun provideCachedDailyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerApi): RepoDailyRewards {
         return RepoDailyRewards(storage, CachedDailyRewardStatisticsRepository(storage, secretStorage, api.apiService))
                 .setTimeToLive(60 * 10)
