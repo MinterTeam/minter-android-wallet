@@ -94,7 +94,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         if (getItemViewType(i) == DelegatedItem.ITEM_VALIDATOR) {
             val vh = viewHolder as ValidatorViewHolder
             val item = getItem(i) as DelegatedValidator
-            vh.fakeHeader.visible = i > 0
+            vh.fakeHeader.visible = true
 
             if (item.name.isNullOrEmpty()) {
                 vh.title.text = item.publicKey.toShortString()
