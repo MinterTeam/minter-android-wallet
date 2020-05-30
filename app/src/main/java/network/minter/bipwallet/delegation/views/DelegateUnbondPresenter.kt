@@ -273,9 +273,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             R.id.input_amount -> {
                 amount = (input.text ?: "").toString().parseBigDecimal()
             }
-            R.id.input_masternode -> {
-
-            }
         }
         checkEnableSubmit()
     }
