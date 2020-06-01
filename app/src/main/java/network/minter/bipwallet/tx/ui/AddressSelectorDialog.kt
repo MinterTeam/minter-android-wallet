@@ -32,8 +32,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import android.widget.ArrayAdapter
+import android.widget.ListPopupWindow
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogAddressSelectorBinding
 import network.minter.bipwallet.internal.dialogs.WalletDialogFragment
@@ -41,7 +43,6 @@ import network.minter.bipwallet.internal.dialogs.WalletDialogFragmentBuilder
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.storage.models.SecretData
 import network.minter.bipwallet.sending.account.SelectorData
-import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
 
 /**
  * minter-android-wallet. 2020
@@ -50,15 +51,10 @@ import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
 
 
 class AddressSelectorDialog(
-        val builder: Builder
+        private val builder: Builder
 ) : WalletDialogFragment() {
-
-    interface OnItemSelected {
-        fun onSelected(item: SelectorData<SecretData>)
-    }
-
     private lateinit var binding: DialogAddressSelectorBinding
-    private var subDialog: WalletAccountSelectorDialog<SecretData>? = null
+    private var popup: ListPopupWindow? = null
     var item: SelectorData<SecretData>? = null
         private set
 
@@ -68,6 +64,11 @@ class AddressSelectorDialog(
         } else {
             binding.inputAddress.setText("${data.title}")
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        popup?.dismiss()
+        super.onDismiss(dialog)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -81,26 +82,38 @@ class AddressSelectorDialog(
         builder.bindAction(this, binding.actionConfirm, DialogInterface.BUTTON_POSITIVE)
         builder.bindAction(this, binding.actionDecline, DialogInterface.BUTTON_NEGATIVE)
 
+        val selectOnClick = View.OnClickListener {
+            popup = ListPopupWindow(context!!)
+            popup!!.anchorView = binding.inputAddress.input
+            popup!!.width = binding.inputAddress.input.width
+            popup!!.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+            val arItems: Array<String> = builder.items.map {
+                if (it.subtitle != null) {
+                    "${it.title} (${it.subtitle})"
+                } else {
+                    "${it.title}"
+                }
+            }.toTypedArray()
+
+            val arAdapter = ArrayAdapter(context!!, R.layout.list_item_textview, R.id.text, arItems)
+
+            popup!!.setAdapter(arAdapter)
+            popup!!.isModal = true
+            popup!!.setOnItemClickListener { _, _, position, _ ->
+                item = builder.items[position]
+                fillInput(item!!)
+                popup?.dismiss()
+            }
+
+            popup!!.setBackgroundDrawable(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
+            popup!!.show()
+        }
+
         binding.title.text = builder.title
         binding.inputAddress.input.isFocusable = false
-        binding.inputAddress.input.setOnClickListener {
-            subDialog = WalletAccountSelectorDialog.Builder<SecretData>(context!!, R.string.dialog_title_choose_wallet)
-                    .setShowTitle(false)
-                    .setItems(builder.items)
-                    .setOnClickListener {
-                        item = it
-                        fillInput(item!!)
-                    }
-                    .create()
-
-            subDialog!!.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            subDialog!!.window?.setWindowAnimations(0)
-            subDialog!!.addOnDismissListener {
-                binding.root.animate().alpha(1f).setDuration(100).start()
-            }
-            binding.root.animate().alpha(0f).setDuration(100).start()
-            subDialog!!.show()
-        }
+        binding.inputAddress.input.setOnClickListener(selectOnClick)
+        binding.inputAddress.setOnSuffixImageClickListener(selectOnClick)
 
         return binding.root
     }
@@ -108,7 +121,6 @@ class AddressSelectorDialog(
 
     class Builder : WalletDialogFragmentBuilder<AddressSelectorDialog, Builder> {
         internal var items: List<SelectorData<SecretData>> = ArrayList()
-        internal var listener: OnItemSelected? = null
         internal var desc: CharSequence? = null
 
         @JvmOverloads

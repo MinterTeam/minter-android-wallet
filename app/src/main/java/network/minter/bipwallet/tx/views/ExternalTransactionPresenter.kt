@@ -30,6 +30,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import com.airbnb.deeplinkdispatch.DeepLink
+import com.annimon.stream.Optional
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
@@ -45,7 +46,6 @@ import network.minter.bipwallet.apis.reactive.rxGate
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.Preconditions.firstNonNull
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
-import network.minter.bipwallet.internal.dialogs.WalletDialogFragment
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction
 import network.minter.bipwallet.internal.helpers.DeepLinkHelper
@@ -54,6 +54,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.sending.account.selectorDataFromSecrets
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
@@ -70,7 +71,6 @@ import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.internal.helpers.StringHelper
 import network.minter.core.util.RLPBoxed
-import network.minter.explorer.models.AddressBalance
 import network.minter.explorer.models.GasValue
 import network.minter.explorer.models.GateResult
 import network.minter.explorer.models.GateResult.copyError
@@ -250,7 +250,22 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
         } else if (mExtTx!!.type == OperationType.SellAllCoins) {
             val data = mExtTx!!.getData(TxCoinSellAll::class.java)
-            val mainWallet: AddressBalance = accountStorage.entity.mainWallet
+
+            val mainWalletRes: Optional<AddressBalanceTotal> = accountStorage.entity.wallets.find(mFrom!!)
+            if (mainWalletRes.isEmpty) {
+                viewState.startDialog(false) { ctx: Context? ->
+                    ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
+                            .setText("Can't resolve balance for selected account")
+                            .setPositiveAction(R.string.btn_close) { d, _ ->
+                                d.dismiss()
+                                viewState.finishCancel()
+                            }
+                            .create()
+                }
+                return false
+            }
+
+            val mainWallet = mainWalletRes.get()
             val acc = mainWallet.findCoinByName(data.coinToSell)
             if (acc.isEmpty) {
                 viewState.disableAll()
@@ -729,15 +744,21 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
     private fun onSubmit() {
         viewState.startDialogFragment { ctx ->
-            AddressSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
+            val d = AddressSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
                     .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
-                    .setPositiveAction(R.string.btn_confirm) { d: WalletDialogFragment, _ ->
+                    .setPositiveAction(R.string.btn_confirm) { d, _ ->
                         mFrom = (d as AddressSelectorDialog).item!!.data.minterAddress
                         d.dismiss()
+                        if (!validateTx()) {
+                            return@setPositiveAction
+                        }
                         startExecuteTransaction()
                     }
                     .setNegativeAction(R.string.btn_cancel)
                     .create()
+
+            d.isCancelable = false
+            d
         }
     }
 
