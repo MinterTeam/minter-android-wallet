@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,8 +27,10 @@
 package network.minter.bipwallet.sending.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
@@ -72,7 +74,6 @@ public class QRCodeScannerActivity extends BaseActivity implements DecodeCallbac
 
     @Override
     public void onBackPressed() {
-        setResult(RESULT_CANCELED);
         super.onBackPressed();
     }
 
@@ -82,20 +83,31 @@ public class QRCodeScannerActivity extends BaseActivity implements DecodeCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_scanner);
         ButterKnife.bind(this);
+        setResult(Activity.RESULT_CANCELED);
 
-        mCodeScanner = new CodeScanner(this, scannerView);
-        mCodeScanner.setDecodeCallback(this);
-        mCodeScanner.setFormats(TWO_DIMENSIONAL_FORMATS);
-        mCodeScanner.setScanMode(ScanMode.SINGLE);
-        scannerView.setOnClickListener(v -> {
-            mCodeScanner.startPreview();
-        });
+        try {
+            mCodeScanner = new CodeScanner(this, scannerView);
+            mCodeScanner.setDecodeCallback(this);
+            mCodeScanner.setFormats(TWO_DIMENSIONAL_FORMATS);
+            mCodeScanner.setScanMode(ScanMode.SINGLE);
+            scannerView.setOnClickListener(v -> {
+                mCodeScanner.startPreview();
+            });
+        } catch (Throwable t) {
+            Toast.makeText(this, "Unable to scan QR code: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mCodeScanner.startPreview();
+        try {
+            mCodeScanner.startPreview();
+        } catch (Throwable t) {
+            Toast.makeText(this, "Unable to scan QR code: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override
