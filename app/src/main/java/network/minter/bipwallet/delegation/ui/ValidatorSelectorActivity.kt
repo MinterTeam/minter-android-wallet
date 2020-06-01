@@ -91,8 +91,6 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
         itemSeparator = BorderedItemSeparator(this, R.drawable.shape_bottom_separator, false, true)
         if (haveLastUsedHeader) {
             itemSeparator!!.setSkipElements(listOf(0, 1, 3))
-        } else {
-            itemSeparator!!.setFirstElementOffset(1)
         }
         binding.list.addItemDecoration(itemSeparator!!)
     }
