@@ -81,6 +81,7 @@
         android:layout_marginTop="4dp"
         style="@style/ListSubtitle"
         android:layout_marginEnd="@dimen/margin_edges_half"
+        android:textAlignment="viewEnd"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/item_amount"
