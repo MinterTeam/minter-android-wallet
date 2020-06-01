@@ -68,7 +68,7 @@ interface DelegateUnbondView : MvpView {
     fun setEnableSubmit(enable: Boolean)
     fun setAccountError(error: CharSequence?)
     fun setOnSubmitListener(listener: View.OnClickListener)
-    fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit)
+    fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem) -> Unit)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(executor: DialogExecutor)

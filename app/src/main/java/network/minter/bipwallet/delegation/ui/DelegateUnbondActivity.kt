@@ -148,13 +148,41 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
             binding.inputAmount.scrollToInput()
         }
 
+        setupAutocomplete()
+        setupSyncStatus()
+    }
+
+    private fun setupSyncStatus() {
         LastBlockHandler.handle(binding.lastUpdated)
         val broadcastManager = BroadcastReceiverManager(this)
         broadcastManager.add(RTMBlockReceiver {
             LastBlockHandler.handle(binding.lastUpdated, it)
         })
         broadcastManager.register()
+    }
 
+    private var onAutocompleteItemSelect: ((ValidatorItem) -> Unit)? = null
+    private var autocompletePresenter: ValidatorsAcPresenter? = null
+
+    private fun setupAutocomplete() {
+        autocompletePresenter = ValidatorsAcPresenter(this)
+        val callback: AutocompleteCallback<ValidatorItem> = object : AutocompleteCallback<ValidatorItem> {
+            override fun onPopupItemClicked(editable: Editable, item: ValidatorItem): Boolean {
+                onAutocompleteItemSelect?.invoke(item)
+                return true
+            }
+
+            override fun onPopupVisibilityChanged(shown: Boolean) {
+            }
+        }
+
+        autocomplete = Autocomplete.on<ValidatorItem>(binding.inputValidator.input)
+                .with(callback)
+                .with(autocompletePresenter as AutocompletePresenter<ValidatorItem>)
+                .with(autocompletePresenter as AutocompletePolicy)
+                .with(6f)
+                .with(ContextCompat.getDrawable(this, R.drawable.shape_rounded_white))
+                .build()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -261,6 +289,11 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        autocomplete?.dismissPopup()
+    }
+
     override fun setAccountTitle(accountName: CharSequence?) {
         binding.inputCoin.postApply { it.setText(accountName) }
     }
@@ -325,29 +358,9 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
         binding.inputCoin.label = getString(labelRes)
     }
 
-    override fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem, Int) -> Unit) {
-        if (items.isEmpty()) {
-            return
-        }
-
-        val presenter = ValidatorsAcPresenter(this, items)
-        val callback: AutocompleteCallback<ValidatorItem> = object : AutocompleteCallback<ValidatorItem> {
-            override fun onPopupItemClicked(editable: Editable, item: ValidatorItem): Boolean {
-                listener(item, 0)
-                return true
-            }
-
-            override fun onPopupVisibilityChanged(shown: Boolean) {
-            }
-        }
-
-        autocomplete = Autocomplete.on<ValidatorItem>(binding.inputValidator.input)
-                .with(callback)
-                .with(presenter as AutocompletePresenter<ValidatorItem>)
-                .with(presenter as AutocompletePolicy)
-                .with(6f)
-                .with(ContextCompat.getDrawable(this, R.drawable.shape_rounded_white))
-                .build()
+    override fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem) -> Unit) {
+        onAutocompleteItemSelect = listener
+        autocompletePresenter?.setItems(items)
     }
 
     override fun startExplorer(txHash: MinterHash) {

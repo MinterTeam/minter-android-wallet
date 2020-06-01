@@ -541,7 +541,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                             }
 
                             if (type == Type.Delegate) {
-                                viewState.setValidatorsAutocomplete(validators.filter { v -> v.status == ValidatorItem.STATUS_ONLINE }) { validator, _ ->
+                                viewState.setValidatorsAutocomplete(validators.filter { v -> v.status == ValidatorItem.STATUS_ONLINE }) { validator ->
                                     onValidatorSelected(validator)
                                 }
                             }

@@ -44,7 +44,7 @@ class ValidatorsAcPresenter(
 ) : RecyclerAcPresenter<ValidatorItem>(context), AutocompletePolicy {
 
     private val itemsLock = Any()
-    private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this, items)
+    private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this)
 
     fun setItems(items: List<ValidatorItem>) {
         synchronized(itemsLock) {
