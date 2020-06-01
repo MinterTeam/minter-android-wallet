@@ -79,6 +79,9 @@ class WalletSelectorController @Inject constructor() {
 
     private fun fillWalletSelector(res: AddressListBalancesTotal) {
         latestBalances = res
+        if (res.balances.isEmpty()) {
+            return
+        }
         viewState!!.setWallets(WalletItem.create(secretStorage, res))
         viewState!!.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
     }
