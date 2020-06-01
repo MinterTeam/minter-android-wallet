@@ -136,9 +136,8 @@ class AddressBookRepository(
 
     fun findByNameOrAddress(nameOrAddress: String): Single<AddressContact> {
         /*
-        если мы указали адрес и не нашли контакт, возвращаем адрес как имя контакта
-        если мы указали валидатора - аналогично
-        если мы указали черт знает то отправить ему мы не можем, соответственно пишем ошибку
+        if user typed address and we didn't found the contact, returning fake contact with name=address.toString()
+        otherwise returning observable error
          */
         val def = AddressContact()
         var defResult = Single.error<AddressContact?>(RuntimeException("Not found in address book"))
