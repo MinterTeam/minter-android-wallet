@@ -30,7 +30,6 @@ import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import com.airbnb.deeplinkdispatch.DeepLink
-import com.annimon.stream.Optional
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
@@ -54,7 +53,6 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.sending.account.selectorDataFromSecrets
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
@@ -240,38 +238,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 viewState.startDialog(false) { ctx: Context? ->
                     ConfirmDialog.Builder(ctx!!, "Unable to scan transaction")
                             .setText("This check given without proof and password. One of parameters is required.")
-                            .setPositiveAction(R.string.btn_close) { d, _ ->
-                                d.dismiss()
-                                viewState.finishCancel()
-                            }
-                            .create()
-                }
-                return false
-            }
-        } else if (mExtTx!!.type == OperationType.SellAllCoins) {
-            val data = mExtTx!!.getData(TxCoinSellAll::class.java)
-
-            val mainWalletRes: Optional<AddressBalanceTotal> = accountStorage.entity.wallets.find(mFrom!!)
-            if (mainWalletRes.isEmpty) {
-                viewState.startDialog(false) { ctx: Context? ->
-                    ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
-                            .setText("Can't resolve balance for selected account")
-                            .setPositiveAction(R.string.btn_close) { d, _ ->
-                                d.dismiss()
-                                viewState.finishCancel()
-                            }
-                            .create()
-                }
-                return false
-            }
-
-            val mainWallet = mainWalletRes.get()
-            val acc = mainWallet.findCoinByName(data.coinToSell)
-            if (acc.isEmpty) {
-                viewState.disableAll()
-                viewState.startDialog(false) { ctx: Context? ->
-                    ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
-                            .setText("You are trying to sell all %s for %s, but your %s balance is 0", data.coinToSell, data.coinToBuy, data.coinToSell)
                             .setPositiveAction(R.string.btn_close) { d, _ ->
                                 d.dismiss()
                                 viewState.finishCancel()

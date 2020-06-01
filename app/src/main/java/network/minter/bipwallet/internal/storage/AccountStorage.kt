@@ -31,7 +31,7 @@ import io.reactivex.Single
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
-import network.minter.bipwallet.apis.reactive.ReactiveExplorer
+import network.minter.bipwallet.apis.reactive.ReactiveExplorer.createExpErrorPlain
 import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
@@ -61,6 +61,7 @@ class AccountStorage(
         private const val KEY_BALANCE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance_"
         private const val KEY_BALANCE_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance_inactive_"
         private const val KEY_DELEGATIONS_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_delegations_inactive_"
+        private const val KEY_DELEGATIONS_META_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_delegations_meta_inactive_"
     }
 
     private fun inactiveBalanceKey(address: MinterAddress): String {
@@ -69,6 +70,10 @@ class AccountStorage(
 
     private fun inactiveDelegationsKey(address: MinterAddress): String {
         return "${KEY_DELEGATIONS_INACTIVE}$address"
+    }
+
+    private fun inactiveDelegationsMetaKey(address: MinterAddress): String {
+        return "${KEY_DELEGATIONS_META_INACTIVE}$address"
     }
 
     private fun getBalanceData(address: MinterAddress): Observable<ExpResult<AddressBalance>> {
@@ -87,6 +92,7 @@ class AccountStorage(
         } else {
             val out = ExpResult<DelegationList>()
             out.result = storage.get(inactiveDelegationsKey(address))
+            out.meta = storage.get(inactiveDelegationsMetaKey(address))
             Observable.just(out)
         }
     }
@@ -127,7 +133,7 @@ class AccountStorage(
         return Function { address: MinterAddress ->
             getBalanceData(address)
                     .map {
-                        if (it.isOk && it.error == null) {
+                        if (secretStorage.mainWallet == address) {
                             storage.putAsync(inactiveBalanceKey(address), it.result)
                         }
                         it
@@ -140,13 +146,17 @@ class AccountStorage(
         return Function { res: ExpResult<AddressBalance> ->
             if (res.result == null || !res.isOk) {
                 return@Function Observable.just(
-                        ReactiveExplorer.createExpErrorPlain<AddressBalanceTotal>(res.message, res.error?.code ?: 0, 0)
+                        createExpErrorPlain<AddressBalanceTotal>(res.message, res.error?.code ?: 0, 0)
                 )
             }
             val address = res.result.address
             getDelegationsData(address)
                     .map {
-                        storage.putAsync(inactiveDelegationsKey(address), it.result)
+                        if (secretStorage.mainWallet == address) {
+                            storage.putAsync(inactiveDelegationsKey(address), it.result)
+                            storage.putAsync(inactiveDelegationsMetaKey(address), it.meta)
+                        }
+
                         it
                     }
                     .map(mapDelegationsToBalances(res))
@@ -157,6 +167,7 @@ class AccountStorage(
         return Function { delegatedResult: ExpResult<DelegationList> ->
             val out = ExpResult<AddressBalanceTotal>()
             out.error = delegatedResult.error
+            out.meta = delegatedResult.meta
 
             if (res.result == null) {
                 return@Function out
