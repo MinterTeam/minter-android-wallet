@@ -145,7 +145,6 @@
                 android:focusableInTouchMode="false"
                 android:hint="@string/tx_send_coin_hint"
                 android:inputType="none"
-                app:errorEnabled="false"
                 app:fieldName="coin"
                 app:label="@string/tx_send_coin_hint"
                 app:layout_constraintEnd_toEndOf="parent"

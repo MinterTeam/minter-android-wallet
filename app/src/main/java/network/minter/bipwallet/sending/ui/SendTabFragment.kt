@@ -56,6 +56,7 @@ import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -227,6 +228,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun hidePayload() {
+        KeyboardHelper.hideKeyboard(this)
         binding.inputPayload.text = null
         binding.inputPayload.inputOverlayVisible = true
     }
@@ -453,7 +455,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
                 .show()
     }
 
-    override fun startAddContact(address: String) {
+    override fun startAddContact(address: String, onAdded: (AddressContact) -> Unit) {
         if (fragmentManager == null) {
             return
         }
@@ -465,6 +467,8 @@ class SendTabFragment : HomeTabFragment(), SendView {
         bottomSheetDialog = AddressContactEditDialog.Builder()
                 .setAddress(address)
                 .build()
+
+        (bottomSheetDialog as AddressContactEditDialog).onContactAddedOrUpdated = onAdded
 
         bottomSheetDialog!!.show(fragmentManager!!, "contact")
     }

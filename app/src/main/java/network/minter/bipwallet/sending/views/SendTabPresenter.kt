@@ -173,6 +173,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         loadAndSetFee()
         accountStorage.update()
 
+        loadAddressBook()
+
+        checkRecipientContactExists()
+    }
+
+    private fun loadAddressBook() {
         addressBookRepo
                 .findAll()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -185,8 +191,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             Timber.w(t2)
                         }
                 )
-
-        checkRecipientContactExists()
     }
 
     /**
@@ -429,7 +433,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 analytics.send(AppEvent.SendCoinPopupScreen)
 
                 val dialog = TxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
-                        .setAmount(mAmount, !mUseMax.get())
+                        .setAmount(mAmount)
                         .setRecipientName(mRecipient!!.name)
                         .setCoin(mFromAccount!!.coin)
                         .setPositiveAction(R.string.btn_confirm) { d, _ ->
@@ -748,7 +752,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             if (mRecipient != null && mRecipient!!.id == 0 && mRecipient!!.address != null) {
                 val recipientAddress = mRecipient!!.address!!
                 builder.setNeutralAction(R.string.btn_save_address) { d, _ ->
-                    viewState.startAddContact(recipientAddress)
+                    viewState.startAddContact(recipientAddress) {
+                        loadAddressBook()
+                    }
                     d.dismiss()
                 }
             }

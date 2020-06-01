@@ -76,7 +76,7 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     fun startScanQRWithPermissions(requestCode: Int)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startAddContact(address: String)
+    fun startAddContact(address: String, onAdded: (AddressContact) -> Unit)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startAddressBook(requestCode: Int)
