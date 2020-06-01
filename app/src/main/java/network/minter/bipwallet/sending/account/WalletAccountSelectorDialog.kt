@@ -34,6 +34,7 @@ import network.minter.bipwallet.databinding.DialogAccountSelectorBinding
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.storage.models.SecretData
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScroll
@@ -117,6 +118,7 @@ class WalletAccountSelectorDialog<out Data> private constructor(
 
 
         binding.apply {
+            title.visible = builder.showTitle
             title.text = builder.title
             val adapter = AccountSelectedAdapter(builder.items)
             adapter.setOnClickListener {
@@ -132,8 +134,9 @@ class WalletAccountSelectorDialog<out Data> private constructor(
     }
 
     class Builder<Data> : WalletDialogBuilder<WalletAccountSelectorDialog<Data>, Builder<Data>> {
-        var items: List<SelectorData<Data>> = ArrayList()
-        var clickListener: AccountSelectedAdapter.OnClickListener<Data>? = null
+        internal var items: List<SelectorData<Data>> = ArrayList()
+        internal var clickListener: AccountSelectedAdapter.OnClickListener<Data>? = null
+        internal var showTitle: Boolean = true
 
         @JvmOverloads
         constructor(context: Context, title: CharSequence? = null) : super(context, title)
@@ -142,6 +145,11 @@ class WalletAccountSelectorDialog<out Data> private constructor(
 
         override fun create(): WalletAccountSelectorDialog<Data> {
             return WalletAccountSelectorDialog(context, this)
+        }
+
+        fun setShowTitle(show: Boolean): Builder<Data> {
+            showTitle = show
+            return this
         }
 
         fun setOnClickListener(listener: (SelectorData<Data>) -> Unit): Builder<Data> {

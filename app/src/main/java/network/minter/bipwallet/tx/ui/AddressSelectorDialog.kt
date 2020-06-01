@@ -85,6 +85,7 @@ class AddressSelectorDialog(
         binding.inputAddress.input.isFocusable = false
         binding.inputAddress.input.setOnClickListener {
             subDialog = WalletAccountSelectorDialog.Builder<SecretData>(context!!, R.string.dialog_title_choose_wallet)
+                    .setShowTitle(false)
                     .setItems(builder.items)
                     .setOnClickListener {
                         item = it
@@ -94,7 +95,10 @@ class AddressSelectorDialog(
 
             subDialog!!.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             subDialog!!.window?.setWindowAnimations(0)
-//            subDialog!!.window?.decorView?.systemUiVisibility = ViewHelper.systemBarsLightness(true)
+            subDialog!!.addOnDismissListener {
+                binding.root.animate().alpha(1f).setDuration(100).start()
+            }
+            binding.root.animate().alpha(0f).setDuration(100).start()
             subDialog!!.show()
         }
 
@@ -105,6 +109,7 @@ class AddressSelectorDialog(
     class Builder : WalletDialogFragmentBuilder<AddressSelectorDialog, Builder> {
         internal var items: List<SelectorData<SecretData>> = ArrayList()
         internal var listener: OnItemSelected? = null
+        internal var desc: CharSequence? = null
 
         @JvmOverloads
         constructor(context: Context, title: CharSequence? = null) : super(context, title)
@@ -113,6 +118,11 @@ class AddressSelectorDialog(
 
         fun setItems(data: List<SelectorData<SecretData>>): Builder {
             items = data
+            return this
+        }
+
+        fun setDescription(resId: Int): Builder {
+            desc = context.getString(resId)
             return this
         }
 

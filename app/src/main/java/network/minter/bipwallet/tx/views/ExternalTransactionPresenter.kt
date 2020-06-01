@@ -731,8 +731,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         viewState.startDialogFragment { ctx ->
             AddressSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
                     .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
-                    .setPositiveAction(R.string.btn_confirm_send) { d: WalletDialogFragment, _ ->
+                    .setPositiveAction(R.string.btn_confirm) { d: WalletDialogFragment, _ ->
                         mFrom = (d as AddressSelectorDialog).item!!.data.minterAddress
+                        d.dismiss()
                         startExecuteTransaction()
                     }
                     .setNegativeAction(R.string.btn_cancel)

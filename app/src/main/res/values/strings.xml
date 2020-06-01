@@ -353,5 +353,6 @@
     <string name="input_hint_public_key_or_name">Public key or name…</string>
     <string name="label_coin_you_want_unbond">Coin you want to unbond</string>
     <string name="item_anonymous">Anonymous</string>
+    <string name="dialog_description_external_tx">You\'re about to perform a transaction.\nChoose your active wallet.</string>
 
 </resources>

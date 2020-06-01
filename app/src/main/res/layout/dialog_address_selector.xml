@@ -65,16 +65,13 @@
                 android:id="@+id/dialog_description"
                 style="@style/WalletDialog.TextLabel"
                 android:layout_width="0dp"
-
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/_inter_regular"
-                android:text="You\'re about to perform transaction\nChoose your active wallet."
+                android:text="@string/dialog_description_external_tx"
                 android:textSize="@dimen/text_size_14"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_address"
