@@ -727,7 +727,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .setNegativeAction(R.string.btn_cancel)
                     .create()
 
-            d.isCancelable = false
             d
         }
     }
