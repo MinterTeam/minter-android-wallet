@@ -98,13 +98,22 @@ class SendTabFragment : HomeTabFragment(), SendView {
     private var recipientListAdapter: RecipientListAdapter? = null
 
     private lateinit var binding: FragmentTabSendBinding
+    private var tabIsActive: Boolean = false
 
     override fun onTabSelected() {
         super.onTabSelected()
+        tabIsActive = true
         if (WalletsTopRecolorHelper.enableRecolorSystemUI()) {
             ViewHelper.setSystemBarsLightness(this, true)
             ViewHelper.setStatusBarColorAnimate(this, 0xFF_FFFFFF.toInt())
         }
+    }
+
+    override fun onTabUnselected() {
+        super.onTabUnselected()
+        tabIsActive = false
+        binding.inputRecipient.input.dismissDropDown()
+        KeyboardHelper.hideKeyboard(this)
     }
 
     override fun onAttach(context: Context) {
@@ -369,7 +378,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
     override fun setRecipientAutocompleteItems(items: List<AddressContact>) {
         binding.inputRecipient.postApply {
             recipientListAdapter!!.setItems(items)
-            it.input.showDropDown()
+            if (tabIsActive) {
+                it.input.showDropDown()
+            }
         }
     }
 
