@@ -288,7 +288,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     }
 
     private fun fillData(tx: ExternalTransaction) {
-
+        adapter.clear()
 
 //        viewState.setPayload(tx.payloadString)
         gasRepo.minGas
