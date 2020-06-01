@@ -29,6 +29,7 @@ import com.edwardstock.inputfield.form.validators.BaseValidator
 import io.reactivex.Single
 import network.minter.bipwallet.internal.Wallet
 import network.minter.core.crypto.MinterAddress
+import network.minter.core.crypto.MinterPublicKey
 
 /**
  * minter-android-wallet. 2020
@@ -47,6 +48,8 @@ internal class RecipientValidator(
             val pref = v.substring(0, 2)
             if (pref.toLowerCase() == "mx") {
                 return Single.just(v.matches(MinterAddress.ADDRESS_PATTERN.toRegex()))
+            } else if (pref.toLowerCase() == "mp" && v.toLowerCase().matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())) {
+                return Single.just(false)
             }
         }
 

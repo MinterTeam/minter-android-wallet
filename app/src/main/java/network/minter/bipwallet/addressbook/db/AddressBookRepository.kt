@@ -31,7 +31,6 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.db.WalletDatabase
 import network.minter.core.crypto.MinterAddress
-import network.minter.core.crypto.MinterPublicKey
 
 class AddressBookRepository(
         private val db: WalletDatabase,
@@ -147,9 +146,6 @@ class AddressBookRepository(
         def.address = nameOrAddress
         if (nameOrAddress.matches(MinterAddress.ADDRESS_PATTERN.toRegex())) {
             def.type = AddressContact.AddressType.Address
-            defResult = Single.just(def)
-        } else if (nameOrAddress.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())) {
-            def.type = AddressContact.AddressType.ValidatorPubKey
             defResult = Single.just(def)
         }
         return db.addressBook().getByNameOrAddress(nameOrAddress)
