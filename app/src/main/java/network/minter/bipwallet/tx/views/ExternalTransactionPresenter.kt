@@ -430,7 +430,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Max Supply"
-                            text = data.maxSupply.humanize()
+                            text = if (data.maxSupply < BigDecimal("10").pow(15)) {
+                                data.maxSupply.humanize()
+                            } else {
+                                "10¹⁵ (max)"
+                            }
                         }
                         .build()
 
