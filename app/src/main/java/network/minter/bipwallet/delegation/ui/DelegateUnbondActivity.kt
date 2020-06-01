@@ -164,6 +164,8 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun hideValidatorOverlay() {
         binding.inputValidator.inputOverlayVisible = false
+        binding.inputValidator.input.isFocusable = true
+        binding.inputValidator.input.isFocusableInTouchMode = true
     }
 
     override fun setTextChangedListener(listener: (input: InputWrapper, valid: Boolean) -> Unit) {
@@ -183,6 +185,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
         binding.apply {
             inputValidator.text = null
             inputValidator.inputOverlayVisible = true
+            binding.inputValidator.input.isFocusable = false
             onInflated(inputValidator.inputOverlay!!)
         }
     }
@@ -190,8 +193,17 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
     override fun setValidator(validator: MinterPublicKey, onInflated: (View) -> Unit) {
         binding.apply {
             inputValidator.inputOverlayVisible = true
+            binding.inputValidator.input.isFocusable = !binding.inputValidator.inputOverlayVisible
+            inputValidator.input.isFocusable = false
             onInflated(inputValidator.inputOverlay!!)
         }
+    }
+
+    override fun setValidatorRaw(validator: MinterPublicKey) {
+        binding.inputValidator.inputOverlayVisible = false
+        binding.inputValidator.setText(
+                validator.toString()
+        )
     }
 
     override fun setOnValidatorSelectListener(onClick: (View) -> Unit) {
@@ -230,6 +242,8 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun setEnableValidator(enable: Boolean) {
         binding.inputValidator.isEnabled = enable
+        binding.inputValidator.input.isFocusable = enable
+        binding.inputValidator.input.isFocusableInTouchMode = enable
     }
 
     override fun startValidatorSelector(requestCode: Int, filter: ValidatorSelectorActivity.Filter) {

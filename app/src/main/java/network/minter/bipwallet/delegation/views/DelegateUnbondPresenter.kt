@@ -34,6 +34,7 @@ import android.text.TextWatcher
 import android.view.View
 import com.edwardstock.inputfield.form.InputWrapper
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import network.minter.bipwallet.R
@@ -154,11 +155,15 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             viewState.setValidatorSelectDisabled()
         } else {
             viewState.setOnValidatorSelectListener(::startValidatorSelector)
+
             if (toValidator != null) {
-                onValidatorSelected(ValidatorItem().apply {
-                    pubKey = toValidator
-                    status = 0
-                })
+                val existed = validators.find { it.pubKey == toValidator }
+
+                if (existed != null) {
+                    onValidatorSelected(existed)
+                } else {
+                    viewState.setValidatorRaw(toValidator!!)
+                }
             }
         }
 
@@ -521,6 +526,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 .retryWhen(errorResolver)
                 .observe()
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         {
                             validators = it.toMutableList()
@@ -528,14 +534,14 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
                             if (toValidator != null) {
                                 try {
-                                    viewSetValidator(findValidator(toValidator!!))
+                                    onValidatorSelected(findValidator(toValidator!!))
                                 } catch (e: NoSuchElementException) {
-                                    viewSetValidator(toValidator!!)
+                                    viewState.setValidatorRaw(toValidator!!)
                                 }
                             }
 
                             if (type == Type.Delegate) {
-                                viewState.setValidatorsAutocomplete(validators.filter { it.status == ValidatorItem.STATUS_ONLINE }) { validator, _ ->
+                                viewState.setValidatorsAutocomplete(validators.filter { v -> v.status == ValidatorItem.STATUS_ONLINE }) { validator, _ ->
                                     onValidatorSelected(validator)
                                 }
                             }

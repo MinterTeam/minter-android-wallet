@@ -52,6 +52,7 @@ interface DelegateUnbondView : MvpView {
     fun onError(err: CharSequence?)
     fun setValidator(validator: ValidatorItem, onInflated: (View) -> Unit)
     fun setValidator(validator: MinterPublicKey, onInflated: (View) -> Unit)
+    fun setValidatorRaw(validator: MinterPublicKey)
     fun setOnValidatorSelectListener(listener: View.OnClickListener)
     fun setOnAccountSelectListener(listener: View.OnClickListener)
 

@@ -191,8 +191,11 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
             if (result != null) {
                 val isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
                 val isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
-                if (isMxAddress || isMpAddress) {
+                if (isMxAddress) {
                     viewState.showSendAndSetAddress(result)
+                    return
+                } else if (isMpAddress) {
+                    viewState.startDelegate(MinterPublicKey(result))
                     return
                 }
                 try {

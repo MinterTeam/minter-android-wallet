@@ -34,6 +34,7 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ProgressView
+import network.minter.core.crypto.MinterPublicKey
 
 /**
  * minter-android-wallet. 2019
@@ -71,6 +72,9 @@ interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDelegationList()
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startDelegate(publicKey: MinterPublicKey)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startConvertCoins()

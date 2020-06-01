@@ -49,6 +49,7 @@ import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.databinding.FragmentTabWalletsBinding
+import network.minter.bipwallet.delegation.ui.DelegateUnbondActivity
 import network.minter.bipwallet.delegation.ui.DelegatedListActivity
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.home.HomeModule
@@ -72,6 +73,7 @@ import network.minter.bipwallet.wallets.selector.WalletListAdapter.*
 import network.minter.bipwallet.wallets.selector.WalletSelectorBroadcastReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.bipwallet.wallets.views.WalletsTabPresenter
+import network.minter.core.crypto.MinterPublicKey
 import org.joda.time.DateTime
 import permissions.dispatcher.*
 import timber.log.Timber
@@ -339,6 +341,12 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun startDelegationList() {
         startActivity(Intent(activity, DelegatedListActivity::class.java))
+    }
+
+    override fun startDelegate(publicKey: MinterPublicKey) {
+        DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
+                .setPublicKey(publicKey)
+                .start()
     }
 
     override fun startConvertCoins() {
