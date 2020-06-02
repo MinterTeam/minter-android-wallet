@@ -145,7 +145,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             handlePayloadChanges = false
 
             mPayload = utfStringSliceToBytes(s.toString(), PayloadValidator.MAX_PAYLOAD_LENGTH)
-            viewState.setPayload(String(mPayload!!))
+            if (mPayload?.size ?: 0 > 1018) {
+                viewState.setPayload(String(mPayload!!))
+            }
 
             setupFee()
             handlePayloadChanges = true
