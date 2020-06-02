@@ -73,7 +73,7 @@ class CacheTxRepository(
         return instantService
                 .getTransactions(
                         listOf(secretStorage.mainWallet).map { it.toString() }.toList(),
-                        1, 5
+                        1, 10
                 )
                 .rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
