@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -153,8 +153,8 @@ public class DisplayHelper {
     }
 
     @Dp
-    public int pxToDp(@Px int px) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, px, getMetrics());
+    public float pxToDp(@Px int px) {
+        return ((float) px) / getMetrics().density;
     }
 
     @Px
