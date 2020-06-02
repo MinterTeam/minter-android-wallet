@@ -28,6 +28,7 @@ package network.minter.bipwallet.external;
 
 import com.airbnb.deeplinkdispatch.BaseRegistry;
 import com.airbnb.deeplinkdispatch.DeepLinkEntry;
+import com.airbnb.deeplinkdispatch.DeepLinkUri;
 
 public class DeepLinkModuleRegistryHelper<T extends BaseRegistry> {
     private T mReg;
@@ -37,11 +38,6 @@ public class DeepLinkModuleRegistryHelper<T extends BaseRegistry> {
     }
 
     public DeepLinkEntry parseUri(String uri) {
-        for (DeepLinkEntry entry : mReg.getRegisteredDeepLinks()) {
-            if (uri.equals(entry.getUriTemplate())) {
-                return entry;
-            }
-        }
-        return null;
+        return mReg.idxMatch(DeepLinkUri.parse(uri));
     }
 }

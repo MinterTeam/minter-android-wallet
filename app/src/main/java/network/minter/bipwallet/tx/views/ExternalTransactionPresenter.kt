@@ -130,9 +130,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 hash = params.getString("d", null)
             } else if (params.containsKey("data")) {
                 support = false
-                hash = BytesData(
-                        Base64UrlSafe.decode(params.getString("data", null).toByteArray())
-                ).toHexString()
+                try {
+                    hash = BytesData(
+                            Base64UrlSafe.decode(params.getString("data", null).toByteArray())
+                    ).toHexString()
+                } catch (e: Throwable) {
+                    viewState.disableAll()
+                    showTxErrorDialog("Unable to parse deeplink: %s", e.message!!)
+                    return
+                }
             }
             if (params.containsKey("p")) {
                 mCheckPassword = try {

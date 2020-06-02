@@ -109,20 +109,20 @@ public class ExternalActivity extends BaseInjectActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Wallet_Splash);
         session.restore();
         if (!session.isLoggedIn(true)) {
-            setTheme(R.style.Wallet_External);
             Timber.d("Session not verified. Logging in");
             startLogin();
             return;
         }
 
-        setTheme(android.R.style.Theme_Translucent);
         startAction();
     }
 
     private void startDeepLink() {
         mLinkLoader = new DeepLinkModuleRegistry();
+        mLinkReg = new DeepLinkModuleRegistryHelper<>(mLinkLoader);
         DeepLinkDelegate delegate = new DeepLinkDelegate(mLinkLoader);
         String old = getIntent().getData().toString();
         if (old.substring(old.length() - 1).equals("/")) {

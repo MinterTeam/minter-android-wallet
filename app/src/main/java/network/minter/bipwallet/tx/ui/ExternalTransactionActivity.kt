@@ -50,10 +50,14 @@ import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.security.PauseTimer
+import network.minter.bipwallet.services.livebalance.RTMService
+import network.minter.bipwallet.services.livebalance.ServiceConnector
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
+import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver.Companion.send
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
+import network.minter.core.crypto.MinterAddress
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -168,8 +172,22 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         return presenterProvider.get()
     }
 
+    override fun onStart() {
+        super.onStart()
+        ServiceConnector.bind(this)
+        ServiceConnector.onConnected()
+                .subscribe { res: RTMService ->
+                    res.setOnMessageListener { message: String?, channel: String, address: MinterAddress? ->
+                        if (channel == RTMService.CHANNEL_BLOCKS) {
+                            send(Wallet.app().context(), message!!)
+                        }
+                    }
+                }
+    }
+
     override fun onStop() {
         super.onStop()
+        ServiceConnector.release(this)
         releaseDialog(walletDialog)
     }
 

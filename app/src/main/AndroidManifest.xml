@@ -128,7 +128,7 @@
             android:name=".external.ui.ExternalActivity"
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:theme="@style/Wallet.External">
+            android:theme="@style/Wallet.Splash">
             <intent-filter>
                 <action android:name="OPEN_HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
