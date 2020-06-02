@@ -317,7 +317,14 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         mInputChange!!
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
-                .subscribe { amount: String? -> onAmountChanged(amount) }
+                .subscribe(
+                        { amount: String? ->
+                            onAmountChanged(amount)
+                        },
+                        { t ->
+                            Timber.e(t, "Unable to handle amount change")
+                        }
+                )
                 .disposeOnDestroy()
 
         mAddressChange!!
