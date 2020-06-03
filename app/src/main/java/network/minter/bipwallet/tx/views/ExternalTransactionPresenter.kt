@@ -349,7 +349,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             text = data.coinToBuy
                         }
                         .add {
-                            label = "Minimum Value To Buy"
+                            label = "Minimum Amount To Get"
                             text = data.minValueToBuy.humanize()
                         }
                         .build()
@@ -378,7 +378,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             text = data.coinToBuy
                         }
                         .add {
-                            label = "Minimum Value To Buy"
+                            label = "Minimum Amount To Get"
                             text = data.minValueToBuy.humanize()
                         }
                         .build()
@@ -403,7 +403,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             text = data.coinToSell
                         }
                         .add {
-                            label = "Maximum Value To Sell"
+                            label = "Maximum Amount To Spend"
                             text = data.maxValueToSell.humanize()
                         }
                         .build()
