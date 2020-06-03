@@ -54,6 +54,9 @@
         app:layout_constraintStart_toEndOf="@id/item_avatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
         tools:text="BIP (120 912.98)" />
 
     <TextView
@@ -63,6 +66,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges_half"
         android:layout_marginEnd="@dimen/margin_edges"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/item_avatar"

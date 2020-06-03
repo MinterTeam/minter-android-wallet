@@ -133,10 +133,10 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                     holder.binding.itemTitle.text = validator.pubKey.toShortString()
                 }
 
-                holder.binding.itemSubtitle.text = validator.pubKey.toShortString()
+                holder.binding.itemSubtitle.text = validator.pubKey.toString()
             } else {
                 holder.binding.itemTitle.text = meta!!.name
-                holder.binding.itemSubtitle.text = validator.pubKey.toShortString()
+                holder.binding.itemSubtitle.text = validator.pubKey.toString()
             }
 
             if (meta?.iconUrl != null) {
