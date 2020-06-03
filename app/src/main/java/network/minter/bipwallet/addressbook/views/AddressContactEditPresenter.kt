@@ -111,10 +111,15 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
             repo.update(mContact)
         }
 
+        if (!mIsNew) {
+            repo.updateLastUsedIfNeeds(mContact!!)
+        }
+
         res.observeOn(AndroidSchedulers.mainThread())
+                .andThen(repo.findByNameOrAddress(mContact!!.address!!))
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    viewState.submitDialog(mContact!!)
+                    viewState.submitDialog(it)
                     viewState.close()
                 }) { t: Throwable? -> Timber.e(t) }
     }

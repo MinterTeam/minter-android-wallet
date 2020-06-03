@@ -50,14 +50,14 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
     @Inject lateinit var addressBookRepo: AddressBookRepository
     @Inject lateinit var validatorsRepo: RepoValidators
 
-    private val mAdapter: AddressBookAdapter = AddressBookAdapter()
+    private val adapter: AddressBookAdapter = AddressBookAdapter()
 
     override fun attachView(view: AddressBookView) {
         super.attachView(view)
         updateList()
-        mAdapter.setOnEditContactListener { contact: AddressContact -> onEditContact(contact) }
-        mAdapter.setOnDeleteContactListener { contact: AddressContact -> onDeleteContact(contact) }
-        mAdapter.setOnItemClickListener { contact: AddressContact -> onSelectContact(contact) }
+        adapter.setOnEditContactListener { contact: AddressContact -> onEditContact(contact) }
+        adapter.setOnDeleteContactListener { contact: AddressContact -> onDeleteContact(contact) }
+        adapter.setOnItemClickListener { contact: AddressContact -> onSelectContact(contact) }
     }
 
     fun onAddAddress() {
@@ -75,7 +75,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.setAdapter(mAdapter)
+        viewState.setAdapter(adapter)
     }
 
     private fun onSelectContact(contact: AddressContact) {
@@ -89,6 +89,12 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
                     .setTextTypeface(R.font._inter_regular)
                     .setPositiveActionStyle(R.style.Wallet_Button_Green)
                     .setPositiveAction(R.string.btn_confirm) { d, _ ->
+                        val lastUsed = addressBookRepo.lastUsed
+                        if (lastUsed.isNotEmpty() && lastUsed[0].address!! == contact.address) {
+                            lastUsed[0].id = 0
+                            lastUsed[0].name = lastUsed[0].address
+                            addressBookRepo.writeLastUsed(lastUsed[0])
+                        }
                         addressBookRepo.delete(contact)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
@@ -129,17 +135,25 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
     private fun onDataLoaded(addressContacts: List<AddressContact>) {
         var lastLetter: String? = null
         val out: MutableList<AddressBookItem> = ArrayList()
+
+        val lastUsed = addressBookRepo.lastUsed
+
+        if (lastUsed.isNotEmpty()) {
+            out.add(AddressBookItemHeader("Last Used"))
+            out.add(lastUsed[0])
+        }
+
         for (contact in addressContacts) {
             if (lastLetter == null) {
-                lastLetter = contact.name!!.substring(0, 1)
+                lastLetter = contact.name!!.substring(0, 1).toLowerCase()
                 out.add(AddressBookItemHeader(lastLetter))
-            } else if (lastLetter != contact.name!!.substring(0, 1)) {
+            } else if (lastLetter != contact.name!!.substring(0, 1).toLowerCase()) {
                 lastLetter = contact.name!!.substring(0, 1)
                 out.add(AddressBookItemHeader(lastLetter))
             }
             out.add(contact)
         }
-        mAdapter.dispatchChanges(AddressContactDiffUtilImpl::class.java, out, true)
+        adapter.dispatchChanges(AddressContactDiffUtilImpl::class.java, out, true)
     }
 
 }

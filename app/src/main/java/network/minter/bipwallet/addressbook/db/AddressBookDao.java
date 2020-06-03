@@ -41,7 +41,7 @@ import network.minter.bipwallet.addressbook.models.AddressContact;
 @Dao
 public interface AddressBookDao {
 
-    @Query("SELECT * FROM minter_contacts ORDER BY name ASC")
+    @Query("SELECT * FROM minter_contacts ORDER BY name COLLATE NOCASE ASC")
     Maybe<List<AddressContact>> findAll();
 
     @Query("SELECT * FROM minter_contacts WHERE id = :id")

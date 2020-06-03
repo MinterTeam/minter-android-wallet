@@ -281,6 +281,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             handleAutocomplete = false
             viewState.setRecipientAutocompleteItems(ArrayList(0))
             mRecipient = contact
+            if (mRecipient!!.id == 0) {
+                mRecipient!!.name = mRecipient!!.address
+            }
             viewState.setRecipient(mRecipient!!)
             handleAutocomplete = true
         }
@@ -762,12 +765,20 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 val recipientAddress = mRecipient!!.address!!
                 builder.setNeutralAction(R.string.btn_save_address) { d, _ ->
                     viewState.startAddContact(recipientAddress) {
+                        addressBookRepo.writeLastUsed(it)
                         loadAddressBook()
                     }
                     d.dismiss()
                 }
             }
             builder.create()
+        }
+
+        if (mRecipient != null) {
+            if (mRecipient!!.id == 0) {
+                mRecipient!!.name = "Anonymous"
+            }
+            addressBookRepo.writeLastUsed(mRecipient!!)
         }
 
         // clear form

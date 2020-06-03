@@ -27,15 +27,51 @@ package network.minter.bipwallet.addressbook.db
 
 import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
+import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.db.WalletDatabase
+import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.core.crypto.MinterAddress
 
 class AddressBookRepository(
         private val db: WalletDatabase,
-        private val validatorsRepo: RepoValidators
+        private val validatorsRepo: RepoValidators,
+        private val storage: KVStorage
 ) {
+
+    companion object {
+        const val KEY_LAST_USED = BuildConfig.MINTER_STORAGE_VERS + "cached_last_used_contacts"
+    }
+
+    val lastUsed: MutableList<AddressContact>
+        get() {
+            if (!storage.contains(KEY_LAST_USED)) {
+                return ArrayList(0)
+            }
+
+            return storage.get(KEY_LAST_USED)!!
+        }
+
+    fun writeLastUsed(item: AddressContact?) {
+        if (item == null) return
+        storage.putAsync(KEY_LAST_USED, mutableListOf(item))
+    }
+
+    fun updateLastUsedIfNeeds(item: AddressContact?) {
+        if (item == null) return
+        val last = lastUsed
+        if (last.isNotEmpty()) {
+            if (last[0].address!! == item.address) {
+                writeLastUsed(item)
+            } else if (last[0].id == item.id && last[0].address != item.address) {
+                last[0].id = 0
+                last[0].name = "Anonymous"
+                writeLastUsed(last[0])
+            }
+        }
+    }
+
     fun findAll(): Observable<List<AddressContact>> {
         return db.addressBook().findAll()
                 .toObservable()

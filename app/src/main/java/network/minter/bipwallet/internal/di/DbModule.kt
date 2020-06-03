@@ -32,6 +32,8 @@ import dagger.Provides
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.db.WalletDatabase
+import network.minter.bipwallet.internal.di.annotations.DbCache
+import network.minter.bipwallet.internal.storage.KVStorage
 
 @Module
 class DbModule {
@@ -52,8 +54,8 @@ class DbModule {
 
     @Provides
     @WalletApp
-    fun provideAddressBookRepository(db: WalletDatabase, validatorsRepo: RepoValidators): AddressBookRepository {
-        return AddressBookRepository(db, validatorsRepo)
+    fun provideAddressBookRepository(db: WalletDatabase, validatorsRepo: RepoValidators, @DbCache storage: KVStorage): AddressBookRepository {
+        return AddressBookRepository(db, validatorsRepo, storage)
     }
 
     companion object {
