@@ -30,7 +30,6 @@ import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.PrivateKey
 import network.minter.core.crypto.PublicKey
-import network.minter.profile.models.ProfileAddressData
 import java.io.Serializable
 import java.util.*
 
@@ -78,17 +77,13 @@ class SecretData : Serializable, Cloneable {
     }
 
     val hasTitle: Boolean
-        get() = mTitle != null
+        get() = mTitle != null && mTitle != minterAddress.toShortString()
 
     var title: String?
         get() = mTitle ?: minterAddress.toShortString()
         set(title) {
             mTitle = title
         }
-
-    fun toAddressData(isMain: Boolean, isServerSecured: Boolean, encKey: String?): ProfileAddressData {
-        return ProfileAddressData(minterAddress, isMain, seedPhrase, isServerSecured, encKey)
-    }
 
     fun cleanup() {
         seedPhrase = ""
