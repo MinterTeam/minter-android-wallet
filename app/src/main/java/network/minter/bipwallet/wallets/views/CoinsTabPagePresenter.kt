@@ -108,8 +108,8 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                             coinsAdapter!!.dispatchChanges(CoinBalanceDiffUtilImpl::class.java, res.getBalance(secretStorage.mainWallet).coinsList)
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Normal)
                         },
-                        { t: Throwable ->
-                            Timber.e(t)
+                        { t ->
+                            Timber.e(t, "Unable to load coin list")
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Error, t.message)
                         }
                 )

@@ -39,6 +39,7 @@ import dagger.android.support.AndroidSupportInjection
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.FragmentPageWalletsBinding
 import network.minter.bipwallet.internal.BaseFragment
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView.ViewStatus
@@ -86,32 +87,28 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
     override fun setViewStatus(status: ViewStatus, error: CharSequence?) {
         when (status) {
             ViewStatus.Progress -> {
-                binding.list.visibility = View.GONE
-//                getAction().visibility = View.GONE
-                binding.emptyTitle.visibility = View.GONE
-                binding.progress.visibility = View.VISIBLE
+                binding.list.visible = false
+                binding.emptyTitle.visible = false
+                binding.progress.visible = true
             }
             ViewStatus.Empty -> {
-                binding.list.visibility = View.GONE
-//                getAction().visibility = View.GONE
-                binding.emptyTitle.visibility = View.VISIBLE
-                binding.progress.visibility = View.GONE
+                binding.list.visible = false
+                binding.emptyTitle.visible = true
+                binding.progress.visible = false
                 CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
 
             }
             ViewStatus.Error -> {
-                binding.list.visibility = View.GONE
-//                getAction().visibility = View.GONE
-                binding.emptyTitle.visibility = View.VISIBLE
+                binding.list.visible = false
+                binding.emptyTitle.visible = true
                 binding.emptyTitle.text = error ?: "Unexpected error"
-                binding.progress.visibility = View.GONE
+                binding.progress.visible = false
                 CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
             }
             ViewStatus.Normal -> {
-                binding.list.visibility = View.VISIBLE
-//                getAction().visibility = View.VISIBLE
-                binding.emptyTitle.visibility = View.GONE
-                binding.progress.visibility = View.GONE
+                binding.list.visible = true
+                binding.emptyTitle.visible = false
+                binding.progress.visible = false
                 CollapsingToolbarScrollDisabler.bindRecycler(binding.list, javaClass)
             }
         }

@@ -104,8 +104,8 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                             }
                         },
                         {
-                            Timber.w(it)
-                            viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Error)
+                            Timber.w(it, "Unable to load transactions")
+                            viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Error, it.message)
                         }
                 )
                 .disposeOnDestroy()
