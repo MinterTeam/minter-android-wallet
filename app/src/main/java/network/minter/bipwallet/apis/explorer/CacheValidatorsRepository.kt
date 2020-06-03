@@ -55,7 +55,13 @@ class CacheValidatorsRepository(
 
     override fun getUpdatableData(): Observable<List<ValidatorItem>> {
         return instantService.validators.rxExp()
-                .map { result: ExpResult<List<ValidatorItem>> -> result.result }
+                .map { result: ExpResult<List<ValidatorItem>> ->
+                    if (result.result == null) {
+                        emptyList()
+                    } else {
+                        result.result!!
+                    }
+                }
     }
 
     override fun onAfterUpdate(result: List<ValidatorItem>) {
