@@ -32,6 +32,7 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
@@ -41,6 +42,14 @@ import network.minter.bipwallet.databinding.IncludeTestnetWarningViewBinding
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+
+class ResTextFormat(
+        @StringRes val resId: Int,
+        vararg format: Any?
+) {
+    val data: Array<Any?> = format as Array<Any?>
+}
+
 object ViewExtensions {
 
     var View.visible: Boolean
@@ -54,6 +63,14 @@ object ViewExtensions {
         this?.post {
             cb(_this)
         }
+    }
+
+    fun <T : TextView> T.setTextFormat(resId: Int, vararg format: Any?) {
+        this.text = context.getString(resId, *format)
+    }
+
+    fun <T : TextView> T.setTextFormat(format: ResTextFormat) {
+        setTextFormat(format.resId, *format.data)
     }
 
     fun <T : TextView> T.copyOnClick(toCopy: String? = null) {

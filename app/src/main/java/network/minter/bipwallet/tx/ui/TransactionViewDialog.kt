@@ -33,13 +33,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogTxViewBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
+import network.minter.bipwallet.internal.helpers.ResTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.copyOnClick
+import network.minter.bipwallet.internal.helpers.ViewExtensions.setTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionView
@@ -177,8 +181,16 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
         binding.dialogTitle.setText(resId)
     }
 
+    override fun setTitle(fmt: ResTextFormat) {
+        binding.dialogTitle.setTextFormat(fmt)
+    }
+
     override fun setTitle(title: CharSequence) {
         binding.dialogTitle.text = title
+    }
+
+    override fun setTitleTyped(@StringRes txTypeRes: Int) {
+        binding.dialogTitle.setTextFormat(ResTextFormat(R.string.fmt_type_of_transaction, getString(txTypeRes)))
     }
 
     data class Builder(

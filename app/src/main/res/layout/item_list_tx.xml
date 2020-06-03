@@ -28,6 +28,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@drawable/bg_ripple_white"
     android:layout_height="wrap_content"
     android:minHeight="48dp">
 
@@ -44,7 +45,7 @@
         style="@style/ListSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edgers_minus_padding"
+        android:layout_marginStart="@dimen/margin_min"
         android:layout_marginEnd="@dimen/margin_min"
         app:layout_constraintBottom_toTopOf="@id/item_title"
         app:layout_constraintEnd_toStartOf="@id/item_amount"
@@ -74,7 +75,7 @@
         style="@style/ListTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edgers_minus_padding"
+        android:layout_marginStart="@dimen/margin_min"
         android:layout_marginEnd="@dimen/margin_edges_half"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0"
@@ -96,5 +97,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/item_amount"
         tools:text="BIP" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@drawable/shape_bottom_separator"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

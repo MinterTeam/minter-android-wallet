@@ -34,6 +34,7 @@ import androidx.annotation.StringRes
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.internal.helpers.ResTextFormat
 
 /**
  * minter-android-wallet. 2020
@@ -42,7 +43,9 @@ import moxy.viewstate.strategy.StateStrategyType
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface TransactionView : MvpView {
     fun setTitle(@StringRes resId: Int)
+    fun setTitle(fmt: ResTextFormat)
     fun setTitle(title: CharSequence)
+    fun setTitleTyped(txTypeRes: Int)
     fun inflateDetails(@LayoutRes layoutRes: Int, l: (View) -> Unit)
     fun setFromAddress(address: String?)
     fun setFromName(name: String?)

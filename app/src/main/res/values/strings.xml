@@ -222,6 +222,7 @@
     <string name="label_coin">Coin</string>
     <string name="label_stake">Stake</string>
     <string name="tx_type_set_candidate_online">Set candidate online</string>
+    <string name="tx_type_set_candidate_offline">Set candidate offline</string>
     <string name="label_public_key">Public Key</string>
     <string name="label_transaction_type">Transaction type</string>
     <string name="menu_btn_add_address">Add address</string>
@@ -326,6 +327,7 @@
     <string name="label_validator">Validator</string>
     <string name="menu_label_delegate">Delegate</string>
     <string name="empty_delegations">You don\'t have any delegated stakes yet.</string>
+    <string name="empty_transactions">You don\'t have any transactions yet.</string>
     <string name="dialog_label_delegate_progress">Delegating...</string>
     <string name="dialog_label_unbond_progress">Unbonding...</string>
     <string name="btn_save_changes">Save Changes</string>
@@ -354,5 +356,11 @@
     <string name="label_coin_you_want_unbond">Coin you want to unbond</string>
     <string name="item_anonymous">Anonymous</string>
     <string name="dialog_description_external_tx">You\'re about to perform a transaction.\nChoose your active wallet.</string>
+    <string name="title_my_coins">My Coins</string>
+    <string name="title_latest_transactions">Latest Transactions</string>
+    <string name="w_transaction">Transaction</string>
+
+    <string name="fmt_decimal_and_coin">%s %s</string>
+    <string name="fmt_type_of_transaction">%s Transaction</string>
 
 </resources>

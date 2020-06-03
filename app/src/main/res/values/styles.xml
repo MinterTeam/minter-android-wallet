@@ -400,6 +400,18 @@
         <item name="android:textSize">@dimen/text_size_11</item>
     </style>
 
+    <style name="Wallet.ItemTxHeader">
+        <item name="android:gravity">bottom</item>
+        <item name="android:fontFamily">@font/_inter_semi_bold</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingStart">@dimen/margin_edges_xlarge</item>
+        <item name="android:paddingEnd">@dimen/margin_edges</item>
+        <item name="android:paddingBottom">9dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textSize">@dimen/text_size_11</item>
+    </style>
+
     <style name="Wallet.ItemHeader.Small" parent="Wallet.ItemHeader">
         <item name="android:minHeight">24dp</item>
         <item name="android:paddingTop">14dp</item>

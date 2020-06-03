@@ -25,7 +25,6 @@
  */
 package network.minter.bipwallet.wallets.contract
 
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import moxy.MvpView
@@ -40,12 +39,7 @@ interface BaseWalletsPageView : MvpView {
 
     fun setViewStatus(status: ViewStatus)
     fun setViewStatus(status: ViewStatus, error: CharSequence?)
-    fun setListTitle(title: CharSequence)
-    fun setListTitle(@StringRes title: Int)
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
-    fun setActionTitle(title: CharSequence)
-    fun setActionTitle(@StringRes title: Int)
-    fun setOnActionClickListener(listener: View.OnClickListener)
     fun showProgress(show: Boolean)
     fun setEmptyTitle(title: CharSequence)
     fun setEmptyTitle(@StringRes title: Int)

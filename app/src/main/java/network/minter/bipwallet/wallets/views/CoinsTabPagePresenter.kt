@@ -29,16 +29,21 @@ import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.ViewExtensions.setTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.internal.views.list.SimpleRecyclerAdapter
+import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.CoinsTabPageView
 import network.minter.bipwallet.wallets.data.CoinBalanceDiffUtilImpl
 import network.minter.bipwallet.wallets.ui.BaseTabPageFragment
+import network.minter.bipwallet.wallets.views.rows.RowWalletsButton
+import network.minter.bipwallet.wallets.views.rows.RowWalletsHeader
+import network.minter.bipwallet.wallets.views.rows.RowWalletsList
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinBalance
 import network.minter.profile.MinterProfileApi
@@ -50,10 +55,15 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
     @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var secretStorage: SecretStorage
 
-    private var adapter: SimpleRecyclerAdapter<CoinBalance, BaseTabPageFragment.ItemViewHolder>? = null
+    private var globalAdapter: MultiRowAdapter = MultiRowAdapter()
+    private var coinsAdapter: SimpleRecyclerAdapter<CoinBalance, BaseTabPageFragment.ItemViewHolder>? = null
+    private var rowButton: RowWalletsButton? = null
+    private var rowHeader: RowWalletsHeader? = null
+    private var rowList: RowWalletsList? = null
 
     override fun attachView(view: CoinsTabPageView) {
         super.attachView(view)
+        viewState.setAdapter(globalAdapter)
         accountStorage.update()
     }
 
@@ -63,18 +73,16 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.setListTitle("My Coins")
-        viewState.setActionTitle(R.string.btn_exchange)
-        viewState.setOnActionClickListener(View.OnClickListener { v -> onClickConvert(v) })
         viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Progress)
-        adapter = SimpleRecyclerAdapter.Builder<CoinBalance, BaseTabPageFragment.ItemViewHolder>()
+        coinsAdapter = SimpleRecyclerAdapter.Builder<CoinBalance, BaseTabPageFragment.ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, BaseTabPageFragment.ItemViewHolder::class.java)
                 .setBinder { vh: BaseTabPageFragment.ItemViewHolder, item: CoinBalance, _: Int ->
                     vh.title!!.text = item.coin
+                    vh.separator!!.visible = true
                     vh.amount!!.text = item.amount.humanize()
                     vh.avatar!!.setImageUrlFallback(item.getImageUrl(), R.drawable.img_avatar_default)
                     if (item.coin != MinterSDK.DEFAULT_COIN) {
-                        vh.subname!!.text = "${item.bipValue.humanize()} ${MinterSDK.DEFAULT_COIN}"
+                        vh.subname!!.setTextFormat(R.string.fmt_decimal_and_coin, item.bipValue.humanize(), MinterSDK.DEFAULT_COIN)
                         vh.subname!!.visible = true
                     } else {
                         vh.subname!!.visible = false
@@ -82,7 +90,13 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
 
                 }.build()
 
-        viewState.setAdapter(adapter!!)
+        rowButton = RowWalletsButton(R.string.btn_exchange, false, ::onClickConvert)
+        rowHeader = RowWalletsHeader(R.string.title_my_coins)
+        rowList = RowWalletsList(coinsAdapter!!)
+
+        globalAdapter.addRow(rowButton!!)
+        globalAdapter.addRow(rowHeader!!)
+        globalAdapter.addRow(rowList!!)
 
         accountStorage
                 .retryWhen(errorResolver)
@@ -91,7 +105,7 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                 .subscribe(
                         { res: AddressListBalancesTotal ->
                             Timber.d("Update coins list")
-                            adapter!!.dispatchChanges(CoinBalanceDiffUtilImpl::class.java, res.getBalance(secretStorage.mainWallet).coinsList)
+                            coinsAdapter!!.dispatchChanges(CoinBalanceDiffUtilImpl::class.java, res.getBalance(secretStorage.mainWallet).coinsList)
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Normal)
                         },
                         { t: Throwable ->

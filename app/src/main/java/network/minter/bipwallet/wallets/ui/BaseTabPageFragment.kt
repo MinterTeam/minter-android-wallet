@@ -39,13 +39,18 @@ import dagger.android.support.AndroidSupportInjection
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.FragmentPageWalletsBinding
 import network.minter.bipwallet.internal.BaseFragment
-import network.minter.bipwallet.internal.views.list.ViewElevationOnScroll
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView.ViewStatus
 
 abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
     private lateinit var binding: FragmentPageWalletsBinding
+
+    protected enum class TabType {
+        Coins, Txs
+    }
+
+    protected abstract fun getTabType(): TabType
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -62,7 +67,7 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
         binding = FragmentPageWalletsBinding.inflate(inflater, container, false)
 
         binding.list.layoutManager = LinearLayoutManager(context)
-        binding.list.addOnScrollListener(ViewElevationOnScroll(binding.top))
+//        binding.list.addOnScrollListener(ViewElevationOnScroll(binding.top))
         return binding.root
     }
 
@@ -70,17 +75,25 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
         setViewStatus(status, null)
     }
 
+//    private fun getAction(): WalletButton {
+//        return if(getTabType() == TabType.Coins) {
+//            binding.action
+//        } else {
+//            binding.actionBottom
+//        }
+//    }
+
     override fun setViewStatus(status: ViewStatus, error: CharSequence?) {
         when (status) {
             ViewStatus.Progress -> {
                 binding.list.visibility = View.GONE
-                binding.action.visibility = View.GONE
+//                getAction().visibility = View.GONE
                 binding.emptyTitle.visibility = View.GONE
                 binding.progress.visibility = View.VISIBLE
             }
             ViewStatus.Empty -> {
                 binding.list.visibility = View.GONE
-                binding.action.visibility = View.GONE
+//                getAction().visibility = View.GONE
                 binding.emptyTitle.visibility = View.VISIBLE
                 binding.progress.visibility = View.GONE
                 CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
@@ -88,7 +101,7 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
             }
             ViewStatus.Error -> {
                 binding.list.visibility = View.GONE
-                binding.action.visibility = View.GONE
+//                getAction().visibility = View.GONE
                 binding.emptyTitle.visibility = View.VISIBLE
                 binding.emptyTitle.text = error ?: "Unexpected error"
                 binding.progress.visibility = View.GONE
@@ -96,7 +109,7 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
             }
             ViewStatus.Normal -> {
                 binding.list.visibility = View.VISIBLE
-                binding.action.visibility = View.VISIBLE
+//                getAction().visibility = View.VISIBLE
                 binding.emptyTitle.visibility = View.GONE
                 binding.progress.visibility = View.GONE
                 CollapsingToolbarScrollDisabler.bindRecycler(binding.list, javaClass)
@@ -106,28 +119,8 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
 
     }
 
-    override fun setListTitle(title: CharSequence) {
-        binding.title.text = title
-    }
-
-    override fun setListTitle(title: Int) {
-        binding.title.setText(title)
-    }
-
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         binding.list.adapter = adapter
-    }
-
-    override fun setActionTitle(title: CharSequence) {
-        binding.action.text = title
-    }
-
-    override fun setActionTitle(title: Int) {
-        binding.action.setText(title)
-    }
-
-    override fun setOnActionClickListener(listener: View.OnClickListener) {
-        binding.action.setOnClickListener(listener)
     }
 
     override fun showProgress(show: Boolean) {
@@ -158,6 +151,9 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
 
         @JvmField @BindView(R.id.item_subamount)
         var subname: TextView? = null
+
+        @JvmField @BindView(R.id.separator)
+        var separator: View? = null
 
         init {
             ButterKnife.bind(this, itemView!!)

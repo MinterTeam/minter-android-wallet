@@ -25,7 +25,6 @@
  */
 package network.minter.bipwallet.wallets.views
 
-import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
@@ -33,12 +32,16 @@ import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.tx.adapters.TransactionDataSource
 import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.adapters.TransactionShortListAdapter
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.TxsTabPageView
 import network.minter.bipwallet.wallets.utils.HistoryTransactionDiffUtil
+import network.minter.bipwallet.wallets.views.rows.RowWalletsButton
+import network.minter.bipwallet.wallets.views.rows.RowWalletsHeader
+import network.minter.bipwallet.wallets.views.rows.RowWalletsList
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,28 +52,38 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
     @Inject lateinit var validatorsRepo: RepoValidators
     @Inject lateinit var addressBookRepo: AddressBookRepository
 
-    private var adapter: TransactionShortListAdapter? = null
+    private var txsAdapter: TransactionShortListAdapter? = null
+    private var globalAdapter = MultiRowAdapter()
+    private var rowHeader: RowWalletsHeader? = null
+    private var rowList: RowWalletsList? = null
+    private var rowButton: RowWalletsButton? = null
 
     override fun attachView(view: TxsTabPageView) {
         super.attachView(view)
+        viewState.setAdapter(globalAdapter)
         txRepo.update()
     }
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        adapter = TransactionShortListAdapter {
+        viewState.setEmptyTitle(R.string.empty_transactions)
+
+        txsAdapter = TransactionShortListAdapter {
             secretRepo.mainWallet
         }
-        adapter!!.setOnExpandDetailsListener { _, tx ->
+        txsAdapter!!.setOnExpandDetailsListener { _, tx ->
             viewState.startDetails(tx)
         }
-        viewState.setAdapter(adapter!!)
-        viewState.setListTitle("Latest Transactions")
-        viewState.setEmptyTitle("No transactions yet")
-        viewState.setActionTitle(R.string.btn_all_txs)
-        viewState.setOnActionClickListener(View.OnClickListener {
+
+        rowHeader = RowWalletsHeader(R.string.title_latest_transactions)
+        rowList = RowWalletsList(txsAdapter!!)
+        rowButton = RowWalletsButton(R.string.btn_all_txs) {
             onClickOpenTransactions()
-        })
+        }
+        globalAdapter.addRow(rowHeader!!)
+        globalAdapter.addRow(rowList!!)
+        globalAdapter.addRow(rowButton!!)
+
 
         txRepo
                 .retryWhen(errorResolver)
@@ -83,8 +96,8 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
                 .subscribe(
                         { res: List<TransactionFacade> ->
                             Timber.d("Updated txs")
-                            adapter!!.dispatchChanges(HistoryTransactionDiffUtil::class.java, res, true)
-                            if (adapter!!.itemCount == 0) {
+                            txsAdapter!!.dispatchChanges(HistoryTransactionDiffUtil::class.java, res, true)
+                            if (txsAdapter!!.itemCount == 0) {
                                 viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Empty)
                             } else {
                                 viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Normal)

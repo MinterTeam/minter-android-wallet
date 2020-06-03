@@ -31,6 +31,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.annimon.stream.Stream
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
 import network.minter.bipwallet.tx.adapters.TxItem
@@ -64,8 +65,12 @@ class TransactionShortListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         bindViewHolder(myAddress, holder, mItems[position])
-        (holder as TxAllViewHolder).itemView.setOnClickListener { v ->
-            mOnExpandDetailsListener?.invoke(v, getItem(holder.getAdapterPosition()).tx)
+
+        (holder as TxAllViewHolder).let {
+            it.itemView.setOnClickListener { v ->
+                mOnExpandDetailsListener?.invoke(v, getItem(holder.getAdapterPosition()).tx)
+            }
+            it.binding.separator.visible = true
         }
     }
 

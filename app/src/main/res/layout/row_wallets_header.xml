@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -25,26 +24,22 @@
   ~ THE SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="52dp"
-    android:background="@color/white"
-    >
+    android:paddingBottom="9dp">
 
     <TextView
-        android:layout_width="0dp"
+        android:id="@+id/title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Wallet.ItemTxHeader"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1"
-        tools:text="Today"
-        />
+        android:layout_marginStart="@dimen/margin_edges_xlarge"
+        android:layout_marginTop="@dimen/margin_edges_large"
+        android:fontFamily="@font/_inter_semi_bold"
+        android:textAllCaps="true"
+        android:textColor="@color/textColorGrey"
+        android:textSize="@dimen/text_size_11"
+        tools:text="My Coins" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

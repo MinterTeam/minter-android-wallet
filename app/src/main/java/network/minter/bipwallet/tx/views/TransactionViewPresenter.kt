@@ -38,6 +38,7 @@ import network.minter.bipwallet.internal.helpers.DateHelper.DATE_FORMAT_WITH_TZ
 import network.minter.bipwallet.internal.helpers.DateHelper.fmt
 import network.minter.bipwallet.internal.helpers.IntentHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.ResTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.copyOnClick
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -113,7 +114,28 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.setTitle(R.string.dialog_title_tx_view_outgoing)
             }
         } else {
-            viewState.setTitle("${tx.type.name} Transaction")
+            when (tx.type) {
+                HistoryTransaction.Type.SellCoin,
+                HistoryTransaction.Type.SellAllCoins,
+                HistoryTransaction.Type.BuyCoin
+                -> viewState.setTitleTyped(R.string.tx_type_exchange)
+                HistoryTransaction.Type.CreateCoin ->
+                    viewState.setTitleTyped(R.string.tx_type_create_coin)
+                HistoryTransaction.Type.DeclareCandidacy ->
+                    viewState.setTitleTyped(R.string.tx_type_declare_candidacy)
+                HistoryTransaction.Type.RedeemCheck ->
+                    viewState.setTitleTyped(R.string.tx_type_redeem_check)
+                HistoryTransaction.Type.SetCandidateOnline ->
+                    viewState.setTitleTyped(R.string.tx_type_set_candidate_online)
+                HistoryTransaction.Type.SetCandidateOffline ->
+                    viewState.setTitleTyped(R.string.tx_type_set_candidate_offline)
+                HistoryTransaction.Type.CreateMultisigAddress ->
+                    viewState.setTitleTyped(R.string.tx_type_create_multisig)
+                HistoryTransaction.Type.EditCandidate ->
+                    viewState.setTitleTyped(R.string.tx_type_edit_candidate)
+
+                else -> viewState.setTitle(ResTextFormat(R.string.fmt_type_of_transaction, tx.type.name))
+            }
         }
 
         when (tx.type) {

@@ -25,10 +25,6 @@
  */
 package network.minter.bipwallet.wallets.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
@@ -47,8 +43,8 @@ class TxsTabPageFragment : BaseTabPageFragment(), TxsTabPageView {
     @JvmField @InjectPresenter
     var presenter: TxsTabPagePresenter? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+    override fun getTabType(): TabType {
+        return TabType.Txs
     }
 
     override fun startTransactions() {

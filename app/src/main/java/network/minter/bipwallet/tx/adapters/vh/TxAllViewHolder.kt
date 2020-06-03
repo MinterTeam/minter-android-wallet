@@ -52,6 +52,7 @@ class TxAllViewHolder(
     fun bind(item: TxItem, myAddresses: () -> MinterAddress) {
 
         binding.itemTitleType.text = item.tx.type.name
+        binding.separator.visible = true
 
         when (item.tx.type) {
             HistoryTransaction.Type.Send -> bindSend(item, myAddresses)
@@ -78,6 +79,7 @@ class TxAllViewHolder(
         val data: HistoryTransaction.TxEditCandidateResult = item.tx.getData()
 
         binding.apply {
+            itemTitleType.setText(R.string.tx_type_edit_candidate)
             itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemAmount.text = item.tx.fee.humanize()
@@ -155,6 +157,12 @@ class TxAllViewHolder(
     private fun bindSetCandidateOnOff(item: TxItem) {
         val data: HistoryTransaction.TxSetCandidateOnlineOfflineResult = item.tx.getData()
         binding.apply {
+            if (item.tx.type == HistoryTransaction.Type.SetCandidateOnline) {
+                itemTitleType.setText(R.string.tx_type_set_candidate_online)
+            } else if (item.tx.type == HistoryTransaction.Type.SetCandidateOffline) {
+                itemTitleType.setText(R.string.tx_type_set_candidate_offline)
+            }
+
             itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemAmount.text = item.tx.fee.humanize()
@@ -166,6 +174,7 @@ class TxAllViewHolder(
     private fun bindRedeemCheck(item: TxItem) {
         val data: HistoryTransaction.TxRedeemCheckResult = item.tx.getData()
         binding.apply {
+            itemTitleType.setText(R.string.tx_type_redeem_check)
             itemAvatar.setImageResource(R.drawable.img_avatar_redeem)
             itemTitle.text = item.tx.hash.toShortString()
             itemAmount.text = data.check.value.humanize()
@@ -198,6 +207,7 @@ class TxAllViewHolder(
     private fun bindCreateCoin(item: TxItem) {
         val data: HistoryTransaction.TxCreateResult = item.tx.getData()
         binding.apply {
+            itemTitleType.setText(R.string.tx_type_create_coin)
             itemAvatar.setImageResource(R.drawable.img_avatar_create_coin)
             itemAmount.text = data.initialAmount.humanize()
             itemTitle.text = data.name
@@ -209,6 +219,7 @@ class TxAllViewHolder(
         val data: HistoryTransaction.TxCreateMultisigResult = item.tx.getData()
 
         binding.apply {
+            itemTitleType.setText(R.string.tx_type_create_multisig)
             itemAvatar.setImageResource(R.drawable.img_avatar_multisend)
             itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
             itemSubamount.visible = false
@@ -219,6 +230,7 @@ class TxAllViewHolder(
     private fun bindDeclareCandidacy(item: TxItem) {
         val data: HistoryTransaction.TxDeclareCandidacyResult = item.tx.getData()
         binding.apply {
+            itemTitleType.setText(R.string.tx_type_declare_candidacy)
             itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
             itemSubamount.text = data.coin
@@ -265,7 +277,7 @@ class TxAllViewHolder(
         val data: HistoryTransaction.TxConvertCoinResult = item.tx.getData()
 
         binding.apply {
-            itemTitleType
+            itemTitleType.setText(R.string.tx_type_exchange)
             itemTitle.text = "${data.getCoinToSell()} –> ${data.getCoinToBuy()}"
             itemAvatar.setImageResource(R.drawable.img_avatar_exchange)
             itemAmount.text = data.valueToBuy.humanize()

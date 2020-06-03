@@ -23,29 +23,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.ui
 
-import android.content.Intent
-import moxy.presenter.InjectPresenter
-import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
-import network.minter.bipwallet.wallets.contract.CoinsTabPageView
-import network.minter.bipwallet.wallets.views.CoinsTabPagePresenter
-import javax.inject.Inject
-import javax.inject.Provider
+package network.minter.bipwallet.wallets.views.rows
 
-class CoinsTabPageFragment : BaseTabPageFragment(), CoinsTabPageView {
-    @Inject lateinit var presenterProvider: Provider<CoinsTabPagePresenter>
-    @InjectPresenter lateinit var presenter: CoinsTabPagePresenter
+import android.view.View
+import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.RowWalletsButtonBinding
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
+import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract
 
-    @ProvidePresenter
-    internal fun providePresenter(): CoinsTabPagePresenter = presenterProvider.get()
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
+ */
+class RowWalletsButton(
+        private val titleRes: Int,
+        private val showSpace: Boolean = true,
+        private val listener: (View) -> Unit
+) : MultiRowContract.Row<RowWalletsButton.ViewHolder> {
 
-    override fun getTabType(): TabType {
-        return TabType.Coins
+    class ViewHolder(v: View) : MultiRowAdapter.RowViewHolder(v)
+
+    override fun getItemView(): Int {
+        return R.layout.row_wallets_button
     }
 
-    override fun startConvert() {
-        startActivity(Intent(activity, ConvertCoinActivity::class.java))
+    override fun onBindViewHolder(viewHolder: ViewHolder) {
+        val b = RowWalletsButtonBinding.bind(viewHolder.itemView)
+        b.action.setText(titleRes)
+        b.action.setOnClickListener(listener)
+        b.space.visible = showSpace
+    }
+
+    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
+
+    }
+
+    override fun getViewHolderClass(): Class<ViewHolder> {
+        return ViewHolder::class.java
     }
 }
