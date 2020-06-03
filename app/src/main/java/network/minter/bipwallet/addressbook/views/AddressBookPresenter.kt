@@ -92,7 +92,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
                         val lastUsed = addressBookRepo.lastUsed
                         if (lastUsed.isNotEmpty() && lastUsed[0].address!! == contact.address) {
                             lastUsed[0].id = 0
-                            lastUsed[0].name = lastUsed[0].address
+                            lastUsed[0].name = "Anonymous"
                             addressBookRepo.writeLastUsed(lastUsed[0])
                         }
                         addressBookRepo.delete(contact)
