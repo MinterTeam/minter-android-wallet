@@ -246,6 +246,13 @@ class TxAllViewHolder(
         val isSelfSending = item.from == data.to
 
         binding.apply {
+
+            if (isIncoming) {
+                itemTitleType.setText(R.string.tx_type_send_recieve)
+            } else {
+                itemTitleType.setText(R.string.tx_type_send)
+            }
+
             if (isIncoming) {
                 itemAvatar.setImageUrlFallback(txItem.tx.fromAvatar, R.drawable.img_avatar_default)
             } else {
