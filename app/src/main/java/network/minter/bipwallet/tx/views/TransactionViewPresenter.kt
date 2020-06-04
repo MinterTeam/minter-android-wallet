@@ -47,6 +47,7 @@ import network.minter.bipwallet.share.SharingText
 import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionView
 import network.minter.bipwallet.tx.ui.TransactionViewDialog
+import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.MinterExplorerApi
 import network.minter.explorer.models.HistoryTransaction
@@ -99,7 +100,12 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
         viewState.setPayload(tx.payload.fromBase64())
         viewState.setTimestamp(DateTime(tx.timestamp).fmt(DATE_FORMAT_WITH_TZ))
-        viewState.setFee("${tx.fee.humanize()} ${tx.gasCoin}")
+        if (tx.gasCoin.toUpperCase() != MinterSDK.DEFAULT_COIN) {
+            viewState.setFee("${tx.gasCoin} (${tx.fee.humanize()} ${MinterSDK.DEFAULT_COIN})")
+        } else {
+            viewState.setFee("${tx.fee.humanize()} ${tx.gasCoin}")
+        }
+
         viewState.setBlockNumber(tx.block.toString())
         viewState.setBlockClickListener(View.OnClickListener {
             onClickBlockNumber()
