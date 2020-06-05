@@ -362,5 +362,7 @@
 
     <string name="fmt_decimal_and_coin">%s %s</string>
     <string name="fmt_type_of_transaction">%s Transaction</string>
+    <string name="tx_type_send_recieve">Receive</string>
+    <string name="tx_type_send">Send</string>
 
 </resources>

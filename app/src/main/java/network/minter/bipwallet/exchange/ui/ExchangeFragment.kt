@@ -63,7 +63,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.widgets.WalletButton
 import network.minter.bipwallet.sending.account.SelectorData
-import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
+import network.minter.bipwallet.sending.account.SelectorDialog
 import network.minter.bipwallet.sending.account.selectorDataFromCoins
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
@@ -160,7 +160,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun startAccountSelector(accounts: List<CoinBalance>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
+        SelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
                 .setItems(selectorDataFromCoins(accounts))
                 .setOnClickListener(clickListener)
                 .create().show()

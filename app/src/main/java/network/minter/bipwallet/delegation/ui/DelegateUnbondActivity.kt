@@ -63,7 +63,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFi
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.sending.account.SelectorData
-import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
+import network.minter.bipwallet.sending.account.SelectorDialog
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterHash
@@ -282,7 +282,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit) {
         startDialog {
-            WalletAccountSelectorDialog.Builder<BaseCoinValue>(this, R.string.dialog_title_choose_coin)
+            SelectorDialog.Builder<BaseCoinValue>(this, R.string.dialog_title_choose_coin)
                     .setItems(items)
                     .setOnClickListener(listener)
                     .create()

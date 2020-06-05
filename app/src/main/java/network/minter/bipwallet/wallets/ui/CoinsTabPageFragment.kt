@@ -26,8 +26,7 @@
 package network.minter.bipwallet.wallets.ui
 
 import android.content.Intent
-import moxy.presenter.InjectPresenter
-import moxy.presenter.ProvidePresenter
+import moxy.ktx.moxyPresenter
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.wallets.contract.CoinsTabPageView
 import network.minter.bipwallet.wallets.views.CoinsTabPagePresenter
@@ -36,10 +35,7 @@ import javax.inject.Provider
 
 class CoinsTabPageFragment : BaseTabPageFragment(), CoinsTabPageView {
     @Inject lateinit var presenterProvider: Provider<CoinsTabPagePresenter>
-    @InjectPresenter lateinit var presenter: CoinsTabPagePresenter
-
-    @ProvidePresenter
-    internal fun providePresenter(): CoinsTabPagePresenter = presenterProvider.get()
+    private val presenter by moxyPresenter { presenterProvider.get() }
 
     override fun getTabType(): TabType {
         return TabType.Coins

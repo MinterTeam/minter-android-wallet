@@ -28,10 +28,9 @@ package network.minter.bipwallet.wallets.contract
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import moxy.MvpView
-import moxy.viewstate.strategy.AddToEndSingleStrategy
-import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
 
-@StateStrategyType(AddToEndSingleStrategy::class)
+@AddToEndSingle
 interface BaseWalletsPageView : MvpView {
     enum class ViewStatus {
         Normal, Progress, Empty, Error
@@ -39,6 +38,7 @@ interface BaseWalletsPageView : MvpView {
 
     fun setViewStatus(status: ViewStatus)
     fun setViewStatus(status: ViewStatus, error: CharSequence?)
+
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
     fun showProgress(show: Boolean)
     fun setEmptyTitle(title: CharSequence)

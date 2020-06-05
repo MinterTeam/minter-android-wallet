@@ -291,8 +291,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        walletSelectorController.onFirstViewAttach(viewState)
         viewState.showBalanceProgress(true)
-        walletSelectorController.onFirstViewAttach()
         accountStorage
                 .retryWhen(errorResolver)
                 .observe()

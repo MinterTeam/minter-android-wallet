@@ -50,9 +50,20 @@ import network.minter.bipwallet.sending.account.SelectorData
  */
 
 
-class AddressSelectorDialog(
+class WalletSelectorDialog(
         private val builder: Builder
 ) : WalletDialogFragment() {
+
+    @JvmOverloads
+    constructor(context: Context, title: CharSequence? = null, builder: Builder.() -> Unit) : this(
+            Builder(context, title).apply(builder)
+    )
+
+    constructor(context: Context, @StringRes titleRes: Int, builder: Builder.() -> Unit) : this(
+            Builder(context, titleRes).apply(builder)
+    )
+
+
     private lateinit var binding: DialogAddressSelectorBinding
     private var popup: ListPopupWindow? = null
     var item: SelectorData<SecretData>? = null
@@ -119,7 +130,7 @@ class AddressSelectorDialog(
     }
 
 
-    class Builder : WalletDialogFragmentBuilder<AddressSelectorDialog, Builder> {
+    class Builder : WalletDialogFragmentBuilder<WalletSelectorDialog, Builder> {
         internal var items: List<SelectorData<SecretData>> = ArrayList()
         internal var desc: CharSequence? = null
 
@@ -138,8 +149,8 @@ class AddressSelectorDialog(
             return this
         }
 
-        override fun create(): AddressSelectorDialog {
-            return AddressSelectorDialog(this)
+        override fun create(): WalletSelectorDialog {
+            return WalletSelectorDialog(this)
         }
 
     }

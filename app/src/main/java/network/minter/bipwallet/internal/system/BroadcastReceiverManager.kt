@@ -62,11 +62,8 @@ class BroadcastReceiverManager<T>(context: T) : LifecycleObserver
         _receivers.forEach { item ->
             val receiverClass: Class<out BaseBroadcastReceiver> = item.javaClass
             item.setOnReceiveListener { context: Context?, intent: Intent? ->
-                if (_listener != null) {
-                    _listener!!.onReceive(receiverClass, context, intent)
-                }
+                _listener?.onReceive(receiverClass, context, intent)
             }
-            item.unregister(_context.get())
             item.register(_context.get())
         }
     }

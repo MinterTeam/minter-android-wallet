@@ -58,9 +58,9 @@ import network.minter.bipwallet.sending.account.selectorDataFromSecrets
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.contract.TxInitData
-import network.minter.bipwallet.tx.ui.AddressSelectorDialog
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.InputFieldRow
+import network.minter.bipwallet.tx.ui.WalletSelectorDialog
 import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.*
 import network.minter.blockchain.utils.Base64UrlSafe
@@ -720,10 +720,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
     private fun onSubmit() {
         viewState.startDialogFragment { ctx ->
-            val d = AddressSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
+            WalletSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
                     .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
                     .setPositiveAction(R.string.btn_confirm) { d, _ ->
-                        mFrom = (d as AddressSelectorDialog).item!!.data.minterAddress
+                        mFrom = (d as WalletSelectorDialog).item!!.data.minterAddress
                         d.dismiss()
                         if (!validateTx()) {
                             return@setPositiveAction
@@ -732,8 +732,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     }
                     .setNegativeAction(R.string.btn_cancel)
                     .create()
-
-            d
         }
     }
 

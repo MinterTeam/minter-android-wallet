@@ -45,7 +45,7 @@ import network.minter.bipwallet.wallets.contract.BaseWalletsPageView
 import network.minter.bipwallet.wallets.contract.BaseWalletsPageView.ViewStatus
 
 abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
-    private lateinit var binding: FragmentPageWalletsBinding
+    protected lateinit var binding: FragmentPageWalletsBinding
 
     protected enum class TabType {
         Coins, Txs
@@ -68,21 +68,12 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
         binding = FragmentPageWalletsBinding.inflate(inflater, container, false)
 
         binding.list.layoutManager = LinearLayoutManager(context)
-//        binding.list.addOnScrollListener(ViewElevationOnScroll(binding.top))
         return binding.root
     }
 
     override fun setViewStatus(status: ViewStatus) {
         setViewStatus(status, null)
     }
-
-//    private fun getAction(): WalletButton {
-//        return if(getTabType() == TabType.Coins) {
-//            binding.action
-//        } else {
-//            binding.actionBottom
-//        }
-//    }
 
     override fun setViewStatus(status: ViewStatus, error: CharSequence?) {
         when (status) {

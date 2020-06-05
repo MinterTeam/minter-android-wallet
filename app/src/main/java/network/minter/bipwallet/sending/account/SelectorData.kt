@@ -23,31 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package network.minter.bipwallet.sending.account
 
-import android.content.Context
-import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.recyclerview.widget.LinearLayoutManager
 import network.minter.bipwallet.R
-import network.minter.bipwallet.databinding.DialogAccountSelectorBinding
-import network.minter.bipwallet.internal.dialogs.WalletDialog
-import network.minter.bipwallet.internal.dialogs.WalletDialogBuilder
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.storage.models.SecretData
-import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
-import network.minter.bipwallet.internal.views.list.ViewElevationOnScroll
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinDelegation
 import network.minter.explorer.models.ValidatorItem
 import network.minter.profile.MinterProfileApi
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-
 
 data class SelectorData<out Data>(
         val data: Data,
@@ -102,73 +92,4 @@ fun selectorDataFromValidators(input: List<ValidatorItem>): List<SelectorData<Va
                 R.drawable.img_avatar_delegate
         )
     }
-}
-
-class WalletAccountSelectorDialog<out Data> private constructor(
-        context: Context,
-        private val builder: Builder<Data>
-) : WalletDialog(context) {
-
-    private lateinit var binding: DialogAccountSelectorBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DialogAccountSelectorBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-
-        binding.apply {
-            title.visible = builder.showTitle
-            title.text = builder.title
-            val adapter = AccountSelectedAdapter(builder.items)
-            adapter.setOnClickListener {
-                builder.clickListener?.onClick(it)
-                dismiss()
-            }
-            list.layoutManager = LinearLayoutManager(context)
-            list.addItemDecoration(BorderedItemSeparator(context, R.drawable.shape_bottom_separator, false, false))
-            list.adapter = adapter
-
-            list.addOnScrollListener(ViewElevationOnScroll(title))
-        }
-    }
-
-    class Builder<Data> : WalletDialogBuilder<WalletAccountSelectorDialog<Data>, Builder<Data>> {
-        internal var items: List<SelectorData<Data>> = ArrayList()
-        internal var clickListener: AccountSelectedAdapter.OnClickListener<Data>? = null
-        internal var showTitle: Boolean = true
-
-        @JvmOverloads
-        constructor(context: Context, title: CharSequence? = null) : super(context, title)
-
-        constructor(context: Context, @StringRes titleRes: Int) : super(context, titleRes)
-
-        override fun create(): WalletAccountSelectorDialog<Data> {
-            return WalletAccountSelectorDialog(context, this)
-        }
-
-        fun setShowTitle(show: Boolean): Builder<Data> {
-            showTitle = show
-            return this
-        }
-
-        fun setOnClickListener(listener: (SelectorData<Data>) -> Unit): Builder<Data> {
-            return setOnClickListener(object : AccountSelectedAdapter.OnClickListener<Data> {
-                override fun onClick(item: SelectorData<Data>) {
-                    listener(item)
-                }
-            })
-        }
-
-        fun setOnClickListener(listener: AccountSelectedAdapter.OnClickListener<Data>): Builder<Data> {
-            clickListener = listener
-            return this
-        }
-
-        fun setItems(items: List<SelectorData<Data>>): Builder<Data> {
-            this.items = items
-            return this
-        }
-    }
-
 }

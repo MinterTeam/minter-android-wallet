@@ -61,19 +61,11 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
     private var rowHeader: RowWalletsHeader? = null
     private var rowList: RowWalletsList? = null
 
-    override fun attachView(view: CoinsTabPageView) {
-        super.attachView(view)
-        viewState.setAdapter(globalAdapter)
-        accountStorage.update()
-    }
-
     private fun CoinBalance.getImageUrl(): String {
         return MinterProfileApi.getCoinAvatarUrl(coin!!)
     }
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-        viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Progress)
+    init {
         coinsAdapter = SimpleRecyclerAdapter.Builder<CoinBalance, BaseTabPageFragment.ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, BaseTabPageFragment.ItemViewHolder::class.java)
                 .setBinder { vh: BaseTabPageFragment.ItemViewHolder, item: CoinBalance, _: Int ->
@@ -97,6 +89,12 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
         globalAdapter.addRow(rowButton!!)
         globalAdapter.addRow(rowHeader!!)
         globalAdapter.addRow(rowList!!)
+    }
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        Timber.d("WALLETS coins first attach")
+        viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Progress)
 
         accountStorage
                 .retryWhen(errorResolver)
@@ -113,6 +111,30 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Error, t.message)
                         }
                 )
+
+
+    }
+
+    override fun attachView(view: CoinsTabPageView) {
+        super.attachView(view)
+        Timber.d("WALLETS coins attach")
+        viewState.setAdapter(globalAdapter)
+        accountStorage.update()
+    }
+
+    override fun detachView(view: CoinsTabPageView) {
+        super.detachView(view)
+        Timber.d("WALLETS coins detach")
+    }
+
+    override fun destroyView(view: CoinsTabPageView?) {
+        super.destroyView(view)
+        Timber.d("WALLETS coins destroy view")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("WALLETS onDestroy")
     }
 
     @Suppress("UNUSED_PARAMETER")

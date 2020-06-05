@@ -73,16 +73,11 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        walletSelectorController.onFirstViewAttach()
+        walletSelectorController.onFirstViewAttach(viewState)
         walletSelectorController.onWalletSelected = {
             viewState.showBalanceProgress(true)
         }
 
-        Timber.d("DAILY_REWARDS begin observe")
-//        if (dailyRewardsRepo.isDataReady) {
-//            Timber.d("DAILY_REWARDS ready from cache")
-//            onDailyRewardsReady(dailyRewardsRepo.data)
-//        }
         if (accountStorage.isDataReady) {
             try {
                 Timber.d("BALANCE ready from cache")
@@ -110,11 +105,6 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                 ).disposeOnDestroy()
 
         accountStorage.update()
-    }
-
-    override fun doOnError(t: Throwable) {
-        super.doOnError(t)
-        Timber.d("DoOnError WALLETS")
     }
 
     override fun attachView(view: WalletsTabView) {

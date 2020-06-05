@@ -41,19 +41,15 @@ class WalletSelectorController @Inject constructor() {
     @Inject lateinit var secretStorage: SecretStorage
     @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var txRepo: RepoTransactions
-//    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
 
     var onWalletSelected: ((WalletItem) -> Unit)? = null
 
     private var viewState: WalletSelectorControllerView? = null
     private var disposable: Disposable? = null
     private var latestBalances: AddressListBalancesTotal? = null
+    private var isAttached = false
 
-    fun onFirstViewAttach() {
-        fillWalletSelector(accountStorage.data)
-    }
-
-    fun attachView(view: WalletSelectorControllerView) {
+    fun onFirstViewAttach(view: WalletSelectorControllerView) {
         viewState = view
 
         disposable = accountStorage.observe()
@@ -65,6 +61,14 @@ class WalletSelectorController @Inject constructor() {
                             Timber.w(it)
                         }
                 )
+    }
+
+    fun attachView(view: WalletSelectorControllerView) {
+        viewState = view
+
+        if (accountStorage.isDataReady) {
+            fillWalletSelector(accountStorage.data)
+        }
 
         viewState!!.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->
             onSelectWallet(walletItem)
@@ -135,6 +139,7 @@ class WalletSelectorController @Inject constructor() {
     }
 
     fun detachView() {
+        isAttached = false
         disposable?.dispose()
         disposable = null
         viewState = null

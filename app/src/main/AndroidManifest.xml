@@ -128,6 +128,7 @@
             android:name=".external.ui.ExternalActivity"
             android:launchMode="singleInstance"
             android:noHistory="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Wallet.Splash">
             <intent-filter>
                 <action android:name="OPEN_HOME" />
@@ -157,6 +158,7 @@
             android:launchMode="singleTop"
             android:theme="@style/Wallet"
             android:parentActivityName=".home.ui.HomeActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -164,6 +166,7 @@
         </activity>
         <activity
             android:name=".addressbook.ui.AddressBookActivity"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".delegation.ui.DelegateUnbondActivity" />

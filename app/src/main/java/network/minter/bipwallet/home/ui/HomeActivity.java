@@ -259,23 +259,6 @@ public class HomeActivity extends BaseMvpActivity implements HomeView, BackPress
                 super.onDetachedFromRecyclerView(recyclerView);
 
             }
-
-            //            @NonNull
-//            @Override
-//            public Object instantiateItem(@NonNull ViewGroup container, int position) {
-//                HomeTabFragment fragment = (HomeTabFragment) super.instantiateItem(container, position);
-//                Timber.d("Instantiate item %s by position: %d", fragment.getClass().getSimpleName(), position);
-//
-//                mActiveTabs.put(position, fragment);
-//                return fragment;
-//            }
-
-//            @Override
-//            public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-//                super.destroyItem(container, position, object);
-//                mActiveTabs.remove(position);
-//                Timber.d("Destroy item %s by position: %d", object.getClass().getSimpleName(), position);
-//            }
         };
 
         homePager.setOffscreenPageLimit(mIsLowRamDevice ? 1 : 4);

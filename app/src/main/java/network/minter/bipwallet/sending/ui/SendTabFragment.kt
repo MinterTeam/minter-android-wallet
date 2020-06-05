@@ -68,7 +68,7 @@ import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidat
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.account.SelectorData
-import network.minter.bipwallet.sending.account.WalletAccountSelectorDialog
+import network.minter.bipwallet.sending.account.SelectorDialog
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter
 import network.minter.bipwallet.sending.contract.SendView
 import network.minter.bipwallet.sending.views.SendTabPresenter
@@ -422,7 +422,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startAccountSelector(accounts: List<SelectorData<CoinBalance>>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
-        WalletAccountSelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
+        SelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
                 .create()

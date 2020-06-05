@@ -40,8 +40,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.appbar.AppBarLayout
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -100,6 +101,12 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     override fun onAttach(context: Context) {
         HomeModule.getComponent().inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        HomeModule.getComponent().inject(this)
+        super.onCreate(savedInstanceState)
+        presenter.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun setOnRefreshListener(listener: OnRefreshListener) {
@@ -281,12 +288,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         startScanQRWithPermissionCheck(requestCode)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        HomeModule.getComponent().inject(this)
-        super.onCreate(savedInstanceState)
-        presenter.onRestoreInstanceState(savedInstanceState)
-    }
-
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         presenter.onTrimMemory()
@@ -387,7 +388,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     @OnPermissionDenied(Manifest.permission.CAMERA)
     fun showOpenPermissionsForCamera() {
         ConfirmDialog.Builder(activity!!, "Camera request")
-                .setText("We need access to your camera to take a shot with Minter Address QR Code")
+                .setText("We need access to your camera to take a shot with Minter QR Code")
                 .setPositiveAction("Open settings") { d: DialogInterface, _: Int ->
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -401,10 +402,8 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 .show()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Suppress("DEPRECATION")
-    private fun setupTabAdapter() {
-        binding.tabsPager.adapter = object : FragmentStatePagerAdapter(activity!!.supportFragmentManager) {
+    private val pagerAdapter: PagerAdapter by lazy {
+        object : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getCount(): Int {
                 return 2
             }
@@ -421,8 +420,10 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 }
             }
         }
-//
-//
+    }
+
+    private fun setupTabAdapter() {
+        binding.tabsPager.adapter = pagerAdapter
         binding.tabsPager.offscreenPageLimit = 2
         binding.tabs.setupWithViewPager(binding.tabsPager)
         binding.tabs.getTabAt(0)!!.setText(R.string.tab_page_coins)
