@@ -112,6 +112,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var gas = BigInteger.ONE
     private var fee = BigDecimal.ZERO
     private var clickedUseMax: Boolean = false
+    private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
 
     private val BaseCoinValue.title: String
         get() = "$coin (${amount.humanize()})"
@@ -176,10 +177,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             if (type == Type.Delegate) {
                 viewState.setAmount(fromAccount!!.amount.toPlainString())
             } else {
-                if (accountStorage.entity.mainWallet.hasDelegated(toValidator, selectAccount)) {
+                if (accountStorage.entity.mainWallet.hasDelegated(toValidator, fromAccount!!.coin)) {
                     viewState.setAmount((
                             accountStorage.entity.mainWallet
-                                    .getDelegatedByValidatorAndCoin(toValidator, selectAccount)?.amount
+                                    .getDelegatedByValidatorAndCoin(toValidator, fromAccount!!.coin)?.amount
                                     ?: BigDecimal.ZERO
                             ).toPlainString()
                     )
@@ -201,6 +202,140 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 onValidatorSelected(validator)
             }
         }
+    }
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        viewState.setTextChangedListener(::onInputChanged)
+        viewState.setOnSubmitListener(View.OnClickListener {
+            onSubmit()
+        })
+        viewState.addValidatorTextChangeListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if ((s == null || s.isEmpty())) {
+                    viewState.setValidatorSelectSuffix(::startValidatorSelector)
+                    if (toValidator == null) {
+                        viewState.setValidatorError("Public key required")
+                    } else {
+                        viewState.setValidatorError(null)
+                    }
+                    checkEnableSubmit()
+                    return
+                }
+
+                viewState.setValidatorClearSuffix(::clearSelectedValidator)
+
+                if (!s.matches(pubkeyPattern)) {
+                    viewState.setValidatorError("Invalid public key format")
+                    checkEnableSubmit()
+                    return
+                }
+
+                toValidator = MinterPublicKey(s.toString())
+                toValidatorName = null
+                toValidatorItem = ValidatorItem().apply {
+                    pubKey = toValidator
+                }
+                viewState.setValidatorError(null)
+                checkEnableSubmit()
+            }
+        })
+        validatorsRepo
+                .retryWhen(errorResolver)
+                .observe()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        {
+                            validators = it.toMutableList()
+                            validators.sortByDescending { v -> v.stake }
+
+                            if (toValidator != null) {
+                                try {
+                                    onValidatorSelected(findValidator(toValidator!!))
+                                } catch (e: NoSuchElementException) {
+                                    viewState.setValidatorRaw(toValidator!!)
+                                    viewState.setValidatorClearSuffix(::clearSelectedValidator)
+                                }
+                            }
+
+                            if (type == Type.Delegate) {
+                                viewState.setValidatorsAutocomplete(validators.filter { v -> v.status == ValidatorItem.STATUS_ONLINE }) { validator ->
+                                    onValidatorSelected(validator)
+                                }
+                            }
+                        },
+                        { t: Throwable ->
+                            Timber.w(t, "Unable to update validators")
+                            viewState.onError(t)
+                        }
+                )
+                .disposeOnDestroy()
+
+        accountStorage
+                .retryWhen(errorResolver)
+                .observe()
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        { res: AddressListBalancesTotal ->
+                            onBalanceLoaded(res)
+                        },
+                        { t: Throwable ->
+                            Timber.w(t, "Unable to update accounts")
+                            viewState.onError(t)
+                        }
+                )
+                .disposeOnDestroy()
+    }
+
+    private fun onBalanceLoaded(res: AddressListBalancesTotal) {
+        if (!res.isEmpty) {
+            val acc = accountStorage.entity.mainWallet
+            if (type == Type.Delegate) {
+                if (fromAccount != null) {
+                    onAccountSelected(acc.findCoinByName(fromAccount?.coin).orElse(acc.coinsList[0]))
+                } else {
+                    onAccountSelected(acc.coinsList[0])
+                }
+            } else {
+                if (fromAccount == null && selectAccount != null) {
+                    fromAccount = acc.getCoin(selectAccount!!)
+                    selectAccount = null
+                }
+                if (fromAccount != null && toValidator != null) {
+                    onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin))
+                }
+            }
+        }
+    }
+
+    override fun attachView(view: DelegateUnbondView) {
+        super.attachView(view)
+        accountStorage.update()
+        validatorsRepo.update()
+
+        viewState.setOnAccountSelectListener(View.OnClickListener {
+            if (type == Type.Delegate) {
+                viewState.startAccountSelector(selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList)) { account ->
+                    onAccountSelected(account.data)
+                }
+            } else {
+                if (toValidator != null) {
+                    val validatorDelegations = accountStorage.entity.mainWallet.getDelegatedListByValidator(toValidator!!)
+                    if (validatorDelegations.isNotEmpty()) {
+                        viewState.startAccountSelector(selectorDataFromDelegatedAccounts(validatorDelegations)) { account ->
+                            onAccountSelected(account.data)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -234,6 +369,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     fee = it
                     viewState.setFee("${it.humanize()} ${MinterSDK.DEFAULT_COIN}")
                 }
+                .disposeOnDestroy()
     }
 
     private fun findValidator(publicKey: MinterPublicKey): ValidatorItem {
@@ -485,139 +621,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
     }
 
-    private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
-
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-        viewState.setTextChangedListener(::onInputChanged)
-        viewState.setOnSubmitListener(View.OnClickListener {
-            onSubmit()
-        })
-        viewState.addValidatorTextChangeListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if ((s == null || s.isEmpty())) {
-                    viewState.setValidatorSelectSuffix(::startValidatorSelector)
-                    if (toValidator == null) {
-                        viewState.setValidatorError("Public key required")
-                    } else {
-                        viewState.setValidatorError(null)
-                    }
-                    checkEnableSubmit()
-                    return
-                }
-
-                viewState.setValidatorClearSuffix(::clearSelectedValidator)
-
-                if (!s.matches(pubkeyPattern)) {
-                    viewState.setValidatorError("Invalid public key format")
-                    checkEnableSubmit()
-                    return
-                }
-
-                toValidator = MinterPublicKey(s.toString())
-                toValidatorName = null
-                toValidatorItem = ValidatorItem().apply {
-                    pubKey = toValidator
-                }
-                viewState.setValidatorError(null)
-                checkEnableSubmit()
-            }
-        })
-        validatorsRepo
-                .retryWhen(errorResolver)
-                .observe()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {
-                            validators = it.toMutableList()
-                            validators.sortByDescending { v -> v.stake }
-
-                            if (toValidator != null) {
-                                try {
-                                    onValidatorSelected(findValidator(toValidator!!))
-                                } catch (e: NoSuchElementException) {
-                                    viewState.setValidatorRaw(toValidator!!)
-                                    viewState.setValidatorClearSuffix(::clearSelectedValidator)
-                                }
-                            }
-
-                            if (type == Type.Delegate) {
-                                viewState.setValidatorsAutocomplete(validators.filter { v -> v.status == ValidatorItem.STATUS_ONLINE }) { validator ->
-                                    onValidatorSelected(validator)
-                                }
-                            }
-                        },
-                        { t: Throwable ->
-                            Timber.w(t, "Unable to update validators")
-                            viewState.onError(t)
-                        }
-                )
-
-        accountStorage
-                .retryWhen(errorResolver)
-                .observe()
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        { res: AddressListBalancesTotal ->
-                            onBalanceLoaded(res)
-                        },
-                        { t: Throwable ->
-                            Timber.w(t, "Unable to update accounts")
-                            viewState.onError(t)
-                        }
-                )
-    }
-
-    private fun onBalanceLoaded(res: AddressListBalancesTotal) {
-        if (!res.isEmpty) {
-            val acc = accountStorage.entity.mainWallet
-            if (type == Type.Delegate) {
-                if (fromAccount != null) {
-                    onAccountSelected(acc.findCoinByName(fromAccount?.coin).orElse(acc.coinsList[0]))
-                } else {
-                    onAccountSelected(acc.coinsList[0])
-                }
-            } else {
-                if (fromAccount == null && selectAccount != null) {
-                    fromAccount = acc.getCoin(selectAccount!!)
-                }
-                if (fromAccount != null && toValidator != null) {
-                    onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin))
-                }
-            }
-        }
-    }
-
-    override fun attachView(view: DelegateUnbondView) {
-        super.attachView(view)
-        accountStorage.update()
-        validatorsRepo.update()
-
-        viewState.setOnAccountSelectListener(View.OnClickListener {
-            if (type == Type.Delegate) {
-                viewState.startAccountSelector(selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList)) { account ->
-                    onAccountSelected(account.data)
-                }
-            } else {
-                if (toValidator != null) {
-                    val validatorDelegations = accountStorage.entity.mainWallet.getDelegatedListByValidator(toValidator!!)
-                    if (validatorDelegations.isNotEmpty()) {
-                        viewState.startAccountSelector(selectorDataFromDelegatedAccounts(validatorDelegations)) { account ->
-                            onAccountSelected(account.data)
-                        }
-                    }
-                }
-            }
-        })
-    }
-
     private fun onAccountSelected(account: BaseCoinValue?) {
         if (account == null) return
         fromAccount = account
@@ -638,10 +641,12 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 viewState.setAccountError("You didn't delegated to selected validator")
                 toValidator = null
             } else {
-                val delegated = accountStorage.entity.mainWallet.getDelegatedListByValidator(toValidator!!)
-                val first = delegated[0]
-                viewState.setAccountError(null)
-                viewState.setAccountTitle(first.title)
+                val coin = fromAccount?.coin ?: selectAccount
+                val account = accountStorage.entity.mainWallet.getDelegatedByValidatorAndCoin(toValidator, coin)
+                if (account != null) {
+                    viewState.setAccountError(null)
+                    viewState.setAccountTitle(account.title)
+                }
             }
         }
         checkEnableSubmit()
