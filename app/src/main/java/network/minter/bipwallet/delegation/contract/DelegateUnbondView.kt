@@ -87,5 +87,8 @@ interface DelegateUnbondView : MvpView {
     fun setValidatorSelectDisabled()
     fun setCoinLabel(labelRes: Int)
     fun setEnableValidator(enable: Boolean)
+    fun setValidatorSelectSuffix(listener: (View) -> Unit)
+    fun setValidatorClearSuffix(listener: (View) -> Unit)
+    fun clearValidatorInput()
 
 }

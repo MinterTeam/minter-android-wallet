@@ -163,6 +163,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     onValidatorSelected(existed)
                 } else {
                     viewState.setValidatorRaw(toValidator!!)
+                    viewState.setValidatorClearSuffix(::clearSelectedValidator)
                 }
             }
         }
@@ -213,7 +214,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         toValidator = null
         toValidatorItem = null
         viewState.hideValidatorOverlay()
-        viewState.setOnValidatorSelectListener(::startValidatorSelector)
+        viewState.clearValidatorInput()
+        viewState.setValidatorSelectSuffix(::startValidatorSelector)
     }
 
     private fun setupFee() {
@@ -318,7 +320,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         }
                         .setNegativeAction(R.string.btn_cancel) { d, _ ->
                             d.dismiss()
-                            viewState.finishCancel()
                         }
                         .create()
             }
@@ -484,6 +485,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
     }
 
+    private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
+
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.setTextChangedListener(::onInputChanged)
@@ -499,6 +502,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if ((s == null || s.isEmpty())) {
+                    viewState.setValidatorSelectSuffix(::startValidatorSelector)
                     if (toValidator == null) {
                         viewState.setValidatorError("Public key required")
                     } else {
@@ -507,7 +511,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     checkEnableSubmit()
                     return
                 }
-                if (!s.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())) {
+
+                viewState.setValidatorClearSuffix(::clearSelectedValidator)
+
+                if (!s.matches(pubkeyPattern)) {
                     viewState.setValidatorError("Invalid public key format")
                     checkEnableSubmit()
                     return
@@ -537,6 +544,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                                     onValidatorSelected(findValidator(toValidator!!))
                                 } catch (e: NoSuchElementException) {
                                     viewState.setValidatorRaw(toValidator!!)
+                                    viewState.setValidatorClearSuffix(::clearSelectedValidator)
                                 }
                             }
 

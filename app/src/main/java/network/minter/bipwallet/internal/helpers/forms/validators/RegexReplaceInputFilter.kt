@@ -33,7 +33,7 @@ import android.text.Spanned
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-open class RegexInputFilter(
+open class RegexReplaceInputFilter(
         private val regex: Regex
 ) : InputFilter {
     override fun filter(source: CharSequence?, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int): CharSequence {

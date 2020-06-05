@@ -68,10 +68,10 @@ class CoinsAcPresenter(
         return adapter
     }
 
-    override fun onQuery(query: CharSequence?) {
+    override fun onQuery(query: CharSequence?): Boolean {
         if (query.isNullOrEmpty()) {
             adapter.setItems(ArrayList(0))
-            return
+            return false
         }
 
         val filtered = items.filter {
@@ -79,6 +79,7 @@ class CoinsAcPresenter(
         }
 
         adapter.setItems(filtered)
+        return filtered.isNotEmpty()
     }
 
     override fun getPopupDimensions(): PopupDimensions {

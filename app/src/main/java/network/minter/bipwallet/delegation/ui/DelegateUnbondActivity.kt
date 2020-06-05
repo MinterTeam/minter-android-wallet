@@ -211,6 +211,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun setValidator(validator: ValidatorItem, onInflated: (View) -> Unit) {
         binding.apply {
+            inputValidator.setSuffixImageSrc(R.drawable.ic_validator_list)
             inputValidator.text = null
             inputValidator.inputOverlayVisible = true
             binding.inputValidator.input.isFocusable = false
@@ -220,6 +221,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun setValidator(validator: MinterPublicKey, onInflated: (View) -> Unit) {
         binding.apply {
+            inputValidator.setSuffixImageSrc(R.drawable.ic_validator_list)
             inputValidator.inputOverlayVisible = true
             binding.inputValidator.input.isFocusable = !binding.inputValidator.inputOverlayVisible
             inputValidator.input.isFocusable = false
@@ -232,6 +234,20 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
         binding.inputValidator.setText(
                 validator.toString()
         )
+    }
+
+    override fun clearValidatorInput() {
+        binding.inputValidator.setText(null)
+    }
+
+    override fun setValidatorClearSuffix(listener: (View) -> Unit) {
+        binding.inputValidator.setSuffixImageSrc(R.drawable.ic_cancel_circle_grey)
+        binding.inputValidator.setOnSuffixImageClickListener(listener)
+    }
+
+    override fun setValidatorSelectSuffix(listener: (View) -> Unit) {
+        binding.inputValidator.setSuffixImageSrc(R.drawable.ic_validator_list)
+        binding.inputValidator.setOnSuffixImageClickListener(listener)
     }
 
     override fun setOnValidatorSelectListener(onClick: (View) -> Unit) {

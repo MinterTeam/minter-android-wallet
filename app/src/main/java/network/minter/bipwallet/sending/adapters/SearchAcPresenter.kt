@@ -56,10 +56,10 @@ class SearchAcPresenter<T>(
         return mAdapter
     }
 
-    override fun onQuery(query: CharSequence?) {
+    override fun onQuery(query: CharSequence?): Boolean {
         if (query.isNullOrEmpty()) {
             mAdapter.setItems(ArrayList(0))
-            return
+            return false
         }
 
         val filtered = ArrayList<T>()
@@ -80,7 +80,7 @@ class SearchAcPresenter<T>(
         }
 
         mAdapter.setItems(filtered)
-
+        return filtered.isNotEmpty()
     }
 
     override fun getPopupDimensions(): PopupDimensions {
