@@ -59,6 +59,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.normalize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
+import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.StringsHelper.utfStringSliceToBytes
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -495,7 +496,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         mUseMax.set(true)
         mClickedUseMax.set(true)
         mAmount = mFromAccount!!.amount
-        viewState.setAmount(mFromAccount!!.amount.stripTrailingZeros().toPlainString())
+        viewState.setAmount(mFromAccount!!.amount.toPlain())
         analytics.send(AppEvent.SendCoinsUseMaxButton)
         if (view != null && view.context is Activity) {
             KeyboardHelper.hideKeyboard(view.context as Activity)

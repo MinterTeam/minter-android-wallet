@@ -53,8 +53,7 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
 
         binding.apply {
             title.text = builder.title
-            dialogFirstValue.text = String.format("%s %s", (builder.amount
-                    ?: ZERO).humanize(builder.humanize), builder.coin)
+            dialogFirstValue.text = String.format("%s %s", (builder.amount ?: ZERO).humanize(), builder.coin)
             dialogSecondValue.text = builder.recipient
 
             builder.bindAction(this@TxSendStartDialog, actionConfirm, DialogInterface.BUTTON_POSITIVE)
@@ -64,7 +63,6 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
 
     class Builder : WalletDialogBuilder<TxSendStartDialog, Builder> {
         var amount: BigDecimal? = null
-        var humanize = true
         var recipient: CharSequence? = null
         var coin = MinterSDK.DEFAULT_COIN
 
@@ -75,9 +73,8 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
             return setAmount(BigDecimal(decimalString).setScale(18, BigDecimal.ROUND_UNNECESSARY))
         }
 
-        fun setAmount(amount: BigDecimal?, humanize: Boolean = true): Builder {
+        fun setAmount(amount: BigDecimal?): Builder {
             this.amount = amount
-            this.humanize = humanize
             return this
         }
 

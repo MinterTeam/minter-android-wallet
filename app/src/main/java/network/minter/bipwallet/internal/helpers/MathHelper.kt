@@ -173,11 +173,12 @@ object MathHelper {
         return formatDecimalCurrency(out, 4, true)
     }
 
-    fun BigDecimal.humanize(enable: Boolean = true): String {
-        if (!enable) {
-            return toPlainString()
-        }
+    fun BigDecimal.humanize(): String {
         return bdHuman(this)
+    }
+
+    fun BigDecimal.toPlain(): String {
+        return stripTrailingZeros().toPlainString()
     }
 
     @JvmStatic

@@ -57,6 +57,7 @@ import network.minter.bipwallet.internal.helpers.IntentHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
+import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -175,14 +176,14 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             clickedUseMax = true
             useMax = true
             if (type == Type.Delegate) {
-                viewState.setAmount(fromAccount!!.amount.toPlainString())
+                viewState.setAmount(fromAccount!!.amount.toPlain())
             } else {
                 if (accountStorage.entity.mainWallet.hasDelegated(toValidator, fromAccount!!.coin)) {
                     viewState.setAmount((
                             accountStorage.entity.mainWallet
                                     .getDelegatedByValidatorAndCoin(toValidator, fromAccount!!.coin)?.amount
                                     ?: BigDecimal.ZERO
-                            ).toPlainString()
+                            ).toPlain()
                     )
                 }
             }

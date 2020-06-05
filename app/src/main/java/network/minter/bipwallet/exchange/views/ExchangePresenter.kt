@@ -56,6 +56,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -401,7 +402,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         if (mAccount == null) {
             return
         }
-        viewState.setAmount(mAccount!!.amount.stripTrailingZeros().toPlainString())
+        viewState.setAmount(mAccount!!.amount.toPlain())
         mUseMax.set(true)
         mClickedUseMax.set(true)
         viewState.hideKeyboard()
@@ -470,7 +471,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.startDialog { ctx ->
             TxConfirmStartDialog.Builder(ctx, R.string.dialog_title_exchange_begin)
                     .setFirstLabel(R.string.dialog_label_exchange_you_will_spend)
-                    .setFirstValue(mSellAmount!!.humanize(!mUseMax.get()))
+                    .setFirstValue(mSellAmount!!.humanize())
                     .setFirstCoin(mAccount!!.coin!!)
                     .setSecondLabel(R.string.dialog_label_exchange_to_get)
                     .setSecondValue(mBuyAmount!!)
