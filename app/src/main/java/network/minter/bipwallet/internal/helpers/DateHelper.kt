@@ -59,7 +59,7 @@ object DateHelper {
     /**
      * Example: 2017-07-28 12:00:00 (GMT +03:00)
      */
-    const val DATE_FORMAT_WITH_TZ = "yyyy-MM-dd HH:mm:ss (z Z)"
+    const val DATE_FORMAT_WITH_TZ = "yyyy-MM-dd HH:mm:ss ('GMT' ZZ)"
 
     /**
      * Example: 2017-07-28 12:00:00
