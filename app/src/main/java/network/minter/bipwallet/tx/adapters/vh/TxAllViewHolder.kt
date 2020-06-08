@@ -35,7 +35,6 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.tx.adapters.TxItem
-import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.HistoryTransaction
 import timber.log.Timber
@@ -82,8 +81,8 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_edit_candidate)
             itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
-            itemAmount.text = item.tx.fee.humanize()
-            itemSubamount.text = MinterSDK.DEFAULT_COIN
+            itemAmount.text = ""
+            itemSubamount.visible = false
         }
     }
 
@@ -165,8 +164,8 @@ class TxAllViewHolder(
 
             itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
-            itemAmount.text = item.tx.fee.humanize()
-            itemSubamount.text = MinterSDK.DEFAULT_COIN
+            itemAmount.text = ""
+            itemSubamount.visible = false
         }
     }
 
@@ -222,8 +221,8 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_create_multisig)
             itemAvatar.setImageResource(R.drawable.img_avatar_multisend)
             itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
+            itemAmount.text = ""
             itemSubamount.visible = false
-            itemAmount.setText(R.string.dots)
         }
     }
 
