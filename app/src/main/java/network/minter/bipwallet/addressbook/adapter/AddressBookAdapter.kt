@@ -88,15 +88,26 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
         }
     }
 
+    private var lastHeaderPos: Int = -1
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is HeaderViewHolder) {
             val item = mItems[position] as AddressBookItemHeader
             holder.title!!.text = item.header
+            lastHeaderPos = position
         } else {
             val vh = holder as ItemViewHolder
             val item = mItems[position] as AddressContact
 
-            (vh.itemView as SwipeLayout).setOnActionsListener(object : SwipeLayout.SwipeActionsListener {
+            var enableSwipe = true
+            if (lastHeaderPos != -1) {
+                val h = mItems[lastHeaderPos] as AddressBookItemHeader
+                enableSwipe = !h.lastUsed
+            }
+
+            (vh.itemView as SwipeLayout).isEnabledSwipe = enableSwipe
+
+            vh.itemView.setOnActionsListener(object : SwipeLayout.SwipeActionsListener {
                 override fun onOpen(direction: Int, isContinuous: Boolean) {
                     closeOpened()
                     mLastOpened = vh.adapterPosition

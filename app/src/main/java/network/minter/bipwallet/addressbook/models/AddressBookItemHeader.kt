@@ -23,45 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.addressbook.models
 
-package network.minter.bipwallet.addressbook.models;
+import java.util.*
 
-import java.util.Objects;
-
-public class AddressBookItemHeader implements AddressBookItem {
-    public final String header;
-
-    public AddressBookItemHeader(String header) {
-        this.header = header.toUpperCase();
+class AddressBookItemHeader(
+        header: String,
+        val lastUsed: Boolean = false
+) : AddressBookItem {
+    val header: String = header.toUpperCase()
+    override fun getViewType(): Int {
+        return AddressBookItem.TYPE_HEADER
     }
 
-    @Override
-    public int getViewType() {
-        return TYPE_HEADER;
+    override fun isSameOf(item: AddressBookItem): Boolean {
+        return item.viewType == viewType && header == (item as AddressBookItemHeader).header
     }
 
-    @Override
-    public boolean isSameOf(AddressBookItem item) {
-        return item.getViewType() == getViewType() && header.equals(((AddressBookItemHeader) item).header);
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val that = o as AddressBookItemHeader
+        return header == that.header
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AddressBookItemHeader that = (AddressBookItemHeader) o;
-        return header.equals(that.header);
-    }
-
-    @Override
-    public String toString() {
+    override fun toString(): String {
         return "AddressBookItemHeader{" +
                 "header='" + header + '\'' +
-                '}';
+                '}'
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(header);
+    override fun hashCode(): Int {
+        return Objects.hash(header)
     }
+
 }
