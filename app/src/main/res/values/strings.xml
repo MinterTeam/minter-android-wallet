@@ -327,9 +327,9 @@
     <string name="label_validator">Validator</string>
     <string name="menu_label_delegate">Delegate</string>
     <string name="empty_delegations">You don\'t have any delegated stakes yet.</string>
-    <string name="empty_transactions">You don\'t have any transactions yet.</string>
-    <string name="dialog_label_delegate_progress">Delegating...</string>
-    <string name="dialog_label_unbond_progress">Unbonding...</string>
+    <string name="empty_transactions">No transactions yet.</string>
+    <string name="dialog_label_delegate_progress">Delegating…</string>
+    <string name="dialog_label_unbond_progress">Unbonding…</string>
     <string name="btn_save_changes">Save Changes</string>
     <string name="dialog_title_your_address">Your Address</string>
     <string name="empty_address_book">No contacts yet</string>
