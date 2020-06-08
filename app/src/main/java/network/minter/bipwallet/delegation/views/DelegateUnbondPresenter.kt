@@ -481,21 +481,21 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun prepareTx(initData: TxInitData, commission: BigDecimal, amount: BigDecimal, acc: CoinBalance): Observable<Transaction> {
         val txBuilder = Transaction.Builder(initData.nonce!!)
         txBuilder.setGasPrice(gas)
-        txBuilder.setGasCoin(fromAccount!!.coin)
+        txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
 
         var amountToSend: BigDecimal = amount
         val accBalance = acc.amount
 
         when {
-            // if balance is too small to send any delegate or unbond tx, throwing error
-            ((accBalance - commission) < 0.toBigDecimal()) -> {
-                return IllegalStateException("Insufficient funds for sending transaction").toObservable()
-            }
+//            // if balance is too small to send any delegate or unbond tx, throwing error
+//            ((accBalance - commission) < 0.toBigDecimal()) -> {
+//                return IllegalStateException("Insufficient funds for sending transaction").toObservable()
+//            }
             // if we're delegating and balance enough only to pay fee - error
-            type == Type.Delegate && accBalance == commission -> {
-                // todo: make another error text
-                return IllegalStateException("Insufficient funds for sending transaction").toObservable()
-            }
+//            type == Type.Delegate && accBalance == commission -> {
+//                // todo: make another error text
+//                return IllegalStateException("Insufficient funds for sending transaction").toObservable()
+//            }
             // if we're delegating ALL FUNDS, subtract fee from balance
             type == Type.Delegate && useMax -> {
                 amountToSend = accBalance - commission
@@ -550,27 +550,25 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun signTx(initData: TxInitData): Observable<TransactionSign> {
 
         val accOptional = accountStorage.entity.mainWallet.findCoinByName(fromAccount!!.coin!!)
+        val bipOptional = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
         if (!accOptional.isPresent) {
             return Observable.error(IllegalStateException("Balance for coin ${fromAccount!!.coin!!} not found!"))
         }
-        val acc = accOptional.get()
-        val isBipAccount = acc!!.coin!! == MinterSDK.DEFAULT_COIN
-
-        if (isBipAccount) {
-            return prepareTx(initData, fee, amount, acc)
-                    .map { it.signSingle(secretStorage.mainSecret.privateKey) }
+        if (!bipOptional.isPresent) {
+            return Observable.error(IllegalStateException("Balance for coin ${MinterSDK.DEFAULT_COIN} not found!"))
         }
 
-        return initDataRepo.estimateRepo.getTransactionCommission(createPreTx()).rxGate()
-                .subscribeOn(Schedulers.io())
-                .switchMap {
-                    if (!it.isOk) {
-                        return@switchMap Observable.error<TransactionSign>(IllegalStateException(it.error!!.message))
-                    }
+        val acc = accOptional.get()
+        val bipAcc = bipOptional.get()
 
-                    prepareTx(initData, it.result!!.getValue(), amount, acc)
-                            .map { tx -> tx.signSingle(secretStorage.mainSecret.privateKey) }
-                }
+        if (bipAcc.amount < type.opType.fee) {
+            return Observable.error(
+                    IllegalStateException("Not enough ${MinterSDK.DEFAULT_COIN} balance to pay fee: required ${type.opType.fee.humanize()}, balance: ${bipAcc.amount.humanize()}")
+            )
+        }
+
+        return prepareTx(initData, fee, amount, acc)
+                .map { it.signSingle(secretStorage.mainSecret.privateKey) }
     }
 
     private fun onSuccessExecuteTransaction(result: GateResult<TransactionSendResult>) {
@@ -603,7 +601,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setText((errorResult.message))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-                        viewState.finishCancel()
                     }
                     .create()
         }
@@ -616,7 +613,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setText((errorResult.error?.message ?: "Caused unknown error"))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
-                        viewState.finishCancel()
                     }
                     .create()
         }

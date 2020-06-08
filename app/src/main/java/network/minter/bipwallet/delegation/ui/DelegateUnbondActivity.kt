@@ -66,6 +66,7 @@ import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.SelectorDialog
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
+import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.crypto.MinterHash
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.BaseCoinValue
@@ -80,6 +81,7 @@ import javax.inject.Provider
 class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     enum class Type(
+            val opType: OperationType,
             val titleRes: Int,
             val firstLabelRes: Int,
             val secondLabelRes: Int,
@@ -87,6 +89,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
             val resultLabelRes: Int
     ) {
         Delegate(
+                OperationType.Delegate,
                 R.string.dialog_title_delegate_begin,
                 R.string.dialog_label_delegate_you_are_delegating,
                 R.string.dialog_label_delegate_to,
@@ -94,6 +97,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
                 R.string.dialog_label_delegate_result
         ),
         Unbond(
+                OperationType.Unbound,
                 R.string.dialog_title_unbond_begin,
                 R.string.dialog_label_unbond_you_are_unbonding,
                 R.string.dialog_label_unbond_from,
