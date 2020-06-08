@@ -76,29 +76,35 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
     protected WalletDialogFragment walletDialogFragment = null;
 
     public void startDialog(Function1<Context, WalletDialog> dialogExecutor) {
-        if (walletDialogFragment != null && walletDialogFragment.isAdded()) {
-            walletDialogFragment.dismiss();
-            walletDialogFragment = null;
-        }
-        walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, dialogExecutor);
+        runOnUiThread(() -> {
+            if (walletDialogFragment != null && walletDialogFragment.isAdded()) {
+                walletDialogFragment.dismiss();
+                walletDialogFragment = null;
+            }
+            walletDialog = WalletDialog.switchDialogWithExecutor(this, walletDialog, dialogExecutor);
+        });
     }
 
     public void startDialogFragment(Function1<Context, WalletDialogFragment> dialogExecutor) {
-        if (walletDialog != null && walletDialog.isShowing()) {
-            walletDialog.dismiss();
-            walletDialog = null;
-        }
-        walletDialogFragment = WalletDialogFragment.switchDialogWithExecutor(this, walletDialogFragment, dialogExecutor);
+        runOnUiThread(() -> {
+            if (walletDialog != null && walletDialog.isShowing()) {
+                walletDialog.dismiss();
+                walletDialog = null;
+            }
+            walletDialogFragment = WalletDialogFragment.switchDialogWithExecutor(this, walletDialogFragment, dialogExecutor);
+        });
     }
 
     public void startBottomDialog(BaseBottomSheetDialogFragment dialog, String tag) {
-        if (mBaseBottomSheetDialogFragment != null) {
-            mBaseBottomSheetDialogFragment.dismiss();
-            mBaseBottomSheetDialogFragment = null;
-        }
+        runOnUiThread(() -> {
+            if (mBaseBottomSheetDialogFragment != null) {
+                mBaseBottomSheetDialogFragment.dismiss();
+                mBaseBottomSheetDialogFragment = null;
+            }
 
-        mBaseBottomSheetDialogFragment = dialog;
-        mBaseBottomSheetDialogFragment.show(getSupportFragmentManager(), tag);
+            mBaseBottomSheetDialogFragment = dialog;
+            mBaseBottomSheetDialogFragment.show(getSupportFragmentManager(), tag);
+        });
     }
 
     @VisibleForTesting
