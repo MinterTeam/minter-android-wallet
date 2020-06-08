@@ -30,8 +30,13 @@ import android.content.Context
 import android.text.Spannable
 import androidx.recyclerview.widget.RecyclerView
 import com.otaliastudios.autocomplete.AutocompletePolicy
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
 import network.minter.explorer.models.ValidatorItem
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -40,11 +45,38 @@ import network.minter.explorer.models.ValidatorItem
  */
 class ValidatorsAcPresenter(
         context: Context,
-        private var items: List<ValidatorItem> = ArrayList()
+        private val onSearchComplete: ((Boolean, CharSequence) -> Unit)? = null
 ) : RecyclerAcPresenter<ValidatorItem>(context), AutocompletePolicy {
-
+    private var items: List<ValidatorItem> = ArrayList()
     private val itemsLock = Any()
     private val adapter: ValidatorsAcAdapter = ValidatorsAcAdapter(this)
+    private val inputSubject: PublishSubject<CharSequence> = PublishSubject.create()
+
+    init {
+        inputSubject
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe { query ->
+                    Timber.d("Query: %s", query)
+                    val filtered = ArrayList<ValidatorItem>()
+
+                    for (item in items) {
+                        if (item.meta != null && item.meta?.name != null) {
+                            if (item.meta!!.name!!.toLowerCase().startsWith(query.toString().toLowerCase())) {
+                                filtered.add(item)
+                            }
+                        }
+
+                        if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
+                            filtered.add(item)
+                        }
+                    }
+
+                    adapter.setItems(filtered)
+                    onSearchComplete?.invoke(filtered.size > 0, query)
+                }
+    }
 
     fun setItems(items: List<ValidatorItem>) {
         synchronized(itemsLock) {
@@ -62,23 +94,9 @@ class ValidatorsAcPresenter(
             return false
         }
 
-        val filtered = ArrayList<ValidatorItem>()
+        inputSubject.onNext(query)
 
-        for (item in items) {
-            if (item.meta != null && item.meta?.name != null) {
-                if (item.meta!!.name!!.toLowerCase().startsWith(query.toString().toLowerCase())) {
-                    filtered.add(item)
-                }
-            }
-
-            if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
-                filtered.add(item)
-            }
-        }
-
-        adapter.setItems(filtered)
-
-        return filtered.isNotEmpty()
+        return adapter.itemCount > 0
     }
 
     override fun getPopupDimensions(): PopupDimensions {

@@ -138,6 +138,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
         inputGroup.addInput(binding.inputValidator)
         inputGroup.addFilter(binding.inputValidator, NewLineInputFilter())
+        inputGroup.clearErrorBeforeValidate = false
 
         presenter.handleExtras(intent)
         type = intent.extras!!.getSerializable(ARG_TYPE) as Type
@@ -165,7 +166,13 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
     private var autocompletePresenter: ValidatorsAcPresenter? = null
 
     private fun setupAutocomplete() {
-        autocompletePresenter = ValidatorsAcPresenter(this)
+        autocompletePresenter = ValidatorsAcPresenter(this) { showPopup, query ->
+            if (!showPopup) {
+                autocomplete?.dismissPopup()
+            } else {
+                autocomplete?.showPopup(query)
+            }
+        }
         val callback: AutocompleteCallback<ValidatorItem> = object : AutocompleteCallback<ValidatorItem> {
             override fun onPopupItemClicked(editable: Editable, item: ValidatorItem): Boolean {
                 onAutocompleteItemSelect?.invoke(item)
