@@ -197,7 +197,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setOnClickAccountSelectedListener(listener: View.OnClickListener) {
-        binding.inputCoin.setOnClickListener(listener)
+        binding.inputCoin.input.setOnClickListener(listener)
         binding.inputCoin.setOnSuffixImageClickListener(listener)
     }
 

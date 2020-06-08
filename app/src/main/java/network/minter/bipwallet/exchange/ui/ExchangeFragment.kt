@@ -220,7 +220,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun setOnClickSelectAccount(listener: View.OnClickListener) {
-        binding.inputOutgoingCoin.setOnClickListener(listener)
+        binding.inputOutgoingCoin.input.setOnClickListener(listener)
         binding.inputOutgoingCoin.setOnSuffixImageClickListener(listener)
     }
 

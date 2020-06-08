@@ -268,7 +268,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
     }
 
     override fun setOnValidatorOverlayClickListener(listener: (View) -> Unit) {
-        binding.inputValidator.setOnClickListener {
+        binding.inputValidator.input.setOnClickListener {
             if (binding.inputValidator.inputOverlayVisible) {
                 binding.inputValidator.inputOverlayVisible = false
             }
@@ -282,12 +282,12 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
         // and only if unbonding,
         if (type == Type.Unbond) {
-            binding.inputValidator.setOnClickListener(listener)
+            binding.inputValidator.input.setOnClickListener(listener)
         }
     }
 
     override fun setOnAccountSelectListener(listener: View.OnClickListener) {
-        binding.inputCoin.setOnClickListener(listener)
+        binding.inputCoin.input.setOnClickListener(listener)
         binding.inputCoin.setOnSuffixImageClickListener(listener)
     }
 
