@@ -58,6 +58,12 @@ object ViewExtensions {
             this.visibility = if (v) View.VISIBLE else View.GONE
         }
 
+    var View.nvisible: Boolean
+        get() = visibility == View.VISIBLE
+        set(v) {
+            this.visibility = if (v) View.VISIBLE else View.INVISIBLE
+        }
+
     fun <T : View?> T.postApply(cb: (T) -> Unit) {
         val _this = this
         this?.post {

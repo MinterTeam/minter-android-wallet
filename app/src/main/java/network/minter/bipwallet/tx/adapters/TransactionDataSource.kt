@@ -70,15 +70,15 @@ import javax.inject.Inject
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<Int, TransactionItem>() {
-    private val mDisposables = CompositeDisposable()
-    private var mLastDate: DateTime? = null
+    private val _disposables = CompositeDisposable()
+    private var _lastDate: DateTime? = null
 
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
 
         resolveInfo(factory.repo.getTransactions(factory.address, 1, factory.txFilter).rxExp())
                 .map { groupByDate(it) }
-                .doOnSubscribe { mDisposables.add(it) }
+                .doOnSubscribe { _disposables.add(it) }
                 .subscribe {
                     factory.loadState?.postValue(LoadState.Loaded)
                     callback.onResult(it.items, null, if (it.meta.lastPage == 1) null else it.meta.currentPage + 1)
@@ -90,7 +90,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
 
         resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter).rxExp())
                 .map { groupByDate(it) }
-                .doOnSubscribe { mDisposables.add(it) }
+                .doOnSubscribe { _disposables.add(it) }
                 .subscribe {
                     factory.loadState?.postValue(LoadState.Loaded)
                     callback.onResult(it.items, if (params.key == 1) null else params.key - 1)
@@ -102,7 +102,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
 
         resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter).rxExp())
                 .map { res: ExpResult<List<TransactionFacade>> -> groupByDate(res) }
-                .doOnSubscribe { mDisposables.add(it) }
+                .doOnSubscribe { _disposables.add(it) }
                 .subscribe { res: DataSourceMeta<TransactionItem> ->
                     factory.loadState?.postValue(LoadState.Loaded)
                     callback.onResult(res.items, if (params.key + 1 > res.meta.lastPage) null else params.key + 1)
@@ -123,13 +123,13 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
 
     override fun invalidate() {
         super.invalidate()
-        mDisposables.dispose()
+        _disposables.dispose()
     }
 
     private fun lastDay(): String {
-        return if (DateHelper.compareFlatDay(mLastDate!!, DateTime())) {
+        return if (DateHelper.compareFlatDay(_lastDate!!, DateTime())) {
             Wallet.app().res().getString(R.string.today)
-        } else mLastDate!!.toString(DateTimeFormat.forPattern("EEEE, dd MMMM").withLocale(Locale.US))
+        } else _lastDate!!.toString(DateTimeFormat.forPattern("EEEE, dd MMMM").withLocale(Locale.US))
     }
 
     private fun dt(d: Date): DateTime {
@@ -139,11 +139,11 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
     private fun groupByDate(res: ExpResult<List<TransactionFacade>>): DataSourceMeta<TransactionItem> {
         val out: MutableList<TransactionItem> = ArrayList()
         for (tx in res.result) {
-            if (mLastDate == null) {
-                mLastDate = DateTime(tx.get().timestamp)
+            if (_lastDate == null) {
+                _lastDate = DateTime(tx.get().timestamp)
                 out.add(HeaderItem(lastDay()))
-            } else if (!DateHelper.compareFlatDay(mLastDate!!, dt(tx.get().timestamp))) {
-                mLastDate = dt(tx.get().timestamp)
+            } else if (!DateHelper.compareFlatDay(_lastDate!!, dt(tx.get().timestamp))) {
+                _lastDate = dt(tx.get().timestamp)
                 out.add(HeaderItem(lastDay()))
             }
             out.add(TxItem(tx))
@@ -366,7 +366,9 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                             }
 
                             if (pubKey != null && validators.containsKey(pubKey)) {
-                                tx.setValidatorMeta(validators[pubKey])
+                                val meta = validators[pubKey]
+                                tx.toName = meta?.name
+                                tx.toAvatar = meta?.iconUrl
                             }
                         }
                         items

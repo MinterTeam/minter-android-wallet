@@ -97,6 +97,7 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
         viewState.syncProgress(mLoadState!!)
         mAdapter!!.setLoadState(mLoadState)
         sourceFactory.observeLoadState(mLoadState!!)
+
         val cfg = PagedList.Config.Builder()
                 .setPageSize(50)
                 .setEnablePlaceholders(false)

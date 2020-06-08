@@ -79,8 +79,8 @@ class TxAllViewHolder(
 
         binding.apply {
             itemTitleType.setText(R.string.tx_type_edit_candidate)
-            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemAmount.text = ""
             itemSubamount.visible = false
         }
@@ -162,8 +162,8 @@ class TxAllViewHolder(
                 itemTitleType.setText(R.string.tx_type_set_candidate_offline)
             }
 
-            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemAmount.text = ""
             itemSubamount.visible = false
         }
@@ -190,8 +190,8 @@ class TxAllViewHolder(
                 R.drawable.img_avatar_unbond
             }
 
-            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, fallbackAvatar)
-            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, fallbackAvatar)
+            itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemSubamount.text = data.coin
 
             if (item.tx.type == HistoryTransaction.Type.Delegate) {
@@ -230,8 +230,8 @@ class TxAllViewHolder(
         val data: HistoryTransaction.TxDeclareCandidacyResult = item.tx.getData()
         binding.apply {
             itemTitleType.setText(R.string.tx_type_declare_candidacy)
-            itemAvatar.setImageUrlFallback(item.tx.validatorMeta?.iconUrl, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.tx.validatorMeta?.name ?: data.publicKey.toShortString()
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemSubamount.text = data.coin
             itemAmount.text = "- ${data.stake.humanize()}"
         }

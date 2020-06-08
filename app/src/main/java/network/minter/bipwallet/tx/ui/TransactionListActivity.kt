@@ -43,6 +43,7 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
+import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
@@ -95,7 +96,9 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
     }
 
     override fun showRefreshProgress() {
-        b.containerSwipeRefresh.isRefreshing = true
+        if (!b.progress.visible) {
+            b.containerSwipeRefresh.isRefreshing = true
+        }
     }
 
     override fun hideRefreshProgress() {
@@ -120,13 +123,13 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
                 return@Observer
             }
             when (s) {
-                LoadState.Loaded, LoadState.Failed -> {
+                LoadState.Loaded,
+                LoadState.Failed
+                -> {
                     hideRefreshProgress()
                     hideProgress()
                 }
                 LoadState.Loading -> showProgress()
-                else -> {
-                }
             }
         })
     }
@@ -138,11 +141,13 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
     }
 
     override fun showProgress() {
-        b.progress.visible = true
+        if (!b.containerSwipeRefresh.isRefreshing) {
+            b.progress.nvisible = true
+        }
     }
 
     override fun hideProgress() {
-        b.progress.visible = false
+        b.progress.nvisible = false
     }
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {

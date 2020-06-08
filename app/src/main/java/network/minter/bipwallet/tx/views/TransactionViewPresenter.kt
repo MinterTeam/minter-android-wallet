@@ -215,7 +215,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
                 viewState.setToAvatar(R.drawable.img_avatar_delegate)
                 viewState.setToAddress(data.publicKey.toString())
-                viewState.setToName(null)
+                viewState.setToName(_tx?.toName)
 
                 viewState.inflateDetails(R.layout.tx_details_declare_candidacy) {
                     val b = TxDetailsDeclareCandidacyBinding.bind(it)

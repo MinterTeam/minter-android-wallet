@@ -35,13 +35,11 @@ import androidx.annotation.Nullable;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterHash;
 import network.minter.explorer.models.HistoryTransaction;
-import network.minter.explorer.models.ValidatorMeta;
 
 @Parcel
 public class TransactionFacade {
     public HistoryTransaction tx;
 
-    public ValidatorMeta validatorMeta = null;
     public String fromName = null;
     public String fromAvatar = null;
     public String toName = null;
@@ -57,26 +55,6 @@ public class TransactionFacade {
     public HistoryTransaction get() {
         return tx;
     }
-
-//    public String getToAvatar() {
-//        if (userMeta != null) {
-//            return firstNonNull(userMeta.avatarUrl, getUserAvatarUrl(1));
-//        } else if (validatorMeta != null) {
-//            return validatorMeta.iconUrl;
-//        } else {
-//            return getUserAvatarUrl(1);
-//        }
-//    }
-//
-//    public String getName() {
-//        if (userMeta != null) {
-//            return userMeta.username;
-//        } else if (validatorMeta != null) {
-//            return validatorMeta.name;
-//        }
-//
-//        return null;
-//    }
 
     @Override
     public boolean equals(@Nullable Object obj) {
@@ -104,10 +82,6 @@ public class TransactionFacade {
     public <TxData> TxData getData() {
         return tx.getData();
     }
-//
-//    public void setUserMeta(String username, String avatarUrl) {
-//        userMeta = new UserMeta(username, avatarUrl);
-//    }
 
     public MinterHash getHash() {
         return tx.getHash();
@@ -115,23 +89,5 @@ public class TransactionFacade {
 
     public BigDecimal getFee() {
         return tx.getFee();
-    }
-
-    public void setValidatorMeta(ValidatorMeta validatorMeta) {
-        this.validatorMeta = validatorMeta;
-    }
-
-    @Parcel
-    public static class UserMeta {
-        public String username;
-        public String avatarUrl;
-
-        public UserMeta(String username, String avatarUrl) {
-            this.username = username;
-            this.avatarUrl = avatarUrl;
-        }
-
-        UserMeta() {
-        }
     }
 }

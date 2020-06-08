@@ -44,52 +44,6 @@ import network.minter.core.crypto.MinterAddress
  * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
 class TransactionListAdapter : PagedListAdapter<TransactionItem, RecyclerView.ViewHolder> {
-    private var myAddress: (() -> MinterAddress)? = null
-    private var mInflater: LayoutInflater? = null
-    private var mLoadState: MutableLiveData<LoadState>? = null
-    private var mOnExpandDetailsListener: ((View, TransactionFacade) -> Unit)? = null
-
-    constructor(addressCallback: () -> MinterAddress) : super(sDiffCallback) {
-        myAddress = addressCallback
-    }
-
-    protected constructor(config: AsyncDifferConfig<TransactionItem?>) : super(config)
-
-    override fun onCreateViewHolder(parent: ViewGroup, @TransactionItem.ListType viewType: Int): RecyclerView.ViewHolder {
-        if (mInflater == null) {
-            mInflater = LayoutInflater.from(parent.context)
-        }
-        return createViewHolder(mInflater!!, parent, viewType)
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return if (hasProgressRow() && position == itemCount - 1) {
-            TransactionItem.ITEM_PROGRESS
-        } else getItem(position)!!.viewType
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        bindViewHolder(myAddress!!, holder, getItem(position)!!)
-        if (holder is TxAllViewHolder) {
-            holder.itemView.setOnClickListener { v ->
-                mOnExpandDetailsListener?.invoke(v, (getItem(holder.getAdapterPosition()) as TxItem).tx)
-            }
-        }
-
-    }
-
-    fun setLoadState(loadState: MutableLiveData<LoadState>?) {
-        mLoadState = loadState
-    }
-
-    fun setOnExpandDetailsListener(listener: (View, TransactionFacade) -> Unit) {
-        mOnExpandDetailsListener = listener
-    }
-
-    private fun hasProgressRow(): Boolean {
-        return mLoadState != null && mLoadState!!.value != LoadState.Loaded
-    }
-
     companion object {
         private val sDiffCallback: DiffUtil.ItemCallback<TransactionItem> = object : DiffUtil.ItemCallback<TransactionItem>() {
             override fun areItemsTheSame(oldItem: TransactionItem, newItem: TransactionItem): Boolean {
@@ -100,5 +54,47 @@ class TransactionListAdapter : PagedListAdapter<TransactionItem, RecyclerView.Vi
                 return oldItem == newItem
             }
         }
+
+
+    }
+
+    private var _myAddress: (() -> MinterAddress)? = null
+    private var _inflater: LayoutInflater? = null
+    private var _loadState: MutableLiveData<LoadState>? = null
+    private var _onExpandDetailsListener: ((View, TransactionFacade) -> Unit)? = null
+
+    constructor(addressCallback: () -> MinterAddress) : super(sDiffCallback) {
+        _myAddress = addressCallback
+    }
+
+    protected constructor(config: AsyncDifferConfig<TransactionItem?>) : super(config)
+
+    override fun onCreateViewHolder(parent: ViewGroup, @TransactionItem.ListType viewType: Int): RecyclerView.ViewHolder {
+        if (_inflater == null) {
+            _inflater = LayoutInflater.from(parent.context)
+        }
+        return createViewHolder(_inflater!!, parent, viewType)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return getItem(position)!!.viewType
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        bindViewHolder(_myAddress!!, holder, getItem(position)!!)
+        if (holder is TxAllViewHolder) {
+            holder.itemView.setOnClickListener { v ->
+                _onExpandDetailsListener?.invoke(v, (getItem(holder.getAdapterPosition()) as TxItem).tx)
+            }
+        }
+
+    }
+
+    fun setLoadState(loadState: MutableLiveData<LoadState>?) {
+        _loadState = loadState
+    }
+
+    fun setOnExpandDetailsListener(listener: (View, TransactionFacade) -> Unit) {
+        _onExpandDetailsListener = listener
     }
 }
