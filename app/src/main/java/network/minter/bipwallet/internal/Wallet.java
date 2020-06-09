@@ -66,7 +66,7 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
     protected static boolean sEnableInject = true;
 
     static {
-        Locale.setDefault(LC_EN);
+//        Locale.setDefault(LC_EN);
     }
 
     @Inject

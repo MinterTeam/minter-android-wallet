@@ -52,6 +52,7 @@ import network.minter.bipwallet.settings.views.rows.SettingsButtonRow
 import network.minter.bipwallet.settings.views.rows.SettingsSwitchRow
 import network.minter.bipwallet.settings.views.rows.TitleRow
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -163,8 +164,13 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     }
 
     private fun onOurChannelClickListener() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MinterTeam"))
-        viewState.startIntent(intent)
+        if (Locale.getDefault().isO3Language.toLowerCase() == "rus") {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MinterNetwork"))
+            viewState.startIntent(intent)
+        } else {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MinterTeam"))
+            viewState.startIntent(intent)
+        }
     }
 
     private val isNotificationsEnabled: Boolean
