@@ -38,6 +38,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressBookItem
 import network.minter.bipwallet.addressbook.models.AddressBookItemHeader
 import network.minter.bipwallet.addressbook.models.AddressContact
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
 import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
@@ -49,9 +50,42 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
     private var mOnEditContactListener: ((AddressContact) -> Unit)? = null
     private var mOnDeleteContactListener: ((AddressContact) -> Unit)? = null
     private var mOnItemClickListener: ((AddressContact) -> Unit)? = null
+    private var lastOpened: Int = -1
+    private var lastHeaderPos: Int = -1
 
     fun setOnItemClickListener(listener: (AddressContact) -> Unit) {
         mOnItemClickListener = listener
+        registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                lastHeaderPos = -1
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                super.onItemRangeRemoved(positionStart, itemCount)
+                lastHeaderPos = -1
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                lastHeaderPos = -1
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                lastHeaderPos = -1
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                super.onItemRangeChanged(positionStart, itemCount)
+                lastHeaderPos = -1
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                super.onItemRangeChanged(positionStart, itemCount, payload)
+                lastHeaderPos = -1
+            }
+        })
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -80,15 +114,12 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
         return mItems[position].viewType
     }
 
-    private var mLastOpened: Int = -1
 
     fun closeOpened() {
-        if (mLastOpened >= 0) {
-            notifyItemChanged(mLastOpened)
+        if (lastOpened >= 0) {
+            notifyItemChanged(lastOpened)
         }
     }
-
-    private var lastHeaderPos: Int = -1
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is HeaderViewHolder) {
@@ -97,6 +128,7 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
             lastHeaderPos = position
         } else {
             val vh = holder as ItemViewHolder
+            vh.separator!!.visible = true
             val item = mItems[position] as AddressContact
 
             var enableSwipe = true
@@ -110,14 +142,14 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
             vh.itemView.setOnActionsListener(object : SwipeLayout.SwipeActionsListener {
                 override fun onOpen(direction: Int, isContinuous: Boolean) {
                     closeOpened()
-                    mLastOpened = vh.adapterPosition
+                    lastOpened = vh.absoluteAdapterPosition
                 }
 
                 override fun onClose() {}
             })
-            if (vh.adapterPosition == mLastOpened) {
+            if (vh.absoluteAdapterPosition == lastOpened) {
                 vh.itemView.post {
-                    mLastOpened = -1
+                    lastOpened = -1
                     vh.itemView.close(true)
                 }
             }
@@ -195,6 +227,9 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
 
         @JvmField @BindView(R.id.main)
         var mainView: View? = null
+
+        @JvmField @BindView(R.id.separator)
+        var separator: View? = null
 
         init {
             ButterKnife.bind(this, itemView)
