@@ -27,13 +27,17 @@
 package network.minter.bipwallet.apis.reactive
 
 import io.reactivex.Observable
+import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.RegexReplaceData
 import network.minter.bipwallet.internal.helpers.StringsHelper
 import network.minter.blockchain.models.operational.Transaction
 import network.minter.core.MinterSDK
+import network.minter.core.crypto.MinterAddress
+import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.GateResult
+import network.minter.profile.MinterProfileApi
 import retrofit2.Call
 import java.math.BigDecimal
 
@@ -76,3 +80,9 @@ fun <T> T.toObservable(): Observable<T> {
 fun <R, T : Throwable> T.toObservable(): Observable<R> {
     return Observable.error<R>(this)
 }
+
+val MinterAddress.avatar: String
+    get() = MinterProfileApi.getUserAvatarUrlByAddress(this)
+
+val MinterPublicKey.avatar: String
+    get() = "${BuildConfig.EXPLORER_STATIC_URL}/validators/${toString()}"

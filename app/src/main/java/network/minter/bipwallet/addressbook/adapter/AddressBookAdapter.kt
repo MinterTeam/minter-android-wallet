@@ -100,7 +100,7 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
             val item = mItems[position] as AddressContact
 
             var enableSwipe = true
-            if (lastHeaderPos != -1) {
+            if (lastHeaderPos != -1 && mItems[lastHeaderPos] is AddressBookItemHeader) {
                 val h = mItems[lastHeaderPos] as AddressBookItemHeader
                 enableSwipe = !h.lastUsed
             }

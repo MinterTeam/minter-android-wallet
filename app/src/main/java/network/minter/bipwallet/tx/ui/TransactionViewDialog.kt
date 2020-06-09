@@ -107,6 +107,10 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
         binding.fromAvatar.setImageResource(resId)
     }
 
+    override fun setFromAvatar(fromAvatar: String?, fallback: Int) {
+        binding.fromAvatar.setImageUrlFallback(fromAvatar, fallback)
+    }
+
     override fun setFromLabel(label: Int) {
         binding.labelFrom.setText(label)
     }

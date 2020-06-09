@@ -33,6 +33,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.view.View
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.*
 import network.minter.bipwallet.internal.helpers.DateHelper.DATE_FORMAT_WITH_TZ
 import network.minter.bipwallet.internal.helpers.DateHelper.fmt
@@ -48,10 +49,8 @@ import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionView
 import network.minter.bipwallet.tx.ui.TransactionViewDialog
 import network.minter.core.MinterSDK
-import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.MinterExplorerApi
 import network.minter.explorer.models.HistoryTransaction
-import network.minter.profile.MinterProfileApi
 import org.joda.time.DateTime
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -74,14 +73,6 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         fillData()
     }
 
-    internal fun HistoryTransaction.fromAvatar(): String {
-        return MinterProfileApi.getUserAvatarUrlByAddress(from)
-    }
-
-    internal fun MinterAddress.avatar(): String {
-        return MinterProfileApi.getUserAvatarUrlByAddress(this.toString())
-    }
-
     private fun String?.fromBase64(): String? {
         if (this == null || isEmpty()) return null
         return String(Base64.decode(this, 0))
@@ -93,9 +84,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         viewState.setOnClickShare(View.OnClickListener {
             startShare()
         })
-        viewState.setFromName(null)
+        viewState.setFromName(_tx?.fromName)
         viewState.setFromAddress(tx.from.toString())
-        viewState.setFromAvatar(tx.fromAvatar())
+        viewState.setFromAvatar(tx.from.avatar)
         viewState.setToName(null)
         viewState.setToAddress(null)
 
@@ -152,7 +143,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.setFromName(_tx!!.fromName)
 
                 viewState.setToAddress(data.to.toString())
-                viewState.setToAvatar(data.to.avatar())
+                viewState.setToAvatar(data.to.avatar)
 
                 viewState.inflateDetails(R.layout.tx_details_send) {
                     val b = TxDetailsSendBinding.bind(it)
@@ -169,7 +160,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                         val entry = sendItem.iterator().next()
                         viewState.setToName(null)
                         viewState.setToAddress(entry.to.toString())
-                        viewState.setToAvatar(entry.to.avatar())
+                        viewState.setToAvatar(entry.to.avatar)
 
                         viewState.inflateDetails(R.layout.tx_details_send) {
                             val b = TxDetailsSendBinding.bind(it)
@@ -219,9 +210,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             HistoryTransaction.Type.DeclareCandidacy -> {
                 val data: HistoryTransaction.TxDeclareCandidacyResult = tx.getData()
 
-                viewState.setToAvatar(R.drawable.img_avatar_delegate)
-                viewState.setToAddress(data.publicKey.toString())
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
                 viewState.setToName(_tx?.toName)
+                viewState.setToAddress(data.publicKey.toString())
 
                 viewState.inflateDetails(R.layout.tx_details_declare_candidacy) {
                     val b = TxDetailsDeclareCandidacyBinding.bind(it)
@@ -252,22 +243,23 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             }
             HistoryTransaction.Type.RedeemCheck -> {
                 viewState.showTo(true)
-                // from = to = issuer
-                viewState.setFromLabel(R.string.label_check_issuer)
 
                 // to = from
                 viewState.setToLabel(R.string.label_from)
                 viewState.setToName(_tx?.fromName)
                 viewState.setToAddress(tx.from.toString())
+                viewState.setToAvatar(_tx?.fromAvatar)
 
                 viewState.inflateDetails(R.layout.tx_details_redeem_check) {
                     val b = TxDetailsRedeemCheckBinding.bind(it)
                     val data: HistoryTransaction.TxRedeemCheckResult = tx.getData()
                     val check = data.getCheck()
 
+                    // from = to = issuer
+                    viewState.setFromLabel(R.string.label_check_issuer)
                     viewState.setFromAddress(check.sender.toString())
                     viewState.setFromName(_tx?.toName)
-                    viewState.setFromAvatar(MinterProfileApi.getUserAvatarUrlByAddress(check.sender))
+                    viewState.setFromAvatar(check.sender.avatar)
 
                     b.valueAmount.text = check.value.humanize()
                     b.valueCoin.text = check.coin
@@ -277,22 +269,16 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             HistoryTransaction.Type.SetCandidateOffline -> {
                 val data: HistoryTransaction.TxSetCandidateOnlineOfflineResult = tx.getData()
 
-                viewState.setToAvatar(R.drawable.img_avatar_candidate)
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
                 viewState.setToAddress(data.publicKey.toString())
-                viewState.setToName(null)
-
-//                viewState.inflateDetails(R.layout.tx_details_set_candidate_on_off) {
-//                    val b = TxDetailsSetCandidateOnOffBinding.bind(it)
-//                    b.valueValidatorPublicKey.text = data.publicKey.toString()
-//                    b.valueValidatorPublicKey.copyOnClick()
-//                }
+                viewState.setToName(_tx?.toName)
             }
             HistoryTransaction.Type.EditCandidate -> {
                 val data: HistoryTransaction.TxEditCandidateResult = tx.getData()
 
-                viewState.setToAvatar(R.drawable.img_avatar_candidate)
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
                 viewState.setToAddress(data.publicKey.toString())
-                viewState.setToName(null)
+                viewState.setToName(_tx?.toName)
 
                 viewState.inflateDetails(R.layout.tx_details_edit_candidate) {
                     val b = TxDetailsEditCandidateBinding.bind(it)

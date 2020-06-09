@@ -163,6 +163,7 @@ android {
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.apps.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.minter.network"'
             buildConfigField "String", "GATE_API_URL", 'null'
         }
 
@@ -172,6 +173,7 @@ android {
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
             buildConfigField "String", "GATE_API_URL", 'null'
         }
 
@@ -181,6 +183,7 @@ android {
             buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
             buildConfigField "String", "GATE_API_URL", 'null'
         }
     }

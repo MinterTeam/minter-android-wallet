@@ -52,6 +52,7 @@ interface TransactionView : MvpView {
     fun setFromLabel(label: Int)
     fun setFromAvatar(fromAvatar: String)
     fun setFromAvatar(@DrawableRes resId: Int)
+    fun setFromAvatar(fromAvatar: String?, fallback: Int)
     fun setToAddress(recipient: String?)
     fun setToName(name: String?)
     fun setToLabel(label: Int)
