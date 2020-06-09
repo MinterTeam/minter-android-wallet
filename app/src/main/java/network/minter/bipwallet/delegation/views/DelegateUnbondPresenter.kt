@@ -68,7 +68,6 @@ import network.minter.bipwallet.sending.account.selectorDataFromDelegatedAccount
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.TransactionSender
 import network.minter.bipwallet.tx.contract.TxInitData
-import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.OperationType
 import network.minter.blockchain.models.operational.Transaction
 import network.minter.blockchain.models.operational.TransactionSign
@@ -571,7 +570,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 .map { it.signSingle(secretStorage.mainSecret.privateKey) }
     }
 
-    private fun onSuccessExecuteTransaction(result: GateResult<TransactionSendResult>) {
+    private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
         accountStorage.update(true)
         txRepo.update(true)
         rewardsDailyRepo.update(true)

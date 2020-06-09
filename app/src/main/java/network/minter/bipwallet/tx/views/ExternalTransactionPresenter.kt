@@ -61,7 +61,6 @@ import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.InputFieldRow
 import network.minter.bipwallet.tx.ui.WalletSelectorDialog
-import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.*
 import network.minter.blockchain.utils.Base64UrlSafe
 import network.minter.core.MinterSDK
@@ -72,6 +71,7 @@ import network.minter.core.util.RLPBoxed
 import network.minter.explorer.models.GasValue
 import network.minter.explorer.models.GateResult
 import network.minter.explorer.models.GateResult.copyError
+import network.minter.explorer.models.PushResult
 import network.minter.explorer.models.TxCount
 import network.minter.explorer.repo.GateEstimateRepository
 import network.minter.explorer.repo.GateGasRepository
@@ -648,10 +648,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
             val d = initData
                     .joinToUi()
-                    .switchMap(Function<TxInitData, ObservableSource<GateResult<TransactionSendResult>>> { cntRes: TxInitData ->
+                    .switchMap(Function<TxInitData, ObservableSource<GateResult<PushResult>>> { cntRes: TxInitData ->
                         // if in previous request we've got error, returning it
                         if (!cntRes.isSuccess) {
-                            return@Function Observable.just(copyError<TransactionSendResult>(cntRes.errorResult))
+                            return@Function Observable.just(copyError<PushResult>(cntRes.errorResult))
                         }
                         val tx = Transaction.Builder(cntRes.nonce, mExtTx)
                                 .setGasPrice(if (mExtTx!!.type == OperationType.RedeemCheck) BigInteger.ONE else cntRes.gas)
@@ -665,7 +665,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         )
                     })
                     .doFinally { onExecuteComplete() }
-                    .subscribe({ result: GateResult<TransactionSendResult> -> onSuccessExecuteTransaction(result) }) { throwable: Throwable -> onFailedExecuteTransaction(throwable) }
+                    .subscribe({ result: GateResult<PushResult> -> onSuccessExecuteTransaction(result) }) { throwable: Throwable -> onFailedExecuteTransaction(throwable) }
             unsubscribeOnDestroy(d)
             dialog
         }
@@ -691,7 +691,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         }
     }
 
-    private fun onSuccessExecuteTransaction(result: GateResult<TransactionSendResult>) {
+    private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
         if (!result.isOk) {
             onErrorExecuteTransaction(result)
             return

@@ -34,7 +34,7 @@ import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.explorer.MinterExplorerApi
+import network.minter.explorer.MinterExplorerSDK
 
 /**
  * minter-android-wallet. 2018
@@ -53,14 +53,14 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideExplorerRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerApi): RepoTransactions {
+    fun provideExplorerRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoTransactions {
         return CachedRepository(storage, CacheTxRepository(storage, secretStorage, api.apiService))
     }
 
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedValidatorsRepo(@DbCache storage: KVStorage, api: MinterExplorerApi): RepoValidators {
+    fun provideCachedValidatorsRepo(@DbCache storage: KVStorage, api: MinterExplorerSDK): RepoValidators {
         return RepoValidators(storage, CacheValidatorsRepository(storage, api.apiService))
                 .setTimeToLive(60 * 20)
     }
@@ -68,7 +68,7 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, api: MinterExplorerApi): RepoCoins {
+    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, api: MinterExplorerSDK): RepoCoins {
         return RepoCoins(storage, CachedCoinsRepository(storage, api.apiService))
                 .setTimeToLive(/*3  minutes */ 60 * 3)
     }
@@ -76,7 +76,7 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedDailyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerApi): RepoDailyRewards {
+    fun provideCachedDailyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoDailyRewards {
         return RepoDailyRewards(storage, CachedDailyRewardStatisticsRepository(storage, secretStorage, api.apiService))
                 .setTimeToLive(60 * 10)
     }
@@ -84,7 +84,7 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedMonthlyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerApi): RepoMonthlyRewards {
+    fun provideCachedMonthlyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoMonthlyRewards {
         return RepoMonthlyRewards(storage, CachedMonthlyRewardsStatisticsRepository(storage, secretStorage, api.apiService))
                 .setTimeToLive(60 * 30)
     }

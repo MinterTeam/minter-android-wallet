@@ -1,7 +1,7 @@
 /*
- * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -33,7 +33,7 @@ import dagger.Provides;
 import network.minter.bipwallet.internal.helpers.NetworkHelper;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager;
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerSDK;
 
 /**
  * minter-android-wallet. 2018
@@ -44,7 +44,7 @@ public class NotificationModule {
 
     @Provides
     @WalletApp
-    public BalanceNotificationManager provideBalanceNotificationManager(Context context, MinterExplorerApi api, NetworkHelper networkHelper, SettingsManager settingsManager) {
+    public BalanceNotificationManager provideBalanceNotificationManager(Context context, MinterExplorerSDK api, NetworkHelper networkHelper, SettingsManager settingsManager) {
         return new BalanceNotificationManager(context, api.getGsonBuilder(), networkHelper, settingsManager);
     }
 }

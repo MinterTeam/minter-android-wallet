@@ -38,14 +38,14 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.models.HistoryTransaction;
 
 public class HistoryTransactionsJsonConverter implements JsonDeserializer<HistoryTransaction>, JsonSerializer<HistoryTransaction> {
     private Gson mGson;
 
     public HistoryTransactionsJsonConverter() {
-        GsonBuilder out = MinterExplorerApi.getInstance().getGsonBuilder();
+        GsonBuilder out = MinterExplorerSDK.getInstance().getGsonBuilder();
 
         mGson = out.create();
     }

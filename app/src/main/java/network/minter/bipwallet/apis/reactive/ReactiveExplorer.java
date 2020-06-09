@@ -41,7 +41,7 @@ import io.reactivex.functions.Function;
 import network.minter.bipwallet.apis.dummies.ExpErrorMapped;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.models.ExpResult;
 import retrofit2.Call;
 import retrofit2.HttpException;
@@ -125,7 +125,7 @@ public final class ReactiveExplorer {
     }
 
     public static <T> ExpResult<T> createExpError(final String json, int code, String message) {
-        Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
+        Gson gson = MinterExplorerSDK.getInstance().getGsonBuilder().create();
         ExpResult<T> out;
         try {
             if (json == null || json.isEmpty()) {

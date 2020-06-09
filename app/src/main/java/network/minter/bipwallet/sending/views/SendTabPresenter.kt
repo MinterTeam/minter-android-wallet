@@ -76,16 +76,12 @@ import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.wallets.views.WalletSelectorController
 import network.minter.blockchain.models.TransactionCommissionValue
-import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK.DEFAULT_COIN
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.core.crypto.PrivateKey
-import network.minter.explorer.models.CoinBalance
-import network.minter.explorer.models.GasValue
-import network.minter.explorer.models.GateResult
-import network.minter.explorer.models.TxCount
+import network.minter.explorer.models.*
 import network.minter.explorer.repo.*
 import network.minter.ledger.connector.rxjava2.RxMinterLedger
 import timber.log.Timber
@@ -627,7 +623,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                     .switchMap { txInitData: TxInitData ->
                         // if in previous request we've got error, returning it
                         if (!txInitData.isSuccess) {
-                            return@switchMap Observable.just(GateResult.copyError<TransactionSendResult>(txInitData.errorResult))
+                            return@switchMap Observable.just(GateResult.copyError<network.minter.explorer.models.PushResult>(txInitData.errorResult))
                         }
                         val amountToSend: BigDecimal
 
@@ -655,7 +651,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                     .doFinally { onExecuteComplete() }
                     .joinToUi()
                     .subscribe(
-                            { result: GateResult<TransactionSendResult> ->
+                            { result: GateResult<PushResult> ->
                                 onSuccessExecuteTransaction(result)
                             },
                             { throwable: Throwable ->
@@ -669,7 +665,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     @Throws(OperationInvalidDataException::class)
-    private fun signSendTx(dialog: WalletProgressDialog, nonce: BigInteger, amountToSend: BigDecimal?): ObservableSource<GateResult<TransactionSendResult>> {
+    private fun signSendTx(dialog: WalletProgressDialog, nonce: BigInteger, amountToSend: BigDecimal?): ObservableSource<GateResult<PushResult>> {
         // creating tx
         val tx = createFinalTx(nonce.add(BigInteger.ONE), amountToSend)
 
@@ -684,13 +680,13 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
-    private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<TransactionSendResult>> {
+    private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = secretStorage.getSecret(mFromAccount!!.address!!)
         val sign = tx.signSingle(data.privateKey)
         return gateTxRepo.sendTransaction(sign).rxGate().joinToUi()
     }
 
-    private fun signSendTxExternally(dialog: WalletProgressDialog, tx: Transaction): ObservableSource<GateResult<TransactionSendResult>> {
+    private fun signSendTxExternally(dialog: WalletProgressDialog, tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val devInstance = Wallet.app().ledger()
         if (!devInstance.isReady) {
             dialog.setText("Connect ledger and open Minter Application")
@@ -735,7 +731,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
-    private fun onSuccessExecuteTransaction(result: GateResult<TransactionSendResult>) {
+    private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
         if (!result.isOk) {
             onErrorExecuteTransaction(result)
             return

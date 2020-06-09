@@ -63,7 +63,7 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
-import network.minter.blockchain.models.TransactionSendResult
+
 import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.*
@@ -244,7 +244,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     .switchMap { initData ->
                         // if error occurred upper, notify error
                         if (!initData.isSuccess) {
-                            return@switchMap copyError<TransactionSendResult>(initData.errorResult).toObservable()
+                            return@switchMap copyError<PushResult>(initData.errorResult).toObservable()
                         }
                         var balance = BigDecimal("0")
                         if (operationType == OperationType.SellCoin || operationType == OperationType.SellAllCoins) {
@@ -255,7 +255,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     .onErrorResumeNext(toGateError())
                     .joinToUi()
                     .subscribe(
-                            { result: GateResult<TransactionSendResult> ->
+                            { result: GateResult<PushResult> ->
                                 onSuccessExecuteTransaction(result)
                             },
                             { t: Throwable? ->
@@ -272,7 +272,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
             dialog: WalletProgressDialog,
             txData: ConvertTransactionData,
             initData: TxInitData,
-            balance: BigDecimal): ObservableSource<GateResult<TransactionSendResult>> {
+            balance: BigDecimal): ObservableSource<GateResult<PushResult>> {
 
         // creating tx
         val tx = txData.build(initData.nonce!!.add(BigInteger.ONE), initData.gas, balance)
@@ -288,7 +288,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
-    private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<TransactionSendResult>> {
+    private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = mSecretStorage.getSecret(mAccount!!.address!!)
         val sign = tx.signSingle(data.privateKey)
         return safeSubscribeIoToUi(
@@ -297,7 +297,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         )
     }
 
-    private fun signSendTxExternally(tx: Transaction, dialog: WalletProgressDialog): ObservableSource<GateResult<TransactionSendResult>> {
+    private fun signSendTxExternally(tx: Transaction, dialog: WalletProgressDialog): ObservableSource<GateResult<PushResult>> {
         val devInstance = Wallet.app().ledger()
         if (!devInstance.isReady) {
             dialog.setText("Please, connect ledger and open Minter Application")
@@ -340,7 +340,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
-    private fun onSuccessExecuteTransaction(result: GateResult<TransactionSendResult>) {
+    private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
         if (!result.isOk) {
             onErrorExecuteTransaction(result)
             return
@@ -512,12 +512,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
             return
         }
         val calculator = ExchangeCalculator.Builder(
-                        estimateRepository,
-                        { mAccounts },
-                        { mAccount!! },
-                        { mBuyCoin!! },
-                        { mBuyAmount ?: BigDecimal.ZERO },
-                        { mSellAmount ?: BigDecimal.ZERO })
+                estimateRepository,
+                { mAccounts },
+                { mAccount!! },
+                { mBuyCoin!! },
+                { mBuyAmount ?: BigDecimal.ZERO },
+                { mSellAmount ?: BigDecimal.ZERO })
                 .doOnSubscribe { it.disposeOnDestroy() }
                 .build()
 

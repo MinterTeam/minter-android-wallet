@@ -32,7 +32,7 @@ import network.minter.bipwallet.apis.gate.TxInitDataRepository;
 import network.minter.bipwallet.internal.storage.AccountStorage;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.storage.SecretStorage;
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
@@ -62,8 +62,8 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public MinterExplorerApi provideMinterExplorerApi() {
-        final MinterExplorerApi api = MinterExplorerApi.getInstance();
+    public MinterExplorerSDK provideMinterExplorerSDK() {
+        final MinterExplorerSDK api = MinterExplorerSDK.getInstance();
         api.getApiService().setDateFormat("yyyy-MM-dd HH:mm:ssZ");
         api.getApiService().setConnectionTimeout(60).setReadTimeout(60);
         return api;
@@ -71,43 +71,43 @@ public class RepoModule {
 
     @Provides
     @WalletApp
-    public ExplorerTransactionRepository provideExplorerTransactionsRepo(MinterExplorerApi api) {
+    public ExplorerTransactionRepository provideExplorerTransactionsRepo(MinterExplorerSDK api) {
         return api.transactions();
     }
 
     @Provides
     @WalletApp
-    public ExplorerAddressRepository provideExplorerAddressRepository(MinterExplorerApi api) {
+    public ExplorerAddressRepository provideExplorerAddressRepository(MinterExplorerSDK api) {
         return api.address();
     }
 
     @Provides
     @WalletApp
-    public ExplorerCoinsRepository provideExplorerCoinsRepo(MinterExplorerApi api) {
+    public ExplorerCoinsRepository provideExplorerCoinsRepo(MinterExplorerSDK api) {
         return api.coins();
     }
 
     @Provides
     @WalletApp
-    public ExplorerValidatorsRepository provideExplorerValidatorsRepo(MinterExplorerApi api) {
+    public ExplorerValidatorsRepository provideExplorerValidatorsRepo(MinterExplorerSDK api) {
         return api.validators();
     }
 
     @Provides
     @WalletApp
-    public GateGasRepository provideGateGasRepo(MinterExplorerApi api) {
+    public GateGasRepository provideGateGasRepo(MinterExplorerSDK api) {
         return api.gas();
     }
 
     @Provides
     @WalletApp
-    public GateEstimateRepository provideGateEstimateRepo(MinterExplorerApi api) {
+    public GateEstimateRepository provideGateEstimateRepo(MinterExplorerSDK api) {
         return api.estimate();
     }
 
     @Provides
     @WalletApp
-    public GateTransactionRepository provideGateTxRepo(MinterExplorerApi api) {
+    public GateTransactionRepository provideGateTxRepo(MinterExplorerSDK api) {
         return api.transactionsGate();
     }
 

@@ -36,7 +36,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import network.minter.bipwallet.apis.dummies.GateErrorMapped;
 import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.models.GateResult;
 import retrofit2.Call;
 import retrofit2.HttpException;
@@ -88,7 +88,7 @@ public final class ReactiveGate {
     }
 
     public static <T> GateResult<T> createGateError(final String json, int code, String message) {
-        Gson gson = MinterExplorerApi.getInstance().getGsonBuilder().create();
+        Gson gson = MinterExplorerSDK.getInstance().getGsonBuilder().create();
         GateResult<T> out;
         try {
             if (json == null || json.isEmpty()) {

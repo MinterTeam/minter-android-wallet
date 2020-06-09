@@ -49,7 +49,7 @@ import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionView
 import network.minter.bipwallet.tx.ui.TransactionViewDialog
 import network.minter.core.MinterSDK
-import network.minter.explorer.MinterExplorerApi
+import network.minter.explorer.MinterExplorerSDK
 import network.minter.explorer.models.HistoryTransaction
 import org.joda.time.DateTime
 import java.math.BigDecimal
@@ -309,7 +309,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
     private fun onClickBlockNumber() {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                MinterExplorerApi.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
+                MinterExplorerSDK.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
         ))
         viewState.startIntent(intent)
     }
@@ -317,7 +317,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
     private fun startShare() {
         val text = SharingText()
         text.title = "Transaction " + tx.hash.toShortString()
-        text.url = MinterExplorerApi.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
+        text.url = MinterExplorerSDK.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
 
         val shareIntent = ShareManager.getInstance().createCommonIntent(text, "Share transaction")
         viewState.startIntent(shareIntent)

@@ -50,7 +50,7 @@ import network.minter.bipwallet.internal.di.RepoModule;
 import network.minter.bipwallet.internal.di.WalletComponent;
 import network.minter.bipwallet.internal.di.WalletModule;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.explorer.MinterExplorerSDK;
 import timber.log.Timber;
 
 /**
@@ -80,7 +80,7 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
             return BuildConfig.EXPLORER_FRONT_URL;
         }
 
-        return MinterExplorerApi.FRONT_URL;
+        return MinterExplorerSDK.FRONT_URL;
     }
 
     private static CircularFifoBuffer<Integer> sTimeOffsets = new CircularFifoBuffer<>(5);

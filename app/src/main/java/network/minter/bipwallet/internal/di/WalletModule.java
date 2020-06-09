@@ -94,7 +94,8 @@ import network.minter.core.internal.api.converters.MinterCheckJsonConverter;
 import network.minter.core.internal.api.converters.MinterHashJsonConverter;
 import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
 import network.minter.core.internal.exceptions.NativeLoadException;
-import network.minter.explorer.MinterExplorerApi;
+import network.minter.core.internal.log.TimberLogger;
+import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.ledger.connector.rxjava2.RxMinterLedger;
 import timber.log.Timber;
@@ -122,15 +123,21 @@ public class WalletModule {
 
         MinterBlockChainApi.initialize(debug);
 
-
-        if (BuildConfig.EXPLORER_API_URL != null) {
-            MinterExplorerApi.initialize(
-                    BuildConfig.EXPLORER_API_URL,
-                    BuildConfig.GATE_API_URL,
-                    debug);
+        if (BuildConfig.LIVE_BALANCE_URL != null) {
             RTMService.LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
-        } else {
-            MinterExplorerApi.initialize(debug);
+        }
+
+        {
+            MinterExplorerSDK.Setup explorerSdk = new MinterExplorerSDK.Setup().setEnableDebug(debug);
+
+            if (BuildConfig.EXPLORER_API_URL != null) {
+                explorerSdk.setExplorerApiUrl(BuildConfig.EXPLORER_API_URL);
+            }
+            if (BuildConfig.GATE_API_URL != null) {
+                explorerSdk.setGateApiUrl(BuildConfig.GATE_API_URL);
+            }
+            explorerSdk.setLogger(new TimberLogger());
+            explorerSdk.init();
         }
 
         WalletGsonHawkParer parser = new WalletGsonHawkParer(getGson());

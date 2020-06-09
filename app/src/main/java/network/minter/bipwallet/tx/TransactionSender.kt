@@ -34,11 +34,11 @@ import network.minter.bipwallet.apis.reactive.ReactiveGate.*
 import network.minter.bipwallet.apis.reactive.rxGate
 import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.tx.contract.TxInitData
-import network.minter.blockchain.models.TransactionSendResult
 import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.GateResult
 import network.minter.explorer.models.GateResult.copyError
+import network.minter.explorer.models.PushResult
 import network.minter.explorer.repo.GateTransactionRepository
 import java.math.BigInteger
 
@@ -50,7 +50,7 @@ import java.math.BigInteger
 typealias Callback = () -> Unit
 typealias ErrorCallback = (GateResult<*>) -> Unit
 typealias FailCallback = (Throwable) -> Unit
-typealias SuccessCallback = (GateResult<TransactionSendResult>) -> Unit
+typealias SuccessCallback = (GateResult<PushResult>) -> Unit
 typealias TxCreator = (initData: TxInitData) -> TransactionSign
 typealias TxCreatorObservable = (initData: TxInitData) -> Observable<TransactionSign>
 
@@ -97,14 +97,14 @@ class TransactionSender(
                 }
                 .switchMap { sign ->
                     if (!sign.isOk) {
-                        return@switchMap copyError<TransactionSendResult>(sign).toObservable()
+                        return@switchMap copyError<PushResult>(sign).toObservable()
                     }
                     gateRepo.sendTransaction(sign.result).rxGate()
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorResumeNext(toGateError())
                 .subscribe(
-                        { result: GateResult<TransactionSendResult> ->
+                        { result: GateResult<PushResult> ->
                             onSuccessExecuteTransaction(result)
                         },
                         { t: Throwable ->
@@ -115,7 +115,7 @@ class TransactionSender(
                 )
     }
 
-    private fun onSuccessExecuteTransaction(result: GateResult<TransactionSendResult>) {
+    private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
         if (!result.isOk) {
             onErrorExecuteTransaction(result)
             return
