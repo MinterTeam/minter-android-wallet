@@ -33,26 +33,6 @@
     android:paddingEnd="@dimen/margin_edges_medium">
 
     <TextView
-        android:id="@+id/label_validator_public_key"
-        style="@style/Wallet.ItemTxLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/label_validator_public_key"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/value_validator_public_key"
-        style="@style/Wallet.ItemTxValue"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_validator_public_key"
-        tools:text="Mpbb7970b2db1948277726372887018e4aceb744cd20c525b5b78aeee4b43aeb1a" />
-
-    <TextView
         android:id="@+id/label_stake"
         style="@style/Wallet.ItemTxLabel"
         android:layout_width="0dp"
@@ -60,7 +40,7 @@
         android:text="@string/label_stake"
         app:layout_constraintEnd_toStartOf="@id/label_coin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/value_validator_public_key"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent=".5" />
 
     <TextView
@@ -70,7 +50,7 @@
         android:layout_height="wrap_content"
         android:text="@string/label_coin"
         app:layout_constraintStart_toEndOf="@id/label_stake"
-        app:layout_constraintTop_toBottomOf="@+id/value_validator_public_key"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent=".5" />
 
     <TextView

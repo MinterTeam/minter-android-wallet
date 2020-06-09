@@ -107,6 +107,10 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
         binding.fromAvatar.setImageResource(resId)
     }
 
+    override fun setFromLabel(label: Int) {
+        binding.labelFrom.setText(label)
+    }
+
     override fun setToAddress(recipient: String?) {
         binding.toAddress.visible = !recipient.isNullOrEmpty()
         binding.toAddress.copyOnClick()
@@ -120,6 +124,10 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
 
     override fun setToAvatar(toAvatar: String?) {
         binding.toAvatar.setImageUrl(toAvatar)
+    }
+
+    override fun setToLabel(label: Int) {
+        binding.labelTo.setText(label)
     }
 
     override fun setToAvatar(toAvatar: String?, fallback: Int) {

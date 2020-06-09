@@ -48,13 +48,13 @@ import java.math.BigDecimal
 class TxAllViewHolder(
         var binding: ItemListTxBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: TxItem, myAddresses: () -> MinterAddress) {
+    fun bind(item: TxItem, myAddress: () -> MinterAddress) {
 
         binding.itemTitleType.text = item.tx.type.name
         binding.separator.visible = true
 
         when (item.tx.type) {
-            HistoryTransaction.Type.Send -> bindSend(item, myAddresses)
+            HistoryTransaction.Type.Send -> bindSend(item, myAddress)
             HistoryTransaction.Type.SellCoin,
             HistoryTransaction.Type.SellAllCoins,
             HistoryTransaction.Type.BuyCoin -> bindExchange(item)
@@ -62,11 +62,11 @@ class TxAllViewHolder(
             HistoryTransaction.Type.DeclareCandidacy -> bindDeclareCandidacy(item)
             HistoryTransaction.Type.Delegate,
             HistoryTransaction.Type.Unbond -> bindDelegateUnbond(item)
-            HistoryTransaction.Type.RedeemCheck -> bindRedeemCheck(item)
+            HistoryTransaction.Type.RedeemCheck -> bindRedeemCheck(item, myAddress)
             HistoryTransaction.Type.SetCandidateOnline,
             HistoryTransaction.Type.SetCandidateOffline -> bindSetCandidateOnOff(item)
             HistoryTransaction.Type.CreateMultisigAddress -> bindCreateMultisigAddress(item)
-            HistoryTransaction.Type.MultiSend -> bindMultisend(item, myAddresses)
+            HistoryTransaction.Type.MultiSend -> bindMultisend(item, myAddress)
             HistoryTransaction.Type.EditCandidate -> bindEditCandidate(item)
             else -> {
 
@@ -170,13 +170,18 @@ class TxAllViewHolder(
     }
 
     @Suppress("DEPRECATION")
-    private fun bindRedeemCheck(item: TxItem) {
+    private fun bindRedeemCheck(item: TxItem, myAddress: () -> MinterAddress) {
         val data: HistoryTransaction.TxRedeemCheckResult = item.tx.getData()
         binding.apply {
             itemTitleType.setText(R.string.tx_type_redeem_check)
             itemAvatar.setImageResource(R.drawable.img_avatar_redeem)
             itemTitle.text = item.tx.hash.toShortString()
-            itemAmount.text = data.check.value.humanize()
+            if (item.tx.from == myAddress()) {
+                itemAmount.text = data.check.value.humanize()
+            } else {
+                itemAmount.text = "- ${data.check.value.humanize()}"
+            }
+
             itemSubamount.text = data.check.coin
         }
     }
@@ -219,7 +224,7 @@ class TxAllViewHolder(
 
         binding.apply {
             itemTitleType.setText(R.string.tx_type_create_multisig)
-            itemAvatar.setImageResource(R.drawable.img_avatar_multisend)
+            itemAvatar.setImageResource(R.drawable.img_avatar_multisig)
             itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
             itemAmount.text = ""
             itemSubamount.visible = false

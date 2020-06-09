@@ -53,6 +53,7 @@ import network.minter.explorer.MinterExplorerApi
 import network.minter.explorer.models.HistoryTransaction
 import network.minter.profile.MinterProfileApi
 import org.joda.time.DateTime
+import java.math.BigDecimal
 import javax.inject.Inject
 
 /**
@@ -207,7 +208,12 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     b.valueInitialAmount.text = data.initialAmount.humanize()
                     b.valueInitialReserve.text = data.initialReserve.humanize()
                     b.valueCrr.text = "${data.constantReserveRatio}%"
-                    b.valueMaxSupply.text = data.maxSupply.humanize()
+
+                    b.valueMaxSupply.text = if (data.maxSupply < BigDecimal("10").pow(15)) {
+                        data.maxSupply.humanize()
+                    } else {
+                        "10¹⁵ (max)"
+                    }
                 }
             }
             HistoryTransaction.Type.DeclareCandidacy -> {
@@ -220,8 +226,6 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_declare_candidacy) {
                     val b = TxDetailsDeclareCandidacyBinding.bind(it)
 
-                    b.valueValidatorPublicKey.text = data.publicKey.toString()
-                    b.valueValidatorPublicKey.copyOnClick()
                     b.valueCommission.text = "${data.commission}%"
                     b.valueCoin.text = data.coin
                     b.valueStake.text = data.stake.humanize()
@@ -242,22 +246,28 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
                 viewState.inflateDetails(R.layout.tx_details_delegate_unbond) {
                     val b = TxDetailsDelegateUnbondBinding.bind(it)
-
-                    b.valueValidatorPublicKey.text = data.publicKey.toString()
-                    b.valueValidatorPublicKey.copyOnClick()
                     b.valueCoin.text = data.coin
                     b.valueStake.text = data.value.humanize()
                 }
             }
             HistoryTransaction.Type.RedeemCheck -> {
-                viewState.showTo(false)
-                viewState.setFromName(_tx?.fromName)
+                viewState.showTo(true)
+                // from = to = issuer
+                viewState.setFromLabel(R.string.label_check_issuer)
+
+                // to = from
+                viewState.setToLabel(R.string.label_from)
+                viewState.setToName(_tx?.fromName)
+                viewState.setToAddress(tx.from.toString())
 
                 viewState.inflateDetails(R.layout.tx_details_redeem_check) {
                     val b = TxDetailsRedeemCheckBinding.bind(it)
                     val data: HistoryTransaction.TxRedeemCheckResult = tx.getData()
                     val check = data.getCheck()
 
+                    viewState.setFromAddress(check.sender.toString())
+                    viewState.setFromName(_tx?.toName)
+                    viewState.setFromAvatar(MinterProfileApi.getUserAvatarUrlByAddress(check.sender))
 
                     b.valueAmount.text = check.value.humanize()
                     b.valueCoin.text = check.coin
@@ -271,12 +281,11 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.setToAddress(data.publicKey.toString())
                 viewState.setToName(null)
 
-                viewState.inflateDetails(R.layout.tx_details_set_candidate_on_off) {
-                    val b = TxDetailsSetCandidateOnOffBinding.bind(it)
-
-                    b.valueValidatorPublicKey.text = data.publicKey.toString()
-                    b.valueValidatorPublicKey.copyOnClick()
-                }
+//                viewState.inflateDetails(R.layout.tx_details_set_candidate_on_off) {
+//                    val b = TxDetailsSetCandidateOnOffBinding.bind(it)
+//                    b.valueValidatorPublicKey.text = data.publicKey.toString()
+//                    b.valueValidatorPublicKey.copyOnClick()
+//                }
             }
             HistoryTransaction.Type.EditCandidate -> {
                 val data: HistoryTransaction.TxEditCandidateResult = tx.getData()
@@ -288,8 +297,6 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_edit_candidate) {
                     val b = TxDetailsEditCandidateBinding.bind(it)
 
-                    b.valueValidatorPublicKey.text = data.publicKey.toString()
-                    b.valueValidatorPublicKey.copyOnClick()
                     b.valueOwnerAddress.text = data.ownerAddress.toString()
                     b.valueOwnerAddress.copyOnClick()
                     b.valueRewardAddress.text = data.rewardAddress.toString()

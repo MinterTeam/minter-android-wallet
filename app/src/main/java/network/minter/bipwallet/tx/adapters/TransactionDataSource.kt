@@ -301,7 +301,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                                     HistoryTransaction.Type.RedeemCheck -> {
                                         val d = tx.getData<HistoryTransaction.TxRedeemCheckResult>()
                                         if (d.getCheck().sender.toString().toLowerCase() == address.address!!.toLowerCase()) {
-                                            tx.fromName = address.name
+                                            tx.toName = address.name
                                         }
                                     }
                                 }
