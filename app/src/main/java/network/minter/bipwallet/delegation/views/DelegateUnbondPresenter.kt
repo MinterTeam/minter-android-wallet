@@ -58,6 +58,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
+import network.minter.bipwallet.internal.helpers.Plurals
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -577,9 +578,15 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         rewardsMonthlyRepo.update(true)
         validatorsRepo.entity.writeLastUsed(toValidatorItem)
 
+        val height = result.result?.txData?.height ?: 120L
+
+        val leftSeconds: Float = (120f - (height % 120)) * 5f
+        val msg = "Please allow ~${Plurals.timeValue(leftSeconds.toLong())} ${Plurals.timeUnitShort(leftSeconds.toLong())} for your delegated balance to update."
+
         viewState.startDialog {
             TxSendSuccessDialog.Builder(it)
-                    .setValue(type.resultLabelRes)
+                    .setLabel(type.resultLabelRes)
+                    .setValue(msg)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
                         viewState.startExplorer(result.result!!.txHash)
