@@ -239,11 +239,14 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
 
     private fun onSwitchNotifications(enabled: Boolean) {
         settings[EnableLiveNotifications] = enabled
+        Wallet.app().sounds().play(R.raw.click_pop_zap)
     }
 
     private fun onSwitchSounds(isChecked: Boolean) {
         settings[EnableSounds] = isChecked
-        Wallet.app().sounds().play(R.raw.click_pop_zap)
+        if (isChecked) {
+            Wallet.app().sounds().playForce(R.raw.click_pop_zap)
+        }
     }
 
     companion object {

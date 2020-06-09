@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,6 +28,7 @@ package network.minter.bipwallet.internal.helpers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 
@@ -54,7 +55,14 @@ public final class SoundManager {
     public SoundManager(Lazy<Boolean> enabled, Context context) {
         mContext = context;
         mEnabled = enabled;
-        mPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
+        mPool = new SoundPool.Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                        .build())
+                .build();
+
         mSoundMap = new HashMap<>(4);
         loadAll();
     }
@@ -64,6 +72,14 @@ public final class SoundManager {
         if (!mEnabled.get()) {
             return;
         }
+        if (!mSoundMap.containsKey(soundId)) {
+            mSoundMap.put(soundId, mPool.load(mContext, soundId, 1));
+        }
+
+        mPool.play(mSoundMap.get(soundId), 1, 1, 0, 0, 1);
+    }
+
+    public void playForce(final @RawRes int soundId) {
         if (!mSoundMap.containsKey(soundId)) {
             mSoundMap.put(soundId, mPool.load(mContext, soundId, 1));
         }
