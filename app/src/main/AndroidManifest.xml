@@ -148,17 +148,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/Wallet.PinEnter"
             android:name=".security.ui.PinEnterActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Wallet.PinEnter" />
 
         <activity
             android:name=".tx.ui.ExternalTransactionActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Wallet"
             android:parentActivityName=".home.ui.HomeActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Wallet"
             android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -166,11 +166,16 @@
         </activity>
         <activity
             android:name=".addressbook.ui.AddressBookActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".delegation.ui.DelegateUnbondActivity" />
-        <activity android:name=".delegation.ui.ValidatorSelectorActivity" />
+        <activity
+            android:name=".delegation.ui.DelegateUnbondActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".delegation.ui.ValidatorSelectorActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".services.livebalance.RTMService"
