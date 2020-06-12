@@ -75,7 +75,7 @@ class CoinsAcPresenter(
         }
 
         val filtered = items.filter {
-            it.symbol.toLowerCase().startsWith(query)
+            it.symbol.toLowerCase().startsWith(query.toString().toLowerCase())
         }
 
         adapter.setItems(filtered)
