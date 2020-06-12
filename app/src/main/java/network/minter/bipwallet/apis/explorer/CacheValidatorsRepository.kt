@@ -59,7 +59,7 @@ class CacheValidatorsRepository(
                     if (result.result == null) {
                         emptyList()
                     } else {
-                        result.result!!
+                        result.result!!.sortedBy { -it.stake }
                     }
                 }
     }
