@@ -547,7 +547,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         get() = OperationType.SendCoin.fee + payloadFee
 
     private val feeNormalized: BigInteger
-        get() = (fee * Transaction.VALUE_MUL_DEC).normalize()
+        get() = fee.normalize()
 
     operator fun BigDecimal.compareTo(value: Int): Int {
         return this.compareTo(BigDecimal(value.toString()))
@@ -591,7 +591,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             val txFeeValue = GateResult<TransactionCommissionValue>()
             txFeeValue.result = TransactionCommissionValue()
             txFeeValue.result.value = feeNormalized
-            enoughBaseForFee = baseAccount.amount > fee
+            enoughBaseForFee = baseAccount.amount >= fee
             var txFeeValueResolver: Observable<GateResult<TransactionCommissionValue>> = Observable.just(txFeeValue)
             val txNonceResolver = estimateRepo.getTransactionCount(mFromAccount!!.address!!).rxGate()
 
