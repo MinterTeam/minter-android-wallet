@@ -74,8 +74,10 @@ import network.minter.blockchain.models.operational.Transaction
 import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterPublicKey
-import network.minter.core.crypto.PrivateKey
-import network.minter.explorer.models.*
+import network.minter.explorer.models.BaseCoinValue
+import network.minter.explorer.models.GateResult
+import network.minter.explorer.models.PushResult
+import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.repo.GateTransactionRepository
 import timber.log.Timber
 import java.math.BigDecimal
@@ -114,6 +116,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var fee = BigDecimal.ZERO
     private var clickedUseMax: Boolean = false
     private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
+    private var txSender: TransactionSender? = null
 
     private val BaseCoinValue.title: String
         get() = "$coin (${amount.humanize()})"
@@ -398,14 +401,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
     }
 
-    private fun viewSetValidator(validator: MinterPublicKey) {
-        viewState.setValidator(validator) { v ->
-            val b = StubValidatorNameBinding.bind(v)
-            b.title.text = validator.toShortString()
-            b.subtitle.visible = false
-        }
-    }
-
     @Suppress("UNUSED_PARAMETER")
     private fun onInputChanged(input: InputWrapper, valid: Boolean) {
         if (!clickedUseMax) {
@@ -437,8 +432,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
             return "$toValidatorName (${toValidator!!.toShortString()})"
         }
-
-    private var txSender: TransactionSender? = null
 
     private fun onSubmit() {
         setupFee()
@@ -478,29 +471,33 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         txSender!!.start()
     }
 
-    private fun prepareTx(initData: TxInitData, commission: BigDecimal, amount: BigDecimal, acc: CoinBalance): Observable<Transaction> {
+    private val realFee: BigDecimal
+        get() {
+            return type.opType.fee * gas.toBigDecimal()
+        }
+
+    private fun signTx(initData: TxInitData): Observable<TransactionSign> {
+        val feeAccountOptional = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
+        if (!feeAccountOptional.isPresent) {
+            return Observable.error(IllegalStateException("Balance for coin ${MinterSDK.DEFAULT_COIN} not found!"))
+        }
+
+        val feeAccount = feeAccountOptional.get()
+
+        if (feeAccount.amount < realFee) {
+            return Observable.error(
+                    IllegalStateException("Not enough ${MinterSDK.DEFAULT_COIN} balance to pay fee: required ${realFee.humanize()} ${MinterSDK.DEFAULT_COIN}, balance: ${feeAccount.amount.humanize()} ${MinterSDK.DEFAULT_COIN}")
+            )
+        }
+
+        var amountToSend = amount
+        if (fromAccount!!.coin!! == MinterSDK.DEFAULT_COIN && type == Type.Delegate && useMax) {
+            amountToSend -= realFee
+        }
+
         val txBuilder = Transaction.Builder(initData.nonce!!)
         txBuilder.setGasPrice(gas)
         txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
-
-        var amountToSend: BigDecimal = amount
-        val accBalance = acc.amount
-
-        when {
-//            // if balance is too small to send any delegate or unbond tx, throwing error
-//            ((accBalance - commission) < 0.toBigDecimal()) -> {
-//                return IllegalStateException("Insufficient funds for sending transaction").toObservable()
-//            }
-            // if we're delegating and balance enough only to pay fee - error
-//            type == Type.Delegate && accBalance == commission -> {
-//                // todo: make another error text
-//                return IllegalStateException("Insufficient funds for sending transaction").toObservable()
-//            }
-            // if we're delegating ALL FUNDS, subtract fee from balance
-            type == Type.Delegate && useMax -> {
-                amountToSend = accBalance - commission
-            }
-        }
 
         val tx: Transaction = when (type) {
             Type.Delegate -> {
@@ -519,56 +516,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             }
         }
 
-        return tx.toObservable()
-    }
-
-    private fun createPreTx(): TransactionSign {
-        val preTx: Transaction
-        val builder = Transaction.Builder(BigInteger("1"))
-                .setGasCoin(fromAccount!!.coin!!)
-                .setGasPrice(gas)
-
-        preTx = if (type == Type.Delegate) {
-            builder
-                    .delegate()
-                    .setCoin(fromAccount!!.coin)
-                    .setPublicKey(toValidator!!)
-                    .setStake(amount)
-                    .build()
-        } else {
-            builder
-                    .unbound()
-                    .setCoin(fromAccount!!.coin)
-                    .setPublicKey(toValidator!!)
-                    .setValue(amount)
-                    .build()
-        }
-        val dummyPrivate = PrivateKey("F000000000000000000000000000000000000000000000000000000000000000")
-        return preTx.signSingle(dummyPrivate)
-    }
-
-    private fun signTx(initData: TxInitData): Observable<TransactionSign> {
-
-        val accOptional = accountStorage.entity.mainWallet.findCoinByName(fromAccount!!.coin!!)
-        val bipOptional = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
-        if (!accOptional.isPresent) {
-            return Observable.error(IllegalStateException("Balance for coin ${fromAccount!!.coin!!} not found!"))
-        }
-        if (!bipOptional.isPresent) {
-            return Observable.error(IllegalStateException("Balance for coin ${MinterSDK.DEFAULT_COIN} not found!"))
-        }
-
-        val acc = accOptional.get()
-        val bipAcc = bipOptional.get()
-
-        if (bipAcc.amount < type.opType.fee) {
-            return Observable.error(
-                    IllegalStateException("Not enough ${MinterSDK.DEFAULT_COIN} balance to pay fee: required ${type.opType.fee.humanize()}, balance: ${bipAcc.amount.humanize()}")
-            )
-        }
-
-        return prepareTx(initData, fee, amount, acc)
-                .map { it.signSingle(secretStorage.mainSecret.privateKey) }
+        return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
     }
 
     private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
@@ -605,18 +553,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.startDialog { ctx: Context ->
             ConfirmDialog.Builder(ctx, "Unable to send transaction")
                     .setText((errorResult.message))
-                    .setPositiveAction(R.string.btn_close) { d, _ ->
-                        d.dismiss()
-                    }
-                    .create()
-        }
-    }
-
-    private fun onErrorRequest(errorResult: ExpResult<*>) {
-        Timber.e("Unable to send transaction: %s", errorResult.error?.message)
-        viewState.startDialog { ctx: Context ->
-            ConfirmDialog.Builder(ctx, "Unable to send transaction")
-                    .setText((errorResult.error?.message ?: "Caused unknown error"))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
                     }

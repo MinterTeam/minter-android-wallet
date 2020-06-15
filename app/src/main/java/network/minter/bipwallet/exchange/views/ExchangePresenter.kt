@@ -356,6 +356,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
 
         // get transaction from explorer to show exact value what we've got after sell
+        // todo: show "Coins have been exchanged" if can't get transaction after 30 seconds
         mTxRepo.entity.waitTransactionUntilUncommitted(result.result.txHash.toString())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
