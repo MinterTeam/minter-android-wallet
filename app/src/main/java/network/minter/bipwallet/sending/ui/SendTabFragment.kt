@@ -244,13 +244,17 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     override fun setWallets(walletItems: List<WalletItem>) {
         activity?.let {
-            WalletSelectorBroadcastReceiver.setWallets(activity!!, walletItems)
+            runOnUiThread {
+                WalletSelectorBroadcastReceiver.setWallets(activity!!, walletItems)
+            }
         }
     }
 
     override fun setMainWallet(walletItem: WalletItem) {
         activity?.let {
-            WalletSelectorBroadcastReceiver.setMainWallet(activity!!, walletItem)
+            runOnUiThread {
+                WalletSelectorBroadcastReceiver.setMainWallet(activity!!, walletItem)
+            }
         }
     }
 

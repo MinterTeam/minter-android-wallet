@@ -74,6 +74,7 @@ import network.minter.blockchain.models.operational.Transaction
 import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterPublicKey
+import network.minter.core.crypto.PrivateKey
 import network.minter.explorer.models.BaseCoinValue
 import network.minter.explorer.models.GateResult
 import network.minter.explorer.models.PushResult
@@ -476,47 +477,124 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             return type.opType.fee * gas.toBigDecimal()
         }
 
+    private fun createPreTx(): TransactionSign {
+        val preTx: Transaction
+        val builder = Transaction.Builder(BigInteger("1"))
+                .setGasCoin(fromAccount!!.coin!!)
+                .setGasPrice(gas)
+
+        preTx = if (type == Type.Delegate) {
+            builder
+                    .delegate()
+                    .setCoin(fromAccount!!.coin)
+                    .setPublicKey(toValidator!!)
+                    .setStake(amount)
+                    .build()
+        } else {
+            builder
+                    .unbound()
+                    .setCoin(fromAccount!!.coin)
+                    .setPublicKey(toValidator!!)
+                    .setValue(amount)
+                    .build()
+        }
+        val dummyPrivate = PrivateKey("F000000000000000000000000000000000000000000000000000000000000000")
+        return preTx.signSingle(dummyPrivate)
+    }
+
     private fun signTx(initData: TxInitData): Observable<TransactionSign> {
-        val feeAccountOptional = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
-        if (!feeAccountOptional.isPresent) {
-            return Observable.error(IllegalStateException("Balance for coin ${MinterSDK.DEFAULT_COIN} not found!"))
-        }
+        /**
+         * delegate
+         *  - enough BIP - use BIP as gas coin
+         *  - not enough BIP - use CUSTOM as gas coin and caluclate real fee in custom coin
+         *  unbond
+         *  - anyway, use BIP as gas coin, if not enough - error
+         */
 
-        val feeAccount = feeAccountOptional.get()
+        val bipAccountOpt = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
 
-        if (feeAccount.amount < realFee) {
-            return Observable.error(
-                    IllegalStateException("Not enough ${MinterSDK.DEFAULT_COIN} balance to pay fee: required ${realFee.humanize()} ${MinterSDK.DEFAULT_COIN}, balance: ${feeAccount.amount.humanize()} ${MinterSDK.DEFAULT_COIN}")
-            )
-        }
+        if (type == Type.Delegate) {
 
-        var amountToSend = amount
-        if (fromAccount!!.coin!! == MinterSDK.DEFAULT_COIN && type == Type.Delegate && useMax) {
-            amountToSend -= realFee
-        }
+            // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
+            if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= realFee) {
 
-        val txBuilder = Transaction.Builder(initData.nonce!!)
-        txBuilder.setGasPrice(gas)
-        txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
-
-        val tx: Transaction = when (type) {
-            Type.Delegate -> {
-                txBuilder.delegate().apply {
+                val txBuilder = Transaction.Builder(initData.nonce!!)
+                txBuilder.setGasPrice(gas)
+                txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
+                val tx = txBuilder.delegate().apply {
                     coin = fromAccount!!.coin!!
                     publicKey = toValidator!!
-                    stake = amountToSend
+                    stake = if (useMax) fromAccount!!.amount else amount
                 }.build()
-            }
-            Type.Unbond -> {
-                txBuilder.unbound().apply {
-                    coin = fromAccount!!.coin!!
-                    publicKey = toValidator!!
-                    value = amountToSend
-                }.build()
-            }
-        }
 
-        return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
+                return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
+            }
+
+            // BIP balance not enough to pay fee, trying to calculate custom coin
+            val fromAccountOpt = accountStorage.entity.mainWallet.findCoinByName(fromAccount!!.coin)
+
+            // if balance for custom coin not found - error
+            if (!fromAccountOpt.isPresent) {
+                return Observable.error(
+                        IllegalStateException("Not enough balance to pay fee")
+                )
+            }
+            val fromAcc = fromAccountOpt.get()
+
+            // calculate custom coin fee
+            return initDataRepo.estimateRepo.getTransactionCommission(createPreTx()).rxGate()
+                    .subscribeOn(Schedulers.io())
+                    .switchMap {
+                        if (!it.isOk) {
+                            return@switchMap Observable.error<TransactionSign>(IllegalStateException(it.error!!.message))
+                        }
+
+                        val customFee = it.result.getValue()
+
+                        // to send - amount typed by user
+                        var amountToSend = amount
+
+                        if (useMax) {
+                            // if clicked "use max", fill with full balance - fee
+                            amountToSend = fromAcc.amount - customFee
+                        }
+
+                        // we're don't have enough BIP, so check custom coin enough balance to pay at least fee
+                        if ((fromAcc.amount - amountToSend - customFee) < 0.toBigDecimal()) {
+                            return@switchMap Observable.error<TransactionSign>(IllegalStateException("Insufficient funds for sending transaction"))
+                        }
+
+                        val txBuilder = Transaction.Builder(initData.nonce!!)
+                        txBuilder.setGasPrice(gas)
+                        txBuilder.setGasCoin(fromAcc.coin)
+                        val tx = txBuilder.delegate().apply {
+                            coin = fromAccount!!.coin!!
+                            publicKey = toValidator!!
+                            stake = amountToSend
+                        }.build()
+
+                        tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
+                    }
+
+        } else {
+            // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
+            if (!bipAccountOpt.isPresent || bipAccountOpt.get().amount < realFee) {
+                val balance = bipAccountOpt.get()?.amount ?: 0.toBigDecimal()
+                return Observable.error<TransactionSign>(IllegalStateException("Insufficient funds for unbond: required ${realFee.humanize()} ${MinterSDK.DEFAULT_COIN}, balance: ${balance.humanize()} ${MinterSDK.DEFAULT_COIN}"))
+            }
+
+            val txBuilder = Transaction.Builder(initData.nonce!!)
+            txBuilder.setGasPrice(gas)
+            txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
+            val tx = txBuilder.unbound().apply {
+                coin = fromAccount!!.coin!!
+                publicKey = toValidator!!
+                value = if (useMax) fromAccount!!.amount else amount
+            }.build()
+
+            return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
+
+        }
     }
 
     private fun onSuccessExecuteTransaction(result: GateResult<PushResult>) {
