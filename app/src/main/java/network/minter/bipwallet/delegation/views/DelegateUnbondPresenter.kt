@@ -514,17 +514,19 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         val bipAccountOpt = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
 
         if (type == Type.Delegate) {
-
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
             if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= realFee) {
-
+                var amountToSend = amount
+                if (useMax) {
+                    amountToSend = amount - realFee
+                }
                 val txBuilder = Transaction.Builder(initData.nonce!!)
                 txBuilder.setGasPrice(gas)
                 txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
                 val tx = txBuilder.delegate().apply {
                     coin = fromAccount!!.coin!!
                     publicKey = toValidator!!
-                    stake = if (useMax) fromAccount!!.amount else amount
+                    stake = amountToSend
                 }.build()
 
                 return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
