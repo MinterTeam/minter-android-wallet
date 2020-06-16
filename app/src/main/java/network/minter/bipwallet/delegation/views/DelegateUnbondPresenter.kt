@@ -54,6 +54,7 @@ import network.minter.bipwallet.exchange.ui.dialogs.TxConfirmStartDialog
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.helpers.IntentHelper
+import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
@@ -519,6 +520,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 var amountToSend = amount
                 if (useMax) {
                     amountToSend = amount - realFee
+                    if (bdNull(amountToSend)) {
+                        return Observable.error<TransactionSign>(IllegalStateException("Can't delegate 0 coins"))
+                    }
                 }
                 val txBuilder = Transaction.Builder(initData.nonce!!)
                 txBuilder.setGasPrice(gas)
@@ -559,6 +563,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         if (useMax) {
                             // if clicked "use max", fill with full balance - fee
                             amountToSend = fromAcc.amount - customFee
+
+                            if (amountToSend == BigDecimal.ZERO) {
+                                return@switchMap Observable.error<TransactionSign>(IllegalStateException("Can't unbond 0 coins"))
+                            }
                         }
 
                         // we're don't have enough BIP, so check custom coin enough balance to pay at least fee
