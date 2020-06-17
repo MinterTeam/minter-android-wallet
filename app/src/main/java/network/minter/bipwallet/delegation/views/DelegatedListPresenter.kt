@@ -172,7 +172,12 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
                 .rxExp()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({ rewardsRes: ExpResult<List<RewardStatistics>> -> onRewardsLoaded(rewardsRes) }) { t: Throwable? -> Timber.w(t) }
+                .subscribe(
+                        { rewardsRes: ExpResult<List<RewardStatistics>> ->
+                            onRewardsLoaded(rewardsRes)
+                        },
+                        { t: Throwable? -> Timber.w(t, "Unable to get rewards statistics") }
+                )
                 .disposeOnDestroy()
 
     }

@@ -187,7 +187,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             viewState.setRecipientAutocompleteItems(suggestions)
                         },
                         { t2: Throwable ->
-                            Timber.w(t2)
+                            Timber.w(t2, "Unable to load address book")
                         }
                 )
     }
@@ -218,7 +218,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                 handleAutocomplete = true
                             }
                         },
-                        { t -> Timber.e(t) }
+                        { t -> Timber.e(t, "Unable to check recipient existence") }
                 )
 
     }
@@ -307,6 +307,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             viewState.showBalanceProgress(false)
                         },
                         { t: Throwable ->
+                            Timber.w(t, "Unable to load balance for sending")
                             viewState.onError(t)
                             viewState.showBalanceProgress(false)
                         }
@@ -382,7 +383,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             }
                         },
                         { e: Throwable? ->
-                            Timber.w(e)
+                            Timber.w(e, "Unable to get min gas price for sending")
                         }
                 )
     }
@@ -808,7 +809,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
                                 },
                                 { t: Throwable ->
-                                    Timber.d(t)
+                                    Timber.d(t, "Unable to find recipient %s", s)
                                     mRecipient = null
                                     viewState.setSubmitEnabled(false)
 

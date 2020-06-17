@@ -111,6 +111,7 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Error, t.message)
                         }
                 )
+                .disposeOnDestroy()
 
 
     }

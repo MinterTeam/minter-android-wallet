@@ -303,13 +303,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ res: GateResult<GasValue> ->
-                    if (res.isOk) {
-                        mGasPrice = res.result.gas
-                        Timber.d("Min Gas price: %s", mGasPrice.toString())
-                        calculateFee(tx)
-                    }
-                }) { t: Throwable -> Timber.w(t) }
+                .subscribe(
+                        { res: GateResult<GasValue> ->
+                            if (res.isOk) {
+                                mGasPrice = res.result.gas
+                                Timber.d("Min Gas price: %s", mGasPrice.toString())
+                                calculateFee(tx)
+                            }
+                        },
+                        { t: Throwable ->
+                            Timber.w(t)
+                        }
+                )
+                .disposeOnDestroy()
 
         viewState.setOnConfirmListener(View.OnClickListener { onSubmit() })
 
@@ -665,7 +671,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         )
                     })
                     .doFinally { onExecuteComplete() }
-                    .subscribe({ result: GateResult<PushResult> -> onSuccessExecuteTransaction(result) }) { throwable: Throwable -> onFailedExecuteTransaction(throwable) }
+                    .subscribe(
+                            { result: GateResult<PushResult> -> onSuccessExecuteTransaction(result) },
+                            { t -> onFailedExecuteTransaction(t) }
+                    )
             unsubscribeOnDestroy(d)
             dialog
         }

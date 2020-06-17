@@ -30,6 +30,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ItemListHeaderBinding
 import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
 import network.minter.explorer.models.ValidatorItem
@@ -139,15 +140,12 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                 holder.binding.itemSubtitle.text = validator.pubKey.toString()
             }
 
-            if (meta?.iconUrl != null) {
-                holder.binding.itemAvatar.setImageUrlFallback(meta.iconUrl, R.drawable.img_avatar_default)
-            } else {
-                holder.binding.itemAvatar.setImageResource(R.drawable.img_avatar_delegate)
-            }
+
+            holder.binding.itemAvatar.setImageUrlFallback(validator.pubKey.avatar, R.drawable.img_avatar_delegate)
 
             holder.itemView.setOnClickListener {
                 onClickListener?.invoke(
-                        (items[holder.adapterPosition] as ItemValue).item
+                        (items[holder.bindingAdapterPosition] as ItemValue).item
                 )
             }
         }

@@ -69,49 +69,52 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                     .doFinally {
                         mBuilder.onCompleteListener?.invoke()
                     }
-                    .subscribe({ res: GateResult<ExchangeBuyValue> ->
-                        val out = CalculationResult()
-                        if (!res.isOk) {
-                            if (checkCoinNotExistError(res)) {
-                                onErrorMessage(res.message ?: "Coin to buy not exists")
-                                return@subscribe
-                            } else {
-                                Timber.w(GateResponseException(res))
-                                onErrorMessage(res.message ?: "Error:${res.error.resultCode.name}")
-                                return@subscribe
+                    .subscribe(
+                            { res: GateResult<ExchangeBuyValue> ->
+                                val out = CalculationResult()
+                                if (!res.isOk) {
+                                    if (checkCoinNotExistError(res)) {
+                                        onErrorMessage(res.message ?: "Coin to buy not exists")
+                                        return@subscribe
+                                    } else {
+                                        Timber.w(GateResponseException(res))
+                                        onErrorMessage(res.message ?: "Error:${res.error.resultCode.name}")
+                                        return@subscribe
+                                    }
+                                }
+                                out.amount = res.result.amount
+                                out.commission = res.result.getCommission()
+
+                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
+                                val getAccount = findAccountByCoin(sourceCoin)
+                                // if enough (exact) MNT ot pay fee, gas coin is MNT
+
+                                if (mntAccount.get().amount >= OperationType.BuyCoin.fee) {
+                                    Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
+
+                                    out.gasCoin = mntAccount.get().coin
+                                    out.estimate = res.result.amount
+                                    out.calculation = String.format("%s %s", bdHuman(res.result.amount), sourceCoin)
+
+                                } else if (getAccount.isPresent && getAccount.get().amount >= res.result.amountWithCommission) {
+                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
+                                    out.gasCoin = getAccount.get().coin
+                                    out.estimate = res.result.amountWithCommission
+                                    out.calculation = String.format("%s %s", res.result.amountWithCommission.humanize(), sourceCoin)
+                                } else {
+                                    //@todo logic duplication to synchronize with iOS app
+                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
+                                    out.gasCoin = getAccount.get().coin
+                                    out.estimate = res.result.amountWithCommission
+                                    out.calculation = String.format("%s %s", bdHuman(res.result.amountWithCommission), sourceCoin)
+                                }
+                                onResult(out)
+                            },
+                            { t ->
+                                Timber.e(t, "Unable to get currency")
+                                onErrorMessage("Unable to get currency")
                             }
-                        }
-                        out.amount = res.result.amount
-                        out.commission = res.result.getCommission()
-
-                        val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
-                        val getAccount = findAccountByCoin(sourceCoin)
-                        // if enough (exact) MNT ot pay fee, gas coin is MNT
-
-                        if (mntAccount.get().amount >= OperationType.BuyCoin.fee) {
-                            Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
-
-                            out.gasCoin = mntAccount.get().coin
-                            out.estimate = res.result.amount
-                            out.calculation = String.format("%s %s", bdHuman(res.result.amount), sourceCoin)
-
-                        } else if (getAccount.isPresent && getAccount.get().amount >= res.result.amountWithCommission) {
-                            Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                            out.gasCoin = getAccount.get().coin
-                            out.estimate = res.result.amountWithCommission
-                            out.calculation = String.format("%s %s", res.result.amountWithCommission.humanize(), sourceCoin)
-                        } else {
-                            //@todo logic duplication to synchronize with iOS app
-                            Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                            out.gasCoin = getAccount.get().coin
-                            out.estimate = res.result.amountWithCommission
-                            out.calculation = String.format("%s %s", bdHuman(res.result.amountWithCommission), sourceCoin)
-                        }
-                        onResult(out)
-                    }) { t: Throwable? ->
-                        Timber.e(t, "Unable to get currency")
-                        onErrorMessage("Unable to get currency")
-                    }
+                    )
         } else {
             // spend (sell or sellAll)
             repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin)
@@ -123,44 +126,47 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                     .doFinally {
                         mBuilder.onCompleteListener?.invoke()
                     }
-                    .subscribe({ res: GateResult<ExchangeSellValue> ->
-                        if (!res.isOk) {
-                            if (checkCoinNotExistError(res)) {
-                                onErrorMessage(res.message ?: "Coin to buy not exists")
-                                return@subscribe
-                            } else {
-                                Timber.w(GateResponseException(res), "Unable to calculate sell/sellAll currency")
-                                onErrorMessage(res.message ?: "Error::${res.error.resultCode.name}")
-                                return@subscribe
+                    .subscribe(
+                            { res: GateResult<ExchangeSellValue> ->
+                                if (!res.isOk) {
+                                    if (checkCoinNotExistError(res)) {
+                                        onErrorMessage(res.message ?: "Coin to buy not exists")
+                                        return@subscribe
+                                    } else {
+                                        Timber.w(GateResponseException(res), "Unable to calculate sell/sellAll currency")
+                                        onErrorMessage(res.message ?: "Error::${res.error.resultCode.name}")
+                                        return@subscribe
+                                    }
+                                }
+
+                                val out = CalculationResult()
+                                out.calculation = String.format("%s %s", bdHuman(res.result.amount), targetCoin)
+                                out.amount = res.result.amount
+                                out.commission = res.result.getCommission()
+                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
+                                val getAccount = findAccountByCoin(sourceCoin)
+                                out.estimate = res.result.amount
+
+                                // if enough (exact) MNT ot pay fee, gas coin is MNT
+
+                                if (mntAccount.get().amount >= OperationType.SellCoin.fee) {
+                                    Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
+                                    out.gasCoin = mntAccount.get().coin
+                                } else if (getAccount.isPresent && getAccount.get().amount >= res.result.getCommission()) {
+                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
+                                    out.gasCoin = getAccount.get().coin
+                                } else {
+                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
+                                    out.gasCoin = mntAccount.get().coin
+                                    onErrorMessage("Not enough balance")
+                                }
+                                onResult(out)
+                            },
+                            { t: Throwable? ->
+                                Timber.e(t, "Unable to get currency")
+                                onErrorMessage("Unable to get currency")
                             }
-                        }
-
-                        val out = CalculationResult()
-                        out.calculation = String.format("%s %s", bdHuman(res.result.amount), targetCoin)
-                        out.amount = res.result.amount
-                        out.commission = res.result.getCommission()
-                        val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
-                        val getAccount = findAccountByCoin(sourceCoin)
-                        out.estimate = res.result.amount
-
-                        // if enough (exact) MNT ot pay fee, gas coin is MNT
-
-                        if (mntAccount.get().amount >= OperationType.SellCoin.fee) {
-                            Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
-                            out.gasCoin = mntAccount.get().coin
-                        } else if (getAccount.isPresent && getAccount.get().amount >= res.result.getCommission()) {
-                            Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                            out.gasCoin = getAccount.get().coin
-                        } else {
-                            Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                            out.gasCoin = mntAccount.get().coin
-                            onErrorMessage("Not enough balance")
-                        }
-                        onResult(out)
-                    }) { t: Throwable? ->
-                        Timber.e(t, "Unable to get currency")
-                        onErrorMessage("Unable to get currency")
-                    }
+                    )
         }
     }
 

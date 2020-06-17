@@ -118,9 +118,12 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
         res.observeOn(AndroidSchedulers.mainThread())
                 .andThen(repo.findByNameOrAddress(mContact!!.address!!))
                 .subscribeOn(Schedulers.io())
-                .subscribe({
-                    viewState.submitDialog(it)
-                    viewState.close()
-                }) { t: Throwable? -> Timber.e(t) }
+                .subscribe(
+                        {
+                            viewState.submitDialog(it)
+                            viewState.close()
+                        },
+                        { t -> Timber.e(t, "Unable to save contact") }
+                )
     }
 }

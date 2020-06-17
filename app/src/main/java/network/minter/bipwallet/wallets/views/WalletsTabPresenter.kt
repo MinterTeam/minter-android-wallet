@@ -98,7 +98,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                             viewState.showBalanceProgress(false)
                         },
                         {
-                            Timber.e(it)
+                            Timber.e(it, "Unable to get balance for Wallets tab")
                             viewState.hideProgress()
                             viewState.showBalanceProgress(false)
                         }

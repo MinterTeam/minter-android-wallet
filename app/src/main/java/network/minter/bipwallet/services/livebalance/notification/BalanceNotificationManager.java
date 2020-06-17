@@ -190,6 +190,6 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
                             .build();
 
                     mNotificationManager.notify(WALLET_BALANCE_ID, messageNotification);
-                });
+                }, t -> Timber.w(t, "Unable to load avatar for noitification: %s", message.getCoinAvatar()));
     }
 }

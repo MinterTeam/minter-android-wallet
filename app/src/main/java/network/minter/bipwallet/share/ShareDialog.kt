@@ -102,7 +102,7 @@ class ShareDialog : BaseBottomSheetDialogFragment() {
     }
 
     private fun onError(t: Throwable) {
-        Timber.e(t)
+        Timber.e(t, "Unable to get or create address QR")
     }
 
     private fun setOnActionShareQR() {

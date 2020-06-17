@@ -104,7 +104,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
                                             d.dismiss()
                                         },
                                         { t ->
-                                            Timber.e(t)
+                                            Timber.e(t, "Unable to delete contact")
                                         }
                                 )
                     }
@@ -127,9 +127,10 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
                             onDataLoaded(addressContacts)
                         },
                         { t: Throwable ->
-                            Timber.e(t)
+                            Timber.e(t, "Unable to update address book list")
                         }
                 )
+                .disposeOnDestroy()
     }
 
     private fun onDataLoaded(addressContacts: List<AddressContact>) {

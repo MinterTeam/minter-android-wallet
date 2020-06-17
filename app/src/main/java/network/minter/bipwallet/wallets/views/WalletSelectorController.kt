@@ -58,7 +58,7 @@ class WalletSelectorController @Inject constructor() {
                             fillWalletSelector(it)
                         },
                         {
-                            Timber.w(it)
+                            Timber.w(it, "Unable to get balance for wallet selector")
                         }
                 )
     }

@@ -134,7 +134,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                             }
                         },
                         {
-                            Timber.w(it)
+                            Timber.w(it, "Unable to get balance for exchanging")
                         }
                 )
                 .disposeOnDestroy()
@@ -176,7 +176,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         viewState.setFee(String.format("%s %s", bdHuman(operationType.fee.multiply(BigDecimal(mGasPrice))), MinterSDK.DEFAULT_COIN))
                     }
                 }) { e: Throwable? ->
-                    Timber.w(e)
+                    Timber.w(e, "Unable to load min gas price for exchange")
                 }
     }
 
@@ -214,7 +214,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                             }
                         },
                         { t: Throwable ->
-                            Timber.w(t)
+                            Timber.w(t, "Unable to get coins list for exchange")
                         }
                 )
                 .disposeOnDestroy()
@@ -258,7 +258,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                             { result: GateResult<PushResult> ->
                                 onSuccessExecuteTransaction(result)
                             },
-                            { t: Throwable? ->
+                            { t: Throwable ->
                                 onErrorExecuteTransaction(ReactiveGate.createGateErrorPlain<Any>(t))
                             }
                     )

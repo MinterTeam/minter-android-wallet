@@ -80,6 +80,8 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
         binding = DialogAddresscontactEditBinding.inflate(inflater, container, false)
 
         inputGroup.enableInputDebounce = false
+        inputGroup.clearErrorBeforeValidate = false
+        inputGroup.appendErrorOnValidation = false
 
         binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 

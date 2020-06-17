@@ -58,7 +58,7 @@ class CoinsAcPresenter(
                             items = res
                         },
                         { t ->
-                            Timber.e(t)
+                            Timber.w(t, "Unable to load coins list")
                         }
                 )
         coinsRepo.update()

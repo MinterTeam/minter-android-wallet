@@ -36,6 +36,7 @@ import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity.Filter
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.explorer.models.ValidatorItem
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -79,6 +80,7 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
                             viewState.hideProgress()
                         },
                         { t ->
+                            Timber.e(t, "Unable to load validators")
                             viewState.onError(t)
                             viewState.hideProgress()
                         }

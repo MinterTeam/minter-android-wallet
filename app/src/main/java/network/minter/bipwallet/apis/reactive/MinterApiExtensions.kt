@@ -85,4 +85,4 @@ val MinterAddress.avatar: String
     get() = MinterProfileApi.getUserAvatarUrlByAddress(this)
 
 val MinterPublicKey.avatar: String
-    get() = "${BuildConfig.EXPLORER_STATIC_URL}/validators/${toString()}"
+    get() = "${BuildConfig.EXPLORER_STATIC_URL}/validators/${toString()}.png"

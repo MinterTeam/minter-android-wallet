@@ -167,15 +167,20 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
         super.onFirstViewAttach();
         ServiceConnector.bind(app().context());
         ServiceConnector.onConnected()
-                .subscribe(res -> res.setOnMessageListener((message, channel, address) -> {
-                    if (channel.equals(RTMService.CHANNEL_BLOCKS)) {
-                        RTMBlockReceiver.send(Wallet.app().context(), message);
-                    } else {
-                        RTMBalanceUpdateReceiver.send(Wallet.app().context(), message);
-                        accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message, address));
-                        app().explorerTransactionsRepoCache().update(true);
-                        Timber.d("WS ON MESSAGE[%s]: %s", channel, message);
-                    }
-                }));
+                .subscribe(
+                        res -> {
+                            res.setOnMessageListener((message, channel, address) -> {
+                                if (channel.equals(RTMService.CHANNEL_BLOCKS)) {
+                                    RTMBlockReceiver.send(Wallet.app().context(), message);
+                                } else {
+                                    RTMBalanceUpdateReceiver.send(Wallet.app().context(), message);
+                                    accountStorage.update(true, account -> app().balanceNotifications().showBalanceUpdate(message, address));
+                                    app().explorerTransactionsRepoCache().update(true);
+                                    Timber.d("WS ON MESSAGE[%s]: %s", channel, message);
+                                }
+                            });
+                        },
+                        t -> Timber.w(t, "Unable to connect to RTM service")
+                );
     }
 }
