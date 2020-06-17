@@ -83,10 +83,20 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
         if (requestCode == REQUEST_CREATE_PIN_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Timber.d("PIN successfully handled")
-            }
+            Timber.d("PIN successfully settled")
+            securityAdapter.clear()
+            mainAdapter.clear()
+            addRows()
+        } else if (requestCode == REQUEST_REMOVE_PIN_CODE) {
+            Timber.d("PIN successfully removed")
+            settings[EnableFingerprint] = false
+            securityAdapter.clear()
+            mainAdapter.clear()
+            addRows()
         }
     }
 
@@ -100,9 +110,7 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
         viewState.startLogin()
     }
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-
+    private fun addRows() {
         // security row
         val enablePinRow = SettingsSwitchRow(
                 "Unlock with PIN-code",
@@ -125,14 +133,16 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
             onChangePinClick(view, sharedView, value)
         }
 
-        changePinRow.setEnabled(Lazy { secretStorage.hasPinCode() })
-
         securityAdapter.addRow(TitleRow("Security"))
         securityAdapter.addRow(enablePinRow)
-        if (fingerHelper.isHardwareDetected) {
-            securityAdapter.addRow(fingerprintRow)
+
+        if (secretStorage.hasPinCode()) {
+            if (fingerHelper.isHardwareDetected) {
+                securityAdapter.addRow(fingerprintRow)
+            }
+            securityAdapter.addRow(changePinRow)
         }
-        securityAdapter.addRow(changePinRow)
+
         mainAdapter.addRow(TitleRow("Notifications"))
 
         mainAdapter.addRow(SettingsSwitchRow(
@@ -145,13 +155,13 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
                 Lazy { isNotificationsEnabled },
                 { _: View, enabled: Boolean -> onSwitchNotifications(enabled) }
         ))
-//        additionalAdapter.addRow(TitleRow("Default Wallet"))
+    }
 
-//        val defWalletRow = SettingsButtonRow(
-//                secretStorage.mainWallet.toShortString(),
-//                ""
-//        ) { _, _, value -> onChangeDefWallet(value) }
-//        additionalAdapter.addRow(defWalletRow)
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+
+        addRows()
+
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -239,7 +249,7 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
         if (!secretStorage.hasPinCode()) {
             viewState.startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Creation)
         } else {
-            viewState.startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Deletion)
+            viewState.startPinCodeManager(REQUEST_REMOVE_PIN_CODE, SecurityModule.PinMode.Deletion)
         }
     }
 
@@ -257,6 +267,7 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
 
     companion object {
         private const val REQUEST_CREATE_PIN_CODE = 1002
+        private const val REQUEST_REMOVE_PIN_CODE = 1004
         private const val REQUEST_VERIFY_PIN_CODE = 1003
     }
 }
