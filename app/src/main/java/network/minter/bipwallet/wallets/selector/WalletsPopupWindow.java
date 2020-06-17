@@ -29,6 +29,7 @@ package network.minter.bipwallet.wallets.selector;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -90,7 +91,6 @@ public class WalletsPopupWindow extends PopupWindow {
         win.getList().setLayoutManager(new LinearLayoutManager(parent.getContext()));
         win.getList().setAdapter(adapter);
 
-
         // Creating the PopupWindow
         win.setContentView(win.binding.getRoot());
         win.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -99,18 +99,18 @@ public class WalletsPopupWindow extends PopupWindow {
         win.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         win.setElevation(Wallet.app().display().getDimen(R.dimen.card_elevation));
         win.setAnimationStyle(R.style.Wallet_PopupAnimation);
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N) {
+            win.setClippingEnabled(false);
+        }
 
         // Some offset to align the popup a bit to the left, and a bit down, relative to button's position.
 
         int OFFSET_X = (int) Wallet.app().display().getDimen(R.dimen.margin_edges_half);
-//        int OFFSET_X = 0;
         int OFFSET_Y = 0;
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N) {
+            OFFSET_Y = Wallet.app().display().getStatusBarHeight();
+        }
 
-        // Clear the default translucent background
-//        win.setBackgroundDrawable(parent.getContext().getResources().getDrawable(R.drawable.bg_white_rounded));
-
-        // Displaying the popup at the specified location, + offsets.
-//        win.showAtLocation(layout, Gravity.NO_GRAVITY, p.x + OFFSET_X, p.y + OFFSET_Y);
         win.showAtLocation(win.binding.getRoot(), Gravity.NO_GRAVITY, OFFSET_X, OFFSET_Y);
 
         return win;

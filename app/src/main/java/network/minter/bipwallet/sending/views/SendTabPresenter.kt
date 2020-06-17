@@ -332,6 +332,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         mAddressChange!!
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { address: String -> onAddressChanged(address) }
                 .disposeOnDestroy()
 

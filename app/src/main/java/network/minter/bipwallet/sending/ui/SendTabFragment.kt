@@ -363,7 +363,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun setFee(fee: CharSequence?) {
-        binding.feeValue.text = fee
+        binding.feeValue.postApply {
+            it.text = fee
+        }
     }
 
     override fun startDelegate(publicKey: MinterPublicKey) {
