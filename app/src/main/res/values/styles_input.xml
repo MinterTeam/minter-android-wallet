@@ -38,6 +38,7 @@
         <item name="errorStyle">@style/Input.Error</item>
         <item name="suffixImageStyle">@style/Input.SuffixImage</item>
         <item name="suffixTextStyle">@style/Input.SuffixButton</item>
+        <item name="errorEnabled">false</item>
     </style>
 
     <style name="Input.Error" parent="WalletBase">
