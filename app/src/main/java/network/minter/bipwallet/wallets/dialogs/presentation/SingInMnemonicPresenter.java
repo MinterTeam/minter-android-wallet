@@ -89,6 +89,7 @@ public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView
                 }
 
                 mPhrase = res;
+                getViewState().setError(null);
                 getViewState().setEnableSubmit(NativeBip39.validateMnemonic(mPhrase, NativeBip39.LANG_DEFAULT));
             }
         };
