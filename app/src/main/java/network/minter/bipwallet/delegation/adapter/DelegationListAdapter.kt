@@ -40,6 +40,7 @@ import butterknife.ButterKnife
 import com.zerobranch.layout.SwipeLayout
 import com.zerobranch.layout.SwipeLayout.SwipeActionsListener
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
@@ -107,11 +108,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
             if (item.description != null) {
                 ViewCompat.setTooltipText(vh.publicKey, item.description)
             }
-            if (item.imageUrl != null) {
-                vh.icon.setImageUrlFallback(item.imageUrl, R.drawable.img_avatar_default)
-            } else {
-                vh.icon.setImageResource(R.drawable.img_avatar_delegate)
-            }
+            vh.icon.setImageUrlFallback(item.publicKey.avatar, R.drawable.img_avatar_delegate)
             vh.actionCopy.setOnClickListener {
                 ContextHelper.copyToClipboard(it.context, item.publicKey.toString())
             }
@@ -126,12 +123,12 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
             (vh.itemView as SwipeLayout).setOnActionsListener(object : SwipeActionsListener {
                 override fun onOpen(direction: Int, isContinuous: Boolean) {
                     closeOpened()
-                    mLastOpened = vh.adapterPosition
+                    mLastOpened = vh.bindingAdapterPosition
                 }
 
                 override fun onClose() {}
             })
-            if (vh.adapterPosition == mLastOpened) {
+            if (vh.bindingAdapterPosition == mLastOpened) {
                 vh.itemView.post {
                     mLastOpened = -1
                     vh.itemView.close(true)
