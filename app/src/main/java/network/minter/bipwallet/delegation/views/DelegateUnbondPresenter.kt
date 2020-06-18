@@ -518,7 +518,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
             if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= realFee) {
                 var amountToSend = amount
-                if (useMax) {
+                if (useMax && fromAccount!!.coin == MinterSDK.DEFAULT_COIN) {
                     amountToSend = amount - realFee
                     if (bdNull(amountToSend)) {
                         return Observable.error<TransactionSign>(IllegalStateException("Can't delegate 0 coins"))
