@@ -38,6 +38,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressBookItem
 import network.minter.bipwallet.addressbook.models.AddressBookItemHeader
 import network.minter.bipwallet.addressbook.models.AddressContact
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
@@ -159,6 +160,7 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
                 mOnItemClickListener?.invoke(mItems[holder.getAdapterPosition()] as AddressContact)
             }
             item.applyAddressIcon(vh.avatar!!)
+            vh.avatar!!.setImageUrlFallback(item.minterAddress.avatar, R.drawable.img_avatar_default)
             vh.title!!.text = item.name
             vh.subtitle!!.text = item.address
             vh.actionEdit!!.setOnClickListener {
