@@ -174,7 +174,7 @@
                             android:id="@+id/balance_last_part"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin_edges_half"
+                            android:layout_marginStart="0dp"
                             android:fontFamily="@font/_inter_semi_bold"
                             android:textAllCaps="true"
                             android:textColor="@color/textColorWhite"

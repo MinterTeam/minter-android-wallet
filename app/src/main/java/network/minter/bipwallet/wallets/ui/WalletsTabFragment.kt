@@ -309,7 +309,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         binding.balanceFirstPart.post {
             binding.apply {
                 balanceFirstPart.text = firstPart
-                balanceMiddlePart.text = ".$middlePart"
+                balanceMiddlePart.text = ".$middlePart "
                 balanceLastPart.text = lastPart
             }
         }
