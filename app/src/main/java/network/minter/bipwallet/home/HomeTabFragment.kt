@@ -87,8 +87,11 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
         super.onDestroyView()
         WalletDialog.releaseDialog(walletDialog)
         if (bottomSheetDialog != null) {
-            bottomSheetDialog!!.dismiss()
-            bottomSheetDialog = null
+            try {
+                bottomSheetDialog!!.dismissAllowingStateLoss()
+                bottomSheetDialog = null
+            } catch (t: Throwable) {
+            }
         }
     }
 
