@@ -78,7 +78,6 @@
             android:dropDownHeight="wrap_content"
             android:focusable="false"
             android:hint="Coin Name"
-            android:inputType="textNoSuggestions"
             android:maxLength="10"
             android:singleLine="true"
             android:textAllCaps="true"

@@ -298,6 +298,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
         binding.inputRecipient.clearFocus()
         binding.inputAmount.clearFocus()
         inputGroup.clearErrors()
+        inputGroup.hideErrors()
         inputGroup.clearData()
     }
 

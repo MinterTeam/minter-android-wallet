@@ -59,6 +59,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.releaseD
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
+import network.minter.bipwallet.internal.helpers.ViewExtensions.scrollDownTo
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.widgets.WalletButton
@@ -116,6 +117,11 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         binding.calculationContainer.calculation.inputType = InputType.TYPE_NULL
 
+        if (this is SellExchangeFragment) {
+            binding.inputIncomingCoin.addTextChangedSimpleListener {
+                binding.root.scrollDownTo(binding.calculationContainer.root)
+            }
+        }
 
         val coinsAutocompletePresenter = CoinsAcPresenter(context!!, Wallet.app().coinsCacheRepo())
         val coinsAutocompleteCallback: AutocompleteCallback<CoinItem> = object : AutocompleteCallback<CoinItem> {
@@ -192,19 +198,6 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
 
     override fun setCoinsAutocomplete(items: List<CoinItem>, listener: (CoinItem, Int) -> Unit) {
         onCoinSelected = listener
-
-//        if (items.isNotEmpty()) {
-//            binding.inputIncomingCoin.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
-//
-//            val adapter = CoinsListAdapter(activity!!, items)
-//            adapter.setOnItemClickListener { item, position ->
-//                listener(item, position)
-//                binding.inputIncomingCoin.input.dismissDropDown()
-//            }
-//            binding.inputIncomingCoin.post {
-//                binding.inputIncomingCoin.input.setAdapter(adapter)
-//            }
-//        }
     }
 
     override fun setCalculationTitle(calcTitle: Int) {

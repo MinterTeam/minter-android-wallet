@@ -150,7 +150,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
         binding.inputValidator.input.isFocusable = type != Type.Unbond
         binding.inputCoin.input.isFocusable = false
         binding.inputAmount.input.setOnClickListener {
-            binding.inputAmount.scrollToInput()
+            binding.inputAmount.scrollToError()
         }
 
         setupAutocomplete()

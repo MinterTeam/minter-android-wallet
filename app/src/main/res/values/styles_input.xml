@@ -29,6 +29,7 @@
     <style name="Input" parent="WalletBase">
         <item name="android:textColor">@color/text_input_stateful</item>
         <item name="inputMinHeight">48dp</item>
+        <item name="inputDisableSuggestions">true</item>
         <item name="android:layout_marginTop">14dp</item>
         <item name="android:textColorHint">@color/grey</item>
         <item name="inputStyle">@style/Input.EditTextStyle</item>

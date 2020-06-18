@@ -81,7 +81,6 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
 
         inputGroup.enableInputDebounce = false
         inputGroup.clearErrorBeforeValidate = false
-        inputGroup.appendErrorOnValidation = false
 
         binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
 

@@ -29,11 +29,17 @@ package network.minter.bipwallet.internal.helpers
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Rect
 import android.net.Uri
+import android.text.InputType
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
+import com.edwardstock.inputfield.InputField
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.IncludeTestnetWarningViewBinding
@@ -136,6 +142,48 @@ object ViewExtensions {
         } else if (!isFirst && isLast) {
             view.setBackgroundResource(R.drawable.bg_ripple_white_bot_rounded)
         }
+    }
+
+    /**
+     * Scroll down the minimum needed amount to show [descendant] in full. More
+     * precisely, reveal its bottom.
+     */
+    fun ViewGroup.scrollDownTo(descendant: View) {
+        // Could use smoothScrollBy, but it sometimes over-scrolled a lot
+        howFarDownIs(descendant)?.let {
+            if (it == 0) return@let
+            when (this) {
+                is ScrollView -> {
+                    this.smoothScrollBy(0, it)
+                }
+                is NestedScrollView -> {
+                    this.smoothScrollBy(0, it)
+                }
+                else -> {
+                    scrollBy(0, it)
+                }
+            }
+        }
+    }
+
+    fun InputField.inputNoSuggestions() {
+        this.input.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+    }
+
+    /**
+     * Calculate how many pixels below the visible portion of this [ViewGroup] is the
+     * bottom of [descendant].
+     *
+     * In other words, how much you need to scroll down, to make [descendant]'s bottom
+     * visible.
+     */
+    fun ViewGroup.howFarDownIs(descendant: View): Int? {
+        val bottom = Rect().also {
+            // See https://stackoverflow.com/a/36740277/1916449
+            descendant.getDrawingRect(it)
+            offsetDescendantRectToMyCoords(descendant, it)
+        }.bottom
+        return (bottom - height - scrollY).takeIf { it > 0 }
     }
 
 }
