@@ -365,5 +365,8 @@
     <string name="tx_type_send_recieve">Receive</string>
     <string name="tx_type_send">Send</string>
     <string name="label_check_issuer">Check Issuer</string>
+    <string name="dialog_description_logout">You will lose all your settings and wallets list.</string>
+    <string name="dialog_text_logout">Are you sure you want to log out?</string>
+    <string name="dialog_title_logout">Logging Out</string>
 
 </resources>

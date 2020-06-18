@@ -101,13 +101,26 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     }
 
     fun onLogout() {
-        analytics.send(AppEvent.SettingsLogoutButton)
-        Wallet.app().session().logout()
-        Wallet.app().secretStorage().destroy()
-        Wallet.app().storage().deleteAll()
-        Wallet.app().storageCache().deleteAll()
-        Wallet.app().prefs().edit().clear().apply()
-        viewState.startLogin()
+        viewState.startDialog {
+            ConfirmDialog.Builder(it, R.string.dialog_title_logout)
+                    .setDescription(R.string.dialog_description_logout)
+                    .setText(R.string.dialog_text_logout)
+                    .setPositiveAction(R.string.btn_logout) { d, _ ->
+                        analytics.send(AppEvent.SettingsLogoutButton)
+                        Wallet.app().session().logout()
+                        Wallet.app().secretStorage().destroy()
+                        Wallet.app().storage().deleteAll()
+                        Wallet.app().storageCache().deleteAll()
+                        Wallet.app().prefs().edit().clear().apply()
+
+                        d.dismiss()
+                        viewState.startLogin()
+
+                    }
+                    .setNegativeAction(R.string.btn_cancel)
+                    .create()
+        }
+
     }
 
     private fun addRows() {
