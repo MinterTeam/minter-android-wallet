@@ -78,6 +78,7 @@
                 android:layout_marginStart="@dimen/margin_edges_medium"
                 android:layout_marginTop="0dp"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
+                android:inputType="textNoSuggestions|textMultiLine"
                 android:hint="Your seed phrase..."
                 app:labelEnabled="false" />
 
