@@ -83,7 +83,7 @@
     <string name="tx_send_begin_dialog_recipient_label">to</string>
     <string name="tx_send_waiting_dialog_description">Coins will be received in</string>
     <string name="tx_send_success_dialog_description">Coins are received by</string>
-    <string name="tx_exchange_success_dialog_description">You\'ve received</string>
+    <string name="tx_exchange_success_dialog_description">You have received</string>
 
     <!--Advanced "secured by" popup menu values-->
     <string name="secured_by_value__you">You</string>
@@ -177,8 +177,8 @@
     <string name="value_secured_by_wallet">Bip Wallet</string>
     <string name="value_secured_by_ledger">Nano S</string>
     <string name="value_secured_by_dots">…</string>
-    <string name="label_ive_saved_mnemonic">I\'ve saved the phrase!</string>
-    <string name="label_ive_compared_addresses">I\'ve compared above address with the Ledger!</string>
+    <string name="label_ive_saved_mnemonic">I have saved the phrase!</string>
+    <string name="label_ive_compared_addresses">I have compared above address with the Ledger!</string>
 
     <string name="or">or</string>
     <string name="label_paste_seed_phrase">Paste Seed Phrase</string>
@@ -247,7 +247,7 @@
     <string name="fingerprint_dialog_enroll_text">Please, check your security settings and enable fingerprint device lock</string>
     <string name="fingerprint_dialog_enroll_text_fix">Please, manually open security settings and enable fingerprint device lock</string>
     <string name="btn_settings">Open settings</string>
-    <string name="pin_invalid_logout">You\'ve entered invalid PIN-code 5 times in a row. Logging out…</string>
+    <string name="pin_invalid_logout">You have entered invalid PIN-code 5 times in a row. Logging out…</string>
     <string name="dialog_show_mnemonic_title">⚠️ Your Mnemonic</string>
     <string name="dialog_show_mnemonic_description">Attention! This is sensitive information, don\'t show it anyone!</string>
     <string name="label_tx_payload">Payload</string>
@@ -273,7 +273,7 @@
     <string name="inter_zeroes">zero</string>
     <string name="title_edit_title">Edit Title</string>
     <string name="input_hint_seed">Seed-Phrase</string>
-    <string name="input_hint_wallet_seed">Or enter seed-phrase to yout existing wallet</string>
+    <string name="input_hint_wallet_seed">Or enter the seed-phrase to yout existing wallet</string>
     <string name="dialog_title_add_wallet">Add New Wallet</string>
     <string name="btn_remove_wallet">Remove Wallet</string>
     <string name="tx_send_payload_hint">You can add a message to your transaction</string>
@@ -368,5 +368,6 @@
     <string name="dialog_description_logout">You will lose all your settings and wallets list.</string>
     <string name="dialog_text_logout">Are you sure you want to log out?</string>
     <string name="dialog_title_logout">Logging Out</string>
+    <string name="dialog_create_wallet_description">⚠️ Save this seed phrase if you plan to use this address in the future. \nIt gives full access to your wallet, so keep it in a safe place.</string>
 
 </resources>

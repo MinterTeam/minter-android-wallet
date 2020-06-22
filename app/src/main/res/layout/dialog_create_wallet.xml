@@ -81,7 +81,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dialog_title"
-            tools:text="⚠️ Save this seed phrase in case you plan to use this address in the future."
+            tools:text="@string/dialog_create_wallet_description"
             tools:visibility="visible" />
     </LinearLayout>
 
