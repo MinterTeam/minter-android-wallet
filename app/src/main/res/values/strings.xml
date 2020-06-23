@@ -273,7 +273,7 @@
     <string name="inter_zeroes">zero</string>
     <string name="title_edit_title">Edit Title</string>
     <string name="input_hint_seed">Seed-Phrase</string>
-    <string name="input_hint_wallet_seed">Or enter the seed-phrase to yout existing wallet</string>
+    <string name="input_hint_wallet_seed">Or enter the seed-phrase of your existing wallet</string>
     <string name="dialog_title_add_wallet">Add New Wallet</string>
     <string name="btn_remove_wallet">Remove Wallet</string>
     <string name="tx_send_payload_hint">You can add a message to your transaction</string>
@@ -294,7 +294,7 @@
     <string name="btn_unbond">Unbond</string>
     <string name="decimal_digits">0,1,2,3,4,5,6,7,8,9,.,,</string>
     <string name="btn_add_message">Add Message</string>
-    <string name="dialog_title_send_type">You\'re sending</string>
+    <string name="dialog_title_send_type">You are sending</string>
     <string name="btn_save_address">Save This Address</string>
     <string name="dialog_title_exchange_begin">Confirm Exchange</string>
     <string name="dialog_label_exchange_you_will_spend">You will spend</string>
@@ -354,15 +354,14 @@
     <string name="error_unable_load_delegations">Unable to load delegations</string>
     <string name="input_hint_public_key_or_name">Public key or name…</string>
     <string name="label_coin_you_want_unbond">Coin you want to unbond</string>
-    <string name="item_anonymous">Anonymous</string>
-    <string name="dialog_description_external_tx">You\'re about to perform a transaction.\nChoose your active wallet.</string>
+    <string name="dialog_description_external_tx">You are about to perform a transaction.\nChoose your active wallet.</string>
     <string name="title_my_coins">My Coins</string>
     <string name="title_latest_transactions">Latest Transactions</string>
     <string name="w_transaction">Transaction</string>
 
     <string name="fmt_decimal_and_coin">%s %s</string>
     <string name="fmt_type_of_transaction">%s Transaction</string>
-    <string name="tx_type_send_recieve">Receive</string>
+    <string name="tx_type_send_receive">Receive</string>
     <string name="tx_type_send">Send</string>
     <string name="label_check_issuer">Check Issuer</string>
     <string name="dialog_description_logout">You will lose all your settings and wallets list.</string>

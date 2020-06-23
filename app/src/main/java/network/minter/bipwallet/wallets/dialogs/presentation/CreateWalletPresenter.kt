@@ -100,7 +100,7 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
     override fun attachView(view: CreateWalletView) {
         super.attachView(view)
 
-        viewState.setDescription(R.string.hint_save_seed)
+        viewState.setDescription(R.string.dialog_create_wallet_description)
         viewState.setSeed(mnemonicResult!!.mnemonic)
         viewState.setOnSeedClickListener(View.OnClickListener { onCopySeed(it) })
         viewState.setOnSavedClickListener(CompoundButton.OnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->

@@ -252,7 +252,7 @@ class TxAllViewHolder(
         binding.apply {
 
             if (isIncoming) {
-                itemTitleType.setText(R.string.tx_type_send_recieve)
+                itemTitleType.setText(R.string.tx_type_send_receive)
             } else {
                 itemTitleType.setText(R.string.tx_type_send)
             }

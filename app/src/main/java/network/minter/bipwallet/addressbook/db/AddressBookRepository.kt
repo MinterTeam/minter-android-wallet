@@ -66,7 +66,7 @@ class AddressBookRepository(
                 writeLastUsed(item)
             } else if (last[0].id == item.id && last[0].address != item.address) {
                 last[0].id = 0
-                last[0].name = "Anonymous"
+                last[0].name = last[0].minterAddress.toShortString()
                 writeLastUsed(last[0])
             }
         }

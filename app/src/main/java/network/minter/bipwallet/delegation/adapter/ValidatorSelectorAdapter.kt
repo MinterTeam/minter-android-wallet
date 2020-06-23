@@ -128,17 +128,11 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             val meta: ValidatorMeta? = validator.meta
 
             if (meta?.name.isNullOrEmpty()) {
-                if (item.lastUsed) {
-                    holder.binding.itemTitle.text = ctx.getString(R.string.item_anonymous)
-                } else {
-                    holder.binding.itemTitle.text = validator.pubKey.toShortString()
-                }
-
-                holder.binding.itemSubtitle.text = validator.pubKey.toString()
+                holder.binding.itemTitle.text = validator.pubKey.toShortString()
             } else {
                 holder.binding.itemTitle.text = meta!!.name
-                holder.binding.itemSubtitle.text = validator.pubKey.toString()
             }
+            holder.binding.itemSubtitle.text = validator.pubKey.toString()
 
 
             holder.binding.itemAvatar.setImageUrlFallback(validator.pubKey.avatar, R.drawable.img_avatar_delegate)

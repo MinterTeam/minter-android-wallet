@@ -776,7 +776,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
         if (mRecipient != null) {
             if (mRecipient!!.id == 0) {
-                mRecipient!!.name = "Anonymous"
+                mRecipient!!.name = mRecipient!!.minterAddress.toShortString()
             }
             addressBookRepo.writeLastUsed(mRecipient!!)
         }
