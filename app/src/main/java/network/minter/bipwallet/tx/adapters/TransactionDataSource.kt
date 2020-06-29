@@ -300,9 +300,12 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                                     }
                                     HistoryTransaction.Type.RedeemCheck -> {
                                         val d = tx.getData<HistoryTransaction.TxRedeemCheckResult>()
+                                        @Suppress("DEPRECATION")
                                         if (d.getCheck().sender.toString().toLowerCase() == address.address!!.toLowerCase()) {
                                             tx.toName = address.name
                                         }
+                                    }
+                                    else -> {
                                     }
                                 }
                             }

@@ -146,7 +146,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
 
         for (contact in addressContacts) {
             val h = contact.name!!.substring(0, 1).toLowerCase()
-            if (lastLetter == null || (lastLetter != null && lastLetter != h)) {
+            if (lastLetter == null || (lastLetter != h)) {
                 lastLetter = h
                 out.add(AddressBookItemHeader(h))
             }

@@ -84,7 +84,7 @@ class TransactionListAdapter : PagedListAdapter<TransactionItem, RecyclerView.Vi
         bindViewHolder(_myAddress!!, holder, getItem(position)!!)
         if (holder is TxAllViewHolder) {
             holder.itemView.setOnClickListener { v ->
-                _onExpandDetailsListener?.invoke(v, (getItem(holder.getAdapterPosition()) as TxItem).tx)
+                _onExpandDetailsListener?.invoke(v, (getItem(holder.bindingAdapterPosition) as TxItem).tx)
             }
         }
 

@@ -68,7 +68,7 @@ class TransactionShortListAdapter(
 
         (holder as TxAllViewHolder).let {
             it.itemView.setOnClickListener { v ->
-                mOnExpandDetailsListener?.invoke(v, getItem(holder.getAdapterPosition()).tx)
+                mOnExpandDetailsListener?.invoke(v, getItem(holder.bindingAdapterPosition).tx)
             }
             it.binding.separator.visible = true
         }

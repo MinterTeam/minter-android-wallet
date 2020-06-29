@@ -177,7 +177,7 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         ServiceConnector.bind(this)
         ServiceConnector.onConnected()
                 .subscribe { res: RTMService ->
-                    res.setOnMessageListener { message: String?, channel: String, address: MinterAddress? ->
+                    res.setOnMessageListener { message: String?, channel: String, _: MinterAddress? ->
                         if (channel == RTMService.CHANNEL_BLOCKS) {
                             send(Wallet.app().context(), message!!)
                         }

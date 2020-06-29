@@ -68,7 +68,7 @@ class SearchAcAdapter<T>(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.setOnClickListener {
             clickDispatcher(
-                    items[holder.adapterPosition]
+                    items[holder.bindingAdapterPosition]
             )
         }
         val item = items[position]

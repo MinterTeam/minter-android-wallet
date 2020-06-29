@@ -500,7 +500,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .build()
         }
         val dummyPrivate = PrivateKey("F000000000000000000000000000000000000000000000000000000000000000")
-        return preTx.signSingle(dummyPrivate)
+        return preTx.signSingle(dummyPrivate)!!
     }
 
     private fun signTx(initData: TxInitData): Observable<TransactionSign> {
@@ -533,7 +533,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     stake = amountToSend
                 }.build()
 
-                return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
+                return tx.signSingle(secretStorage.mainSecret.privateKey)!!.toObservable()
             }
 
             // BIP balance not enough to pay fee, trying to calculate custom coin
@@ -602,7 +602,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 value = if (useMax) fromAccount!!.amount else amount
             }.build()
 
-            return tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
+            return tx.signSingle(secretStorage.mainSecret.privateKey)!!.toObservable()
 
         }
     }

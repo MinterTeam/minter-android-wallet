@@ -55,7 +55,7 @@ class CoinsAcAdapter(
 
         listItemBackgroundRippleRounded(holder.itemView, position, items.size)
         holder.b.root.setOnClickListener {
-            presenter.dispatchClick(items[holder.adapterPosition])
+            presenter.dispatchClick(items[holder.bindingAdapterPosition])
         }
 
         holder.b.itemTitle.text = item.symbol

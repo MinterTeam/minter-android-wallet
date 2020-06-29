@@ -524,7 +524,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 .build()
 
         val dummyPrivate = PrivateKey("F000000000000000000000000000000000000000000000000000000000000000")
-        return preTx.signSingle(dummyPrivate)
+        return preTx.signSingle(dummyPrivate)!!
     }
 
     @Throws(OperationInvalidDataException::class)
@@ -685,7 +685,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = secretStorage.getSecret(mFromAccount!!.address!!)
-        val sign = tx.signSingle(data.privateKey)
+        val sign = tx.signSingle(data.privateKey)!!
         return gateTxRepo.sendTransaction(sign).rxGate().joinToUi()
     }
 

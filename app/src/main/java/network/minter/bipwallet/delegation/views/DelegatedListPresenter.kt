@@ -224,6 +224,7 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
 
     }
 
+    @Suppress("DEPRECATION")
     private fun onRewardsLoaded(rewardsRes: ExpResult<List<RewardStatistics>>) {
         if (!rewardsRes.isOk || rewardsRes.result.isEmpty()) {
             viewState.setBipsPerMinute("0")

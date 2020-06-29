@@ -114,7 +114,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
             }
             vh.actionDelegate.setOnClickListener {
                 if (mOnDelegatedClickListener != null) {
-                    mOnDelegatedClickListener!!.invoke(getItem(viewHolder.getAdapterPosition()) as DelegatedValidator)
+                    mOnDelegatedClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedValidator)
                 }
             }
         } else if (getItemViewType(i) == DelegatedItem.ITEM_STAKE) {
@@ -146,7 +146,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
             }
             vh.actionUnbond!!.setOnClickListener {
                 if (mOnUnbondItemClickListener != null && vh.itemView.isRightOpen) {
-                    mOnUnbondItemClickListener!!.invoke(getItem(viewHolder.getAdapterPosition()) as DelegatedStake)
+                    mOnUnbondItemClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedStake)
                 }
             }
         }

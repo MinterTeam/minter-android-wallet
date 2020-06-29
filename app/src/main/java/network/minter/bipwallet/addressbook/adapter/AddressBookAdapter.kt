@@ -157,7 +157,7 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
 
 
             vh.mainView!!.setOnClickListener {
-                mOnItemClickListener?.invoke(mItems[holder.getAdapterPosition()] as AddressContact)
+                mOnItemClickListener?.invoke(mItems[holder.bindingAdapterPosition] as AddressContact)
             }
             item.applyAddressIcon(vh.avatar!!)
             vh.avatar!!.setImageUrlFallback(item.minterAddress.avatar, R.drawable.img_avatar_default)
@@ -165,11 +165,11 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
             vh.subtitle!!.text = item.address
             vh.actionEdit!!.setOnClickListener {
                 closeOpened()
-                mOnEditContactListener?.invoke(mItems[holder.getAdapterPosition()] as AddressContact)
+                mOnEditContactListener?.invoke(mItems[holder.bindingAdapterPosition] as AddressContact)
             }
             vh.actionDelete!!.setOnClickListener {
                 closeOpened()
-                mOnDeleteContactListener?.invoke(mItems[holder.getAdapterPosition()] as AddressContact)
+                mOnDeleteContactListener?.invoke(mItems[holder.bindingAdapterPosition] as AddressContact)
             }
         }
     }

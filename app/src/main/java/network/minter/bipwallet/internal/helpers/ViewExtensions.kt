@@ -53,6 +53,7 @@ class ResTextFormat(
         @StringRes val resId: Int,
         vararg format: Any?
 ) {
+    @Suppress("UNCHECKED_CAST")
     val data: Array<Any?> = format as Array<Any?>
 }
 

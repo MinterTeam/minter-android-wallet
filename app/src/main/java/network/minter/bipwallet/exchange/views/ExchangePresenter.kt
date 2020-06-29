@@ -290,7 +290,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = mSecretStorage.getSecret(mAccount!!.address!!)
-        val sign = tx.signSingle(data.privateKey)
+        val sign = tx.signSingle(data.privateKey)!!
         return safeSubscribeIoToUi(
                 ReactiveGate.rxGate(mGateTxRepo.sendTransaction(sign))
                         .onErrorResumeNext(toGateError())

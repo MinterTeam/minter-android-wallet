@@ -208,7 +208,7 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
 
     override fun onViewDetachedFromWindow(holder: RowViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        val position = holder.adapterPosition
+        val position = holder.bindingAdapterPosition
         if (position < 0) {
             return
         }

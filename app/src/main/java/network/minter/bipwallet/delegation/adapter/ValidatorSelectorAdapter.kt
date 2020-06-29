@@ -118,7 +118,6 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val ctx = holder.itemView.context
         if (holder is HeaderViewHolder) {
             val item = items[position] as ItemHeader
             holder.binding.title.text = item.title

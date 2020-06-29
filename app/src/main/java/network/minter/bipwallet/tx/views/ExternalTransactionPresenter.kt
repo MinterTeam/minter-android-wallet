@@ -660,11 +660,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             return@Function Observable.just(copyError<PushResult>(cntRes.errorResult))
                         }
                         val tx = Transaction.Builder(cntRes.nonce, mExtTx)
-                                .setGasPrice(if (mExtTx!!.type == OperationType.RedeemCheck) BigInteger.ONE else cntRes.gas)
+                                .setGasPrice(if (mExtTx!!.type == OperationType.RedeemCheck) BigInteger.ONE else (cntRes.gas
+                                        ?: BigInteger.ONE))
                                 .setPayload(mPayload)
                                 .buildFromExternal()
                         val data = secretStorage.getSecret(mFrom!!)
-                        val sign = tx.signSingle(data.privateKey)
+                        val sign = tx.signSingle(data.privateKey)!!
                         safeSubscribeIoToUi(
                                 ReactiveGate.rxGate(gateTxRepo.sendTransaction(sign))
                                         .onErrorResumeNext(ReactiveGate.toGateError())

@@ -61,7 +61,7 @@ class ValidatorsAcAdapter(
         holder.b.separator.visible = items.isNotEmpty() && position < items.size - 1
 
         holder.b.root.setOnClickListener {
-            presenter.dispatchClick(items[holder.adapterPosition])
+            presenter.dispatchClick(items[holder.bindingAdapterPosition])
         }
         holder.b.searchItemTitle.text = name
         holder.b.searchItemIconLeft.setImageUrlFallback(item.meta?.iconUrl, R.drawable.img_avatar_delegate)
