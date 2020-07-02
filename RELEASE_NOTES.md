@@ -1,5 +1,13 @@
 # Release Notes
 
+## 2.0.1
+ - Fixes for large system font size
+ - Fix for duplicated delegated stakes after api changes
+ - Removed disabling "wallets" tabs scroll if content fits into screen height (works wrong in some cases)
+
+## 2.0.0
+ - Fully refactored codebase, java -> kotlin
+
 ## 1.14.0
  - Added support new deeplinks protocol
  - Added information about last updated block

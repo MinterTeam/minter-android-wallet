@@ -51,15 +51,24 @@
     <dimen name="margin_edges_quart">4dp</dimen>
 
     <dimen name="text_size_10">10sp</dimen>
+    <dimen name="text_size_fixed_10">10dp</dimen>
     <dimen name="text_size_11">11sp</dimen>
+    <dimen name="text_size_fixed_11">11dp</dimen>
     <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_fixed_12">12dp</dimen>
     <dimen name="text_size_13">13sp</dimen>
+    <dimen name="text_size_fixed_13">13dp</dimen>
     <dimen name="text_size_14">14sp</dimen>
+    <dimen name="text_size_fixed_14">14dp</dimen>
     <dimen name="text_size_14_unified">14dp</dimen>
     <dimen name="text_size_default">16sp</dimen>
+    <dimen name="text_size_fixed_default">16dp</dimen>
     <dimen name="text_size_17">17sp</dimen>
+    <dimen name="text_size_fixed_17">17dp</dimen>
     <dimen name="text_size_18">18sp</dimen>
+    <dimen name="text_size_fixed_18">18dp</dimen>
     <dimen name="text_size_20">20sp</dimen>
+    <dimen name="text_size_fixed_20">20dp</dimen>
     <dimen name="text_size_22">22sp</dimen>
     <dimen name="text_size_24">24sp</dimen>
     <dimen name="text_size_26">26sp</dimen>

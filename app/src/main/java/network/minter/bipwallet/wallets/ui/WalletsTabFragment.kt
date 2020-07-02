@@ -161,7 +161,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
             }
         })
         binding.walletSelector.registerLifecycle(activity!!)
-        CollapsingToolbarScrollDisabler(binding)
+//        CollapsingToolbarScrollDisabler(binding)
 
         LastBlockHandler.handle(binding.balanceUpdatedLabel, null, LastBlockHandler.ViewType.Main)
         val broadcastManager = BroadcastReceiverManager(activity!!)

@@ -61,8 +61,14 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                 .subscribe(
                         { res: ExpResult<MutableList<DelegatedItem>> ->
                             factory.loadState.postValue(LoadState.Loaded)
-                            callback.onResult(res.result!!, null,
-                                    if (res.meta!!.lastPage == 1) null else res.meta!!.currentPage + 1)
+                            val lastPage = res.meta?.lastPage ?: 0
+
+                            var nextPage: Int? = null
+                            if (lastPage > 1) {
+                                nextPage = (res.meta?.currentPage ?: 1) + 1
+                            }
+
+                            callback.onResult(res.result!!, null, nextPage)
                             if (res.result?.isEmpty() == true) {
                                 factory.loadState.postValue(LoadState.Empty)
                             }

@@ -28,6 +28,7 @@
 
     <style name="WalletBase" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:colorPrimary">@color/white</item>
+        <item name="android:colorEdgeEffect">@color/colorPrimaryLighter</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
@@ -465,7 +466,7 @@
     </style>
 
     <style name="Wallet.ItemTitle">
-        <item name="android:textSize">@dimen/text_size_17</item>
+        <item name="android:textSize">@dimen/text_size_fixed_17</item>
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:fontFamily">@font/_inter_medium</item>
     </style>
@@ -489,7 +490,7 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">@dimen/text_size_default</item>
+        <item name="android:textSize">@dimen/text_size_fixed_default</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>

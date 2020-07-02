@@ -66,6 +66,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:overScrollMode="always"
+        android:scrollbars="vertical"
         app:layout_constraintTop_toBottomOf="@id/testnet_warning">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,11 +83,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:itemCount="3"
+                android:scrollbars="none"
                 tools:listitem="@layout/item_list_settings" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_main"
                 android:layout_width="0dp"
+                android:scrollbars="none"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -97,6 +101,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_additional"
                 android:layout_width="0dp"
+                android:scrollbars="none"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

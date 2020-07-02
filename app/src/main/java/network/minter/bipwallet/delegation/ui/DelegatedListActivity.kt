@@ -69,6 +69,7 @@ import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextExtensions.getColorCompat
 import network.minter.bipwallet.internal.helpers.DateHelper.toDateMonthOptYear
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
+import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
@@ -106,20 +107,24 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
     }
 
     override fun showRefreshProgress() {
-        binding.containerSwipeRefresh.isRefreshing = true
+        if (!binding.progress.nvisible) {
+            binding.containerSwipeRefresh.isRefreshing = true
+        }
     }
 
     override fun hideRefreshProgress() {
         binding.containerSwipeRefresh.isRefreshing = false
-        binding.progress.visible = false
+        hideProgress()
     }
 
     override fun showProgress() {
-        binding.progress.visible = true
+        if (!binding.containerSwipeRefresh.isRefreshing) {
+            binding.progress.nvisible = true
+        }
     }
 
     override fun hideProgress() {
-        binding.progress.visible = false
+        binding.progress.nvisible = false
     }
 
     override fun scrollTo(pos: Int) {

@@ -86,7 +86,7 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
                 binding.list.visible = false
                 binding.emptyTitle.visible = true
                 binding.progress.visible = false
-                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
+//                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
 
             }
             ViewStatus.Error -> {
@@ -94,13 +94,13 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
                 binding.emptyTitle.visible = true
                 binding.emptyTitle.text = error ?: "Unexpected error"
                 binding.progress.visible = false
-                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
+//                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
             }
             ViewStatus.Normal -> {
                 binding.list.visible = true
                 binding.emptyTitle.visible = false
                 binding.progress.visible = false
-                CollapsingToolbarScrollDisabler.bindRecycler(binding.list, javaClass)
+//                CollapsingToolbarScrollDisabler.bindRecycler(binding.list, javaClass)
             }
         }
 

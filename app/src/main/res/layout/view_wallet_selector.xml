@@ -31,6 +31,7 @@
     android:layout_height="wrap_content"
     android:minHeight="?attr/actionBarSize"
     android:orientation="horizontal"
+    tools:background="@color/colorPrimary"
     android:weightSum="10">
 
     <FrameLayout
@@ -70,9 +71,9 @@
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="@color/textColorWhite"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_fixed_18"
         app:layout_constraintHorizontal_bias="0"
-        tools:text="Mx8d008dffe2f9144a"
+        tools:text="Mx8d008d...ffe2f9"
         tools:textColor="@color/white" />
 
     <ImageView
@@ -80,7 +81,7 @@
         android:id="@+id/dropdown"
         android:layout_width="32dp"
         android:layout_weight="1"
-        android:layout_marginStart="@dimen/margin_edges_half"
+        android:layout_marginStart="0dp"
         android:contentDescription="@string/image_cd_wallet_selector_dropdown"
         android:src="@drawable/ic_drop_down_white" />
 
