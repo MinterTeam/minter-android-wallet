@@ -86,6 +86,7 @@
                 android:layout_marginStart="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="Address"
+                android:maxLength="42"
                 android:imeOptions="actionNext"
                 android:inputType="textNoSuggestions|textMultiLine"
                 android:maxLines="4"
