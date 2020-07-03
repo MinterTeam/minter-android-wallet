@@ -214,6 +214,7 @@ class PinEnterPresenter @Inject constructor() : MvpBasePresenter<PinEnterView>()
             }
         } else if (mode == PinMode.Deletion) {
             if (valid && len == 4) {
+                viewState.setPinEnabled(false)
                 storage.removePinCode()
                 settings.remoteSync(EnablePinCode)
                 Timber.d("PIN removed")
