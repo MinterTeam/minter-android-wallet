@@ -91,6 +91,7 @@ import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import javax.net.ssl.SSLException
 
 /**
  * minter-android-wallet. 2018
@@ -722,9 +723,13 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     private fun onFailedExecuteTransaction(throwable: Throwable) {
         Timber.w(throwable, "Uncaught tx error")
+        var errorMessage = throwable.message
+        if (throwable is SSLException) {
+            errorMessage = "Bad internet connection: ${throwable.message}"
+        }
         viewState.startDialog { ctx ->
             ConfirmDialog.Builder(ctx, "Unable to send transaction")
-                    .setText(throwable.message)
+                    .setText(errorMessage)
                     .setPositiveAction("Close")
                     .create()
         }
