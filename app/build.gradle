@@ -326,23 +326,16 @@ dependencies {
     implementation 'com.airbnb:deeplinkdispatch:5.1.0'
     kapt 'com.airbnb:deeplinkdispatch-processor:5.1.0'
 
-    // testing
-//    implementation 'androidx.test.espresso:espresso-core:3.2.0'
-//    testImplementation 'junit:junit:4.12'
-//    androidTestImplementation 'junit:junit:4.12'
-//    testImplementation "org.mockito:mockito-core:2.25.0"
-//    androidTestImplementation 'org.mockito:mockito-android:2.23.4'
-//    androidTestImplementation 'com.squareup.retrofit2:retrofit-mock:2.5.0'
-//    androidTestImplementation 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
-//    androidTestImplementation 'androidx.test:runner:1.2.0'
-//    androidTestImplementation 'androidx.test:rules:1.2.0'
-//    androidTestImplementation 'org.awaitility:awaitility:3.1.6'
-////    androidTest
-//    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
-//    androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
-//
-//    androidTestAnnotationProcessor 'com.google.dagger:dagger-compiler:2.26'
-//    androidTestAnnotationProcessor 'com.google.dagger:dagger-android-processor:2.26'
+    // tests
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+    androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.0"
+    androidTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.0"
+
+    // (Optional) If you need "Parameterized Tests"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
+    testImplementation 'org.mockito:mockito-core:2.25.0'
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
 }
 

@@ -38,6 +38,7 @@ import network.minter.bipwallet.addressbook.models.AddressBookItemHeader
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.helpers.EmojiDetector
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
@@ -145,7 +146,13 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
         }
 
         for (contact in addressContacts) {
-            val h = contact.name!!.substring(0, 1).toLowerCase()
+            val emojiLen = EmojiDetector.emojiLength(contact.name!!)
+            val h = if (emojiLen > -1) {
+                contact.name!!.substring(0, emojiLen).toLowerCase()
+            } else {
+                contact.name!!.substring(0, 1).toLowerCase()
+            }
+
             if (lastLetter == null || (lastLetter != h)) {
                 lastLetter = h
                 out.add(AddressBookItemHeader(h))
