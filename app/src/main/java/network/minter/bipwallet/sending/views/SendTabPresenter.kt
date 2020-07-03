@@ -578,7 +578,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
      */
     private fun onStartExecuteTransaction() {
 
-        viewState.startDialog { ctx: Context? ->
+        viewState.startDialog { ctx: Context ->
             val dialog = WalletProgressDialog.Builder(ctx, R.string.tx_send_in_progress)
                     .setText(R.string.please_wait)
                     .create()
@@ -586,6 +586,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
             // BIP account exists anyway, no need
             val baseAccount = findAccountByCoin(DEFAULT_COIN).get()
+            if (baseAccount.address == null) {
+                return@startDialog ConfirmDialog.Builder(ctx, "Unable to send transaction")
+                        .setText("Can't get wallet balance. Maybe you have bad internet connection?")
+                        .setPositiveAction("Close")
+                        .create()
+            }
             val sendAccount = mFromAccount
             val isBaseAccount = sendAccount!!.coin == DEFAULT_COIN
             val enoughBaseForFee: Boolean

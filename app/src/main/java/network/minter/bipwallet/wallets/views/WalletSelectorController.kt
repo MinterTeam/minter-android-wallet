@@ -66,8 +66,10 @@ class WalletSelectorController @Inject constructor() {
     fun attachView(view: WalletSelectorControllerView) {
         viewState = view
 
-        if (accountStorage.isDataReady) {
+        if (accountStorage.isDataReady && accountStorage.data.balances.isNotEmpty()) {
             fillWalletSelector(accountStorage.data)
+        } else {
+            fillWalletSelector(AddressListBalancesTotal(secretStorage.addresses))
         }
 
         viewState!!.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->

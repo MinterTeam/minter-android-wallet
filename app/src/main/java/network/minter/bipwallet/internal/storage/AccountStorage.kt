@@ -108,6 +108,10 @@ class AccountStorage(
         get() = getData()
 
     override fun onAfterUpdate(result: AddressListBalancesTotal) {
+        if (result.balances.isEmpty()) {
+            storage.put(KEY_BALANCE, AddressListBalancesTotal(secretStorage.addresses))
+            return
+        }
         storage.put(KEY_BALANCE, result)
     }
 
