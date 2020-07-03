@@ -170,6 +170,15 @@ class AddressBookRepository(
         return db.addressBook().countByNameOrAddress(likeArg)
     }
 
+    @JvmOverloads
+    fun countExactByNameOrAddress(nameOrAddress: String, exclude: String? = null): Single<Int> {
+        if (exclude != null) {
+            return db.addressBook().countExactByNameOrAddress(nameOrAddress, exclude)
+        }
+
+        return db.addressBook().countExactByNameOrAddress(nameOrAddress)
+    }
+
     fun findByNameOrAddress(nameOrAddress: String): Single<AddressContact> {
         /*
         if user typed address and we didn't found the contact, returning fake contact with name=address.toString()

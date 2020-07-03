@@ -53,7 +53,7 @@ internal class RecipientValidator(
             }
         }
 
-        return Wallet.app().addressBookRepo().countLikeByNameOrAddress(v)
+        return Wallet.app().addressBookRepo().countExactByNameOrAddress(v)
                 .map { cnt -> cnt > 0 }
     }
 }

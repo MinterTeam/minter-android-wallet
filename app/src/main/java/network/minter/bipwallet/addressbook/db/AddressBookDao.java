@@ -63,6 +63,22 @@ public interface AddressBookDao {
      * @param nameOrAddress should be ENCLOSED with "%"
      * @return
      */
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE address = :nameOrAddress OR name = :nameOrAddress")
+    Single<Integer> countExactByNameOrAddress(String nameOrAddress);
+
+    /**
+     * Get the count of contacts like passed name or address
+     * @param nameOrAddress should be ENCLOSED with "%"
+     * @return
+     */
+    @Query("SELECT COUNT(*) FROM minter_contacts WHERE (name != :excludeName OR address != :excludeName) AND (address = :nameOrAddress OR name = :nameOrAddress)")
+    Single<Integer> countExactByNameOrAddress(String nameOrAddress, String excludeName);
+
+    /**
+     * Get the count of contacts like passed name or address
+     * @param nameOrAddress should be ENCLOSED with "%"
+     * @return
+     */
     @Query("SELECT COUNT(*) FROM minter_contacts WHERE (name != :excludeName OR address != :excludeName) AND (address LIKE :nameOrAddress OR name LIKE :nameOrAddress)")
     Single<Integer> countByNameOrAddress(String nameOrAddress, String excludeName);
 
