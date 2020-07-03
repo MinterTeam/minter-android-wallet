@@ -143,6 +143,9 @@ class PinEnterPresenter @Inject constructor() : MvpBasePresenter<PinEnterView>()
 
     @Suppress("UNUSED_PARAMETER")
     private fun onValidationError(value: String) {
+        if (mode == PinMode.Confirmation) {
+            return
+        }
         val timestamp = System.currentTimeMillis() / 1000
         var firstInvalidTime = kvStorage[PREF_PIN_INVALID_TYPE_TIME, 0L]
         var invalidCount = kvStorage[PREF_PIN_INVALID_TYPE_COUNT, 0]
