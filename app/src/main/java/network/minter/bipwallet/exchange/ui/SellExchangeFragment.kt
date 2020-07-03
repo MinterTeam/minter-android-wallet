@@ -34,6 +34,7 @@ import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.FragmentExchangeSellBinding
 import network.minter.bipwallet.exchange.contract.SellExchangeView
 import network.minter.bipwallet.exchange.views.SellExchangePresenter
+import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
@@ -58,6 +59,15 @@ class SellExchangeFragment : ExchangeFragment(), SellExchangeView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         itemBinding = FragmentExchangeSellBinding.inflate(inflater, container, false)
         itemBinding.apply {
+            inputAmount.input.setOnEditorActionListener { v, actionId, event ->
+                inputIncomingCoin.input.requestFocus()
+                false
+            }
+            inputIncomingCoin.input.setOnEditorActionListener { v, actionId, event ->
+                KeyboardHelper.hideKeyboard(this@SellExchangeFragment)
+                false
+            }
+
             binding = ExchangeBinding(
                     root,
                     inputOutgoingCoin,

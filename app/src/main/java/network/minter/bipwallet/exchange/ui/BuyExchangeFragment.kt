@@ -34,6 +34,7 @@ import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.FragmentExchangeBuyBinding
 import network.minter.bipwallet.exchange.contract.BuyExchangeView
 import network.minter.bipwallet.exchange.views.BuyExchangePresenter
+import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
@@ -57,6 +58,16 @@ class BuyExchangeFragment : ExchangeFragment(), BuyExchangeView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         itemBinding = FragmentExchangeBuyBinding.inflate(inflater, container, false)
         itemBinding.apply {
+            inputAmount.input.setOnEditorActionListener { v, actionId, event ->
+                KeyboardHelper.hideKeyboard(this@BuyExchangeFragment)
+                false
+            }
+            inputIncomingCoin.input.setOnEditorActionListener { v, actionId, event ->
+                inputIncomingCoin.input.requestFocus()
+                false
+            }
+
+
             binding = ExchangeBinding(
                     root,
                     inputOutgoingCoin,
