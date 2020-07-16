@@ -1,5 +1,8 @@
 # Release Notes
 
+## 2.0.3
+ - Minor issues fix
+
 ## 2.0.1
  - Fixes for large system font size
  - Fix for duplicated delegated stakes after api changes
