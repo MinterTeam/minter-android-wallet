@@ -40,7 +40,7 @@
     <string name="crop_image_menu_rotate_right">Rotate</string>
     <string name="crop_image_menu_crop">Save</string>
 
-    <string name="advanced_generate_seed_description">Save this seed phrase in case you plan to use this address in the future.</string>
+    <string name="advanced_generate_seed_description">Save this seed phrase in case you plan to use this address in the future</string>
     <string name="advanced_using_ledger">This feature is absolutely safe, because all your private data (including mnemonic and private keys) staying on your hardware wallet and no one, except you, don\'t have access to it.
     \n\nTo activate wallet, unlock your device and open Minter application</string>
     <string name="advanced_action_generate">Generate Address</string>
@@ -148,8 +148,8 @@
     <string name="hint_pin_enter">Please enter a 4-digit PIN</string>
     <string name="hint_pin_repeat">Please confirm your 4-digit PIN</string>
     <string name="error_pin_invalid" formatted="false">Invalid PIN-code. Left %d tries.</string>
-    <string name="error_pin_invalid_simple" formatted="false">Invalid PIN-code.</string>
-    <string name="error_pin_locked" formatted="false">Wallet is locked for %s, because you were entered invalid PIN-code %d times in a row.</string>
+    <string name="error_pin_invalid_simple" formatted="false">Invalid PIN-code</string>
+    <string name="error_pin_locked" formatted="false">Wallet is locked for %s, because you were entered invalid PIN-code %d times in a row</string>
     <string name="pin_fp_title_enable">Unlock the wallet with fingerprint</string>
 
     <string name="notification_balance_update_name">Balance updates</string>
@@ -195,7 +195,7 @@
     <string name="label_payload_short">Payload Message</string>
     <string name="btn_use_max">Use max</string>
     <string name="label_you_will_pay_approximately">You will pay approximately</string>
-    <string name="attention_exchange_rate">The final amount depends on the exchange rate at the moment of transaction.</string>
+    <string name="attention_exchange_rate">The final amount depends on the exchange rate at the moment of transaction</string>
     <string name="label_coin_to_sell">Coin to sell</string>
     <string name="label_you_will_get_approximately">You will get approximately</string>
     <string name="label_balance">Balance</string>
@@ -258,7 +258,7 @@
     <string name="hw_not_connected">Hardware wallet not connected</string>
 
     <string name="alert_copied">Copied!</string>
-    <string name="hint_save_seed">⚠️ Save this seed phrase in case you plan to use this address in the future.</string>
+    <string name="hint_save_seed">⚠️ Save this seed phrase in case you plan to use this address in the future</string>
     <string name="balance_last_updated_main">(Updated %d %s ago)</string>
     <string name="balance_last_updated_now_main">(Updated just now)</string>
     <string name="balance_last_updated_never_main">(Never updated)</string>
@@ -322,8 +322,8 @@
     <string name="label_multisig_address">Multisig Address</string>
     <string name="title_delegate">New Delegation</string>
     <string name="title_unbond">Unbond</string>
-    <string name="dialog_label_delegate">Delegate your coins to validators and receive related regular payments.</string>
-    <string name="dialog_label_unbond">The process will be finalized within ~30 days after the request has been sent.</string>
+    <string name="dialog_label_delegate">Delegate your coins to validators and receive related regular payments</string>
+    <string name="dialog_label_unbond">The process will be finalized within ~30 days after the request has been sent</string>
     <string name="label_validator">Validator</string>
     <string name="menu_label_delegate">Delegate</string>
     <string name="empty_delegations">You don\'t have any delegated stakes yet</string>
@@ -364,7 +364,7 @@
     <string name="tx_type_send_receive">Receive</string>
     <string name="tx_type_send">Send</string>
     <string name="label_check_issuer">Check Issuer</string>
-    <string name="dialog_description_logout">You will lose all your settings and wallets list.</string>
+    <string name="dialog_description_logout">You will lose all your settings and wallets list</string>
     <string name="dialog_text_logout">Are you sure you want to log out?</string>
     <string name="dialog_title_logout">Logging Out</string>
     <string name="dialog_create_wallet_description">⚠️ Save this seed phrase if you plan to use this address in the future. \nIt gives full access to your wallet, so keep it in a very safe place.</string>
