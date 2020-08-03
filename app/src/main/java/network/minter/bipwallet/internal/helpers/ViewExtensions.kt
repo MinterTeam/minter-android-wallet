@@ -62,7 +62,9 @@ object ViewExtensions {
     var View.visible: Boolean
         get() = visibility == View.VISIBLE
         set(v) {
-            this.visibility = if (v) View.VISIBLE else View.GONE
+            this.post {
+                this.visibility = if (v) View.VISIBLE else View.GONE
+            }
         }
 
     var View.nvisible: Boolean

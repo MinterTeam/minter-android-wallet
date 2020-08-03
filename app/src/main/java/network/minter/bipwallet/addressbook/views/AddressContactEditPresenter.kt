@@ -38,7 +38,6 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog
 import network.minter.bipwallet.internal.helpers.IntentHelper.getParcelExtra
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
-import network.minter.core.crypto.MinterPublicKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,6 +63,7 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
                 viewState.validate()
             }
         } else {
+            // copy values
             mContact!!.apply {
                 id = c.id
                 name = c.name
@@ -94,9 +94,8 @@ class AddressContactEditPresenter @Inject constructor() : MvpBasePresenter<Addre
                     if (s == null) {
                         return@addTextChangedListener
                     }
-                    val isPubKey = s.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
                     mContact!!.address = s
-                    mContact!!.type = if (isPubKey) AddressContact.AddressType.ValidatorPubKey else AddressContact.AddressType.Address
+                    mContact!!.type = AddressContact.AddressType.Address
                 }
                 R.id.input_title -> mContact!!.name = s?.trim()
             }

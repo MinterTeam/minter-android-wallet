@@ -32,6 +32,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import network.minter.bipwallet.exchange.ExchangeAmount
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.explorer.models.CoinBalance
@@ -59,7 +60,8 @@ interface ExchangeView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startExplorer(txHash: String)
-    fun finish()
+    fun finishCancel()
+    fun finishSuccess(exchangeAmount: ExchangeAmount)
     fun setCalculation(calculation: String)
     fun setOutAccountName(accountName: CharSequence)
     fun setAmount(amount: CharSequence)
@@ -70,4 +72,5 @@ interface ExchangeView : MvpView {
     fun setCalculationTitle(@StringRes calcTitle: Int)
     fun hideKeyboard()
     fun hideCalculation()
+    fun validateForm()
 }

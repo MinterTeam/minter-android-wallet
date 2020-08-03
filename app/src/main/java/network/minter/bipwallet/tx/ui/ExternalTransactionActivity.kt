@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.ActivityExternalTransactionBinding
+import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.external.*
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
@@ -47,18 +48,18 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.releaseD
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
+import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.security.PauseTimer
-import network.minter.bipwallet.services.livebalance.RTMService
-import network.minter.bipwallet.services.livebalance.ServiceConnector
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
-import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver.Companion.send
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterAddress
 import timber.log.Timber
+import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -160,6 +161,42 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)))
     }
 
+    override fun showExchangeBanner(text: CharSequence, listener: (View) -> Unit) {
+        b.exchangeContainer.visible = true
+        b.exchangeText.text = text
+        b.exchangeAction.setOnClickListener {
+            listener(it)
+        }
+    }
+
+    override fun startExchangeCoins(requestCode: Int, coin: String, value: BigDecimal, account: MinterAddress) {
+        ConvertCoinActivity.Builder(this)
+                .buyCoins(coin, value)
+                .withAccount(account)
+                .start(requestCode)
+    }
+
+    override fun hideExchangeBanner() {
+        b.exchangeContainer.visible = false
+    }
+
+    override fun showWaitProgress() {
+        runOnUiThread {
+            b.inputList.alpha = 0.3f
+            b.progress.nvisible = true
+            b.action.isEnabled = false
+        }
+
+    }
+
+    override fun hideWaitProgress() {
+        runOnUiThread {
+            b.inputList.alpha = 1f
+            b.progress.nvisible = false
+            b.action.isEnabled = true
+        }
+    }
+
     override fun disableAll() {
         b.action.isEnabled = false
         b.action.isClickable = false
@@ -172,22 +209,8 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         return presenterProvider.get()
     }
 
-    override fun onStart() {
-        super.onStart()
-        ServiceConnector.bind(this)
-        ServiceConnector.onConnected()
-                .subscribe { res: RTMService ->
-                    res.setOnMessageListener { message: String?, channel: String, _: MinterAddress? ->
-                        if (channel == RTMService.CHANNEL_BLOCKS) {
-                            send(Wallet.app().context(), message!!)
-                        }
-                    }
-                }
-    }
-
     override fun onStop() {
         super.onStop()
-        ServiceConnector.release(this)
         releaseDialog(walletDialog)
     }
 
@@ -207,6 +230,11 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
             LastBlockHandler.handle(b.lastUpdated, it)
         })
         broadcastManager.register()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presenter.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onNewIntent(intent: Intent) {

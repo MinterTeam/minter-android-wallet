@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.exchange.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -49,6 +50,7 @@ import com.otaliastudios.autocomplete.AutocompletePolicy
 import com.otaliastudios.autocomplete.AutocompletePresenter
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.IncludeExchangeCalculationBinding
+import network.minter.bipwallet.exchange.ExchangeAmount
 import network.minter.bipwallet.exchange.adapters.CoinsAcPresenter
 import network.minter.bipwallet.exchange.contract.ExchangeView
 import network.minter.bipwallet.internal.BaseInjectFragment
@@ -161,6 +163,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         }
     }
 
+
     override fun setTextChangedListener(listener: (InputWrapper, Boolean) -> Unit) {
         inputGroup.addTextChangedListener(listener)
     }
@@ -188,7 +191,14 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)))
     }
 
-    override fun finish() {
+    override fun finishCancel() {
+        activity!!.finish()
+    }
+
+    override fun finishSuccess(exchangeAmount: ExchangeAmount) {
+        val data = Intent()
+        data.putExtra(ConvertCoinActivity.RESULT_EXCHANGE_AMOUNT, exchangeAmount)
+        activity!!.setResult(Activity.RESULT_OK, data)
         activity!!.finish()
     }
 
@@ -255,6 +265,10 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
 
     override fun hideCalculation() {
         binding.calculationContainer.layoutCalculation.visible = false
+    }
+
+    override fun validateForm() {
+
     }
 
     override fun setOutAccountName(accountName: CharSequence) {

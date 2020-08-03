@@ -25,6 +25,9 @@
  */
 package network.minter.bipwallet.exchange.ui
 
+import android.app.Activity
+import android.app.Service
+import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -35,10 +38,15 @@ import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.ActivityConvertCoinBinding
+import network.minter.bipwallet.exchange.ExchangeAmount
 import network.minter.bipwallet.exchange.contract.ConvertCoinView
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
+import network.minter.bipwallet.internal.system.ActivityBuilder
+import network.minter.core.crypto.MinterAddress
+import org.parceler.Parcels
+import java.math.BigDecimal
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
@@ -63,6 +71,7 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
         binding.tabs.tabGravity = TabLayout.GRAVITY_FILL
 
         binding.testnetWarning.visibleForTestnet()
+        setResult(Activity.RESULT_CANCELED)
     }
 
     override fun setupTabs() {
@@ -78,6 +87,10 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
+
+        if (intent.hasExtra(EXTRA_COIN_TO_BUY)) {
+            binding.pager.setCurrentItem(1, false)
+        }
     }
 
     override fun setCurrentPage(page: Int) {
@@ -97,7 +110,11 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
             }
 
             override fun getItem(position: Int): Fragment {
-                return sTabs[position].newInstance()
+                return when (position) {
+                    0 -> SellExchangeFragment.newInstance(intent)
+                    1 -> BuyExchangeFragment.newInstance(intent)
+                    else -> throw IllegalStateException("Unknown tab $position")
+                }
             }
 
             override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
@@ -107,11 +124,56 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
     }
 
     companion object {
+        const val EXTRA_COIN_TO_BUY = "EXTRA_COIN_TO_BUY"
+        const val EXTRA_VALUE_TO_BUY = "EXTRA_VALUE_TO_BUY"
+        const val EXTRA_ACCOUNT = "EXTRA_ACCOUNT"
+        const val RESULT_EXCHANGE_AMOUNT = "RESULT_EXCHANGE_AMOUNT"
+
+        fun getResult(data: Intent): ExchangeAmount {
+            return data.getParcelableExtra(RESULT_EXCHANGE_AMOUNT)!!
+        }
+
         private val sTabs: List<Class<out ExchangeFragment>> = object : ArrayList<Class<out ExchangeFragment>>() {
             init {
                 add(SellExchangeFragment::class.java)
                 add(BuyExchangeFragment::class.java)
             }
+        }
+    }
+
+    class Builder : ActivityBuilder {
+        private var mCoinToBuy: String? = null
+        private var mValueToBuy: BigDecimal = BigDecimal.ZERO
+        private var mFromAccount: MinterAddress? = null
+
+        constructor(from: Activity) : super(from)
+        constructor(from: Fragment) : super(from)
+        constructor(from: Service) : super(from)
+
+        fun buyCoins(coin: String, value: BigDecimal): Builder {
+            mCoinToBuy = coin
+            mValueToBuy = value
+            return this
+        }
+
+        fun withAccount(account: MinterAddress): Builder {
+            mFromAccount = account
+            return this
+        }
+
+        override fun onBeforeStart(intent: Intent) {
+            super.onBeforeStart(intent)
+            if (mCoinToBuy != null) {
+                intent.putExtra(EXTRA_COIN_TO_BUY, mCoinToBuy)
+                intent.putExtra(EXTRA_VALUE_TO_BUY, mValueToBuy.toPlainString())
+            }
+            if (mFromAccount != null) {
+                intent.putExtra(EXTRA_ACCOUNT, Parcels.wrap(mFromAccount))
+            }
+        }
+
+        override fun getActivityClass(): Class<*> {
+            return ConvertCoinActivity::class.java
         }
     }
 }

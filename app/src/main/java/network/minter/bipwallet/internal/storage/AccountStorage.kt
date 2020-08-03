@@ -107,6 +107,10 @@ class AccountStorage(
     val wallets: AddressListBalancesTotal
         get() = getData()
 
+    fun getWalletByAddress(address: MinterAddress): AddressBalanceTotal {
+        return getData().getBalance(address)
+    }
+
     override fun onAfterUpdate(result: AddressListBalancesTotal) {
         if (result.balances.isEmpty()) {
             storage.put(KEY_BALANCE, AddressListBalancesTotal(secretStorage.addresses))

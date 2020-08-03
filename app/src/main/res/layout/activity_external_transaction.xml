@@ -105,7 +105,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sync_container"
                 tools:itemCount="3"
+                tools:alpha="0.3"
                 tools:listitem="@layout/row_input_field" />
+
+            <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
+                android:id="@+id/progress"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="72dp"
+                android:visibility="invisible"
+                app:color="@color/colorPrimaryLight"
+                app:layout_constraintEnd_toEndOf="@id/input_list"
+                app:layout_constraintStart_toStartOf="@id/input_list"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
             <!--LABELS-->
@@ -182,7 +194,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_error"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <TextView
                     android:id="@+id/exchange_text"
@@ -201,6 +213,7 @@
                     tools:text="@string/description_external_not_enough_coins" />
 
                 <TextView
+                    android:id="@+id/exchange_action"
                     style="@style/Wallet.Text.ButtonBorderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

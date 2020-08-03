@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -23,16 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.exchange
 
-package network.minter.bipwallet.exchange;
-
-import dagger.Module;
+import android.os.Parcelable
+import dagger.Module
+import kotlinx.android.parcel.Parcelize
+import java.math.BigDecimal
 
 /**
  * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
-@Module
-public class ExchangeModule {
+@Parcelize
+data class ExchangeAmount(
+        var amount: BigDecimal,
+        var coin: String
+) : Parcelable
 
-}
+@Module
+class ExchangeModule

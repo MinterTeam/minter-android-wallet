@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.exchange.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -54,6 +55,19 @@ class BuyExchangeFragment : ExchangeFragment(), BuyExchangeView {
 
     private lateinit var itemBinding: FragmentExchangeBuyBinding
 
+    companion object {
+        fun newInstance(intent: Intent?): BuyExchangeFragment {
+            val args = Bundle()
+            val instance = BuyExchangeFragment()
+            if (intent != null && intent.extras != null) {
+                args.putAll(intent.extras)
+            }
+
+            instance.arguments = args
+            return instance
+
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         itemBinding = FragmentExchangeBuyBinding.inflate(inflater, container, false)
@@ -77,6 +91,8 @@ class BuyExchangeFragment : ExchangeFragment(), BuyExchangeView {
                     action,
                     lastUpdated
             )
+
+            presenter!!.handleExtras(arguments)
 
             LastBlockHandler.handle(lastUpdated)
             val broadcastManager = BroadcastReceiverManager(activity!!)

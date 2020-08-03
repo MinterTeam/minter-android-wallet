@@ -35,6 +35,8 @@ import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ProgressView
+import network.minter.core.crypto.MinterAddress
+import java.math.BigDecimal
 
 /**
  * minter-android-wallet. 2019
@@ -63,4 +65,13 @@ interface ExternalTransactionView : MvpView, ProgressView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startExplorer(hash: String?)
+
+    fun showExchangeBanner(text: CharSequence, listener: (View) -> Unit)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startExchangeCoins(requestCode: Int, coin: String, value: BigDecimal, account: MinterAddress)
+    fun hideExchangeBanner()
+
+    fun showWaitProgress()
+    fun hideWaitProgress()
 }

@@ -161,6 +161,11 @@ class SecretStorage(private val mStorage: KVStorage) {
             return out
         }
 
+    val secretsSize: Int
+        get() {
+            return secretsListSafe.size
+        }
+
     val secretsSafe: Map<String, SecretData>
         get() {
             var secrets = mStorage.get<Map<String, SecretData>>(KEY_SECRETS)

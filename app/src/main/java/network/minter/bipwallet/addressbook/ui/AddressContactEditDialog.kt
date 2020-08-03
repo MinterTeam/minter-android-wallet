@@ -48,7 +48,6 @@ import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilt
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueContactNameValidator
 import network.minter.bipwallet.internal.views.list.ViewElevationOnScrollNestedScrollView
 import org.parceler.Parcels
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -79,7 +78,6 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DialogAddresscontactEditBinding.inflate(inflater, container, false)
 
-        inputGroup.enableInputDebounce = false
         inputGroup.clearErrorBeforeValidate = false
 
         binding.scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(binding.dialogTop))
@@ -118,14 +116,14 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
     }
 
     override fun validate() {
-        inputGroup.validate(true).subscribe(
-                { _ ->
-
-                },
-                { t ->
-                    Timber.e(t, "Unable to validate form")
-                }
-        )
+//        inputGroup.validate(true).subscribe(
+//                { _ ->
+//
+//                },
+//                { t ->
+//                    Timber.e(t, "Unable to validate form")
+//                }
+//        )
     }
 
     override fun setOnSubmitListener(listener: View.OnClickListener) {
