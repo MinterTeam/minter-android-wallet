@@ -52,6 +52,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
+import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.security.PauseTimer
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
@@ -170,10 +171,13 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     }
 
     override fun startExchangeCoins(requestCode: Int, coin: String, value: BigDecimal, account: MinterAddress) {
-        ConvertCoinActivity.Builder(this)
-                .buyCoins(coin, value)
-                .withAccount(account)
-                .start(requestCode)
+        SingleCallHandler.call("exchange") {
+            ConvertCoinActivity.Builder(this)
+                    .buyCoins(coin, value)
+                    .withAccount(account)
+                    .start(requestCode)
+        }
+
     }
 
     override fun hideExchangeBanner() {
@@ -239,6 +243,7 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        presenter.resetAccount()
         presenter.handleExtras(intent)
     }
 

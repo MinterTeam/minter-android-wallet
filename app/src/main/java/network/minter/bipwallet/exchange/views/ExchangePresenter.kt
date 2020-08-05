@@ -124,12 +124,16 @@ abstract class ExchangePresenter<V : ExchangeView>(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
+        mAccountStorage.update()
 
         mInputChange = BehaviorSubject.create()
         mInputChange!!
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
-                .subscribe { buying: Boolean -> onAmountChangedInternal(buying) }
+                .subscribe(
+                        { buying: Boolean -> onAmountChangedInternal(buying) },
+                        { t -> Timber.w(t, "Error after exchange amount changed") }
+                )
 //                .disposeOnDestroy()
 
         viewState.setSubmitEnabled(false)
@@ -184,6 +188,10 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                     mAccount = Stream.of(mAccounts).filter { value: CoinBalance -> (value.coin == mCurrentCoin) }.findFirst().orElse(mAccount)
                                 }
                                 onAccountSelected(mAccount, true)
+
+                                if (mBuyAmount != null && mBuyCoin != null) {
+                                    onAmountChangedInternal(isBuying)
+                                }
                             }
                         },
                         {
@@ -201,6 +209,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun loadAndSetFee() {
         ReactiveGate.rxGate(gasRepo.minGas)
                 .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .subscribe({ res: GateResult<GasValue> ->
                     if (res.isOk) {
@@ -224,33 +233,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
     }
 
     private fun setCoinsAutocomplete() {
-        mExplorerCoinsRepo.all.rxExp()
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        { res ->
-                            if (res.result != null) {
-                                res.result!!.filter {
-                                    it.symbol.toUpperCase() == MinterSDK.DEFAULT_COIN
-                                }.forEach {
-                                    it.reserveBalance = BigDecimal("10e9")
-                                }
-
-                                val resMutable = res.result!!.toMutableList()
-
-                                resMutable.sortWith(Comparator { a, b ->
-                                    b.reserveBalance.compareTo(a.reserveBalance)
-                                })
-
-                                viewState.setCoinsAutocomplete(resMutable) { item, _ ->
-                                    viewState.setIncomingCoin(item.symbol)
-                                }
-                            }
-                        },
-                        { t: Throwable ->
-                            Timber.w(t, "Unable to get coins list for exchange")
-                        }
-                )
-                .disposeOnDestroy()
+        viewState.setCoinsAutocomplete { item, _ ->
+            viewState.setIncomingCoin(item.symbol)
+        }
     }
 
     private fun findAccountByCoin(coin: String): Optional<CoinBalance> {
@@ -559,6 +544,10 @@ abstract class ExchangePresenter<V : ExchangeView>(
         Timber.d("OnAmountChangedInternal")
         if (mBuyCoin == null) {
             Timber.i("Can't exchange: coin is not set")
+            return
+        }
+        if (mAccount == null) {
+            Timber.i("Can't exchange until user account is not loaded")
             return
         }
         val calculator = ExchangeCalculator.Builder(

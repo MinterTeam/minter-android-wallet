@@ -30,7 +30,6 @@ import android.content.Context
 import android.text.Spannable
 import androidx.recyclerview.widget.RecyclerView
 import com.otaliastudios.autocomplete.AutocompletePolicy
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.apis.explorer.RepoCoins
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
@@ -48,14 +47,17 @@ class CoinsAcPresenter(
 ) : RecyclerAcPresenter<CoinItem>(context), AutocompletePolicy {
     private val adapter: CoinsAcAdapter = CoinsAcAdapter(this)
     private var items: List<CoinItem> = ArrayList()
+    private val itemsLock: Any = Any()
 
     init {
         coinsRepo.observe()
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         { res ->
-                            items = res
+                            synchronized(itemsLock) {
+                                items = res
+                            }
                         },
                         { t ->
                             Timber.w(t, "Unable to load coins list")
@@ -74,8 +76,11 @@ class CoinsAcPresenter(
             return false
         }
 
-        val filtered = items.filter {
-            it.symbol.toLowerCase().startsWith(query.toString().toLowerCase())
+        val filtered: List<CoinItem>
+        synchronized(itemsLock) {
+            filtered = items.filter {
+                it.symbol.toLowerCase().startsWith(query.toString().toLowerCase())
+            }
         }
 
         adapter.setItems(filtered)

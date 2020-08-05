@@ -206,7 +206,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         KeyboardHelper.hideKeyboard(this)
     }
 
-    override fun setCoinsAutocomplete(items: List<CoinItem>, listener: (CoinItem, Int) -> Unit) {
+    override fun setCoinsAutocomplete(listener: (CoinItem, Int) -> Unit) {
         onCoinSelected = listener
     }
 

@@ -154,6 +154,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         if (!isWsBound) {
             ServiceConnector.release(Wallet.app().context())
         }
+        from = null
     }
 
     override fun attachView(view: ExternalTransactionView) {
@@ -168,7 +169,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 .disposeOnDestroy()
 
         viewState.setOnCancelListener(View.OnClickListener { onCancel() })
+    }
 
+    fun resetAccount() {
+        from = null
     }
 
     override fun handleExtras(intent: Intent?) {
@@ -195,7 +199,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 viewState.startDialogFragment { ctx ->
                     WalletSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
                             .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
-                            .setPositiveAction(R.string.btn_ok) { d, _ ->
+                            .setPositiveAction(R.string.btn_continue) { d, _ ->
                                 from = (d as WalletSelectorDialog).item!!.data.minterAddress
                                 init(intent)
                                 d.dismiss()

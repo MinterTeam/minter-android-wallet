@@ -65,7 +65,7 @@ interface ExchangeView : MvpView {
     fun setCalculation(calculation: String)
     fun setOutAccountName(accountName: CharSequence)
     fun setAmount(amount: CharSequence)
-    fun setCoinsAutocomplete(items: List<CoinItem>, listener: (CoinItem, Int) -> Unit)
+    fun setCoinsAutocomplete(listener: (CoinItem, Int) -> Unit)
     fun setIncomingCoin(symbol: String)
     fun setFee(commission: CharSequence)
     fun showCalculationProgress(show: Boolean)
