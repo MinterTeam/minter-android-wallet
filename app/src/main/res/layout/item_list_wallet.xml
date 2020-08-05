@@ -61,13 +61,15 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_edges_half"
         android:fontFamily="@font/_inter_medium"
         android:gravity="center_vertical"
         android:textColor="@color/textColorPrimary"
         android:textSize="17sp"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:layout_marginEnd="@dimen/margin_edges_half"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/action"

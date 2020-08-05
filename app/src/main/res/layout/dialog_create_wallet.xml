@@ -194,7 +194,6 @@
                 android:layout_marginStart="@dimen/margin_edges_medium"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
                 android:hint="@string/input_hint_wallet_title"
-                android:maxLength="18"
                 android:inputType="textMultiLine"
                 android:visibility="gone"
                 app:fieldName="title"

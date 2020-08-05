@@ -83,7 +83,6 @@
                 style="@style/Input"
                 android:layout_marginTop="0dp"
                 android:layout_marginEnd="@dimen/margin_edges_medium"
-                android:maxLength="18"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges_medium"

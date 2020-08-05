@@ -44,11 +44,10 @@
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:minWidth="248dp"
-
+        android:minWidth="268dp"
         tools:itemCount="3"
         tools:layout_height="183dp"
-        tools:layout_width="248dp"
+        tools:layout_width="268dp"
         tools:listitem="@layout/item_list_wallet" />
 
     <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar

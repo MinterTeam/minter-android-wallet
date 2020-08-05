@@ -92,8 +92,8 @@ class AddressContactEditDialog : BaseBottomSheetDialogFragment(), AddressContact
             isRequired = false
         })
 
-        inputGroup.addValidator(binding.inputTitle, LengthValidator(1, 18).apply {
-            errorMessage = "Title length should be from 1 to 18 symbols"
+        inputGroup.addValidator(binding.inputTitle, LengthValidator(1).apply {
+            errorMessage = "Title length should be at least 1 symbol"
         })
 
         binding.inputAddress.input.setOnClickListener { ViewHelper.tryToPasteMinterAddressFromCB(it, binding.inputAddress.input) }
