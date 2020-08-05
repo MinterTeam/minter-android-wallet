@@ -99,10 +99,10 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
 
             if (item.name.isNullOrEmpty()) {
                 vh.title.text = item.publicKey.toShortString()
-                vh.publicKey.text = item.publicKey.toString()
+                vh.publicKey.text = item.publicKey.toShortString()
             } else {
                 vh.title.text = item.name
-                vh.publicKey.text = item.publicKey.toString()
+                vh.publicKey.text = item.publicKey.toShortString()
             }
 
             if (item.description != null) {

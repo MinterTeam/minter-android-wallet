@@ -131,7 +131,7 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             } else {
                 holder.binding.itemTitle.text = meta!!.name
             }
-            holder.binding.itemSubtitle.text = validator.pubKey.toString()
+            holder.binding.itemSubtitle.text = validator.pubKey.toShortString()
 
 
             holder.binding.itemAvatar.setImageUrlFallback(validator.pubKey.avatar, R.drawable.img_avatar_delegate)
