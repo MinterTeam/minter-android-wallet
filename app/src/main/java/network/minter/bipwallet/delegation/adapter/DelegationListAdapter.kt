@@ -37,8 +37,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.zerobranch.layout.SwipeLayout
-import com.zerobranch.layout.SwipeLayout.SwipeActionsListener
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.adapter.LoadState
@@ -71,7 +69,6 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
 
     private var mInflater: LayoutInflater? = null
     private var mLoadState: MutableLiveData<LoadState>? = null
-    private var mLastOpened = -1
     private var mOnDelegatedClickListener: OnDelegatedClickListener? = null
     private var mOnUnbondItemClickListener: OnUnbondItemClickListener? = null
 
@@ -120,20 +117,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         } else if (getItemViewType(i) == DelegatedItem.ITEM_STAKE) {
             val vh = viewHolder as StakeViewHolder
             val item = getItem(i) as DelegatedStake?
-            (vh.itemView as SwipeLayout).setOnActionsListener(object : SwipeActionsListener {
-                override fun onOpen(direction: Int, isContinuous: Boolean) {
-                    closeOpened()
-                    mLastOpened = vh.bindingAdapterPosition
-                }
 
-                override fun onClose() {}
-            })
-            if (vh.bindingAdapterPosition == mLastOpened) {
-                vh.itemView.post {
-                    mLastOpened = -1
-                    vh.itemView.close(true)
-                }
-            }
             vh.avatar!!.setImageUrl(item)
             vh.coin!!.text = item!!.coin
             vh.amount!!.text = bdHuman(item.amount)
@@ -145,7 +129,7 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
                 vh.subamount!!.visibility = View.VISIBLE
             }
             vh.actionUnbond!!.setOnClickListener {
-                if (mOnUnbondItemClickListener != null && vh.itemView.isRightOpen) {
+                if (mOnUnbondItemClickListener != null) {
                     mOnUnbondItemClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedStake)
                 }
             }
@@ -160,12 +144,6 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
 
     fun setLoadState(loadState: MutableLiveData<LoadState>?) {
         mLoadState = loadState
-    }
-
-    fun closeOpened() {
-        if (mLastOpened >= 0) {
-            notifyItemChanged(mLastOpened)
-        }
     }
 
     fun setOnDelegatedClickListener(listener: OnDelegatedClickListener) {

@@ -24,94 +24,70 @@
   ~ THE SOFTWARE.
   -->
 
-<com.zerobranch.layout.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:minHeight="48dp"
-    app:draggedItem="@id/main"
-    app:isContinuousSwipe="false"
-    app:isEnabledSwipe="true"
-    app:isFreeDragAfterOpen="false"
-    app:rightItem="@id/swipe_actions"
-    app:swipeDirection="left">
+    android:minHeight="48dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/swipe_actions"
+    <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
+        android:id="@+id/item_avatar"
+        style="@style/ListAvatar"
+        android:src="@drawable/img_avatar_delegate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/item_coin"
+        style="@style/ListTitle"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_gravity="end"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_edges_half"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/item_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="BIP" />
+
+    <TextView
+        android:id="@+id/item_amount"
+        style="@style/ListTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_edges_half"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/item_subamount"
+        app:layout_constraintEnd_toStartOf="@id/action_unbond"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="4 900.000" />
+
+    <TextView
+        android:id="@+id/item_subamount"
+        style="@style/Wallet.ItemSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_edges_half"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/action_unbond"
+        app:layout_constraintTop_toBottomOf="@id/item_amount"
+        tools:text="31 456.76" />
+
+    <ImageView
+        android:id="@+id/action_unbond"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        android:src="@drawable/ic_remove_circle_outline_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/action_unbond"
-            style="@style/Wallet.Button.SwipeAction"
-            android:layout_width="90dp"
-            android:layout_height="0dp"
-            android:background="@color/colorPrimaryWarning"
-            android:text="@string/btn_unbond"
-            android:textColor="@color/textColorWhite"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:minHeight="48dp">
-
-        <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
-            android:id="@+id/item_avatar"
-            style="@style/ListAvatar"
-            android:src="@drawable/img_avatar_delegate"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/item_coin"
-            style="@style/ListTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_edges_half"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/item_avatar"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="BIP" />
-
-        <TextView
-            android:id="@+id/item_amount"
-            style="@style/ListTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_edges_half"
-            android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@id/item_subamount"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:text="4 900.000" />
-
-        <TextView
-            android:id="@+id/item_subamount"
-            style="@style/Wallet.ItemSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_edges_half"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_amount"
-            tools:text="31 456.76" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</com.zerobranch.layout.SwipeLayout>
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

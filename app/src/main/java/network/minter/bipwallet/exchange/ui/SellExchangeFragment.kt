@@ -74,11 +74,11 @@ class SellExchangeFragment : ExchangeFragment(), SellExchangeView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         itemBinding = FragmentExchangeSellBinding.inflate(inflater, container, false)
         itemBinding.apply {
-            inputAmount.input.setOnEditorActionListener { v, actionId, event ->
+            inputAmount.input.setOnEditorActionListener { _, _, _ ->
                 inputIncomingCoin.input.requestFocus()
                 false
             }
-            inputIncomingCoin.input.setOnEditorActionListener { v, actionId, event ->
+            inputIncomingCoin.input.setOnEditorActionListener { _, _, _ ->
                 KeyboardHelper.hideKeyboard(this@SellExchangeFragment)
                 false
             }

@@ -61,7 +61,6 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ActivityDelegationListBinding
 import network.minter.bipwallet.delegation.adapter.DelegatedStake
 import network.minter.bipwallet.delegation.adapter.DelegatedValidator
-import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
 import network.minter.bipwallet.delegation.contract.DelegatedListView
 import network.minter.bipwallet.delegation.views.DelegatedListPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
@@ -79,7 +78,6 @@ import org.joda.time.DateTime
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlin.math.abs
 
 /**
  * minter-android-wallet. 2020
@@ -220,16 +218,9 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
 
         setupToolbar(binding.toolbar)
         presenter.handleExtras(intent)
-        binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
-            if (binding.list.adapter != null && abs(scrollY - oldScrollY) > 10) {
-                (binding.list.adapter as DelegationListAdapter).closeOpened()
-            }
+        binding.parentScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
             presenter.onScrolledTo(scrollY)
         })
-        binding.list.setOnTouchListener { _, _ ->
-            (binding.list.adapter as DelegationListAdapter).closeOpened()
-            false
-        }
         binding.list.layoutManager = LinearLayoutManager(this)
         itemSeparator = BorderedItemSeparator(this, R.drawable.shape_bottom_separator, false, true)
         binding.list.addItemDecoration(itemSeparator!!)

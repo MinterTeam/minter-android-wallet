@@ -139,7 +139,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         RTMBlockReceiver.send(Wallet.app().context(), message!!)
                                     } else {
                                         RTMBalanceUpdateReceiver.send(Wallet.app().context(), message)
-                                        accountStorage.update(true, Consumer<AddressListBalancesTotal> { account: AddressListBalancesTotal? -> Wallet.app().balanceNotifications().showBalanceUpdate(message, address) })
+                                        accountStorage.update(true, Consumer<AddressListBalancesTotal> { Wallet.app().balanceNotifications().showBalanceUpdate(message, address) })
                                         cachedTxRepo.update(true)
                                         Timber.d("WS ON MESSAGE[%s]: %s", channel, message)
                                     }
@@ -951,7 +951,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         viewState.startDialog { ctx ->
             ConfirmDialog.Builder(ctx, R.string.dialog_title_confirm_transaction)
                     .setText(R.string.dialog_description_external_tx_short)
-                    .setPositiveAction(R.string.btn_confirm) { d, _ ->
+                    .setPositiveAction(R.string.btn_confirm) { _, _ ->
                         startExecuteTransaction()
                     }
                     .setNegativeAction(R.string.btn_cancel)
