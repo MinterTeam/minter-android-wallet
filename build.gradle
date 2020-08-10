@@ -81,13 +81,13 @@ ext {
     minterLibSupport = "28.0.0"
     minterBuildTools = "29.0.3"
 
-    minterExplorerSDK = "0.8.0"
+    minterExplorerSDK = "0.8.1"
     minterProfileSDK = "0.2.6"
     minterBlockchainSDK = "0.13.0"
     minterCoreSDK = "0.7.1"
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"
 
-    appVersionName = "2.0.3-beta01"
-    appVersionCode = 175
+    appVersionName = "2.0.3-beta02"
+    appVersionCode = 176
 }

@@ -370,5 +370,6 @@
     <string name="dialog_title_logout">Logging Out</string>
     <string name="dialog_create_wallet_description">⚠️ Save this seed phrase if you plan to use this address in the future. \nIt gives full access to your wallet, so keep it in a very safe place.</string>
     <string name="dialog_title_confirm_transaction">Confirm Transaction</string>
+    <string name="min_stake">Min. ~%s %s</string>
 
 </resources>

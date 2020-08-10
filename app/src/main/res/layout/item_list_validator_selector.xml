@@ -49,15 +49,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_edges_half"
         android:layout_marginEnd="@dimen/margin_edges"
-        app:layout_constraintBottom_toTopOf="@id/item_subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/item_avatar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
         android:ellipsize="end"
         android:maxLines="1"
         android:singleLine="true"
-        tools:text="BIP (120 912.98)" />
+        app:layout_constraintBottom_toTopOf="@id/item_subtitle"
+        app:layout_constraintEnd_toStartOf="@id/item_commission"
+        app:layout_constraintStart_toEndOf="@id/item_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="ONLY1" />
 
     <TextView
         android:id="@+id/item_subtitle"
@@ -70,11 +70,32 @@
         android:maxLines="1"
         android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/item_min_stake"
         app:layout_constraintStart_toEndOf="@id/item_avatar"
         app:layout_constraintTop_toBottomOf="@id/item_title"
-        tools:text="Mx4ec2ac...2e866b"
+        tools:text="Mp629bff...111111" />
 
-        />
+    <TextView
+        android:id="@+id/item_commission"
+        style="@style/ListTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_edges"
+        app:layout_constraintBottom_toTopOf="@id/item_min_stake"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="10%" />
+
+    <TextView
+        android:id="@+id/item_min_stake"
+        style="@style/ListSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_edges"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_commission"
+        tools:text="Min. ~115999 BIP" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

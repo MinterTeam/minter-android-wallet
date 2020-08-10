@@ -33,8 +33,10 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ItemListHeaderBinding
 import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
+import network.minter.core.MinterSDK
 import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.models.ValidatorMeta
+import java.math.RoundingMode
 
 /**
  * minter-android-wallet. 2020
@@ -132,6 +134,8 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                 holder.binding.itemTitle.text = meta!!.name
             }
             holder.binding.itemSubtitle.text = validator.pubKey.toShortString()
+//            holder.binding.itemCommission.text = validator.
+            holder.binding.itemMinStake.text = holder.itemView.context.getString(R.string.min_stake, item.item.minStake.setScale(0, RoundingMode.HALF_UP).toPlainString(), MinterSDK.DEFAULT_COIN)
 
 
             holder.binding.itemAvatar.setImageUrlFallback(validator.pubKey.avatar, R.drawable.img_avatar_delegate)
