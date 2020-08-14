@@ -40,7 +40,7 @@
         android:enabled="false"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:inputType="textMultiLine"
+        android:inputType="numberDecimal|textMultiLine"
         app:errorEnabled="false"
         app:fieldName="value"
         app:labelEnabled="true"

@@ -32,6 +32,8 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import org.parceler.Parcels;
+
 import java.lang.reflect.Field;
 
 import javax.inject.Inject;
@@ -68,7 +70,7 @@ public class RTMService extends Service {
     private final IBinder mBinder = new LocalBinder();
     @Inject SecretStorage secretStorage;
     @Inject AuthSession session;
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private OnMessageListener mOnMessageListener;
     private Client mClient = null;
     private MinterAddress mAddress;
@@ -118,6 +120,9 @@ public class RTMService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         try {
+            if (intent.hasExtra("address")) {
+                mAddress = Parcels.unwrap(intent.getParcelableExtra("address"));
+            }
             connect();
             secretStorage.addOnMainWalletChangeListener(minterAddress -> {
                 reconnect();
@@ -194,7 +199,10 @@ public class RTMService extends Service {
             mClient = new Client(BuildConfig.LIVE_BALANCE_URL + "?format=protobuf", opts, listener);
             mClient.connect();
 
-            mAddress = secretStorage.getMainWallet();
+            if (mAddress == null) {
+                mAddress = secretStorage.getMainWallet();
+            }
+
             Timber.d("Subscribe to address balance: %s", mAddress.toString());
             Subscription balanceSubscription = mClient.newSubscription(mAddress.toString(), new SubscriptionEventListener() {
                 @Override

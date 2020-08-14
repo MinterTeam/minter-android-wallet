@@ -83,7 +83,7 @@ ext {
 
     minterExplorerSDK = "0.8.1"
     minterProfileSDK = "0.2.6"
-    minterBlockchainSDK = "0.13.0"
+    minterBlockchainSDK = "0.13.1"
     minterCoreSDK = "0.7.1"
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"

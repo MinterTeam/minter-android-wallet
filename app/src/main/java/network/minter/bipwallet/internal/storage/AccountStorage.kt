@@ -62,6 +62,9 @@ class AccountStorage(
         private const val KEY_BALANCE_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_balance_inactive_"
         private const val KEY_DELEGATIONS_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_delegations_inactive_"
         private const val KEY_DELEGATIONS_META_INACTIVE = BuildConfig.MINTER_STORAGE_VERS + "account_storage_delegations_meta_inactive_"
+
+        // @todo: hack, needs more elegance solution
+        var FORCE_ALL: Boolean = false
     }
 
     private fun inactiveBalanceKey(address: MinterAddress): String {
@@ -77,7 +80,7 @@ class AccountStorage(
     }
 
     private fun getBalanceData(address: MinterAddress): Observable<ExpResult<AddressBalance>> {
-        return if (secretStorage.mainWallet == address || !storage.contains(inactiveBalanceKey(address))) {
+        return if (secretStorage.mainWallet == address || !storage.contains(inactiveBalanceKey(address)) || FORCE_ALL) {
             addressRepo.getAddressData(address, true).rxExp()
         } else {
             val out = ExpResult<AddressBalance>()
@@ -135,6 +138,10 @@ class AccountStorage(
                 .flatMap(aggregate())
                 .subscribeOn(Schedulers.io())
                 .toObservable()
+    }
+
+    fun loadBalanceForAddress(address: MinterAddress): Observable<ExpResult<AddressBalance>> {
+        return addressRepo.getAddressData(address).rxExp()
     }
 
     private fun mapBalances(): Function<MinterAddress, ObservableSource<ExpResult<AddressBalanceTotal>>> {

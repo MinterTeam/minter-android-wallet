@@ -38,6 +38,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
@@ -82,6 +83,7 @@ import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinBalance
 import permissions.dispatcher.*
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -136,6 +138,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
             walletSelector.registerLifecycle(activity!!)
 
             inputCoin.input.setFocusable(false)
+
+            Timber.d("InputType for Decimal: ${inputAmount.inputType}")
+            Timber.d("InputType class Decimal: %d", EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_FLAG_DECIMAL or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE)
 
             inputGroup.setup {
                 add(inputRecipient, RecipientValidator("Invalid recipient", true))

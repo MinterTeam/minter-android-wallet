@@ -35,6 +35,7 @@ import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ProgressView
+import network.minter.bipwallet.tx.ui.TxInputFieldRow
 import network.minter.core.crypto.MinterAddress
 import java.math.BigDecimal
 
@@ -45,6 +46,8 @@ import java.math.BigDecimal
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface ExternalTransactionView : MvpView, ProgressView {
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
+    fun setData(allRows: MutableList<TxInputFieldRow<*>>)
+
     fun setFee(fee: CharSequence)
 
     fun disableAll()
@@ -74,4 +77,7 @@ interface ExternalTransactionView : MvpView, ProgressView {
 
     fun showWaitProgress()
     fun hideWaitProgress()
+
+    fun enableEditAction(enable: Boolean)
+
 }

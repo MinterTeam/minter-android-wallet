@@ -30,9 +30,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputFilter
 import android.text.InputType
-import android.text.Spanned
 import android.view.View
 import android.widget.ScrollView
 import android.widget.TextView
@@ -43,7 +41,6 @@ import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.DecimalValidator
-import com.edwardstock.inputfield.form.validators.RegexValidator
 import com.otaliastudios.autocomplete.Autocomplete
 import com.otaliastudios.autocomplete.AutocompleteCallback
 import com.otaliastudios.autocomplete.AutocompletePolicy
@@ -63,6 +60,8 @@ import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.scrollDownTo
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.forms.validators.CoinFilter
+import network.minter.bipwallet.internal.helpers.forms.validators.CoinValidator
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.widgets.WalletButton
 import network.minter.bipwallet.sending.account.SelectorData
@@ -72,7 +71,6 @@ import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinItem
-import timber.log.Timber
 import java.util.regex.Pattern
 
 /**
@@ -108,14 +106,8 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         inputGroup.addInput(binding.inputIncomingCoin, binding.inputAmount)
         inputGroup.addValidator(binding.inputAmount, DecimalValidator("Invalid number"))
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
-        val coinValidator = RegexValidator("^[a-zA-Z0-9]{1,10}$").apply {
-            errorMessage = "Invalid coin name"
-        }
-        inputGroup.addValidator(binding.inputIncomingCoin, coinValidator)
-        inputGroup.addFilter(binding.inputIncomingCoin, InputFilter { source: CharSequence, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int ->
-            Timber.d("Filter: source=%s, start=%d, end=%d, dest=%s, destStart=%d, destEnd=%d", source, start, end, dest, dstart, dend)
-            source.toString().toUpperCase().replace("[^A-Z0-9]".toRegex(), "")
-        })
+        inputGroup.addValidator(binding.inputIncomingCoin, CoinValidator())
+        inputGroup.addFilter(binding.inputIncomingCoin, CoinFilter())
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         binding.calculationContainer.calculation.inputType = InputType.TYPE_NULL
 
@@ -150,6 +142,11 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
             LastBlockHandler.handle(binding.lastUpdated, it)
         })
         broadcastManager.register()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        autocomplete?.dismissPopup()
     }
 
     override fun onDestroyView() {
@@ -281,8 +278,11 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
 
 
     override fun setIncomingCoin(symbol: String) {
-        binding.inputIncomingCoin.setText(symbol)
-        binding.inputIncomingCoin.setSelection(symbol.length)
+        binding.inputIncomingCoin.postApply {
+            binding.inputIncomingCoin.setText(symbol)
+            autocomplete?.dismissPopup()
+            binding.inputIncomingCoin.setSelection(symbol.length)
+        }
     }
 
     override fun setFee(commission: CharSequence) {

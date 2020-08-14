@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (C) by MinterTeam. 2020
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
@@ -24,27 +24,12 @@
   ~ THE SOFTWARE.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <com.edwardstock.inputfield.InputField
-        android:id="@+id/row_input"
-        style="@style/Input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_edges"
-        android:layout_marginEnd="@dimen/margin_edges"
-        android:enabled="false"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:inputType="textMultiLine"
-        app:errorEnabled="false"
-        app:fieldName="value"
-        app:labelEnabled="true"
-        tools:hint="Amount"
-        tools:label="@string/tx_send_amount_hint"
-        tools:text="10000000000010000000000000000000.10203040506070809004240000" />
-</FrameLayout>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24.0"
+    android:viewportHeight="24.0">
+    <path
+        android:fillColor="@color/grey"
+        android:pathData="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z" />
+</vector>

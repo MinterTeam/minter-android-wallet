@@ -29,6 +29,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.text.InputFilter
 import android.view.View
 import com.airbnb.deeplinkdispatch.DeepLink
 import io.reactivex.BackpressureStrategy
@@ -54,11 +55,13 @@ import network.minter.bipwallet.internal.helpers.DeepLinkHelper
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.MathHelper.clamp
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
+import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
+import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
-import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.sending.account.selectorDataFromSecrets
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.services.livebalance.RTMService
@@ -68,13 +71,14 @@ import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
-import network.minter.bipwallet.tx.ui.InputFieldRow
+import network.minter.bipwallet.tx.ui.TxInputFieldRow
 import network.minter.bipwallet.tx.ui.WalletSelectorDialog
 import network.minter.blockchain.models.operational.*
 import network.minter.blockchain.utils.Base64UrlSafe
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
+import network.minter.core.crypto.MinterPublicKey
 import network.minter.core.internal.helpers.StringHelper
 import network.minter.core.util.RLPBoxed
 import network.minter.explorer.models.GasValue
@@ -122,12 +126,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private var payload: BytesData? = null
     private var checkPassword: String? = null
     private var gasPrice = BigInteger.ONE
-    private val adapter = MultiRowAdapter()
     private var isWsBound = false
     private var buyRequiredAmount: BuyRequiredAmount? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        AccountStorage.FORCE_ALL = true
         isWsBound = ServiceConnector.isBound()
         if (!isWsBound) {
             ServiceConnector.bind(Wallet.app().context())
@@ -151,6 +155,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
     override fun onDestroy() {
         super.onDestroy()
+        AccountStorage.FORCE_ALL = false
         if (!isWsBound) {
             ServiceConnector.release(Wallet.app().context())
         }
@@ -512,10 +517,14 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         viewState.setFee(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
     }
 
-    private fun fillData(tx: ExternalTransaction) {
-        adapter.clear()
+    private var inputEnabled = false
 
-//        viewState.setPayload(tx.payloadString)
+    fun toggleEditing() {
+        inputEnabled = !inputEnabled
+        fillData(extTx!!)
+    }
+
+    private fun fillData(tx: ExternalTransaction) {
         gasRepo.minGas
                 .rxGate()
                 .subscribeOn(Schedulers.io())
@@ -538,50 +547,86 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
         viewState.setOnConfirmListener(View.OnClickListener { onSubmit() })
 
+        val allRows: MutableList<TxInputFieldRow<*>> = ArrayList()
+
         when (tx.type) {
             OperationType.SendCoin -> {
+                viewState.enableEditAction(true)
                 val data = tx.getData(TxSendCoin::class.java)
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxSendCoin::class.java, extTx!!)
                         .add {
                             label = "You're sending"
                             text = data.coin
+                            enabled = inputEnabled
+                            tplCoin(
+                                    { data, value ->
+                                        data.coin = value
+                                    },
+                                    {
+                                        validateEnoughCoins()
+                                    }
+                            )
                         }
                         .add {
                             label = "Amount"
-                            text = data.value.humanize()
+                            text = data.value.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal({ data, value ->
+                                data.setValue(value)
+                            }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "To"
                             text = data.to.toString()
+                            enabled = inputEnabled
+                            tplAddress { txSendCoin, s ->
+                                txSendCoin.setTo(s)
+                            }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
             }
             OperationType.SellCoin -> {
+                viewState.enableEditAction(true)
                 val data = tx.getData(TxCoinSell::class.java)
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxCoinSell::class.java, extTx!!)
                         .add {
                             label = "You're selling"
                             text = data.coinToSell
+                            enabled = inputEnabled
+                            tplCoin({ txCoinSell, s ->
+                                txCoinSell.coinToSell = s
+                            }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "Amount"
-                            text = data.valueToSell.humanize()
+                            text = data.valueToSell.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal({ txCoinSell, s ->
+                                txCoinSell.valueToSell = s.parseBigDecimal()
+                            }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "Coin To Buy"
                             text = data.coinToBuy
+                            enabled = inputEnabled
+                            tplCoin { txCoinSell, s ->
+                                txCoinSell.coinToBuy = s
+                            }
                         }
                         .add {
                             label = "Minimum Amount To Get"
-                            text = data.minValueToBuy.humanize()
+                            text = data.minValueToBuy.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal { txCoinSell, s ->
+                                txCoinSell.minValueToBuy = s.parseBigDecimal()
+                            }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
             }
             OperationType.SellAllCoins -> {
+                viewState.enableEditAction(true)
                 val data = tx.getData(TxCoinSellAll::class.java)
                 val acc = accountStorage.entity.mainWallet.findCoinByName(data.coinToSell)
                 val amount = if (acc.isPresent) {
@@ -589,56 +634,85 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 } else {
                     BigDecimal.ZERO
                 }
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxCoinSellAll::class.java, extTx!!)
                         .add {
                             label = "You're selling (sell all)"
                             text = data.coinToSell
+                            enabled = inputEnabled
+                            tplCoin { txCoinSellAll, value ->
+                                txCoinSellAll.coinToSell = value
+                            }
                         }
                         .add {
                             label = "Amount"
-                            text = amount.humanize()
+                            text = amount.toPlainString()
+                            enabled = false
                         }
                         .add {
                             label = "Coin To Buy"
                             text = data.coinToBuy
+                            enabled = inputEnabled
+                            tplCoin { txCoinSellAll, value ->
+                                txCoinSellAll.coinToBuy = value
+                            }
                         }
                         .add {
                             label = "Minimum Amount To Get"
-                            text = data.minValueToBuy.humanize()
+                            text = data.minValueToBuy.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal { txCoinSellAll, value ->
+                                txCoinSellAll.minValueToBuy = value.parseBigDecimal()
+                            }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
             }
 
             OperationType.BuyCoin -> {
+                viewState.enableEditAction(true)
                 val data = tx.getData(TxCoinBuy::class.java)
 
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxCoinBuy::class.java, extTx!!)
                         .add {
                             label = "You're buying"
                             text = data.coinToBuy
+                            enabled = inputEnabled
+                            tplCoin { txCoinBuy, s ->
+                                txCoinBuy.coinToBuy = s
+                            }
                         }
                         .add {
                             label = "Amount"
-                            text = data.valueToBuy.humanize()
+                            text = data.valueToBuy.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal { txCoinBuy, s ->
+                                txCoinBuy.valueToBuy = s.parseBigDecimal()
+                            }
                         }
                         .add {
                             label = "Coin To Sell"
                             text = data.coinToSell
+                            enabled = inputEnabled
+                            tplCoin { txCoinBuy, s ->
+                                txCoinBuy.coinToSell = s
+                            }
                         }
                         .add {
                             label = "Maximum Amount To Spend"
-                            text = data.maxValueToSell.humanize()
+                            text = data.maxValueToSell.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal { txCoinBuy, s ->
+                                txCoinBuy.maxValueToSell = s.parseBigDecimal()
+                            }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
             }
             OperationType.CreateCoin -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxCreateCoin::class.java)
 
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxCreateCoin::class.java, extTx!!)
                         .add {
                             label = "You're creating coin"
                             text = data.symbol
@@ -668,13 +742,14 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
+//                adapter.addRows(rows)
             }
             OperationType.DeclareCandidacy -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxDeclareCandidacy::class.java)
 
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxDeclareCandidacy::class.java, extTx!!)
                         .add {
                             label = "You're declaring candidacy"
                             text = data.publicKey.toString()
@@ -692,53 +767,78 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             text = "${data.commission}%"
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
+//                adapter.addRows(rows)
             }
             OperationType.Delegate -> {
+                viewState.enableEditAction(true)
                 val data = tx.getData(TxDelegate::class.java)
 
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxDelegate::class.java, extTx!!)
                         .add {
                             label = "You're delegating"
                             text = data.coin
+                            enabled = inputEnabled
+                            tplCoin({ txDelegate, value ->
+                                txDelegate.coin = value
+                            }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "Amount"
-                            text = data.stake.humanize()
+                            text = data.stake.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal({ txDelegate, s ->
+                                txDelegate.stake = s.parseBigDecimal()
+                            }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "To"
                             text = data.publicKey.toString()
+                            enabled = inputEnabled
+                            tplPublicKey { txDelegate, s ->
+                                txDelegate.publicKey = MinterPublicKey(s)
+                            }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
             }
             OperationType.Unbound -> {
+                viewState.enableEditAction(true)
                 val data = tx.getData(TxUnbound::class.java)
 
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxUnbound::class.java, extTx!!)
                         .add {
                             label = "You're unbonding"
                             text = data.coin
+                            enabled = inputEnabled
+                            tplCoin { txUnbond, value ->
+                                txUnbond.coin = value
+                            }
                         }
                         .add {
                             label = "Amount"
-                            text = data.value.humanize()
+                            text = data.value.toPlainString()
+                            enabled = inputEnabled
+                            tplDecimal { txUnbond, s ->
+                                txUnbond.value = s.parseBigDecimal()
+                            }
                         }
                         .add {
                             label = "From"
                             text = data.publicKey.toString()
+                            enabled = inputEnabled
+                            tplPublicKey { txUnbond, s ->
+                                txUnbond.publicKey = MinterPublicKey(s)
+                            }
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
             }
             OperationType.RedeemCheck -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxRedeemCheck::class.java)
                 val check = data.decodedCheck
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxRedeemCheck::class.java, extTx!!)
                         .add {
                             label = "You're using check"
                             text = data.rawCheck.toString()
@@ -752,35 +852,38 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             text = check.value.humanize()
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
+//                adapter.addRows(rows)
             }
             OperationType.SetCandidateOnline -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxSetCandidateOnline::class.java)
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxSetCandidateOnline::class.java, extTx!!)
                         .add {
                             label = "You're switching on candidate"
                             text = data.publicKey.toString()
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
+//                adapter.addRows(rows)
             }
             OperationType.SetCandidateOffline -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxSetCandidateOffline::class.java)
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxSetCandidateOffline::class.java, extTx!!)
                         .add {
                             label = "You're switching off candidate"
                             text = data.publicKey.toString()
                         }
                         .build()
-
-                adapter.addRows(rows)
+                allRows.addAll(rows)
+//                adapter.addRows(rows)
             }
             OperationType.Multisend -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxMultisend::class.java)
 
-                val rowsBuilder = InputFieldRow.MultiBuilder()
+                val rowsBuilder = TxInputFieldRow.MultiBuilder(TxMultisend::class.java, extTx!!)
                         .add {
                             label = "You're multi-sending"
                             text = "To ${data.items.size} recipients"
@@ -792,13 +895,14 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         text = "${item.value.humanize()} ${item.coin}"
                     }
                 }
-
-                adapter.addRows(rowsBuilder.build())
+                allRows.addAll(rowsBuilder.build())
+//                adapter.addRows(rowsBuilder.build())
             }
             OperationType.CreateMultisigAddress -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData<TxCreateMultisigAddress>()
 
-                val rowsBuilder = InputFieldRow.MultiBuilder()
+                val rowsBuilder = TxInputFieldRow.MultiBuilder(TxCreateMultisigAddress::class.java, extTx!!)
                         .add {
                             label = "You're creating MultiSig address"
                             text = "With ${data.addresses.size} addresses"
@@ -815,12 +919,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         text = "Weight: $weight"
                     }
                 }
-
-                adapter.addRows(rowsBuilder.build())
+                allRows.addAll(rowsBuilder.build())
+//                adapter.addRows(rowsBuilder.build())
             }
             OperationType.EditCandidate -> {
+                viewState.enableEditAction(false)
                 val data = tx.getData(TxEditCandidate::class.java)
-                val rows = InputFieldRow.MultiBuilder()
+                val rows = TxInputFieldRow.MultiBuilder(TxEditCandidate::class.java, extTx!!)
                         .add {
                             label = "You're editing candidate"
                             text = data.pubKey.toString()
@@ -835,7 +940,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .build()
 
-                adapter.addRows(rows)
+                allRows.addAll(rows)
+//                adapter.addRows(rows)
             }
             else -> {
                 viewState.startDialog(false) { ctx: Context? ->
@@ -847,14 +953,32 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
         }
 
-        if (tx.payload.size() > 0) {
-            adapter.addRow(InputFieldRow.Builder().apply {
+        if (tx.payload.size() > 0 || inputEnabled) {
+            val row = TxInputFieldRow.Builder(tx.type.opClass, extTx!!).apply {
                 label = res.getString(R.string.label_payload_explicit)
                 text = tx.payload.stringValue()
-            }.build())
+                validator = PayloadValidator()
+                enabled = inputEnabled
+                configureInput { inputGroup, inputField ->
+                    inputField.hint = Wallet.app().res().getString(R.string.label_payload_type)
+                    inputGroup.addFilter(inputField, InputFilter { source, _, _, _, _, _ ->
+                        if (inputField.text.toString().toByteArray().size >= 1024) {
+                            ""
+                        } else {
+                            source
+                        }
+                    })
+                    inputField.addTextChangedSimpleListener {
+                        extTx!!.resetPayload(BytesData(it.toString().toByteArray()))
+                        payload = extTx!!.payload
+                        calculateFee(extTx!!)
+                    }
+                }
+            }.build()
+            allRows.add(row)
         }
 
-        viewState.setAdapter(adapter)
+        viewState.setData(allRows)
     }
 
     private fun startExecuteTransaction() {

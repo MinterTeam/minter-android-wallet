@@ -159,7 +159,7 @@
             android:parentActivityName=".home.ui.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Wallet"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".home.ui.HomeActivity" />

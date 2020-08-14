@@ -97,16 +97,29 @@
                     android:textSize="@dimen/text_size_12" />
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/input_list"
+            <!--            <androidx.recyclerview.widget.RecyclerView-->
+            <!--                android:id="@+id/input_list"-->
+            <!--                android:layout_width="0dp"-->
+
+            <!--                android:focusable="false"-->
+            <!--                android:focusableInTouchMode="false"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintStart_toStartOf="parent"-->
+            <!--                app:layout_constraintTop_toBottomOf="@id/sync_container"-->
+            <!--                tools:itemCount="3"-->
+            <!--                android:descendantFocusability="afterDescendants"-->
+            <!--                tools:alpha="0.3"-->
+            <!--                tools:listitem="@layout/row_input_field" />-->
+
+            <LinearLayout
+                android:id="@+id/input_list_layout"
+                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sync_container"
-                tools:itemCount="3"
-                tools:alpha="0.3"
-                tools:listitem="@layout/row_input_field" />
+                app:layout_constraintTop_toBottomOf="@id/sync_container" />
 
             <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
                 android:id="@+id/progress"
@@ -115,8 +128,8 @@
                 android:layout_marginTop="72dp"
                 android:visibility="invisible"
                 app:color="@color/colorPrimaryLight"
-                app:layout_constraintEnd_toEndOf="@id/input_list"
-                app:layout_constraintStart_toStartOf="@id/input_list"
+                app:layout_constraintEnd_toEndOf="@id/input_list_layout"
+                app:layout_constraintStart_toStartOf="@id/input_list_layout"
                 app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -127,7 +140,7 @@
                 android:layout_height="@dimen/margin_edges"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_list" />
+                app:layout_constraintTop_toBottomOf="@id/input_list_layout" />
 
             <TextView
                 android:id="@+id/fee_label"

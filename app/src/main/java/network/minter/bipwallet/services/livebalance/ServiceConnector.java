@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,8 +32,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import org.parceler.Parcels;
+
 import io.reactivex.Observable;
 import io.reactivex.subjects.ReplaySubject;
+import network.minter.core.crypto.MinterAddress;
 import timber.log.Timber;
 
 /**
@@ -45,7 +48,7 @@ public class ServiceConnector implements ServiceConnection {
     private static RTMService service = null;
     private static ServiceConnector instance;
     private static boolean bound = false;
-    private static ReplaySubject<RTMService> serviceConnected = ReplaySubject.create(1);
+    private static final ReplaySubject<RTMService> serviceConnected = ReplaySubject.create(1);
 
     private ServiceConnector() {
     }
@@ -72,8 +75,23 @@ public class ServiceConnector implements ServiceConnection {
         } catch (Throwable t) {
             Timber.w(t, "Unble to bind");
         }
+    }
 
+    public static void bind(Context context, MinterAddress address) {
+        if (instance == null) {
+            instance = new ServiceConnector();
+        }
 
+        try {
+            if (!bound) {
+                Intent intent = new Intent(context, RTMService.class);
+                intent.putExtra("address", Parcels.wrap(address));
+                context.startService(intent);
+                context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
+            }
+        } catch (Throwable t) {
+            Timber.w(t, "Unble to bind");
+        }
     }
 
 

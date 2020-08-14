@@ -32,12 +32,17 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ActivityExternalTransactionBinding
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.external.*
@@ -61,6 +66,7 @@ import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterAddress
 import timber.log.Timber
 import java.math.BigDecimal
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -84,9 +90,20 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     private lateinit var b: ActivityExternalTransactionBinding
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
-        b.inputList.adapter = adapter
+//        b.inputList.setHasFixedSize(true)
+//        (b.inputList.layoutManager as NonScrollableLinearLayoutManager).initialPrefetchItemCount = adapter.itemCount
+//        b.inputList.adapter = adapter
     }
 
+    override fun setData(allRows: MutableList<TxInputFieldRow<*>>) {
+        b.inputListLayout.removeAllViews()
+        for (fieldRow in allRows) {
+            val view = layoutInflater.inflate(fieldRow.getItemView(), null)
+            val vh = TxInputFieldRow.ViewHolder(view)
+            b.inputListLayout.addView(view)
+            fieldRow.onBindViewHolder(vh)
+        }
+    }
 
     override fun setFee(fee: CharSequence) {
         if (fee.isEmpty()) {
@@ -186,7 +203,8 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
 
     override fun showWaitProgress() {
         runOnUiThread {
-            b.inputList.alpha = 0.3f
+//            b.inputList.alpha = 0.3f
+            b.inputListLayout.alpha = 0.3f
             b.progress.nvisible = true
             b.action.isEnabled = false
         }
@@ -195,9 +213,26 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
 
     override fun hideWaitProgress() {
         runOnUiThread {
-            b.inputList.alpha = 1f
+//            b.inputList.alpha = 1f
+            b.inputListLayout.alpha = 1f
             b.progress.nvisible = false
             b.action.isEnabled = true
+        }
+    }
+
+    private var enabledEditAction = false
+
+    override fun enableEditAction(enable: Boolean) {
+        if (!enabledEditAction) {
+            enabledEditAction = true
+            b.toolbar.menu
+                    .add(R.string.btn_edit)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    .setIcon(R.drawable.ic_edit_grey)
+                    .setOnMenuItemClickListener {
+                        presenter.toggleEditing()
+                        false
+                    }
         }
     }
 
@@ -218,12 +253,28 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         releaseDialog(walletDialog)
     }
 
+    private var tmp: Disposable? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityExternalTransactionBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        b.inputList.layoutManager = LinearLayoutManager(this)
+//        b.inputList.layoutManager = NonScrollableLinearLayoutManager(this)
+//        b.inputList.isNestedScrollingEnabled = false
+
+
+        tmp = Observable.interval(3, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe {
+                    if (currentFocus == null) {
+                        Timber.d("Current focus on view: undefined")
+                    } else {
+                        Timber.d("Current focus on view: ${resources.getResourceEntryName(currentFocus!!.id)}")
+                    }
+
+                }
 
         setupToolbar(b.toolbar)
         presenter.handleExtras(intent)
@@ -234,6 +285,12 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
             LastBlockHandler.handle(b.lastUpdated, it)
         })
         broadcastManager.register()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        tmp?.dispose()
+        tmp = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
