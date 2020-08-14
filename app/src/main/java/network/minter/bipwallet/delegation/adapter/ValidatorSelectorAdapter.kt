@@ -31,7 +31,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
-import network.minter.bipwallet.databinding.ItemListHeaderBinding
+import network.minter.bipwallet.databinding.ItemListValidatorHeaderBinding
 import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.ValidatorItem
@@ -60,7 +60,7 @@ private class ItemValue(val item: ValidatorItem, val lastUsed: Boolean = false) 
 }
 
 class HeaderViewHolder(
-        val binding: ItemListHeaderBinding
+        val binding: ItemListValidatorHeaderBinding
 ) : RecyclerView.ViewHolder(binding.root)
 
 class ItemViewHolder(
@@ -101,7 +101,7 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
         return when (viewType) {
             ITEM_HEADER -> {
                 HeaderViewHolder(
-                        ItemListHeaderBinding.inflate(inflater!!, parent, false)
+                        ItemListValidatorHeaderBinding.inflate(inflater!!, parent, false)
                 )
             }
             ITEM_VALUE -> {
@@ -134,7 +134,7 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
                 holder.binding.itemTitle.text = meta!!.name
             }
             holder.binding.itemSubtitle.text = validator.pubKey.toShortString()
-//            holder.binding.itemCommission.text = validator.
+            holder.binding.itemCommission.text = "${validator.commission}%"
             holder.binding.itemMinStake.text = holder.itemView.context.getString(R.string.min_stake, item.item.minStake.setScale(0, RoundingMode.HALF_UP).toPlainString(), MinterSDK.DEFAULT_COIN)
 
 
