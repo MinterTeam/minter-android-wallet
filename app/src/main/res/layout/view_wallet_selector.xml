@@ -67,13 +67,12 @@
         android:layout_weight="8"
         android:fontFamily="@font/_inter_semi_bold"
         android:gravity="center_vertical|start"
-        android:maxLength="18"
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="@color/textColorWhite"
         android:textSize="@dimen/text_size_fixed_18"
         app:layout_constraintHorizontal_bias="0"
-        tools:text="Mx8d008d...ffe2f9"
+        tools:text="Mx8d008d...fпыпыпыпыпfe2f9"
         tools:textColor="@color/white" />
 
     <ImageView
