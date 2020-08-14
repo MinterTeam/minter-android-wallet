@@ -28,8 +28,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@drawable/bg_ripple_white"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_ripple_white"
     android:minHeight="48dp">
 
     <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
@@ -56,11 +56,11 @@
 
     <TextView
         android:id="@+id/item_amount"
+        style="@style/ListTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_edges_half"
         android:textAlignment="viewEnd"
-        style="@style/ListTitle"
         app:layout_constraintBottom_toTopOf="@id/item_subamount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
@@ -73,16 +73,20 @@
     <TextView
         android:id="@+id/item_title"
         style="@style/ListTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_min"
         android:layout_marginEnd="@dimen/margin_edges_half"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/item_subamount"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/item_avatar"
         app:layout_constraintTop_toBottomOf="@id/item_title_type"
-        tools:text="BIP" />
+        tools:text="BIPBIPBIPBIPBIPBIPBIPBIPBIPBIPBIPBIPBIPBIPBIPBBIPBIPBIP" />
 
     <TextView
         android:id="@+id/item_subamount"
