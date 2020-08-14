@@ -123,7 +123,8 @@
         <activity
             android:name=".exchange.ui.ConvertCoinActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".external.ui.ExternalActivity"
             android:launchMode="singleInstance"
