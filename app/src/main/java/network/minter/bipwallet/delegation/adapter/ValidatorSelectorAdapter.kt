@@ -82,9 +82,8 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
         if (lastUsed.isNotEmpty()) {
             data.add(ItemHeader("Last Used"))
             data.addAll(lastUsed.map { ItemValue(it, true) })
-            data.add(ItemHeader("All Validators"))
         }
-
+        data.add(ItemHeader("All Validators"))
         data.addAll(validators.map { ItemValue(it) })
         items = data
     }
