@@ -27,7 +27,6 @@ package network.minter.bipwallet.tx.contract
 
 import android.content.Context
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
@@ -45,7 +44,6 @@ import java.math.BigDecimal
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface ExternalTransactionView : MvpView, ProgressView {
-    fun setAdapter(adapter: RecyclerView.Adapter<*>)
     fun setData(allRows: MutableList<TxInputFieldRow<*>>)
 
     fun setFee(fee: CharSequence)
@@ -79,5 +77,6 @@ interface ExternalTransactionView : MvpView, ProgressView {
     fun hideWaitProgress()
 
     fun enableEditAction(enable: Boolean)
+    fun enableSubmit(enable: Boolean)
 
 }

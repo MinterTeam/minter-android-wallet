@@ -26,14 +26,24 @@
 
 package network.minter.bipwallet.internal.helpers.forms.validators
 
+import com.edwardstock.inputfield.form.validators.BaseValidator
+import io.reactivex.Single
+import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 
 /**
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class CoinValidator : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}\$") {
+class NumberNotZeroValidator : BaseValidator("Amount must be more than 0", true, false) {
 
-    init {
-        errorMessage = "Invalid coin name"
+    override fun validate(value: CharSequence?): Single<Boolean> {
+        if (value == null || value.isEmpty()) {
+            return Single.just(true)
+        }
+        return Single.fromCallable {
+            value.parseBigDecimal() > 0.toBigDecimal()
+        }
     }
+
+
 }

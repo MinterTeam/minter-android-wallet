@@ -56,6 +56,8 @@ import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.MathHelper.clamp
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
+import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
+import network.minter.bipwallet.internal.helpers.forms.validators.NumberNotZeroValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.AccountStorage
@@ -468,7 +470,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             if (notEnough > BigDecimal.ZERO) {
                 buyRequiredAmount = BuyRequiredAmount(txValues.coin, notEnough)
                 viewState.showExchangeBanner(
-                        HtmlCompat.fromHtml(Wallet.app().res().getString(R.string.description_external_not_enough_coins, notEnough, txValues.coin))
+                        HtmlCompat.fromHtml(Wallet.app().res().getString(R.string.description_external_not_enough_coins, notEnough.toPlain(), txValues.coin))
                 ) {
                     viewState.startExchangeCoins(REQUEST_EXCHANGE_COINS, txValues.coin, notEnough, from!!)
                 }
@@ -554,6 +556,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 viewState.enableEditAction(true)
                 val data = tx.getData(TxSendCoin::class.java)
                 val rows = TxInputFieldRow.MultiBuilder(TxSendCoin::class.java, extTx!!)
+                        .onValid { viewState.enableSubmit(it) }
                         .add {
                             label = "You're sending"
                             text = data.coin
@@ -569,7 +572,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Amount"
-                            text = data.value.toPlainString()
+                            text = data.value.toPlain()
                             enabled = inputEnabled
                             tplDecimal({ data, value ->
                                 data.setValue(value)
@@ -600,7 +603,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Amount"
-                            text = data.valueToSell.toPlainString()
+                            text = data.valueToSell.toPlain()
                             enabled = inputEnabled
                             tplDecimal({ txCoinSell, s ->
                                 txCoinSell.valueToSell = s.parseBigDecimal()
@@ -616,24 +619,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Minimum Amount To Get"
-                            text = data.minValueToBuy.toPlainString()
+                            text = data.minValueToBuy.toPlain()
                             enabled = inputEnabled
                             tplDecimal { txCoinSell, s ->
                                 txCoinSell.minValueToBuy = s.parseBigDecimal()
                             }
                         }
+                        .onValid { viewState.enableSubmit(it) }
                         .build()
                 allRows.addAll(rows)
             }
             OperationType.SellAllCoins -> {
                 viewState.enableEditAction(true)
                 val data = tx.getData(TxCoinSellAll::class.java)
-                val acc = accountStorage.entity.mainWallet.findCoinByName(data.coinToSell)
-                val amount = if (acc.isPresent) {
-                    acc.get().amount
-                } else {
-                    BigDecimal.ZERO
-                }
                 val rows = TxInputFieldRow.MultiBuilder(TxCoinSellAll::class.java, extTx!!)
                         .add {
                             label = "You're selling (sell all)"
@@ -642,11 +640,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             tplCoin { txCoinSellAll, value ->
                                 txCoinSellAll.coinToSell = value
                             }
-                        }
-                        .add {
-                            label = "Amount"
-                            text = amount.toPlainString()
-                            enabled = false
                         }
                         .add {
                             label = "Coin To Buy"
@@ -658,12 +651,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Minimum Amount To Get"
-                            text = data.minValueToBuy.toPlainString()
+                            text = data.minValueToBuy.toPlain()
                             enabled = inputEnabled
                             tplDecimal { txCoinSellAll, value ->
                                 txCoinSellAll.minValueToBuy = value.parseBigDecimal()
                             }
                         }
+                        .onValid { viewState.enableSubmit(it) }
                         .build()
                 allRows.addAll(rows)
             }
@@ -683,7 +677,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Amount"
-                            text = data.valueToBuy.toPlainString()
+                            text = data.valueToBuy.toPlain()
                             enabled = inputEnabled
                             tplDecimal { txCoinBuy, s ->
                                 txCoinBuy.valueToBuy = s.parseBigDecimal()
@@ -699,12 +693,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Maximum Amount To Spend"
-                            text = data.maxValueToSell.toPlainString()
+                            text = data.maxValueToSell.toPlain()
                             enabled = inputEnabled
                             tplDecimal { txCoinBuy, s ->
                                 txCoinBuy.maxValueToSell = s.parseBigDecimal()
                             }
                         }
+                        .onValid { viewState.enableSubmit(it) }
                         .build()
                 allRows.addAll(rows)
             }
@@ -743,7 +738,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .build()
                 allRows.addAll(rows)
-//                adapter.addRows(rows)
             }
             OperationType.DeclareCandidacy -> {
                 viewState.enableEditAction(false)
@@ -768,7 +762,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .build()
                 allRows.addAll(rows)
-//                adapter.addRows(rows)
             }
             OperationType.Delegate -> {
                 viewState.enableEditAction(true)
@@ -785,8 +778,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Amount"
-                            text = data.stake.toPlainString()
+                            text = data.stake.toPlain()
                             enabled = inputEnabled
+                            addValidator(NumberNotZeroValidator())
                             tplDecimal({ txDelegate, s ->
                                 txDelegate.stake = s.parseBigDecimal()
                             }, { validateEnoughCoins() })
@@ -799,6 +793,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                 txDelegate.publicKey = MinterPublicKey(s)
                             }
                         }
+                        .onValid { viewState.enableSubmit(it) }
                         .build()
                 allRows.addAll(rows)
             }
@@ -817,7 +812,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Amount"
-                            text = data.value.toPlainString()
+                            text = data.value.toPlain()
                             enabled = inputEnabled
                             tplDecimal { txUnbond, s ->
                                 txUnbond.value = s.parseBigDecimal()
@@ -831,6 +826,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                 txUnbond.publicKey = MinterPublicKey(s)
                             }
                         }
+                        .onValid { viewState.enableSubmit(it) }
                         .build()
                 allRows.addAll(rows)
             }
@@ -957,9 +953,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             val row = TxInputFieldRow.Builder(tx.type.opClass, extTx!!).apply {
                 label = res.getString(R.string.label_payload_explicit)
                 text = tx.payload.stringValue()
-                validator = PayloadValidator()
                 enabled = inputEnabled
                 configureInput { inputGroup, inputField ->
+                    inputGroup.addValidator(inputField, PayloadValidator())
                     inputField.hint = Wallet.app().res().getString(R.string.label_payload_type)
                     inputGroup.addFilter(inputField, InputFilter { source, _, _, _, _, _ ->
                         if (inputField.text.toString().toByteArray().size >= 1024) {
