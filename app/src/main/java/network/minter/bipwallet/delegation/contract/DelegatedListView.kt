@@ -36,6 +36,7 @@ import network.minter.bipwallet.delegation.adapter.DelegatedStake
 import network.minter.bipwallet.delegation.adapter.DelegatedValidator
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.mvp.ProgressView
+import network.minter.core.crypto.MinterPublicKey
 
 /**
  * minter-android-wallet. 2019
@@ -55,6 +56,7 @@ interface DelegatedListView : MvpView, ProgressView {
     fun invalidateChartData(dataSets: LineData)
     fun setBipsPerMinute(amount: String)
     fun startDelegate(delegated: DelegatedValidator)
+    fun startDelegate(pubKey: MinterPublicKey)
     fun startUnbond(delegated: DelegatedStake)
     fun hideChart()
     fun showChart()

@@ -28,6 +28,7 @@ package network.minter.bipwallet.sending.ui
 import com.edwardstock.inputfield.form.validators.BaseValidator
 import io.reactivex.Single
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 
@@ -38,10 +39,15 @@ import network.minter.core.crypto.MinterPublicKey
 internal class RecipientValidator(
         errorMessage: CharSequence = "Invalid recipient",
         required: Boolean = true) : BaseValidator(errorMessage, required) {
+
+    private val defMessage: CharSequence = errorMessage
+
     override fun validate(value: CharSequence?): Single<Boolean> {
         if (value.isNullOrEmpty()) {
             return Single.just(isRequired)
         }
+
+        errorMessage = defMessage
 
         val v = value.toString()
         if (v.length >= 2) {
@@ -49,6 +55,7 @@ internal class RecipientValidator(
             if (pref.toLowerCase() == "mx") {
                 return Single.just(v.matches(MinterAddress.ADDRESS_PATTERN.toRegex()))
             } else if (pref.toLowerCase() == "mp" && v.toLowerCase().matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())) {
+                errorMessage = HtmlCompat.fromHtml(String.format("For delegation please go to <a href=\"minter://stakes/%s\">Delegations</a> section.", v))
                 return Single.just(false)
             }
         }

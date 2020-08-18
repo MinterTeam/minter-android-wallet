@@ -407,7 +407,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     private fun onAmountChanged(amount: String?) {
-        mAmount = amount.parseBigDecimal()
+        mAmount = if (amount == null || amount.isEmpty()) {
+            null
+        } else {
+            amount.parseBigDecimal()
+        }
 
         if (!mClickedUseMax.get()) {
             mUseMax.set(false)
@@ -431,8 +435,17 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     private fun onSubmit() {
+        var valid = true
         if (mRecipient == null) {
             viewState.setRecipientError("Recipient required")
+            valid = false
+        }
+        if (mAmount == null) {
+            viewState.setAmountError("Amount can't be empty")
+            valid = false
+        }
+
+        if (!valid) {
             return
         }
         analytics.send(AppEvent.SendCoinsSendButton)
@@ -476,6 +489,10 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private fun checkEnableSubmit() {
         if (mFromAccount == null) {
             Timber.d("Account did not loaded yet!")
+            viewState.setSubmitEnabled(false)
+            return
+        }
+        if (mAmount == null) {
             viewState.setSubmitEnabled(false)
             return
         }
@@ -850,5 +867,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         mFromAccount = coinAccount
         mLastAccount = coinAccount
         viewState.setAccountName(String.format("%s (%s)", coinAccount.coin?.toUpperCase(), coinAccount.amount.humanize()))
+        viewState.validate()
     }
 }

@@ -105,5 +105,7 @@ interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDelegate(publicKey: MinterPublicKey)
 
+    fun validate()
+
 
 }

@@ -38,12 +38,13 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import com.edwardstock.inputfield.form.validators.CustomValidator
-import com.edwardstock.inputfield.form.validators.EmptyValidator
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.BuildConfig
@@ -139,17 +140,29 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
             inputCoin.input.setFocusable(false)
 
-            Timber.d("InputType for Decimal: ${inputAmount.inputType}")
-            Timber.d("InputType class Decimal: %d", EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_FLAG_DECIMAL or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE)
-
             inputGroup.setup {
                 add(inputRecipient, RecipientValidator("Invalid recipient", true))
                 add(inputPayload, PayloadValidator())
             }
             inputGroup.addInput(inputAmount)
-            inputGroup.addValidator(inputAmount, EmptyValidator().apply { errorMessage = "Amount can't be empty" })
             inputGroup.addFilter(inputAmount, DecimalInputFilter(inputAmount))
             inputGroup.addFilter(inputRecipient, NewLineInputFilter())
+            // add ability to click error link
+            inputRecipient.errorView!!.movementMethod = BetterLinkMovementMethod.newInstance().apply {
+                setOnLinkClickListener { textView, url ->
+                    val tmpPubKey = inputRecipient.text.toString()
+                    try {
+                        val pubKey = MinterPublicKey(tmpPubKey)
+                        DelegateUnbondActivity.Builder(this@SendTabFragment, DelegateUnbondActivity.Type.Delegate)
+                                .setPublicKey(pubKey)
+                                .start()
+                    } catch (err: Throwable) {
+                        Timber.w(err, "Unable to handle public key %s", tmpPubKey)
+                    }
+                    inputRecipient.setText("")
+                    true
+                }
+            }
 
             val payloadMnemonicValidator = IsNotMnemonicValidator("""
     ATTENTION: You are about to send seed phrase in the message attached to this transaction.
@@ -225,6 +238,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
     override fun setPayload(payload: String?) {
         binding.inputPayload.setText(payload)
         binding.inputPayload.setSelection(payload?.length ?: 0)
+    }
+
+    override fun validate() {
+        inputGroup.validate(true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ }, { t -> Timber.w(t) })
     }
 
     //@TODO
@@ -311,6 +331,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
         binding.inputAmount.clearFocus()
         binding.inputAmount.text = null
         inputGroup.clearErrors()
+        binding.inputAmount.error = null
     }
 
     override fun startExplorer(txHash: String) {

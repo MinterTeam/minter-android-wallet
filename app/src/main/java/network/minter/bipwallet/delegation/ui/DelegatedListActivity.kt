@@ -73,6 +73,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
+import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.RewardStatistics
 import org.joda.time.DateTime
 import java.util.*
@@ -182,6 +183,12 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
     override fun startDelegate(delegated: DelegatedValidator) {
         DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
                 .setPublicKey(delegated.publicKey)
+                .start()
+    }
+
+    override fun startDelegate(pubKey: MinterPublicKey) {
+        DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
+                .setPublicKey(pubKey)
                 .start()
     }
 
