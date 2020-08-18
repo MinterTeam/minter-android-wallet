@@ -30,6 +30,7 @@ import android.graphics.PorterDuff
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -68,6 +69,8 @@ class WalletSelector : FrameLayout {
     @JvmField
     @BindView(R.id.dropdown)
     var dropdown: ImageView? = null
+
+    private var layout: ViewGroup? = null
     private var mAdapter: WalletListAdapter? = null
     private var mPopup: WalletsPopupWindow? = null
     private var mOnClickWallet: OnClickWalletListener? = null
@@ -139,9 +142,9 @@ class WalletSelector : FrameLayout {
         mAdapter!!.setOnClickWalletListener { addressBalance: WalletItem -> onClickWallet(addressBalance) }
         mAdapter!!.setOnClickEditWalletListener { addressBalance: WalletItem -> onClickEditWallet(addressBalance) }
         mAdapter!!.setOnClickAddWalletListener { onClickAddWallet() }
-        val view = View.inflate(context, R.layout.view_wallet_selector, this)
-        ButterKnife.bind(this, view)
-        view.setOnClickListener { openPopup() }
+        layout = View.inflate(context, R.layout.view_wallet_selector, this) as ViewGroup
+        ButterKnife.bind(this, layout!!)
+        layout!!.setOnClickListener { openPopup() }
         Paris.style(this).apply(attrs)
 
         if (!WalletWeight.supportsNativeEmoji()) {
@@ -213,7 +216,10 @@ class WalletSelector : FrameLayout {
     }
 
     internal fun setMainWallet(wallet: WalletItem) {
-        name!!.post { name!!.text = Preconditions.firstNonNull(wallet.title, wallet.addressShort) }
+        name!!.post {
+            name!!.text = Preconditions.firstNonNull(wallet.title, wallet.addressShort)
+            name!!.requestLayout()
+        }
 
         if (WalletWeight.supportsNativeEmoji()) {
             weight?.postApply {
