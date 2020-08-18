@@ -88,6 +88,6 @@ ext {
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"
 
-    appVersionName = "2.0.3-beta04"
-    appVersionCode = 178
+    appVersionName = "2.0.3-beta05"
+    appVersionCode = 179
 }
