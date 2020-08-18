@@ -149,7 +149,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputGroup.addFilter(inputRecipient, NewLineInputFilter())
             // add ability to click error link
             inputRecipient.errorView!!.movementMethod = BetterLinkMovementMethod.newInstance().apply {
-                setOnLinkClickListener { textView, url ->
+                setOnLinkClickListener { _, _ ->
                     val tmpPubKey = inputRecipient.text.toString()
                     try {
                         val pubKey = MinterPublicKey(tmpPubKey)

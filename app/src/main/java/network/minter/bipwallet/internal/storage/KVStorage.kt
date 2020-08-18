@@ -78,7 +78,7 @@ open class KVStorage : Storage {
             try {
                 Hawk.db(mDbName)[key]
             } catch (t: Throwable) {
-                Timber.w(t)
+                Timber.w(t, "Unable to get value from kvstorage: %s", key)
                 try {
                     Hawk.db(mDbName).delete(key)
                 } catch (ignore: Throwable) {

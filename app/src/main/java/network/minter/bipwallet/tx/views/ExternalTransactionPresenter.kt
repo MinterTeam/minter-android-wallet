@@ -204,7 +204,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 init(intent)
             } else {
                 viewState.startDialogFragment { ctx ->
-                    WalletSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
+                    val d = WalletSelectorDialog.Builder(ctx, R.string.dialog_title_choose_wallet)
                             .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
                             .setPositiveAction(R.string.btn_continue) { d, _ ->
                                 from = (d as WalletSelectorDialog).item!!.data.minterAddress
@@ -216,6 +216,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                 d.dismiss()
                             }
                             .create()
+                    d.isCancelable = false
+                    d
                 }
             }
         } else {
