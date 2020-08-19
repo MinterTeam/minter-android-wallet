@@ -240,11 +240,11 @@ class SendTabFragment : HomeTabFragment(), SendView {
         binding.inputPayload.setSelection(payload?.length ?: 0)
     }
 
-    override fun validate() {
+    override fun validate(onValidated: (Boolean) -> Unit) {
         inputGroup.validate(true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({ }, { t -> Timber.w(t) })
+                .subscribe({ onValidated(it) }, { t -> Timber.w(t) })
     }
 
     //@TODO

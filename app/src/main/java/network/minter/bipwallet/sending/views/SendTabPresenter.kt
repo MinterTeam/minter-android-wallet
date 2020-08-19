@@ -94,7 +94,7 @@ import javax.inject.Inject
 import javax.net.ssl.SSLException
 
 /**
- * minter-android-wallet. 2018
+ * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 
@@ -867,6 +867,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         mFromAccount = coinAccount
         mLastAccount = coinAccount
         viewState.setAccountName(String.format("%s (%s)", coinAccount.coin?.toUpperCase(), coinAccount.amount.humanize()))
-        viewState.validate()
+        viewState.validate {
+            mFormValid = it
+            checkEnableSubmit()
+        }
     }
 }

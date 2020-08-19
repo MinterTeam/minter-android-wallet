@@ -56,7 +56,13 @@ public final class ReactiveGate {
             try {
                 res = call.execute();
             } catch (Throwable t) {
-                emitter.onError(NetworkException.convertIfNetworking(t));
+                if (!emitter.isDisposed()) {
+                    Throwable e = NetworkException.convertIfNetworking(t);
+                    if (e == null) {
+                        e = new RuntimeException(t);
+                    }
+                    emitter.onError(e);
+                }
                 return;
             }
 
