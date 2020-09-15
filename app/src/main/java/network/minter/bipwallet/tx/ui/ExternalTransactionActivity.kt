@@ -47,6 +47,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.releaseDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
+import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
@@ -60,6 +61,7 @@ import network.minter.bipwallet.tx.contract.ExternalTransactionView
 import network.minter.bipwallet.tx.views.ExternalTransactionPresenter
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterAddress
+import network.minter.explorer.models.CoinItemBase
 import timber.log.Timber
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -168,15 +170,28 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)))
     }
 
-    override fun showExchangeBanner(text: CharSequence, listener: (View) -> Unit) {
+    override fun showBannerExchangeText(text: CharSequence, listener: (View) -> Unit) {
         b.exchangeContainer.visible = true
         b.exchangeText.text = text
+        b.exchangeAction.visible = true
         b.exchangeAction.setOnClickListener {
             listener(it)
         }
     }
 
-    override fun startExchangeCoins(requestCode: Int, coin: String, value: BigDecimal, account: MinterAddress) {
+    override fun showBannerError(text: CharSequence) {
+        b.exchangeContainer.visible = true
+        b.exchangeText.text = text
+        b.exchangeAction.visible = false
+    }
+
+    override fun showBannerError(resId: Int) {
+        b.exchangeContainer.visible = true
+        b.exchangeText.text = HtmlCompat.fromHtml(getString(resId))
+        b.exchangeAction.visible = false
+    }
+
+    override fun startExchangeCoins(requestCode: Int, coin: CoinItemBase, value: BigDecimal, account: MinterAddress) {
         SingleCallHandler.call("exchange") {
             ConvertCoinActivity.Builder(this)
                     .buyCoins(coin, value)

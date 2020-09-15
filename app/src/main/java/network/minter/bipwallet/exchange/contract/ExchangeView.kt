@@ -32,7 +32,7 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.exchange.ExchangeAmount
+import network.minter.bipwallet.exchange.models.ExchangeAmount
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.explorer.models.CoinBalance

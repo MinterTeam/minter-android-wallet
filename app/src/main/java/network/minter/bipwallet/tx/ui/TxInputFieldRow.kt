@@ -37,7 +37,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.RowInputDecimalFieldBinding
 import network.minter.bipwallet.databinding.RowInputFieldBinding
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinFilter
-import network.minter.bipwallet.internal.helpers.forms.validators.CoinValidator
+import network.minter.bipwallet.internal.helpers.forms.validators.DbCoinValidatorWithSuffix
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterAddressValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterPubKeyValidator
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
@@ -145,9 +145,9 @@ class TxInputFieldRow<T : Operation> internal constructor(
         fun tplCoin(onChanged: (T, String) -> Unit, afterChange: (() -> Unit)? = null): Builder<T> {
             configureInput { inputGroup, inputField ->
                 validCallback?.invoke(ValidState.Undefined, inputField)
-                inputGroup.addFilter(inputField, InputFilter.LengthFilter(10))
+//                inputGroup.addFilter(inputField, InputFilter.LengthFilter(10))
                 inputGroup.addFilter(inputField, CoinFilter())
-                inputGroup.addValidator(inputField, CoinValidator())
+                inputGroup.addValidator(inputField, DbCoinValidatorWithSuffix())
                 handleTextChange(inputGroup, inputField, onChanged, afterChange)
             }
             return this

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,39 +24,46 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
+package network.minter.bipwallet.exchange.models
 
-import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.explorer.models.GateResult;
-import retrofit2.HttpException;
+import android.os.Parcel
+import android.os.Parcelable
+import network.minter.explorer.models.CoinItemBase
+import org.parceler.Parcels
+import java.math.BigDecimal
 
 /**
  * minter-android-wallet. 2018
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
-public class GateErrorMapped<Result> extends GateResult<Result> implements ResultErrorMapper {
-    public int statusCode;
-    public String errorMessage;
 
-    @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
-        }
+class ExchangeAmount(
+        var coin: CoinItemBase,
+        var amount: BigDecimal
+) : Parcelable {
 
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
+    constructor(parcel: Parcel) : this(
+            Parcels.unwrap<CoinItemBase>(parcel.readParcelable(CoinItemBase::class.java.classLoader)),
+            parcel.readValue(BigDecimal::class.java.classLoader) as BigDecimal
+    )
 
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        result = null;
-        error = new ErrorResult();
-        error.code = statusCode;
-        error.message = e.getUserMessage();
-        statusCode = e.getStatusCode();
-        errorMessage = e.getUserMessage();
-
-        return true;
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(Parcels.wrap(coin), flags)
+        parcel.writeValue(amount)
     }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ExchangeAmount> {
+        override fun createFromParcel(parcel: Parcel): ExchangeAmount {
+            return ExchangeAmount(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ExchangeAmount?> {
+            return arrayOfNulls(size)
+        }
+    }
+
 }

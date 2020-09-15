@@ -32,8 +32,13 @@ import com.google.gson.GsonBuilder
 import dagger.Component
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.analytics.AnalyticsManager
-import network.minter.bipwallet.apis.explorer.*
+import network.minter.bipwallet.apis.explorer.RepoDailyRewards
+import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
+import network.minter.bipwallet.apis.explorer.RepoTransactions
+import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
+import network.minter.bipwallet.coins.CoinMapper
+import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.db.WalletDatabase
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
@@ -118,6 +123,7 @@ interface WalletComponent {
     fun txGateRepo(): GateTransactionRepository
     fun estimateRepo(): GateEstimateRepository
     fun txInitDataRepo(): TxInitDataRepository
+    fun coinMapper(): CoinMapper
 
     // db
     fun db(): WalletDatabase

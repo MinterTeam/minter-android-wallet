@@ -33,6 +33,7 @@ import network.minter.core.MinterSDK
 import network.minter.explorer.models.BaseCoinValue
 import network.minter.explorer.models.CoinBalance
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * minter-android-wallet. 2020
@@ -222,10 +223,20 @@ object CollectionsHelper {
         fun apply(input: Input): Output
     }
 
+    fun <T> Iterable<T>.unique(): ArrayList<T> {
+        val out = ArrayList<T>()
+        for (item in this) {
+            if (!out.contains(item)) {
+                out.add(item)
+            }
+        }
+        return out
+    }
+
     class StableCoinSorting<T : BaseCoinValue> : Comparator<T> {
         override fun compare(ac: T, bc: T): Int {
-            val a = ac.coin!!.toLowerCase()
-            val b = bc.coin!!.toLowerCase()
+            val a = ac.coin!!.symbol.toLowerCase()
+            val b = bc.coin!!.symbol.toLowerCase()
             if (a == b) // update to make it stable
                 return 0
             if (a == sStable) return -1
@@ -239,8 +250,8 @@ object CollectionsHelper {
 
     class StableCoinSortingCoinBalance : Comparator<CoinBalance> {
         override fun compare(ac: CoinBalance, bc: CoinBalance): Int {
-            val a = ac.coin!!.toLowerCase()
-            val b = bc.coin!!.toLowerCase()
+            val a = ac.coin!!.symbol.toLowerCase()
+            val b = bc.coin!!.symbol.toLowerCase()
             if (a == b) // update to make it stable
                 return 0
             if (a == sStable) return -1
@@ -251,4 +262,6 @@ object CollectionsHelper {
             private val sStable = MinterSDK.DEFAULT_COIN.toLowerCase()
         }
     }
+
+
 }

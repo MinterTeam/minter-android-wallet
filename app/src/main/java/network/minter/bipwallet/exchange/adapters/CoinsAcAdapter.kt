@@ -30,10 +30,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
 import network.minter.bipwallet.internal.helpers.ViewExtensions.listItemBackgroundRippleRounded
 import network.minter.explorer.models.CoinItem
-import network.minter.profile.MinterProfileApi
 import timber.log.Timber
 
 /**
@@ -60,7 +60,7 @@ class CoinsAcAdapter(
 
         holder.b.itemTitle.text = item.symbol
         holder.b.itemSubtitle.text = item.name
-        holder.b.itemAvatar.setImageUrlFallback(MinterProfileApi.getCoinAvatarUrl(item.symbol), R.drawable.img_avatar_default)
+        holder.b.itemAvatar.setImageUrlFallback(item.avatar, R.drawable.img_avatar_default)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

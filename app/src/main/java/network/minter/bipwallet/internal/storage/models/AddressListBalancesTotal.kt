@@ -30,6 +30,7 @@ import com.annimon.stream.Stream
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.AddressBalance
+import network.minter.explorer.models.CoinItemBase
 import java.math.BigDecimal
 import java.util.*
 
@@ -88,5 +89,9 @@ class AddressListBalancesTotal(
 
     fun getCoinBalance(address: MinterAddress, coin: String): BigDecimal {
         return getBalance(address).getCoin(coin)?.amount ?: BigDecimal.ZERO
+    }
+
+    fun getCoinBalance(address: MinterAddress, coin: CoinItemBase): BigDecimal {
+        return getBalance(address).getCoin(coin.id)?.amount ?: BigDecimal.ZERO
     }
 }

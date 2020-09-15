@@ -31,7 +31,7 @@ import android.text.Spannable
 import androidx.recyclerview.widget.RecyclerView
 import com.otaliastudios.autocomplete.AutocompletePolicy
 import io.reactivex.schedulers.Schedulers
-import network.minter.bipwallet.apis.explorer.RepoCoins
+import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
 import network.minter.explorer.models.CoinItem
 import timber.log.Timber

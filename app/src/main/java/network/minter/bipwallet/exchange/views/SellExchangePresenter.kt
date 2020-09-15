@@ -28,6 +28,7 @@ package network.minter.bipwallet.exchange.views
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
+import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.exchange.contract.SellExchangeView
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
@@ -35,7 +36,6 @@ import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.MinterSDK
-import network.minter.explorer.repo.ExplorerCoinsRepository
 import network.minter.explorer.repo.GateEstimateRepository
 import network.minter.explorer.repo.GateGasRepository
 import network.minter.explorer.repo.GateTransactionRepository
@@ -51,7 +51,7 @@ open class SellExchangePresenter @Inject constructor(
         secretStorage: SecretStorage,
         accountStorage: RepoAccounts,
         txRepo: RepoTransactions,
-        explorerCoinsRepository: ExplorerCoinsRepository,
+        explorerCoinsRepository: RepoCoins,
         gasRepo: GateGasRepository,
         estimateRepository: GateEstimateRepository,
         gateTransactionRepository: GateTransactionRepository) :

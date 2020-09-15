@@ -28,10 +28,10 @@ package network.minter.bipwallet.addressbook.models
 import androidx.annotation.NonNull
 import androidx.room.*
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.views.widgets.RemoteImageView
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
-import network.minter.profile.MinterProfileApi
 import org.parceler.Parcel
 
 @Parcel
@@ -125,7 +125,7 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
                 return extAvatar!!
             }
 
-            return MinterProfileApi.getUserAvatarUrlByAddress(address)
+            return minterAddress.avatar
         }
 
     val minterAddress: MinterAddress

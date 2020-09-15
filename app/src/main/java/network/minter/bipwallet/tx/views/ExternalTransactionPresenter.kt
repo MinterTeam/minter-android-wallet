@@ -44,7 +44,9 @@ import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.reactive.ReactiveGate
-import network.minter.bipwallet.apis.reactive.rxGate
+import network.minter.bipwallet.apis.reactive.castErrorResultTo
+import network.minter.bipwallet.coins.CoinMapper
+import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.Preconditions.firstNonNull
@@ -81,11 +83,8 @@ import network.minter.core.MinterSDK
 import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
-import network.minter.core.internal.helpers.StringHelper
-import network.minter.core.util.RLPBoxed
 import network.minter.explorer.models.GasValue
 import network.minter.explorer.models.GateResult
-import network.minter.explorer.models.GateResult.copyError
 import network.minter.explorer.models.PushResult
 import network.minter.explorer.models.TxCount
 import network.minter.explorer.repo.GateEstimateRepository
@@ -103,7 +102,7 @@ import javax.inject.Inject
  */
 
 private data class BuyRequiredAmount(
-        var coin: String,
+        var coinId: BigInteger,
         var amount: BigDecimal
 )
 
@@ -121,6 +120,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     @Inject lateinit var gateTxRepo: GateTransactionRepository
     @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var cachedTxRepo: RepoTransactions
+    @Inject lateinit var coins: RepoCoins
+    @Inject lateinit var coinMapper: CoinMapper
     @Inject lateinit var res: Resources
 
     private var extTx: ExternalTransaction? = null
@@ -130,6 +131,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private var gasPrice = BigInteger.ONE
     private var isWsBound = false
     private var buyRequiredAmount: BuyRequiredAmount? = null
+    private var enableEditInput = false
+    private var enableEditForm = true
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -232,26 +235,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 viewState.finishCancel()
                 return
             }
-            var hash: String? = null
-            // this value represents that we are parsing old-style deeplinks
-            var support = true
-            if (!params.containsKey("d") && !params.containsKey("data")) {
+            val hash: String
+            try {
+                hash = BytesData(
+                        Base64UrlSafe.decode(params.getString("data", null).toByteArray())
+                ).toHexString()
+            } catch (e: Throwable) {
                 viewState.disableAll()
-                showTxErrorDialog("Unable to parse deeplink: No transaction data passed")
+                showTxErrorDialog("Unable to parse deeplink: %s", e.message!!)
                 return
-            } else if (params.containsKey("d")) {
-                hash = params.getString("d", null)
-            } else if (params.containsKey("data")) {
-                support = false
-                try {
-                    hash = BytesData(
-                            Base64UrlSafe.decode(params.getString("data", null).toByteArray())
-                    ).toHexString()
-                } catch (e: Throwable) {
-                    viewState.disableAll()
-                    showTxErrorDialog("Unable to parse deeplink: %s", e.message!!)
-                    return
-                }
             }
             if (params.containsKey("p")) {
                 checkPassword = try {
@@ -259,11 +251,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     if (rawPass == null) {
                         null
                     } else {
-                        if (support) {
-                            RLPBoxed.decodeString(StringHelper.hexStringToChars(rawPass))
-                        } else {
-                            Base64UrlSafe.decodeString(rawPass)
-                        }
+                        Base64UrlSafe.decodeString(rawPass)
                     }
                 } catch (t: Throwable) {
                     Timber.w(t, "Unable to decode check password")
@@ -313,6 +301,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         } catch (t: Throwable) {
             showTxErrorDialog("Invalid transaction data: %s", t.message!!)
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -322,9 +311,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 if (buyRequiredAmount != null) {
                     val exchangedAmount = ConvertCoinActivity.getResult(data!!)
 
-                    if (exchangedAmount.coin == buyRequiredAmount!!.coin) {
+                    if (exchangedAmount.coin.id == buyRequiredAmount!!.coinId) {
                         if (exchangedAmount.amount >= buyRequiredAmount!!.amount) {
-                            Timber.d("Exchanged enough coins: ${exchangedAmount.amount} ${exchangedAmount.coin}")
+                            Timber.d("Exchanged enough coins: ${exchangedAmount.amount} ${exchangedAmount.coin.symbol}")
                             viewState.hideExchangeBanner()
                         } else {
                             Observable
@@ -337,13 +326,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 run = false
                                                 break
                                             }
-                                            accountStorage.update(true, Consumer { balance ->
+                                            accountStorage.update(true, { balance ->
                                                 if (balance.getCoinBalance(from!!, exchangedAmount.coin) >= exchangedAmount.amount) {
                                                     Timber.d("Success found balance after buy required coins!")
                                                     run = false
                                                     success = true
                                                 }
-                                            }, Consumer { err -> Timber.w(err, "Unable to update balance!") })
+                                            }, { err -> Timber.w(err, "Unable to update balance!") })
 
                                             i++
                                             if (i > 1) {
@@ -375,15 +364,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
     private fun getTxInitData(address: MinterAddress?): Observable<TxInitData> {
         return Observable.combineLatest(
-                estimateRepo.getTransactionCount(address!!).rxGate(),
-                gasRepo.minGas.rxGate(),
+                estimateRepo.getTransactionCount(address!!),
+                gasRepo.minGas,
                 BiFunction { txCountGateResult: GateResult<TxCount>, gasValueGateResult: GateResult<GasValue> ->
 
                     // if some request failed, returning error result
                     if (!txCountGateResult.isOk) {
-                        return@BiFunction TxInitData(copyError<Any>(txCountGateResult))
+                        return@BiFunction TxInitData(txCountGateResult.castErrorResultTo<Any>())
                     } else if (!gasValueGateResult.isOk) {
-                        return@BiFunction TxInitData(copyError<Any>(gasValueGateResult))
+                        return@BiFunction TxInitData(gasValueGateResult.castErrorResultTo<Any>())
                     }
                     TxInitData(
                             txCountGateResult.result.count.add(BigInteger.ONE),
@@ -410,6 +399,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             return false
         }
         val type = extTx!!.type
+
         validateEnoughCoins()
         if (type == OperationType.RedeemCheck) {
             val d = extTx!!.getData<TxRedeemCheck>()
@@ -437,15 +427,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         when (type) {
             OperationType.SendCoin -> {
                 val d = extTx!!.getData<TxSendCoin>()
-                out = BuyRequiredAmount(d.coin, d.value)
+                out = BuyRequiredAmount(d.coinId, d.value)
             }
             OperationType.SellCoin -> {
                 val d = extTx!!.getData<TxCoinSell>()
-                out = BuyRequiredAmount(d.coinToSell, d.valueToSell)
+                out = BuyRequiredAmount(d.coinIdToSell, d.valueToSell)
             }
             OperationType.Delegate -> {
                 val d = extTx!!.getData<TxDelegate>()
-                out = BuyRequiredAmount(d.coin, d.stake)
+                out = BuyRequiredAmount(d.coinId, d.stake)
             }
             else -> {
                 out = null
@@ -461,7 +451,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
         if (txValues != null) {
             val balance = accountStorage.data.getBalance(from!!)
-            val coinBalanceSearch = balance.findCoinByName(txValues.coin)
+            val coinBalanceSearch = balance.findCoinById(txValues.coinId)
 
             var balanceSum: BigDecimal = BigDecimal.ZERO
             if (coinBalanceSearch.isPresent) {
@@ -470,12 +460,33 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             val notEnough: BigDecimal = txValues.amount - balanceSum
 
             if (notEnough > BigDecimal.ZERO) {
-                buyRequiredAmount = BuyRequiredAmount(txValues.coin, notEnough)
-                viewState.showExchangeBanner(
-                        HtmlCompat.fromHtml(Wallet.app().res().getString(R.string.description_external_not_enough_coins, notEnough.toPlain(), txValues.coin))
-                ) {
-                    viewState.startExchangeCoins(REQUEST_EXCHANGE_COINS, txValues.coin, notEnough, from!!)
-                }
+                buyRequiredAmount = BuyRequiredAmount(txValues.coinId, notEnough)
+
+                //@todo: check it's working
+
+                coinMapper.exist(txValues.coinId)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                { exist ->
+                                    if (exist) {
+                                        val coin = coinMapper.getById(txValues.coinId)
+                                        viewState.showBannerExchangeText(
+                                                HtmlCompat.fromHtml(Wallet.app().res().getString(R.string.description_external_not_enough_coins, notEnough.toPlain(), coin!!.symbol))
+                                        ) {
+                                            viewState.startExchangeCoins(REQUEST_EXCHANGE_COINS, coin, notEnough, from!!)
+                                        }
+                                    } else {
+                                        viewState.showBannerError(R.string.description_external_unknown_coin_id)
+                                    }
+
+                                },
+                                { t ->
+                                    Timber.w(t, "Unable to check coin exists")
+
+                                }
+                        )
+
                 return
             }
         }
@@ -521,16 +532,14 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         viewState.setFee(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
     }
 
-    private var inputEnabled = false
-
     fun toggleEditing() {
-        inputEnabled = !inputEnabled
+        enableEditInput = !enableEditInput
         fillData(extTx!!)
     }
 
+
     private fun fillData(tx: ExternalTransaction) {
         gasRepo.minGas
-                .rxGate()
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -549,7 +558,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 )
                 .disposeOnDestroy()
 
-        viewState.setOnConfirmListener(View.OnClickListener { onSubmit() })
+        viewState.setOnConfirmListener { onSubmit() }
 
         val allRows: MutableList<TxInputFieldRow<*>> = ArrayList()
 
@@ -561,11 +570,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .onValid { viewState.enableSubmit(it) }
                         .add {
                             label = "You're sending"
-                            text = data.coin
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinId)
+                            enabled = enableEditInput
                             tplCoin(
                                     { data, value ->
-                                        data.coin = value
+                                        //todo: map coin from db
+                                        data.coinId = coinMapper[value]
                                     },
                                     {
                                         validateEnoughCoins()
@@ -575,7 +586,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .add {
                             label = "Amount"
                             text = data.value.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal({ data, value ->
                                 data.setValue(value)
                             }, { validateEnoughCoins() })
@@ -583,7 +594,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .add {
                             label = "To"
                             text = data.to.toString()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplAddress { txSendCoin, s ->
                                 txSendCoin.setTo(s)
                             }
@@ -597,32 +608,36 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val rows = TxInputFieldRow.MultiBuilder(TxCoinSell::class.java, extTx!!)
                         .add {
                             label = "You're selling"
-                            text = data.coinToSell
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinIdToSell)
+                            enabled = enableEditInput
                             tplCoin({ txCoinSell, s ->
-                                txCoinSell.coinToSell = s
+                                //todo: map coin from db
+                                txCoinSell.coinIdToSell = coinMapper[s]
                             }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "Amount"
                             text = data.valueToSell.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal({ txCoinSell, s ->
                                 txCoinSell.valueToSell = s.parseBigDecimal()
                             }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "Coin To Buy"
-                            text = data.coinToBuy
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinIdToBuy)
+                            enabled = enableEditInput
                             tplCoin { txCoinSell, s ->
-                                txCoinSell.coinToBuy = s
+                                //todo: map coin from db
+                                txCoinSell.coinIdToBuy = coinMapper[s]
                             }
                         }
                         .add {
                             label = "Minimum Amount To Get"
                             text = data.minValueToBuy.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal { txCoinSell, s ->
                                 txCoinSell.minValueToBuy = s.parseBigDecimal()
                             }
@@ -637,24 +652,29 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val rows = TxInputFieldRow.MultiBuilder(TxCoinSellAll::class.java, extTx!!)
                         .add {
                             label = "You're selling (sell all)"
-                            text = data.coinToSell
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinIdToSell)
+                            enabled = enableEditInput
                             tplCoin { txCoinSellAll, value ->
-                                txCoinSellAll.coinToSell = value
+                                //todo: map coin from db
+                                txCoinSellAll.coinIdToSell = coinMapper[value]
+//                                txCoinSellAll.coinToSell = value
                             }
                         }
                         .add {
                             label = "Coin To Buy"
-                            text = data.coinToBuy
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinIdToBuy)
+                            enabled = enableEditInput
                             tplCoin { txCoinSellAll, value ->
-                                txCoinSellAll.coinToBuy = value
+                                //todo: map coin from db
+                                txCoinSellAll.coinIdToBuy = coinMapper[value]
                             }
                         }
                         .add {
                             label = "Minimum Amount To Get"
                             text = data.minValueToBuy.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal { txCoinSellAll, value ->
                                 txCoinSellAll.minValueToBuy = value.parseBigDecimal()
                             }
@@ -663,7 +683,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
                 allRows.addAll(rows)
             }
-
             OperationType.BuyCoin -> {
                 viewState.enableEditAction(true)
                 val data = tx.getData(TxCoinBuy::class.java)
@@ -671,32 +690,36 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val rows = TxInputFieldRow.MultiBuilder(TxCoinBuy::class.java, extTx!!)
                         .add {
                             label = "You're buying"
-                            text = data.coinToBuy
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinIdToBuy)
+                            enabled = enableEditInput
                             tplCoin { txCoinBuy, s ->
-                                txCoinBuy.coinToBuy = s
+                                //todo: map coin from db
+                                txCoinBuy.coinIdToBuy = coinMapper[s]
                             }
                         }
                         .add {
                             label = "Amount"
                             text = data.valueToBuy.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal { txCoinBuy, s ->
                                 txCoinBuy.valueToBuy = s.parseBigDecimal()
                             }
                         }
                         .add {
                             label = "Coin To Sell"
-                            text = data.coinToSell
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinIdToSell)
+                            enabled = enableEditInput
                             tplCoin { txCoinBuy, s ->
-                                txCoinBuy.coinToSell = s
+                                //todo: map coin from db
+                                txCoinBuy.coinIdToSell = coinMapper[s]
                             }
                         }
                         .add {
                             label = "Maximum Amount To Spend"
                             text = data.maxValueToSell.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal { txCoinBuy, s ->
                                 txCoinBuy.maxValueToSell = s.parseBigDecimal()
                             }
@@ -705,13 +728,20 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
                 allRows.addAll(rows)
             }
-            OperationType.CreateCoin -> {
+            OperationType.CreateCoin,
+            OperationType.RecreateCoin -> {
                 viewState.enableEditAction(false)
-                val data = tx.getData(TxCreateCoin::class.java)
+                val data = if (tx.type == OperationType.RecreateCoin) {
+                    tx.getData<TxRecreateCoin>()
+                } else {
+                    tx.getData<TxCreateCoin>()
+                }
 
-                val rows = TxInputFieldRow.MultiBuilder(TxCreateCoin::class.java, extTx!!)
+                val title = if (tx.type == OperationType.RecreateCoin) "You're re-creating coin" else "You're creating coin"
+
+                val rows = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
                         .add {
-                            label = "You're creating coin"
+                            label = title
                             text = data.symbol
                         }
                         .add {
@@ -756,7 +786,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Coin"
-                            text = data.coin
+//                            todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinId)
                         }
                         .add {
                             label = "Commission Percent"
@@ -772,16 +803,18 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val rows = TxInputFieldRow.MultiBuilder(TxDelegate::class.java, extTx!!)
                         .add {
                             label = "You're delegating"
-                            text = data.coin
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinId)
+                            enabled = enableEditInput
                             tplCoin({ txDelegate, value ->
-                                txDelegate.coin = value
+                                //todo: map coin from db
+                                txDelegate.coinId = coinMapper[value]
                             }, { validateEnoughCoins() })
                         }
                         .add {
                             label = "Amount"
                             text = data.stake.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             addValidator(NumberNotZeroValidator())
                             tplDecimal({ txDelegate, s ->
                                 txDelegate.stake = s.parseBigDecimal()
@@ -790,7 +823,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .add {
                             label = "To"
                             text = data.publicKey.toString()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplPublicKey { txDelegate, s ->
                                 txDelegate.publicKey = MinterPublicKey(s)
                             }
@@ -806,16 +839,18 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val rows = TxInputFieldRow.MultiBuilder(TxUnbound::class.java, extTx!!)
                         .add {
                             label = "You're unbonding"
-                            text = data.coin
-                            enabled = inputEnabled
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(data.coinId)
+                            enabled = enableEditInput
                             tplCoin { txUnbond, value ->
-                                txUnbond.coin = value
+                                //todo: map coin from db
+                                txUnbond.coinId = coinMapper[value]
                             }
                         }
                         .add {
                             label = "Amount"
                             text = data.value.toPlain()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplDecimal { txUnbond, s ->
                                 txUnbond.value = s.parseBigDecimal()
                             }
@@ -823,7 +858,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .add {
                             label = "From"
                             text = data.publicKey.toString()
-                            enabled = inputEnabled
+                            enabled = enableEditInput
                             tplPublicKey { txUnbond, s ->
                                 txUnbond.publicKey = MinterPublicKey(s)
                             }
@@ -843,7 +878,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .add {
                             label = "Coin"
-                            text = check.coin
+                            //todo: map coin from db
+                            text = coinMapper.idToSymbolDef(check.coinId)
                         }
                         .add {
                             label = "Amount"
@@ -875,7 +911,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .build()
                 allRows.addAll(rows)
-//                adapter.addRows(rows)
             }
             OperationType.Multisend -> {
                 viewState.enableEditAction(false)
@@ -890,19 +925,26 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 for (item in data.items) {
                     rowsBuilder.add {
                         label = "${item.to}"
-                        text = "${item.value.humanize()} ${item.coin}"
+                        text = "${item.value.humanize()} ${coinMapper.idToSymbolDef(item.coinId, "(coin ID: %s)")}"
+                        //todo: map coin from db
                     }
                 }
                 allRows.addAll(rowsBuilder.build())
-//                adapter.addRows(rowsBuilder.build())
             }
-            OperationType.CreateMultisigAddress -> {
+            OperationType.CreateMultisigAddress,
+            OperationType.EditMultisigOwnersData -> {
                 viewState.enableEditAction(false)
-                val data = tx.getData<TxCreateMultisigAddress>()
+                val data = if (tx.type == OperationType.CreateMultisigAddress) {
+                    tx.getData<TxCreateMultisigAddress>()
+                } else {
+                    tx.getData<TxEditMultisigOwnersData>()
+                }
 
-                val rowsBuilder = TxInputFieldRow.MultiBuilder(TxCreateMultisigAddress::class.java, extTx!!)
+                val title = if (tx.type == OperationType.CreateMultisigAddress) "creating" else "editing"
+
+                val rowsBuilder = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
                         .add {
-                            label = "You're creating MultiSig address"
+                            label = "You're $title MultiSig address"
                             text = "With ${data.addresses.size} addresses"
                         }
                         .add {
@@ -918,7 +960,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     }
                 }
                 allRows.addAll(rowsBuilder.build())
-//                adapter.addRows(rowsBuilder.build())
             }
             OperationType.EditCandidate -> {
                 viewState.enableEditAction(false)
@@ -926,7 +967,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val rows = TxInputFieldRow.MultiBuilder(TxEditCandidate::class.java, extTx!!)
                         .add {
                             label = "You're editing candidate"
-                            text = data.pubKey.toString()
+                            text = data.publicKey.toString()
                         }
                         .add {
                             label = "Owner address"
@@ -939,7 +980,38 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
 
                 allRows.addAll(rows)
-//                adapter.addRows(rows)
+            }
+            OperationType.SetHaltBlock -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxSetHaltBlock::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxSetHaltBlock::class.java, extTx!!)
+                        .add {
+                            label = "You're setting halt block"
+                            text = data.publicKey.toString()
+                        }
+                        .add {
+                            label = "Height"
+                            text = data.height.toString()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
+            OperationType.ChangeCoinOwner -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxChangeCoinOwner::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxChangeCoinOwner::class.java, extTx!!)
+                        .add {
+                            label = "You're changing coin owner"
+                            text = data.symbol
+                        }
+                        .add {
+                            label = "New owner"
+                            text = data.newOwner.toString()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
             }
             else -> {
                 viewState.startDialog(false) { ctx: Context? ->
@@ -951,11 +1023,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
         }
 
-        if (tx.payload.size() > 0 || inputEnabled) {
+        if (tx.payload.size() > 0 || enableEditInput) {
             val row = TxInputFieldRow.Builder(tx.type.opClass, extTx!!).apply {
                 label = res.getString(R.string.label_payload_explicit)
                 text = tx.payload.stringValue()
-                enabled = inputEnabled
+                enabled = enableEditInput
                 configureInput { inputGroup, inputField ->
                     inputGroup.addValidator(inputField, PayloadValidator())
                     inputField.hint = Wallet.app().res().getString(R.string.label_payload_type)
@@ -998,7 +1070,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .switchMap(Function<TxInitData, ObservableSource<GateResult<PushResult>>> { cntRes: TxInitData ->
                         // if in previous request we've got error, returning it
                         if (!cntRes.isSuccess) {
-                            return@Function Observable.just(copyError<PushResult>(cntRes.errorResult))
+                            return@Function Observable.just(cntRes.errorResult!!.castErrorResultTo<PushResult>())
                         }
                         val tx = Transaction.Builder(cntRes.nonce, extTx)
                                 .setGasPrice(if (extTx!!.type == OperationType.RedeemCheck) BigInteger.ONE else (cntRes.gas
@@ -1008,7 +1080,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         val data = secretStorage.getSecret(from!!)
                         val sign = tx.signSingle(data.privateKey)!!
                         safeSubscribeIoToUi(
-                                ReactiveGate.rxGate(gateTxRepo.sendTransaction(sign))
+                                gateTxRepo.sendTransaction(sign)
                                         .onErrorResumeNext(ReactiveGate.toGateError())
                         )
                     })
@@ -1055,7 +1127,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .setValue(null)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
-                        viewState.startExplorer(result.result.txHash.toString())
+                        viewState.startExplorer(result.result.data.hash.toString())
                         d.dismiss()
                         viewState.finishSuccess()
                     }

@@ -76,7 +76,7 @@ open class KVStorage : Storage {
     override fun <T> get(key: String): T? {
         return synchronized(makeLock(key)) {
             try {
-                Hawk.db(mDbName)[key]
+                Hawk.db(mDbName).get<T>(key)
             } catch (t: Throwable) {
                 Timber.w(t, "Unable to get value from kvstorage: %s", key)
                 try {

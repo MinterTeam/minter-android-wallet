@@ -181,8 +181,7 @@ public class RTMService extends Service {
 
                         Timber.w(exception, msg);
                     } catch (Throwable t) {
-                        Timber.d(t);
-                        Timber.d("LiveBalance connection error (unknown)");
+                        Timber.d(t, "LiveBalance connection error (unknown)");
                     }
                     // @TODO WTF?
 

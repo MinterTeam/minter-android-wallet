@@ -38,13 +38,14 @@ import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.databinding.ActivityConvertCoinBinding
-import network.minter.bipwallet.exchange.ExchangeAmount
 import network.minter.bipwallet.exchange.contract.ConvertCoinView
+import network.minter.bipwallet.exchange.models.ExchangeAmount
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.core.crypto.MinterAddress
+import network.minter.explorer.models.CoinItemBase
 import org.parceler.Parcels
 import java.math.BigDecimal
 import java.util.*
@@ -142,7 +143,7 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
     }
 
     class Builder : ActivityBuilder {
-        private var mCoinToBuy: String? = null
+        private var mCoinToBuy: CoinItemBase? = null
         private var mValueToBuy: BigDecimal = BigDecimal.ZERO
         private var mFromAccount: MinterAddress? = null
 
@@ -150,7 +151,7 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
         constructor(from: Fragment) : super(from)
         constructor(from: Service) : super(from)
 
-        fun buyCoins(coin: String, value: BigDecimal): Builder {
+        fun buyCoins(coin: CoinItemBase, value: BigDecimal): Builder {
             mCoinToBuy = coin
             mValueToBuy = value
             return this
@@ -164,7 +165,7 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
         override fun onBeforeStart(intent: Intent) {
             super.onBeforeStart(intent)
             if (mCoinToBuy != null) {
-                intent.putExtra(EXTRA_COIN_TO_BUY, mCoinToBuy)
+                intent.putExtra(EXTRA_COIN_TO_BUY, Parcels.wrap(mCoinToBuy))
                 intent.putExtra(EXTRA_VALUE_TO_BUY, mValueToBuy.toPlainString())
             }
             if (mFromAccount != null) {

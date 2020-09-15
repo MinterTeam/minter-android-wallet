@@ -25,18 +25,19 @@
  */
 package network.minter.bipwallet.delegation.adapter
 
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.views.widgets.RemoteImageContainer
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinDelegation
+import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.ValidatorMeta
-import network.minter.profile.MinterProfileApi
 import org.parceler.Parcel
 import java.math.BigDecimal
 
 @Parcel
 class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake> {
     @JvmField
-    var coin: String? = null
+    var coin: CoinItemBase? = null
 
     @JvmField
     var amount: BigDecimal = BigDecimal.ZERO
@@ -67,8 +68,9 @@ class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<Delegated
     override val viewType: Int
         get() = DelegatedItem.ITEM_STAKE
 
+    @Deprecated("Use new variable binding", ReplaceWith("coin.avatar"))
     override val imageUrl: String
-        get() = MinterProfileApi.getCoinAvatarUrl(coin!!)
+        get() = coin!!.avatar
 
     override fun compareTo(other: DelegatedStake): Int {
         return other.amountBIP.compareTo(amountBIP)

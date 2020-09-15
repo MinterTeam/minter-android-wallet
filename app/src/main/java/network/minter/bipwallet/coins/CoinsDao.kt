@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,37 +24,38 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet;
+package network.minter.bipwallet.coins
 
-import org.junit.Test;
-
-import network.minter.core.crypto.HashUtil;
-import network.minter.profile.models.RegisterData;
-
-import static org.junit.Assert.assertEquals;
+import androidx.room.*
+import io.reactivex.Maybe
+import io.reactivex.Single
+import java.math.BigInteger
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public class HashTest {
+@Dao
+interface CoinsDao {
 
-    @Test
-    public void testHashStringDoubleSha256() {
-        final String password = "123456";
-        assertEquals("49dc52e6bf2abe5ef6e2bb5b0f1ee2d765b922ae6cc8b95d39dc06c21c848f8c", HashUtil.sha256HexDouble(password));
-    }
+    @Query("SELECT * FROM minter_coins ORDER BY symbol COLLATE NOCASE ASC")
+    fun findAll(): Single<List<DbCoin>>
 
-    @Test
-    public void testRegisterDataPasswordHash() {
-        final RegisterData regData = new RegisterData();
-        regData.rawPassword = "123456";
-        regData.preparePassword();
-        assertEquals("49dc52e6bf2abe5ef6e2bb5b0f1ee2d765b922ae6cc8b95d39dc06c21c848f8c", regData.password);
+    @Query("SELECT * FROM minter_coins WHERE coinId IN (:ids)")
+    fun findAllByIds(ids: List<BigInteger>): Single<List<DbCoin>>
 
-        regData.preparePassword();
-        // result does not changes
-        assertEquals("49dc52e6bf2abe5ef6e2bb5b0f1ee2d765b922ae6cc8b95d39dc06c21c848f8c", regData.password);
-    }
+    @Query("SELECT * FROM minter_coins WHERE coinId = :coinId")
+    fun findById(coinId: BigInteger): Maybe<DbCoin>
 
+    @Query("SELECT * FROM minter_coins WHERE symbol = :name ORDER BY id DESC")
+    fun findByName(name: String): Maybe<DbCoin>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(coins: List<DbCoin>): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun updateMultiple(coins: List<DbCoin>)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun update(coin: DbCoin)
 }

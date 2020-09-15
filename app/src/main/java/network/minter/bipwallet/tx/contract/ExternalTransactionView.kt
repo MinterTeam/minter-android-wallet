@@ -36,6 +36,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ProgressView
 import network.minter.bipwallet.tx.ui.TxInputFieldRow
 import network.minter.core.crypto.MinterAddress
+import network.minter.explorer.models.CoinItemBase
 import java.math.BigDecimal
 
 /**
@@ -67,10 +68,12 @@ interface ExternalTransactionView : MvpView, ProgressView {
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startExplorer(hash: String?)
 
-    fun showExchangeBanner(text: CharSequence, listener: (View) -> Unit)
+    fun showBannerExchangeText(text: CharSequence, listener: (View) -> Unit)
+    fun showBannerError(text: CharSequence)
+    fun showBannerError(resId: Int)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startExchangeCoins(requestCode: Int, coin: String, value: BigDecimal, account: MinterAddress)
+    fun startExchangeCoins(requestCode: Int, coin: CoinItemBase, value: BigDecimal, account: MinterAddress)
     fun hideExchangeBanner()
 
     fun showWaitProgress()

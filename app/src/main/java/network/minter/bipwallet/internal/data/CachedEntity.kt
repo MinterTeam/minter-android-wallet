@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.internal.data
 
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 /**
@@ -52,6 +53,11 @@ interface CachedEntity<ResultModel> {
      * @param result ResultModel
      */
     fun onAfterUpdate(result: ResultModel)
+
+    /**
+     * @todo this is temporary workaround to avoid getting unsaved data, needs refactoring
+     */
+    fun onAfterUpdateDeferred(result: ResultModel): Completable? = null
 
     /**
      * Called after cache cleared

@@ -120,12 +120,12 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun onAttach(context: Context) {
-        HomeModule.getComponent().inject(this)
+        HomeModule.component!!.inject(this)
         super.onAttach(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        HomeModule.getComponent().inject(this)
+        HomeModule.component!!.inject(this)
         super.onCreate(savedInstanceState)
     }
 

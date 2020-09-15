@@ -29,7 +29,6 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer
-import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.storage.KVStorage
@@ -39,7 +38,6 @@ import network.minter.core.internal.exceptions.NetworkException
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.HistoryTransaction
 import network.minter.explorer.repo.ExplorerTransactionRepository
-import retrofit2.Response
 import timber.log.Timber
 
 /**
@@ -56,7 +54,7 @@ class CacheTxRepository(
 ) : ExplorerTransactionRepository(apiBuilder), CachedEntity<@JvmSuppressWildcards List<HistoryTransaction>> {
 
     companion object {
-        private const val KEY_TRANSACTIONS = BuildConfig.MINTER_STORAGE_VERS + "cached_explorer_transaction_repository_transactions_"
+        private const val KEY_TRANSACTIONS = BuildConfig.MINTER_CACHE_VERS + "cached_explorer_transaction_repository_transactions_"
     }
 
     private val cacheKey: String
@@ -75,7 +73,6 @@ class CacheTxRepository(
                         listOf(secretStorage.mainWallet).map { it.toString() }.toList(),
                         1, 10
                 )
-                .rxExp()
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { res: ExpResult<MutableList<HistoryTransaction>?> ->
                     if (res.result != null) {
@@ -104,16 +101,17 @@ class CacheTxRepository(
 
                 val call = getTransaction(txHash)
 
-                var res: Response<ExpResult<HistoryTransaction>?>
+                var res: ExpResult<HistoryTransaction>
                 res = try {
-                    call.execute()
+                    call.blockingFirst()
                 } catch (t: Throwable) {
                     emitter.onError(NetworkException.convertIfNetworking(t))
                     return@create
                 }
 
-                if (res.body() == null) {
-                    val body = ReactiveExplorer.createExpErrorRes(res)
+                //todo: check this logic
+                if (!res.isOk) {
+                    val body = res
                     if (body.error.code != 404) {
                         run = false
                         emitter.onNext(body)
@@ -122,8 +120,8 @@ class CacheTxRepository(
                         Thread.sleep(1000)
                     }
                 } else {
-                    val body = res.body()
-                    if (body?.result != null) {
+                    val body = res
+                    if (body.result != null) {
                         run = false
                         emitter.onNext(body)
                         emitter.onComplete()

@@ -49,7 +49,8 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
-import network.minter.bipwallet.apis.reactive.rxGate
+import network.minter.bipwallet.apis.reactive.castErrorResultTo
+import network.minter.bipwallet.home.HomeScope
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
@@ -78,6 +79,7 @@ import network.minter.bipwallet.wallets.views.WalletSelectorController
 import network.minter.blockchain.models.TransactionCommissionValue
 import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK.DEFAULT_COIN
+import network.minter.core.MinterSDK.DEFAULT_COIN_ID
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.core.crypto.PrivateKey
@@ -97,7 +99,7 @@ import javax.net.ssl.SSLException
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-
+@HomeScope
 @InjectViewState
 class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     companion object {
@@ -128,7 +130,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private val mClickedUseMax = AtomicBoolean(false)
     private var mInputChange: BehaviorSubject<String>? = null
     private var mAddressChange: BehaviorSubject<String>? = null
-    private var mGasCoin = DEFAULT_COIN
+    private var mGasCoinId = DEFAULT_COIN_ID
     private var mGasPrice = BigInteger("1")
     private var mLastAccount: CoinBalance? = null
     private var mSendFee: BigDecimal? = null
@@ -300,7 +302,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                             if (!res.isEmpty) {
                                 val acc = accountStorage.entity.mainWallet
                                 if (mLastAccount != null) {
-                                    onAccountSelected(acc.findCoinByName(mLastAccount!!.coin).orElse(acc.coinsList[0]))
+                                    onAccountSelected(acc.findCoinById(mLastAccount!!.coin.id).orElse(acc.coinsList[0]))
                                 } else {
                                     onAccountSelected(acc.coinsList[0])
                                 }
@@ -370,7 +372,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     }
 
     private fun loadAndSetFee() {
-        gasRepo.minGas.rxGate()
+        gasRepo.minGas
                 .subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -400,7 +402,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         get() = BigDecimal.valueOf(firstNonNull(mPayload, ByteArray(0)).size.toLong()).multiply(PAYLOAD_FEE)
 
     private fun checkEnoughBalance(amount: BigDecimal): Boolean {
-        if (mFromAccount!!.coin!!.toLowerCase() != DEFAULT_COIN.toLowerCase()) {
+        if (mFromAccount!!.coin!!.id != DEFAULT_COIN_ID) {
             return true
         }
         return amount >= fee
@@ -461,7 +463,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 val dialog = TxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(mAmount)
                         .setRecipientName(mRecipient!!.name)
-                        .setCoin(mFromAccount!!.coin)
+                        .setCoin(mFromAccount!!.coin.symbol)
                         .setPositiveAction(R.string.btn_confirm) { d, _ ->
                             Wallet.app().sounds().play(R.raw.bip_beep_digi_octave)
                             onStartExecuteTransaction()
@@ -520,15 +522,15 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
-    private fun findAccountByCoin(coin: String): Optional<CoinBalance> {
-        return accountStorage.entity.mainWallet.findCoinByName(coin)
+    private fun findAccountByCoin(coin: BigInteger): Optional<CoinBalance> {
+        return accountStorage.entity.mainWallet.findCoinById(coin)
     }
 
     @Throws(OperationInvalidDataException::class)
     private fun createPreTx(): TransactionSign {
         val preTx: Transaction
         val builder = Transaction.Builder(BigInteger("1"))
-                .setGasCoin(mGasCoin)
+                .setGasCoinId(mGasCoinId)
                 .setGasPrice(mGasPrice)
 
         if (mPayload != null && mPayload!!.isNotEmpty()) {
@@ -536,7 +538,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
         preTx = builder
                 .sendCoin()
-                .setCoin(mFromAccount!!.coin)
+                .setCoinId(mFromAccount!!.coin.id)
                 .setTo(mRecipient!!.address)
                 .setValue(mAmount)
                 .build()
@@ -549,14 +551,14 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private fun createFinalTx(nonce: BigInteger, amountToSend: BigDecimal?): Transaction {
         val tx: Transaction
         val builder = Transaction.Builder(nonce)
-                .setGasCoin(mGasCoin)
+                .setGasCoinId(mGasCoinId)
                 .setGasPrice(mGasPrice)
         if (mPayload != null && mPayload!!.isNotEmpty()) {
             builder.setPayload(mPayload)
         }
         tx = builder
                 .sendCoin()
-                .setCoin(mFromAccount!!.coin)
+                .setCoinId(mFromAccount!!.coin.id)
                 .setTo(mRecipient!!.address)
                 .setValue(amountToSend)
                 .build()
@@ -603,7 +605,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             dialog.setCancelable(false)
 
             // BIP account exists anyway, no need
-            val baseAccount = findAccountByCoin(DEFAULT_COIN).get()
+            val baseAccount = findAccountByCoin(DEFAULT_COIN_ID).get()
             if (baseAccount.address == null) {
                 return@startDialog ConfirmDialog.Builder(ctx, "Unable to send transaction")
                         .setText("Can't get wallet balance. Maybe you have bad internet connection?")
@@ -611,7 +613,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                         .create()
             }
             val sendAccount = mFromAccount
-            val isBaseAccount = sendAccount!!.coin == DEFAULT_COIN
+            val isBaseAccount = sendAccount!!.coin.id == DEFAULT_COIN_ID
             val enoughBaseForFee: Boolean
 
             // default coin for pay fee - MNT (base coin)
@@ -620,22 +622,22 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             txFeeValue.result.value = feeNormalized
             enoughBaseForFee = baseAccount.amount >= fee
             var txFeeValueResolver: Observable<GateResult<TransactionCommissionValue>> = Observable.just(txFeeValue)
-            val txNonceResolver = estimateRepo.getTransactionCount(mFromAccount!!.address!!).rxGate()
+            val txNonceResolver = estimateRepo.getTransactionCount(mFromAccount!!.address!!)
 
             // if enough balance on base BIP account, set it as gas coin
             if (enoughBaseForFee) {
                 Timber.tag("TX Send").d("Using base coin commission %s", DEFAULT_COIN)
-                mGasCoin = baseAccount.coin!!
+                mGasCoinId = baseAccount.coin.id!!
             } else if (!isBaseAccount) {
                 Timber.tag("TX Send").d("Not enough balance in %s to pay fee, using %s coin", DEFAULT_COIN, sendAccount.coin)
-                mGasCoin = sendAccount.coin!!
+                mGasCoinId = sendAccount.coin.id!!
                 // otherwise getting
                 Timber.tag("TX Send").d("Resolving REAL fee value in custom coin %s relatively to base coin", mFromAccount!!.coin)
                 // resolving fee currency for custom currency
                 // creating tx
                 try {
                     val preSign = createPreTx()
-                    txFeeValueResolver = estimateRepo.getTransactionCommission(preSign).rxGate()
+                    txFeeValueResolver = estimateRepo.getTransactionCommission(preSign)
                 } catch (e: OperationInvalidDataException) {
                     Timber.w(e)
                     val commissionValue = GateResult<TransactionCommissionValue>()
@@ -650,7 +652,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                     .switchMap { txInitData: TxInitData ->
                         // if in previous request we've got error, returning it
                         if (!txInitData.isSuccess) {
-                            return@switchMap Observable.just(GateResult.copyError<network.minter.explorer.models.PushResult>(txInitData.errorResult))
+                            return@switchMap Observable.just(txInitData.errorResult!!.castErrorResultTo<PushResult>())
                         }
                         val amountToSend: BigDecimal
 
@@ -710,7 +712,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = secretStorage.getSecret(mFromAccount!!.address!!)
         val sign = tx.signSingle(data.privateKey)!!
-        return gateTxRepo.sendTransaction(sign).rxGate().joinToUi()
+        return gateTxRepo.sendTransaction(sign).joinToUi()
     }
 
     private fun signSendTxExternally(dialog: WalletProgressDialog, tx: Transaction): ObservableSource<GateResult<PushResult>> {
@@ -728,7 +730,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                 .switchMap { signatureSingleData: SignatureSingleData? ->
                     val sign = tx.signExternal(signatureSingleData)
                     dialog.setText(R.string.tx_send_in_progress)
-                    gateTxRepo.sendTransaction(sign).rxGate().joinToUi()
+                    gateTxRepo.sendTransaction(sign).joinToUi()
                 }
                 .doFinally { devInstance.destroy() }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -780,7 +782,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                     .setValue(mRecipient!!.name)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
-                        viewState.startExplorer(result.result.txHash.toString())
+                        viewState.startExplorer(result.result.data.hash.toString())
                         d.dismiss()
                         analytics.send(AppEvent.SentCoinPopupViewTransactionButton)
                     }
@@ -866,7 +868,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     private fun onAccountSelected(coinAccount: CoinBalance) {
         mFromAccount = coinAccount
         mLastAccount = coinAccount
-        viewState.setAccountName(String.format("%s (%s)", coinAccount.coin?.toUpperCase(), coinAccount.amount.humanize()))
+        viewState.setAccountName(String.format("%s (%s)", coinAccount.coin?.symbol, coinAccount.amount.humanize()))
         viewState.validate {
             mFormValid = it
             checkEnableSubmit()

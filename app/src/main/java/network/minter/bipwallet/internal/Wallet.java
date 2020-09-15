@@ -28,7 +28,7 @@ package network.minter.bipwallet.internal;
 
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.Seconds;
@@ -83,7 +83,7 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
         return MinterExplorerSDK.FRONT_URL;
     }
 
-    private static CircularFifoBuffer<Integer> sTimeOffsets = new CircularFifoBuffer<>(5);
+    private static final CircularFifoBuffer<Integer> sTimeOffsets = new CircularFifoBuffer<>(5);
 
     public static int timeOffset() {
         if (sTimeOffsets.size() == 0) {
@@ -158,22 +158,20 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
     }
 
     public static final class CrashlyticsTree extends Timber.Tree {
-        private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
-        private static final String CRASHLYTICS_KEY_TAG = "tag";
-        private static final String CRASHLYTICS_KEY_MESSAGE = "message";
 
         @Override
         protected void log(int priority, String tag, @NotNull String message, Throwable t) {
             if (priority == Log.ERROR || priority == Log.WARN) {
-                Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
-                Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
-                Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
-
-                if (t == null) {
-                    Crashlytics.logException(new Exception(message));
-                } else {
-                    Crashlytics.logException(t);
+                if (app().secretStorage().getHasSecrets()) {
+                    FirebaseCrashlytics.getInstance().setUserId(app().secretStorage().getMainWallet().toString());
                 }
+                final String verb;
+                if (priority == Log.ERROR) {
+                    verb = "E";
+                } else {
+                    verb = "W";
+                }
+                FirebaseCrashlytics.getInstance().recordException(new RuntimeException(String.format("%s/%s: %s", verb, tag, message), t));
             }
         }
     }

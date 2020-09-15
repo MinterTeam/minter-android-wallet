@@ -132,7 +132,6 @@
             android:focusable="false"
             android:hint="Coin Name"
             android:imeOptions="actionDone"
-            android:maxLength="10"
             android:singleLine="true"
             android:tag="income_coin"
             android:textAllCaps="true"

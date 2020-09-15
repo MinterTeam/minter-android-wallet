@@ -35,10 +35,9 @@ import android.hardware.usb.UsbManager;
 import android.os.Build;
 
 import com.annimon.stream.Stream;
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.edwardstock.secp256k1.NativeSecp256k1;
 import com.fatboyindustrial.gsonjodatime.Converters;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -64,7 +63,6 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
-import io.fabric.sdk.android.Fabric;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
@@ -78,7 +76,7 @@ import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import network.minter.bipwallet.internal.system.UnzipUtil;
 import network.minter.bipwallet.services.livebalance.RTMService;
-import network.minter.blockchain.MinterBlockChainApi;
+import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.core.MinterSDK;
 import network.minter.core.bip39.NativeBip39;
 import network.minter.core.crypto.BytesData;
@@ -110,18 +108,17 @@ import static network.minter.bipwallet.internal.Wallet.ENABLE_CRASHLYTICS;
 @Module
 public class WalletModule {
     public final static String DB_CACHE = "minter_cache";
-    private Context mContext;
-    private boolean mDebug;
-    private boolean mEnableExternalLog;
+    private final Context mContext;
+    private final boolean mDebug;
+    private final boolean mEnableExternalLog;
 
-    @SuppressWarnings("ConstantConditions")
     public WalletModule(Context context, boolean debug, boolean enableExternalLog) {
         mContext = context;
         mDebug = debug;
         mEnableExternalLog = enableExternalLog;
         initCrashlytics();
 
-        MinterBlockChainApi.initialize(debug);
+        MinterBlockChainSDK.initialize(debug);
 
         if (BuildConfig.LIVE_BALANCE_URL != null) {
             RTMService.LIVE_BALANCE_URL = BuildConfig.LIVE_BALANCE_URL;
@@ -356,7 +353,11 @@ public class WalletModule {
         return new RxMinterLedger(context, (UsbManager) context.getSystemService(USB_SERVICE));
     }
 
-    private final static class WalletGsonHawkParer extends GsonParser {
+    private void initCrashlytics() {
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
+    }
+
+    public final static class WalletGsonHawkParer extends GsonParser {
 
         public WalletGsonHawkParer(GsonBuilder gsonBuilder) {
             super(gsonBuilder);
@@ -375,11 +376,6 @@ public class WalletModule {
                 throw t;
             }
         }
-    }
-
-    private void initCrashlytics() {
-        CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(!mEnableExternalLog).build();
-        Fabric.with(mContext, new Crashlytics.Builder().core(core).build());
     }
 }
 

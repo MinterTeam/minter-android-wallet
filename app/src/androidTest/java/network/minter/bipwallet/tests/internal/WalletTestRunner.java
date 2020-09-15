@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,29 +24,42 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.services.livebalance.models;
+package network.minter.bipwallet.tests.internal;
 
-import java.math.BigDecimal;
+import android.app.Application;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.StrictMode;
 
-import network.minter.profile.MinterProfileApi;
+import com.squareup.rx2.idler.Rx2Idler;
+
+import androidx.test.runner.AndroidJUnitRunner;
+import io.reactivex.plugins.RxJavaPlugins;
 
 /**
- * minter-android-wallet. 2018
+ * minter-android-wallet. 2020
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class RTMBalance {
-    public String coin;
-    public BigDecimal amount;
+public class WalletTestRunner extends AndroidJUnitRunner {
 
-    public String getCoin() {
-        return coin.toUpperCase();
+    @Override
+    public Application newApplication(ClassLoader cl, String className, Context context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+        return super.newApplication(cl, TestWallet.class.getName(), context);
     }
 
-    public String getCoinAvatar() {
-        return MinterProfileApi.getCoinAvatarUrl(getCoin());
+    @Override
+    public void onCreate(Bundle arguments) {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());
+        super.onCreate(arguments);
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    @Override
+    public void onStart() {
+        RxJavaPlugins.setInitComputationSchedulerHandler(
+                Rx2Idler.create("RxJava 2.x Computation Scheduler")
+        );
+        RxJavaPlugins.setInitIoSchedulerHandler(
+                Rx2Idler.create("RxJava 2.x IO Scheduler"));
+        super.onStart();
     }
 }

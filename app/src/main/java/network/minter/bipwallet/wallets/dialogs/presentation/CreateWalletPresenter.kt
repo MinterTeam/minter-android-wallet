@@ -41,7 +41,6 @@ import network.minter.bipwallet.wallets.dialogs.ui.CreateWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
 import network.minter.core.bip39.MnemonicResult
 import network.minter.core.bip39.NativeBip39
-import network.minter.profile.models.User
 import java.security.SecureRandom
 import javax.inject.Inject
 
@@ -118,7 +117,6 @@ class CreateWalletPresenter @Inject constructor() : MvpBasePresenter<CreateWalle
     private fun onSubmit(view: View) {
         session.login(
                 AuthSession.AUTH_TOKEN_ADVANCED,
-                User(AuthSession.AUTH_TOKEN_ADVANCED),
                 AuthSession.AuthType.Advanced
         )
         val address = secretStorage.add(mnemonicResult!!, walletTitle)

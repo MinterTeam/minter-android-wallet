@@ -35,9 +35,10 @@ import network.minter.blockchain.models.operational.Transaction
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
+import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.ExpResult
 import network.minter.explorer.models.GateResult
-import network.minter.profile.MinterProfileApi
+import network.minter.explorer.models.HistoryTransaction
 import retrofit2.Call
 import java.math.BigDecimal
 
@@ -58,14 +59,9 @@ fun GateResult<*>.humanError(defValue: String? = "Caused unknown error"): String
     return message ?: defValue
 }
 
-/**
- * minter-android-wallet. 2020
- * @author Eduard Maximovich (edward.vstock@gmail.com)
- */
 
-fun <T> Call<GateResult<T>>.rxGate(): Observable<GateResult<T>> {
-    return ReactiveGate.rxGate(this)
-            .onErrorResumeNext(ReactiveGate.toGateError())
+fun <T> GateResult<*>.castErrorResultTo(): GateResult<T> {
+    return ReactiveGate.copyError(this)
 }
 
 fun <T> Call<ExpResult<T>>.rxExp(): Observable<ExpResult<T>> {
@@ -81,8 +77,20 @@ fun <R, T : Throwable> T.toObservable(): Observable<R> {
     return Observable.error<R>(this)
 }
 
+val CoinItemBase.avatar: String
+    get() {
+        return BuildConfig.COIN_AVATAR_BASE_URL + symbol
+    }
+
+val HistoryTransaction.TxChangeCoinOwnerResult.avatar: String
+    get() {
+        return BuildConfig.COIN_AVATAR_BASE_URL + symbol
+    }
+
 val MinterAddress.avatar: String
-    get() = MinterProfileApi.getUserAvatarUrlByAddress(this)
+    get() {
+        return BuildConfig.ADDRESS_AVATAR_BASE_URL + toString()
+    }
 
 val MinterPublicKey.avatar: String
     get() = "${BuildConfig.EXPLORER_STATIC_URL}/validators/${toString()}.png"

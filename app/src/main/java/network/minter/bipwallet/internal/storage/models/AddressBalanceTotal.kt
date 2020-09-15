@@ -32,6 +32,7 @@ import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.AddressBalance
 import network.minter.explorer.models.CoinDelegation
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -53,7 +54,8 @@ class AddressBalanceTotal(
 
         totalBalance = source.totalBalance
         totalBalanceUSD = source.totalBalanceUSD
-        availableBalanceBIP = if (coins.containsKey(MinterSDK.DEFAULT_COIN)) {
+        //todo: check this out
+        stakeBalanceBIP = if (coins.containsKey(MinterSDK.DEFAULT_COIN)) {
             coins[MinterSDK.DEFAULT_COIN]?.amount ?: BigDecimal.ZERO
         } else {
             BigDecimal.ZERO
@@ -76,10 +78,10 @@ class AddressBalanceTotal(
         return stakes
     }
 
-    fun getDelegatedByValidatorAndCoin(publicKey: MinterPublicKey?, coin: String?): CoinDelegation? {
+    fun getDelegatedByValidatorAndCoin(publicKey: MinterPublicKey?, coin: BigInteger?): CoinDelegation? {
         if (!hasDelegated(publicKey, coin)) return null
 
-        return delegatedCoins[publicKey]!!.first { it.coin == coin }
+        return delegatedCoins[publicKey]!!.first { it.coin.id == coin }
     }
 
     fun hasDelegated(publicKey: MinterPublicKey?): Boolean {
@@ -87,9 +89,9 @@ class AddressBalanceTotal(
         return delegatedCoins.containsKey(publicKey) && delegatedCoins[publicKey] != null
     }
 
-    fun hasDelegated(publicKey: MinterPublicKey?, coin: String?): Boolean {
+    fun hasDelegated(publicKey: MinterPublicKey?, coin: BigInteger?): Boolean {
         if (publicKey == null || coin == null) return false
 
-        return delegatedCoins[publicKey]?.first { it.coin == coin } != null
+        return delegatedCoins[publicKey]?.first { it.coin.id == coin } != null
     }
 }

@@ -27,12 +27,12 @@
 package network.minter.bipwallet.sending.account
 
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.storage.models.SecretData
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinDelegation
 import network.minter.explorer.models.ValidatorItem
-import network.minter.profile.MinterProfileApi
 
 /**
  * minter-android-wallet. 2020
@@ -53,7 +53,7 @@ fun selectorDataFromSecrets(input: List<SecretData>): List<SelectorData<SecretDa
                 it,
                 it.title!!,
                 if (!it.hasTitle) null else it.minterAddress.toShortString(),
-                MinterProfileApi.getUserAvatarUrlByAddress(it.minterAddress)
+                it.minterAddress.avatar
         )
     }
 }
@@ -62,9 +62,9 @@ fun selectorDataFromCoins(input: List<CoinBalance>): List<SelectorData<CoinBalan
     return input.map {
         SelectorData(
                 it,
-                "${it.coin!!.toUpperCase()} (${it.amount.humanize()})",
+                "${it.coin!!} (${it.amount.humanize()})",
                 null,
-                MinterProfileApi.getCoinAvatarUrl(it.coin!!)
+                it.coin!!.avatar
         )
     }
 }
@@ -73,9 +73,9 @@ fun selectorDataFromDelegatedAccounts(input: List<CoinDelegation>): List<Selecto
     return input.map {
         SelectorData(
                 it,
-                "${it.coin!!.toUpperCase()} (${it.amount.humanize()})",
+                "${it.coin!!} (${it.amount.humanize()})",
                 it.publicKey!!.toShortString(),
-                MinterProfileApi.getCoinAvatarUrl(it.coin!!)
+                it.coin!!.avatar
         )
     }
 }

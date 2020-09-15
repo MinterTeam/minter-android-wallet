@@ -29,6 +29,7 @@ package network.minter.bipwallet.tx.adapters.vh
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ItemListTxBinding
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
@@ -36,6 +37,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.tx.adapters.TxItem
 import network.minter.core.crypto.MinterAddress
+import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.HistoryTransaction
 import timber.log.Timber
 import java.math.BigDecimal
@@ -68,9 +70,63 @@ class TxAllViewHolder(
             HistoryTransaction.Type.CreateMultisigAddress -> bindCreateMultisigAddress(item)
             HistoryTransaction.Type.MultiSend -> bindMultisend(item, myAddress)
             HistoryTransaction.Type.EditCandidate -> bindEditCandidate(item)
+            /** @since minter 1.2 */
+            HistoryTransaction.Type.SetHaltBlock -> bindSetHaltBlock(item)
+            HistoryTransaction.Type.RecreateCoin -> bindCreateCoin(item)
+            HistoryTransaction.Type.ChangeCoinOwner -> bindChangeCoinOwner(item)
+            HistoryTransaction.Type.EditMultisigOwnersData -> bindCreateMultisigAddress(item)
+            HistoryTransaction.Type.PriceVote -> bindPriceVote(item)
+            HistoryTransaction.Type.EditCandidatePublicKey -> bindEditCandidatePublicKey(item)
             else -> {
 
             }
+        }
+    }
+
+    private fun bindEditCandidatePublicKey(item: TxItem) {
+        val data: HistoryTransaction.TxEditCandidatePublicKeyResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_edit_candidate_pub_key)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
+            itemAmount.text = ""
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindPriceVote(item: TxItem) {
+        val data: HistoryTransaction.TxPriceVoteResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_price_vote)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = "Value: ${data.price}"
+            itemAmount.text = ""
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindChangeCoinOwner(item: TxItem) {
+        val data: HistoryTransaction.TxChangeCoinOwnerResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_change_coin_owner)
+            itemAvatar.setImageUrlFallback(data.avatar, R.drawable.img_avatar_create_coin)
+            itemTitle.text = data.newOwner.toShortString()
+            itemAmount.text = ""
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindSetHaltBlock(item: TxItem) {
+        val data: HistoryTransaction.TxSetHaltBlockResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_set_halt_block)
+            itemTitle.text = data.height.toString()
+            itemAmount.text = ""
+            itemSubamount.visible = false
         }
     }
 
@@ -87,8 +143,8 @@ class TxAllViewHolder(
     }
 
 
-    private fun mapMultisend(result: List<HistoryTransaction.TxSendCoinResult>): Map<String, BigDecimal> {
-        val out = HashMap<String, BigDecimal>()
+    private fun mapMultisend(result: List<HistoryTransaction.TxSendCoinResult>): Map<CoinItemBase, BigDecimal> {
+        val out = HashMap<CoinItemBase, BigDecimal>()
         result.forEach {
             if (out.containsKey(it.coin) && out[it.coin] != null) {
                 out[it.coin] = out[it.coin]!! + it.amount
@@ -99,8 +155,8 @@ class TxAllViewHolder(
         return out
     }
 
-    private fun mapIncomingMultisend(myAddress: () -> MinterAddress, result: List<HistoryTransaction.TxSendCoinResult>): Map<String, BigDecimal> {
-        val out = HashMap<String, BigDecimal>()
+    private fun mapIncomingMultisend(myAddress: () -> MinterAddress, result: List<HistoryTransaction.TxSendCoinResult>): Map<CoinItemBase, BigDecimal> {
+        val out = HashMap<CoinItemBase, BigDecimal>()
         result.filter { it.to == myAddress() }
                 .forEach {
                     if (out.containsKey(it.coin) && out[it.coin] != null) {
@@ -122,7 +178,7 @@ class TxAllViewHolder(
             itemTitle.text = txItem.tx.fromName ?: item.from.toShortString()
             itemAvatar.setImageUrlFallback(item.toAvatar, R.drawable.img_avatar_multisend)
 
-            val coinsAmount: Map<String, BigDecimal>
+            val coinsAmount: Map<CoinItemBase, BigDecimal>
 
             if (isIncoming) {
                 coinsAmount = mapIncomingMultisend(myAddress, data.items)
@@ -136,7 +192,7 @@ class TxAllViewHolder(
                 } else {
                     val entry = coinsAmount.entries.iterator().next()
                     itemAmount.text = entry.value.humanize()
-                    itemSubamount.text = entry.key
+                    itemSubamount.text = entry.key.symbol
                 }
             } else {
                 coinsAmount = mapMultisend(data.items)
@@ -147,7 +203,7 @@ class TxAllViewHolder(
                 } else {
                     val entry = coinsAmount.entries.iterator().next()
                     itemAmount.text = String.format("- %s", bdHuman(entry.value))
-                    itemSubamount.text = entry.key
+                    itemSubamount.text = entry.key.symbol
                 }
             }
         }
@@ -163,7 +219,7 @@ class TxAllViewHolder(
             }
 
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
+            itemTitle.text = item.tx.toName ?: data.publicKey?.toShortString() ?: "<unknown>"
             itemAmount.text = ""
             itemSubamount.visible = false
         }
@@ -176,13 +232,15 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_redeem_check)
             itemAvatar.setImageResource(R.drawable.img_avatar_redeem)
             itemTitle.text = item.tx.hash.toShortString()
-            if (item.tx.from == myAddress()) {
-                itemAmount.text = data.check.value.humanize()
-            } else {
-                itemAmount.text = "- ${data.check.value.humanize()}"
-            }
+            if (data.check != null) {
+                if (item.tx.from == myAddress()) {
+                    itemAmount.text = data.check.value.humanize()
+                } else {
+                    itemAmount.text = "- ${data.check.value.humanize()}"
+                }
 
-            itemSubamount.text = data.check.coin
+                itemSubamount.text = data.check.coin.symbol
+            }
         }
     }
 
@@ -197,7 +255,7 @@ class TxAllViewHolder(
 
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, fallbackAvatar)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
-            itemSubamount.text = data.coin
+            itemSubamount.text = data.coin.symbol
 
             if (item.tx.type == HistoryTransaction.Type.Delegate) {
                 itemAmount.text = "- ${data.value.humanize()}"
@@ -209,21 +267,33 @@ class TxAllViewHolder(
     }
 
     private fun bindCreateCoin(item: TxItem) {
-        val data: HistoryTransaction.TxCreateResult = item.tx.getData()
+        var createCoin = true
+        val data = if (item.tx.type == HistoryTransaction.Type.CreateCoin) {
+            item.tx.getData<HistoryTransaction.TxCreateCoinResult>()
+        } else {
+            createCoin = false
+            item.tx.getData<HistoryTransaction.TxRecreateCoinResult>()
+        }
         binding.apply {
-            itemTitleType.setText(R.string.tx_type_create_coin)
+            itemTitleType.setText(if (createCoin) R.string.tx_type_create_coin else R.string.tx_type_recreate_coin)
             itemAvatar.setImageResource(R.drawable.img_avatar_create_coin)
             itemAmount.text = data.initialAmount.humanize()
-            itemTitle.text = data.name
+            itemTitle.text = if (data.name.isEmpty()) data.symbol else data.name
             itemSubamount.text = data.symbol
         }
     }
 
     private fun bindCreateMultisigAddress(item: TxItem) {
-        val data: HistoryTransaction.TxCreateMultisigResult = item.tx.getData()
+        var create = true
+        val data = if (item.tx.type == HistoryTransaction.Type.CreateMultisigAddress) {
+            item.tx.getData<HistoryTransaction.TxCreateMultisigResult>()
+        } else {
+            create = false
+            item.tx.getData<HistoryTransaction.TxEditMultisigOwnersDataResult>()
+        }
 
         binding.apply {
-            itemTitleType.setText(R.string.tx_type_create_multisig)
+            itemTitleType.setText(if (create) R.string.tx_type_create_multisig else R.string.tx_type_edit_multisig)
             itemAvatar.setImageResource(R.drawable.img_avatar_multisig)
             itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
             itemAmount.text = ""
@@ -237,7 +307,7 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_declare_candidacy)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
-            itemSubamount.text = data.coin
+            itemSubamount.text = data.coin.symbol
             itemAmount.text = "- ${data.stake.humanize()}"
         }
     }

@@ -28,7 +28,6 @@ package network.minter.bipwallet.apis.explorer
 
 import io.reactivex.Observable
 import network.minter.bipwallet.BuildConfig
-import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.storage.KVStorage
@@ -45,8 +44,8 @@ class CacheValidatorsRepository(
 ) : ExplorerValidatorsRepository(apiBuilder), CachedEntity<@JvmSuppressWildcards List<ValidatorItem>> {
 
     companion object {
-        private const val KEY_VALIDATORS = BuildConfig.MINTER_STORAGE_VERS + "cached_explorer_validators_repository_list"
-        private const val KEY_LAST_USED = BuildConfig.MINTER_STORAGE_VERS + "cached_last_used_validators"
+        private const val KEY_VALIDATORS = BuildConfig.MINTER_CACHE_VERS + "cached_explorer_validators_repository_list"
+        private const val KEY_LAST_USED = BuildConfig.MINTER_CACHE_VERS + "cached_last_used_validators"
     }
 
     override fun getData(): List<ValidatorItem> {
@@ -54,7 +53,7 @@ class CacheValidatorsRepository(
     }
 
     override fun getUpdatableData(): Observable<List<ValidatorItem>> {
-        return instantService.validators.rxExp()
+        return instantService.validators
                 .map { result: ExpResult<List<ValidatorItem>> ->
                     if (result.result == null) {
                         emptyList()

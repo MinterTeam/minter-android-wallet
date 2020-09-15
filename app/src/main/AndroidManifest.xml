@@ -56,10 +56,6 @@
             android:required="false" />
 
         <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="e0c0d96cb82d0098481845be3477bc7970f956e3" />
-
-        <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="barcode" />
 

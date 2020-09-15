@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -23,17 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.auth.views
 
-package network.minter.bipwallet.auth;
-
-import dagger.Module;
+import moxy.InjectViewState
+import network.minter.bipwallet.auth.contract.AuthView
+import network.minter.bipwallet.internal.di.annotations.FragmentScope
+import network.minter.bipwallet.internal.mvp.MvpBasePresenter
+import javax.inject.Inject
 
 /**
  * minter-android-wallet. 2018
  *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
-@Module
-public class AuthModule {
+@InjectViewState
+@FragmentScope
+class AuthPresenter @Inject constructor() : MvpBasePresenter<AuthView>() {
 
+    override fun attachView(view: AuthView) {
+        super.attachView(view)
+        viewState!!.setOnClickCreateWallet { onClickCreateWallet() }
+        viewState!!.setOnClickSignIn { onClickSignIn() }
+        viewState!!.setOnHelp { onClickHelp() }
+    }
+
+    private fun onClickSignIn() {
+        viewState!!.startSignIn()
+    }
+
+    private fun onClickHelp() {
+        viewState!!.startHelp()
+    }
+
+    private fun onClickCreateWallet() {
+        viewState!!.startCreateWallet()
+    }
 }

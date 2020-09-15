@@ -23,48 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.services.livebalance.models
 
-package network.minter.bipwallet.auth.views;
-
-import android.view.View;
-
-import javax.inject.Inject;
-
-import moxy.InjectViewState;
-import network.minter.bipwallet.auth.contract.AuthView;
-import network.minter.bipwallet.internal.di.annotations.FragmentScope;
-import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
+import network.minter.bipwallet.apis.reactive.avatar
+import network.minter.explorer.models.CoinItemBase
+import java.math.BigDecimal
 
 /**
  * minter-android-wallet. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
-@InjectViewState
-@FragmentScope
-public class AuthPresenter extends MvpBasePresenter<AuthView> {
-
-    @Inject
-    public AuthPresenter() {
-    }
-
-    @Override
-    public void attachView(AuthView view) {
-        super.attachView(view);
-        getViewState().setOnClickCreateWallet(this::onClickCreateWallet);
-        getViewState().setOnClickSignIn(this::onClickSignIn);
-        getViewState().setOnHelp(this::onClickHelp);
-    }
-
-    private void onClickSignIn(View view) {
-        getViewState().startSignIn();
-    }
-
-    private void onClickHelp(View view) {
-        getViewState().startHelp();
-    }
-
-    private void onClickCreateWallet(View view) {
-        getViewState().startCreateWallet();
-    }
+class RTMBalance {
+    var coin: CoinItemBase? = null
+    var amount: BigDecimal? = null
+    val coinAvatar: String = coin!!.avatar
 }

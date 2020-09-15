@@ -29,22 +29,23 @@ import com.annimon.stream.Optional
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import network.minter.bipwallet.apis.reactive.ReactiveGate
-import network.minter.bipwallet.apis.reactive.rxGate
+import network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError
 import network.minter.bipwallet.internal.exceptions.GateResponseException
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.firstOptional
-import network.minter.blockchain.models.BCResult.ResultCode
+import network.minter.blockchain.models.BlockchainStatus
 import network.minter.blockchain.models.ExchangeBuyValue
 import network.minter.blockchain.models.ExchangeSellValue
 import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinBalance
+import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.GateResult
 import network.minter.explorer.repo.GateEstimateRepository
 import timber.log.Timber
 import java.math.BigDecimal
+import java.math.BigInteger
 
 /**
  * minter-android-wallet. 2019
@@ -58,13 +59,18 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
         // this may happens when user has slow internet or something like this
         val sourceCoin = mBuilder.account().coin
         val targetCoin = mBuilder.getCoin()
+
+        if (targetCoin.id == null) {
+            onErrorMessage("Coin to buy not exists")
+            return
+        }
+
         if (opType == OperationType.BuyCoin) {
             // get (buy)
             repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin)
-                    .rxGate()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(ReactiveGate.toGateError())
+                    .onErrorResumeNext(toGateError())
                     .doOnSubscribe(mBuilder.disposableConsumer)
                     .doFinally {
                         mBuilder.onCompleteListener?.invoke()
@@ -78,33 +84,33 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                         return@subscribe
                                     } else {
                                         Timber.w(GateResponseException(res))
-                                        onErrorMessage(res.message ?: "Error:${res.error.resultCode.name}")
+                                        onErrorMessage(res.message ?: "Error:${res.status.name}")
                                         return@subscribe
                                     }
                                 }
                                 out.amount = res.result.amount
                                 out.commission = res.result.getCommission()
 
-                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
+                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
                                 val getAccount = findAccountByCoin(sourceCoin)
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
 
                                 if (mntAccount.get().amount >= OperationType.BuyCoin.fee) {
                                     Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
 
-                                    out.gasCoin = mntAccount.get().coin
+                                    out.gasCoin = mntAccount.get().coin.id
                                     out.estimate = res.result.amount
                                     out.calculation = String.format("%s %s", bdHuman(res.result.amount), sourceCoin)
 
                                 } else if (getAccount.isPresent && getAccount.get().amount >= res.result.amountWithCommission) {
                                     Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = getAccount.get().coin
+                                    out.gasCoin = getAccount.get().coin.id
                                     out.estimate = res.result.amountWithCommission
                                     out.calculation = String.format("%s %s", res.result.amountWithCommission.humanize(), sourceCoin)
                                 } else {
                                     //@todo logic duplication to synchronize with iOS app
                                     Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                                    out.gasCoin = getAccount.get().coin
+                                    out.gasCoin = getAccount.get().coin.id
                                     out.estimate = res.result.amountWithCommission
                                     out.calculation = String.format("%s %s", bdHuman(res.result.amountWithCommission), sourceCoin)
                                 }
@@ -118,10 +124,9 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
         } else {
             // spend (sell or sellAll)
             repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin)
-                    .rxGate()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .onErrorResumeNext(ReactiveGate.toGateError())
+                    .onErrorResumeNext(toGateError())
                     .doOnSubscribe(mBuilder.disposableConsumer)
                     .doFinally {
                         mBuilder.onCompleteListener?.invoke()
@@ -134,7 +139,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                         return@subscribe
                                     } else {
                                         Timber.w(GateResponseException(res), "Unable to calculate sell/sellAll currency")
-                                        onErrorMessage(res.message ?: "Error::${res.error.resultCode.name}")
+                                        onErrorMessage(res.message ?: "Error::${res.status.name}")
                                         return@subscribe
                                     }
                                 }
@@ -143,7 +148,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                 out.calculation = String.format("%s %s", bdHuman(res.result.amount), targetCoin)
                                 out.amount = res.result.amount
                                 out.commission = res.result.getCommission()
-                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN)
+                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
                                 val getAccount = findAccountByCoin(sourceCoin)
                                 out.estimate = res.result.amount
 
@@ -151,13 +156,13 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
 
                                 if (mntAccount.get().amount >= OperationType.SellCoin.fee) {
                                     Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = mntAccount.get().coin
+                                    out.gasCoin = mntAccount.get().coin.id
                                 } else if (getAccount.isPresent && getAccount.get().amount >= res.result.getCommission()) {
                                     Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = getAccount.get().coin
+                                    out.gasCoin = getAccount.get().coin.id
                                 } else {
                                     Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                                    out.gasCoin = mntAccount.get().coin
+                                    out.gasCoin = mntAccount.get().coin.id
                                     onErrorMessage("Not enough balance")
                                 }
                                 onResult(out)
@@ -176,11 +181,16 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
             return false
         }
         return if (res.error != null) {
-            res.error.code == 404 || res.error.resultCode == ResultCode.CoinNotExists
-        } else res.statusCode == 404 || res.statusCode == 400
+            res.error.code == 404 || res.status == BlockchainStatus.CoinNotExists
+        } else res.code == 404 || res.code == 400
     }
 
-    private fun findAccountByCoin(coin: String?): Optional<CoinBalance> {
+    private fun findAccountByCoin(id: BigInteger?): Optional<CoinBalance> {
+        return mBuilder.accounts()
+                .firstOptional { it.coin.id == id!! }
+    }
+
+    private fun findAccountByCoin(coin: CoinItemBase?): Optional<CoinBalance> {
         return mBuilder.accounts()
                 .firstOptional { it.coin == coin!! }
     }
@@ -189,7 +199,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
             internal val estimateRepo: GateEstimateRepository,
             var accounts: () -> List<CoinBalance>,
             var account: () -> CoinBalance,
-            var getCoin: () -> String,
+            var getCoin: () -> CoinItemBase,
             var getAmount: () -> BigDecimal,
             var spendAmount: () -> BigDecimal
     ) {
@@ -212,7 +222,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
             return this
         }
 
-        fun setGetCoin(getCoin: () -> String): Builder {
+        fun setGetCoin(getCoin: () -> CoinItemBase): Builder {
             this.getCoin = getCoin
             return this
         }
@@ -230,7 +240,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
 
 
     data class CalculationResult(
-            var gasCoin: String? = null,
+            var gasCoin: BigInteger? = null,
             var estimate: BigDecimal = BigDecimal.ZERO,
             var amount: BigDecimal = BigDecimal.ZERO,
             var calculation: String? = null,

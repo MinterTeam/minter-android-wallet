@@ -28,13 +28,23 @@ package network.minter.bipwallet.db;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import network.minter.bipwallet.addressbook.db.AddressBookDao;
 import network.minter.bipwallet.addressbook.models.AddressContact;
+import network.minter.bipwallet.coins.CoinsDao;
+import network.minter.bipwallet.coins.DbCoin;
 import network.minter.bipwallet.internal.di.DbModule;
 
 @Database(entities = {
         AddressContact.class,
+        DbCoin.class,
 }, version = DbModule.DB_VERSION)
+@TypeConverters({
+        DbCoin.BigIntConverter.class,
+        DbCoin.BigDecimalConverter.class,
+        DbCoin.MinterAddressConverter.class
+})
 public abstract class WalletDatabase extends RoomDatabase {
     public abstract AddressBookDao addressBook();
+    public abstract CoinsDao coins();
 }

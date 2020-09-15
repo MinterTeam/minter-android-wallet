@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,34 +24,16 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.profile.models.ProfileResult;
-import retrofit2.HttpException;
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public class ProfileErrorMapped<T> extends ProfileResult<T> implements ResultErrorMapper {
+class CoinValidatorWithSuffix : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}(\\-\\d+)?$") {
 
-    @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
-        }
-
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        error = new ProfileResult.Error();
-        error.code = e.getCode().name();
-        error.message = e.getUserMessage();
-        data = null;
-
-        return true;
+    init {
+        errorMessage = "Invalid coin name"
     }
 }

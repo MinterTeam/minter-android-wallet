@@ -204,9 +204,15 @@
     <string name="label_from_coin">From coin</string>
     <string name="label_to_coin">To coin</string>
     <string name="tx_type_create_coin">Create Coin</string>
+    <string name="tx_type_recreate_coin">Recreate Coin</string>
     <string name="tx_type_multisend">MultiSend</string>
     <string name="tx_type_create_multisig">Create Multisig Address</string>
+    <string name="tx_type_edit_multisig">Edit Multisig Owners</string>
     <string name="tx_type_edit_candidate">Edit Candidate</string>
+    <string name="tx_type_edit_candidate_pub_key">Edit Candidate Public Key</string>
+    <string name="tx_type_price_vote">Price Voting</string>
+    <string name="tx_type_change_coin_owner">Change Coin Owner</string>
+    <string name="tx_type_set_halt_block">Set Halt Block</string>
     <string name="tx_type_redeem_check">Redeem Check</string>
     <string name="tx_incoming_multisend">+ …</string>
     <string name="tx_outgoing_multisend">- …</string>
@@ -224,6 +230,9 @@
     <string name="tx_type_set_candidate_online">Set Candidate Online</string>
     <string name="tx_type_set_candidate_offline">Set Candidate Offline</string>
     <string name="label_public_key">Public Key</string>
+    <string name="label_old_public_key">Old Public Key</string>
+    <string name="label_new_public_key">New Public Key</string>
+    <string name="label_price">Price</string>
     <string name="label_transaction_type">Transaction type</string>
     <string name="menu_btn_add_address">Add address</string>
     <string name="attention_please_wait">Please, wait</string>
@@ -316,10 +325,13 @@
     <string name="btn_share_tx">Share Transaction</string>
     <string name="label_fee">Fee</string>
     <string name="label_block">Block</string>
+    <string name="label_height">Height (block number)</string>
     <string name="label_max_supply">Max Supply</string>
     <string name="label_reward_address">Reward Address</string>
     <string name="label_owner_address">Owner Address</string>
+    <string name="label_control_address">Control Address</string>
     <string name="label_multisig_address">Multisig Address</string>
+    <string name="label_new_owner">New Owner</string>
     <string name="title_delegate">New Delegation</string>
     <string name="title_unbond">Unbond</string>
     <string name="dialog_label_delegate">Delegate your coins to validators and receive related regular payments</string>
@@ -345,6 +357,7 @@
     <string name="dialog_title_signin">Sign In</string>
     <string name="btn_exchange_coins">Exchange Coins</string>
     <string name="description_external_not_enough_coins"><![CDATA[Not enough coins. Please buy <b>%s %s</b> to finish transaction.]]></string>
+    <string name="description_external_unknown_coin_id"><![CDATA[<b>Unknown coin ID used for transaction</b>]]></string>
     <string name="filter_tx_all">All</string>
     <string name="filter_tx_incoming">Incoming</string>
     <string name="filter_tx_outgoing">Outgoing</string>

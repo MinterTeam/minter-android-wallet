@@ -1,7 +1,7 @@
 /*
- * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -23,24 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package network.minter.bipwallet.home
 
-package network.minter.bipwallet.internal.exceptions;
-
-import network.minter.blockchain.models.BCResult;
+import dagger.Component
+import network.minter.bipwallet.home.ui.HomeActivity
+import network.minter.bipwallet.internal.di.WalletComponent
+import network.minter.bipwallet.sending.ui.SendTabFragment
+import network.minter.bipwallet.settings.ui.SettingsTabFragment
+import network.minter.bipwallet.wallets.ui.WalletsTabFragment
 
 /**
- * Dogsy. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public final class BCResponseException extends RuntimeException {
-    private BCResult mError;
+@Component(dependencies = [WalletComponent::class], modules = [HomeModule::class])
+@HomeScope
+interface HomeComponent {
+    fun inject(activity: HomeActivity)
+    fun inject(fragment: WalletsTabFragment)
+    fun inject(fragment: SendTabFragment)
+    fun inject(fragment: SettingsTabFragment)
 
-    public BCResponseException(BCResult error) {
-        mError = error;
-    }
-
-    public BCResult getError() {
-        return mError;
-    }
+    @HomeTabsClasses
+    fun tabsClasses(): @JvmSuppressWildcards List<Class<out HomeTabFragment>>
+    fun homeActivity(): HomeActivity
 }

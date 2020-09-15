@@ -38,9 +38,7 @@ import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.apis.explorer.CacheValidatorsRepository
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer.toExpError
-import network.minter.bipwallet.apis.reactive.ReactiveMyMinter
-import network.minter.bipwallet.apis.reactive.ReactiveMyMinter.rxProfile
-import network.minter.bipwallet.apis.reactive.rxExp
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.DataSourceMeta
 import network.minter.bipwallet.internal.adapter.LoadState
@@ -55,10 +53,6 @@ import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.models.ValidatorMeta
 import network.minter.explorer.repo.ExplorerTransactionRepository
 import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
-import network.minter.profile.MinterProfileApi
-import network.minter.profile.models.AddressInfoResult
-import network.minter.profile.models.ProfileResult
-import network.minter.profile.repo.ProfileInfoRepository
 import okhttp3.internal.toImmutableList
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -76,7 +70,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
 
-        resolveInfo(factory.repo.getTransactions(factory.address, 1, factory.txFilter).rxExp())
+        resolveInfo(factory.repo.getTransactions(factory.address, 1, factory.txFilter))
                 .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
                 .subscribe {
@@ -88,7 +82,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
 
-        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter).rxExp())
+        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter))
                 .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
                 .subscribe {
@@ -100,7 +94,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
         factory.loadState?.postValue(LoadState.Loading)
 
-        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter).rxExp())
+        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter))
                 .map { res: ExpResult<List<TransactionFacade>> -> groupByDate(res) }
                 .doOnSubscribe { _disposables.add(it) }
                 .subscribe { res: DataSourceMeta<TransactionItem> ->
@@ -201,63 +195,16 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
             )
         }
 
-        fun mapAddressesInfo(
-                myAddresses: List<MinterAddress>,
-                infoRepo: ProfileInfoRepository,
-                items: ExpResult<List<TransactionFacade>>
-        ): ObservableSource<ExpResult<List<TransactionFacade>>> {
-
-            if (items.result == null || items.result!!.isEmpty()) {
-                return Observable.just(items)
-            }
-
-            val toFetch: MutableList<MinterAddress> = ArrayList()
-            val toFetchAddresses: MutableMap<MinterAddress?, MutableList<TransactionFacade>> = LinkedHashMap(items.result!!.size)
-
-            for (tx in items.result!!) {
-                if (tx.type != HistoryTransaction.Type.Send) {
-                    continue
-                }
-                val add: MinterAddress = if (tx.isIncoming(myAddresses)) {
-                    tx.from
-                } else {
-                    tx.getData<HistoryTransaction.TxSendCoinResult>().getTo()
-                }
-                if (!toFetch.contains(add)) {
-                    toFetch.add(add)
-                }
-                if (!toFetchAddresses.containsKey(add)) {
-                    toFetchAddresses[add] = ArrayList()
-                }
-                toFetchAddresses[add]!!.add(tx)
-            }
-
-            return rxProfile(infoRepo.getAddressesWithUserInfo(toFetch))
-                    .onErrorResumeNext(ReactiveMyMinter.toProfileError())
-                    .map { listInfoResult: ProfileResult<List<AddressInfoResult>> ->
-                        if (listInfoResult.data.isEmpty()) {
-                            return@map items
-                        }
-                        for (info in listInfoResult.data) {
-                            for (t in toFetchAddresses[info.address]!!) {
-
-//                                t.setUserMeta(info.user.username, info.user.getAvatar().url)
-                            }
-                        }
-                        items
-                    }
-        }
-
         fun mapAvatar(
                 result: List<TransactionFacade>
         ): Observable<List<TransactionFacade>> {
             return Observable.just(result)
                     .map {
                         it.forEach { tx ->
-                            tx.fromAvatar = MinterProfileApi.getUserAvatarUrlByAddress(tx.from)
+                            tx.fromAvatar = tx.from.avatar
                             if (tx.type == HistoryTransaction.Type.Send) {
                                 val d = tx.getData<HistoryTransaction.TxSendCoinResult>()
-                                tx.toAvatar = MinterProfileApi.getUserAvatarUrlByAddress(d.to)
+                                tx.toAvatar = d.to.avatar
                             }
                         }
                         it
@@ -301,7 +248,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                                     HistoryTransaction.Type.RedeemCheck -> {
                                         val d = tx.getData<HistoryTransaction.TxRedeemCheckResult>()
                                         @Suppress("DEPRECATION")
-                                        if (d.getCheck().sender.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                        if (d.check.sender.toString().toLowerCase() == address.address!!.toLowerCase()) {
                                             tx.toName = address.name
                                         }
                                     }
@@ -377,53 +324,6 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                         items
                     }
 
-        }
-
-        fun mapAddressesInfo(
-                addresses: List<MinterAddress>,
-                infoRepo: ProfileInfoRepository,
-                items: List<TransactionFacade>): ObservableSource<List<TransactionFacade>> {
-
-            if (items.isEmpty()) {
-                return Observable.just(emptyList())
-            }
-            val toFetch: MutableList<MinterAddress> = ArrayList()
-            val toFetchAddresses: MutableMap<MinterAddress, MutableList<TransactionFacade>> = LinkedHashMap(items.size)
-            for (tx in items) {
-                if (tx.type != HistoryTransaction.Type.Send) {
-                    continue
-                }
-                val add: MinterAddress = if (tx.isIncoming(addresses)) {
-                    tx.from
-                } else {
-                    tx.getData<HistoryTransaction.TxSendCoinResult>().to
-                }
-                if (!toFetch.contains(add)) {
-                    toFetch.add(add)
-                }
-                if (!toFetchAddresses.containsKey(add)) {
-                    toFetchAddresses[add] = ArrayList()
-                }
-                toFetchAddresses[add]!!.add(tx)
-            }
-            return rxProfile(infoRepo.getAddressesWithUserInfo(toFetch))
-                    .onErrorResumeNext(ReactiveMyMinter.toProfileError())
-                    .map { listInfoResult: ProfileResult<List<AddressInfoResult>?> ->
-                        if (listInfoResult.data == null) {
-                            listInfoResult.data = emptyList()
-                        }
-                        if (listInfoResult.data!!.isEmpty()) {
-                            return@map items
-                        }
-                        for (info in listInfoResult.data!!) {
-                            for (t in toFetchAddresses[info.address]!!) {
-//                                t.userMeta = UserMeta()
-//                                t.userMeta.username = info.user.username
-//                                t.userMeta.avatarUrl = info.user.getAvatar().url
-                            }
-                        }
-                        items
-                    }
         }
     }
 

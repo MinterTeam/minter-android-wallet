@@ -33,6 +33,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
+import network.minter.bipwallet.home.HomeScope
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
@@ -60,6 +61,7 @@ import javax.inject.Inject
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+@HomeScope
 @InjectViewState
 class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabView>() {
     @Inject lateinit var accountStorage: RepoAccounts
@@ -129,7 +131,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
     private fun onBalanceReady(res: AddressListBalancesTotal) {
         val mainWallet = accountStorage.entity.mainWallet
 
-        val availableBIP = splitDecimalStringFractions(mainWallet.availableBalanceBIP.setScale(4, RoundingMode.DOWN))
+        val availableBIP = splitDecimalStringFractions(mainWallet.stakeBalanceBIP.setScale(4, RoundingMode.DOWN))
         val totalBIP = splitDecimalStringFractions(mainWallet.totalBalance.setScale(4, RoundingMode.DOWN))
         val totalUSD = splitDecimalStringFractions(mainWallet.totalBalanceUSD.setScale(2, RoundingMode.DOWN))
 

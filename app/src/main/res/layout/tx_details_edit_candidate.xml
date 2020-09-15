@@ -72,5 +72,25 @@
         app:layout_constraintTop_toBottomOf="@id/label_owner_address"
         tools:text="Mx06e6fc78e4c202e19745bb20c193c7f7f29e04f4" />
 
+    <TextView
+        android:id="@+id/label_control_address"
+        style="@style/Wallet.ItemTxLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/label_control_address"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/value_owner_address" />
+
+    <TextView
+        android:id="@+id/value_control_address"
+        style="@style/Wallet.ItemTxValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_control_address"
+        tools:text="Mx06e6fc78e4c202e19745bb20c193c7f7f29e04f4" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

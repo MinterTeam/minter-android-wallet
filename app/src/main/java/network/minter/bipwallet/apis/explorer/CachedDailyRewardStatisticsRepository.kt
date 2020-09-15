@@ -28,7 +28,6 @@ package network.minter.bipwallet.apis.explorer
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
-import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.helpers.DateHelper
@@ -54,7 +53,7 @@ open class CachedDailyRewardStatisticsRepository(
 ) : ExplorerAddressRepository(apiBuilder), CachedEntity<RewardStatistics> {
 
     companion object {
-        private const val KEY_REWARDS = BuildConfig.MINTER_STORAGE_VERS + "cached_reward_stats_today_"
+        private const val KEY_REWARDS = BuildConfig.MINTER_CACHE_VERS + "cached_reward_stats_today_"
     }
 
     private val cacheKey: String
@@ -78,7 +77,6 @@ open class CachedDailyRewardStatisticsRepository(
                 startTime.toString(fmt),
                 endTime.toString(fmt)
         )
-                .rxExp()
                 .map { res: ExpResult<MutableList<RewardStatistics>?> ->
                     if (res.result == null || !res.isOk || res.result?.isEmpty() == true) {
                         val empty = RewardStatistics()

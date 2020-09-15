@@ -48,9 +48,9 @@ typealias OnMainWalletChangeListener = (MinterAddress) -> Unit
 
 class SecretStorage(private val mStorage: KVStorage) {
     companion object {
+        // don't touch names and version until it really necessary
         private const val KEY_SECRETS = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_mnemonic_secret_list"
         private const val KEY_ADDRESSES = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_addresses_list"
-        private const val KEY_ENCRYPTION_PASS = BuildConfig.MINTER_STORAGE_VERS + "secret_storage_encryption_key"
         private const val KEY_PIN_CODE = BuildConfig.MINTER_STORAGE_VERS + "secret_app_pin_code"
         private const val KEY_MAIN_WALLET = BuildConfig.MINTER_STORAGE_VERS + "secret_main_wallet"
 

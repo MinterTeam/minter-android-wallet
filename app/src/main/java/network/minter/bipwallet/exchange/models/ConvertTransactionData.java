@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,9 +31,10 @@ import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
-import network.minter.core.MinterSDK;
+import network.minter.explorer.models.CoinItemBase;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 
 /**
  * minter-android-wallet. 2018
@@ -41,9 +42,9 @@ import static com.google.common.base.MoreObjects.firstNonNull;
  */
 public final class ConvertTransactionData {
     private final Type mType;
-    private final String mGasCoin;
-    private final String mSellCoin;
-    private final String mBuyCoin;
+    private final BigInteger mGasCoin;
+    private final CoinItemBase mSellCoin;
+    private final CoinItemBase mBuyCoin;
     private final BigDecimal mAmount;
     private final BigDecimal mEstimate;
 
@@ -53,7 +54,7 @@ public final class ConvertTransactionData {
         Buy,
     }
 
-    public ConvertTransactionData(Type type, String gasCoin, String sellCoin, String buyCoin, BigDecimal amount, BigDecimal estimate) {
+    public ConvertTransactionData(Type type, BigInteger gasCoin, CoinItemBase sellCoin, CoinItemBase buyCoin, BigDecimal amount, BigDecimal estimate) {
         mType = type;
         mGasCoin = gasCoin;
         mSellCoin = sellCoin;
@@ -66,39 +67,39 @@ public final class ConvertTransactionData {
         final Transaction tx;
 
         // if sellAll AND selling coin is a custom coin AND calculator says enough MNT to use as gas coin
-        boolean customToCustom = mType == Type.SellAll && !mSellCoin.equals(MinterSDK.DEFAULT_COIN) && mGasCoin.equals(MinterSDK.DEFAULT_COIN);
+        boolean customToCustom = mType == Type.SellAll && !mSellCoin.id.equals(DEFAULT_COIN_ID) && mGasCoin.equals(DEFAULT_COIN_ID);
 
         if (mType == Type.Sell || customToCustom) {
             // SELL
             tx = new Transaction.Builder(nonce)
-                    .setGasCoin(mGasCoin)
+                    .setGasCoinId(mGasCoin)
                     .setGasPrice(gasPrice)
                     .sellCoin()
-                    .setCoinToSell(mSellCoin)
+                    .setCoinIdToSell(mSellCoin.id)
                     .setValueToSell(mAmount)
-                    .setCoinToBuy(mBuyCoin)
+                    .setCoinIdToBuy(mBuyCoin.id)
                     .setMinValueToBuy("0")
                     .build();
         } else if (mType == Type.Buy) {
             // BUY
             tx = new Transaction.Builder(nonce)
-                    .setGasCoin(mGasCoin)
+                    .setGasCoinId(mGasCoin)
                     .setGasPrice(gasPrice)
                     .buyCoin()
-                    .setCoinToSell(mSellCoin)
+                    .setCoinIdToSell(mSellCoin.id)
                     .setValueToBuy(mAmount)
-                    .setCoinToBuy(mBuyCoin)
-                    .setMaxValueToSell(getEstimate().multiply(new BigDecimal(1.1d)))
+                    .setCoinIdToBuy(mBuyCoin.id)
+                    .setMaxValueToSell(getEstimate().multiply(new BigDecimal("1.1")))
                     .build();
         } else {
             // this case used ONLY: when not enough mnt to pay fee with mnt
             // SELL ALL
             tx = new Transaction.Builder(nonce)
-                    .setGasCoin(mGasCoin)
+                    .setGasCoinId(mGasCoin)
                     .setGasPrice(gasPrice)
                     .sellAllCoins()
-                    .setCoinToSell(mSellCoin)
-                    .setCoinToBuy(mBuyCoin)
+                    .setCoinIdToSell(mSellCoin.id)
+                    .setCoinIdToBuy(mBuyCoin.id)
                     .setMinValueToBuy("0")
                     .build();
         }

@@ -46,7 +46,6 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.ledger.connector.LedgerNanoS;
 import network.minter.ledger.connector.MinterLedger;
 import network.minter.ledger.connector.rxjava2.RxMinterLedger;
-import network.minter.profile.models.User;
 
 @InjectViewState
 public class AdvancedLedgerPresenter extends MvpBasePresenter<LedgerActivateView> implements LedgerNanoS.DeviceListener {
@@ -134,7 +133,6 @@ public class AdvancedLedgerPresenter extends MvpBasePresenter<LedgerActivateView
 
         session.login(
                 AuthSession.AUTH_TOKEN_ADVANCED,
-                new User(AuthSession.AUTH_TOKEN_ADVANCED),
                 AuthSession.AuthType.Hardware
         );
 

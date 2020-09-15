@@ -1,7 +1,7 @@
 /*
- * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * Copyright (C) by MinterTeam. 2020
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -24,28 +24,25 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.internal.exceptions;
+package network.minter.bipwallet.tests.internal.di;
 
+import java.util.Collections;
 
-import network.minter.profile.models.ProfileResult;
+import dagger.Module;
+import dagger.Provides;
+import network.minter.bipwallet.analytics.AnalyticsManager;
+import network.minter.bipwallet.internal.di.WalletApp;
 
 /**
- * Dogsy. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-wallet. 2018
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public final class ProfileResponseException extends RuntimeException {
-    private ProfileResult.Error mError;
+@Module
+public class TestAnalyticsModule {
 
-    public ProfileResponseException(ProfileResult.Error error) {
-        mError = error;
-    }
-
-    public ProfileResponseException(ProfileResult<?> result) {
-        this(result.getError());
-    }
-
-    public ProfileResult.Error getError() {
-        return mError;
+    @Provides
+    @WalletApp
+    public AnalyticsManager provideAnalyticsManager() {
+        return new AnalyticsManager(Collections.emptySet());
     }
 }

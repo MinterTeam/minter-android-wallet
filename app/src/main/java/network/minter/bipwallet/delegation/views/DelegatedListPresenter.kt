@@ -39,7 +39,6 @@ import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
-import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.delegation.adapter.DelegatedItem
 import network.minter.bipwallet.delegation.adapter.DelegationDataSource
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
@@ -169,7 +168,6 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
 
         addressRepo
                 .getRewardStatistics(secretRepo.mainWallet, toSimpleISODate(pastLastDateChart!!), toSimpleISODate(futureLastDateChart!!))
-                .rxExp()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(

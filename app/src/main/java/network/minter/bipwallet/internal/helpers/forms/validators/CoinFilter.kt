@@ -36,6 +36,6 @@ import android.text.Spanned
 class CoinFilter : InputFilter {
 
     override fun filter(source: CharSequence?, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int): CharSequence {
-        return source.toString().toUpperCase().replace("[^A-Z0-9]".toRegex(), "")
+        return source.toString().toUpperCase().replace("[^A-Z0-9\\-]".toRegex(), "")
     }
 }

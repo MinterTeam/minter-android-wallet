@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,35 +24,21 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.apis.dummies;
+package network.minter.bipwallet.tests;
 
-import network.minter.blockchain.models.BCResult;
-import network.minter.core.internal.exceptions.NetworkException;
-import retrofit2.HttpException;
+import androidx.annotation.IdRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * Created by Alexander Kolpakov (jquickapp@gmail.com) on 18-Apr-19
  */
-public class BCErrorMapped<Result> extends BCResult<Result> implements ResultErrorMapper {
-    @Override
-    public boolean mapError(Throwable throwable) {
-        if (throwable instanceof HttpException) {
-            // don't handle, we need real error data, not just status info
-            return false;
-        }
-
-        if (!NetworkException.isNetworkError(throwable)) {
-            return false;
-        }
-
-        NetworkException e = (NetworkException) NetworkException.convertIfNetworking(throwable);
-        result = null;
-        statusCode = e.getStatusCode();
-        error = new ErrorResult();
-        error.code = ResultCode.UnknownError.getValue();
-        error.data = e.getUserMessage();
-
-        return true;
+public class ActivityUtils {
+    public static void openFragment(AppCompatActivity activity, Fragment newFragment, @IdRes int containerId) {
+        activity
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(containerId, newFragment)
+                .commitAllowingStateLoss();
     }
 }

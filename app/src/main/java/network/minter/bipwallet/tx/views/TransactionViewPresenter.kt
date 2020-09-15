@@ -31,7 +31,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
-import android.view.View
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.*
@@ -78,12 +77,29 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         return String(Base64.decode(this, 0))
     }
 
+    private val titleTypedMap: HashMap<HistoryTransaction.Type, Int> = hashMapOf(
+            Pair(HistoryTransaction.Type.SellCoin, R.string.tx_type_exchange),
+            Pair(HistoryTransaction.Type.SellAllCoins, R.string.tx_type_exchange),
+            Pair(HistoryTransaction.Type.BuyCoin, R.string.tx_type_exchange),
+            Pair(HistoryTransaction.Type.CreateCoin, R.string.tx_type_create_coin),
+            Pair(HistoryTransaction.Type.DeclareCandidacy, R.string.tx_type_declare_candidacy),
+            Pair(HistoryTransaction.Type.RedeemCheck, R.string.tx_type_redeem_check),
+            Pair(HistoryTransaction.Type.SetCandidateOnline, R.string.tx_type_set_candidate_online),
+            Pair(HistoryTransaction.Type.SetCandidateOffline, R.string.tx_type_set_candidate_offline),
+            Pair(HistoryTransaction.Type.CreateMultisigAddress, R.string.tx_type_create_multisig),
+            Pair(HistoryTransaction.Type.EditCandidate, R.string.tx_type_edit_candidate),
+            Pair(HistoryTransaction.Type.SetHaltBlock, R.string.tx_type_set_halt_block),
+            Pair(HistoryTransaction.Type.RecreateCoin, R.string.tx_type_recreate_coin),
+            Pair(HistoryTransaction.Type.ChangeCoinOwner, R.string.tx_type_change_coin_owner),
+            Pair(HistoryTransaction.Type.EditMultisigOwnersData, R.string.tx_type_edit_multisig),
+            Pair(HistoryTransaction.Type.PriceVote, R.string.tx_type_price_vote),
+            Pair(HistoryTransaction.Type.EditCandidatePublicKey, R.string.tx_type_edit_candidate_pub_key),
+    )
+
     @Suppress("DEPRECATION")
     @SuppressLint("SetTextI18n")
     private fun fillData() {
-        viewState.setOnClickShare(View.OnClickListener {
-            startShare()
-        })
+        viewState.setOnClickShare { startShare() }
         viewState.setFromName(_tx?.fromName)
         viewState.setFromAddress(tx.from.toString())
         viewState.setFromAvatar(tx.from.avatar)
@@ -92,16 +108,14 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
         viewState.setPayload(tx.payload.fromBase64())
         viewState.setTimestamp(DateTime(tx.timestamp).fmt(DATE_FORMAT_WITH_TZ))
-        if (tx.gasCoin.toUpperCase() != MinterSDK.DEFAULT_COIN) {
+        if (tx.gasCoin.id != MinterSDK.DEFAULT_COIN_ID) {
             viewState.setFee("${tx.gasCoin} (${tx.fee.humanize()} ${MinterSDK.DEFAULT_COIN})")
         } else {
             viewState.setFee("${tx.fee.humanize()} ${tx.gasCoin}")
         }
 
         viewState.setBlockNumber(tx.block.toString())
-        viewState.setBlockClickListener(View.OnClickListener {
-            onClickBlockNumber()
-        })
+        viewState.setBlockClickListener { onClickBlockNumber() }
 
         val isIncoming = tx.isIncoming(listOf(secretStorage.mainWallet))
 
@@ -112,27 +126,10 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.setTitle(R.string.dialog_title_tx_view_outgoing)
             }
         } else {
-            when (tx.type) {
-                HistoryTransaction.Type.SellCoin,
-                HistoryTransaction.Type.SellAllCoins,
-                HistoryTransaction.Type.BuyCoin
-                -> viewState.setTitleTyped(R.string.tx_type_exchange)
-                HistoryTransaction.Type.CreateCoin ->
-                    viewState.setTitleTyped(R.string.tx_type_create_coin)
-                HistoryTransaction.Type.DeclareCandidacy ->
-                    viewState.setTitleTyped(R.string.tx_type_declare_candidacy)
-                HistoryTransaction.Type.RedeemCheck ->
-                    viewState.setTitleTyped(R.string.tx_type_redeem_check)
-                HistoryTransaction.Type.SetCandidateOnline ->
-                    viewState.setTitleTyped(R.string.tx_type_set_candidate_online)
-                HistoryTransaction.Type.SetCandidateOffline ->
-                    viewState.setTitleTyped(R.string.tx_type_set_candidate_offline)
-                HistoryTransaction.Type.CreateMultisigAddress ->
-                    viewState.setTitleTyped(R.string.tx_type_create_multisig)
-                HistoryTransaction.Type.EditCandidate ->
-                    viewState.setTitleTyped(R.string.tx_type_edit_candidate)
-
-                else -> viewState.setTitle(ResTextFormat(R.string.fmt_type_of_transaction, tx.type.name))
+            if (titleTypedMap.containsKey(tx.type)) {
+                viewState.setTitleTyped(titleTypedMap[tx.type]!!)
+            } else {
+                viewState.setTitle(ResTextFormat(R.string.fmt_type_of_transaction, tx.type.name))
             }
         }
 
@@ -148,7 +145,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_send) {
                     val b = TxDetailsSendBinding.bind(it)
                     b.valueAmount.text = data.amount.humanize()
-                    b.valueCoin.text = data.coin
+                    b.valueCoin.text = data.coin.symbol
                 }
             }
             HistoryTransaction.Type.MultiSend -> {
@@ -165,7 +162,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                         viewState.inflateDetails(R.layout.tx_details_send) {
                             val b = TxDetailsSendBinding.bind(it)
                             b.valueAmount.text = entry.amount.humanize()
-                            b.valueCoin.text = entry.coin
+                            b.valueCoin.text = entry.coin.symbol
                         }
                     } else {
                         viewState.showTo(false)
@@ -182,18 +179,19 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_exchange) {
                     val b = TxDetailsExchangeBinding.bind(it)
                     val data: HistoryTransaction.TxConvertCoinResult = tx.getData()
-                    b.valueFromCoin.text = data.coinToSell
-                    b.valueToCoin.text = data.coinToBuy
+                    b.valueFromCoin.text = data.coinToSell.symbol
+                    b.valueToCoin.text = data.coinToBuy.symbol
                     b.valueAmountReceived.text = data.valueToBuy.humanize()
                     b.valueAmountSpent.text = data.valueToSell.humanize()
                 }
             }
-            HistoryTransaction.Type.CreateCoin -> {
+            HistoryTransaction.Type.CreateCoin,
+            HistoryTransaction.Type.RecreateCoin -> {
                 viewState.showTo(false)
 
                 viewState.inflateDetails(R.layout.tx_details_create_coin) {
                     val b = TxDetailsCreateCoinBinding.bind(it)
-                    val data: HistoryTransaction.TxCreateResult = tx.getData()
+                    val data: HistoryTransaction.TxCreateCoinResult = tx.getData()
                     b.valueCoinName.text = data.name
                     b.valueCoinSymbol.text = data.symbol
                     b.valueInitialAmount.text = data.initialAmount.humanize()
@@ -218,7 +216,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     val b = TxDetailsDeclareCandidacyBinding.bind(it)
 
                     b.valueCommission.text = "${data.commission}%"
-                    b.valueCoin.text = data.coin
+                    b.valueCoin.text = data.coin.symbol
                     b.valueStake.text = data.stake.humanize()
                 }
             }
@@ -237,7 +235,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
                 viewState.inflateDetails(R.layout.tx_details_delegate_unbond) {
                     val b = TxDetailsDelegateUnbondBinding.bind(it)
-                    b.valueCoin.text = data.coin
+                    b.valueCoin.text = data.coin.symbol
                     b.valueStake.text = data.value.humanize()
                 }
             }
@@ -253,16 +251,19 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_redeem_check) {
                     val b = TxDetailsRedeemCheckBinding.bind(it)
                     val data: HistoryTransaction.TxRedeemCheckResult = tx.getData()
-                    val check = data.getCheck()
+                    //todo: check value given from explorer
+                    val check = data.check
 
-                    // from = to = issuer
-                    viewState.setFromLabel(R.string.label_check_issuer)
-                    viewState.setFromAddress(check.sender.toString())
-                    viewState.setFromName(_tx?.toName)
-                    viewState.setFromAvatar(check.sender.avatar)
+                    if (check != null) {
+                        // from = to = issuer
+                        viewState.setFromLabel(R.string.label_check_issuer)
+                        viewState.setFromAddress(check.sender.toString())
+                        viewState.setFromName(_tx?.toName)
+                        viewState.setFromAvatar(check.sender.avatar)
 
-                    b.valueAmount.text = check.value.humanize()
-                    b.valueCoin.text = check.coin
+                        b.valueAmount.text = check.value.humanize()
+                        b.valueCoin.text = check.coin.symbol
+                    }
                 }
             }
             HistoryTransaction.Type.SetCandidateOnline,
@@ -270,7 +271,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 val data: HistoryTransaction.TxSetCandidateOnlineOfflineResult = tx.getData()
 
                 viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
-                viewState.setToAddress(data.publicKey.toString())
+                viewState.setToAddress(data.publicKey?.toString() ?: "<unknown>")
                 viewState.setToName(_tx?.toName)
             }
             HistoryTransaction.Type.EditCandidate -> {
@@ -287,9 +288,12 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     b.valueOwnerAddress.copyOnClick()
                     b.valueRewardAddress.text = data.rewardAddress.toString()
                     b.valueRewardAddress.copyOnClick()
+                    b.valueControlAddress.text = data.controlAddress.toString()
+                    b.valueControlAddress.copyOnClick()
                 }
             }
-            HistoryTransaction.Type.CreateMultisigAddress -> {
+            HistoryTransaction.Type.CreateMultisigAddress,
+            HistoryTransaction.Type.EditMultisigOwnersData -> {
                 viewState.showTo(false)
 
                 viewState.inflateDetails(R.layout.tx_details_create_multisig_address) {
@@ -299,6 +303,49 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     b.valueMultisigAddress.copyOnClick()
                 }
 
+            }
+            HistoryTransaction.Type.SetHaltBlock -> {
+                viewState.showTo(false)
+
+                viewState.inflateDetails(R.layout.tx_details_set_halt_block) {
+                    val data: HistoryTransaction.TxSetHaltBlockResult = tx.getData()
+                    val b = TxDetailsSetHaltBlockBinding.bind(it)
+                    b.valuePublicKey.text = data.publicKey.toString()
+                    b.valuePublicKey.copyOnClick()
+                    b.valueHeight.text = data.height.toString()
+                }
+            }
+            HistoryTransaction.Type.ChangeCoinOwner -> {
+                viewState.showTo(false)
+
+                viewState.inflateDetails(R.layout.tx_details_change_coin_owner) {
+                    val data: HistoryTransaction.TxChangeCoinOwnerResult = tx.getData()
+                    val b = TxDetailsChangeCoinOwnerBinding.bind(it)
+                    b.valueCoinSymbol.text = data.symbol
+                    b.valueNewOwner.text = data.newOwner.toString()
+                    b.valueNewOwner.copyOnClick()
+                }
+
+            }
+            HistoryTransaction.Type.PriceVote -> {
+                viewState.showTo(false)
+
+                viewState.inflateDetails(R.layout.tx_details_price_vote) {
+                    val data: HistoryTransaction.TxPriceVoteResult = tx.getData()
+                    val b = TxDetailsPriceVoteBinding.bind(it)
+                    b.valuePrice.text = data.price.toString()
+                }
+            }
+            HistoryTransaction.Type.EditCandidatePublicKey -> {
+
+                viewState.inflateDetails(R.layout.tx_details_edit_candidate_public_key) {
+                    val data: HistoryTransaction.TxEditCandidatePublicKeyResult = tx.getData()
+                    val b = TxDetailsEditCandidatePublicKeyBinding.bind(it)
+                    b.valueOldPublicKey.text = data.publicKey.toString()
+                    b.valueOldPublicKey.copyOnClick()
+                    b.valueNewPublicKey.text = data.newPublicKey.toString()
+                    b.valueNewPublicKey.copyOnClick()
+                }
             }
             else -> {
                 viewState.showTo(false)

@@ -70,7 +70,9 @@ import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.crypto.MinterHash
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.BaseCoinValue
+import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.ValidatorItem
+import org.parceler.Parcels
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -401,7 +403,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     class Builder : ActivityBuilder {
         private var publicKey: MinterPublicKey? = null
-        private var coin: String? = null
+        private var coin: CoinItemBase? = null
         private var type: Type = Type.Delegate
 
         constructor(from: Activity, type: Type) : super(from) {
@@ -425,7 +427,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
             return this
         }
 
-        fun setSelectedCoin(coin: String): Builder {
+        fun setSelectedCoin(coin: CoinItemBase): Builder {
             this.coin = coin
             return this
         }
@@ -437,7 +439,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
                 intent.putExtra(ARG_PUB_KEY, publicKey.toParcel())
             }
             if (coin != null) {
-                intent.putExtra(ARG_COIN, coin)
+                intent.putExtra(ARG_COIN, Parcels.wrap(coin))
             }
 
         }

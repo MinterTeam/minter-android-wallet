@@ -119,9 +119,9 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
             val item = getItem(i) as DelegatedStake?
 
             vh.avatar!!.setImageUrl(item)
-            vh.coin!!.text = item!!.coin
+            vh.coin!!.text = item!!.coin!!.symbol
             vh.amount!!.text = bdHuman(item.amount)
-            if (item.coin == MinterSDK.DEFAULT_COIN) {
+            if (item.coin!!.id == MinterSDK.DEFAULT_COIN_ID) {
                 vh.subamount!!.visibility = View.GONE
                 vh.subamount!!.text = null
             } else {

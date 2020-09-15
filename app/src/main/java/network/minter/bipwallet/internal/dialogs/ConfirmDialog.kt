@@ -34,14 +34,12 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import com.airbnb.paris.extensions.style
-import network.minter.bipwallet.apis.reactive.ReactiveMyMinter
 import network.minter.bipwallet.databinding.DialogConfirmBinding
 import network.minter.bipwallet.internal.common.Preconditions.checkArgument
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper.setSelectableItemBackground
 import network.minter.core.internal.exceptions.NetworkException
-import network.minter.profile.models.ProfileResult
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -170,24 +168,17 @@ class ConfirmDialog(context: Context, private val builder: Builder) : WalletDial
                 } else {
                     setTitle(title.toString() + " (network error " + t.code() + ")")
                 }
-                try {
-                    var out = """
-                        ${t.response()!!.errorBody()!!.string()}
-
-                        """.trimIndent()
-                    val errorResult: ProfileResult<*> = ReactiveMyMinter.createProfileError<Any>(t)
-                    out += """
-                        ${errorResult.getError().message}
-                        ${errorResult.getError().message}
-                        ${ExceptionHelper.getStackTrace(t)}
-                        """.trimIndent()
-                    mText = out
+                mText = try {
+                    """
+                                ${t.response()!!.errorBody()!!.string()}
+        
+                                """.trimIndent()
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    mText = """
-                        ${t.message()}
-                        ${ExceptionHelper.getStackTrace(t)}
-                        """.trimIndent()
+                    """
+                                ${t.message()}
+                                ${ExceptionHelper.getStackTrace(t)}
+                                """.trimIndent()
                 }
             } else if (t is NetworkException) {
                 val statusCode = t.statusCode

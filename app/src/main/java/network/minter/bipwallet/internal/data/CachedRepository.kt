@@ -63,7 +63,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         protected const val NOTIFY_ONLY_ON_UPDATE = 1
         protected const val NOTIFY_ALWAYS_IF_EXISTS = 0
 
-        private const val KEY_EXPIRED_ITEM = BuildConfig.MINTER_STORAGE_VERS + "_expire_time_item_"
+        private const val KEY_EXPIRED_ITEM = BuildConfig.MINTER_CACHE_VERS + "_expire_time_item_"
     }
 
     //    protected var mData: ResultModel
@@ -137,8 +137,6 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      */
     fun clear() {
         entity.onClear()
-//        mData = entity.getData()
-//        mDataIsReady = false
         expire()
         mNotifier.onComplete()
         mNotifier = BehaviorSubject.create()
@@ -233,7 +231,18 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     @CallSuper
     fun notifyData(data: ResultModel) {
         onAfterUpdate(data)
-        notifyOnSuccess(true)
+        if (entity.onAfterUpdateDeferred(data) != null) {
+            entity.onAfterUpdateDeferred(data)!!
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe {
+                        notifyOnSuccess(true)
+                    }
+        } else {
+            notifyOnSuccess(true)
+        }
+
+
     }
 
     /**

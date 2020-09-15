@@ -26,6 +26,7 @@
 
 package network.minter.bipwallet.tx.contract
 
+import network.minter.bipwallet.apis.reactive.castErrorResultTo
 import network.minter.blockchain.models.TransactionCommissionValue
 import network.minter.explorer.models.GasValue
 import network.minter.explorer.models.GateResult
@@ -42,7 +43,7 @@ class TxInitData {
     constructor(vararg values: GateResult<*>) {
         for (item in values) {
             if (!item.isOk) {
-                errorResult = GateResult.copyError<Any>(item)
+                errorResult = item.castErrorResultTo<Any>()
                 return
             }
         }

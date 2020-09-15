@@ -30,7 +30,7 @@ import io.reactivex.Observable
 import io.reactivex.Observable.combineLatest
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import network.minter.bipwallet.apis.reactive.rxGate
+
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.GasValue
@@ -50,8 +50,8 @@ class TxInitDataRepository(
 
     fun load(address: MinterAddress): Observable<TxInitData> {
         return combineLatest(
-                estimateRepo.getTransactionCount(address).rxGate(),
-                gasRepo.minGas.rxGate(),
+                estimateRepo.getTransactionCount(address),
+                gasRepo.minGas,
                 BiFunction { t1: GateResult<TxCount>, t2: GateResult<GasValue> ->
                     TxInitData(t1, t2)
                 })

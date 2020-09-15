@@ -27,6 +27,8 @@ package network.minter.bipwallet.internal.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
@@ -39,15 +41,33 @@ import network.minter.bipwallet.internal.storage.KVStorage
 class DbModule {
     @Provides
     @WalletApp
-    fun provideWalletDB(context: Context? /*, @DbMigration Set<Migration> migrationSet*/): WalletDatabase {
-        /* Enable when migrations will be required
-        final Migration[] migrations = new Migration[migrationSet.size()];
-        int i = 0;
-        for (Migration m : migrationSet) {
-            migrations[i] = m;
+    fun provideWalletDB(context: Context?): WalletDatabase {
+
+        val migration_v2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val createTable = """
+                    CREATE TABLE IF NOT EXISTS `minter_coins` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `coinId` TEXT,
+                    `symbol` TEXT,
+                    `crr` INTEGER,
+                    `reserveBalance` TEXT,
+                    `maxSupply` TEXT,
+                    `owner` TEXT
+                    )
+                """.trimIndent()
+                val createIndex = """
+                    CREATE UNIQUE INDEX IF NOT EXISTS `index_minter_coins_coinId_symbol` ON `minter_coins` (`coinId`, `symbol`)
+                """.trimIndent()
+
+                db.execSQL(createTable)
+                db.execSQL(createIndex)
+            }
+
         }
-         */
-        return Room.databaseBuilder(context!!, WalletDatabase::class.java, DB_NAME) //                .addMigrations(migrations)
+
+        return Room.databaseBuilder(context!!, WalletDatabase::class.java, DB_NAME)
+                .addMigrations(migration_v2)
                 .fallbackToDestructiveMigration()
                 .build()
     }
@@ -60,6 +80,6 @@ class DbModule {
 
     companion object {
         const val DB_NAME = "minter.db"
-        const val DB_VERSION = 1
+        const val DB_VERSION = 2
     }
 }

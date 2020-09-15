@@ -27,22 +27,22 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = "1.3.72"
+    ext.kotlin_version = "1.4.10"
+//    ext.kotlin_version = "1.3.72"
 //    ext.kotlin_version = "1.4-M1"
     repositories {
         mavenLocal()
         google()
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath 'io.fabric.tools:gradle:1.31.2'
+        classpath 'com.android.tools.build:gradle:4.1.0-rc02'
         classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.1'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.1'
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.6.0.0"
 
     }
@@ -81,13 +81,13 @@ ext {
     minterLibSupport = "28.0.0"
     minterBuildTools = "29.0.3"
 
-    minterExplorerSDK = "0.8.1"
+    minterExplorerSDK = "1.0.0"
     minterProfileSDK = "0.2.6"
-    minterBlockchainSDK = "0.13.1"
-    minterCoreSDK = "0.7.1"
+    minterBlockchainSDK = "1.0.0"
+    minterCoreSDK = "1.0.0"
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"
 
-    appVersionName = "2.0.3-beta07"
-    appVersionCode = 181
+    appVersionName = "2.1.0-beta01"
+    appVersionCode = 182
 }

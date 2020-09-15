@@ -43,7 +43,7 @@ import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
-import network.minter.bipwallet.apis.reactive.rxGate
+
 import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.databinding.StubValidatorNameBinding
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
@@ -76,11 +76,9 @@ import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.core.crypto.PrivateKey
-import network.minter.explorer.models.BaseCoinValue
-import network.minter.explorer.models.GateResult
-import network.minter.explorer.models.PushResult
-import network.minter.explorer.models.ValidatorItem
+import network.minter.explorer.models.*
 import network.minter.explorer.repo.GateTransactionRepository
+import org.parceler.Parcels
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -104,7 +102,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     @Inject lateinit var rewardsMonthlyRepo: RepoMonthlyRewards
     @Inject lateinit var rewardsDailyRepo: RepoDailyRewards
 
-    private var selectAccount: String? = null
+    private var selectAccount: CoinItemBase? = null
     private var validators: MutableList<ValidatorItem> = ArrayList()
     private var toValidatorItem: ValidatorItem? = null
     private var toValidator: MinterPublicKey? = null
@@ -140,7 +138,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
 
         if (intent.hasExtra(DelegateUnbondActivity.ARG_COIN)) {
-            selectAccount = intent.getStringExtra(DelegateUnbondActivity.ARG_COIN)
+            selectAccount = Parcels.unwrap(intent.getParcelableExtra(DelegateUnbondActivity.ARG_COIN))
         }
 
         viewState.setTitle(
@@ -183,10 +181,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             if (type == Type.Delegate) {
                 viewState.setAmount(fromAccount!!.amount.toPlain())
             } else {
-                if (accountStorage.entity.mainWallet.hasDelegated(toValidator, fromAccount!!.coin)) {
+                if (accountStorage.entity.mainWallet.hasDelegated(toValidator, fromAccount!!.coin.id)) {
                     viewState.setAmount((
                             accountStorage.entity.mainWallet
-                                    .getDelegatedByValidatorAndCoin(toValidator, fromAccount!!.coin)?.amount
+                                    .getDelegatedByValidatorAndCoin(toValidator, fromAccount!!.coin.id)?.amount
                                     ?: BigDecimal.ZERO
                             ).toPlain()
                     )
@@ -305,17 +303,17 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             val acc = accountStorage.entity.mainWallet
             if (type == Type.Delegate) {
                 if (fromAccount != null) {
-                    onAccountSelected(acc.findCoinByName(fromAccount?.coin).orElse(acc.coinsList[0]))
+                    onAccountSelected(acc.findCoinById(fromAccount?.coin?.id).orElse(acc.coinsList[0]))
                 } else {
                     onAccountSelected(acc.coinsList[0])
                 }
             } else {
                 if (fromAccount == null && selectAccount != null) {
-                    fromAccount = acc.getCoin(selectAccount!!)
+                    fromAccount = acc.getCoin(selectAccount!!.id)
                     selectAccount = null
                 }
                 if (fromAccount != null && toValidator != null) {
-                    onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin))
+                    onAccountSelected(acc.getDelegatedByValidatorAndCoin(toValidator, fromAccount?.coin?.id))
                 }
             }
         }
@@ -360,7 +358,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     }
 
     private fun setupFee() {
-        initDataRepo.gasRepo.minGas.rxGate()
+        initDataRepo.gasRepo.minGas
                 .joinToUi()
                 .map {
                     val txFee = when (type) {
@@ -444,7 +442,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 TxConfirmStartDialog.Builder(it, type.titleRes)
                         .setFirstLabel(type.firstLabelRes)
                         .setFirstValue(amount.humanize())
-                        .setFirstCoin(fromAccount!!.coin!!)
+                        .setFirstCoin(fromAccount!!.coin!!.symbol)
                         .setSecondLabel(type.secondLabelRes)
                         .setSecondValueText(validatorFullName)
                         .setPositiveAction(R.string.btn_confirm) { _, _ ->
@@ -481,20 +479,20 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun createPreTx(): TransactionSign {
         val preTx: Transaction
         val builder = Transaction.Builder(BigInteger("1"))
-                .setGasCoin(fromAccount!!.coin!!)
+                .setGasCoinId(fromAccount!!.coin.id!!)
                 .setGasPrice(gas)
 
         preTx = if (type == Type.Delegate) {
             builder
                     .delegate()
-                    .setCoin(fromAccount!!.coin)
+                    .setCoinId(fromAccount!!.coin.id)
                     .setPublicKey(toValidator!!)
                     .setStake(amount)
                     .build()
         } else {
             builder
                     .unbound()
-                    .setCoin(fromAccount!!.coin)
+                    .setCoinId(fromAccount!!.coin.id)
                     .setPublicKey(toValidator!!)
                     .setValue(amount)
                     .build()
@@ -518,7 +516,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
             if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= realFee) {
                 var amountToSend = amount
-                if (useMax && fromAccount!!.coin == MinterSDK.DEFAULT_COIN) {
+                if (useMax && fromAccount!!.coin.id == MinterSDK.DEFAULT_COIN_ID) {
                     amountToSend = amount - realFee
                     if (bdNull(amountToSend)) {
                         return Observable.error<TransactionSign>(IllegalStateException("Can't delegate 0 coins"))
@@ -526,9 +524,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 }
                 val txBuilder = Transaction.Builder(initData.nonce!!)
                 txBuilder.setGasPrice(gas)
-                txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
+                txBuilder.setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
                 val tx = txBuilder.delegate().apply {
-                    coin = fromAccount!!.coin!!
+                    coinId = fromAccount!!.coin.id!!
                     publicKey = toValidator!!
                     stake = amountToSend
                 }.build()
@@ -537,7 +535,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             }
 
             // BIP balance not enough to pay fee, trying to calculate custom coin
-            val fromAccountOpt = accountStorage.entity.mainWallet.findCoinByName(fromAccount!!.coin)
+            val fromAccountOpt = accountStorage.entity.mainWallet.findCoinById(fromAccount!!.coin.id)
 
             // if balance for custom coin not found - error
             if (!fromAccountOpt.isPresent) {
@@ -548,7 +546,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             val fromAcc = fromAccountOpt.get()
 
             // calculate custom coin fee
-            return initDataRepo.estimateRepo.getTransactionCommission(createPreTx()).rxGate()
+            return initDataRepo.estimateRepo.getTransactionCommission(createPreTx())
                     .subscribeOn(Schedulers.io())
                     .switchMap {
                         if (!it.isOk) {
@@ -576,9 +574,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
                         val txBuilder = Transaction.Builder(initData.nonce!!)
                         txBuilder.setGasPrice(gas)
-                        txBuilder.setGasCoin(fromAcc.coin)
+                        txBuilder.setGasCoinId(fromAcc.coin.id)
                         val tx = txBuilder.delegate().apply {
-                            coin = fromAccount!!.coin!!
+                            coinId = fromAccount!!.coin.id!!
                             publicKey = toValidator!!
                             stake = amountToSend
                         }.build()
@@ -595,9 +593,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
             val txBuilder = Transaction.Builder(initData.nonce!!)
             txBuilder.setGasPrice(gas)
-            txBuilder.setGasCoin(MinterSDK.DEFAULT_COIN)
+            txBuilder.setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
             val tx = txBuilder.unbound().apply {
-                coin = fromAccount!!.coin!!
+                coinId = fromAccount!!.coin.id!!
                 publicKey = toValidator!!
                 value = if (useMax) fromAccount!!.amount else amount
             }.build()
@@ -614,7 +612,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         rewardsMonthlyRepo.update(true)
         validatorsRepo.entity.writeLastUsed(toValidatorItem)
 
-        val height = result.result?.txData?.height ?: 120L
+        val height = result.result?.data?.height?.toLong() ?: 120L
 
         val leftSeconds: Float = (120f - (height % 120)) * 5f
         val msg = "Please allow ~${Plurals.timeValue(leftSeconds.toLong())} ${Plurals.timeUnitShort(leftSeconds.toLong())} for your delegated balance to update."
@@ -625,7 +623,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setValue(msg)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
-                        viewState.startExplorer(result.result!!.txHash)
+                        viewState.startExplorer(result.result!!.data.hash)
                         viewState.finishSuccess()
                     }
                     .setNegativeAction(R.string.btn_close) { d, _ ->
@@ -669,7 +667,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 toValidator = null
             } else {
                 val coin = fromAccount?.coin ?: selectAccount
-                val account = accountStorage.entity.mainWallet.getDelegatedByValidatorAndCoin(toValidator, coin)
+                val account = accountStorage.entity.mainWallet.getDelegatedByValidatorAndCoin(toValidator, coin!!.id)
                 if (account != null) {
                     viewState.setAccountError(null)
                     viewState.setAccountTitle(account.title)

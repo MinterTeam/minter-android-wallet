@@ -79,7 +79,6 @@
             android:focusable="false"
             android:hint="Coin Name"
             android:imeOptions="actionNext"
-            android:maxLength="10"
             android:singleLine="true"
             android:textAllCaps="true"
             app:fieldName="income_coin"

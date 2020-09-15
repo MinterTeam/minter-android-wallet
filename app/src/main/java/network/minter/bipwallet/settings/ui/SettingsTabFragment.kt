@@ -76,7 +76,7 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
     private lateinit var binding: FragmentTabSettingsBinding
 
     override fun onAttach(context: Context) {
-        HomeModule.getComponent().inject(this)
+        HomeModule.component!!.inject(this)
         super.onAttach(context)
     }
 
@@ -212,7 +212,7 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        HomeModule.getComponent().inject(this)
+        HomeModule.component!!.inject(this)
         super.onCreate(savedInstanceState)
     }
 

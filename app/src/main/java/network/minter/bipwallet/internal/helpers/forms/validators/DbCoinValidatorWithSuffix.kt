@@ -24,33 +24,30 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.home;
+package network.minter.bipwallet.internal.helpers.forms.validators
 
-import java.util.List;
+import io.reactivex.Single
+import io.reactivex.functions.BiFunction
+import network.minter.bipwallet.internal.Wallet
 
-import dagger.Component;
-import network.minter.bipwallet.home.ui.HomeActivity;
-import network.minter.bipwallet.internal.di.WalletComponent;
-import network.minter.bipwallet.sending.ui.SendTabFragment;
-import network.minter.bipwallet.settings.ui.SettingsTabFragment;
-import network.minter.bipwallet.wallets.ui.WalletsTabFragment;
 
 /**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Component(dependencies = WalletComponent.class, modules = {
-        HomeModule.class
-})
-@HomeScope
-public interface HomeComponent {
+class DbCoinValidatorWithSuffix : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}(\\-\\d+)?$") {
 
-    void inject(HomeActivity activity);
-    void inject(WalletsTabFragment fragment);
-    void inject(SendTabFragment fragment);
-    void inject(SettingsTabFragment fragment);
+    init {
+        errorMessage = "Invalid coin name"
+    }
 
-    @HomeTabsClasses
-    List<Class<? extends HomeTabFragment>> tabsClasses();
-    HomeActivity homeActivity();
+    override fun validate(value: CharSequence?): Single<Boolean> {
+        val validText = super.validate(value)
+
+        if (value == null || value.isEmpty()) {
+            return validText
+        }
+
+        return Single.zip(validText, Wallet.app().coinMapper().exist(value.toString()), BiFunction<Boolean, Boolean, Boolean> { t1, t2 -> t1 && t2 })
+    }
 }

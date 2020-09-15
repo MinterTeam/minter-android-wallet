@@ -25,20 +25,7 @@
  */
 package network.minter.bipwallet.exchange
 
-import android.os.Parcelable
 import dagger.Module
-import kotlinx.android.parcel.Parcelize
-import java.math.BigDecimal
-
-/**
- * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
- */
-@Parcelize
-data class ExchangeAmount(
-        var amount: BigDecimal,
-        var coin: String
-) : Parcelable
 
 @Module
 class ExchangeModule

@@ -31,13 +31,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.apis.reactive.ReactiveGate.*
-import network.minter.bipwallet.apis.reactive.rxGate
+
 import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.GateResult
-import network.minter.explorer.models.GateResult.copyError
 import network.minter.explorer.models.PushResult
 import network.minter.explorer.repo.GateTransactionRepository
 import java.math.BigInteger
@@ -99,7 +98,7 @@ class TransactionSender(
                     if (!sign.isOk) {
                         return@switchMap copyError<PushResult>(sign).toObservable()
                     }
-                    gateRepo.sendTransaction(sign.result).rxGate()
+                    gateRepo.sendTransaction(sign.result)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorResumeNext(toGateError())

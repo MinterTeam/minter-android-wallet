@@ -40,7 +40,6 @@ import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.internal.system.SimpleTextWatcher;
 import network.minter.core.bip39.NativeBip39;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.profile.models.User;
 
 @InjectViewState
 public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView> {
@@ -71,7 +70,6 @@ public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView
         MinterAddress address = secretStorage.add(mPhrase);
         session.login(
                 AuthSession.AUTH_TOKEN_ADVANCED,
-                new User(AuthSession.AUTH_TOKEN_ADVANCED),
                 AuthSession.AuthType.Advanced
         );
         getViewState().startHome();

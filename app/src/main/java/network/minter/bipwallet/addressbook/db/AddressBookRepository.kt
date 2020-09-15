@@ -41,7 +41,7 @@ class AddressBookRepository(
 ) {
 
     companion object {
-        const val KEY_LAST_USED = BuildConfig.MINTER_STORAGE_VERS + "cached_last_used_contacts"
+        const val KEY_LAST_USED = BuildConfig.MINTER_CACHE_VERS + "cached_last_used_contacts"
     }
 
     val lastUsed: MutableList<AddressContact>

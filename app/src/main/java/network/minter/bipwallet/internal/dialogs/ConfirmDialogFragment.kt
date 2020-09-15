@@ -37,14 +37,12 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import com.airbnb.paris.extensions.style
-import network.minter.bipwallet.apis.reactive.ReactiveMyMinter
 import network.minter.bipwallet.databinding.DialogConfirmBinding
 import network.minter.bipwallet.internal.common.Preconditions.checkArgument
 import network.minter.bipwallet.internal.helpers.ExceptionHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper.setSelectableItemBackground
 import network.minter.core.internal.exceptions.NetworkException
-import network.minter.profile.models.ProfileResult
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -184,15 +182,9 @@ class ConfirmDialogFragment(private val builder: Builder) : WalletDialogFragment
                     setTitle(title.toString() + " (network error " + t.code() + ")")
                 }
                 try {
-                    var out = """
+                    val out = """
                         ${t.response()!!.errorBody()!!.string()}
 
-                        """.trimIndent()
-                    val errorResult: ProfileResult<*> = ReactiveMyMinter.createProfileError<Any>(t)
-                    out += """
-                        ${errorResult.getError().message}
-                        ${errorResult.getError().message}
-                        ${ExceptionHelper.getStackTrace(t)}
                         """.trimIndent()
                     mText = out
                 } catch (e: IOException) {

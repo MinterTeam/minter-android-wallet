@@ -30,7 +30,6 @@ import androidx.paging.DataSource
 import androidx.paging.PageKeyedDataSource
 import io.reactivex.disposables.CompositeDisposable
 import network.minter.bipwallet.apis.reactive.ReactiveExplorer
-import network.minter.bipwallet.apis.reactive.rxExp
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.sortByValue
 import network.minter.core.MinterSDK
@@ -54,7 +53,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
 
-        factory.mRepo.getDelegations(factory.mainWallet, 1).rxExp()
+        factory.mRepo.getDelegations(factory.mainWallet, 1)
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
@@ -83,7 +82,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
-        factory.mRepo.getDelegations(factory.mainWallet, params.key).rxExp()
+        factory.mRepo.getDelegations(factory.mainWallet, params.key)
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
@@ -105,7 +104,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
         factory.loadState.postValue(LoadState.Loading)
 
-        factory.mRepo.getDelegations(factory.mainWallet, params.key).rxExp()
+        factory.mRepo.getDelegations(factory.mainWallet, params.key)
                 .onErrorResumeNext(ReactiveExplorer.toExpError())
                 .map { mapToDelegationItem(it) }
                 .doOnSubscribe { disposables.add(it) }
@@ -177,8 +176,8 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     class StableCoinSorting : Comparator<DelegatedStake> {
         override fun compare(ac: DelegatedStake, bc: DelegatedStake): Int {
-            val a = ac.coin!!.toLowerCase()
-            val b = bc.coin!!.toLowerCase()
+            val a = ac.coin!!.symbol.toLowerCase()
+            val b = bc.coin!!.symbol.toLowerCase()
             if (a == b) // update to make it stable
                 return 0
             if (a == sStable) return -1

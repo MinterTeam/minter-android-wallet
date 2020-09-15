@@ -28,6 +28,10 @@ package network.minter.bipwallet.internal.di
 import dagger.Module
 import dagger.Provides
 import network.minter.bipwallet.apis.explorer.*
+import network.minter.bipwallet.coins.CachedCoinsRepository
+import network.minter.bipwallet.coins.CoinMapper
+import network.minter.bipwallet.coins.RepoCoins
+import network.minter.bipwallet.db.WalletDatabase
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.di.annotations.DbCache
 import network.minter.bipwallet.internal.storage.AccountStorage
@@ -68,9 +72,16 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, api: MinterExplorerSDK): RepoCoins {
-        return RepoCoins(storage, CachedCoinsRepository(storage, api.apiService))
+    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, db: WalletDatabase, api: MinterExplorerSDK): RepoCoins {
+        return RepoCoins(storage, CachedCoinsRepository(storage, db, api.apiService))
                 .setTimeToLive(/*3  minutes */ 60 * 3)
+    }
+
+    @JvmStatic
+    @Provides
+    @WalletApp
+    fun provideCoinsMapper(repo: RepoCoins): CoinMapper {
+        return CoinMapper(repo)
     }
 
     @JvmStatic

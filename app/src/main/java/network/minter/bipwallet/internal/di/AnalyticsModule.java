@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,7 +39,6 @@ import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.analytics.AnalyticsManager;
 import network.minter.bipwallet.analytics.AnalyticsProvider;
 import network.minter.bipwallet.analytics.providers.DummyProvider;
-import network.minter.bipwallet.analytics.providers.FabricProvider;
 import network.minter.bipwallet.internal.di.annotations.AnalyticsProviders;
 
 /**
@@ -48,14 +47,6 @@ import network.minter.bipwallet.internal.di.annotations.AnalyticsProviders;
  */
 @Module
 public class AnalyticsModule {
-
-    @Provides
-    @IntoSet
-    @AnalyticsProviders
-    @WalletApp
-    public AnalyticsProvider provideFabricAnalytics() {
-        return new FabricProvider();
-    }
 
     @Provides
     @IntoSet

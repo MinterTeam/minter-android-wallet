@@ -47,9 +47,9 @@ import com.otaliastudios.autocomplete.AutocompletePolicy
 import com.otaliastudios.autocomplete.AutocompletePresenter
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.IncludeExchangeCalculationBinding
-import network.minter.bipwallet.exchange.ExchangeAmount
 import network.minter.bipwallet.exchange.adapters.CoinsAcPresenter
 import network.minter.bipwallet.exchange.contract.ExchangeView
+import network.minter.bipwallet.exchange.models.ExchangeAmount
 import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
@@ -61,7 +61,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.scrollDownTo
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinFilter
-import network.minter.bipwallet.internal.helpers.forms.validators.CoinValidator
+import network.minter.bipwallet.internal.helpers.forms.validators.CoinValidatorWithSuffix
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.widgets.WalletButton
 import network.minter.bipwallet.sending.account.SelectorData
@@ -106,7 +106,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         inputGroup.addInput(binding.inputIncomingCoin, binding.inputAmount)
         inputGroup.addValidator(binding.inputAmount, DecimalValidator("Invalid number"))
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
-        inputGroup.addValidator(binding.inputIncomingCoin, CoinValidator())
+        inputGroup.addValidator(binding.inputIncomingCoin, CoinValidatorWithSuffix())
         inputGroup.addFilter(binding.inputIncomingCoin, CoinFilter())
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         binding.calculationContainer.calculation.inputType = InputType.TYPE_NULL

@@ -28,6 +28,7 @@ package network.minter.bipwallet.wallets.views
 import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.setTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -46,7 +47,6 @@ import network.minter.bipwallet.wallets.views.rows.RowWalletsHeader
 import network.minter.bipwallet.wallets.views.rows.RowWalletsList
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinBalance
-import network.minter.profile.MinterProfileApi
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -61,19 +61,20 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
     private var rowHeader: RowWalletsHeader? = null
     private var rowList: RowWalletsList? = null
 
+    @Deprecated("Use new variable binding", ReplaceWith("coin.avatar"))
     private fun CoinBalance.getImageUrl(): String {
-        return MinterProfileApi.getCoinAvatarUrl(coin!!)
+        return coin.avatar
     }
 
     init {
         coinsAdapter = SimpleRecyclerAdapter.Builder<CoinBalance, BaseTabPageFragment.ItemViewHolder>()
                 .setCreator(R.layout.item_list_with_image, BaseTabPageFragment.ItemViewHolder::class.java)
                 .setBinder { vh: BaseTabPageFragment.ItemViewHolder, item: CoinBalance, _: Int ->
-                    vh.title!!.text = item.coin
+                    vh.title!!.text = item.coin.symbol
                     vh.separator!!.visible = true
                     vh.amount!!.text = item.amount.humanize()
-                    vh.avatar!!.setImageUrlFallback(item.getImageUrl(), R.drawable.img_avatar_default)
-                    if (item.coin != MinterSDK.DEFAULT_COIN) {
+                    vh.avatar!!.setImageUrlFallback(item.coin.avatar, R.drawable.img_avatar_default)
+                    if (item.coin.id != MinterSDK.DEFAULT_COIN_ID) {
                         vh.subname!!.setTextFormat(R.string.fmt_decimal_and_coin, item.bipValue.humanize(), MinterSDK.DEFAULT_COIN)
                         vh.subname!!.visible = true
                     } else {
