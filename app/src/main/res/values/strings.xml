@@ -339,6 +339,7 @@
     <string name="label_validator">Validator</string>
     <string name="menu_label_delegate">Delegate</string>
     <string name="empty_delegations">You don\'t have any delegated stakes yet</string>
+    <string name="warning_stake_in_waitlist">Attention! There are currently one or more of your stakes in wait list. It means they don’t bring any rewards. Please delegate more coins to fit the minimum requirement, wait for an open slot or unbond.</string>
     <string name="empty_transactions">No transactions yet</string>
     <string name="dialog_label_delegate_progress">Delegating…</string>
     <string name="dialog_label_unbond_progress">Unbonding…</string>

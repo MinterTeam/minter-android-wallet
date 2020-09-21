@@ -30,7 +30,7 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
-import coil.api.load
+import coil.load
 import coil.size.Scale
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.annotations.Dp

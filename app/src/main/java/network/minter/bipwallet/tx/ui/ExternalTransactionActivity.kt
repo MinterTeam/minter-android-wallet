@@ -85,6 +85,7 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     @InjectPresenter lateinit var presenter: ExternalTransactionPresenter
 
     private lateinit var b: ActivityExternalTransactionBinding
+    private var enabledEditAction = false
 
     override fun setData(allRows: MutableList<TxInputFieldRow<*>>) {
         b.inputListLayout.removeAllViews()
@@ -228,10 +229,8 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         }
     }
 
-    private var enabledEditAction = false
-
     override fun enableEditAction(enable: Boolean) {
-        if (!enabledEditAction) {
+        if (enable && !enabledEditAction) {
             enabledEditAction = true
             b.toolbar.postApply {
                 b.toolbar.menu

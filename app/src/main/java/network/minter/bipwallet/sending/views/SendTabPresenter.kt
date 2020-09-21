@@ -782,7 +782,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                     .setValue(mRecipient!!.name)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
-                        viewState.startExplorer(result.result.data.hash.toString())
+                        viewState.startExplorer(result.result.hash.toString())
                         d.dismiss()
                         analytics.send(AppEvent.SentCoinPopupViewTransactionButton)
                     }

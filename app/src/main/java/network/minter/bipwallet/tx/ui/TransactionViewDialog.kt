@@ -127,7 +127,10 @@ class TransactionViewDialog : BaseBottomSheetDialogFragment(), TransactionView {
     }
 
     override fun setToAvatar(toAvatar: String?) {
-        binding.toAvatar.setImageUrl(toAvatar)
+        binding.toAvatar.visible = toAvatar != null
+        if (toAvatar != null) {
+            binding.toAvatar.setImageUrl(toAvatar)
+        }
     }
 
     override fun setToLabel(label: Int) {

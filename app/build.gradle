@@ -32,7 +32,7 @@ plugins {
     id 'kotlin-android-extensions'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.appdistribution'
-
+    id "com.github.plnice.canidropjetifier" version "0.5"
 //    id 'firebase.test.lab'
 }
 
@@ -191,8 +191,7 @@ android {
         netTest {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-//            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.chilinet.minter.network/connection/websocket"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
             buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
@@ -204,7 +203,7 @@ android {
         netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.chilinet.minter.network/connection/websocket"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
             buildConfigField "String", "EXPLORER_API_URL", 'null'
             buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
             buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
@@ -275,8 +274,8 @@ dependencies {
     implementation "androidx.room:room-rxjava2:$roomVersion"
 
     // android arch
-    implementation 'androidx.paging:paging-runtime:2.1.2'
-    implementation 'android.arch.paging:rxjava2:1.0.1'
+    implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
+    implementation 'androidx.paging:paging-rxjava2-ktx:2.1.2'
 
 
     // yandex
@@ -336,9 +335,9 @@ dependencies {
     //ui
     implementation 'com.jakewharton:butterknife:10.2.1'
     kapt 'com.jakewharton:butterknife-compiler:10.2.1'
-    implementation 'io.coil-kt:coil:0.9.5'
+    implementation 'io.coil-kt:coil:0.13.0'
 
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
+    implementation 'com.edwardstock.android:BottomNavigationViewEx:2.1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.edwardstock.android:input-field:0.0.2'
     implementation 'com.edwardstock.android:autocomplete:1.1.2'
@@ -357,8 +356,8 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
     androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
-    androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.0.0"
-    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.0.0"
+//    androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.0.0"
+//    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.0.0"
     androidTestImplementation 'org.mockito:mockito-android:2.25.0'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.11.0'
 

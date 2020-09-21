@@ -173,6 +173,13 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
+        // unset if user disabled fingerprint by OS
+        if (isFingerprintEnabled) {
+            if (!fingerHelper.hasEnrolledFingerprints() || !fingerHelper.isHardwareDetected) {
+                settings[EnableFingerprint] = false
+            }
+        }
+
         addRows()
 
     }
@@ -206,7 +213,7 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
         get() = settings[EnablePinCode]
 
     private val isFingerprintEnabled: Boolean
-        get() = settings[EnableFingerprint] && settings[EnablePinCode]
+        get() = settings[EnableFingerprint] && settings[EnablePinCode] && fingerHelper.hasEnrolledFingerprints()
 
     @Suppress("UNUSED_PARAMETER")
     private fun onChangePinClick(view: View, view1: View, s: String) {

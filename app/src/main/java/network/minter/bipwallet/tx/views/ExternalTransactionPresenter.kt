@@ -29,15 +29,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.text.InputFilter
-import android.view.View
 import com.airbnb.deeplinkdispatch.DeepLink
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
-import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
@@ -65,7 +62,6 @@ import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.account.selectorDataFromSecrets
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.services.livebalance.RTMService
@@ -132,7 +128,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private var isWsBound = false
     private var buyRequiredAmount: BuyRequiredAmount? = null
     private var enableEditInput = false
-    private var enableEditForm = true
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -148,7 +143,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         RTMBlockReceiver.send(Wallet.app().context(), message!!)
                                     } else {
                                         RTMBalanceUpdateReceiver.send(Wallet.app().context(), message)
-                                        accountStorage.update(true, Consumer<AddressListBalancesTotal> { Wallet.app().balanceNotifications().showBalanceUpdate(message, address) })
+                                        accountStorage.update(true, { Wallet.app().balanceNotifications().showBalanceUpdate(message, address) })
                                         cachedTxRepo.update(true)
                                         Timber.d("WS ON MESSAGE[%s]: %s", channel, message)
                                     }
@@ -178,7 +173,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 )
                 .disposeOnDestroy()
 
-        viewState.setOnCancelListener(View.OnClickListener { onCancel() })
+        viewState.setOnCancelListener { onCancel() }
     }
 
     fun resetAccount() {
@@ -215,8 +210,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                 d.dismiss()
                             }
                             .setNegativeAction(R.string.btn_cancel) { d, _ ->
-                                viewState.finishCancel()
                                 d.dismiss()
+                                viewState.finishCancel()
                             }
                             .create()
                     d.isCancelable = false
@@ -932,12 +927,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 allRows.addAll(rowsBuilder.build())
             }
             OperationType.CreateMultisigAddress,
-            OperationType.EditMultisigOwnersData -> {
+            OperationType.EditMultisig -> {
                 viewState.enableEditAction(false)
                 val data = if (tx.type == OperationType.CreateMultisigAddress) {
                     tx.getData<TxCreateMultisigAddress>()
                 } else {
-                    tx.getData<TxEditMultisigOwnersData>()
+                    tx.getData<TxEditMultisig>()
                 }
 
                 val title = if (tx.type == OperationType.CreateMultisigAddress) "creating" else "editing"
@@ -955,8 +950,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 for ((i, item) in data.addresses.withIndex()) {
                     val weight = data.weights[i]
                     rowsBuilder.add {
-                        label = "$item"
-                        text = "Weight: $weight"
+                        label = "Weight: $weight"
+                        text = "$item"
                     }
                 }
                 allRows.addAll(rowsBuilder.build())
@@ -976,6 +971,26 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .add {
                             label = "Reward address"
                             text = data.rewardAddress.toString()
+                        }
+                        .add {
+                            label = "Control address"
+                            text = data.controlAddress.toString()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
+            OperationType.EditCandidatePublicKey -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxEditCandidatePublicKey::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxEditCandidatePublicKey::class.java, extTx!!)
+                        .add {
+                            label = "You're editing candidate public key"
+                            text = data.publicKey.toString()
+                        }
+                        .add {
+                            label = "New Public Key"
+                            text = data.newPublicKey.toString()
                         }
                         .build()
 
@@ -997,10 +1012,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                 allRows.addAll(rows)
             }
-            OperationType.ChangeCoinOwner -> {
+            OperationType.EditCoinOwner -> {
                 viewState.enableEditAction(false)
-                val data = tx.getData(TxChangeCoinOwner::class.java)
-                val rows = TxInputFieldRow.MultiBuilder(TxChangeCoinOwner::class.java, extTx!!)
+                val data = tx.getData(TxEditCoinOwner::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxEditCoinOwner::class.java, extTx!!)
                         .add {
                             label = "You're changing coin owner"
                             text = data.symbol
@@ -1013,11 +1028,26 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                 allRows.addAll(rows)
             }
+            OperationType.PriceVote -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxPriceVote::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxPriceVote::class.java, extTx!!)
+                        .add {
+                            label = "You're voting for price"
+                            text = data.price.toString()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
             else -> {
                 viewState.startDialog(false) { ctx: Context? ->
                     ConfirmDialog.Builder(ctx!!, "Unable to send")
                             .setText("Wallet doesn't support this type of transaction: %s", tx.type.name)
-                            .setPositiveAction(R.string.btn_close)
+                            .setPositiveAction(R.string.btn_close) { d, _ ->
+                                d.dismiss()
+                                viewState.finishCancel()
+                            }
                             .create()
                 }
             }
@@ -1031,13 +1061,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 configureInput { inputGroup, inputField ->
                     inputGroup.addValidator(inputField, PayloadValidator())
                     inputField.hint = Wallet.app().res().getString(R.string.label_payload_type)
-                    inputGroup.addFilter(inputField, InputFilter { source, _, _, _, _, _ ->
+                    inputGroup.addFilter(inputField) { source, _, _, _, _, _ ->
                         if (inputField.text.toString().toByteArray().size >= 1024) {
                             ""
                         } else {
                             source
                         }
-                    })
+                    }
                     inputField.addTextChangedSimpleListener {
                         extTx!!.resetPayload(BytesData(it.toString().toByteArray()))
                         payload = extTx!!.payload
@@ -1072,9 +1102,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         if (!cntRes.isSuccess) {
                             return@Function Observable.just(cntRes.errorResult!!.castErrorResultTo<PushResult>())
                         }
+                        val gasPrice = if (extTx!!.type == OperationType.RedeemCheck) {
+                            BigInteger.ONE
+                        } else {
+                            cntRes.gas ?: BigInteger.ONE
+                        }
+                        val gasCoinId = extTx!!.gasCoinId ?: MinterSDK.DEFAULT_COIN_ID
                         val tx = Transaction.Builder(cntRes.nonce, extTx)
-                                .setGasPrice(if (extTx!!.type == OperationType.RedeemCheck) BigInteger.ONE else (cntRes.gas
-                                        ?: BigInteger.ONE))
+                                .setGasPrice(gasPrice)
+                                .setGasCoinId(gasCoinId)
                                 .setPayload(payload)
                                 .buildFromExternal()
                         val data = secretStorage.getSecret(from!!)
@@ -1099,7 +1135,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         viewState.startDialog { ctx: Context? ->
             ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
                     .setText(errorResult.message)
-                    .setPositiveAction("Close")
+                    .setPositiveAction("Close") { d, _ ->
+                        d.dismiss()
+                        viewState.finishCancel()
+                    }
                     .create()
         }
     }
@@ -1109,7 +1148,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         viewState.startDialog { ctx: Context? ->
             ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
                     .setText(throwable.message)
-                    .setPositiveAction("Close")
+                    .setPositiveAction("Close") { d, _ ->
+                        d.dismiss()
+                        viewState.finishCancel()
+                    }
                     .create()
         }
     }
@@ -1127,7 +1169,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .setValue(null)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
-                        viewState.startExplorer(result.result.data.hash.toString())
+                        viewState.startExplorer(result.result.hash.toString())
                         d.dismiss()
                         viewState.finishSuccess()
                     }

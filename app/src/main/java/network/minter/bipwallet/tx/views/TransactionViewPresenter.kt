@@ -90,8 +90,8 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             Pair(HistoryTransaction.Type.EditCandidate, R.string.tx_type_edit_candidate),
             Pair(HistoryTransaction.Type.SetHaltBlock, R.string.tx_type_set_halt_block),
             Pair(HistoryTransaction.Type.RecreateCoin, R.string.tx_type_recreate_coin),
-            Pair(HistoryTransaction.Type.ChangeCoinOwner, R.string.tx_type_change_coin_owner),
-            Pair(HistoryTransaction.Type.EditMultisigOwnersData, R.string.tx_type_edit_multisig),
+            Pair(HistoryTransaction.Type.EditCoinOwner, R.string.tx_type_change_coin_owner),
+            Pair(HistoryTransaction.Type.EditMultisig, R.string.tx_type_edit_multisig),
             Pair(HistoryTransaction.Type.PriceVote, R.string.tx_type_price_vote),
             Pair(HistoryTransaction.Type.EditCandidatePublicKey, R.string.tx_type_edit_candidate_pub_key),
     )
@@ -254,15 +254,21 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     //todo: check value given from explorer
                     val check = data.check
 
+                    // from = to = issuer
+                    viewState.setFromLabel(R.string.label_check_issuer)
+
                     if (check != null) {
-                        // from = to = issuer
-                        viewState.setFromLabel(R.string.label_check_issuer)
                         viewState.setFromAddress(check.sender.toString())
                         viewState.setFromName(_tx?.toName)
                         viewState.setFromAvatar(check.sender.avatar)
 
                         b.valueAmount.text = check.value.humanize()
                         b.valueCoin.text = check.coin.symbol
+                    } else {
+                        viewState.setFromAddress("<unknown>")
+                        viewState.setFromName(null)
+                        b.valueAmount.text = "<unknown>"
+                        b.valueCoin.text = "<unknown>"
                     }
                 }
             }
@@ -270,9 +276,13 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             HistoryTransaction.Type.SetCandidateOffline -> {
                 val data: HistoryTransaction.TxSetCandidateOnlineOfflineResult = tx.getData()
 
-                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
-                viewState.setToAddress(data.publicKey?.toString() ?: "<unknown>")
-                viewState.setToName(_tx?.toName)
+                if (data.publicKey == null) {
+                    viewState.showTo(false)
+                } else {
+                    viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
+                    viewState.setToAddress(data.publicKey?.toString() ?: "<unknown>")
+                    viewState.setToName(_tx?.toName)
+                }
             }
             HistoryTransaction.Type.EditCandidate -> {
                 val data: HistoryTransaction.TxEditCandidateResult = tx.getData()
@@ -293,7 +303,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 }
             }
             HistoryTransaction.Type.CreateMultisigAddress,
-            HistoryTransaction.Type.EditMultisigOwnersData -> {
+            HistoryTransaction.Type.EditMultisig -> {
                 viewState.showTo(false)
 
                 viewState.inflateDetails(R.layout.tx_details_create_multisig_address) {
@@ -315,7 +325,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     b.valueHeight.text = data.height.toString()
                 }
             }
-            HistoryTransaction.Type.ChangeCoinOwner -> {
+            HistoryTransaction.Type.EditCoinOwner -> {
                 viewState.showTo(false)
 
                 viewState.inflateDetails(R.layout.tx_details_change_coin_owner) {
@@ -338,9 +348,15 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             }
             HistoryTransaction.Type.EditCandidatePublicKey -> {
 
+                val data: HistoryTransaction.TxEditCandidatePublicKeyResult = tx.getData()
+
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
+                viewState.setToName(_tx?.toName)
+                viewState.setToAddress(data.publicKey.toString())
+
                 viewState.inflateDetails(R.layout.tx_details_edit_candidate_public_key) {
-                    val data: HistoryTransaction.TxEditCandidatePublicKeyResult = tx.getData()
                     val b = TxDetailsEditCandidatePublicKeyBinding.bind(it)
+
                     b.valueOldPublicKey.text = data.publicKey.toString()
                     b.valueOldPublicKey.copyOnClick()
                     b.valueNewPublicKey.text = data.newPublicKey.toString()

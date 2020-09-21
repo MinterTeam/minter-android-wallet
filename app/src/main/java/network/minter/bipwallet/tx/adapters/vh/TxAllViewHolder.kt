@@ -73,8 +73,8 @@ class TxAllViewHolder(
             /** @since minter 1.2 */
             HistoryTransaction.Type.SetHaltBlock -> bindSetHaltBlock(item)
             HistoryTransaction.Type.RecreateCoin -> bindCreateCoin(item)
-            HistoryTransaction.Type.ChangeCoinOwner -> bindChangeCoinOwner(item)
-            HistoryTransaction.Type.EditMultisigOwnersData -> bindCreateMultisigAddress(item)
+            HistoryTransaction.Type.EditCoinOwner -> bindChangeCoinOwner(item)
+            HistoryTransaction.Type.EditMultisig -> bindCreateMultisigAddress(item)
             HistoryTransaction.Type.PriceVote -> bindPriceVote(item)
             HistoryTransaction.Type.EditCandidatePublicKey -> bindEditCandidatePublicKey(item)
             else -> {
@@ -123,6 +123,7 @@ class TxAllViewHolder(
         val data: HistoryTransaction.TxSetHaltBlockResult = item.tx.getData()
 
         binding.apply {
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitleType.setText(R.string.tx_type_set_halt_block)
             itemTitle.text = data.height.toString()
             itemAmount.text = ""
@@ -289,7 +290,7 @@ class TxAllViewHolder(
             item.tx.getData<HistoryTransaction.TxCreateMultisigResult>()
         } else {
             create = false
-            item.tx.getData<HistoryTransaction.TxEditMultisigOwnersDataResult>()
+            item.tx.getData<HistoryTransaction.TxEditMultisigResult>()
         }
 
         binding.apply {

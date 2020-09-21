@@ -170,7 +170,10 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
 
     override fun startFingerprintEnrollment() {
         var intent: Intent
-        intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Intent(Settings.ACTION_BIOMETRIC_ENROLL)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            @Suppress("DEPRECATION")
             Intent(Settings.ACTION_FINGERPRINT_ENROLL)
         } else {
             Intent(Settings.ACTION_SECURITY_SETTINGS)

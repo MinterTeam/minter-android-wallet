@@ -34,7 +34,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Px
 import coil.Coil
 import coil.ImageLoader
-import coil.api.load
+import coil.load
+
 import coil.size.Scale
 import coil.util.CoilUtils
 import kotlinx.coroutines.Dispatchers
@@ -58,14 +59,15 @@ class ImageHelper(mContext: Context, private val mDisplay: DisplayHelper) {
                 .cache(CoilUtils.createDefaultCache(mContext))
                 .build()
 
-        imageLoader = ImageLoader(mContext) {
-            crossfade(160)
-            okHttpClient { httpClient }
-            dispatcher(Dispatchers.IO)
-        }
+        imageLoader = ImageLoader.Builder(mContext)
+                .crossfade(160)
+                .okHttpClient { httpClient }
+                .dispatcher(Dispatchers.IO)
+                .build()
 
 //        CoilLogger.setEnabled(BuildConfig.DEBUG)
-        Coil.setDefaultImageLoader(imageLoader)
+        Coil.setImageLoader(imageLoader)
+//        Coil.setDefaultImageLoader(imageLoader)
     }
 
     fun loadResize(iv: ImageView, imageUrl: Uri?, @Dp resizeDp: Float) {

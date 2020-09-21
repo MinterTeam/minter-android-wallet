@@ -28,6 +28,7 @@ package network.minter.bipwallet.tx.contract
 
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
 import network.minter.blockchain.models.TransactionCommissionValue
+import network.minter.core.MinterSDK
 import network.minter.explorer.models.GasValue
 import network.minter.explorer.models.GateResult
 import network.minter.explorer.models.TxCount
@@ -37,6 +38,7 @@ import java.math.BigInteger
 class TxInitData {
     var nonce: BigInteger? = null
     var gas: BigInteger? = null
+    var gasCoin: BigInteger = MinterSDK.DEFAULT_COIN_ID
     var commission: BigDecimal? = null
     var errorResult: GateResult<*>? = null
 
@@ -50,9 +52,10 @@ class TxInitData {
         setValues(*values)
     }
 
-    constructor(nonce: BigInteger?, gas: BigInteger?) {
+    constructor(nonce: BigInteger?, gas: BigInteger?, gasCoin: BigInteger = MinterSDK.DEFAULT_COIN_ID) {
         this.nonce = nonce
         this.gas = gas
+        this.gasCoin = gasCoin
     }
 
     constructor(err: GateResult<*>?) {

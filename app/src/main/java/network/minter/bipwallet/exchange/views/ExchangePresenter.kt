@@ -367,13 +367,13 @@ abstract class ExchangePresenter<V : ExchangeView>(
             saveExchangeAmount(mBuyCoin!!, mBuyAmount!!)
 
             // for buy tab just show how much we've got
-            showSuccessDialog(result.result.data.hash.toString(), mBuyAmount!!, mBuyCoin!!)
+            showSuccessDialog(result.result.hash.toString(), mBuyAmount!!, mBuyCoin!!)
             return
         }
 
         // get transaction from explorer to show exact value what we've got after sell
         // todo: show "Coins have been exchanged" if can't get transaction after 30 seconds
-        mTxRepo.entity.waitTransactionUntilUncommitted(result.result.data.hash.toString())
+        mTxRepo.entity.waitTransactionUntilUncommitted(result.result.hash.toString())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(

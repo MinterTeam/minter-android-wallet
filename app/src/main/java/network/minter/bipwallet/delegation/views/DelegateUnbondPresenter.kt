@@ -612,7 +612,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         rewardsMonthlyRepo.update(true)
         validatorsRepo.entity.writeLastUsed(toValidatorItem)
 
-        val height = result.result?.data?.height?.toLong() ?: 120L
+        val height = result.result?.transaction?.height?.toLong() ?: 120L
 
         val leftSeconds: Float = (120f - (height % 120)) * 5f
         val msg = "Please allow ~${Plurals.timeValue(leftSeconds.toLong())} ${Plurals.timeUnitShort(leftSeconds.toLong())} for your delegated balance to update."
@@ -623,7 +623,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     .setValue(msg)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         d.dismiss()
-                        viewState.startExplorer(result.result!!.data.hash)
+                        viewState.startExplorer(result.result!!.hash)
                         viewState.finishSuccess()
                     }
                     .setNegativeAction(R.string.btn_close) { d, _ ->

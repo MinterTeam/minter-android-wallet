@@ -28,24 +28,25 @@ package network.minter.bipwallet.internal.helpers;
 
 import android.content.Context;
 
-import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.biometric.BiometricManager;
 
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public final class FingerprintHelper {
-    private final FingerprintManagerCompat mFingerprintManagerCompat;
+    private final BiometricManager mBiometricManager;
 
     public FingerprintHelper(Context context) {
-        mFingerprintManagerCompat = FingerprintManagerCompat.from(context);
+        mBiometricManager = BiometricManager.from(context);
     }
 
     public boolean isHardwareDetected() {
-        return mFingerprintManagerCompat.isHardwareDetected();
+        int res = mBiometricManager.canAuthenticate();
+        return res != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE && res != BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE;
     }
 
     public boolean hasEnrolledFingerprints() {
-        return mFingerprintManagerCompat.hasEnrolledFingerprints();
+        return mBiometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
     }
 }
