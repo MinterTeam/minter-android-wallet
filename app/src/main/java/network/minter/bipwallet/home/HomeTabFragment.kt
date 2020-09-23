@@ -48,35 +48,6 @@ abstract class HomeTabFragment : BaseFragment() {
 
     open fun onTabSelected() {}
     open fun onTabUnselected() {}
-//    override fun onError(t: Throwable) {
-//        if (activity is ErrorView) {
-//            (activity as ErrorView?)!!.onError(t)
-//        }
-//    }
-//
-//    override fun onError(err: String) {
-//        if (activity is ErrorView) {
-//            (activity as ErrorView?)!!.onError(err)
-//        }
-//    }
-//
-//    override fun onErrorWithRetry(errorMessage: String, errorResolver: View.OnClickListener) {
-//        onErrorWithRetry(errorMessage, getString(R.string.btn_retry), errorResolver)
-//    }
-//
-//    override fun onErrorWithRetry(
-//            errorMessage: String, actionName: String,
-//            errorResolver: View.OnClickListener
-//    ) {
-//        runOnUiThread {
-//            SnackbarBuilder(this)
-//                    .setMessage(errorMessage)
-//                    .setAction(actionName, errorResolver)
-//                    .setDurationInfinite()
-//                    .show()
-//        }
-//
-//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

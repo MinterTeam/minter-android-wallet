@@ -128,55 +128,6 @@ public class BaseMvpActivity extends MvpAppCompatActivity implements LifecycleOw
         from.finish();
     }
 
-//    @Override
-//    public void onError(Throwable t) {
-//        Timber.e(t);
-//    }
-//
-//    @Override
-//    public void onError(String err) {
-//        Timber.e(err);
-//        runOnUiThread(() -> {
-//            if (err != null) {
-////                if (mStatusView != null) {
-////                    mStatusView
-////                            .withText(err)
-////                            .withoutRetryButton()
-////                            .showStatus();
-////                } else {
-////                    new SnackbarBuilder(this)
-////                            .setMessage(err)
-////                            .setDurationLong()
-////                            .show();
-////                }
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
-//        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
-//    }
-//
-//    @Override
-//    public void onErrorWithRetry(String errorMessage, String actionName,
-//                                 View.OnClickListener errorResolver) {
-//        runOnUiThread(() -> {
-////            if (mStatusView != null) {
-////                mStatusView
-////                        .withText(errorMessage)
-////                        .withRetryButton(actionName, errorResolver)
-////                        .showStatus();
-////            } else {
-////                new SnackbarBuilder(this)
-////                        .setMessage(errorMessage)
-////                        .setAction(actionName, errorResolver)
-////                        .setDurationIndefinite()
-////                        .show();
-////            }
-//        });
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -63,35 +63,6 @@ public abstract class BaseInjectFragment extends BaseFragment {
     public void prepareIdlingResources() {
     }
 
-//    @Override
-//    public void onError(Throwable t) {
-//        if (getActivity() instanceof ErrorView) {
-//            ((ErrorView) getActivity()).onError(t);
-//        }
-//    }
-//
-//    @Override
-//    public void onError(String err) {
-//        if (getActivity() instanceof ErrorView) {
-//            ((ErrorView) getActivity()).onError(err);
-//        }
-//    }
-//
-//    @Override
-//    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
-//        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
-//    }
-//
-//    @Override
-//    public void onErrorWithRetry(String errorMessage, String actionName,
-//                                 View.OnClickListener errorResolver) {
-////        new SnackbarBuilder(this)
-////                .setMessage(errorMessage)
-////                .setAction(actionName, errorResolver)
-////                .setDurationIndefinite()
-////                .show();
-//    }
-
     protected boolean enableAutoInjection() {
         return true;
     }
