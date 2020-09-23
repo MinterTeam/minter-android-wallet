@@ -371,6 +371,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
         inputGroup.setError("amount", error)
     }
 
+
     override fun setCommonError(error: CharSequence?) {
         binding.textError.post {
             binding.textError.visible = !error.isNullOrEmpty()

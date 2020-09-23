@@ -27,68 +27,49 @@ package network.minter.bipwallet.internal.mvp
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.annotation.CallSuper
 import io.reactivex.Observable
-import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import moxy.MvpPresenter
 import moxy.MvpView
 import network.minter.bipwallet.analytics.AnalyticsManager
 import network.minter.bipwallet.analytics.base.*
 import network.minter.bipwallet.internal.Wallet
-import network.minter.core.internal.exceptions.NetworkException
-import timber.log.Timber
-import java.util.concurrent.TimeUnit
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.RetryListener
+import network.minter.bipwallet.internal.exceptions.humanMessage
 
 /**
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
+abstract class MvpBasePresenter<V : MvpView> : MvpPresenter<V>() {
     private val subscriptions = CompositeDisposable()
-    private var errorRetrySubject: PublishSubject<Any> = PublishSubject.create()
     private var isInitialized = false
-    private var retriedAfterError = false
-    private var isErrorWithRetryShown: Boolean = false
-
-    internal fun Disposable.disposeOnDestroy(): Disposable {
-        subscriptions.add(this)
-        return this
-    }
-
-    fun unsubscribeOnDestroy(subscription: Disposable?): MvpBasePresenter<V> {
-        subscriptions.add(subscription!!)
-        return this
-    }
-
-    fun retry() {
-        doOnErrorResolve()
-        errorRetrySubject.onNext(Any())
-        retriedAfterError = true
-    }
-
-    open fun onSaveInstanceState(outState: Bundle?) {}
-    open fun onRestoreInstanceState(savedInstanceState: Bundle?) {}
-    fun retryOnClick(): View.OnClickListener {
-        return View.OnClickListener { retry() }
-    }
 
     @CallSuper
     override fun attachView(view: V) {
-        errorRetrySubject.doOnSubscribe { unsubscribeOnDestroy(it) }
-        errorRetrySubject.doOnNext {
-            Timber.d("Retry reactive")
-        }
-
         if (!isInitialized) {
             isInitialized = true
             handleAnalytics()
+        }
+        if (this is ErrorManager.ErrorGlobalHandlerListener) {
+            Wallet.app().errorManager().subscribe(this as ErrorManager.ErrorGlobalHandlerListener)
+        }
+        if (this is ErrorManager.ErrorGlobalReceiverListener) {
+            Wallet.app().errorManager().subscribe(this as ErrorManager.ErrorGlobalReceiverListener)
+        }
+        if (this is ErrorManager.ErrorLocalHandlerListener) {
+            Wallet.app().errorManager().subscribe(this as ErrorManager.ErrorLocalHandlerListener)
+        }
+        if (this is ErrorManager.ErrorLocalReceiverListener) {
+            Wallet.app().errorManager().subscribe(this as ErrorManager.ErrorLocalReceiverListener)
         }
         super.attachView(view)
     }
@@ -96,6 +77,18 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
     @CallSuper
     override fun detachView(view: V) {
         super.detachView(view)
+        if (this is ErrorManager.ErrorGlobalHandlerListener) {
+            Wallet.app().errorManager().unsubscribe(this as ErrorManager.ErrorGlobalHandlerListener)
+        }
+        if (this is ErrorManager.ErrorGlobalReceiverListener) {
+            Wallet.app().errorManager().unsubscribe(this as ErrorManager.ErrorGlobalReceiverListener)
+        }
+        if (this is ErrorManager.ErrorLocalHandlerListener) {
+            Wallet.app().errorManager().unsubscribe(this as ErrorManager.ErrorLocalHandlerListener)
+        }
+        if (this is ErrorManager.ErrorLocalReceiverListener) {
+            Wallet.app().errorManager().unsubscribe(this as ErrorManager.ErrorLocalReceiverListener)
+        }
     }
 
     @CallSuper
@@ -106,41 +99,67 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
         super.onDestroy()
     }
 
+    open fun onSaveInstanceState(outState: Bundle?) {}
+    open fun onRestoreInstanceState(savedInstanceState: Bundle?) {}
     fun onTrimMemory() {}
     open fun onLowMemory() {}
     open fun handleExtras(intent: Intent?) {}
     open fun handleExtras(bundle: Bundle?) {}
     open fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {}
+
     protected val analytics: AnalyticsManager
         get() = Wallet.app().analytics()
 
+    protected open fun handlerError(t: Throwable, retryListener: RetryListener) {
+        Handler(Looper.getMainLooper()).post {
+            if (viewState is ProgressView) {
+                (viewState as ProgressView).hideProgress()
+            }
+
+            if (viewState is ErrorViewWithRetry) {
+                (viewState as ErrorViewWithRetry).onErrorWithRetry(t.humanMessage, retryOnClick(retryListener))
+            } else if (viewState is ErrorView) {
+                (viewState as ErrorView).onError(t.humanMessage)
+            }
+        }
+    }
+
+    fun retryOnClick(retryListener: RetryListener): View.OnClickListener {
+        return View.OnClickListener {
+            retryListener()
+            retry()
+        }
+    }
+
+    fun retry() {
+        doOnErrorResolve()
+    }
+
     protected open fun doOnErrorResolve() {
-        isErrorWithRetryShown = false
-        if (viewState is ProgressView) {
-            (viewState as ProgressView).showProgress()
+        Handler(Looper.getMainLooper()).post {
+            if (viewState is ProgressView) {
+                (viewState as ProgressView).showProgress()
+            }
         }
     }
 
-    protected open fun doOnError(t: Throwable) {
-        if (viewState is ProgressView) {
-            (viewState as ProgressView).hideProgress()
+    internal fun Disposable?.disposeOnDestroy(): Disposable? {
+        if (this != null) {
+            subscriptions.add(this)
         }
-        if (viewState is ErrorViewWithRetry) {
-            var exceptionMessage = t.message
-            if (t is NetworkException) {
-                exceptionMessage = t.userMessage
-            }
-
-            if (!isErrorWithRetryShown) {
-                isErrorWithRetryShown = true
-                (viewState as ErrorViewWithRetry).onErrorWithRetry(String.format("%s", exceptionMessage), retryOnClick())
-            }
-
-        }
+        return this
     }
 
-    protected open fun <T> safeSubscribe(input: Observable<T>): Observable<T> {
-        return input.retryWhen(errorResolver)
+    internal fun <R, T : Observable<R>> T.disposeOnDestroy(): Observable<R> {
+        this.doOnSubscribe { unsubscribeOnDestroy(it) }
+        return this
+    }
+
+    fun unsubscribeOnDestroy(subscription: Disposable?): MvpBasePresenter<V> {
+        if (subscription != null) {
+            subscriptions.add(subscription)
+        }
+        return this
     }
 
     protected open fun <T> safeSubscribeComputeToUi(input: Observable<T>): Observable<T> {
@@ -157,28 +176,6 @@ abstract class MvpBasePresenter<V : MvpView?> : MvpPresenter<V>() {
         return input
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    protected open val errorResolver: Function<Observable<out Throwable>, ObservableSource<*>>
-        get() = Function { observable: Observable<out Throwable> ->
-            observable.flatMap { err: Throwable ->
-                val t = NetworkException.convertIfNetworking(err)
-                Timber.w(t, "Error occurred in %s", javaClass.name)
-                doOnError(t)
-                errorRetrySubject.delay(500, TimeUnit.MILLISECONDS)
-            }
-        }
-
-    protected open fun errorResolverWithCallback(cb: (Throwable) -> Unit): Function<Observable<out Throwable>, ObservableSource<*>> {
-        return Function { observable: Observable<out Throwable> ->
-            observable.flatMap { err: Throwable ->
-                val t = NetworkException.convertIfNetworking(err)
-                Timber.w(t, "Error occurred in %s", javaClass.name)
-                doOnError(t)
-                cb.invoke(t)
-                errorRetrySubject.delay(500, TimeUnit.MILLISECONDS)
-            }
-        }
     }
 
     private fun handleAnalytics() {

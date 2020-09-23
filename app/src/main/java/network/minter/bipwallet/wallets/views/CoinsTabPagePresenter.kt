@@ -29,6 +29,8 @@ import android.view.View
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.humanMessage
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.setTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -51,9 +53,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @InjectViewState
-class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPageView>() {
+class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPageView>(), ErrorManager.ErrorGlobalReceiverListener {
     @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var secretStorage: SecretStorage
+    @Inject lateinit var errorManager: ErrorManager
 
     private var globalAdapter: MultiRowAdapter = MultiRowAdapter()
     private var coinsAdapter: SimpleRecyclerAdapter<CoinBalance, BaseTabPageFragment.ItemViewHolder>? = null
@@ -98,7 +101,6 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
         viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Progress)
 
         accountStorage
-                .retryWhen(errorResolver)
                 .observe()
                 .joinToUi()
                 .subscribe(
@@ -108,24 +110,28 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                             viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Normal)
                         },
                         { t ->
-                            Timber.e(t, "Unable to load coin list")
-                            viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Error, t.message)
+                            Timber.e(t, "Unable to load coin list (onError)")
+
                         }
                 )
                 .disposeOnDestroy()
+    }
 
-
+    override fun onError(t: Throwable) {
+        viewState!!.setViewStatus(BaseWalletsPageView.ViewStatus.Error, t.humanMessage)
     }
 
     override fun attachView(view: CoinsTabPageView) {
         super.attachView(view)
         Timber.d("WALLETS coins attach")
         viewState.setAdapter(globalAdapter)
+        errorManager.subscribe(this)
         accountStorage.update()
     }
 
     override fun detachView(view: CoinsTabPageView) {
         super.detachView(view)
+        errorManager.unsubscribe(this)
         Timber.d("WALLETS coins detach")
     }
 

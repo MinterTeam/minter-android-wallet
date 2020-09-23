@@ -36,6 +36,7 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.core.crypto.MinterHash
 import network.minter.core.crypto.MinterPublicKey
@@ -47,8 +48,7 @@ import network.minter.explorer.models.ValidatorItem
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface DelegateUnbondView : MvpView {
-    fun onError(t: Throwable?)
+interface DelegateUnbondView : MvpView, ErrorViewWithRetry {
     fun onError(err: CharSequence?)
     fun setValidator(validator: ValidatorItem, onInflated: (View) -> Unit)
     fun setValidator(validator: MinterPublicKey, onInflated: (View) -> Unit)

@@ -26,57 +26,34 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_input_fake">
+    android:layout_height="wrap_content"
+    android:background="@color/errorColor"
+    android:paddingStart="@dimen/margin_edges">
 
     <TextView
-        android:id="@+id/title"
-        style="@style/Wallet.ItemTitle"
+        android:id="@+id/ev_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:paddingStart="@dimen/margin_edges"
-        android:paddingEnd="@dimen/margin_edges"
-        android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/subtitle"
-        app:layout_constraintEnd_toStartOf="@id/dropdown"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Enlighment Node" />
-
-    <TextView
-        android:id="@+id/subtitle"
-        style="@style/Wallet.ItemSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:paddingStart="@dimen/margin_edges"
-        android:paddingEnd="@dimen/margin_edges"
-        android:singleLine="true"
+        android:layout_marginEnd="@dimen/margin_edges_half"
+        android:fontFamily="@font/_inter_semi_bold"
+        android:text="@string/error_unknown"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/dropdown"
+        app:layout_constraintEnd_toStartOf="@id/ev_action"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="Mp123f...101010" />
-
-    <ImageView
-        android:id="@+id/dropdown"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="4dp"
-        android:background="@drawable/ripple_suffix"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="4dp"
-        android:src="@drawable/ic_cancel_circle_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/ev_action"
+        style="@style/Wallet.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_retry"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ev_text"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

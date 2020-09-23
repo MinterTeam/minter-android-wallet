@@ -52,6 +52,11 @@ fun Fragment.snackbar(): SnackbarBuilder = SnackbarBuilder(this)
 fun Activity.snackbar(): SnackbarBuilder = SnackbarBuilder(this)
 
 class SnackbarBuilder {
+
+    companion object {
+        const val DURATION_3_SEC: Int = 3 * 1000
+    }
+
     private var mContext: Context?
     private var mContainerView: View?
     private var mMessage: CharSequence? = null
@@ -71,6 +76,11 @@ class SnackbarBuilder {
     private var mMessageTextSizeRes = -1f
     private var mAction: Button? = null
     private var mEnableAction = true
+
+    constructor(context: Context, view: View) {
+        mContext = context
+        mContainerView = view
+    }
 
     constructor(activity: Activity?, containerView: ViewGroup?) {
         mContext = activity
@@ -158,7 +168,7 @@ class SnackbarBuilder {
     }
 
     fun setAction(actionName: CharSequence?, onClickListener: View.OnClickListener?): SnackbarBuilder {
-        mActionName = actionName
+        mActionName = actionName ?: mContext!!.getString(R.string.btn_retry)
         mOnClickListener = onClickListener
         return this
     }

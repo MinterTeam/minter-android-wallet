@@ -334,6 +334,7 @@
     <string name="label_new_owner">New Owner</string>
     <string name="title_delegate">New Delegation</string>
     <string name="title_unbond">Unbond</string>
+    <string name="stake_validator_fees">Fee %d%% | Min. %s %s</string>
     <string name="dialog_label_delegate">Delegate your coins to validators and receive related regular payments</string>
     <string name="dialog_label_unbond">The process will be finalized within ~30 days after the request has been sent</string>
     <string name="label_validator">Validator</string>
@@ -385,5 +386,6 @@
     <string name="dialog_create_wallet_description">⚠️ Save this seed phrase if you plan to use this address in the future. \nIt gives full access to your wallet, so keep it in a very safe place.</string>
     <string name="dialog_title_confirm_transaction">Confirm Transaction</string>
     <string name="min_stake">Min. ~%s %s</string>
+    <string name="error_unknown">Unknown error</string>
 
 </resources>

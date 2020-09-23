@@ -30,6 +30,7 @@ import android.app.Activity
 import android.app.Service
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +41,7 @@ import network.minter.bipwallet.databinding.ActivityValidatorSelectorBinding
 import network.minter.bipwallet.delegation.contract.ValidatorSelectorView
 import network.minter.bipwallet.delegation.views.ValidatorSelectorPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
+import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.ActivityBuilder
@@ -129,6 +131,22 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
         override fun getActivityClass(): Class<*> {
             return ValidatorSelectorActivity::class.java
         }
+    }
+
+    override fun onError(t: Throwable?) {
+        ErrorViewHelper(binding.errorView).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        ErrorViewHelper(binding.errorView).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, actionName, errorResolver)
     }
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {

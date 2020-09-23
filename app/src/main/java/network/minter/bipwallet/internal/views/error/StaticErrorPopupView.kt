@@ -23,26 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.contract
 
-import androidx.annotation.StringRes
-import androidx.recyclerview.widget.RecyclerView
-import moxy.MvpView
-import moxy.viewstate.strategy.alias.AddToEndSingle
-import network.minter.bipwallet.internal.mvp.ProgressView
+package network.minter.bipwallet.internal.views.error
 
-@AddToEndSingle
-interface BaseWalletsPageView : MvpView, ProgressView {
-    enum class ViewStatus {
-        Normal, Progress, Empty, Error
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.widget.TextView
+import network.minter.bipwallet.databinding.ViewErrorStaticPopupBinding
+
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+class StaticErrorPopupView @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : BaseStaticErrorView(context, attrs, defStyleAttr) {
+
+    private val binding: ViewErrorStaticPopupBinding = ViewErrorStaticPopupBinding.inflate(LayoutInflater.from(context), this, true)
+
+    override fun getMessageView(): TextView {
+        return binding.evText
     }
 
-    fun setViewStatus(status: ViewStatus)
-    fun setViewStatus(status: ViewStatus, error: CharSequence?)
-
-    fun setAdapter(adapter: RecyclerView.Adapter<*>)
-    fun showProgress(show: Boolean)
-    fun setEmptyTitle(title: CharSequence)
-    fun setEmptyTitle(@StringRes title: Int)
-    fun showEmpty(show: Boolean)
+    override fun getActionView(): TextView {
+        return binding.evAction
+    }
 }

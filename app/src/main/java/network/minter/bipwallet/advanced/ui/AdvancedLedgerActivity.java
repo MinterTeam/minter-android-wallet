@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -71,6 +71,7 @@ public class AdvancedLedgerActivity extends BaseMvpInjectActivity implements Led
     @BindView(R.id.progress_layout) View progressLayout;
     @BindView(R.id.progress) ColoredProgressBar progress;
     @BindView(R.id.progress_text) TextView progressText;
+
 
     @Override
     public void setOnSwitchedConfirm(Switch.OnCheckedChangeListener listener) {

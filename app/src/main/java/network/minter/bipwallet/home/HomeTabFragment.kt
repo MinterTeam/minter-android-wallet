@@ -25,16 +25,11 @@
  */
 package network.minter.bipwallet.home
 
-import android.view.View
-import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.BaseFragment
 import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
-import network.minter.bipwallet.internal.mvp.ErrorView
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
-import network.minter.bipwallet.internal.views.SnackbarBuilder
 import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
@@ -44,7 +39,7 @@ import timber.log.Timber
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
+abstract class HomeTabFragment : BaseFragment() {
     protected var bottomSheetDialog: BaseBottomSheetDialogFragment? = null
     protected var walletDialog: WalletDialog? = null
 
@@ -53,35 +48,35 @@ abstract class HomeTabFragment : BaseFragment(), ErrorView, ErrorViewWithRetry {
 
     open fun onTabSelected() {}
     open fun onTabUnselected() {}
-    override fun onError(t: Throwable) {
-        if (activity is ErrorView) {
-            (activity as ErrorView?)!!.onError(t)
-        }
-    }
-
-    override fun onError(err: String) {
-        if (activity is ErrorView) {
-            (activity as ErrorView?)!!.onError(err)
-        }
-    }
-
-    override fun onErrorWithRetry(errorMessage: String, errorResolver: View.OnClickListener) {
-        onErrorWithRetry(errorMessage, getString(R.string.btn_retry), errorResolver)
-    }
-
-    override fun onErrorWithRetry(
-            errorMessage: String, actionName: String,
-            errorResolver: View.OnClickListener
-    ) {
-        runOnUiThread {
-            SnackbarBuilder(this)
-                    .setMessage(errorMessage)
-                    .setAction(actionName, errorResolver)
-                    .setDurationInfinite()
-                    .show()
-        }
-
-    }
+//    override fun onError(t: Throwable) {
+//        if (activity is ErrorView) {
+//            (activity as ErrorView?)!!.onError(t)
+//        }
+//    }
+//
+//    override fun onError(err: String) {
+//        if (activity is ErrorView) {
+//            (activity as ErrorView?)!!.onError(err)
+//        }
+//    }
+//
+//    override fun onErrorWithRetry(errorMessage: String, errorResolver: View.OnClickListener) {
+//        onErrorWithRetry(errorMessage, getString(R.string.btn_retry), errorResolver)
+//    }
+//
+//    override fun onErrorWithRetry(
+//            errorMessage: String, actionName: String,
+//            errorResolver: View.OnClickListener
+//    ) {
+//        runOnUiThread {
+//            SnackbarBuilder(this)
+//                    .setMessage(errorMessage)
+//                    .setAction(actionName, errorResolver)
+//                    .setDurationInfinite()
+//                    .show()
+//        }
+//
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

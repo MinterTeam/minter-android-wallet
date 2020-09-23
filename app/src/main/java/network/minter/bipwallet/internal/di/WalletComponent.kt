@@ -43,6 +43,7 @@ import network.minter.bipwallet.db.WalletDatabase
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.di.annotations.DbCache
+import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.*
 import network.minter.bipwallet.internal.settings.SettingsManager
 import network.minter.bipwallet.internal.storage.AccountStorage
@@ -99,6 +100,7 @@ interface WalletComponent {
     fun sounds(): SoundManager
     fun fingerprint(): FingerprintHelper
     fun foregroundDetector(): ForegroundDetector
+    fun errorManager(): ErrorManager
 
     // notification
     fun balanceNotifications(): BalanceNotificationManager

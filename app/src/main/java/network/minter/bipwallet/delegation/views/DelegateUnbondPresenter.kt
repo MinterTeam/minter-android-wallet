@@ -43,7 +43,6 @@ import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
-
 import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.databinding.StubValidatorNameBinding
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
@@ -53,6 +52,8 @@ import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity
 import network.minter.bipwallet.exchange.ui.dialogs.TxConfirmStartDialog
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.helpers.IntentHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
@@ -92,7 +93,7 @@ import javax.inject.Inject
 private const val REQUEST_CODE_SELECT_VALIDATOR = 4000
 
 @InjectViewState
-class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateUnbondView>() {
+class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateUnbondView>(), ErrorManager.ErrorGlobalHandlerListener {
     @Inject lateinit var validatorsRepo: RepoValidators
     @Inject lateinit var accountStorage: RepoAccounts
     @Inject lateinit var gateRepo: GateTransactionRepository
@@ -101,6 +102,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var rewardsMonthlyRepo: RepoMonthlyRewards
     @Inject lateinit var rewardsDailyRepo: RepoDailyRewards
+    @Inject lateinit var errorManager: ErrorManager
 
     private var selectAccount: CoinItemBase? = null
     private var validators: MutableList<ValidatorItem> = ArrayList()
@@ -175,7 +177,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
         setupFee()
 
-        viewState.setOnClickUseMax(View.OnClickListener {
+        viewState.setOnClickUseMax {
             clickedUseMax = true
             useMax = true
             if (type == Type.Delegate) {
@@ -190,7 +192,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     )
                 }
             }
-        })
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -211,9 +213,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.setTextChangedListener(::onInputChanged)
-        viewState.setOnSubmitListener(View.OnClickListener {
+        viewState.setOnSubmitListener {
             onSubmit()
-        })
+        }
         viewState.addValidatorTextChangeListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }
@@ -251,7 +253,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             }
         })
         validatorsRepo
-                .retryWhen(errorResolver)
                 .observe()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -283,7 +284,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 .disposeOnDestroy()
 
         accountStorage
-                .retryWhen(errorResolver)
                 .observe()
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -324,7 +324,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         accountStorage.update()
         validatorsRepo.update()
 
-        viewState.setOnAccountSelectListener(View.OnClickListener {
+        viewState.setOnAccountSelectListener {
             if (type == Type.Delegate) {
                 viewState.startAccountSelector(selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList)) { account ->
                     onAccountSelected(account.data)
@@ -339,7 +339,11 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                     }
                 }
             }
-        })
+        }
+    }
+
+    override fun onError(t: Throwable, retryListener: RetryListener) {
+        handlerError(t, retryListener)
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -359,6 +363,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
     private fun setupFee() {
         initDataRepo.gasRepo.minGas
+                .retryWhen(errorManager.retryWhenHandler)
                 .joinToUi()
                 .map {
                     val txFee = when (type) {

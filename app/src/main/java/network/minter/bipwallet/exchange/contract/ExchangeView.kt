@@ -34,6 +34,7 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.exchange.models.ExchangeAmount
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinItem
@@ -43,7 +44,7 @@ import network.minter.explorer.models.CoinItem
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface ExchangeView : MvpView {
+interface ExchangeView : MvpView, ErrorViewWithRetry {
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(executor: DialogExecutor)
     fun setOnClickMaximum(listener: View.OnClickListener)

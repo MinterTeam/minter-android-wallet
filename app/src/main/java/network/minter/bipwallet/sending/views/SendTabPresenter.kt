@@ -39,7 +39,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import moxy.InjectViewState
@@ -55,6 +54,8 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.humanDetailsMessage
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.MathHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
@@ -101,7 +102,7 @@ import javax.net.ssl.SSLException
  */
 @HomeScope
 @InjectViewState
-class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
+class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), ErrorManager.ErrorGlobalReceiverListener {
     companion object {
         private const val REQUEST_CODE_QR_SCAN_ADDRESS = 101
         private const val REQUEST_CODE_ADDRESS_BOOK_SELECT = 102
@@ -118,8 +119,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
     @Inject lateinit var estimateRepo: GateEstimateRepository
     @Inject lateinit var gateTxRepo: GateTransactionRepository
     @Inject lateinit var addressBookRepo: AddressBookRepository
-    @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var walletSelectorController: WalletSelectorController
+    @Inject lateinit var errorManager: ErrorManager
 
     private var mFromAccount: CoinBalance? = null
     private var mAmount: BigDecimal? = null
@@ -154,6 +155,10 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         }
     }
 
+    override fun onError(t: Throwable) {
+        viewState.showBalanceProgress(false)
+    }
+
     override fun attachView(view: SendView) {
         walletSelectorController.attachView(view)
         walletSelectorController.onWalletSelected = {
@@ -161,17 +166,20 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
             viewState.clearAmount()
         }
         super.attachView(view)
-        viewState.setOnClickAccountSelectedListener(View.OnClickListener { onClickAccountSelector() })
+        viewState.setOnClickAccountSelectedListener { onClickAccountSelector() }
 
-        viewState.setOnSubmit(View.OnClickListener { onSubmit() })
-        viewState.setOnClickMaximum(View.OnClickListener { v -> onClickMaximum(v) })
-        viewState.setOnClickAddPayload(View.OnClickListener { v -> onClickAddPayload(v) })
-        viewState.setOnClickClearPayload(View.OnClickListener { onClickClearPayload() })
+        viewState.setOnSubmit { onSubmit() }
+        viewState.setOnClickMaximum { v -> onClickMaximum(v) }
+        viewState.setOnClickAddPayload { v -> onClickAddPayload(v) }
+        viewState.setOnClickClearPayload { onClickClearPayload() }
         viewState.setPayloadChangeListener(mPayloadChangeListener)
-        viewState.setOnContactsClickListener(View.OnClickListener { onClickContacts() })
+        viewState.setOnContactsClickListener { onClickContacts() }
         viewState.setRecipientAutocompleteItemClickListener { contact: AddressContact, pos: Int ->
             onAutocompleteSelected(contact, pos)
         }
+
+        errorManager.subscribe(this)
+
         loadAndSetFee()
         accountStorage.update()
 
@@ -179,6 +187,13 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
         checkRecipientContactExists()
     }
+
+    override fun detachView(view: SendView) {
+        super.detachView(view)
+        errorManager.unsubscribe(this)
+        walletSelectorController.detachView()
+    }
+
 
     private fun loadAddressBook() {
         addressBookRepo
@@ -224,11 +239,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                         { t -> Timber.e(t, "Unable to check recipient existence") }
                 )
 
-    }
-
-    override fun detachView(view: SendView) {
-        super.detachView(view)
-        walletSelectorController.detachView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -294,7 +304,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
         walletSelectorController.onFirstViewAttach(viewState)
         viewState.showBalanceProgress(true)
         accountStorage
-                .retryWhen(errorResolver)
                 .observe()
                 .joinToUi()
                 .subscribe(
@@ -311,8 +320,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                         },
                         { t: Throwable ->
                             Timber.w(t, "Unable to load balance for sending")
-                            viewState.onError(t)
-                            viewState.showBalanceProgress(false)
                         }
                 )
                 .disposeOnDestroy()
@@ -373,9 +380,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     private fun loadAndSetFee() {
         gasRepo.minGas
+                .retryWhen(errorManager.retryWhenHandler)
                 .subscribeOn(Schedulers.io())
-                .toFlowable(BackpressureStrategy.LATEST)
-                .debounce(200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         { res: GateResult<GasValue> ->
@@ -648,7 +654,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
             // creating preparation result to send transaction
             Observable
-                    .combineLatest(txFeeValueResolver, txNonceResolver, BiFunction { t1: GateResult<TransactionCommissionValue>, t2: GateResult<TxCount> -> TxInitData(t1, t2) })
+                    .combineLatest(txFeeValueResolver, txNonceResolver, { t1: GateResult<TransactionCommissionValue>, t2: GateResult<TxCount> -> TxInitData(t1, t2) })
                     .switchMap { txInitData: TxInitData ->
                         // if in previous request we've got error, returning it
                         if (!txInitData.isSuccess) {
@@ -742,7 +748,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
 
     private fun onFailedExecuteTransaction(throwable: Throwable) {
         Timber.w(throwable, "Uncaught tx error")
-        var errorMessage = throwable.message
+        var errorMessage = throwable.humanDetailsMessage
         if (throwable is SSLException) {
             errorMessage = "Bad internet connection: ${throwable.message}"
         }
@@ -839,7 +845,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>() {
                                     mAddressChange!!.onNext(mRecipient!!.name!!)
                                 },
                                 { t: Throwable ->
-                                    Timber.d(t, "Unable to find recipient %s", s)
+                                    Timber.d("Unable to find recipient %s: %s", s, t.message)
                                     mRecipient = null
                                     viewState.setSubmitEnabled(false)
 

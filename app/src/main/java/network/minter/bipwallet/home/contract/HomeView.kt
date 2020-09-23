@@ -29,16 +29,14 @@ import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.internal.mvp.ErrorView
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
-import network.minter.bipwallet.internal.mvp.ProgressView
 
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface HomeView : MvpView, ErrorView, ErrorViewWithRetry, ProgressView {
+interface HomeView : MvpView, ErrorViewWithRetry {
     fun setCurrentPage(position: Int)
 
     @StateStrategyType(OneExecutionStateStrategy::class)

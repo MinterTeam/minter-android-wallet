@@ -32,7 +32,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -40,9 +39,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.LifecycleOwner;
 import moxy.MvpAppCompatActivity;
-import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.mvp.ErrorView;
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
 import timber.log.Timber;
 
@@ -54,7 +50,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @SuppressLint("Registered")
-public class BaseMvpActivity extends MvpAppCompatActivity implements LifecycleOwner, ErrorView, ErrorViewWithRetry {
+public class BaseMvpActivity extends MvpAppCompatActivity implements LifecycleOwner {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -132,54 +128,54 @@ public class BaseMvpActivity extends MvpAppCompatActivity implements LifecycleOw
         from.finish();
     }
 
-    @Override
-    public void onError(Throwable t) {
-        Timber.e(t);
-    }
-
-    @Override
-    public void onError(String err) {
-        Timber.e(err);
-        runOnUiThread(() -> {
-            if (err != null) {
-//                if (mStatusView != null) {
-//                    mStatusView
-//                            .withText(err)
-//                            .withoutRetryButton()
-//                            .showStatus();
-//                } else {
-//                    new SnackbarBuilder(this)
-//                            .setMessage(err)
-//                            .setDurationLong()
-//                            .show();
-//                }
-            }
-        });
-    }
-
-    @Override
-    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
-        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
-    }
-
-    @Override
-    public void onErrorWithRetry(String errorMessage, String actionName,
-                                 View.OnClickListener errorResolver) {
-        runOnUiThread(() -> {
-//            if (mStatusView != null) {
-//                mStatusView
-//                        .withText(errorMessage)
-//                        .withRetryButton(actionName, errorResolver)
-//                        .showStatus();
-//            } else {
-//                new SnackbarBuilder(this)
-//                        .setMessage(errorMessage)
-//                        .setAction(actionName, errorResolver)
-//                        .setDurationIndefinite()
-//                        .show();
+//    @Override
+//    public void onError(Throwable t) {
+//        Timber.e(t);
+//    }
+//
+//    @Override
+//    public void onError(String err) {
+//        Timber.e(err);
+//        runOnUiThread(() -> {
+//            if (err != null) {
+////                if (mStatusView != null) {
+////                    mStatusView
+////                            .withText(err)
+////                            .withoutRetryButton()
+////                            .showStatus();
+////                } else {
+////                    new SnackbarBuilder(this)
+////                            .setMessage(err)
+////                            .setDurationLong()
+////                            .show();
+////                }
 //            }
-        });
-    }
+//        });
+//    }
+//
+//    @Override
+//    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
+//        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
+//    }
+//
+//    @Override
+//    public void onErrorWithRetry(String errorMessage, String actionName,
+//                                 View.OnClickListener errorResolver) {
+//        runOnUiThread(() -> {
+////            if (mStatusView != null) {
+////                mStatusView
+////                        .withText(errorMessage)
+////                        .withRetryButton(actionName, errorResolver)
+////                        .showStatus();
+////            } else {
+////                new SnackbarBuilder(this)
+////                        .setMessage(errorMessage)
+////                        .setAction(actionName, errorResolver)
+////                        .setDurationIndefinite()
+////                        .show();
+////            }
+//        });
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

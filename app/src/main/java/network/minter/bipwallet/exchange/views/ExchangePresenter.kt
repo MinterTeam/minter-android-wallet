@@ -55,6 +55,9 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.RetryListener
+import network.minter.bipwallet.internal.exceptions.humanDetailsMessage
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString
@@ -95,8 +98,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         protected val mExplorerCoinsRepo: RepoCoins,
         protected val gasRepo: GateGasRepository,
         protected val estimateRepository: GateEstimateRepository,
-        protected val mGateTxRepo: GateTransactionRepository
-) : MvpBasePresenter<V>() {
+        protected val mGateTxRepo: GateTransactionRepository,
+        protected val errorManager: ErrorManager
+) : MvpBasePresenter<V>(), ErrorManager.ErrorGlobalReceiverListener, ErrorManager.ErrorLocalHandlerListener, ErrorManager.ErrorLocalReceiverListener {
     private var mAccount: CoinBalance? = null
     private var mCurrentCoin: CoinItemBase? = null
     private var mBuyCoin: CoinItemBase? = null
@@ -114,6 +118,22 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var fromAccount: MinterAddress? = null
 
     protected abstract val isBuying: Boolean
+
+    override fun onError(t: Throwable) {
+        Timber.w("Unable to get balance for exchanging: %s", t.humanDetailsMessage)
+    }
+
+    override fun onError(t: Throwable, retryListener: RetryListener) {
+        handlerError(t, retryListener)
+    }
+
+    override fun onRetried() {
+
+    }
+
+    override fun handleErrorFor(): Class<*> {
+        return GateGasRepository::class.java
+    }
 
     override fun attachView(view: V) {
         super.attachView(view)
@@ -142,9 +162,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.setTextChangedListener { input, valid ->
             onInputChanged(input, valid)
         }
-        viewState.setOnClickSelectAccount(View.OnClickListener { view: View -> onClickSelectAccount(view) })
-        viewState.setOnClickMaximum(View.OnClickListener { onClickMaximum() })
-        viewState.setOnClickSubmit(View.OnClickListener { onSubmit() })
+        viewState.setOnClickSelectAccount { view: View -> onClickSelectAccount(view) }
+        viewState.setOnClickMaximum { onClickMaximum() }
+        viewState.setOnClickSubmit { onSubmit() }
         setCoinsAutocomplete()
     }
 
@@ -171,7 +191,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
 
         mAccountStorage
-                .retryWhen(errorResolver)
                 .observe()
                 .joinToUi()
                 .subscribe(
@@ -205,6 +224,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private fun loadAndSetFee() {
         gasRepo.minGas
+                .retryWhen(errorManager.createLocalRetryWhenHandler(GateGasRepository::class.java))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .debounce(300, TimeUnit.MILLISECONDS)

@@ -34,6 +34,7 @@ import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.db.WalletDatabase
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.di.annotations.DbCache
+import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -50,31 +51,33 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideAccountStorage(@DbCache storage: KVStorage, accountStorage: AccountStorage): RepoAccounts {
-        return RepoAccounts(storage, accountStorage)
+    fun provideAccountStorage(@DbCache storage: KVStorage, accountStorage: AccountStorage, em: ErrorManager): RepoAccounts {
+        return RepoAccounts(storage, accountStorage).retryWhen(em.retryWhenHandler)
     }
 
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideExplorerRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoTransactions {
-        return CachedRepository(storage, CacheTxRepository(storage, secretStorage, api.apiService))
+    fun provideExplorerRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK, em: ErrorManager): RepoTransactions {
+        return CachedRepository(storage, CacheTxRepository(storage, secretStorage, api.apiService)).retryWhen(em.retryWhenHandler)
     }
 
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedValidatorsRepo(@DbCache storage: KVStorage, api: MinterExplorerSDK): RepoValidators {
+    fun provideCachedValidatorsRepo(@DbCache storage: KVStorage, api: MinterExplorerSDK, em: ErrorManager): RepoValidators {
         return RepoValidators(storage, CacheValidatorsRepository(storage, api.apiService))
                 .setTimeToLive(60 * 20)
+                .retryWhen(em.retryWhenHandler)
     }
 
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, db: WalletDatabase, api: MinterExplorerSDK): RepoCoins {
+    fun provideCachedCoinsRepo(@DbCache storage: KVStorage, db: WalletDatabase, api: MinterExplorerSDK, em: ErrorManager): RepoCoins {
         return RepoCoins(storage, CachedCoinsRepository(storage, db, api.apiService))
                 .setTimeToLive(/*3  minutes */ 60 * 3)
+                .retryWhen(em.retryWhenHandler)
     }
 
     @JvmStatic

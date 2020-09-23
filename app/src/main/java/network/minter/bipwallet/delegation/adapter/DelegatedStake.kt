@@ -51,6 +51,9 @@ class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<Delegated
     @JvmField
     var validatorMeta: ValidatorMeta? = null
 
+    @JvmField
+    var isKicked: Boolean = false
+
     constructor()
 
     constructor(info: CoinDelegation) {
@@ -59,6 +62,7 @@ class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<Delegated
         amountBIP = info.bipValue
         publicKey = info.publicKey!!
         validatorMeta = info.meta!!
+        isKicked = info.isKicked
     }
 
     override fun isSameOf(item: DelegatedItem): Boolean {

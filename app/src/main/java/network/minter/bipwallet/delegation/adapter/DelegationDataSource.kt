@@ -28,11 +28,13 @@ package network.minter.bipwallet.delegation.adapter
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import androidx.paging.PageKeyedDataSource
+import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.disposables.CompositeDisposable
-import network.minter.bipwallet.apis.reactive.ReactiveExplorer
+import io.reactivex.functions.Function
+import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.sortByValue
-import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.DelegationList
@@ -50,16 +52,37 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
     private val disposables = CompositeDisposable()
     private var validatorTotalStakes: MutableMap<MinterPublicKey, BigDecimal> = HashMap()
 
+    /**
+     * Find kicked stake in stake list
+     */
+    private fun ExpResult<MutableList<DelegatedItem>>.hasKicked(): Boolean {
+        var hasKicked = false
+
+        for (item in result) {
+            if (item is DelegatedStake && item.isKicked) {
+                hasKicked = true
+                break
+            }
+        }
+
+        return hasKicked
+    }
+
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
 
-        factory.mRepo.getDelegations(factory.mainWallet, 1)
-                .onErrorResumeNext(ReactiveExplorer.toExpError())
+        factory.repo.getDelegations(factory.mainWallet, 1)
+                .retryWhen(factory.retryWhenHandler)
                 .map { mapToDelegationItem(it) }
+                .switchMap { mapValidatorCommissionAndMinStake(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe(
                         { res: ExpResult<MutableList<DelegatedItem>> ->
                             factory.loadState.postValue(LoadState.Loaded)
+
+                            // notify receiver we have kicked stake
+                            factory.hasInWaitList.postValue(res.hasKicked())
+
                             val lastPage = res.meta?.lastPage ?: 0
 
                             var nextPage: Int? = null
@@ -74,6 +97,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                         },
                         { t ->
                             Timber.w(t, "Unable to load delegations")
+                            factory.hasInWaitList.postValue(false)
                             factory.loadState.postValue(LoadState.Failed)
                             callback.onResult(ArrayList(), null, null)
                         }
@@ -82,13 +106,19 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DelegatedItem>) {
         factory.loadState.postValue(LoadState.Loading)
-        factory.mRepo.getDelegations(factory.mainWallet, params.key)
-                .onErrorResumeNext(ReactiveExplorer.toExpError())
+        factory.repo.getDelegations(factory.mainWallet, params.key)
+                .retryWhen(factory.retryWhenHandler)
                 .map { mapToDelegationItem(it) }
+                .switchMap { mapValidatorCommissionAndMinStake(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe(
                         { res: ExpResult<MutableList<DelegatedItem>> ->
                             factory.loadState.postValue(LoadState.Loaded)
+
+                            // notify receiver we have kicked stake
+                            factory.hasInWaitList.postValue(res.hasKicked())
+
+                            // send result
                             callback.onResult(res.result!!, if (params.key == 1) null else params.key - 1)
                         },
                         { t ->
@@ -104,13 +134,18 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
 
         factory.loadState.postValue(LoadState.Loading)
 
-        factory.mRepo.getDelegations(factory.mainWallet, params.key)
-                .onErrorResumeNext(ReactiveExplorer.toExpError())
+        factory.repo.getDelegations(factory.mainWallet, params.key)
+                .retryWhen(factory.retryWhenHandler)
                 .map { mapToDelegationItem(it) }
+                .switchMap { mapValidatorCommissionAndMinStake(it) }
                 .doOnSubscribe { disposables.add(it) }
                 .subscribe(
                         { res: ExpResult<MutableList<DelegatedItem>> ->
                             factory.loadState.postValue(LoadState.Loaded)
+
+                            // notify receiver we have kicked stake
+                            factory.hasInWaitList.postValue(res.hasKicked())
+
                             callback.onResult(res.result!!, if (params.key + 1 > res.meta!!.lastPage) null else params.key + 1)
                         },
                         { t ->
@@ -126,6 +161,26 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
         disposables.dispose()
     }
 
+    private fun mapValidatorCommissionAndMinStake(res: ExpResult<MutableList<DelegatedItem>>): ObservableSource<ExpResult<MutableList<DelegatedItem>>> {
+        return factory.validatorsRepo.fetch()
+                .map { validators ->
+                    for (item in res.result) {
+                        if (item is DelegatedValidator) {
+                            val validator = validators.findLast { it.pubKey == item.publicKey }
+                            if (validator != null) {
+                                item.minStake = validator.minStake
+                                item.commission = validator.commission
+                            }
+                        }
+                    }
+
+                    res
+                }
+    }
+
+    /**
+     * Convert CoinDelegation to adapter-specific model DelegatedItem (Stake or Validator) to show them in single recyclerview
+     */
     private fun mapToDelegationItem(res: ExpResult<DelegationList?>): ExpResult<MutableList<DelegatedItem>> {
         val out = ExpResult<MutableList<DelegatedItem>>()
         out.meta = res.meta
@@ -174,25 +229,13 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
         return out
     }
 
-    class StableCoinSorting : Comparator<DelegatedStake> {
-        override fun compare(ac: DelegatedStake, bc: DelegatedStake): Int {
-            val a = ac.coin!!.symbol.toLowerCase()
-            val b = bc.coin!!.symbol.toLowerCase()
-            if (a == b) // update to make it stable
-                return 0
-            if (a == sStable) return -1
-            return if (b == sStable) 1 else a.compareTo(b)
-        }
-
-        companion object {
-            private val sStable = MinterSDK.DEFAULT_COIN.toLowerCase()
-        }
-    }
-
     class Factory(
-            val mRepo: ExplorerAddressRepository,
+            val repo: ExplorerAddressRepository,
+            val validatorsRepo: RepoValidators,
             val mainWallet: MinterAddress,
-            val loadState: MutableLiveData<LoadState>
+            val loadState: MutableLiveData<LoadState>,
+            val hasInWaitList: MutableLiveData<Boolean>,
+            val retryWhenHandler: Function<Observable<out Throwable>, ObservableSource<*>>
     ) : DataSource.Factory<Int, DelegatedItem>() {
 
 

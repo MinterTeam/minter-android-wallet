@@ -35,7 +35,6 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.internal.dialogs.DialogExecutor
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.wallets.contract.WalletSelectorControllerView
 import network.minter.core.crypto.MinterPublicKey
@@ -46,7 +45,7 @@ import network.minter.explorer.models.CoinBalance
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface SendView : WalletSelectorControllerView, MvpView, ErrorViewWithRetry {
+interface SendView : WalletSelectorControllerView, MvpView {
     fun setOnClickAccountSelectedListener(listener: View.OnClickListener)
     fun setOnClickMaximum(listener: View.OnClickListener)
     fun setOnClickAddPayload(listener: View.OnClickListener)

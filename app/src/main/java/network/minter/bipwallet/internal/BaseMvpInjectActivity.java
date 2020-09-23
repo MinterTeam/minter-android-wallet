@@ -32,7 +32,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import javax.inject.Inject;
 
@@ -45,18 +44,11 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasAndroidInjector;
 import kotlin.jvm.functions.Function1;
 import moxy.MvpAppCompatActivity;
-import network.minter.bipwallet.BuildConfig;
-import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment;
-import network.minter.bipwallet.internal.dialogs.ConfirmDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialog;
 import network.minter.bipwallet.internal.dialogs.WalletDialogFragment;
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog;
-import network.minter.bipwallet.internal.mvp.ErrorView;
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
-import network.minter.bipwallet.internal.mvp.ProgressTextView;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
-import network.minter.bipwallet.internal.views.SnackbarBuilder;
 import timber.log.Timber;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
@@ -67,7 +59,7 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @SuppressLint("Registered")
-public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAndroidInjector, ErrorView, ErrorViewWithRetry, ProgressTextView {
+public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAndroidInjector {
 
     @Inject DispatchingAndroidInjector<Object> androidInjector;
     private WalletProgressDialog mProgress;
@@ -161,73 +153,73 @@ public class BaseMvpInjectActivity extends MvpAppCompatActivity implements HasAn
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    @Override
-    public void onError(Throwable t) {
-        Timber.e(t);
-        if (BuildConfig.DEBUG && t != null) {
-            new ConfirmDialog.Builder(this, "Error")
-                    .setPositiveAction("Ok")
-                    .setText(t)
-                    .create()
-                    .show();
-        }
-    }
+//    @Override
+//    public void onError(Throwable t) {
+//        Timber.e(t);
+//        if (BuildConfig.DEBUG && t != null) {
+//            new ConfirmDialog.Builder(this, "Error")
+//                    .setPositiveAction("Ok")
+//                    .setText(t)
+//                    .create()
+//                    .show();
+//        }
+//    }
+//
+//    @Override
+//    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
+//        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
+//    }
+//
+//    @Override
+//    public void onError(String err) {
+//        Timber.e(err);
+//        runOnUiThread(() -> {
+//            if (err != null) {
+//                new ConfirmDialog.Builder(this, "Error")
+//                        .setPositiveAction("Ok")
+//                        .setText(err)
+//                        .create()
+//                        .show();
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public void onErrorWithRetry(String errorMessage, String actionName,
+//                                 View.OnClickListener errorResolver) {
+//        runOnUiThread(() -> {
+//            new SnackbarBuilder(this)
+//                    .setMessage(errorMessage)
+//                    .setAction(actionName, errorResolver)
+//                    .setDurationInfinite()
+//                    .show();
+//        });
+//    }
 
-    @Override
-    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
-        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
-    }
-
-    @Override
-    public void onError(String err) {
-        Timber.e(err);
-        runOnUiThread(() -> {
-            if (err != null) {
-                new ConfirmDialog.Builder(this, "Error")
-                        .setPositiveAction("Ok")
-                        .setText(err)
-                        .create()
-                        .show();
-            }
-        });
-    }
-
-    @Override
-    public void onErrorWithRetry(String errorMessage, String actionName,
-                                 View.OnClickListener errorResolver) {
-        runOnUiThread(() -> {
-            new SnackbarBuilder(this)
-                    .setMessage(errorMessage)
-                    .setAction(actionName, errorResolver)
-                    .setDurationInfinite()
-                    .show();
-        });
-    }
-
-    @Override
-    public void showProgress(CharSequence title, CharSequence message) {
-        if (mProgress == null) {
-            mProgress = new WalletProgressDialog.Builder(this, title == null ? "Please, wait a few seconds" : title)
-                    .setText(message == null ? "working on..." : message)
-                    .create();
-            mProgress.setCancelable(false);
-            mProgress.setCanceledOnTouchOutside(false);
-        }
-
-        if (!mProgress.isShowing()) {
-            mProgress.show();
-        }
-    }
-
-    @Override
-    public void hideProgress() {
-        if (mProgress == null) {
-            return;
-        }
-
-        mProgress.dismiss();
-        mProgress = null;
-    }
+//    @Override
+//    public void showProgress(CharSequence title, CharSequence message) {
+//        if (mProgress == null) {
+//            mProgress = new WalletProgressDialog.Builder(this, title == null ? "Please, wait a few seconds" : title)
+//                    .setText(message == null ? "working on..." : message)
+//                    .create();
+//            mProgress.setCancelable(false);
+//            mProgress.setCanceledOnTouchOutside(false);
+//        }
+//
+//        if (!mProgress.isShowing()) {
+//            mProgress.show();
+//        }
+//    }
+//
+//    @Override
+//    public void hideProgress() {
+//        if (mProgress == null) {
+//            return;
+//        }
+//
+//        mProgress.dismiss();
+//        mProgress = null;
+//    }
 
     @Override
     public AndroidInjector<Object> androidInjector() {

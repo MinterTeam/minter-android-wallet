@@ -44,7 +44,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp">
+        android:minHeight="64dp">
 
         <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
             android:id="@+id/item_avatar"
@@ -81,11 +81,25 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:singleLine="true"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/item_fees"
             app:layout_constraintEnd_toStartOf="@id/action_copy"
             app:layout_constraintStart_toEndOf="@id/item_avatar"
             app:layout_constraintTop_toBottomOf="@id/item_title"
             tools:text="Mpaaa...bbb" />
+
+        <TextView
+            android:id="@+id/item_fees"
+            style="@style/ListSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/item_public_key"
+            app:layout_constraintStart_toStartOf="@id/item_public_key"
+            app:layout_constraintTop_toBottomOf="@id/item_public_key"
+            tools:text="Fee 10% | Min. 1999 BIP" />
 
         <ImageView
             android:id="@+id/action_copy"

@@ -33,6 +33,9 @@ import network.minter.bipwallet.delegation.adapter.ValidatorSelectorAdapter
 import network.minter.bipwallet.delegation.contract.ValidatorSelectorView
 import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity
 import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity.Filter
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.RetryListener
+import network.minter.bipwallet.internal.exceptions.humanDetailsMessage
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.explorer.models.ValidatorItem
@@ -44,9 +47,10 @@ import javax.inject.Inject
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 @InjectViewState
-class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<ValidatorSelectorView>() {
+class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<ValidatorSelectorView>(), ErrorManager.ErrorGlobalHandlerListener {
     @Inject lateinit var repoValidators: RepoValidators
     @Inject lateinit var accountStorage: RepoAccounts
+    @Inject lateinit var errorManager: ErrorManager
 
     private val adapter = ValidatorSelectorAdapter()
     private var filter: Filter = Filter.Online
@@ -58,7 +62,6 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
         }
 
         repoValidators.observe()
-                .retryWhen(errorResolver)
                 .joinToUi()
                 .subscribe(
                         { res ->
@@ -80,6 +83,7 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
                             viewState.hideProgress()
                         },
                         { t ->
+                            //todo remove
                             Timber.e(t, "Unable to load validators")
                             viewState.onError(t)
                             viewState.hideProgress()
@@ -107,5 +111,10 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
             viewState.finishSuccess(it)
         }
         viewState.setAdapter(adapter)
+    }
+
+    override fun onError(t: Throwable, retryListener: RetryListener) {
+        Timber.d("Unable to load validators %s", t.humanDetailsMessage)
+        handlerError(t, retryListener)
     }
 }

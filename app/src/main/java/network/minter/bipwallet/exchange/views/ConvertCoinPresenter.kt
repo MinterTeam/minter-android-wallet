@@ -28,6 +28,8 @@ package network.minter.bipwallet.exchange.views
 import moxy.InjectViewState
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.exchange.contract.ConvertCoinView
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import javax.inject.Inject
 
@@ -37,8 +39,12 @@ import javax.inject.Inject
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 @InjectViewState
-class ConvertCoinPresenter @Inject constructor() : MvpBasePresenter<ConvertCoinView>() {
+class ConvertCoinPresenter @Inject constructor() : MvpBasePresenter<ConvertCoinView>(), ErrorManager.ErrorGlobalHandlerListener {
     private var mLastPage = 0
+
+    override fun onError(t: Throwable, retryListener: RetryListener) {
+        handlerError(t, retryListener)
+    }
 
     override fun attachView(view: ConvertCoinView) {
         super.attachView(view)

@@ -50,6 +50,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <network.minter.bipwallet.internal.views.error.StaticErrorPopupView
+            android:id="@+id/error_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/navigation_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible" />
+
         <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
             android:id="@+id/navigation_bottom"
             android:layout_width="0dp"

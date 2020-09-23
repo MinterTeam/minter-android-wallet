@@ -39,12 +39,15 @@ import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
+import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.delegation.adapter.DelegatedItem
 import network.minter.bipwallet.delegation.adapter.DelegationDataSource
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
 import network.minter.bipwallet.delegation.contract.DelegatedListView
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.helpers.DateHelper
 import network.minter.bipwallet.internal.helpers.DateHelper.day
 import network.minter.bipwallet.internal.helpers.DateHelper.toSimpleISODate
@@ -72,11 +75,13 @@ import kotlin.collections.ArrayList
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 @InjectViewState
-class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedListView>() {
+class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedListView>(), ErrorManager.ErrorGlobalHandlerListener {
     @Inject lateinit var addressRepo: ExplorerAddressRepository
+    @Inject lateinit var validatorsRepo: RepoValidators
     @Inject lateinit var rewardsMonthlyRepo: RepoMonthlyRewards
     @Inject lateinit var secretRepo: SecretStorage
     @Inject lateinit var display: DisplayHelper
+    @Inject lateinit var errorManager: ErrorManager
 
     private var adapter: DelegationListAdapter? = null
     private var sourceFactory: DelegationDataSource.Factory? = null
@@ -84,6 +89,7 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     private var listBuilder: RxPagedListBuilder<Int, DelegatedItem>? = null
     private var lastScrollPosition = 0
     private var loadState: MutableLiveData<LoadState>? = null
+    private var hasInWaitList: MutableLiveData<Boolean>? = null
     private var rewardsSet: LineDataSet? = null
     private var pastLastDateChart: DateTime? = null
     private var futureLastDateChart: DateTime? = null
@@ -91,6 +97,11 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     private var cachedRewards: MutableList<RewardStatistics> = ArrayList()
     private var firstRewardsLoad = true
     private var rewardsPerMinuteSettled = false
+
+    override fun onError(t: Throwable, retryListener: RetryListener) {
+        loadState?.postValue(LoadState.Failed)
+        handlerError(t, retryListener)
+    }
 
     override fun attachView(view: DelegatedListView) {
         super.attachView(view)
@@ -130,9 +141,18 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
 //        }
 
         loadState = MutableLiveData()
+        hasInWaitList = MutableLiveData()
         viewState.syncProgress(loadState!!)
+        viewState.syncHasInWaitList(hasInWaitList!!)
         adapter!!.setLoadState(loadState)
-        sourceFactory = DelegationDataSource.Factory(addressRepo, secretRepo.mainWallet, loadState!!)
+        sourceFactory = DelegationDataSource.Factory(
+                addressRepo,
+                validatorsRepo,
+                secretRepo.mainWallet,
+                loadState!!,
+                hasInWaitList!!,
+                errorManager.retryWhenHandler
+        )
         val cfg = PagedList.Config.Builder()
                 .setPageSize(50)
                 .setEnablePlaceholders(false)
@@ -273,6 +293,7 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     }
 
     private fun refresh() {
+        errorManager.retryListener()
         listDisposable = listBuilder!!.buildObservable()
                 .subscribe { res: PagedList<DelegatedItem> ->
                     viewState!!.hideRefreshProgress()

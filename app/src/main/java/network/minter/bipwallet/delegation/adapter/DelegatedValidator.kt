@@ -44,7 +44,9 @@ data class DelegatedValidator(
         val name: String? = null,
         override var imageUrl: String? = null,
         val description: String? = null,
-        val delegatedBips: BigDecimal = BigDecimal.ZERO
+        val delegatedBips: BigDecimal = BigDecimal.ZERO,
+        var commission: Int = 0,
+        var minStake: BigDecimal = BigDecimal.ZERO
 ) : DelegatedItem, RemoteImageContainer, Comparable<DelegatedValidator>, Parcelable {
 
     constructor(info: CoinDelegation) : this(

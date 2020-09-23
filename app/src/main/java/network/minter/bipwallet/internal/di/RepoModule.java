@@ -48,6 +48,7 @@ import network.minter.explorer.repo.GateTransactionRepository;
 @Module
 public class RepoModule {
 
+
     @Provides
     @WalletApp
     public SecretStorage provideSecretRepository(KVStorage storage) {

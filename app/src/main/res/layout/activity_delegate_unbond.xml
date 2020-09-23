@@ -84,7 +84,7 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_watch_later"
-                    android:tint="@color/grey" />
+                    app:tint="@color/grey" />
 
                 <TextView
                     android:id="@+id/last_updated"
@@ -262,5 +262,15 @@
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <network.minter.bipwallet.internal.views.error.StaticErrorPopupView
+        android:id="@+id/error_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

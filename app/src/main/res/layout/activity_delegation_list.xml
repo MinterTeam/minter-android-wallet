@@ -52,7 +52,6 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:visibility="gone"
-                tools:visibility="visible"
                 android:id="@+id/collapsing_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -96,6 +95,7 @@
                     app:layout_constraintTop_toBottomOf="@id/bip_per_min" />
 
                 <com.github.mikephil.charting.charts.LineChart
+                    android:visibility="gone"
                     android:id="@+id/chart"
                     android:layout_width="0dp"
                     android:layout_height="170dp"
@@ -149,6 +149,13 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <network.minter.bipwallet.internal.views.error.StaticErrorView
+            android:id="@+id/error_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
         <include
             android:id="@+id/testnet_warning"
             layout="@layout/include_testnet_warning_view"
@@ -176,16 +183,54 @@
                 android:layout_height="match_parent"
                 android:fillViewport="true">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/list"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    tools:itemCount="4"
-                    tools:listitem="@layout/item_list_delegated_validator" />
+                    android:orientation="vertical">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:itemCount="4"
+                        tools:listitem="@layout/item_list_delegated_validator" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/waitlist_attention_root"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_edges_half"
+                        android:layout_marginTop="@dimen/margin_edges"
+                        android:layout_marginEnd="@dimen/margin_edges"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/waitlist_attention_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_warning_yellow"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_edges_half"
+                            android:fontFamily="@font/_inter_regular"
+                            android:text="@string/warning_stake_in_waitlist"
+                            android:textColor="@color/grey"
+                            android:textSize="@dimen/text_size_14"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/waitlist_attention_icon"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
 
 
             </androidx.core.widget.NestedScrollView>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,21 +28,17 @@ package network.minter.bipwallet.internal;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import dagger.android.support.AndroidSupportInjection;
-import network.minter.bipwallet.R;
-import network.minter.bipwallet.internal.mvp.ErrorView;
-import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry;
 
 /**
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
-public abstract class BaseInjectFragment extends BaseFragment implements ErrorView, ErrorViewWithRetry {
+public abstract class BaseInjectFragment extends BaseFragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,34 +63,34 @@ public abstract class BaseInjectFragment extends BaseFragment implements ErrorVi
     public void prepareIdlingResources() {
     }
 
-    @Override
-    public void onError(Throwable t) {
-        if (getActivity() instanceof ErrorView) {
-            ((ErrorView) getActivity()).onError(t);
-        }
-    }
-
-    @Override
-    public void onError(String err) {
-        if (getActivity() instanceof ErrorView) {
-            ((ErrorView) getActivity()).onError(err);
-        }
-    }
-
-    @Override
-    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
-        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
-    }
-
-    @Override
-    public void onErrorWithRetry(String errorMessage, String actionName,
-                                 View.OnClickListener errorResolver) {
-//        new SnackbarBuilder(this)
-//                .setMessage(errorMessage)
-//                .setAction(actionName, errorResolver)
-//                .setDurationIndefinite()
-//                .show();
-    }
+//    @Override
+//    public void onError(Throwable t) {
+//        if (getActivity() instanceof ErrorView) {
+//            ((ErrorView) getActivity()).onError(t);
+//        }
+//    }
+//
+//    @Override
+//    public void onError(String err) {
+//        if (getActivity() instanceof ErrorView) {
+//            ((ErrorView) getActivity()).onError(err);
+//        }
+//    }
+//
+//    @Override
+//    public void onErrorWithRetry(String errorMessage, View.OnClickListener errorResolver) {
+//        onErrorWithRetry(errorMessage, getResources().getString(R.string.btn_retry), errorResolver);
+//    }
+//
+//    @Override
+//    public void onErrorWithRetry(String errorMessage, String actionName,
+//                                 View.OnClickListener errorResolver) {
+////        new SnackbarBuilder(this)
+////                .setMessage(errorMessage)
+////                .setAction(actionName, errorResolver)
+////                .setDurationIndefinite()
+////                .show();
+//    }
 
     protected boolean enableAutoInjection() {
         return true;

@@ -47,7 +47,6 @@ import com.otaliastudios.autocomplete.AutocompletePolicy
 import com.otaliastudios.autocomplete.AutocompletePresenter
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ActivityDelegateUnbondBinding
 import network.minter.bipwallet.delegation.adapter.autocomplete.ValidatorsAcPresenter
@@ -55,7 +54,7 @@ import network.minter.bipwallet.delegation.contract.DelegateUnbondView
 import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.helpers.ExceptionHelper
+import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -157,6 +156,22 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
         setupAutocomplete()
         setupSyncStatus()
+    }
+
+    override fun onError(t: Throwable?) {
+        ErrorViewHelper(binding.errorView).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        ErrorViewHelper(binding.errorView).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, actionName, errorResolver)
     }
 
     private fun setupSyncStatus() {
@@ -336,22 +351,6 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun setFee(fee: CharSequence) {
         binding.feeValue.postApply { it.text = fee }
-    }
-
-
-    override fun onError(t: Throwable?) {
-        binding.textError.postApply {
-            binding.textError.visible = t != null
-            if (t == null) {
-                return@postApply
-            }
-
-            if (BuildConfig.DEBUG) {
-                binding.textError.text = "${t.message}\n${ExceptionHelper.getStackTrace(t)}"
-            } else {
-                binding.textError.text = t.message
-            }
-        }
     }
 
     override fun setOnClickUseMax(listener: View.OnClickListener) {

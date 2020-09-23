@@ -29,12 +29,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.home.HomeScope
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.Plurals
@@ -63,13 +63,15 @@ import javax.inject.Inject
  */
 @HomeScope
 @InjectViewState
-class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabView>() {
+class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabView>(), ErrorManager.ErrorGlobalReceiverListener {
     @Inject lateinit var accountStorage: RepoAccounts
-//    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
+
+    //    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
     @Inject lateinit var addressRepo: ExplorerAddressRepository
     @Inject lateinit var secretStorage: SecretStorage
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var walletSelectorController: WalletSelectorController
+    @Inject lateinit var errorManager: ErrorManager
 
     private val balanceState = BalanceCurrentState()
 
@@ -109,23 +111,31 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         accountStorage.update()
     }
 
+    override fun onError(t: Throwable) {
+        viewState.hideProgress()
+        viewState.showBalanceProgress(false)
+    }
+
     override fun attachView(view: WalletsTabView) {
         walletSelectorController.attachView(view)
         super.attachView(view)
+        errorManager.subscribe(this)
 
-        viewState.setOnClickDelegated(View.OnClickListener {
+        viewState.setOnClickDelegated {
             onClickStartDelegationList(it)
-        })
+        }
 
-        viewState.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
+        viewState.setOnRefreshListener {
             onRefresh()
-        })
+            errorManager.retryListener()
+        }
         balanceState.applyTo(viewState)
     }
 
     override fun detachView(view: WalletsTabView) {
         super.detachView(view)
         walletSelectorController.detachView()
+        errorManager.unsubscribe(this)
     }
 
     private fun onBalanceReady(res: AddressListBalancesTotal) {

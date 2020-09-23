@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType
-import network.minter.bipwallet.internal.mvp.ErrorView
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.internal.mvp.ProgressView
 import network.minter.explorer.models.ValidatorItem
 
@@ -39,7 +39,7 @@ import network.minter.explorer.models.ValidatorItem
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface ValidatorSelectorView : MvpView, ErrorView, ProgressView {
+interface ValidatorSelectorView : MvpView, ErrorViewWithRetry, ProgressView {
 
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
     fun finishCancel()

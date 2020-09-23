@@ -31,6 +31,7 @@ import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.IdRes
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
@@ -49,6 +50,7 @@ import network.minter.bipwallet.home.contract.HomeView
 import network.minter.bipwallet.home.views.HomePresenter
 import network.minter.bipwallet.internal.BaseMvpActivity
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.system.ActivityBuilder
 
 import network.minter.bipwallet.internal.system.BackPressedListener
@@ -87,6 +89,22 @@ class HomeActivity : BaseMvpActivity(), HomeView {
         }
     }
 
+    override fun onError(t: Throwable?) {
+        ErrorViewHelper(b.errorView).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        ErrorViewHelper(b.errorView).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(b.errorView).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(b.errorView).onErrorWithRetry(errorMessage, actionName, errorResolver)
+    }
+
     val currentTabFragment: HomeTabFragment?
         get() = mActiveTabs[b.homePager.currentItem]
 
@@ -106,8 +124,6 @@ class HomeActivity : BaseMvpActivity(), HomeView {
         super.onBackPressed()
     }
 
-    override fun showProgress() {}
-    override fun hideProgress() {}
     fun setCurrentPageById(@IdRes tab: Int) {
         val pos = presenter.getBottomPositionById(tab)
         setCurrentPage(pos)

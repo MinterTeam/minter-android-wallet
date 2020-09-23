@@ -33,14 +33,13 @@ import moxy.MvpView;
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
 import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
-import network.minter.bipwallet.internal.mvp.ErrorView;
 
 /**
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy.class)
-public interface LedgerActivateView extends MvpView, ErrorView {
+public interface LedgerActivateView extends MvpView {
     void setOnSwitchedConfirm(Switch.OnCheckedChangeListener listener);
     void setOnActionClick(View.OnClickListener listener);
     void setAddress(CharSequence phrase);

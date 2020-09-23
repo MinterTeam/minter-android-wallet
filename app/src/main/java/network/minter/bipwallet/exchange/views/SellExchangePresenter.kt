@@ -31,6 +31,7 @@ import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.exchange.contract.SellExchangeView
 import network.minter.bipwallet.internal.auth.AuthSession
+import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -54,7 +55,8 @@ open class SellExchangePresenter @Inject constructor(
         explorerCoinsRepository: RepoCoins,
         gasRepo: GateGasRepository,
         estimateRepository: GateEstimateRepository,
-        gateTransactionRepository: GateTransactionRepository) :
+        gateTransactionRepository: GateTransactionRepository,
+        errorManager: ErrorManager) :
         ExchangePresenter<SellExchangeView>(
                 session,
                 secretStorage,
@@ -63,7 +65,8 @@ open class SellExchangePresenter @Inject constructor(
                 explorerCoinsRepository,
                 gasRepo,
                 estimateRepository,
-                gateTransactionRepository
+                gateTransactionRepository,
+                errorManager
         ) {
     override val isBuying: Boolean
         get() = false

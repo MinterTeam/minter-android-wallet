@@ -115,6 +115,14 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
         binding.progress.visibility = if (show) View.VISIBLE else View.GONE
     }
 
+    override fun showProgress() {
+        showProgress(true)
+    }
+
+    override fun hideProgress() {
+        showProgress(false)
+    }
+
     override fun setEmptyTitle(title: CharSequence) {
         binding.emptyTitle.text = title
     }

@@ -30,6 +30,8 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.explorer.RepoValidators
+import network.minter.bipwallet.internal.exceptions.ErrorManager
+import network.minter.bipwallet.internal.exceptions.humanMessage
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
@@ -46,11 +48,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @InjectViewState
-class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageView>() {
+class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageView>(), ErrorManager.ErrorGlobalReceiverListener {
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var secretRepo: SecretStorage
     @Inject lateinit var validatorsRepo: RepoValidators
     @Inject lateinit var addressBookRepo: AddressBookRepository
+    @Inject lateinit var errorManager: ErrorManager
 
     private var txsAdapter: TransactionShortListAdapter? = null
     private var globalAdapter = MultiRowAdapter()
@@ -61,7 +64,18 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
     override fun attachView(view: TxsTabPageView) {
         super.attachView(view)
         viewState.setAdapter(globalAdapter)
+
+        errorManager.subscribe(this)
         txRepo.update()
+    }
+
+    override fun onError(t: Throwable) {
+        viewState.setViewStatus(BaseWalletsPageView.ViewStatus.Error, t.humanMessage)
+    }
+
+    override fun detachView(view: TxsTabPageView) {
+        super.detachView(view)
+        errorManager.unsubscribe(this)
     }
 
     override fun onFirstViewAttach() {
@@ -86,7 +100,6 @@ class TxsTabPagePresenter @Inject constructor() : MvpBasePresenter<TxsTabPageVie
 
 
         txRepo
-                .retryWhen(errorResolver)
                 .observe()
                 .joinToUi()
                 .switchMap { TransactionDataSource.mapToFacade(it) }

@@ -73,6 +73,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     private var mMetaNotifier: BehaviorSubject<MetaResult<ResultModel>> = BehaviorSubject.create()
     private var mNotifier: BehaviorSubject<ResultModel> = BehaviorSubject.create()
     private val subscriptions = CompositeDisposable()
+    private val updateLock = Any()
 
     private val expiredEntityStorageKey: String
         get() {
@@ -105,10 +106,14 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     val updateObservable: Observable<ResultModel>
         get() {
             var observable = entity.getUpdatableData()
-            observable = observable.doOnError { t: Throwable -> notifyOnError(t) }
 
             if (retryWhenHandler != null) {
-                observable = observable.retryWhen(retryWhenHandler)
+                observable = observable.retryWhen {
+                    Timber.d("Call retryWhen for %s repo", entity.javaClass.simpleName)
+                    retryWhenHandler!!.apply(it)
+                }
+            } else {
+                observable = observable.doOnError { t: Throwable -> notifyOnError(t) }
             }
 
             observable = observable
@@ -349,29 +354,30 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         return this
     }
 
-    @Synchronized
     protected fun updateInternal(
             force: Boolean = false,
             onSuccess: Consumer<ResultModel>? = null,
             onError: Consumer<Throwable>? = null,
             onComplete: Action? = null
     ) {
-        val observable: Observable<ResultModel>
-        if (!force && !isExpired && isDataReady) {
-            if (notifyStrategy == NOTIFY_ONLY_ON_UPDATE) {
-                return
+        synchronized(updateLock) {
+            val observable: Observable<ResultModel>
+            if (!force && !isExpired && isDataReady) {
+                if (notifyStrategy == NOTIFY_ONLY_ON_UPDATE) {
+                    return
+                }
+                observable = Observable.just(entity.getData())
+            } else {
+                observable = updateObservable
+                invalidateTime()
             }
-            observable = Observable.just(entity.getData())
-        } else {
-            observable = updateObservable
-            invalidateTime()
+            observable
+                    .subscribe(
+                            callOnNext(onSuccess),
+                            callOnError(onError),
+                            callOnComplete(onComplete)
+                    )
         }
-        observable
-                .subscribe(
-                        callOnNext(onSuccess),
-                        callOnError(onError),
-                        callOnComplete(onComplete)
-                )
     }
 
     protected fun notifyOnSuccess(isNew: Boolean) {

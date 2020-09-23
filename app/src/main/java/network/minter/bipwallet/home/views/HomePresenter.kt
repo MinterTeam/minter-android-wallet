@@ -34,11 +34,11 @@ import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.home.HomeTabsClasses
 import network.minter.bipwallet.home.contract.HomeView
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.data.CachedRepository
+import network.minter.bipwallet.internal.exceptions.ErrorGlobalHandler
+import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
-import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.KVStorage
-import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
+import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.services.livebalance.RTMService
 import network.minter.bipwallet.services.livebalance.ServiceConnector
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBalanceUpdateReceiver
@@ -62,17 +62,22 @@ class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
         }
     }
 
-    @Inject lateinit var storage: KVStorage
     @Inject @HomeTabsClasses lateinit var tabsClasses: @JvmSuppressWildcards List<Class<out HomeTabFragment>>
-
-    @Inject
-    lateinit var accountStorage: CachedRepository<AddressListBalancesTotal, AccountStorage>
+    @Inject lateinit var storage: KVStorage
+    @Inject lateinit var accountStorage: RepoAccounts
+    @Inject lateinit var errorManager: ErrorManager
 
     private var mLastPosition = 0
 
     override fun attachView(view: HomeView) {
         super.attachView(view)
+        errorManager.subscribe(ErrorGlobalHandler(javaClass, this::handlerError, this::doOnErrorResolve))
         viewState!!.setCurrentPage(mLastPosition)
+    }
+
+    override fun detachView(view: HomeView) {
+        errorManager.unsubscribe(javaClass)
+        super.detachView(view)
     }
 
     override fun onDestroy() {

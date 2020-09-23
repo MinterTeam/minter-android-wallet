@@ -62,6 +62,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.scrollDownTo
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinValidatorWithSuffix
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.widgets.WalletButton
 import network.minter.bipwallet.sending.account.SelectorData
@@ -286,7 +287,6 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun setFee(commission: CharSequence) {
-
         binding.apply {
             calculationContainer.feeValue.postApply {
                 it.text = commission
@@ -301,5 +301,21 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
                 calculationContainer.calculationProgress.visible = show
             }
         }
+    }
+
+    override fun onError(t: Throwable?) {
+        (activity as ErrorViewWithRetry).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        (activity as ErrorViewWithRetry).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        (activity as ErrorViewWithRetry).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        (activity as ErrorViewWithRetry).onErrorWithRetry(errorMessage, actionName, errorResolver)
     }
 }

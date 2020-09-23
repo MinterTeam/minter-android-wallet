@@ -28,22 +28,22 @@ package network.minter.bipwallet.delegation.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
+import network.minter.bipwallet.databinding.ItemListDelegatedStakeBinding
+import network.minter.bipwallet.databinding.ItemListDelegatedValidatorBinding
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder
 import network.minter.core.MinterSDK
 
@@ -83,33 +83,40 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         if (viewType == ITEM_PROGRESS) {
             return TxProgressViewHolder(view)
         } else if (viewType == DelegatedItem.ITEM_STAKE) {
-            return StakeViewHolder(view)
+            return StakeViewHolder(ItemListDelegatedStakeBinding.inflate(mInflater!!, parent, false))
         }
-        return ValidatorViewHolder(view)
+        return ValidatorViewHolder(ItemListDelegatedValidatorBinding.inflate(mInflater!!, parent, false))
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, i: Int) {
         if (getItemViewType(i) == DelegatedItem.ITEM_VALIDATOR) {
             val vh = viewHolder as ValidatorViewHolder
             val item = getItem(i) as DelegatedValidator
-            vh.fakeHeader.visible = true
+            vh.b.fakeHeader.visible = true
 
             if (item.name.isNullOrEmpty()) {
-                vh.title.text = item.publicKey.toShortString()
-                vh.publicKey.text = item.publicKey.toShortString()
+                vh.b.itemTitle.text = item.publicKey.toShortString()
+                vh.b.itemPublicKey.text = item.publicKey.toShortString()
             } else {
-                vh.title.text = item.name
-                vh.publicKey.text = item.publicKey.toShortString()
+                vh.b.itemTitle.text = item.name
+                vh.b.itemPublicKey.text = item.publicKey.toShortString()
             }
 
             if (item.description != null) {
-                ViewCompat.setTooltipText(vh.publicKey, item.description)
+                ViewCompat.setTooltipText(vh.b.itemPublicKey, item.description)
             }
-            vh.icon.setImageUrlFallback(item.publicKey.avatar, R.drawable.img_avatar_delegate)
-            vh.actionCopy.setOnClickListener {
+            vh.b.itemFees.text = vh.b.root.context.getString(R.string.stake_validator_fees,
+                    item.commission,
+                    item.minStake.humanize(),
+                    MinterSDK.DEFAULT_COIN
+            )
+
+
+            vh.b.itemAvatar.setImageUrlFallback(item.publicKey.avatar, R.drawable.img_avatar_delegate)
+            vh.b.actionCopy.setOnClickListener {
                 ContextHelper.copyToClipboard(it.context, item.publicKey.toString())
             }
-            vh.actionDelegate.setOnClickListener {
+            vh.b.actionDelegate.setOnClickListener {
                 if (mOnDelegatedClickListener != null) {
                     mOnDelegatedClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedValidator)
                 }
@@ -117,18 +124,26 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         } else if (getItemViewType(i) == DelegatedItem.ITEM_STAKE) {
             val vh = viewHolder as StakeViewHolder
             val item = getItem(i) as DelegatedStake?
+            val ctx = vh.b.root.context
 
-            vh.avatar!!.setImageUrl(item)
-            vh.coin!!.text = item!!.coin!!.symbol
-            vh.amount!!.text = bdHuman(item.amount)
-            if (item.coin!!.id == MinterSDK.DEFAULT_COIN_ID) {
-                vh.subamount!!.visibility = View.GONE
-                vh.subamount!!.text = null
+            if (item!!.isKicked) {
+                vh.b.itemCoin.setTextColor(ContextCompat.getColor(ctx, R.color.grey))
+                vh.b.itemAvatar.setImageResource(R.drawable.ic_warning_yellow)
             } else {
-                vh.subamount!!.text = String.format("%s %s", bdHuman(item.amountBIP), MinterSDK.DEFAULT_COIN)
-                vh.subamount!!.visibility = View.VISIBLE
+                vh.b.itemCoin.setTextColor(ContextCompat.getColor(ctx, R.color.textColorPrimary))
+                vh.b.itemAvatar.setImageUrl(item)
             }
-            vh.actionUnbond!!.setOnClickListener {
+
+            vh.b.itemCoin.text = item.coin!!.symbol
+            vh.b.itemAmount.text = bdHuman(item.amount)
+            if (item.coin!!.id == MinterSDK.DEFAULT_COIN_ID) {
+                vh.b.itemSubamount.visibility = View.GONE
+                vh.b.itemSubamount.text = null
+            } else {
+                vh.b.itemSubamount.text = String.format("%s %s", bdHuman(item.amountBIP), MinterSDK.DEFAULT_COIN)
+                vh.b.itemSubamount.visibility = View.VISIBLE
+            }
+            vh.b.actionUnbond.setOnClickListener {
                 if (mOnUnbondItemClickListener != null) {
                     mOnUnbondItemClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedStake)
                 }
@@ -158,40 +173,6 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
         return mLoadState != null && mLoadState!!.value != LoadState.Loaded
     }
 
-    class StakeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @JvmField @BindView(R.id.item_avatar)
-        var avatar: BipCircleImageView? = null
-
-        @JvmField @BindView(R.id.item_coin)
-        var coin: TextView? = null
-
-        @JvmField @BindView(R.id.item_amount)
-        var amount: TextView? = null
-
-        @JvmField @BindView(R.id.item_subamount)
-        var subamount: TextView? = null
-
-        @JvmField @BindView(R.id.action_unbond)
-        var actionUnbond: View? = null
-
-        @JvmField @BindView(R.id.main)
-        var main: View? = null
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
-    }
-
-    class ValidatorViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @BindView(R.id.fake_header) lateinit var fakeHeader: View
-        @BindView(R.id.item_title) lateinit var title: TextView
-        @BindView(R.id.item_public_key) lateinit var publicKey: TextView
-        @BindView(R.id.action_delegate) lateinit var actionDelegate: View
-        @BindView(R.id.action_copy) lateinit var actionCopy: View
-        @BindView(R.id.item_avatar) lateinit var icon: BipCircleImageView
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
-    }
+    class StakeViewHolder(val b: ItemListDelegatedStakeBinding) : RecyclerView.ViewHolder(b.root)
+    class ValidatorViewHolder(val b: ItemListDelegatedValidatorBinding) : RecyclerView.ViewHolder(b.root)
 }

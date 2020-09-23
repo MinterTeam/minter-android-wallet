@@ -23,26 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.wallets.contract
 
-import androidx.annotation.StringRes
-import androidx.recyclerview.widget.RecyclerView
-import moxy.MvpView
-import moxy.viewstate.strategy.alias.AddToEndSingle
-import network.minter.bipwallet.internal.mvp.ProgressView
+package network.minter.bipwallet.internal.helpers
 
-@AddToEndSingle
-interface BaseWalletsPageView : MvpView, ProgressView {
-    enum class ViewStatus {
-        Normal, Progress, Empty, Error
+import android.view.View
+import network.minter.bipwallet.internal.exceptions.humanMessage
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
+import network.minter.bipwallet.internal.views.error.BaseStaticErrorView
+
+/**
+ * minter-android-wallet. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+class ErrorViewHelper(
+        val errorView: BaseStaticErrorView
+) : ErrorViewWithRetry {
+
+
+    override fun onError(t: Throwable?) {
+        errorView.setText(t?.humanMessage ?: "Unknown message").showFor()
     }
 
-    fun setViewStatus(status: ViewStatus)
-    fun setViewStatus(status: ViewStatus, error: CharSequence?)
+    override fun onError(err: String?) {
+        errorView.setText(err ?: "Unknown error").showFor()
+    }
 
-    fun setAdapter(adapter: RecyclerView.Adapter<*>)
-    fun showProgress(show: Boolean)
-    fun setEmptyTitle(title: CharSequence)
-    fun setEmptyTitle(@StringRes title: Int)
-    fun showEmpty(show: Boolean)
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        errorView.setText(errorMessage ?: "Unknown error")
+                .setActionListener(errorResolver!!)
+                .show()
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        errorView.setText(errorMessage ?: "Unknown error")
+                .setActionName(actionName)
+                .setActionListener(errorResolver!!)
+                .show()
+    }
 }

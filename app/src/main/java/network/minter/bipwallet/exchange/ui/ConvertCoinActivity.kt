@@ -29,6 +29,7 @@ import android.app.Activity
 import android.app.Service
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -42,6 +43,7 @@ import network.minter.bipwallet.exchange.contract.ConvertCoinView
 import network.minter.bipwallet.exchange.models.ExchangeAmount
 import network.minter.bipwallet.exchange.views.ConvertCoinPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
+import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.core.crypto.MinterAddress
@@ -96,6 +98,22 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
 
     override fun setCurrentPage(page: Int) {
         binding.pager.currentItem = page
+    }
+
+    override fun onError(t: Throwable?) {
+        ErrorViewHelper(binding.errorView).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        ErrorViewHelper(binding.errorView).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, actionName, errorResolver)
     }
 
     @ProvidePresenter

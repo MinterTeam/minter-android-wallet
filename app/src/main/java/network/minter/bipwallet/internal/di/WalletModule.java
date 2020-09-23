@@ -68,6 +68,7 @@ import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.di.annotations.DbCache;
+import network.minter.bipwallet.internal.exceptions.ErrorManager;
 import network.minter.bipwallet.internal.gson.BigDecimalJsonConverter;
 import network.minter.bipwallet.internal.gson.HistoryTransactionsJsonConverter;
 import network.minter.bipwallet.internal.helpers.DateHelper;
@@ -163,20 +164,6 @@ public class WalletModule {
         }
 
         JodaTimeAndroid.init(context);
-    }
-
-    private GsonBuilder getGson() {
-        GsonBuilder out = new GsonBuilder();
-        out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
-        out.registerTypeAdapter(BigDecimal.class, new BigDecimalJsonConverter());
-        out.registerTypeAdapter(MinterAddress.class, new MinterAddressJsonConverter());
-        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyJsonConverter());
-        out.registerTypeAdapter(MinterHash.class, new MinterHashJsonConverter());
-        out.registerTypeAdapter(MinterCheck.class, new MinterCheckJsonConverter());
-        out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
-        out.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionsJsonConverter());
-
-        return out;
     }
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
@@ -351,6 +338,26 @@ public class WalletModule {
     @Provides
     public RxMinterLedger provideLedger(Context context) {
         return new RxMinterLedger(context, (UsbManager) context.getSystemService(USB_SERVICE));
+    }
+
+    @Provides
+    @WalletApp
+    public ErrorManager provideErrorManager() {
+        return new ErrorManager();
+    }
+
+    private GsonBuilder getGson() {
+        GsonBuilder out = new GsonBuilder();
+        out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
+        out.registerTypeAdapter(BigDecimal.class, new BigDecimalJsonConverter());
+        out.registerTypeAdapter(MinterAddress.class, new MinterAddressJsonConverter());
+        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyJsonConverter());
+        out.registerTypeAdapter(MinterHash.class, new MinterHashJsonConverter());
+        out.registerTypeAdapter(MinterCheck.class, new MinterCheckJsonConverter());
+        out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
+        out.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionsJsonConverter());
+
+        return out;
     }
 
     private void initCrashlytics() {

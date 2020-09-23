@@ -35,6 +35,7 @@ import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.delegation.adapter.DelegatedStake
 import network.minter.bipwallet.delegation.adapter.DelegatedValidator
 import network.minter.bipwallet.internal.adapter.LoadState
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.internal.mvp.ProgressView
 import network.minter.core.crypto.MinterPublicKey
 
@@ -43,7 +44,7 @@ import network.minter.core.crypto.MinterPublicKey
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface DelegatedListView : MvpView, ProgressView {
+interface DelegatedListView : MvpView, ProgressView, ErrorViewWithRetry {
     fun setAdapter(adapter: RecyclerView.Adapter<*>)
     fun setOnRefreshListener(listener: OnRefreshListener)
     fun showRefreshProgress()
@@ -52,6 +53,7 @@ interface DelegatedListView : MvpView, ProgressView {
     fun hideChartProgress()
     fun scrollTo(pos: Int)
     fun syncProgress(loadState: MutableLiveData<LoadState>)
+    fun syncHasInWaitList(state: MutableLiveData<Boolean>)
     fun setChartData(minMaxValue: FloatArray, dataSets: LineData)
     fun invalidateChartData(dataSets: LineData)
     fun setBipsPerMinute(amount: String)

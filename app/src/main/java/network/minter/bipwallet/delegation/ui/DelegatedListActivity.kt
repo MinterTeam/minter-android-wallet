@@ -34,6 +34,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.View
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
@@ -67,6 +68,7 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.ContextExtensions.getColorCompat
 import network.minter.bipwallet.internal.helpers.DateHelper.toDateMonthOptYear
+import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -89,6 +91,23 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
     @InjectPresenter lateinit var presenter: DelegatedListPresenter
     private lateinit var binding: ActivityDelegationListBinding
     private var itemSeparator: BorderedItemSeparator? = null
+
+    override fun onError(t: Throwable?) {
+        ErrorViewHelper(binding.errorView).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        ErrorViewHelper(binding.errorView).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(binding.errorView).onErrorWithRetry(errorMessage, actionName, errorResolver)
+    }
+
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
         binding.list.adapter = adapter
     }
@@ -159,6 +178,12 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
                     showEmpty()
                 }
             }
+        })
+    }
+
+    override fun syncHasInWaitList(state: MutableLiveData<Boolean>) {
+        state.observe(this, { has: Boolean ->
+            binding.waitlistAttentionRoot.visible = has
         })
     }
 
