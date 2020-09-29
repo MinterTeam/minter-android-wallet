@@ -371,7 +371,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         Type.Unbond -> OperationType.Unbound.fee
                     }
 
-                    gas = (it.result?.gas ?: BigInteger.ONE)
+                    gas = (it.result.gas ?: BigInteger.ONE)
                     txFee * gas.toBigDecimal()
                 }
                 .subscribe {

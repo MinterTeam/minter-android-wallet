@@ -251,7 +251,6 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 viewState.inflateDetails(R.layout.tx_details_redeem_check) {
                     val b = TxDetailsRedeemCheckBinding.bind(it)
                     val data: HistoryTransaction.TxRedeemCheckResult = tx.getData()
-                    //todo: check value given from explorer
                     val check = data.check
 
                     // from = to = issuer

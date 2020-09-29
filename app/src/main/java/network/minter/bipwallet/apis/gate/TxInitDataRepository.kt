@@ -30,7 +30,6 @@ import io.reactivex.Observable
 import io.reactivex.Observable.combineLatest
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.GasValue

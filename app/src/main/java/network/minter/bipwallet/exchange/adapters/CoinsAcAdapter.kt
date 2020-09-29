@@ -34,7 +34,6 @@ import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
 import network.minter.bipwallet.internal.helpers.ViewExtensions.listItemBackgroundRippleRounded
 import network.minter.explorer.models.CoinItem
-import timber.log.Timber
 
 /**
  * minter-android-wallet. 2020
@@ -73,7 +72,6 @@ class CoinsAcAdapter(
     }
 
     override fun getItemCount(): Int {
-        Timber.d("Coins adapter check items count: %d", items.size)
         return items.size
     }
 
