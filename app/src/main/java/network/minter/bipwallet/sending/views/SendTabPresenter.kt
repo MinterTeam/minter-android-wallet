@@ -392,6 +392,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                             }
                         },
                         { e: Throwable? ->
+                            mGasPrice = BigInteger.ONE
                             Timber.w(e, "Unable to get min gas price for sending")
                         }
                 )

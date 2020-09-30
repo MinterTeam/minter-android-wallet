@@ -35,7 +35,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import network.minter.bipwallet.R
@@ -235,6 +234,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         viewState.setFee(String.format("%s %s", bdHuman(operationType.fee.multiply(BigDecimal(mGasPrice))), MinterSDK.DEFAULT_COIN))
                     }
                 }) { e: Throwable? ->
+                    mGasPrice = BigInteger.ONE
                     Timber.w(e, "Unable to load min gas price for exchange")
                 }
     }
@@ -267,7 +267,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     .combineLatest(
                             estimateRepository.getTransactionCount(mAccount!!.address!!),
                             gasRepo.minGas,
-                            BiFunction { t1: GateResult<TxCount>, t2: GateResult<GasValue> ->
+                            { t1: GateResult<TxCount>, t2: GateResult<GasValue> ->
                                 TxInitData(t1, t2)
                             })
 
