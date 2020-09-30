@@ -218,6 +218,7 @@
                 android:hint="@string/label_payload_type"
                 app:errorTextAppearance="@style/Wallet.ErrorTextAppearance"
                 app:fieldName="payload"
+                android:inputType="text|textMultiLine"
                 app:inputOverlay="@layout/stub_payload_overlay"
                 app:inputOverlayVisible="true"
                 app:label="@string/tx_send_payload_hint"
