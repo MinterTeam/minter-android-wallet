@@ -530,7 +530,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     }
 
     private fun findAccountByCoin(coin: BigInteger): Optional<CoinBalance> {
-        return accountStorage.entity.mainWallet.findCoinById(coin)
+        return accountStorage.entity.mainWallet.findCoin(coin)
     }
 
     @Throws(OperationInvalidDataException::class)

@@ -51,15 +51,19 @@ class AddressBalanceTotal(
         super.address = source.address
         coins = source.coins
         coins = CollectionsHelper.sortByValue(coins, CollectionsHelper.StableCoinSorting())
+        // todo: this may be unnecessary, but just in case
+        if (source.coinsById == null || source.coinsById.size != coins.size) {
+            coins.forEach {
+                coinsById[it.value.coin.id] = it.value
+            }
+        } else {
+            coinsById = source.coinsById ?: HashMap()
+        }
+        coinsById = CollectionsHelper.sortByValue(coinsById, CollectionsHelper.StableCoinSorting())
 
         totalBalance = source.totalBalance
         totalBalanceUSD = source.totalBalanceUSD
-        //todo: check this out
-        stakeBalanceBIP = if (coins.containsKey(MinterSDK.DEFAULT_COIN)) {
-            coins[MinterSDK.DEFAULT_COIN]?.amount ?: BigDecimal.ZERO
-        } else {
-            BigDecimal.ZERO
-        }
+        stakeBalanceBIP = getCoin(MinterSDK.DEFAULT_COIN_ID).amount ?: BigDecimal.ZERO
 
         this.delegated = delegated
     }
