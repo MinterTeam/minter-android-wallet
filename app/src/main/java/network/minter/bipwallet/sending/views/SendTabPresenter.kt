@@ -611,8 +611,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                     .create()
             dialog.setCancelable(false)
 
-            // BIP account exists anyway, no need
+            // BIP account exists anyway
             val baseAccount = findAccountByCoin(DEFAULT_COIN_ID).get()
+            // this is the edge case, when coin balance created after some error
             if (baseAccount.address == null) {
                 return@startDialog ConfirmDialog.Builder(ctx, "Unable to send transaction")
                         .setText("Can't get wallet balance. Maybe you have bad internet connection?")
@@ -635,7 +636,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             if (enoughBaseForFee) {
                 Timber.tag("TX Send").d("Using base coin commission %s", DEFAULT_COIN)
                 mGasCoinId = baseAccount.coin.id!!
-            } else if (!isBaseAccount) {
+            }
+            // if sending coin is not a BIP AND not enough BIPs to pay fee
+            else if (!isBaseAccount) {
                 Timber.tag("TX Send").d("Not enough balance in %s to pay fee, using %s coin", DEFAULT_COIN, sendAccount.coin)
                 mGasCoinId = sendAccount.coin.id!!
                 // otherwise getting
@@ -652,6 +655,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                     txFeeValueResolver = Observable.just(commissionValue)
                 }
             }
+            // there is no else, because here you sending BIP and you don't have enough BIP, nothing to calculate, this leads to error
+
 
             // creating preparation result to send transaction
             Observable
@@ -663,19 +668,27 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                         }
                         val amountToSend: BigDecimal
 
-                        // don't calc fee if enough balance in base coin and we are sending not a base coin (MNT or BIP)
+                        // don't calc fee if enough BIP and we are sending not a BIP
                         if (enoughBaseForFee && !isBaseAccount) {
+                            // don't subtract fee from final sum
                             txInitData.commission = ZERO
                         }
 
                         // if balance enough to send required sum + fee, do nothing
-                        // (mAmount + txInitData.commission) <= mFromAccount.getBalance()
-
+                        // (mAmount + txInitData.commission) <= mFromAccount.amount
                         if (mFromAccount!!.amount >= (mAmount!! + txInitData.commission!!)) {
                             Timber.tag("TX Send").d("Don't change sending amount - balance enough to send")
                             amountToSend = mAmount!!
                         } else {
+                            // if user didn't clicked USE MAX, we don't subtract fee from sending amount
                             if (!mUseMax.get()) {
+                                txInitData.commission = ZERO
+                            }
+
+                            // If user clicked USE MAX, we have to subtract fee from sending amount,
+                            // but if balance is not enough to pay amount+fee, don't subtract fee from amount
+                            // as we don't want to send negative amount. Network just received error with required sum
+                            if ((mAmount!! + txInitData.commission!!) > mFromAccount!!.amount) {
                                 txInitData.commission = ZERO
                             }
                             amountToSend = mAmount!! - txInitData.commission!!
