@@ -60,6 +60,9 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
     @Transient
     var extAvatar: String? = null
 
+    @Transient
+    var isLastUsed = false
+
     enum class AddressType(var type: String) {
         Address("address"),
         ValidatorPubKey("validator");

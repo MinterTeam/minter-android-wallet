@@ -139,6 +139,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
         val out: MutableList<AddressBookItem> = ArrayList()
 
         val lastUsed = addressBookRepo.lastUsed
+        lastUsed[0].isLastUsed = true
 
         if (lastUsed.isNotEmpty()) {
             out.add(AddressBookItemHeader("Last Used", true))
