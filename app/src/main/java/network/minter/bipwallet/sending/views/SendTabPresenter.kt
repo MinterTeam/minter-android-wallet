@@ -666,7 +666,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                         if (!txInitData.isSuccess) {
                             return@switchMap Observable.just(txInitData.errorResult!!.castErrorResultTo<PushResult>())
                         }
-                        val amountToSend: BigDecimal
+                        var amountToSend: BigDecimal
 
                         // don't calc fee if enough BIP and we are sending not a BIP
                         if (enoughBaseForFee && !isBaseAccount) {
@@ -685,14 +685,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                                 txInitData.commission = ZERO
                             }
 
-                            // If user clicked USE MAX, we have to subtract fee from sending amount,
-                            // but if balance is not enough to pay amount+fee, don't subtract fee from amount
-                            // as we don't want to send negative amount. Network just received error with required sum
-                            if ((mAmount!! + txInitData.commission!!) > mFromAccount!!.amount) {
-                                txInitData.commission = ZERO
-                            }
                             amountToSend = mAmount!! - txInitData.commission!!
                             Timber.tag("TX Send").d("Subtracting sending amount (-%s): balance not enough to send", txInitData.commission)
+                        }
+
+                        if (amountToSend < ZERO) {
+                            amountToSend = mAmount!!
                         }
 
                         return@switchMap signSendTx(dialog, txInitData.nonce!!, amountToSend)
