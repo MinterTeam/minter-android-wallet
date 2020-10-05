@@ -153,22 +153,29 @@ object MathHelper {
     @JvmStatic
     fun bdHuman(source: BigDecimal): String {
         val num = Preconditions.firstNonNull(source, BigDecimal(0))
+        // if 0 or null = 4 digits
         if (bdNull(num)) {
             return formatDecimalCurrency(num, 4, true)
         }
+        // if less than 1 = min 4 digits, max 8
         if (bdLT(num, BigDecimal(1))) {
+            // if precision < 4, show 4 digits
             return if (num.stripTrailingZeros().scale() <= 4) {
                 formatDecimalCurrency(num.setScale(4, BigDecimal.ROUND_DOWN), 4, true)
             } else {
+                // use 8 digits precision
                 val v = formatDecimalCurrency(num.setScale(8, BigDecimal.ROUND_UP), 8, false)
                 val test = BigDecimal(v)
+                // if after rounding, number is still less than 1, return 8 digits
                 if (bdLT(test, BigDecimal.ONE)) {
                     v
                 } else {
+                    // otherwise recurse and format number as > 1
                     formatDecimalCurrency(test.setScale(4, BigDecimal.ROUND_DOWN), 4, true)
                 }
             }
         }
+        // if number is >= 1 use 4 digits
         val out = num.setScale(4, RoundingMode.DOWN)
         return formatDecimalCurrency(out, 4, true)
     }
