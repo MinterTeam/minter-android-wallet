@@ -44,6 +44,7 @@ import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract
 import network.minter.blockchain.models.operational.ExternalTransaction
 import network.minter.blockchain.models.operational.Operation
+import timber.log.Timber
 
 /**
  * minter-android-wallet. 2020
@@ -82,6 +83,7 @@ class TxInputFieldRow<T : Operation> internal constructor(
         if (inputGroup == null) {
             inputGroup = InputGroup()
             inputGroup!!.addInput(inputField)
+            inputGroup!!.appendErrorOnValidation = false
             builder.validators.forEach {
                 inputGroup!!.addValidator(inputField, it)
             }
@@ -145,7 +147,7 @@ class TxInputFieldRow<T : Operation> internal constructor(
         fun tplCoin(onChanged: (T, String) -> Unit, afterChange: (() -> Unit)? = null): Builder<T> {
             configureInput { inputGroup, inputField ->
                 validCallback?.invoke(ValidState.Undefined, inputField)
-//                inputGroup.addFilter(inputField, InputFilter.LengthFilter(10))
+
                 inputGroup.addFilter(inputField, CoinFilter())
                 inputGroup.addValidator(inputField, DbCoinValidatorWithSuffix())
                 handleTextChange(inputGroup, inputField, onChanged, afterChange)
@@ -201,6 +203,7 @@ class TxInputFieldRow<T : Operation> internal constructor(
         private fun handleTextChange(inputGroup: InputGroup, inputField: InputField, onChanged: (T, String) -> Unit, afterChange: (() -> Unit)? = null) {
             inputGroup.addTextChangedListener { input, valid ->
                 validCallback?.invoke(if (valid) ValidState.Valid else ValidState.Invalid, inputField)
+                Timber.d("TX_INPUT: ${input.fieldName} is valid: $valid")
                 if (valid) {
                     val data: T = extTx!!.getData(cls!!)
                     onChanged(data, input.text.toString())

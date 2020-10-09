@@ -27,6 +27,7 @@
 package network.minter.bipwallet.coins
 
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -35,28 +36,19 @@ import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.unique
 import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinItem
+import network.minter.explorer.repo.GateCoinRepository
 import timber.log.Timber
 import java.math.BigInteger
 
 /**
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
+ * @todo re-work this helper
  */
 class CoinMapper(
-        val coinsRepo: RepoCoins
+        val coinsRepo: RepoCoins,
+        val coinsGateRepo: GateCoinRepository
 ) {
-
-    init {
-        coinsRepo.observe()
-                .observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
-                .switchMapCompletable { resolveAllCoins() }
-                .subscribe {
-                    Timber.d("Coin mapper cache has been auto-updated")
-                }
-
-        coinsRepo.update()
-    }
 
     /**
      * Lock object for synchronizations
@@ -74,6 +66,18 @@ class CoinMapper(
     private var nameCache: MutableMap<String, CoinItem> = HashMap()
 
     private var resolvedAll = false
+
+    init {
+        coinsRepo.observe()
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .switchMapCompletable { resolveAllCoins() }
+                .subscribe {
+                    Timber.d("Coin mapper cache has been auto-updated")
+                }
+
+        coinsRepo.update()
+    }
 
     fun resolveAllCoins(): Completable {
         return coinsRepo.entity.getAllDb()
@@ -286,6 +290,15 @@ class CoinMapper(
 
         return resolveAllCoins()
                 .toSingle { get(name) != null }
+                .toObservable()
+                .switchMap {
+                    if (!it) {
+                        return@switchMap coinsGateRepo.coinExists(name)
+                    }
+
+                    Observable.just(it)
+                }
+                .single(false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
     }
@@ -297,6 +310,15 @@ class CoinMapper(
 
         return resolveAllCoins()
                 .toSingle { get(id) != null }
+                .toObservable()
+                .switchMap {
+                    if (!it) {
+                        return@switchMap coinsGateRepo.coinExists(id)
+                    }
+
+                    Observable.just(it)
+                }
+                .single(false)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
     }

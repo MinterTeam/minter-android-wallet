@@ -114,17 +114,17 @@
 
             <LinearLayout
                 android:id="@+id/input_list_layout"
-                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sync_container" />
 
             <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
                 android:id="@+id/progress"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="72dp"
                 android:visibility="invisible"
                 app:color="@color/colorPrimaryLight"
@@ -248,22 +248,26 @@
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
                 android:text="@string/btn_continue"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/exchange_container" />
+                app:layout_constraintTop_toBottomOf="@id/exchange_container"
+                tools:visibility="visible" />
 
             <network.minter.bipwallet.internal.views.widgets.WalletButton
                 android:id="@+id/cancel_action"
-                style="@style/Wallet.Button.Transparent.BlueBorder"
+                style="@style/Wallet.Button.Transparent.BlackBorder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
                 android:text="@string/btn_cancel"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/action" />
+                app:layout_constraintTop_toBottomOf="@id/action"
+                tools:visibility="visible" />
 
             <Space
                 android:layout_width="0dp"

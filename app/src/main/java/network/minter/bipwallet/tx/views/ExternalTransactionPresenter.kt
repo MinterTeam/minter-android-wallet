@@ -291,8 +291,17 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             calculateFee(extTx!!)
         }
 
+        viewState.showWaitProgress()
+
         try {
-            fillData(extTx!!)
+            coinMapper.resolveAllCoins()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        viewState.hideWaitProgress()
+                        Timber.d("Coin mapper cache has been loaded")
+                        fillData(extTx!!)
+                    }
         } catch (t: Throwable) {
             showTxErrorDialog("Invalid transaction data: %s", t.message!!)
         }
@@ -1107,7 +1116,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         } else {
                             cntRes.gas ?: BigInteger.ONE
                         }
-                        val gasCoinId = extTx!!.gasCoinId ?: MinterSDK.DEFAULT_COIN_ID
+                        var gasCoinId = extTx!!.gasCoinId ?: MinterSDK.DEFAULT_COIN_ID
+                        if (extTx!!.type == OperationType.RedeemCheck) {
+                            gasCoinId = extTx!!.getData<TxRedeemCheck>().decodedCheck.gasCoinId
+                        }
                         val tx = Transaction.Builder(cntRes.nonce, extTx)
                                 .setGasPrice(gasPrice)
                                 .setGasCoinId(gasCoinId)

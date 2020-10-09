@@ -37,6 +37,7 @@ import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.explorer.repo.ExplorerValidatorsRepository;
+import network.minter.explorer.repo.GateCoinRepository;
 import network.minter.explorer.repo.GateEstimateRepository;
 import network.minter.explorer.repo.GateGasRepository;
 import network.minter.explorer.repo.GateTransactionRepository;
@@ -110,6 +111,12 @@ public class RepoModule {
     @WalletApp
     public GateTransactionRepository provideGateTxRepo(MinterExplorerSDK api) {
         return api.transactionsGate();
+    }
+
+    @Provides
+    @WalletApp
+    public GateCoinRepository provideGateCoinRepo(MinterExplorerSDK api) {
+        return api.coinsGate();
     }
 
     @Provides

@@ -40,6 +40,7 @@ import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.explorer.MinterExplorerSDK
+import network.minter.explorer.repo.GateCoinRepository
 
 /**
  * minter-android-wallet. 2018
@@ -83,8 +84,8 @@ object CacheModule {
     @JvmStatic
     @Provides
     @WalletApp
-    fun provideCoinsMapper(repo: RepoCoins): CoinMapper {
-        return CoinMapper(repo)
+    fun provideCoinsMapper(repo: RepoCoins, gateRepo: GateCoinRepository): CoinMapper {
+        return CoinMapper(repo, gateRepo)
     }
 
     @JvmStatic

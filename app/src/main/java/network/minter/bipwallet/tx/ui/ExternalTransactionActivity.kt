@@ -211,6 +211,10 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
             b.inputListLayout.alpha = 0.3f
             b.progress.nvisible = true
             b.action.isEnabled = false
+            b.action.visible = false
+            b.cancelAction.visible = false
+            b.feeLabel.visible = false
+            b.feeValue.visible = false
         }
 
     }
@@ -220,6 +224,10 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
             b.inputListLayout.alpha = 1f
             b.progress.nvisible = false
             b.action.isEnabled = true
+            b.action.visible = true
+            b.cancelAction.visible = true
+            b.feeLabel.visible = true
+            b.feeValue.visible = true
         }
     }
 

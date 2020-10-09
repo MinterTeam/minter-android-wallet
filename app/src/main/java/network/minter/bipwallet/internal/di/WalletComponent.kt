@@ -125,6 +125,7 @@ interface WalletComponent {
     fun txGateRepo(): GateTransactionRepository
     fun estimateRepo(): GateEstimateRepository
     fun txInitDataRepo(): TxInitDataRepository
+    fun coinsGateRepo(): GateCoinRepository
     fun coinMapper(): CoinMapper
 
     // db
