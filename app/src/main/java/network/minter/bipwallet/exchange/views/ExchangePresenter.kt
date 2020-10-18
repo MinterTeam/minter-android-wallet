@@ -477,7 +477,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                     mBuyCoin = it
                                     mInputChange!!.onNext(isBuying)
                                 },
-                                { t ->
+                                {
                                     mBuyCoin = null
                                     mInputChange!!.onNext(isBuying)
                                     Timber.d("Unable to find coin by name %s", text)

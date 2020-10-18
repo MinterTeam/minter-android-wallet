@@ -92,6 +92,8 @@ abstract class BaseBottomSheetDialogFragment : BaseMvpBottomSheetDialogFragment(
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
             d.window!!.attributes = params
             d.window!!.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
+            //todo
+            @Suppress("DEPRECATION")
             d.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             d.window!!.statusBarColor = Color.TRANSPARENT
         }

@@ -92,6 +92,6 @@ class AddressListBalancesTotal(
     }
 
     fun getCoinBalance(address: MinterAddress, coin: CoinItemBase): BigDecimal {
-        return getBalance(address).getCoin(coin.id)?.amount ?: BigDecimal.ZERO
+        return getBalance(address).getCoin(coin.id).amount ?: BigDecimal.ZERO
     }
 }

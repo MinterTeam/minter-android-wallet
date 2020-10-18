@@ -106,6 +106,8 @@ class PinValidationDialog : MvpAppCompatDialogFragment(), PinValidatingView {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
             dialog.window!!.attributes = params
+            //todo
+            @Suppress("DEPRECATION")
             dialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
         return dialog

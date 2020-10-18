@@ -311,7 +311,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                             if (!res.isEmpty) {
                                 val acc = accountStorage.entity.mainWallet
                                 if (mLastAccount != null) {
-                                    onAccountSelected(acc.findCoinById(mLastAccount!!.coin.id).orElse(acc.coinsList[0]))
+                                    onAccountSelected(acc.findCoin(mLastAccount!!.coin.id).orElse(acc.coinsList[0]))
                                 } else {
                                     onAccountSelected(acc.coinsList[0])
                                 }

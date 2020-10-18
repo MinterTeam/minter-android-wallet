@@ -455,7 +455,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
         if (txValues != null) {
             val balance = accountStorage.data.getBalance(from!!)
-            val coinBalanceSearch = balance.findCoinById(txValues.coinId)
+            val coinBalanceSearch = balance.findCoin(txValues.coinId)
 
             var balanceSum: BigDecimal = BigDecimal.ZERO
             if (coinBalanceSearch.isPresent) {

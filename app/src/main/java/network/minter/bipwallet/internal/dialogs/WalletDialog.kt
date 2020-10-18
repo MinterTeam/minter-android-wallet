@@ -69,7 +69,10 @@ abstract class WalletDialog protected constructor(context: Context) :
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
             window!!.attributes = params
             window!!.setGravity(Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL)
+            //todo
+            @Suppress("DEPRECATION")
             window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            @Suppress("DEPRECATION")
             window!!.decorView.systemUiVisibility = ViewHelper.systemBarsLightness(false)
         }
 

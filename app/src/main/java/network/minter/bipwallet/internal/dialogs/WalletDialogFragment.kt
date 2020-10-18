@@ -106,6 +106,8 @@ abstract class WalletDialogFragment : MvpAppCompatDialogFragment() {
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT
             d.window!!.attributes = params
             d.window!!.setGravity(Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL)
+            //todo
+            @Suppress("DEPRECATION")
             d.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             d.window!!.navigationBarColor = ContextCompat.getColor(context!!, R.color.white)
             if (disableAnimations) {

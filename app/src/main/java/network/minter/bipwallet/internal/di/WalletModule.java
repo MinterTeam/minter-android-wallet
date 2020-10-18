@@ -128,6 +128,12 @@ public class WalletModule {
         {
             MinterExplorerSDK.Setup explorerSdk = new MinterExplorerSDK.Setup().setEnableDebug(debug);
 
+            /* for test purposes only
+            if(BuildConfig.FLAVOR.startsWith("netMain")) {
+                explorerSdk.setNetId("chilinet");
+            }
+            */
+
             if (BuildConfig.EXPLORER_API_URL != null) {
                 explorerSdk.setExplorerApiUrl(BuildConfig.EXPLORER_API_URL);
             }

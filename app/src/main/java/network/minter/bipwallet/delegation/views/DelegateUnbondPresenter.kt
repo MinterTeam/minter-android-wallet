@@ -303,7 +303,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             val acc = accountStorage.entity.mainWallet
             if (type == Type.Delegate) {
                 if (fromAccount != null) {
-                    onAccountSelected(acc.findCoinById(fromAccount?.coin?.id).orElse(acc.coinsList[0]))
+                    onAccountSelected(acc.findCoin(fromAccount?.coin?.id).orElse(acc.coinsList[0]))
                 } else {
                     onAccountSelected(acc.coinsList[0])
                 }
@@ -515,7 +515,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
          *  - anyway, use BIP as gas coin, if not enough - error
          */
 
-        val bipAccountOpt = accountStorage.entity.mainWallet.findCoinByName(MinterSDK.DEFAULT_COIN)
+        val bipAccountOpt = accountStorage.entity.mainWallet.findCoin(MinterSDK.DEFAULT_COIN)
 
         if (type == Type.Delegate) {
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
@@ -540,7 +540,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             }
 
             // BIP balance not enough to pay fee, trying to calculate custom coin
-            val fromAccountOpt = accountStorage.entity.mainWallet.findCoinById(fromAccount!!.coin.id)
+            val fromAccountOpt = accountStorage.entity.mainWallet.findCoin(fromAccount!!.coin.id)
 
             // if balance for custom coin not found - error
             if (!fromAccountOpt.isPresent) {

@@ -62,7 +62,7 @@ class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<Delegated
         amountBIP = info.bipValue
         publicKey = info.publicKey!!
         validatorMeta = info.meta!!
-        isKicked = info.isKicked
+        isKicked = info.isInWaitlist
     }
 
     override fun isSameOf(item: DelegatedItem): Boolean {
