@@ -247,7 +247,7 @@
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginTop="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
-                android:text="@string/btn_continue"
+                android:text="@string/btn_confirm_send"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

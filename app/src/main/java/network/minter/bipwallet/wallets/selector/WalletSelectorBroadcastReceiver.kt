@@ -29,8 +29,12 @@ package network.minter.bipwallet.wallets.selector
 import android.content.Context
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.internal.system.BaseBroadcastReceiver
+import java.util.concurrent.TimeUnit
 
 /**
  * minter-android-wallet. 2020
@@ -47,13 +51,34 @@ class WalletSelectorBroadcastReceiver(
         private const val EXTRA_WALLETS = "WALLET_LIST"
         private const val EXTRA_MAIN_WALLET = "MAIN_WALLET"
 
+        //@todo: better solution is just queued intents
+        internal fun retrySendBroadcast(context: Context, intent: Intent, maxRetries: Int = 5, intervalMs: Long = 150) {
+            var sub: Disposable? = null
+            var retried = 0
+
+            Observable.interval(intervalMs, TimeUnit.MILLISECONDS)
+                    .doOnSubscribe { sub = it }
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe {
+                        val sent = LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                        if (sent || (retried >= maxRetries - 1)) {
+                            sub?.dispose()
+                            return@subscribe
+                        }
+                        retried++
+                    }
+        }
+
         fun setWallets(context: Context, wallets: List<WalletItem>) {
             val intent = Intent(BROADCAST_ACTION)
             intent.putExtra(EXTRA_ACTION, Action.FillWallets.ordinal)
             val al = ArrayList(wallets)
             intent.putParcelableArrayListExtra(EXTRA_WALLETS, al)
 
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            if (!LocalBroadcastManager.getInstance(context).sendBroadcast(intent)) {
+                retrySendBroadcast(context, intent)
+            }
         }
 
         fun setMainWallet(context: Context, mainWallet: WalletItem) {
@@ -61,7 +86,9 @@ class WalletSelectorBroadcastReceiver(
             intent.putExtra(EXTRA_ACTION, Action.SetMain.ordinal)
             intent.putExtra(EXTRA_MAIN_WALLET, mainWallet)
 
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            if (!LocalBroadcastManager.getInstance(context).sendBroadcast(intent)) {
+                retrySendBroadcast(context, intent)
+            }
         }
     }
 

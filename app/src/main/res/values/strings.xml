@@ -123,7 +123,7 @@
     <string name="btn_change_password">Change password</string>
     <string name="hint_change_password_old">Current password</string>
     <string name="btn_delegate">Delegate</string>
-    <string name="btn_confirm_send">Confirm and send</string>
+    <string name="btn_confirm_send">Confirm and Send</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_ok">Ok</string>
     <string name="btn_proceed">Proceed</string>

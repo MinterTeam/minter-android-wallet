@@ -206,6 +206,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             .setItems(selectorDataFromSecrets(secretStorage.secretsListSafe))
                             .setPositiveAction(R.string.btn_continue) { d, _ ->
                                 from = (d as WalletSelectorDialog).item!!.data.minterAddress
+                                secretStorage.setMain(from!!)
+                                accountStorage.update(true)
                                 init(intent)
                                 d.dismiss()
                             }
@@ -1196,15 +1198,16 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private fun onExecuteComplete() {}
 
     private fun onSubmit() {
-        viewState.startDialog { ctx ->
-            ConfirmDialog.Builder(ctx, R.string.dialog_title_confirm_transaction)
-                    .setText(R.string.dialog_description_external_tx_short)
-                    .setPositiveAction(R.string.btn_confirm) { _, _ ->
-                        startExecuteTransaction()
-                    }
-                    .setNegativeAction(R.string.btn_cancel)
-                    .create()
-        }
+        startExecuteTransaction()
+//        viewState.startDialog { ctx ->
+//            ConfirmDialog.Builder(ctx, R.string.dialog_title_confirm_transaction)
+//                    .setText(R.string.dialog_description_external_tx_short)
+//                    .setPositiveAction(R.string.btn_confirm) { _, _ ->
+//                        startExecuteTransaction()
+//                    }
+//                    .setNegativeAction(R.string.btn_cancel)
+//                    .create()
+//        }
     }
 
     private fun onCancel() {

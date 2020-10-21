@@ -33,6 +33,7 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.wallets.contract.WalletSelectorControllerView
 import network.minter.bipwallet.wallets.selector.WalletItem
+import network.minter.core.crypto.MinterAddress
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,6 +48,7 @@ class WalletSelectorController @Inject constructor() {
     private var disposable: Disposable? = null
     private var latestBalances: AddressListBalancesTotal? = null
     private var isAttached = false
+    private var lastMainAddress: MinterAddress? = null
 
     fun onFirstViewAttach(view: WalletSelectorControllerView) {
         viewState = view
@@ -65,11 +67,13 @@ class WalletSelectorController @Inject constructor() {
     fun attachView(view: WalletSelectorControllerView) {
         viewState = view
 
-        if (accountStorage.isDataReady && accountStorage.data.balances.isNotEmpty()) {
+        val walletChanged = lastMainAddress != null && lastMainAddress!! != secretStorage.mainWallet
+        if (!walletChanged && accountStorage.isDataReady && accountStorage.data.balances.isNotEmpty()) {
             fillWalletSelector(accountStorage.data)
         } else {
             fillWalletSelector(AddressListBalancesTotal(secretStorage.addresses))
         }
+        lastMainAddress = secretStorage.mainWallet
 
         viewState!!.setOnClickWalletListener { walletItem: WalletItem ->
             onSelectWallet(walletItem)
