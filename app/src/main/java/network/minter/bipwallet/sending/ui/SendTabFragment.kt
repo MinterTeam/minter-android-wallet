@@ -204,7 +204,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
             val num = it.parseBigDecimal()
             num <= coinSupplier()!!.amount
-        }.apply { errorMessage = "Not enough coins" })
+        }.apply { errorMessage = getString(R.string.error_not_enough_coins) })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

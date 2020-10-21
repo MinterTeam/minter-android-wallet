@@ -69,6 +69,7 @@ interface DelegateUnbondView : MvpView, ErrorViewWithRetry {
     fun setAccountError(error: CharSequence?)
     fun setOnSubmitListener(listener: View.OnClickListener)
     fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem) -> Unit)
+    fun setMaxAmountValidator(@StringRes errorMessage: Int, coinSupplier: () -> BaseCoinValue?)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startDialog(executor: DialogExecutor)

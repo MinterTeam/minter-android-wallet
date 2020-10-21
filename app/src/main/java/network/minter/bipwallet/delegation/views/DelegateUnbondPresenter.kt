@@ -216,6 +216,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.setOnSubmitListener {
             onSubmit()
         }
+
+        val exceedAmountError = if (type == Type.Delegate) R.string.error_not_enough_coins else R.string.error_amount_exceed_stake
+        viewState.setMaxAmountValidator(exceedAmountError) { fromAccount }
         viewState.addValidatorTextChangeListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }

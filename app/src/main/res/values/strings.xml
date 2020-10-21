@@ -387,6 +387,8 @@
     <string name="dialog_title_confirm_transaction">Confirm Transaction</string>
     <string name="min_stake">Min. ~%s %s</string>
     <string name="error_unknown">Unknown error</string>
+    <string name="error_not_enough_coins">Not enough coins</string>
+    <string name="error_amount_exceed_stake">Amount exceeds delegated stake</string>
     <string name="empty_validators">Unable to show validators</string>
 
 </resources>

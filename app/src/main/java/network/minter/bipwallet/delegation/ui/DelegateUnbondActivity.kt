@@ -34,12 +34,14 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.edwardstock.inputfield.InputField
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
+import com.edwardstock.inputfield.form.validators.CustomValidator
 import com.edwardstock.inputfield.form.validators.RegexValidator
 import com.otaliastudios.autocomplete.Autocomplete
 import com.otaliastudios.autocomplete.AutocompleteCallback
@@ -56,6 +58,7 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
+import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
@@ -389,6 +392,17 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
     override fun setValidatorsAutocomplete(items: List<ValidatorItem>, listener: (ValidatorItem) -> Unit) {
         onAutocompleteItemSelect = listener
         autocompletePresenter?.setItems(items)
+    }
+
+    override fun setMaxAmountValidator(@StringRes error: Int, coinSupplier: () -> BaseCoinValue?) {
+        inputGroup.addValidator(binding.inputAmount, CustomValidator {
+            if (it.isNullOrEmpty() || coinSupplier() == null) {
+                return@CustomValidator true
+            }
+
+            val num = it.parseBigDecimal()
+            num <= coinSupplier()!!.amount
+        }.apply { errorMessage = getString(error) })
     }
 
     override fun startExplorer(txHash: MinterHash) {
