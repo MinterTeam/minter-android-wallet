@@ -119,6 +119,9 @@ class SettingsSwitchRow : MultiRowContract.Row<SettingsSwitchRow.ViewHolder> {
         vh.key!!.text = mKey
         vh.value!!.isEnabled = mEnabled.get()
         vh.value!!.isChecked = mValue.get()
+        vh.itemView.setOnClickListener {
+            vh.value!!.isChecked = !vh.value!!.isChecked
+        }
         vh.value!!.setOnCheckedChangeListener { buttonView: CompoundButton, isChecked: Boolean ->
             mListener?.invoke(buttonView, isChecked)
         }
