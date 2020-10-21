@@ -45,4 +45,5 @@ interface ValidatorSelectorView : MvpView, ErrorViewWithRetry, ProgressView {
     fun finishCancel()
     fun finishSuccess(validator: ValidatorItem)
     fun createItemSeparator(haveLastUsedHeader: Boolean)
+    fun showEmpty(show: Boolean)
 }

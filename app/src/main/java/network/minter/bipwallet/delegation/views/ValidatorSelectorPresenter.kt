@@ -65,6 +65,7 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
                 .joinToUi()
                 .subscribe(
                         { res ->
+                            viewState.showEmpty(false)
                             val validators = when (filter) {
                                 Filter.None -> {
                                     res
@@ -77,6 +78,9 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
                                 }
                             }
 
+                            if (validators.isEmpty() && repoValidators.entity.lastUsed.isEmpty()) {
+                                viewState.showEmpty(true)
+                            }
                             viewState.createItemSeparator(repoValidators.entity.lastUsed.size > 0)
                             adapter.setItems(repoValidators.entity.lastUsed, validators)
                             adapter.notifyDataSetChanged()
@@ -115,6 +119,7 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
 
     override fun onError(t: Throwable, retryListener: RetryListener) {
         Timber.d("Unable to load validators %s", t.humanDetailsMessage)
+        viewState.showEmpty(true)
         handlerError(t, retryListener)
     }
 }

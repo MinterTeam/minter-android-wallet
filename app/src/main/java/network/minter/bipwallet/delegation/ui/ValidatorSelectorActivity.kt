@@ -58,6 +58,9 @@ import javax.inject.Provider
 class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView {
     @Inject lateinit var presenterProvider: Provider<ValidatorSelectorPresenter>
     @InjectPresenter lateinit var presenter: ValidatorSelectorPresenter
+    private lateinit var binding: ActivityValidatorSelectorBinding
+    private var itemSeparator: BorderedItemSeparator? = null
+
 
     @ProvidePresenter
     fun providePresenter(): ValidatorSelectorPresenter {
@@ -97,8 +100,6 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
         binding.list.addItemDecoration(itemSeparator!!)
     }
 
-    private lateinit var binding: ActivityValidatorSelectorBinding
-    private var itemSeparator: BorderedItemSeparator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +131,12 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
 
         override fun getActivityClass(): Class<*> {
             return ValidatorSelectorActivity::class.java
+        }
+    }
+
+    override fun showEmpty(show: Boolean) {
+        runOnUiThread {
+            binding.emptyText.visible = show
         }
     }
 

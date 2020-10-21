@@ -387,5 +387,6 @@
     <string name="dialog_title_confirm_transaction">Confirm Transaction</string>
     <string name="min_stake">Min. ~%s %s</string>
     <string name="error_unknown">Unknown error</string>
+    <string name="empty_validators">Unable to show validators</string>
 
 </resources>
