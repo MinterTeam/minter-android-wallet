@@ -26,21 +26,17 @@
 package network.minter.bipwallet.delegation.views
 
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagedList
-import androidx.paging.RxPagedListBuilder
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.annimon.stream.Stream
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
 import network.minter.bipwallet.apis.explorer.RepoValidators
-import network.minter.bipwallet.delegation.adapter.DelegatedItem
+import network.minter.bipwallet.delegation.adapter.DelegatedItemDiffUtil
 import network.minter.bipwallet.delegation.adapter.DelegationDataSource
 import network.minter.bipwallet.delegation.adapter.DelegationListAdapter
 import network.minter.bipwallet.delegation.contract.DelegatedListView
@@ -84,9 +80,7 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     @Inject lateinit var errorManager: ErrorManager
 
     private var adapter: DelegationListAdapter? = null
-    private var sourceFactory: DelegationDataSource.Factory? = null
-    private var listDisposable: Disposable? = null
-    private var listBuilder: RxPagedListBuilder<Int, DelegatedItem>? = null
+    private var dataSource: DelegationDataSource? = null
     private var lastScrollPosition = 0
     private var loadState: MutableLiveData<LoadState>? = null
     private var hasInWaitList: MutableLiveData<Boolean>? = null
@@ -106,11 +100,8 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     override fun attachView(view: DelegatedListView) {
         super.attachView(view)
         viewState.setAdapter(adapter!!)
-        viewState.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
-            onRefresh()
-        })
+        viewState.setOnRefreshListener { onRefresh() }
         viewState.scrollTo(lastScrollPosition)
-
     }
 
     fun onScrolledTo(scrollY: Int) {
@@ -145,21 +136,16 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
         viewState.syncProgress(loadState!!)
         viewState.syncHasInWaitList(hasInWaitList!!)
         adapter!!.setLoadState(loadState)
-        sourceFactory = DelegationDataSource.Factory(
+        dataSource = DelegationDataSource.Factory(
                 addressRepo,
                 validatorsRepo,
                 secretRepo.mainWallet,
                 loadState!!,
                 hasInWaitList!!,
                 errorManager.retryWhenHandler
-        )
-        val cfg = PagedList.Config.Builder()
-                .setPageSize(50)
-                .setEnablePlaceholders(false)
-                .build()
-        listBuilder = RxPagedListBuilder(sourceFactory!!, cfg)
+        ).create()
         refresh()
-        unsubscribeOnDestroy(listDisposable)
+        unsubscribeOnDestroy(dataSource?.disposable)
 //        loadRewards()
     }
 
@@ -287,18 +273,16 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     }
 
     private fun onRefresh() {
-        listDisposable!!.dispose()
+        dataSource?.invalidate()
         viewState.scrollTo(0)
         refresh()
     }
 
     private fun refresh() {
         errorManager.retryListener()
-        listDisposable = listBuilder!!.buildObservable()
-                .subscribe { res: PagedList<DelegatedItem> ->
-                    viewState!!.hideRefreshProgress()
-                    adapter!!.submitList(res)
-                }
-                .disposeOnDestroy()
+        dataSource!!.load {
+            viewState!!.hideRefreshProgress()
+            adapter?.dispatchChanges(DelegatedItemDiffUtil::class.java, it, true)
+        }
     }
 }

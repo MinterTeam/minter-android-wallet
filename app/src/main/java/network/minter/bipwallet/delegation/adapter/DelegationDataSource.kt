@@ -26,12 +26,12 @@
 package network.minter.bipwallet.delegation.adapter
 
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.DataSource
-import androidx.paging.PageKeyedDataSource
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.sortByValue
@@ -48,8 +48,8 @@ import kotlin.collections.ArrayList
 /**
  * Created by Alexander Kolpakov (jquickapp@gmail.com) on 06-Jun-19
  */
-class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<Int, DelegatedItem>() {
-    private val disposables = CompositeDisposable()
+class DelegationDataSource(private val factory: Factory) {
+    var disposable: Disposable? = null
     private var validatorTotalStakes: MutableMap<MinterPublicKey, BigDecimal> = HashMap()
 
     /**
@@ -68,14 +68,15 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
         return hasKicked
     }
 
-    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, DelegatedItem>) {
+    fun load(callback: (MutableList<DelegatedItem>) -> Unit) {
         factory.loadState.postValue(LoadState.Loading)
 
-        factory.repo.getDelegations(factory.mainWallet, 1)
+        disposable = factory.repo.getDelegations(factory.mainWallet)
                 .retryWhen(factory.retryWhenHandler)
                 .map { mapToDelegationItem(it) }
                 .switchMap { mapValidatorCommissionAndMinStake(it) }
-                .doOnSubscribe { disposables.add(it) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         { res: ExpResult<MutableList<DelegatedItem>> ->
                             factory.loadState.postValue(LoadState.Loaded)
@@ -83,19 +84,7 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                             // notify receiver we have kicked stake
                             factory.hasInWaitList.postValue(res.hasKicked())
 
-                            //todo: stake list loading as one page, so we don't need to paginate. re-work this
-//                            val lastPage = res.meta?.lastPage ?: 0
-
-//                            var nextPage: Int? = null
-//                            if (lastPage > 1) {
-//                                nextPage = (res.meta?.currentPage ?: 1) + 1
-//                            }
-
-                            try {
-                                callback.onResult(res.result!!, null, null)
-                            } catch (e: IllegalStateException) {
-                                //todo: investigate - double calling
-                            }
+                            callback(res.result)
 
                             if (res.result?.isEmpty() == true) {
                                 factory.loadState.postValue(LoadState.Empty)
@@ -105,66 +94,13 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                             Timber.w(t, "Unable to load delegations")
                             factory.hasInWaitList.postValue(false)
                             factory.loadState.postValue(LoadState.Failed)
-                            callback.onResult(ArrayList(), null, null)
+                            callback(ArrayList())
                         }
                 )
     }
 
-    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, DelegatedItem>) {
-        factory.loadState.postValue(LoadState.Loading)
-        factory.repo.getDelegations(factory.mainWallet, params.key)
-                .retryWhen(factory.retryWhenHandler)
-                .map { mapToDelegationItem(it) }
-                .switchMap { mapValidatorCommissionAndMinStake(it) }
-                .doOnSubscribe { disposables.add(it) }
-                .subscribe(
-                        { res: ExpResult<MutableList<DelegatedItem>> ->
-                            factory.loadState.postValue(LoadState.Loaded)
-
-                            // notify receiver we have kicked stake
-                            factory.hasInWaitList.postValue(res.hasKicked())
-
-                            // send result
-                            callback.onResult(res.result!!, if (params.key == 1) null else params.key - 1)
-                        },
-                        { t ->
-                            Timber.w(t, "Unable to load delegations")
-                            factory.loadState.postValue(LoadState.Failed)
-                            callback.onResult(ArrayList(), null)
-                        }
-                )
-    }
-
-    override fun loadAfter(params: LoadParams<Int>,
-                           callback: LoadCallback<Int, DelegatedItem>) {
-
-        factory.loadState.postValue(LoadState.Loading)
-
-        factory.repo.getDelegations(factory.mainWallet, params.key)
-                .retryWhen(factory.retryWhenHandler)
-                .map { mapToDelegationItem(it) }
-                .switchMap { mapValidatorCommissionAndMinStake(it) }
-                .doOnSubscribe { disposables.add(it) }
-                .subscribe(
-                        { res: ExpResult<MutableList<DelegatedItem>> ->
-                            factory.loadState.postValue(LoadState.Loaded)
-
-                            // notify receiver we have kicked stake
-                            factory.hasInWaitList.postValue(res.hasKicked())
-
-                            callback.onResult(res.result!!, if (params.key + 1 > res.meta!!.lastPage) null else params.key + 1)
-                        },
-                        { t ->
-                            Timber.w(t, "Unable to load delegations")
-                            factory.loadState.postValue(LoadState.Failed)
-                            callback.onResult(ArrayList(), null)
-                        }
-                )
-    }
-
-    override fun invalidate() {
-        super.invalidate()
-        disposables.dispose()
+    fun invalidate() {
+        disposable?.dispose()
     }
 
     private fun mapValidatorCommissionAndMinStake(res: ExpResult<MutableList<DelegatedItem>>): ObservableSource<ExpResult<MutableList<DelegatedItem>>> {
@@ -242,13 +178,10 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
             val loadState: MutableLiveData<LoadState>,
             val hasInWaitList: MutableLiveData<Boolean>,
             val retryWhenHandler: Function<Observable<out Throwable>, ObservableSource<*>>
-    ) : DataSource.Factory<Int, DelegatedItem>() {
-
-
-        override fun create(): DataSource<Int, DelegatedItem> {
+    ) {
+        fun create(): DelegationDataSource {
             return DelegationDataSource(this)
         }
-
     }
 
 }

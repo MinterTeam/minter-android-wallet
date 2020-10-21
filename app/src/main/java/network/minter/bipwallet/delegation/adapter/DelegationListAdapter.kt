@@ -31,8 +31,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.R
@@ -44,6 +42,8 @@ import network.minter.bipwallet.internal.helpers.ContextHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
+import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
 import network.minter.bipwallet.tx.adapters.vh.TxProgressViewHolder
 import network.minter.core.MinterSDK
 
@@ -53,39 +53,29 @@ import network.minter.core.MinterSDK
 typealias OnDelegatedClickListener = (DelegatedValidator) -> Unit
 typealias OnUnbondItemClickListener = (DelegatedStake) -> Unit
 
-class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewHolder> {
+class DelegationListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), DiffUtilDispatcherDelegate<DelegatedItem> {
     companion object {
-        private val sDiffCallback: DiffUtil.ItemCallback<DelegatedItem> = object : DiffUtil.ItemCallback<DelegatedItem>() {
-            override fun areItemsTheSame(oldItem: DelegatedItem, newItem: DelegatedItem): Boolean {
-                return oldItem.isSameOf(newItem)
-            }
-
-            override fun areContentsTheSame(oldItem: DelegatedItem, newItem: DelegatedItem): Boolean {
-                return oldItem == newItem
-            }
-        }
         private const val ITEM_PROGRESS = R.layout.item_list_transaction_progress
     }
 
-    private var mInflater: LayoutInflater? = null
-    private var mLoadState: MutableLiveData<LoadState>? = null
-    private var mOnDelegatedClickListener: OnDelegatedClickListener? = null
-    private var mOnUnbondItemClickListener: OnUnbondItemClickListener? = null
+    private var data: MutableList<DelegatedItem> = ArrayList()
+    private var inflater: LayoutInflater? = null
+    private var loadState: MutableLiveData<LoadState>? = null
+    private var onDelegatedClickListener: OnDelegatedClickListener? = null
+    private var onUnbondItemClickListener: OnUnbondItemClickListener? = null
 
-    constructor() : super(sDiffCallback)
-    constructor(config: AsyncDifferConfig<DelegatedItem?>) : super(config)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if (mInflater == null) {
-            mInflater = LayoutInflater.from(parent.context)
+        if (inflater == null) {
+            inflater = LayoutInflater.from(parent.context)
         }
-        val view = mInflater!!.inflate(viewType, parent, false)
+        val view = inflater!!.inflate(viewType, parent, false)
         if (viewType == ITEM_PROGRESS) {
             return TxProgressViewHolder(view)
         } else if (viewType == DelegatedItem.ITEM_STAKE) {
-            return StakeViewHolder(ItemListDelegatedStakeBinding.inflate(mInflater!!, parent, false))
+            return StakeViewHolder(ItemListDelegatedStakeBinding.inflate(inflater!!, parent, false))
         }
-        return ValidatorViewHolder(ItemListDelegatedValidatorBinding.inflate(mInflater!!, parent, false))
+        return ValidatorViewHolder(ItemListDelegatedValidatorBinding.inflate(inflater!!, parent, false))
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, i: Int) {
@@ -117,8 +107,8 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
                 ContextHelper.copyToClipboard(it.context, item.publicKey.toString())
             }
             vh.b.actionDelegate.setOnClickListener {
-                if (mOnDelegatedClickListener != null) {
-                    mOnDelegatedClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedValidator)
+                if (onDelegatedClickListener != null) {
+                    onDelegatedClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedValidator)
                 }
             }
         } else if (getItemViewType(i) == DelegatedItem.ITEM_STAKE) {
@@ -144,11 +134,15 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
                 vh.b.itemSubamount.visibility = View.VISIBLE
             }
             vh.b.actionUnbond.setOnClickListener {
-                if (mOnUnbondItemClickListener != null) {
-                    mOnUnbondItemClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedStake)
+                if (onUnbondItemClickListener != null) {
+                    onUnbondItemClickListener!!.invoke(getItem(viewHolder.bindingAdapterPosition) as DelegatedStake)
                 }
             }
         }
+    }
+
+    fun getItem(pos: Int): DelegatedItem? {
+        return data[pos]
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -158,21 +152,45 @@ class DelegationListAdapter : PagedListAdapter<DelegatedItem, RecyclerView.ViewH
     }
 
     fun setLoadState(loadState: MutableLiveData<LoadState>?) {
-        mLoadState = loadState
+        this.loadState = loadState
     }
 
     fun setOnDelegatedClickListener(listener: OnDelegatedClickListener) {
-        mOnDelegatedClickListener = listener
+        onDelegatedClickListener = listener
     }
 
     fun setOnUnbondItemClickListener(listener: OnUnbondItemClickListener) {
-        mOnUnbondItemClickListener = listener
+        onUnbondItemClickListener = listener
     }
 
     private fun hasProgressRow(): Boolean {
-        return mLoadState != null && mLoadState!!.value != LoadState.Loaded
+        return loadState != null && loadState!!.value != LoadState.Loaded
     }
 
     class StakeViewHolder(val b: ItemListDelegatedStakeBinding) : RecyclerView.ViewHolder(b.root)
     class ValidatorViewHolder(val b: ItemListDelegatedValidatorBinding) : RecyclerView.ViewHolder(b.root)
+
+    override fun getItemCount(): Int {
+        return data.size
+    }
+
+    override fun <T : DiffUtil.Callback?> dispatchChanges(diffUtilCallbackCls: Class<T>?, items: MutableList<DelegatedItem>, detectMoves: Boolean) {
+        DiffUtilDispatcher.dispatchChanges(this, diffUtilCallbackCls, items, detectMoves)
+    }
+
+    override fun <T : DiffUtil.Callback?> dispatchChanges(diffUtilCallbackCls: Class<T>?, items: MutableList<DelegatedItem>) {
+        DiffUtilDispatcher.dispatchChanges(this, diffUtilCallbackCls, items)
+    }
+
+    override fun getItems(): MutableList<DelegatedItem> {
+        return data
+    }
+
+    override fun setItems(items: MutableList<DelegatedItem>) {
+        data = items
+    }
+
+    override fun clear() {
+        data.clear()
+    }
 }
