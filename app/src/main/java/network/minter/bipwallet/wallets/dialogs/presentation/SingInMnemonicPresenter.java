@@ -30,6 +30,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import javax.inject.Inject;
 
 import moxy.InjectViewState;
@@ -72,6 +74,7 @@ public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView
                 AuthSession.AUTH_TOKEN_ADVANCED,
                 AuthSession.AuthType.Advanced
         );
+        FirebaseCrashlytics.getInstance().setUserId(address.toString());
         getViewState().startHome();
     }
 

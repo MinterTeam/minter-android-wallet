@@ -39,9 +39,12 @@ public class KeyboardHelper {
         View view = fragment.getView();
         if (view != null) {
             view.post(() -> {
-                InputMethodManager imm = (InputMethodManager) fragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null)
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                if (fragment.getActivity() != null) {
+                    InputMethodManager imm = (InputMethodManager) fragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                }
             });
         }
     }

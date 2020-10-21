@@ -83,14 +83,20 @@ class DelegationDataSource(private val factory: Factory) : PageKeyedDataSource<I
                             // notify receiver we have kicked stake
                             factory.hasInWaitList.postValue(res.hasKicked())
 
-                            val lastPage = res.meta?.lastPage ?: 0
+                            //todo: stake list loading as one page, so we don't need to paginate. re-work this
+//                            val lastPage = res.meta?.lastPage ?: 0
 
-                            var nextPage: Int? = null
-                            if (lastPage > 1) {
-                                nextPage = (res.meta?.currentPage ?: 1) + 1
+//                            var nextPage: Int? = null
+//                            if (lastPage > 1) {
+//                                nextPage = (res.meta?.currentPage ?: 1) + 1
+//                            }
+
+                            try {
+                                callback.onResult(res.result!!, null, null)
+                            } catch (e: IllegalStateException) {
+                                //todo: investigate - double calling
                             }
 
-                            callback.onResult(res.result!!, null, nextPage)
                             if (res.result?.isEmpty() == true) {
                                 factory.loadState.postValue(LoadState.Empty)
                             }

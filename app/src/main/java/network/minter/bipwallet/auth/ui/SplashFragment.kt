@@ -33,6 +33,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -122,6 +123,10 @@ class SplashFragment : BaseInjectFragment() {
     }
 
     private fun startHome() {
+        if (secretStorage.addresses.isNotEmpty()) {
+            FirebaseCrashlytics.getInstance().setUserId(secretStorage.mainWallet.toString())
+        }
+
         (activity as BaseMvpInjectActivity?)!!.startActivityClearTop(activity, HomeActivity::class.java)
         activity!!.finish()
     }

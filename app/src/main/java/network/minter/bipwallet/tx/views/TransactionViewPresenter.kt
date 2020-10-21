@@ -31,6 +31,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.*
@@ -51,6 +52,7 @@ import network.minter.core.MinterSDK
 import network.minter.explorer.MinterExplorerSDK
 import network.minter.explorer.models.HistoryTransaction
 import org.joda.time.DateTime
+import timber.log.Timber
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -116,6 +118,11 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
         viewState.setBlockNumber(tx.block.toString())
         viewState.setBlockClickListener { onClickBlockNumber() }
+
+        if (tx.data == null) {
+            FirebaseCrashlytics.getInstance().setCustomKey("tx_id", tx.hash?.toHexString() ?: "null")
+            Timber.e("Tx data is null!")
+        }
 
         val isIncoming = tx.isIncoming(listOf(secretStorage.mainWallet))
 
@@ -222,10 +229,16 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             }
             HistoryTransaction.Type.Delegate,
             HistoryTransaction.Type.Unbond -> {
-                val data: HistoryTransaction.TxDelegateUnbondResult = tx.getData()
+                val data: HistoryTransaction.TxDelegateUnbondResult? = tx.getData()
 
                 viewState.setToName(_tx?.toName)
-                viewState.setToAddress(data.publicKey.toString())
+
+                if (data != null) {
+                    viewState.setToAddress(data.publicKey?.toString())
+                } else {
+                    viewState.setToAddress("<unknown>")
+                }
+
 
                 if (tx.type == HistoryTransaction.Type.Delegate) {
                     viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_delegate)
@@ -235,8 +248,14 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
                 viewState.inflateDetails(R.layout.tx_details_delegate_unbond) {
                     val b = TxDetailsDelegateUnbondBinding.bind(it)
-                    b.valueCoin.text = data.coin.symbol
-                    b.valueStake.text = data.value.humanize()
+                    if (data != null) {
+                        b.valueCoin.text = data.coin.symbol
+                        b.valueStake.text = data.value.humanize()
+                    } else {
+                        b.valueCoin.text = "<unknown>"
+                        b.valueStake.text = "<unknown>"
+                    }
+
                 }
             }
             HistoryTransaction.Type.RedeemCheck -> {

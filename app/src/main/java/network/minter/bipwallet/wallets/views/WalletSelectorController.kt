@@ -33,7 +33,6 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.wallets.contract.WalletSelectorControllerView
 import network.minter.bipwallet.wallets.selector.WalletItem
-import network.minter.bipwallet.wallets.selector.WalletListAdapter
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,15 +71,15 @@ class WalletSelectorController @Inject constructor() {
             fillWalletSelector(AddressListBalancesTotal(secretStorage.addresses))
         }
 
-        viewState!!.setOnClickWalletListener(WalletListAdapter.OnClickWalletListener { walletItem: WalletItem ->
+        viewState!!.setOnClickWalletListener { walletItem: WalletItem ->
             onSelectWallet(walletItem)
-        })
-        viewState!!.setOnClickAddWalletListener(WalletListAdapter.OnClickAddWalletListener {
+        }
+        viewState!!.setOnClickAddWalletListener {
             onClickWalletAdd()
-        })
-        viewState!!.setOnClickEditWalletListener(WalletListAdapter.OnClickEditWalletListener { walletItem: WalletItem ->
+        }
+        viewState!!.setOnClickEditWalletListener { walletItem: WalletItem ->
             onClickWalletEdit(walletItem)
-        })
+        }
     }
 
     private fun fillWalletSelector(res: AddressListBalancesTotal) {
@@ -88,8 +87,8 @@ class WalletSelectorController @Inject constructor() {
         if (res.balances.isEmpty()) {
             return
         }
-        viewState!!.setWallets(WalletItem.create(secretStorage, res))
-        viewState!!.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
+        viewState?.setWallets(WalletItem.create(secretStorage, res))
+        viewState?.setMainWallet(WalletItem.create(secretStorage, res.getBalance(secretStorage.mainWallet)))
     }
 
     private fun onClickWalletAdd() {

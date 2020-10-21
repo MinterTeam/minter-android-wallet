@@ -162,9 +162,6 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
         @Override
         protected void log(int priority, String tag, @NotNull String message, Throwable t) {
             if (priority == Log.ERROR || priority == Log.WARN) {
-                if (app().secretStorage().getHasSecrets()) {
-                    FirebaseCrashlytics.getInstance().setUserId(app().secretStorage().getMainWallet().toString());
-                }
                 final String verb;
                 if (priority == Log.ERROR) {
                     verb = "E";

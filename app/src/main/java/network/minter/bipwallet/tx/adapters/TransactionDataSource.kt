@@ -56,6 +56,7 @@ import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
 import okhttp3.internal.toImmutableList
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -73,10 +74,16 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
         resolveInfo(factory.repo.getTransactions(factory.address, 1, factory.txFilter))
                 .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
-                .subscribe {
-                    factory.loadState?.postValue(LoadState.Loaded)
-                    callback.onResult(it.items, null, if (it.meta.lastPage == 1) null else it.meta.currentPage + 1)
-                }
+                .subscribe(
+                        {
+                            factory.loadState?.postValue(LoadState.Loaded)
+                            val nextPage = if (it.meta.lastPage == 1) null else it.meta.currentPage + 1
+                            callback.onResult(it.items, null, nextPage)
+                        },
+                        {
+                            Timber.w(it, "Unable to load initial tx list"
+                            )
+                        })
     }
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
@@ -85,10 +92,14 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
         resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter))
                 .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
-                .subscribe {
-                    factory.loadState?.postValue(LoadState.Loaded)
-                    callback.onResult(it.items, if (params.key == 1) null else params.key - 1)
-                }
+                .subscribe(
+                        {
+                            factory.loadState?.postValue(LoadState.Loaded)
+                            callback.onResult(it.items, if (params.key == 1) null else params.key - 1)
+                        },
+                        {
+                            Timber.w(it, "Unable to load previous tx list")
+                        })
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
@@ -97,10 +108,14 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
         resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter))
                 .map { res: ExpResult<List<TransactionFacade>> -> groupByDate(res) }
                 .doOnSubscribe { _disposables.add(it) }
-                .subscribe { res: DataSourceMeta<TransactionItem> ->
-                    factory.loadState?.postValue(LoadState.Loaded)
-                    callback.onResult(res.items, if (params.key + 1 > res.meta.lastPage) null else params.key + 1)
-                }
+                .subscribe(
+                        { res: DataSourceMeta<TransactionItem> ->
+                            factory.loadState?.postValue(LoadState.Loaded)
+                            callback.onResult(res.items, if (params.key + 1 > res.meta.lastPage) null else params.key + 1)
+                        },
+                        {
+                            Timber.w(it, "Unable to load next tx list")
+                        })
     }
 
     private fun resolveInfo(source: Observable<ExpResult<List<HistoryTransaction>>>): Observable<ExpResult<List<TransactionFacade>>> {
