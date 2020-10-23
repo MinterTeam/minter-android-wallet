@@ -37,6 +37,7 @@ import android.os.Build;
 import com.annimon.stream.Stream;
 import com.edwardstock.secp256k1.NativeSecp256k1;
 import com.fatboyindustrial.gsonjodatime.Converters;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -63,6 +64,7 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.exceptions.CompositeException;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
@@ -367,7 +369,25 @@ public class WalletModule {
     }
 
     private void initCrashlytics() {
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
+        try {
+            FirebaseApp.initializeApp(mContext);
+        } catch (IllegalStateException ignore) {
+            // it must create instance by itself but on some devices it doesn't work
+        }
+        try {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
+        } catch (Throwable err1) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+            }
+            try {
+                FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
+            } catch (Throwable wtfGoogle) {
+                Timber.e(new CompositeException(err1, wtfGoogle), "Crashed Crashlytics");
+            }
+        }
+
     }
 
     public final static class WalletGsonHawkParer extends GsonParser {

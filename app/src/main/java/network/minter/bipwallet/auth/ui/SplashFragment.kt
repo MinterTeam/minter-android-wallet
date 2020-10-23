@@ -33,7 +33,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -44,6 +43,7 @@ import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
+import network.minter.bipwallet.internal.exceptions.FirebaseSafe
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.security.SecurityModule
 import network.minter.bipwallet.security.ui.PinEnterActivity
@@ -124,7 +124,7 @@ class SplashFragment : BaseInjectFragment() {
 
     private fun startHome() {
         if (secretStorage.addresses.isNotEmpty()) {
-            FirebaseCrashlytics.getInstance().setUserId(secretStorage.mainWallet.toString())
+            FirebaseSafe.setUserId(secretStorage.mainWallet.toString())
         }
 
         (activity as BaseMvpInjectActivity?)!!.startActivityClearTop(activity, HomeActivity::class.java)

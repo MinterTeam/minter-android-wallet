@@ -65,10 +65,6 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
     protected static WalletComponent app;
     protected static boolean sEnableInject = true;
 
-    static {
-//        Locale.setDefault(LC_EN);
-    }
-
     @Inject
     DispatchingAndroidInjector<Object> dispatchingAndroidInjector;
 
@@ -168,7 +164,11 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
                 } else {
                     verb = "W";
                 }
-                FirebaseCrashlytics.getInstance().recordException(new RuntimeException(String.format("%s/%s: %s", verb, tag, message), t));
+                try {
+                    FirebaseCrashlytics.getInstance().recordException(new RuntimeException(String.format("%s/%s: %s", verb, tag, message), t));
+                } catch (Throwable ignore) {
+                }
+
             }
         }
     }

@@ -30,13 +30,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
 import javax.inject.Inject;
 
 import moxy.InjectViewState;
 import network.minter.bipwallet.auth.contract.SignInMnemonicView;
 import network.minter.bipwallet.internal.auth.AuthSession;
+import network.minter.bipwallet.internal.exceptions.FirebaseSafe;
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter;
 import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.internal.system.SimpleTextWatcher;
@@ -74,7 +73,7 @@ public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView
                 AuthSession.AUTH_TOKEN_ADVANCED,
                 AuthSession.AuthType.Advanced
         );
-        FirebaseCrashlytics.getInstance().setUserId(address.toString());
+        FirebaseSafe.setUserId(address.toString());
         getViewState().startHome();
     }
 

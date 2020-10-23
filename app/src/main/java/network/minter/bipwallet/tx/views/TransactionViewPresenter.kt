@@ -31,10 +31,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.*
+import network.minter.bipwallet.internal.exceptions.FirebaseSafe
 import network.minter.bipwallet.internal.helpers.DateHelper.DATE_FORMAT_WITH_TZ
 import network.minter.bipwallet.internal.helpers.DateHelper.fmt
 import network.minter.bipwallet.internal.helpers.IntentHelper
@@ -52,7 +52,6 @@ import network.minter.core.MinterSDK
 import network.minter.explorer.MinterExplorerSDK
 import network.minter.explorer.models.HistoryTransaction
 import org.joda.time.DateTime
-import timber.log.Timber
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -120,8 +119,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
         viewState.setBlockClickListener { onClickBlockNumber() }
 
         if (tx.data == null) {
-            FirebaseCrashlytics.getInstance().setCustomKey("tx_id", tx.hash?.toHexString() ?: "null")
-            Timber.e("Tx data is null!")
+            FirebaseSafe.setCustomKey("tx_id", tx.hash?.toHexString() ?: "null")
         }
 
         val isIncoming = tx.isIncoming(listOf(secretStorage.mainWallet))
