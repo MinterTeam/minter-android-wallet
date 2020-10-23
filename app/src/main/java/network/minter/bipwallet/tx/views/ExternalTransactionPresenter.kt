@@ -49,13 +49,16 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.Preconditions.firstNonNull
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
+import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction
+import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.helpers.DeepLinkHelper
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.MathHelper.clamp
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
+import network.minter.bipwallet.internal.helpers.NetworkHelper
 import network.minter.bipwallet.internal.helpers.forms.validators.NumberNotZeroValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -102,9 +105,11 @@ private data class BuyRequiredAmount(
         var amount: BigDecimal
 )
 
-
+/**
+ * @TODO: total refactor needed
+ */
 @InjectViewState
-class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<ExternalTransactionView>() {
+class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<ExternalTransactionView>(), ErrorManager.ErrorGlobalHandlerListener {
 
     companion object {
         const val REQUEST_EXCHANGE_COINS = 6000
@@ -119,6 +124,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     @Inject lateinit var coins: RepoCoins
     @Inject lateinit var coinMapper: CoinMapper
     @Inject lateinit var res: Resources
+    @Inject lateinit var networkHelper: NetworkHelper
+    @Inject lateinit var errorManager: ErrorManager
 
     private var extTx: ExternalTransaction? = null
     private var from: MinterAddress? = null
@@ -128,6 +135,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private var isWsBound = false
     private var buyRequiredAmount: BuyRequiredAmount? = null
     private var enableEditInput = false
+
+    override fun onError(t: Throwable, retryListener: RetryListener) {
+        viewState.hideWaitProgress()
+        viewState.hideExchangeBanner()
+        handlerError(t, retryListener)
+    }
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -164,6 +177,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
     override fun attachView(view: ExternalTransactionView) {
         super.attachView(view)
+        coins.observe()
+                .subscribe {
+                    viewState.hideProgress()
+                }
+        coins.update()
         accountStorage.observe()
                 .subscribe(
                         {
@@ -293,21 +311,22 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             calculateFee(extTx!!)
         }
 
-        viewState.showWaitProgress()
+        viewState.showProgress()
 
-        try {
-            coinMapper.resolveAllCoins()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        viewState.hideWaitProgress()
+        coinMapper.resolveAllCoins()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe {
+                    try {
+                        viewState.hideProgress()
                         Timber.d("Coin mapper cache has been loaded")
                         fillData(extTx!!)
-                    }
-        } catch (t: Throwable) {
-            showTxErrorDialog("Invalid transaction data: %s", t.message!!)
-        }
 
+                    } catch (t: Throwable) {
+                        viewState.hideProgress()
+                        showTxErrorDialog("Invalid transaction data: %s", t.message!!)
+                    }
+                }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -342,13 +361,13 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                             i++
                                             if (i > 1) {
-                                                viewState.showWaitProgress()
+                                                viewState.showProgress()
                                             }
                                             Thread.sleep(1000)
 
                                         } while (run)
 
-                                        viewState.hideWaitProgress()
+                                        viewState.hideProgress()
                                         emitter.onNext(success)
                                         emitter.onComplete()
                                     }
@@ -369,23 +388,24 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     }
 
     private fun getTxInitData(address: MinterAddress?): Observable<TxInitData> {
-        return Observable.combineLatest(
-                estimateRepo.getTransactionCount(address!!),
-                gasRepo.minGas,
-                BiFunction { txCountGateResult: GateResult<TxCount>, gasValueGateResult: GateResult<GasValue> ->
+        return Observable
+                .combineLatest(
+                        estimateRepo.getTransactionCount(address!!),
+                        gasRepo.minGas,
+                        BiFunction { txCountGateResult: GateResult<TxCount>, gasValueGateResult: GateResult<GasValue> ->
 
-                    // if some request failed, returning error result
-                    if (!txCountGateResult.isOk) {
-                        return@BiFunction TxInitData(txCountGateResult.castErrorResultTo<Any>())
-                    } else if (!gasValueGateResult.isOk) {
-                        return@BiFunction TxInitData(gasValueGateResult.castErrorResultTo<Any>())
-                    }
-                    TxInitData(
-                            txCountGateResult.result.count.add(BigInteger.ONE),
-                            gasValueGateResult.result.gas
-                    )
-                }
-        )
+                            // if some request failed, returning error result
+                            if (!txCountGateResult.isOk) {
+                                return@BiFunction TxInitData(txCountGateResult.castErrorResultTo<Any>())
+                            } else if (!gasValueGateResult.isOk) {
+                                return@BiFunction TxInitData(gasValueGateResult.castErrorResultTo<Any>())
+                            }
+                            TxInitData(
+                                    txCountGateResult.result.count.add(BigInteger.ONE),
+                                    gasValueGateResult.result.gas
+                            )
+                        }
+                )
     }
 
     private fun showTxErrorDialog(message: String, vararg args: Any) {
@@ -455,6 +475,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         val type = extTx!!.type
         val txValues = getCoinAndAmountFromTx(type)
 
+
         if (txValues != null) {
             val balance = accountStorage.data.getBalance(from!!)
             val coinBalanceSearch = balance.findCoin(txValues.coinId)
@@ -471,21 +492,26 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 //@todo: check it's working
 
                 coinMapper.exist(txValues.coinId)
+                        .retryWhen(errorManager.retryWhenHandlerCompletable)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(
                                 { exist ->
                                     if (exist) {
                                         val coin = coinMapper.getById(txValues.coinId)
-                                        viewState.showBannerExchangeText(
-                                                HtmlCompat.fromHtml(Wallet.app().res().getString(R.string.description_external_not_enough_coins, notEnough.toPlain(), coin!!.symbol))
-                                        ) {
-                                            viewState.startExchangeCoins(REQUEST_EXCHANGE_COINS, coin, notEnough, from!!)
+                                        if (coin != null) {
+                                            viewState.showBannerExchangeText(
+                                                    HtmlCompat.fromHtml(Wallet.app().res().getString(R.string.description_external_not_enough_coins, notEnough.toPlain(), coin.symbol
+                                                            ?: txValues.coinId.toString()))
+                                            ) {
+                                                viewState.startExchangeCoins(REQUEST_EXCHANGE_COINS, coin, notEnough, from!!)
+                                            }
+                                        } else {
+                                            viewState.hideExchangeBanner()
                                         }
                                     } else {
                                         viewState.showBannerError(R.string.description_external_unknown_coin_id)
                                     }
-
                                 },
                                 { t ->
                                     Timber.w(t, "Unable to check coin exists")
@@ -496,6 +522,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 return
             }
         }
+
+
 
         buyRequiredAmount = null
         viewState.hideExchangeBanner()
@@ -1134,7 +1162,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         .onErrorResumeNext(ReactiveGate.toGateError())
                         )
                     })
-                    .doFinally { onExecuteComplete() }
                     .subscribe(
                             { result: GateResult<PushResult> -> onSuccessExecuteTransaction(result) },
                             { t -> onFailedExecuteTransaction(t) }
@@ -1151,7 +1178,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .setText(errorResult.message)
                     .setPositiveAction("Close") { d, _ ->
                         d.dismiss()
-                        viewState.finishCancel()
+//                        viewState.finishCancel()
                     }
                     .create()
         }
@@ -1164,7 +1191,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .setText(throwable.message)
                     .setPositiveAction("Close") { d, _ ->
                         d.dismiss()
-                        viewState.finishCancel()
+                        //viewState.finishCancel()
                     }
                     .create()
         }
@@ -1195,19 +1222,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         }
     }
 
-    private fun onExecuteComplete() {}
-
     private fun onSubmit() {
         startExecuteTransaction()
-//        viewState.startDialog { ctx ->
-//            ConfirmDialog.Builder(ctx, R.string.dialog_title_confirm_transaction)
-//                    .setText(R.string.dialog_description_external_tx_short)
-//                    .setPositiveAction(R.string.btn_confirm) { _, _ ->
-//                        startExecuteTransaction()
-//                    }
-//                    .setNegativeAction(R.string.btn_cancel)
-//                    .create()
-//        }
     }
 
     private fun onCancel() {

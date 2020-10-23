@@ -46,7 +46,7 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.releaseDialog
 import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDialogWithExecutor
-import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
+import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.MathHelper.startsFromNumber
 import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
@@ -125,16 +125,34 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
     }
 
     override fun hideProgress() {
-        releaseDialog(walletDialog)
-        walletDialog = null
+        hideWaitProgress()
+//        releaseDialog(walletDialog)
+//        walletDialog = null
+    }
+
+    override fun onError(t: Throwable?) {
+        ErrorViewHelper(b.errorView).onError(t)
+    }
+
+    override fun onError(err: String?) {
+        ErrorViewHelper(b.errorView).onError(err)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(b.errorView).onErrorWithRetry(errorMessage, errorResolver)
+    }
+
+    override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
+        ErrorViewHelper(b.errorView).onErrorWithRetry(errorMessage, actionName, errorResolver)
     }
 
     override fun showProgress() {
-        walletDialog = switchDialogWithExecutor(this, walletDialog, { ctx: Context? ->
-            WalletProgressDialog.Builder(ctx, "Please, wait")
-                    .setText("We're loading required account information")
-                    .create()
-        })
+        showWaitProgress()
+//        walletDialog = switchDialogWithExecutor(this, walletDialog, { ctx: Context? ->
+//            WalletProgressDialog.Builder(ctx, "Please, wait")
+//                    .setText("We're loading required account information")
+//                    .create()
+//        })
     }
 
     override fun finishSuccess() {

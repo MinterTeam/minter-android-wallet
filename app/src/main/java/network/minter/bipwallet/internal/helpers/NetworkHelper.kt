@@ -28,8 +28,11 @@ package network.minter.bipwallet.internal.helpers
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.*
+import android.os.Build
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import io.reactivex.subjects.BehaviorSubject
 import network.minter.bipwallet.internal.helpers.ImageHelper.Companion.makeBitmapCircle
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -41,11 +44,45 @@ import java.io.IOException
  *
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class NetworkHelper(private val mContext: Context) {
+class NetworkHelper(private val context: Context) {
+    private val connectivityManager by lazy { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+    private var networkCallback: ConnectivityManager.NetworkCallback
+    private var hasNetwork: Boolean = false
+    private var hasInternet: Boolean = false
+    private val networkSubject: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
+    init {
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                hasNetwork = true
+            }
+
+            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+                super.onCapabilitiesChanged(network, networkCapabilities)
+
+                hasInternet = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                networkSubject.onNext(hasNetwork && hasInternet)
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                hasNetwork = false
+                hasNetwork = false
+                networkSubject.onNext(false)
+            }
+        }
+
+        connectivityManager.registerNetworkCallback(
+                NetworkRequest.Builder()
+                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        .build(),
+                networkCallback)
+    }
 
     fun downloadImage(url: String?): Observable<Bitmap?> {
         return downloadFile(url)
-                .switchMap { result: ResponseBody? -> Observable.just(result!!.bytes()) }
+                .switchMap { result: ResponseBody -> Observable.just(result.bytes()) }
                 .switchMap { bytes: ByteArray -> Observable.just(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) }
     }
 
@@ -68,6 +105,26 @@ class NetworkHelper(private val mContext: Context) {
                 subscriber.onError(e)
             }
         }
+    }
+
+    fun hasNetworkConnectionSubject(): BehaviorSubject<Boolean> {
+        return networkSubject
+    }
+
+    fun hasNetworkConnection(): Boolean {
+        val res = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            hasInternet || connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
+        } else {
+            val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+            var result = false
+            if (activeNetwork != null) {
+                result = activeNetwork.isConnectedOrConnecting
+            }
+
+            hasInternet || result
+        }
+        networkSubject.onNext(res)
+        return res
     }
 
 }

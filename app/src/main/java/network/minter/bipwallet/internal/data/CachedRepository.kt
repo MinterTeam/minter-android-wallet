@@ -29,6 +29,7 @@ import androidx.annotation.CallSuper
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.exceptions.UndeliverableException
@@ -352,6 +353,31 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
                 .subscribe { updateInternal(force, onNext, onError, onComplete) }
         subscriptions.add(sub)
         return this
+    }
+
+    fun updateBlockingSingle(force: Boolean = false,
+                             onSuccess: Consumer<ResultModel>? = null,
+                             onError: Consumer<Throwable>? = null,
+                             onComplete: Action? = null): Single<ResultModel> {
+        synchronized(updateLock) {
+            val observable: Observable<ResultModel>
+            if (!force && !isExpired && isDataReady) {
+                observable = Observable.just(entity.getData())
+            } else {
+                observable = updateObservable
+                invalidateTime()
+            }
+
+            return try {
+                val res = observable.blockingFirst()
+                callOnNext(onSuccess).accept(res)
+                callOnComplete(onComplete).run()
+                Single.just(res)
+            } catch (t: Throwable) {
+                callOnError(onError).accept(t)
+                Single.error(t)
+            }
+        }
     }
 
     protected fun updateInternal(

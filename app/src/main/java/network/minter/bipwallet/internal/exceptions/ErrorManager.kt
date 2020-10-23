@@ -26,11 +26,14 @@
 
 package network.minter.bipwallet.internal.exceptions
 
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
 import network.minter.core.internal.exceptions.NetworkException
+import org.reactivestreams.Publisher
 import java.util.concurrent.TimeUnit
 
 typealias RetryListener = () -> Unit
@@ -326,6 +329,27 @@ class ErrorManager {
             }
         }
     }
+
+    val retryWhenHandlerCompletable: Function<Flowable<out Throwable>, Publisher<*>>
+        get() {
+            return Function { observable: Flowable<out Throwable> ->
+                observable.flatMap { err: Throwable ->
+
+                    synchronized(lock) {
+                        handlers.values.forEach { it.onError(err, retryListener) }
+                        receivers.values.forEach { it.onError(err) }
+                    }
+                    subject.doOnNext {
+                        synchronized(lock) {
+                            handlers.values.forEach { it.onRetried?.invoke() }
+                            receivers.values.forEach { it.onRetried?.invoke() }
+                        }
+                    }
+
+                    subject.toFlowable(BackpressureStrategy.LATEST).delay(500, TimeUnit.MILLISECONDS)
+                }
+            }
+        }
 
     val retryWhenHandler: Function<Observable<out Throwable>, ObservableSource<*>>
         get() {

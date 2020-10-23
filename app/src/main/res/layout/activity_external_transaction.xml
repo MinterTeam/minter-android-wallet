@@ -51,6 +51,16 @@
             android:text="@string/title_confirm_tx" />
     </androidx.appcompat.widget.Toolbar>
 
+    <network.minter.bipwallet.internal.views.error.StaticErrorView
+        android:id="@+id/error_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:visibility="visible" />
+
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -58,7 +68,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/error_view">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

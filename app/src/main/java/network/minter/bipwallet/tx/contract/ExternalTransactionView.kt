@@ -33,6 +33,7 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.DialogFragmentExecutor
 import network.minter.bipwallet.internal.dialogs.WalletDialog
+import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.internal.mvp.ProgressView
 import network.minter.bipwallet.tx.ui.TxInputFieldRow
 import network.minter.core.crypto.MinterAddress
@@ -44,7 +45,7 @@ import java.math.BigDecimal
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface ExternalTransactionView : MvpView, ProgressView {
+interface ExternalTransactionView : MvpView, ProgressView, ErrorViewWithRetry {
     fun setData(allRows: MutableList<TxInputFieldRow<*>>)
 
     fun setFee(fee: CharSequence)
