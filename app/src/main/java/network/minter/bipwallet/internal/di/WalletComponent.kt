@@ -52,6 +52,8 @@ import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.system.ForegroundDetector
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager
+import network.minter.bipwallet.stories.repo.RepoCachedStories
+import network.minter.bipwallet.stories.repo.StoriesRepository
 import network.minter.core.internal.api.ApiService
 import network.minter.explorer.repo.*
 import network.minter.ledger.connector.rxjava2.RxMinterLedger
@@ -127,6 +129,9 @@ interface WalletComponent {
     fun txInitDataRepo(): TxInitDataRepository
     fun coinsGateRepo(): GateCoinRepository
     fun coinMapper(): CoinMapper
+
+    fun storiesRepo(): StoriesRepository
+    fun storiesCachedRepo(): RepoCachedStories
 
     // db
     fun db(): WalletDatabase

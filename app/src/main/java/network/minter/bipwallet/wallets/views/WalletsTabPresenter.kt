@@ -29,6 +29,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
@@ -39,10 +41,13 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.Plurals
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
+import network.minter.bipwallet.internal.settings.EnableStories
+import network.minter.bipwallet.internal.settings.SettingsManager
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
+import network.minter.bipwallet.stories.repo.RepoCachedStories
 import network.minter.bipwallet.wallets.contract.WalletsTabView
 import network.minter.bipwallet.wallets.data.BalanceCurrentState
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment
@@ -72,8 +77,11 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
     @Inject lateinit var txRepo: RepoTransactions
     @Inject lateinit var walletSelectorController: WalletSelectorController
     @Inject lateinit var errorManager: ErrorManager
+    @Inject lateinit var storiesRepository: RepoCachedStories
+    @Inject lateinit var settings: SettingsManager
 
     private val balanceState = BalanceCurrentState()
+    private var storiesDisposable: Disposable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -116,10 +124,32 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         viewState.showBalanceProgress(false)
     }
 
+    private fun initStories() {
+        if (settings[EnableStories]) {
+            storiesDisposable = storiesRepository.observe()
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe {
+                        if (it.isNotEmpty()) {
+                            Timber.d("Show stories")
+                            viewState.showStoriesList(it)
+                        }
+                    }
+
+            storiesRepository.update()
+        } else {
+            storiesDisposable?.dispose()
+            storiesDisposable = null
+            viewState.hideStoriesList()
+        }
+    }
+
     override fun attachView(view: WalletsTabView) {
         walletSelectorController.attachView(view)
         super.attachView(view)
         errorManager.subscribe(this)
+
+        initStories()
 
         viewState.setOnClickDelegated {
             onClickStartDelegationList(it)
@@ -219,10 +249,12 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         viewState.setBalanceRewards("+ ${res.amount.humanize()} ${MinterSDK.DEFAULT_COIN} today")
     }
 
-
     private fun forceUpdate() {
         accountStorage.update(true)
 //        dailyRewardsRepo.update(true)
+        if (settings[EnableStories]) {
+            storiesRepository.update(true)
+        }
         txRepo.update(true)
     }
 
@@ -234,5 +266,9 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
     @Suppress("UNUSED_PARAMETER")
     private fun onClickStartDelegationList(view: View) {
         viewState.startDelegationList()
+    }
+
+    fun setShowStories(enabled: Boolean) {
+        initStories()
     }
 }

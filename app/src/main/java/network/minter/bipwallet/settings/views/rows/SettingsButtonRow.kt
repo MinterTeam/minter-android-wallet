@@ -26,17 +26,13 @@
 package network.minter.bipwallet.settings.views.rows
 
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import butterknife.BindView
-import butterknife.ButterKnife
 import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.ItemListSettingsBinding
 import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.common.Lazy
-import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter.RowViewHolder
-import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract
+import network.minter.bipwallet.internal.views.list.multirow.BindingRow
 
 /**
  * minter-android-wallet. 2020
@@ -44,131 +40,118 @@ import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract
  */
 typealias SettingsButtonClickListener = (view: View, sharedView: View, value: String) -> Unit
 
-class SettingsButtonRow : MultiRowContract.Row<SettingsButtonRow.ViewHolder> {
-    private var mKey: CharSequence?
-    private var mValue: Lazy<String>
-    private var mEnabled = Lazy { true }
-    private var mDefValue: String? = null
-    private var mListener: SettingsButtonClickListener?
-    private var mInactive = false
-    private val mDefer = DeferredCall.createWithSize<ViewHolder>(1)
+class SettingsButtonRow : BindingRow<ItemListSettingsBinding> {
+    private var key: CharSequence? = null
+    private var keyRes: Int = 0
+    private var value: Lazy<String>
+    private var defValue: String? = null
+    private var isEnabledLazy = Lazy { true }
+    private var clickListener: SettingsButtonClickListener?
+    private var isInactive = false
+    private val deferCall = DeferredCall.createWithSize<ItemListSettingsBinding>(1)
+
+    constructor(@StringRes key: Int, value: Lazy<String>, defValue: String, listener: SettingsButtonClickListener?) :
+            this(key, value, listener) {
+        this.defValue = defValue
+    }
+
+    constructor(@StringRes key: Int, value: String, listener: SettingsButtonClickListener?) {
+        this.keyRes = key
+        this.value = Lazy { value }
+        clickListener = listener
+    }
+
+    constructor(@StringRes key: Int, value: Lazy<String>, listener: SettingsButtonClickListener?) {
+        this.keyRes = key
+        this.value = value
+        clickListener = listener
+    }
 
     constructor(key: CharSequence?, value: Lazy<String>, defValue: String, listener: SettingsButtonClickListener?) :
             this(key, value, listener) {
-        mDefValue = defValue
+        this.defValue = defValue
     }
 
     constructor(key: CharSequence?, value: String, listener: SettingsButtonClickListener?) {
-        mKey = key
-        mValue = Lazy { value }
-        mListener = listener
+        this.key = key
+        this.value = Lazy { value }
+        clickListener = listener
     }
 
     constructor(key: CharSequence?, value: Lazy<String>, listener: SettingsButtonClickListener?) {
-        mKey = key
-        mValue = value
-        mListener = listener
+        this.key = key
+        this.value = value
+        clickListener = listener
     }
 
     fun setInactive(inactive: Boolean): SettingsButtonRow {
-        mInactive = inactive
+        isInactive = inactive
         return this
     }
 
     fun setValue(value: Lazy<String>, listener: SettingsButtonClickListener?): SettingsButtonRow {
-        mValue = value
-        mListener = listener
-        mDefer.call { vh: ViewHolder -> this.fill(vh) }
+        this.value = value
+        clickListener = listener
+        deferCall.call { b: ItemListSettingsBinding -> this.fill(b) }
         return this
     }
 
     fun setValue(value: Lazy<String>): SettingsButtonRow {
-        mValue = value
-        mDefer.call { vh: ViewHolder -> this.fill(vh) }
+        this.value = value
+        deferCall.call { b: ItemListSettingsBinding -> this.fill(b) }
         return this
     }
 
     fun setEnabled(enabled: Lazy<Boolean>): SettingsButtonRow {
-        mEnabled = enabled
+        isEnabledLazy = enabled
         setInactive(!enabled.get())
         return this
     }
 
     fun setEnabled(enabled: Boolean): SettingsButtonRow {
-        mEnabled = Lazy { enabled }
+        isEnabledLazy = Lazy { enabled }
         setInactive(!enabled)
         return this
     }
 
-    override fun getItemView(): Int {
-        return R.layout.item_list_settings
+    override fun onBind(binding: ItemListSettingsBinding) {
+        fill(binding)
+        deferCall.attach(binding)
     }
 
-    override fun getRowPosition(): Int {
-        return 0
+    override fun onUnbind(binding: ItemListSettingsBinding) {
+        deferCall.detach()
     }
 
-    override fun isVisible(): Boolean {
-        return true
+    override fun getBindingClass(): Class<ItemListSettingsBinding> {
+        return ItemListSettingsBinding::class.java
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder) {
-        fill(viewHolder)
-        mDefer.attach(viewHolder)
-    }
-
-    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
-        mDefer.detach()
-    }
-
-    override fun getViewHolderClass(): Class<ViewHolder> {
-        return ViewHolder::class.java
-    }
-
-    private fun fill(vh: ViewHolder) {
-        if (mKey != null && mKey!!.length > 0) {
-            ViewCompat.setTransitionName(vh.key!!, "settings_field")
+    private fun fill(b: ItemListSettingsBinding) {
+        if (keyRes > 0) {
+            key = b.root.context.getString(keyRes)
         }
-        vh.itemView.isEnabled = mEnabled.get()
-        vh.key!!.text = mKey
-        vh.value!!.text = mValue.get()
-        if (mDefValue == null) {
-            if (mInactive) {
+        b.root.isEnabled = isEnabledLazy.get()
+        b.itemKey.text = key
+        b.itemValue.text = value.get()
+        if (defValue == null) {
+            if (isInactive) {
 
-                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorGrey))
+                b.itemValue.setTextColor(ContextCompat.getColor(b.root.context, R.color.textColorGrey))
             } else {
-                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorPrimary))
+                b.itemValue.setTextColor(ContextCompat.getColor(b.root.context, R.color.textColorPrimary))
             }
         } else {
-            if (mValue.get() != null && mValue.get()!!.isEmpty()) {
-                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorGrey))
-                vh.value!!.text = mDefValue
+            if (value.get() != null && value.get()!!.isEmpty()) {
+                b.itemValue.setTextColor(ContextCompat.getColor(b.root.context, R.color.textColorGrey))
+                b.itemValue.text = defValue
             } else {
-                vh.value!!.setTextColor(ContextCompat.getColor(vh.itemView.context, R.color.textColorPrimary))
-                vh.value!!.text = mValue.get()
+                b.itemValue.setTextColor(ContextCompat.getColor(b.root.context, R.color.textColorPrimary))
+                b.itemValue.text = value.get()
             }
         }
-        vh.itemView.setOnClickListener {
-            mListener?.invoke(vh.itemView, vh.key!!, mValue.get())
-        }
-    }
-//
-//    interface OnClickListener {
-//        fun onClick(view: View, sharedView: View, value: String)
-//    }
-
-    class ViewHolder(itemView: View) : RowViewHolder(itemView) {
-        @JvmField @BindView(R.id.item_key)
-        var key: TextView? = null
-
-        @JvmField @BindView(R.id.item_value)
-        var value: TextView? = null
-
-        @JvmField @BindView(R.id.item_icon)
-        var icon: ImageView? = null
-
-        init {
-            ButterKnife.bind(this, itemView)
+        b.root.setOnClickListener {
+            clickListener?.invoke(b.root, b.itemKey, value.get())
         }
     }
 }

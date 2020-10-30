@@ -34,6 +34,7 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
@@ -61,6 +62,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import network.minter.bipwallet.R;
@@ -123,6 +125,15 @@ public final class ViewHelper {
         ViewGroup.MarginLayoutParams lp = ((ViewGroup.MarginLayoutParams) textView.getLayoutParams());
         lp.topMargin = ((int) context.getResources().getDimension(dimenRes));
         textView.setLayoutParams(lp);
+    }
+
+    public static int getNavigationBarHeight(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
     }
 
     public static void setMarginTop(TextView textView, @Dp float dps) {
@@ -300,6 +311,16 @@ public final class ViewHelper {
         if (activity == null) return;
         if (activity.getWindow().getStatusBarColor() == color) return;
         activity.getWindow().setStatusBarColor(color);
+    }
+
+    public static void setSystemBarsTranslucent(Activity activity) {
+        activity.getWindow().setNavigationBarColor(ContextCompat.getColor(activity, R.color.transparent));
+        activity.getWindow().setStatusBarColor(ContextCompat.getColor(activity, R.color.transparent));
+    }
+
+    public static void setSystemBarsOpaque(Activity activity) {
+//        activity.getWindow().setNavigationBarColor(ContextCompat.getColor(activity, R.color.transparent));
+//        activity.getWindow().setStatusBarColor(ContextCompat.getColor(activity, R.color.transparent));
     }
 
     public static void setSystemBarsLightness(Fragment fragment, boolean light) {

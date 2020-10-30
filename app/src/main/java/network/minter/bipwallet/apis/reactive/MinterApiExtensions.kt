@@ -26,8 +26,12 @@
 
 package network.minter.bipwallet.apis.reactive
 
+import android.content.Context
+import android.content.Intent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.reactivex.Observable
 import network.minter.bipwallet.BuildConfig
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.RegexReplaceData
 import network.minter.bipwallet.internal.helpers.StringsHelper
@@ -94,3 +98,16 @@ val MinterAddress.avatar: String
 
 val MinterPublicKey.avatar: String
     get() = "${BuildConfig.EXPLORER_STATIC_URL}/validators/${toString()}.png"
+
+fun Context?.sendLocalBroadcast(intent: Intent) {
+    if (this == null) return
+    LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+}
+
+fun Float.dp(): Float {
+    return Wallet.app().display().dpToPx(this).toFloat()
+}
+
+fun Int.dp(): Float {
+    return Wallet.app().display().dpToPx(this).toFloat()
+}

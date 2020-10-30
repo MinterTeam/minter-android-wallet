@@ -65,6 +65,7 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.exceptions.CompositeException;
+import io.reactivex.schedulers.Schedulers;
 import network.minter.bipwallet.BuildConfig;
 import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
@@ -94,11 +95,15 @@ import network.minter.core.internal.api.converters.MinterAddressJsonConverter;
 import network.minter.core.internal.api.converters.MinterCheckJsonConverter;
 import network.minter.core.internal.api.converters.MinterHashJsonConverter;
 import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
+import network.minter.core.internal.common.Acceptor;
 import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.core.internal.log.TimberLogger;
 import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.models.HistoryTransaction;
 import network.minter.ledger.connector.rxjava2.RxMinterLedger;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import timber.log.Timber;
 
 import static android.content.Context.USB_SERVICE;
@@ -301,12 +306,37 @@ public class WalletModule {
         builder
                 .setEmptyAuthTokenListener(session::logout)
                 .setDebug(mDebug)
+                .setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY)
                 .setAuthHeaderName("Authorization")
                 .addHeader("User-Agent", "Minter Android " + BuildConfig.VERSION_CODE)
                 .addHeader("X-Client-Version", BuildConfig.VERSION_NAME)
                 .addHeader("X-Client-Build", String.valueOf(BuildConfig.VERSION_CODE));
 
         return builder;
+    }
+
+    @Provides
+    @Named("stories")
+    public ApiService.Builder provideStoriesApiService() {
+        ApiService.Builder api = new ApiService.Builder(BuildConfig.STORIES_API_URL);
+        api.setDebug(mDebug);
+        api.addHeader("User-Agent", "Minter Android " + BuildConfig.VERSION_CODE);
+        api.addHeader("X-Client-Version", BuildConfig.VERSION_NAME);
+        api.addHeader("X-Client-Build", String.valueOf(BuildConfig.VERSION_CODE));
+        api.addHeader("Content-Type", "application/json");
+
+        String dateFormat = "yyyy-MM-dd HH:mm:ssX";
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
+            dateFormat = "yyyy-MM-dd HH:mm:ssZ";
+        }
+        api.setDateFormat(dateFormat);
+        api.setRetrofitClientConfig(new Acceptor<Retrofit.Builder>() {
+            @Override
+            public void accept(Retrofit.Builder builder) {
+                builder.addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()));
+            }
+        });
+        return api;
     }
 
     @Provides
@@ -369,24 +399,27 @@ public class WalletModule {
     }
 
     private void initCrashlytics() {
-        try {
-            FirebaseApp.initializeApp(mContext);
-        } catch (IllegalStateException ignore) {
-            // it must create instance by itself but on some devices it doesn't work
-        }
-        try {
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
-        } catch (Throwable err1) {
+        if (mEnableExternalLog) {
             try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
+                FirebaseApp.initializeApp(mContext);
+            } catch (IllegalStateException ignore) {
+                // it must create instance by itself but on some devices it doesn't work
             }
             try {
                 FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
-            } catch (Throwable wtfGoogle) {
-                Timber.e(new CompositeException(err1, wtfGoogle), "Crashed Crashlytics");
+            } catch (Throwable err1) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                }
+                try {
+                    FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(mEnableExternalLog);
+                } catch (Throwable wtfGoogle) {
+                    Timber.e(new CompositeException(err1, wtfGoogle), "Crashed Crashlytics");
+                }
             }
         }
+
 
     }
 

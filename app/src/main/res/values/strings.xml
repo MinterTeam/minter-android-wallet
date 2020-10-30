@@ -390,5 +390,15 @@
     <string name="error_not_enough_coins">Not enough coins</string>
     <string name="error_amount_exceed_stake">Amount exceeds delegated stake</string>
     <string name="empty_validators">Unable to show validators</string>
+    <string name="error_unable_load_story_slide">Unable to load story</string>
+    <string name="settings_title_stories">Stories</string>
+    <string name="settings_title_notifications">Notifications</string>
+    <string name="settings_title_security">Security</string>
+    <string name="settings_stories_enabled_label">Show Stories</string>
+    <string name="settings_notifications_enabled_label">Enable notifications</string>
+    <string name="settings_sounds_enabled_label">Enable sounds</string>
+    <string name="settings_sec_pin_change_label">Change PIN-code</string>
+    <string name="settings_sec_fingerprint_enabled_label">Unlock with fingerprint</string>
+    <string name="settings_sec_pin_enabled_label">Unlock with PIN-code</string>
 
 </resources>

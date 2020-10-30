@@ -34,6 +34,7 @@ import moxy.viewstate.strategy.OneExecutionStateStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.internal.mvp.ProgressView
+import network.minter.bipwallet.stories.models.Story
 import network.minter.core.crypto.MinterPublicKey
 
 /**
@@ -86,4 +87,7 @@ interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
     fun notifyUpdated()
 
     fun showBalanceProgress(show: Boolean)
+    fun showStoriesList(stories: List<Story>)
+    fun hideStoriesList()
+    fun setStoriesListData(items: List<Story>)
 }

@@ -58,6 +58,7 @@ import network.minter.bipwallet.security.SecurityModule.PinMode
 import network.minter.bipwallet.security.ui.PinEnterActivity
 import network.minter.bipwallet.settings.contract.SettingsTabView
 import network.minter.bipwallet.settings.views.SettingsTabPresenter
+import network.minter.bipwallet.stories.StoriesStateReceiver
 import network.minter.bipwallet.wallets.ui.WalletsTopRecolorHelper
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -200,6 +201,10 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
 
     override fun startIntent(intent: Intent) {
         startActivity(intent)
+    }
+
+    override fun notifyStoriesState(enabled: Boolean) {
+        StoriesStateReceiver.send(context, enabled)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

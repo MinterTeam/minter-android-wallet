@@ -27,16 +27,11 @@ package network.minter.bipwallet.settings.views.rows
 
 import android.view.View
 import android.widget.CompoundButton
-import android.widget.Switch
-import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.view.ViewCompat
-import butterknife.BindView
-import butterknife.ButterKnife
-import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.RowItemSwitchSettingsBinding
 import network.minter.bipwallet.internal.common.DeferredCall
-import network.minter.bipwallet.internal.common.Lazy
-import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter.RowViewHolder
-import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract
+import network.minter.bipwallet.internal.views.list.multirow.BindingRow
 
 /**
  * minter-android-wallet. 2020
@@ -45,101 +40,91 @@ import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract
 
 typealias SettingsSwitchClickListener = (view: View, checked: Boolean) -> Unit
 
-class SettingsSwitchRow : MultiRowContract.Row<SettingsSwitchRow.ViewHolder> {
-    private var mKey: CharSequence?
-    private var mValue: Lazy<Boolean>
-    private var mListener: SettingsSwitchClickListener? = null
-    private var mEnabled: Lazy<Boolean> = Lazy { true }
+class SettingsSwitchRow : BindingRow<RowItemSwitchSettingsBinding> {
+    private var key: CharSequence? = null
+    private var keyRes: Int = 0
+    private var value: () -> Boolean
+    private var clickListener: SettingsSwitchClickListener? = null
+    private var isEnabled: () -> Boolean = { true }
 
-    private val mDefer = DeferredCall.createWithSize<ViewHolder>(1)
+    private val mDefer = DeferredCall.createWithSize<RowItemSwitchSettingsBinding>(1)
+
+    constructor(@StringRes key: Int, value: Boolean, listener: SettingsSwitchClickListener? = null) {
+        this.keyRes = key
+        this.value = { value }
+        clickListener = listener
+    }
+
+    constructor(@StringRes key: Int, value: () -> Boolean, listener: SettingsSwitchClickListener? = null) {
+        this.keyRes = key
+        this.value = value
+        clickListener = listener
+    }
 
     constructor(key: CharSequence, value: Boolean, listener: SettingsSwitchClickListener? = null) {
-        mKey = key
-        mValue = Lazy { value }
-        mListener = listener
+        this.key = key
+        this.value = { value }
+        clickListener = listener
     }
 
-    constructor(key: CharSequence?, value: Lazy<Boolean>, listener: SettingsSwitchClickListener? = null) {
-        mKey = key
-        mValue = value
-        mListener = listener
+    constructor(key: CharSequence?, value: () -> Boolean, listener: SettingsSwitchClickListener? = null) {
+        this.key = key
+        this.value = value
+        clickListener = listener
     }
 
-    fun setValue(value: Lazy<Boolean>, listener: SettingsSwitchClickListener? = null): SettingsSwitchRow {
-        mValue = value
-        mListener = listener
-        mDefer.call { vh: ViewHolder -> this.fill(vh) }
+    fun setValue(value: () -> Boolean, listener: SettingsSwitchClickListener? = null): SettingsSwitchRow {
+        this.value = value
+        clickListener = listener
+        mDefer.call { b: RowItemSwitchSettingsBinding -> this.fill(b) }
         return this
     }
 
-    fun setValue(value: Lazy<Boolean>): SettingsSwitchRow {
-        mValue = value
-        mDefer.call { vh: ViewHolder -> this.fill(vh) }
+    fun setValue(value: () -> Boolean): SettingsSwitchRow {
+        this.value = value
+        mDefer.call { b: RowItemSwitchSettingsBinding -> this.fill(b) }
         return this
     }
 
-    override fun getItemView(): Int {
-        return R.layout.row_item_switch_settings
+    override fun onBind(binding: RowItemSwitchSettingsBinding) {
+        fill(binding)
+        mDefer.attach(binding)
     }
 
-    override fun getRowPosition(): Int {
-        return 0
-    }
-
-    override fun isVisible(): Boolean {
-        return true
-    }
-
-    override fun onBindViewHolder(viewHolder: ViewHolder) {
-        fill(viewHolder)
-        mDefer.attach(viewHolder)
-    }
-
-    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
+    override fun onUnbind(binding: RowItemSwitchSettingsBinding) {
+        super.onUnbind(binding)
         mDefer.detach()
     }
 
-    override fun getViewHolderClass(): Class<ViewHolder> {
-        return ViewHolder::class.java
+    override fun getBindingClass(): Class<RowItemSwitchSettingsBinding> {
+        return RowItemSwitchSettingsBinding::class.java
     }
 
-    fun setEnabled(enabled: Lazy<Boolean>) {
-        mEnabled = enabled
+    fun setEnabled(enabled: () -> Boolean) {
+        isEnabled = enabled
     }
 
     fun setEnabled(enabled: Boolean) {
-        mEnabled = Lazy { enabled }
+        isEnabled = { enabled }
     }
 
-    private fun fill(vh: ViewHolder) {
-        if (mKey != null && mKey!!.isNotEmpty()) {
-            ViewCompat.setTransitionName(vh.key!!, "settings_field")
+    private fun fill(b: RowItemSwitchSettingsBinding) {
+        if (keyRes != 0) {
+            key = b.root.context.getString(keyRes)
         }
 
-        vh.key!!.text = mKey
-        vh.value!!.isEnabled = mEnabled.get()
-        vh.value!!.isChecked = mValue.get()
-        vh.itemView.setOnClickListener {
-            vh.value!!.isChecked = !vh.value!!.isChecked
+        if (key != null && key!!.isNotEmpty()) {
+            ViewCompat.setTransitionName(b.itemKey, "settings_field")
         }
-        vh.value!!.setOnCheckedChangeListener { buttonView: CompoundButton, isChecked: Boolean ->
-            mListener?.invoke(buttonView, isChecked)
+
+        b.itemKey.text = key
+        b.itemValue.isEnabled = isEnabled()
+        b.itemValue.isChecked = value()
+        b.root.setOnClickListener {
+            b.itemValue.isChecked = !b.itemValue.isChecked
         }
-    }
-
-//    interface OnClickListener {
-//        fun onClick(view: View?, value: Boolean?)
-//    }
-
-    class ViewHolder(itemView: View) : RowViewHolder(itemView) {
-        @JvmField @BindView(R.id.item_key)
-        var key: TextView? = null
-
-        @JvmField @BindView(R.id.item_value)
-        var value: Switch? = null
-
-        init {
-            ButterKnife.bind(this, itemView)
+        b.itemValue.setOnCheckedChangeListener { buttonView: CompoundButton, isChecked: Boolean ->
+            clickListener?.invoke(buttonView, isChecked)
         }
     }
 }

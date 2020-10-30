@@ -28,6 +28,7 @@ package network.minter.bipwallet.internal.helpers
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
+import android.os.StatFs
 import android.widget.ImageView
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -35,12 +36,19 @@ import androidx.annotation.Px
 import coil.Coil
 import coil.ImageLoader
 import coil.load
-
 import coil.size.Scale
-import coil.util.CoilUtils
+import com.squareup.picasso.Callback
+import com.squareup.picasso.OkHttp3Downloader
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 import kotlinx.coroutines.Dispatchers
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.annotations.Dp
+import okhttp3.Cache
+import okhttp3.CacheControl
 import okhttp3.OkHttpClient
+import timber.log.Timber
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -48,21 +56,71 @@ import java.util.concurrent.TimeUnit
  *
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class ImageHelper(mContext: Context, private val mDisplay: DisplayHelper) {
+
+class ImageHelper(private val context: Context, private val mDisplay: DisplayHelper) {
+    companion object {
+        internal fun calcDiskCacheSize(cacheDirectory: File): Long {
+            val cacheDir = StatFs(cacheDirectory.absolutePath)
+            val size = 0.1 * cacheDir.blockCountLong * cacheDir.blockSizeLong
+            return size.toLong().coerceIn(10L * 1024L * 1024L, 500L * 1024L * 1024L)
+        }
+
+        @JvmStatic
+        fun makeBitmapCircle(bitmap: Bitmap): Bitmap {
+            val output = Bitmap.createBitmap(
+                    bitmap.width,
+                    bitmap.height,
+                    Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(output)
+            val color = Color.RED
+            val paint = Paint()
+            val rect = Rect(0, 0, bitmap.width, bitmap.height)
+            val rectF = RectF(rect)
+            paint.isAntiAlias = true
+            canvas.drawARGB(0, 0, 0, 0)
+            paint.color = color
+            canvas.drawOval(rectF, paint)
+            paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+            canvas.drawBitmap(bitmap, rect, rect, paint)
+            bitmap.recycle()
+            return output
+        }
+    }
+
     private val imageLoader: ImageLoader
+    val picasso: Picasso
 
     init {
+        val cacheDir = File(context.cacheDir, "image_cache").apply { mkdirs() }
         val httpClient = OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
-                .cache(CoilUtils.createDefaultCache(mContext))
+                .addInterceptor {
+                    val nreq = it.request().newBuilder()
+                            .cacheControl(CacheControl.Builder()
+                                    .maxAge(7, TimeUnit.DAYS)
+                                    .maxStale(1, TimeUnit.HOURS)
+                                    .build())
+                            .build()
+                    it.proceed(nreq)
+                }
+                .cache(Cache(cacheDir, calcDiskCacheSize(cacheDir)))
                 .build()
 
-        imageLoader = ImageLoader.Builder(mContext)
+        imageLoader = ImageLoader.Builder(context)
                 .crossfade(160)
                 .okHttpClient { httpClient }
                 .dispatcher(Dispatchers.IO)
+                .build()
+
+        picasso = Picasso.Builder(context)
+                .downloader(OkHttp3Downloader(httpClient))
+                .listener { instance, uri, exception ->
+                    Timber.w(exception, "Unable to load image %s", uri.toString())
+                }
+                .indicatorsEnabled(false)
                 .build()
 
 //        CoilLogger.setEnabled(BuildConfig.DEBUG)
@@ -130,28 +188,44 @@ class ImageHelper(mContext: Context, private val mDisplay: DisplayHelper) {
             size(widthPx, heightPx)
         }
     }
+}
 
-    companion object {
-        @JvmStatic
-        fun makeBitmapCircle(bitmap: Bitmap): Bitmap {
-            val output = Bitmap.createBitmap(
-                    bitmap.width,
-                    bitmap.height,
-                    Bitmap.Config.ARGB_8888
-            )
-            val canvas = Canvas(output)
-            val color = Color.RED
-            val paint = Paint()
-            val rect = Rect(0, 0, bitmap.width, bitmap.height)
-            val rectF = RectF(rect)
-            paint.isAntiAlias = true
-            canvas.drawARGB(0, 0, 0, 0)
-            paint.color = color
-            canvas.drawOval(rectF, paint)
-            paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-            canvas.drawBitmap(bitmap, rect, rect, paint)
-            bitmap.recycle()
-            return output
+fun <T : ImageView> T.loadPicasso(path: String?, onSuccess: (() -> Unit)? = null, onError: ((Exception) -> Unit)? = null, applier: (RequestCreator.() -> Unit)? = null) {
+    return Wallet.app().image().picasso.load(path).apply(applier ?: {}).into(this, object : Callback {
+        override fun onSuccess() {
+            onSuccess?.invoke()
         }
-    }
+
+        override fun onError(e: Exception) {
+            onError?.invoke(e)
+        }
+    })
+}
+
+//fun <T: ImageView> T.loadPicasso(path: String?, applier: RequestCreator.() -> Unit) {
+//    return Wallet.app().image().picasso.load(path).apply(applier).into(this)
+//}
+
+fun <T : ImageView> T.loadPicasso(uri: Uri?): RequestCreator {
+    return Wallet.app().image().picasso.load(uri)
+}
+
+fun <T : ImageView> T.loadPicasso(uri: Uri?, applier: RequestCreator.() -> Unit): RequestCreator {
+    return loadPicasso(uri).apply(applier)
+}
+
+fun <T : ImageView> T.loadPicasso(file: File): RequestCreator {
+    return Wallet.app().image().picasso.load(file)
+}
+
+fun <T : ImageView> T.loadPicasso(file: File, applier: RequestCreator.() -> Unit): RequestCreator {
+    return loadPicasso(file).apply(applier)
+}
+
+fun <T : ImageView> T.loadPicasso(resourceId: Int): RequestCreator {
+    return Wallet.app().image().picasso.load(resourceId)
+}
+
+fun <T : ImageView> T.loadPicasso(resourceId: Int, applier: RequestCreator.() -> Unit): RequestCreator {
+    return loadPicasso(resourceId).apply(applier)
 }

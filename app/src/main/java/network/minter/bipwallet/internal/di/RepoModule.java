@@ -26,12 +26,17 @@
 
 package network.minter.bipwallet.internal.di;
 
+import javax.inject.Named;
+
 import dagger.Module;
 import dagger.Provides;
 import network.minter.bipwallet.apis.gate.TxInitDataRepository;
+import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.storage.AccountStorage;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.storage.SecretStorage;
+import network.minter.bipwallet.stories.repo.StoriesRepository;
+import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
@@ -123,5 +128,11 @@ public class RepoModule {
     @WalletApp
     public TxInitDataRepository provideTxInitDataRepo(GateEstimateRepository estimateRepo, GateGasRepository gasRepo) {
         return new TxInitDataRepository(estimateRepo, gasRepo);
+    }
+
+    @Provides
+    @WalletApp
+    public StoriesRepository provideStoriesRepo(@Named("stories") ApiService.Builder api, @DbCache KVStorage storage, @Named("uuid") String uuid) {
+        return new StoriesRepository(api, storage, uuid);
     }
 }

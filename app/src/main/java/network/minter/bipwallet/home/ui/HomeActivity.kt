@@ -30,10 +30,15 @@ import android.app.ActivityManager
 import android.app.Service
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowManager
 import androidx.annotation.IdRes
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -42,6 +47,7 @@ import com.annimon.stream.Stream
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ActivityHomeBinding
 import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
@@ -51,9 +57,13 @@ import network.minter.bipwallet.home.views.HomePresenter
 import network.minter.bipwallet.internal.BaseMvpActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.system.ActivityBuilder
 
 import network.minter.bipwallet.internal.system.BackPressedListener
+import network.minter.bipwallet.stories.models.Story
+import network.minter.bipwallet.stories.ui.StoriesPagerFragment
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -75,6 +85,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
     private val mBackPressedListeners: MutableList<BackPressedListener> = ArrayList(1)
     private var mIsLowRamDevice = false
     private lateinit var b: ActivityHomeBinding
+    private var storiesPagerFragment: StoriesPagerFragment? = null
 
     @get:VisibleForTesting val activeTabs: Map<Int, HomeTabFragment?>
         get() = mActiveTabs
@@ -120,6 +131,9 @@ class HomeActivity : BaseMvpActivity(), HomeView {
             if (!listener.onBackPressed()) {
                 return
             }
+        }
+        if (closeStoriesPager()) {
+            return
         }
         super.onBackPressed()
     }
@@ -239,6 +253,55 @@ class HomeActivity : BaseMvpActivity(), HomeView {
             runOnUiThread { b.homePager.currentItem = presenter.getBottomPositionById(item.itemId) }
             true
         }
+    }
+
+    fun startStoriesPager(stories: List<Story>, startPosition: Int, sharedImage: View) {
+        if (storiesPagerFragment != null) {
+            return
+        }
+        b.navigationBottom.animate().translationY(b.navigationBottom.height.toFloat() * 2f).setDuration(150).start()
+        b.storiesPager.visible = true
+
+        storiesPagerFragment = StoriesPagerFragment.newInstance(stories, startPosition)
+        storiesPagerFragment!!.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(R.transition.image_shared_element_transition)
+
+        supportFragmentManager.beginTransaction()
+                .setReorderingAllowed(true)
+                .addSharedElement(sharedImage, sharedImage.transitionName)
+                .setCustomAnimations(
+                        R.anim.stories_pager_enter,
+                        R.anim.stories_pager_exit,
+                        R.anim.stories_pager_enter,
+                        R.anim.stories_pager_exit
+                )
+                .add(R.id.stories_pager, storiesPagerFragment!!, "stories_pager")
+                .commit()
+    }
+
+    fun closeStoriesPager(): Boolean {
+        if (storiesPagerFragment == null) return false
+//        ViewHelper.setSystemBarsTranslucent(this)
+        b.navigationBottom.animate().translationY(0f).setDuration(150).start()
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.greyBackground)
+        ViewHelper.setSystemBarsLightness(this, false)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.show(WindowInsets.Type.statusBars())
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        }
+//        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                        R.anim.stories_pager_enter,
+                        R.anim.stories_pager_exit,
+                        R.anim.stories_pager_enter,
+                        R.anim.stories_pager_exit)
+                .remove(storiesPagerFragment!!)
+                .commit()
+//        b.storiesPager.visible = false
+        storiesPagerFragment = null
+        return true
     }
 
     class Builder : ActivityBuilder {

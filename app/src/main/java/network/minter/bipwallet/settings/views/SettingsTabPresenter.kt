@@ -34,18 +34,18 @@ import android.view.View
 import android.widget.Switch
 import androidx.biometric.BiometricPrompt
 import moxy.InjectViewState
+import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.home.HomeScope
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
-import network.minter.bipwallet.internal.common.Lazy
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.FingerprintHelper
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.settings.*
 import network.minter.bipwallet.internal.storage.SecretStorage
-import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter
+import network.minter.bipwallet.internal.views.list.multirow.BindingMultiRowAdapter
 import network.minter.bipwallet.security.SecurityModule
 import network.minter.bipwallet.settings.contract.SettingsTabView
 import network.minter.bipwallet.settings.views.rows.SettingsButtonRow
@@ -68,17 +68,32 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     @Inject lateinit var settings: SettingsManager
     @Inject lateinit var fingerHelper: FingerprintHelper
 
-    private val mainAdapter: MultiRowAdapter = MultiRowAdapter()
-    private val additionalAdapter: MultiRowAdapter = MultiRowAdapter()
-    private val securityAdapter: MultiRowAdapter = MultiRowAdapter()
+    private val securityAdapter: BindingMultiRowAdapter = BindingMultiRowAdapter()
+    private val mainAdapter: BindingMultiRowAdapter = BindingMultiRowAdapter()
+    private val additionalAdapter: BindingMultiRowAdapter = BindingMultiRowAdapter()
+
+    private val isNotificationsEnabled: Boolean
+        get() = settings[EnableLiveNotifications]
+
+    private val isSoundsEnabled: Boolean
+        get() = settings[EnableSounds]
+
+    private val isPinCodeEnabled: Boolean
+        get() = settings[EnablePinCode]
+
+    private val isFingerprintEnabled: Boolean
+        get() = settings[EnableFingerprint] && settings[EnablePinCode] && fingerHelper.hasEnrolledFingerprints()
+
+    private val isStoriesEnabled: Boolean
+        get() = settings[EnableStories] && BuildConfig.ENABLE_STORIES
 
     override fun attachView(view: SettingsTabView) {
         super.attachView(view)
         viewState.setSecurityAdapter(securityAdapter)
         viewState.setMainAdapter(mainAdapter)
         viewState.setAdditionalAdapter(additionalAdapter)
-        viewState.setOnOurChannelClickListener(View.OnClickListener { onOurChannelClickListener() })
-        viewState.setOnSupportChatClickListener(View.OnClickListener { onSupportChatClickListener() })
+        viewState.setOnOurChannelClickListener { onOurChannelClickListener() }
+        viewState.setOnSupportChatClickListener { onSupportChatClickListener() }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -126,48 +141,57 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     private fun addRows() {
         // security row
         val enablePinRow = SettingsSwitchRow(
-                "Unlock with PIN-code",
-                Lazy { isPinCodeEnabled },
+                R.string.settings_sec_pin_enabled_label,
+                { isPinCodeEnabled },
                 { _, enabled -> onEnablePinCode(enabled) }
         )
 
         val fingerprintRow = SettingsSwitchRow(
-                "Unlock with fingerprint",
-                Lazy { isFingerprintEnabled },
+                R.string.settings_sec_fingerprint_enabled_label,
+                { isFingerprintEnabled },
                 { view, enabled -> onEnableFingerprint(view, enabled) }
         )
 
-        fingerprintRow.setEnabled(Lazy { isPinCodeEnabled })
+        fingerprintRow.setEnabled { isPinCodeEnabled }
 
         val changePinRow = SettingsButtonRow(
-                "Change PIN-code",
+                R.string.settings_sec_pin_change_label,
                 ""
         ) { view, sharedView, value ->
             onChangePinClick(view, sharedView, value)
         }
 
-        securityAdapter.addRow(TitleRow("Security"))
-        securityAdapter.addRow(enablePinRow)
+        securityAdapter.add(TitleRow(R.string.settings_title_security))
+        securityAdapter.add(enablePinRow)
 
         if (secretStorage.hasPinCode()) {
             if (fingerHelper.isHardwareDetected) {
-                securityAdapter.addRow(fingerprintRow)
+                securityAdapter.add(fingerprintRow)
             }
-            securityAdapter.addRow(changePinRow)
+            securityAdapter.add(changePinRow)
         }
 
-        mainAdapter.addRow(TitleRow("Notifications"))
+        mainAdapter.add(TitleRow(R.string.settings_title_notifications))
 
-        mainAdapter.addRow(SettingsSwitchRow(
-                "Enable sounds",
-                Lazy { isSoundsEnabled },
+        mainAdapter.add(SettingsSwitchRow(
+                R.string.settings_sounds_enabled_label,
+                { isSoundsEnabled },
                 { _, isChecked -> onSwitchSounds(isChecked) }
         ))
-        mainAdapter.addRow(SettingsSwitchRow(
-                "Enable notifications",
-                Lazy { isNotificationsEnabled },
+        mainAdapter.add(SettingsSwitchRow(
+                R.string.settings_notifications_enabled_label,
+                { isNotificationsEnabled },
                 { _: View, enabled: Boolean -> onSwitchNotifications(enabled) }
         ))
+
+        if (BuildConfig.ENABLE_STORIES) {
+            mainAdapter.add(TitleRow(R.string.settings_title_stories))
+            mainAdapter.add(SettingsSwitchRow(
+                    R.string.settings_stories_enabled_label,
+                    { isStoriesEnabled },
+                    { _, enabled -> onSwitchStories(enabled) }
+            ))
+        }
     }
 
     override fun onFirstViewAttach() {
@@ -202,18 +226,6 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
             viewState.startIntent(intent)
         }
     }
-
-    private val isNotificationsEnabled: Boolean
-        get() = settings[EnableLiveNotifications]
-
-    private val isSoundsEnabled: Boolean
-        get() = settings[EnableSounds]
-
-    private val isPinCodeEnabled: Boolean
-        get() = settings[EnablePinCode]
-
-    private val isFingerprintEnabled: Boolean
-        get() = settings[EnableFingerprint] && settings[EnablePinCode] && fingerHelper.hasEnrolledFingerprints()
 
     @Suppress("UNUSED_PARAMETER")
     private fun onChangePinClick(view: View, view1: View, s: String) {
@@ -276,6 +288,12 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     private fun onSwitchNotifications(enabled: Boolean) {
         settings[EnableLiveNotifications] = enabled
         Wallet.app().sounds().play(R.raw.click_pop_zap)
+    }
+
+    private fun onSwitchStories(enabled: Boolean) {
+        settings[EnableStories] = enabled
+        Wallet.app().sounds().play(R.raw.click_pop_zap)
+        viewState.notifyStoriesState(enabled)
     }
 
     private fun onSwitchSounds(isChecked: Boolean) {

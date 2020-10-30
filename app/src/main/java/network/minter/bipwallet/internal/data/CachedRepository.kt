@@ -54,7 +54,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         val entity: Entity
 ) {
     companion object {
-        const val DEFAULT_EXPIRE_TIME = 30 //30 seconds
+        const val DEFAULT_EXPIRE_TIME = 30L //30 seconds
         protected val THREAD_MAIN: Scheduler = AndroidSchedulers.mainThread()
         protected val THREAD_IO = Schedulers.io()
 
@@ -90,7 +90,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      * Returns seconds to object life (ttl)
      * @return integer seconds
      */
-    var expireTime = DEFAULT_EXPIRE_TIME
+    var expireTime: Long = DEFAULT_EXPIRE_TIME
         private set
 
     val entityClass: Class<Entity>
@@ -194,8 +194,13 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         storage.put(expiredEntityStorageKey, _expiredAt)
     }
 
-    fun setTimeToLive(ttlSeconds: Int): CachedRepository<ResultModel, Entity> {
+    fun setTimeToLive(ttlSeconds: Long): CachedRepository<ResultModel, Entity> {
         expireTime = ttlSeconds
+        return this
+    }
+
+    fun setTimeToLive(time: Long, unit: TimeUnit): CachedRepository<ResultModel, Entity> {
+        expireTime = unit.toSeconds(time)
         return this
     }
 

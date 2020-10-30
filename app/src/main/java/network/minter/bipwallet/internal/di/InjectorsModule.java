@@ -50,6 +50,12 @@ import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.security.ui.PinValidationDialog;
 import network.minter.bipwallet.services.livebalance.RTMService;
 import network.minter.bipwallet.share.ShareDialog;
+import network.minter.bipwallet.stories.StoriesScope;
+import network.minter.bipwallet.stories.ui.StoriesListFragment;
+import network.minter.bipwallet.stories.ui.StoriesPagerActivity;
+import network.minter.bipwallet.stories.ui.StoriesPagerFragment;
+import network.minter.bipwallet.stories.ui.StoryFragment;
+import network.minter.bipwallet.stories.ui.StorySlideFragment;
 import network.minter.bipwallet.tx.TransactionsModule;
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity;
 import network.minter.bipwallet.tx.ui.TransactionListActivity;
@@ -147,6 +153,26 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @ActivityScope
     AddressBookActivity addressBookActivityInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    StoriesPagerActivity storiesTabsActivityInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    StoriesPagerFragment storiesPagerFragmentInjector();
+
+    @ContributesAndroidInjector
+    @FragmentScope
+    StoriesListFragment storiesListFragmentInjector();
+
+    @ContributesAndroidInjector
+    @StoriesScope
+    StoryFragment storySlidesFragmentInjector();
+
+    @ContributesAndroidInjector
+    @StoriesScope
+    StorySlideFragment storySlideFragmentInjector();
 
     @ContributesAndroidInjector
     @FragmentScope

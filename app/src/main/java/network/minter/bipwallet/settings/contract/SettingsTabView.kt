@@ -63,4 +63,5 @@ interface SettingsTabView : MvpView {
     fun startBiometricPrompt(callback: BiometricPrompt.AuthenticationCallback)
     fun startFingerprintEnrollment()
     fun startIntent(intent: Intent)
+    fun notifyStoriesState(enabled: Boolean)
 }

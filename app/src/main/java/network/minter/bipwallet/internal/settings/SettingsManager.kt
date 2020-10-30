@@ -33,7 +33,7 @@ import network.minter.bipwallet.internal.storage.KVStorage
  * minter-android-wallet. 2020
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-class Key<T> internal constructor(
+class Key<out T> internal constructor(
         name: String,
         val defaultValue: T
 ) {
@@ -61,6 +61,9 @@ val EnableFingerprint = Key("sec_enable_fingerprint", false)
 
 @JvmField
 val LastBlockTime = Key("last_block_time", 0L)
+
+@JvmField
+val EnableStories = Key("enable_stories", true)
 
 @SuppressLint("CommitPrefEdits")
 class SettingsManager(private val storage: KVStorage) {

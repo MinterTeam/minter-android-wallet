@@ -246,11 +246,11 @@
                             android:layout_height="32dp"
                             android:padding="4dp"
                             android:src="@drawable/ic_chevron_right"
-                            android:tint="@color/white"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.5" />
+                            app:layout_constraintVertical_bias="0.5"
+                            app:tint="@color/white" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -262,6 +262,16 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/delegated_layout" />
 
+                    <FrameLayout
+                        android:id="@+id/fragment_stories"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/balance_space" />
+
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/tabs"
                         android:layout_width="0dp"
@@ -269,7 +279,7 @@
                         android:background="@color/white"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/balance_space"
+                        app:layout_constraintTop_toBottomOf="@id/fragment_stories"
                         app:tabSelectedTextColor="@color/colorPrimaryLight"
                         app:tabTextAppearance="@style/Wallet.TabLayout.TabItem" />
 

@@ -382,7 +382,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         gasRepo.minGas
                 .retryWhen(errorManager.retryWhenHandler)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribe(
                         { res: GateResult<GasValue> ->
                             if (res.isOk) {

@@ -39,8 +39,11 @@ import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.stories.repo.RepoCachedStories
+import network.minter.bipwallet.stories.repo.StoriesRepository
 import network.minter.explorer.MinterExplorerSDK
 import network.minter.explorer.repo.GateCoinRepository
+import java.util.concurrent.TimeUnit
 
 /**
  * minter-android-wallet. 2018
@@ -102,6 +105,15 @@ object CacheModule {
     fun provideCachedMonthlyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoMonthlyRewards {
         return RepoMonthlyRewards(storage, CachedMonthlyRewardsStatisticsRepository(storage, secretStorage, api.apiService))
                 .setTimeToLive(60 * 30)
+    }
+
+    @JvmStatic
+    @Provides
+    @WalletApp
+    fun provideCachedStoriesRepo(@DbCache storage: KVStorage, repo: StoriesRepository, em: ErrorManager): RepoCachedStories {
+        return RepoCachedStories(storage, repo)
+                .setTimeToLive(10, TimeUnit.MINUTES)
+                .retryWhen(em.retryWhenHandler)
     }
 
 }

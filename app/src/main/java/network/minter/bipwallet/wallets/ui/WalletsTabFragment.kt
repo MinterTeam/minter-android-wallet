@@ -66,6 +66,9 @@ import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
 import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.share.ShareDialog
+import network.minter.bipwallet.stories.StoriesStateReceiver
+import network.minter.bipwallet.stories.models.Story
+import network.minter.bipwallet.stories.ui.StoriesListFragment
 import network.minter.bipwallet.tx.ui.ExternalTransactionActivity
 import network.minter.bipwallet.tx.ui.TransactionListActivity
 import network.minter.bipwallet.wallets.contract.WalletsTabView
@@ -97,6 +100,8 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     private val swipeRefreshHacker = SwipeRefreshHacker()
     private lateinit var mRecolorHelper: WalletsTopRecolorHelper
     lateinit var binding: FragmentTabWalletsBinding
+    private var storiesListFragment: StoriesListFragment? = null
+    private var storiesListLock = Any()
 
     override fun onAttach(context: Context) {
         HomeModule.component!!.inject(this)
@@ -167,6 +172,9 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         val broadcastManager = BroadcastReceiverManager(activity!!)
         broadcastManager.add(RTMBlockReceiver {
             LastBlockHandler.handle(binding.balanceUpdatedLabel, it, LastBlockHandler.ViewType.Main)
+        })
+        broadcastManager.add(StoriesStateReceiver {
+            presenter.setShowStories(it)
         })
         broadcastManager.register()
 
@@ -432,5 +440,47 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     private fun onStartRefresh() {
         Wallet.app().sounds().play(R.raw.refresh_pop_down)
+    }
+
+    override fun showStoriesList(stories: List<Story>) {
+        synchronized(storiesListLock) {
+            if (storiesListFragment == null) {
+                storiesListFragment = StoriesListFragment.newInstance(stories)
+
+                runOnUiThread {
+                    Timber.d("Add stories fragment")
+                    childFragmentManager.beginTransaction()
+                            .add(R.id.fragment_stories, storiesListFragment!!, "stories_list")
+                            .commit()
+                }
+            } else {
+                storiesListFragment!!.setData(stories)
+            }
+        }
+    }
+
+    override fun hideStoriesList() {
+        if (storiesListFragment == null) {
+            return
+        }
+
+        childFragmentManager.beginTransaction()
+                .remove(storiesListFragment!!)
+                .commit()
+
+        storiesListFragment = null
+    }
+
+    override fun setStoriesListData(items: List<Story>) {
+        storiesListFragment?.setData(items)
+    }
+
+    fun startStoriesPager(stories: List<Story>, startPosition: Int, sharedImage: View) {
+        (activity as HomeActivity?)?.startStoriesPager(stories, startPosition, sharedImage)
+
+    }
+
+    fun closeStoriesPager() {
+        (activity as HomeActivity?)?.closeStoriesPager()
     }
 }
