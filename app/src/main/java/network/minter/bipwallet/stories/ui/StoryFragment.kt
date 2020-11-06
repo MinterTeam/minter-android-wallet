@@ -77,19 +77,6 @@ class StoryFragment : BaseInjectFragment() {
     private var blockPagerTouches = false
 
     private fun goNext() {
-        if (slidePosition == 0 && b.progress.currentProgress.progress > 0.9f) {
-            repoCachedStories.entity.markWatched(slides[0].storyId)
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            {
-                                Timber.d("Mark story ${slides[0].storyId} as watched")
-                                repoCachedStories.update(true)
-                            },
-                            { t -> Timber.w(t, "Unable to mark story ${slides[0].storyId} as watched") }
-                    )
-        }
-
         slidePosition++
         if (slidePosition > slides.size - 1) {
             Timber.d("Story: last slide reached. Going to next story")
@@ -131,6 +118,17 @@ class StoryFragment : BaseInjectFragment() {
         b = FragmentStoryBinding.inflate(inflater, container, false)
         slides = arguments?.getParcelableArrayList(ARG_SLIDES) ?: ArrayList()
         isFirstStory = arguments?.getInt(ARG_POSITION, 0) == 0
+
+        repoCachedStories.entity.markWatched(slides[0].storyId)
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        {
+                            Timber.d("Mark story ${slides[0].storyId} as watched")
+                            repoCachedStories.update(true)
+                        },
+                        { t -> Timber.w(t, "Unable to mark story ${slides[0].storyId} as watched") }
+                )
 
         b.pager.adapter = StorySlideAdapter(this)
         b.pager.setPageTransformer(FadeOutPageTransformer())
