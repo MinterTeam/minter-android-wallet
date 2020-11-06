@@ -126,15 +126,17 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
 
     private fun initStories() {
         if (settings[EnableStories]) {
-            storiesDisposable = storiesRepository.observe()
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe {
-                        if (it.isNotEmpty()) {
-                            Timber.d("Show stories")
-                            viewState.showStoriesList(it)
+            if (storiesDisposable == null) {
+                storiesDisposable = storiesRepository.observe()
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe {
+                            if (it.isNotEmpty()) {
+                                Timber.d("Show stories")
+                                viewState.showStoriesList(it)
+                            }
                         }
-                    }
+            }
 
             storiesRepository.update()
         } else {

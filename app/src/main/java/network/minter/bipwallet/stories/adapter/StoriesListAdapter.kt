@@ -61,7 +61,7 @@ class StoriesListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val story = items[position]
 
-        holder.b.root.isSelected = story.isActive
+        holder.b.root.isSelected = !story.watchedLocal
         holder.b.image.load(story.icon) {
             transformations(RoundedCornersTransformation(
                     roundedCornersSize,

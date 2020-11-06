@@ -174,7 +174,7 @@ android {
             buildConfigField "String", "GATE_API_URL", 'null'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/address/"'
-            buildConfigField "String", "STORIES_API_URL", '"https://minter-stories-api.kubernetes.icu/api/v1/"'
+            buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
         }
 
         netMainLocal {
@@ -187,7 +187,7 @@ android {
             buildConfigField "String", "GATE_API_URL", 'null'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/address/"'
-            buildConfigField "String", "STORIES_API_URL", '"https://minter-stories-api.kubernetes.icu/api/v1/"'
+            buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
         }
 
         netTest {
@@ -200,7 +200,7 @@ android {
             buildConfigField "String", "GATE_API_URL", 'null'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
-            buildConfigField "String", "STORIES_API_URL", '"https://minter-stories-api.kubernetes.icu/api/v1/"'
+            buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
         }
 
         netTestLocal {
@@ -213,7 +213,7 @@ android {
             buildConfigField "String", "GATE_API_URL", 'null'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
-            buildConfigField "String", "STORIES_API_URL", '"https://minter-stories-api.kubernetes.icu/api/v1/"'
+            buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
         }
     }
 }

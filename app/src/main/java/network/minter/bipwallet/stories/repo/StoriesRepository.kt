@@ -51,15 +51,32 @@ class StoriesRepository(
         ) : DataRepository<StoriesEndpoint>(storiesApiService), CachedEntity<@kotlin.jvm.JvmSuppressWildcards List<Story>> {
 
     companion object {
-        private const val KEY_STORIES = BuildConfig.MINTER_CACHE_VERS + "coins_all"
+        private const val KEY_STORIES = BuildConfig.MINTER_CACHE_VERS + "stories"
+        private const val KEY_WATCHED_STORIES = BuildConfig.MINTER_CACHE_VERS + "stories_watched"
     }
 
     fun getStories(): Observable<List<Story>> {
         return instantService.list()
                 .map { it.data }
-                .map { list ->
-                    list.filter { it.slides != null }
+                .map { stories ->
+                    val watched = getWatched()
+                    stories.map { story ->
+                        story.watchedLocal = false
+                        if (watched.containsKey(story.id)) {
+                            story.watchedLocal = watched.getOrElse(story.id) { false }
+                        }
+                        story
+                    }
                 }
+                .map { list ->
+                    list.filter {
+                        it.slides != null && it.isActive
+                    }
+                }
+    }
+
+    fun getWatched(): HashMap<Long, Boolean> {
+        return storage[KEY_WATCHED_STORIES, HashMap()]
     }
 
     fun markWatched(story: Story): Completable {
@@ -68,6 +85,11 @@ class StoriesRepository(
 
     fun markWatched(storyId: Long): Completable {
         return instantService.markWatched(uid, storyId)
+                .doOnComplete {
+                    val watched = getWatched()
+                    watched[storyId] = true
+                    storage.put(KEY_WATCHED_STORIES, watched)
+                }
     }
 
     override fun getServiceClass(): Class<StoriesEndpoint> {
@@ -84,6 +106,9 @@ class StoriesRepository(
 
     override fun onAfterUpdate(result: List<Story>) {
         storage.put(KEY_STORIES, result)
+        result.forEach { story ->
+            story.slides?.map { !it.file.isNullOrEmpty() }
+        }
     }
 
     override fun onClear() {

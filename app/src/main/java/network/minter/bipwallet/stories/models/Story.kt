@@ -36,33 +36,16 @@ import java.util.*
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 
-//"weight": 1,
-//      "is_active": true,
-//      "expire_date": null,
-//      "created_at": "2020-09-28T10:44:06.075043Z",
-//      "updated_at": null,
-//      "deleted_at": null,
-//      "slides": null
-
-//"id": 1,
-//          "story_id": 2,
-//          "weight": 0,
-//          "title": "test",
-//          "file": "https://image.minter.network/minter-stories/2/slide/1",
-//          "link": "https://minter.network",
-//          "created_at": "2020-09-28T10:46:30.969621Z",
-//          "updated_at": null,
-//          "deleted_at": null
-
 @Parcelize
 data class StorySlide(
         val id: Long,
         @SerializedName("story_id")
         val storyId: Long,
         val weight: Int,
-        val title: String,
+        val title: String?,
         val file: String,
-        val link: String,
+        val link: String?,
+        val text: String?,
         @SerializedName("created_at")
         val createdAt: Date,
         @SerializedName("updated_at")
@@ -79,11 +62,16 @@ data class Story(
         val weight: Int,
         @SerializedName("is_active")
         val isActive: Boolean,
+        @SerializedName("expire_date")
+        val expireAt: Date?,
         @SerializedName("created_at")
         val createdAt: Date,
         @SerializedName("updated_at")
         val updatedAt: Date?,
         @SerializedName("deleted_at")
         val deletedAt: Date?,
-        val slides: List<StorySlide>?
+        val slides: List<StorySlide>?,
+
+        // local
+        var watchedLocal: Boolean = false
 ) : Parcelable

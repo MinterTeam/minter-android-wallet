@@ -30,9 +30,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.FragmentStorySlideBinding
 import network.minter.bipwallet.internal.BaseInjectFragment
+import network.minter.bipwallet.internal.helpers.HtmlCompat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.helpers.loadPicasso
 import network.minter.bipwallet.stories.StoriesScope
 import network.minter.bipwallet.stories.models.StorySlide
@@ -76,7 +79,23 @@ class StorySlideFragment : BaseInjectFragment() {
         position = arguments!!.getInt(ARG_POSITION)
         b.image.transitionName = "story_${slide.storyId}_slide_${position}_image"
 
-//        activity?.startPostponedEnterTransition()
+        var showContentRoot = false
+        if (!slide.title.isNullOrEmpty()) {
+            b.title.text = HtmlCompat.fromHtml(slide.title)
+            showContentRoot = true
+        }
+        if (!slide.text.isNullOrEmpty()) {
+            b.text.text = HtmlCompat.fromHtml(slide.text)
+            showContentRoot = true
+        }
+
+        b.contentRoot.setPadding(
+                b.contentRoot.paddingLeft,
+                b.contentRoot.paddingTop,
+                b.contentRoot.paddingRight,
+                ViewHelper.getNavigationBarHeight(requireContext()) + resources.getDimension(R.dimen.margin_edges).toInt()
+        )
+        b.contentRoot.visible = showContentRoot
 
         return b.root
     }

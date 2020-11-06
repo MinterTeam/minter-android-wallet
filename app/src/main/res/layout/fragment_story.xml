@@ -62,16 +62,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent=".5" />
 
-    <network.minter.bipwallet.stories.ui.StoriesProgressView
-        android:id="@+id/progress"
+    <FrameLayout
+        android:id="@+id/progress_container"
         android:layout_width="0dp"
-        android:layout_height="@dimen/stories_progress_bar_height"
-        android:layout_marginStart="@dimen/margin_edges_half"
-        android:layout_marginTop="@dimen/margin_edges_half"
-        android:layout_marginEnd="@dimen/margin_edges_half"
+        android:layout_height="12dp"
+        android:background="@drawable/shape_black_half_vignette_top_bot"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <network.minter.bipwallet.stories.ui.StoriesProgressView
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/stories_progress_bar_height"
+            android:layout_marginStart="@dimen/margin_edges_half"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:layout_marginEnd="@dimen/margin_edges_half" />
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/debug_pagenum"
@@ -80,6 +88,7 @@
         android:fontFamily="@font/_inter_extra_bold"
         android:textColor="@color/white"
         android:textSize="22dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/action_close"
@@ -94,7 +103,7 @@
         android:padding="3dp"
         android:src="@drawable/ic_close_grey"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progress"
+        app:layout_constraintTop_toBottomOf="@id/progress_container"
         app:tint="@color/white" />
 
     <ImageView
@@ -106,7 +115,7 @@
         android:padding="4dp"
         android:src="@drawable/ic_share_white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progress"
+        app:layout_constraintTop_toBottomOf="@id/progress_container"
         app:tint="@color/white" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -35,6 +35,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import io.reactivex.schedulers.Schedulers
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.FragmentStoryBinding
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.BaseInjectFragment
@@ -73,6 +74,7 @@ class StoryFragment : BaseInjectFragment() {
     private var slides: List<StorySlide> = ArrayList()
     private var slidePosition: Int = 0
     private var isFirstStory = false
+    private var blockPagerTouches = false
 
     private fun goNext() {
         if (slidePosition == 0 && b.progress.currentProgress.progress > 0.9f) {
@@ -117,15 +119,12 @@ class StoryFragment : BaseInjectFragment() {
     }
 
     private fun goNextStory() {
-//        (activity as StoriesTabsActivity?)?.goNext()
         (parentFragment as StoriesPagerFragment?)?.goNext()
     }
 
     private fun goPrevStory(): Boolean {
         return (parentFragment as StoriesPagerFragment?)?.goPrev() == true
     }
-
-    private var blockPagerTouches = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -143,11 +142,23 @@ class StoryFragment : BaseInjectFragment() {
             }
             false
         }
-        b.debugPagenum.text = "${slidePosition + 1} / ${slides.size}"
+//        b.debugPagenum.text = "${slidePosition + 1} / ${slides.size}"
         b.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                b.debugPagenum.text = "${position + 1} / ${slides.size}"
+//                b.debugPagenum.text = "${position + 1} / ${slides.size}"
+                if (!slides[position].link.isNullOrEmpty()) {
+                    b.actionShare.setOnClickListener {
+                        val shareIntent = Intent()
+                        shareIntent.action = Intent.ACTION_SEND
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, slides[position].link)
+                        shareIntent.type = "text/plain"
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.title_share_story)))
+                    }
+                    b.actionShare.visible = true
+                } else {
+                    b.actionShare.visible = false
+                }
             }
         })
         b.progress.autoStartNext = false
@@ -177,6 +188,7 @@ class StoryFragment : BaseInjectFragment() {
         b.actionClose.setOnClickListener {
             (activity as HomeActivity?)?.closeStoriesPager()
         }
+
         if (slideHasLink()) {
             b.actionShare.setOnClickListener {
                 val shareIntent = Intent()
@@ -184,6 +196,7 @@ class StoryFragment : BaseInjectFragment() {
                 shareIntent.putExtra(Intent.EXTRA_TEXT, slides[slidePosition].link)
                 startActivity(shareIntent)
             }
+            b.actionShare.visible = true
         } else {
             b.actionShare.visible = false
         }
@@ -192,54 +205,14 @@ class StoryFragment : BaseInjectFragment() {
     }
 
     private fun slideHasLink(): Boolean {
-        return slides[slidePosition].link.isNotEmpty()
+        return !slides[slidePosition].link.isNullOrEmpty()
     }
 
     private fun startStoryUrl() {
-        if (slides[slidePosition].link.isNotEmpty()) {
+        if (slides[slidePosition].link?.isNotEmpty() == true) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(slides[slidePosition].link))
             startActivity(intent)
             (activity as HomeActivity?)?.closeStoriesPager()
-        }
-    }
-
-    private class SwipeUpDetector(
-            private val f: StoryFragment,
-            private val t: OverlayTouchHandler
-    ) : GestureDetector.SimpleOnGestureListener() {
-        override fun onDown(e: MotionEvent?): Boolean {
-
-            return true
-        }
-
-        override fun onFling(firstEvent: MotionEvent, currentEvent: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-            if (velocityY > 0) {
-                Timber.d("OnFling first event up Y: ${firstEvent.y}")
-                Timber.d("OnFling current event up Y: ${currentEvent.y}")
-            }
-            return false
-        }
-
-        override fun onScroll(firstEvent: MotionEvent, currentEvent: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            if (distanceY > 0) {
-                if (f.slideHasLink()) {
-                    f.blockPagerTouches = true
-//                    val deltaY = firstEvent.y - currentEvent.y
-                    // only swipe up
-
-                    if (distanceY > t.touchSlop) {
-                        val percent = distanceY / t.slideUpThreshold
-                        Timber.d("Alpha percent: $percent")
-                        f.b.linkInfo.alpha = percent.coerceAtMost(1.0f)
-                        f.b.pager.translationY = -t.slideUpViewTranslateY * percent
-
-                        if (percent > 0.99) {
-                            f.startStoryUrl()
-                        }
-                    }
-                }
-            }
-            return true
         }
     }
 
@@ -248,8 +221,7 @@ class StoryFragment : BaseInjectFragment() {
             private val fragment: StoryFragment
     ) : View.OnTouchListener {
         private var touchDownTime: Long = 0
-        val swipeUpDetector = SwipeUpDetector(fragment, this)
-        val gestureDetector = GestureDetector(fragment.context, swipeUpDetector)
+
         val slideUpThreshold: Float = Wallet.app().display().height.toFloat() / 3f
         val slideUpViewTranslateY: Float = Wallet.app().display().height.toFloat() / 4f
         val clickActionThreshold = 200
@@ -271,10 +243,8 @@ class StoryFragment : BaseInjectFragment() {
         }
 
         override fun onTouch(v: View, event: MotionEvent): Boolean {
-//            gestureDetector.onTouchEvent(event)
             return when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    Timber.d("OnTouch: DOWN")
                     startX = event.x
                     startY = event.y
 
@@ -283,11 +253,9 @@ class StoryFragment : BaseInjectFragment() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    Timber.d("OnTouch: UP")
                     val endX = event.x
                     val endY = event.y
                     if (isSimpleClick(startX, endX, startY, endY) && (event.eventTime - touchDownTime) < 200) {
-                        Timber.d("OnTouch: UP: Click")
                         if (left) {
                             fragment.b.progress.prev(fragment.isFirstStory && fragment.slidePosition == 0)
                         } else {
@@ -295,12 +263,10 @@ class StoryFragment : BaseInjectFragment() {
                         }
                         v.performClick()
                     } else if (isLongPress(startX, endX, startY, endY) && (event.eventTime - touchDownTime) > 200) {
-                        Timber.d("OnTouch: Just UP")
                         fragment.b.progress.resume()
                         touchDownTime = 0
                     } else {
                         fragment.b.progress.resume()
-                        Timber.d("OnTouch: unknown UP gesture")
                     }
 
                     fragment.b.linkInfo.animate()
@@ -323,7 +289,7 @@ class StoryFragment : BaseInjectFragment() {
                             fragment.blockPagerTouches = true
                             fragment.b.pager.requestDisallowInterceptTouchEvent(true)
                             val percent = deltaY / slideUpThreshold
-                            Timber.d("Alpha percent: $percent")
+//                            Timber.d("Alpha percent: $percent")
                             fragment.b.linkInfo.alpha = percent.coerceAtMost(1.0f)
                             fragment.b.pager.translationY = -slideUpViewTranslateY * percent
 
@@ -335,7 +301,6 @@ class StoryFragment : BaseInjectFragment() {
                     false
                 }
                 MotionEvent.ACTION_CANCEL -> {
-
                     fragment.b.progress.resume()
                     fragment.b.linkInfo.animate().alpha(0f).setDuration(150).start()
                     fragment.b.pager.animate()
@@ -344,14 +309,11 @@ class StoryFragment : BaseInjectFragment() {
                             .start()
                     fragment.blockPagerTouches = false
                     fragment.b.pager.requestDisallowInterceptTouchEvent(false)
-
-                    Timber.d("OnTouch: CANCEL")
                     true
                 }
                 else -> true
             }
         }
-
     }
 
     override fun onPause() {
@@ -374,11 +336,7 @@ class StoryFragment : BaseInjectFragment() {
             b.progress.pause()
         }
 
-//        Timber.d("Story ${slides[0].storyId} resumed")
-    }
-
-    fun onSelected() {
-//        Timber.d("Story ${slides[0].storyId} active")
+        Timber.d("Story ${slides[0].storyId} resumed")
     }
 
     private var startProgress = false

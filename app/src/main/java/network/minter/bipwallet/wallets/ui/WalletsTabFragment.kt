@@ -454,7 +454,9 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                             .commit()
                 }
             } else {
-                storiesListFragment!!.setData(stories)
+                runOnUiThread {
+                    storiesListFragment!!.setData(stories)
+                }
             }
         }
     }

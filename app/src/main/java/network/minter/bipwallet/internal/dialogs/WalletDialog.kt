@@ -108,7 +108,7 @@ abstract class WalletDialog protected constructor(context: Context) :
 
         @JvmStatic
         fun <T : WalletDialog> switchDialogWithExecutor(fragment: Fragment, dialog: T?, executor: DialogExecutor): T {
-            return switchDialogWithExecutor(fragment.activity!!, dialog, executor)
+            return switchDialogWithExecutor(fragment.requireActivity(), dialog, executor)
         }
 
         @JvmStatic

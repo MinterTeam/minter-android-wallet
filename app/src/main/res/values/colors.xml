@@ -57,6 +57,7 @@
     <color name="white70">#B2FFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="black50">#7C000000</color>
+    <color name="black35">#59000000</color>
     <color name="transparent">#00000000</color>
     <color name="textColorSelectedAddress">#9e8be4</color>
     <color name="pinPadDefault">#3E1EAA</color>
