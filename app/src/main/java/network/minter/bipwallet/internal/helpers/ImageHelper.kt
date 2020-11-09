@@ -27,6 +27,7 @@ package network.minter.bipwallet.internal.helpers
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.StatFs
 import android.widget.ImageView
@@ -49,6 +50,7 @@ import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.File
+import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 
 /**
@@ -85,6 +87,31 @@ class ImageHelper(private val context: Context, private val mDisplay: DisplayHel
             canvas.drawBitmap(bitmap, rect, rect, paint)
             bitmap.recycle()
             return output
+        }
+
+        fun isLightImage(bitmap: Bitmap): Boolean {
+            return try {
+                val mask = BigInteger("FFFFFFFF", 16)
+                val middle = BigInteger("FF7FFFFF", 16)
+
+                val topLeft = BigInteger.valueOf(bitmap.getPixel(0, 0).toLong()).and(mask)
+                val topRight = BigInteger.valueOf(bitmap.getPixel(bitmap.width - 1, 0).toLong()).and(mask)
+                val botLeft = BigInteger.valueOf(bitmap.getPixel(0, bitmap.height - 1).toLong()).and(mask)
+                val botRight = BigInteger.valueOf(bitmap.getPixel(bitmap.width - 1, bitmap.height - 1).toLong()).and(mask)
+
+                val avg = (topLeft + topRight + botLeft + botRight) / BigInteger("4")
+                //Timber.d("Average color: %s", avg.toString(16))
+                avg.and(mask) > middle
+            } catch (e: Throwable) {
+                false
+            }
+        }
+
+        fun isLightImage(iv: ImageView): Boolean {
+            if (iv.drawable != null && iv.drawable is BitmapDrawable && (iv.drawable as BitmapDrawable).bitmap != null) {
+                return isLightImage((iv.drawable as BitmapDrawable).bitmap)
+            }
+            return false
         }
     }
 

@@ -29,6 +29,7 @@ package network.minter.bipwallet.stories.repo
 import io.reactivex.Completable
 import io.reactivex.Observable
 import network.minter.bipwallet.BuildConfig
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
 import network.minter.bipwallet.internal.storage.KVStorage
@@ -47,7 +48,6 @@ class StoriesRepository(
         storiesApiService: ApiService.Builder,
         private val storage: KVStorage,
         private val uid: String,
-
         ) : DataRepository<StoriesEndpoint>(storiesApiService), CachedEntity<@kotlin.jvm.JvmSuppressWildcards List<Story>> {
 
     companion object {
@@ -72,6 +72,14 @@ class StoriesRepository(
                     list.filter {
                         it.slides != null && it.isActive
                     }
+                }
+                .map { list ->
+                    list.map {
+                        it.slides!!.forEach { slide ->
+                            Wallet.app().image().picasso.load(slide.file).fetch()
+                        }
+                    }
+                    list
                 }
     }
 

@@ -58,6 +58,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.inject.Named;
@@ -324,6 +325,7 @@ public class WalletModule {
         api.addHeader("X-Client-Version", BuildConfig.VERSION_NAME);
         api.addHeader("X-Client-Build", String.valueOf(BuildConfig.VERSION_CODE));
         api.addHeader("Content-Type", "application/json");
+        api.addHeader("Accept-Language", Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry());
 
         String dateFormat = "yyyy-MM-dd HH:mm:ssX";
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {

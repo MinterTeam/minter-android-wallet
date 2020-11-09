@@ -72,12 +72,6 @@ class StoriesPagerFragment : BaseInjectFragment() {
     private var firstTab: WeakReference<StoryFragment>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Avoid a postponeEnterTransition on orientation change, and postpone only of first creation.
-//        if (savedInstanceState == null) {
-
-//        }
-//        postponeEnterTransition()
-
         ViewHelper.setSystemBarsLightness(activity, true)
         activity!!.window.navigationBarColor = ContextCompat.getColor(context!!, R.color.transparent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -96,6 +90,10 @@ class StoriesPagerFragment : BaseInjectFragment() {
         b.pager.adapter = StorySlidesAdapter(this)
         b.pager.setPageTransformer(DepthPageTransformer())
         b.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                this@StoriesPagerFragment.position = position
+            }
         })
         b.pager.setCurrentItem(startPosition.coerceAtMost(stories.size - 1), false)
 

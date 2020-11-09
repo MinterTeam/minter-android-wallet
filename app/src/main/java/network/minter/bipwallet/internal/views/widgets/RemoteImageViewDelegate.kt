@@ -34,6 +34,7 @@ import coil.load
 import coil.size.Scale
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.annotations.Dp
+import network.minter.bipwallet.internal.helpers.loadPicasso
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -87,11 +88,14 @@ internal class RemoteImageViewDelegate(imageView: ImageView) : RemoteImageView {
     }
 
     override fun setImageUrlFallback(url: String?, fallbackResId: Int) {
-        mImage.get()!!.load(url) {
-            scale(Scale.FIT)
-            fallback(fallbackResId)
+        mImage.get()!!.loadPicasso(url, {}, {}) {
             error(fallbackResId)
         }
+//        mImage.get()!!.load(url) {
+//            scale(Scale.FIT)
+//            fallback(fallbackResId)
+//            error(fallbackResId)
+//        }
     }
 
     override fun setImageUrlFallback(url: String?, fallbackUrl: String?) {

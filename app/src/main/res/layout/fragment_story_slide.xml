@@ -74,6 +74,7 @@
             android:layout_marginEnd="@dimen/margin_edges"
             android:textColor="@color/textColorWhite"
             tools:text="Реальная история о том, как власти США пыталась посадить за решетку босса мафии Аль Капоне. Гангстерская драма Брайана де Пальмы с Коннери в роли честного полицейского, за которую он получил свой единственный «Оскар»." />
+
     </LinearLayout>
 
 
@@ -97,7 +98,7 @@
         android:text="@string/error_unable_load_story_slide"
         android:textAlignment="center"
         android:textAllCaps="true"
-        android:textColor="@color/grey"
+        android:textColor="@color/textColorWhite"
         android:textSize="@dimen/text_size_14"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

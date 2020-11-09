@@ -26,11 +26,14 @@
 
 package network.minter.bipwallet.stories.ui
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -140,23 +143,12 @@ class StoryFragment : BaseInjectFragment() {
             }
             false
         }
-//        b.debugPagenum.text = "${slidePosition + 1} / ${slides.size}"
+
         b.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-//                b.debugPagenum.text = "${position + 1} / ${slides.size}"
-                if (!slides[position].link.isNullOrEmpty()) {
-                    b.actionShare.setOnClickListener {
-                        val shareIntent = Intent()
-                        shareIntent.action = Intent.ACTION_SEND
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, slides[position].link)
-                        shareIntent.type = "text/plain"
-                        startActivity(Intent.createChooser(shareIntent, getString(R.string.title_share_story)))
-                    }
-                    b.actionShare.visible = true
-                } else {
-                    b.actionShare.visible = false
-                }
+                slidePosition = position
+                onStorySelected(position)
             }
         })
         b.progress.autoStartNext = false
@@ -187,27 +179,44 @@ class StoryFragment : BaseInjectFragment() {
             (activity as HomeActivity?)?.closeStoriesPager()
         }
 
-        if (slideHasLink()) {
+        b.seeMoreContainer.setPadding(
+                b.seeMoreContainer.paddingLeft,
+                b.seeMoreContainer.paddingTop,
+                b.seeMoreContainer.paddingRight,
+                ViewHelper.getNavigationBarHeight(requireContext()) + resources.getDimension(R.dimen.margin_edges).toInt()
+        )
+
+        return b.root
+    }
+
+    private fun onStorySelected(position: Int) {
+        if (!slides[position].link.isNullOrEmpty()) {
             b.actionShare.setOnClickListener {
                 val shareIntent = Intent()
                 shareIntent.action = Intent.ACTION_SEND
-                shareIntent.putExtra(Intent.EXTRA_TEXT, slides[slidePosition].link)
-                startActivity(shareIntent)
+                shareIntent.putExtra(Intent.EXTRA_TEXT, slides[position].link)
+                shareIntent.type = "text/plain"
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.title_share_story)))
             }
             b.actionShare.visible = true
+
+            b.seeMoreContainer.visible = true
+            b.seeMoreAction.setOnClickListener {
+                startStoryUrl(position)
+            }
         } else {
+            b.seeMoreContainer.visible = false
             b.actionShare.visible = false
         }
-
-        return b.root
     }
 
     private fun slideHasLink(): Boolean {
         return !slides[slidePosition].link.isNullOrEmpty()
     }
 
-    private fun startStoryUrl() {
-        if (slides[slidePosition].link?.isNotEmpty() == true) {
+    private fun startStoryUrl(position: Int = -1) {
+        val pos = if (position == -1) slidePosition else position
+        if (slides[pos].link?.isNotEmpty() == true) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(slides[slidePosition].link))
             startActivity(intent)
             (activity as HomeActivity?)?.closeStoriesPager()
@@ -251,6 +260,7 @@ class StoryFragment : BaseInjectFragment() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
+                    Timber.d("ActionUP View id: %s", fragment.requireContext().resources.getResourceEntryName(v.id))
                     val endX = event.x
                     val endY = event.y
                     if (isSimpleClick(startX, endX, startY, endY) && (event.eventTime - touchDownTime) < 200) {
@@ -270,11 +280,19 @@ class StoryFragment : BaseInjectFragment() {
                     fragment.b.linkInfo.animate()
                             .alpha(0f)
                             .setDuration(150).start()
+                    fragment.b.seeMoreContainer.animate()
+                            .alpha(1f)
+                            .setDuration(150).start()
 
-                    fragment.b.pager.animate()
-                            .translationY(0f)
+                    val animator = ValueAnimator
+                            .ofFloat(fragment.b.pager.translationY, 0f)
                             .setDuration(150)
-                            .start()
+
+                    animator.addUpdateListener {
+                        fragment.b.pager.translationY = it.animatedValue as Float
+                        fragment.b.seeMoreContainer.translationY = it.animatedValue as Float
+                    }
+                    animator.start()
 
                     true
                 }
@@ -290,6 +308,8 @@ class StoryFragment : BaseInjectFragment() {
 //                            Timber.d("Alpha percent: $percent")
                             fragment.b.linkInfo.alpha = percent.coerceAtMost(1.0f)
                             fragment.b.pager.translationY = -slideUpViewTranslateY * percent
+                            fragment.b.seeMoreContainer.translationY = -slideUpViewTranslateY * percent
+                            fragment.b.seeMoreContainer.alpha = 1f - percent
 
                             if (percent > 0.99f) {
                                 fragment.startStoryUrl()
@@ -301,10 +321,18 @@ class StoryFragment : BaseInjectFragment() {
                 MotionEvent.ACTION_CANCEL -> {
                     fragment.b.progress.resume()
                     fragment.b.linkInfo.animate().alpha(0f).setDuration(150).start()
-                    fragment.b.pager.animate()
-                            .translationY(0f)
+                    fragment.b.seeMoreContainer.animate().alpha(1f).setDuration(150).start()
+
+                    val animator = ValueAnimator
+                            .ofFloat(fragment.b.pager.translationY, 0f)
                             .setDuration(150)
-                            .start()
+
+                    animator.addUpdateListener {
+                        fragment.b.pager.translationY = it.animatedValue as Float
+                        fragment.b.seeMoreContainer.translationY = it.animatedValue as Float
+                    }
+                    animator.start()
+
                     fragment.blockPagerTouches = false
                     fragment.b.pager.requestDisallowInterceptTouchEvent(false)
                     true
@@ -339,7 +367,16 @@ class StoryFragment : BaseInjectFragment() {
 
     private var startProgress = false
 
-    fun onSlideLoaded() {
+    fun onSlideLoaded(isLightImage: Boolean) {
+        if (isLightImage) {
+            val filterColor = ContextCompat.getColor(requireContext(), R.color.black)
+            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+        } else {
+            val filterColor = ContextCompat.getColor(requireContext(), R.color.white)
+            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+        }
         Timber.d("Slide loaded")
         startProgress = true
         b.progress.resume()

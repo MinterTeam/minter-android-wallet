@@ -401,5 +401,6 @@
     <string name="settings_sec_fingerprint_enabled_label">Unlock with fingerprint</string>
     <string name="settings_sec_pin_enabled_label">Unlock with PIN-code</string>
     <string name="title_share_story">Share Story</string>
+    <string name="action_see_more">See More</string>
 
 </resources>
