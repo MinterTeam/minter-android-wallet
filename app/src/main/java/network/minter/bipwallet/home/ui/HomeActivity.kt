@@ -42,7 +42,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import butterknife.ButterKnife
 import com.annimon.stream.Stream
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
 import moxy.presenter.InjectPresenter
@@ -60,7 +59,6 @@ import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.system.ActivityBuilder
-
 import network.minter.bipwallet.internal.system.BackPressedListener
 import network.minter.bipwallet.stories.models.Story
 import network.minter.bipwallet.stories.ui.StoriesPagerFragment
@@ -186,7 +184,6 @@ class HomeActivity : BaseMvpActivity(), HomeView {
         b = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        ButterKnife.bind(this)
         val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager?
         if (am != null) {
             mIsLowRamDevice = am.isLowRamDevice

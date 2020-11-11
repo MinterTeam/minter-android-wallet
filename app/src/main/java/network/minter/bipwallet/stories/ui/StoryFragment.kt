@@ -78,6 +78,9 @@ class StoryFragment : BaseInjectFragment() {
     private var slidePosition: Int = 0
     private var isFirstStory = false
     private var blockPagerTouches = false
+    private var startProgress = false
+    private var pauseByUser = false
+    private var storyPosition: Int = 0
 
     private fun goNext() {
         slidePosition++
@@ -120,14 +123,19 @@ class StoryFragment : BaseInjectFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         b = FragmentStoryBinding.inflate(inflater, container, false)
         slides = arguments?.getParcelableArrayList(ARG_SLIDES) ?: ArrayList()
-        isFirstStory = arguments?.getInt(ARG_POSITION, 0) == 0
+        storyPosition = arguments?.getInt(ARG_POSITION, 0) ?: 0
+        isFirstStory = storyPosition == 0
+
+
+        pauseByUser = savedInstanceState?.getBoolean("state_pause_by_user", false) ?: false
+
 
         repoCachedStories.entity.markWatched(slides[0].storyId)
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
-                            Timber.d("Mark story ${slides[0].storyId} as watched")
+//                            Timber.d("Mark story ${slides[0].storyId} as watched")
                             repoCachedStories.update(true)
                         },
                         { t -> Timber.w(t, "Unable to mark story ${slides[0].storyId} as watched") }
@@ -196,6 +204,7 @@ class StoryFragment : BaseInjectFragment() {
                 shareIntent.action = Intent.ACTION_SEND
                 shareIntent.putExtra(Intent.EXTRA_TEXT, slides[position].link)
                 shareIntent.type = "text/plain"
+                pauseByUser = true
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.title_share_story)))
             }
             b.actionShare.visible = true
@@ -221,6 +230,69 @@ class StoryFragment : BaseInjectFragment() {
             startActivity(intent)
             (activity as HomeActivity?)?.closeStoriesPager()
         }
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("state_pause_by_user", pauseByUser)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        b.progress.pause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        pauseByUser = false
+        b.progress.reset()
+        slidePosition = 0
+        b.pager.setCurrentItem(slidePosition, false)
+        Timber.d("Story $storyPosition reset")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (pauseByUser) {
+            b.progress.resume()
+            pauseByUser = false
+            Timber.d("Story $storyPosition resumed")
+        } else {
+            Timber.d("Story $storyPosition reset")
+            b.progress.reset()
+            b.progress.start()
+            if (!startProgress) {
+                b.progress.pause()
+            }
+            Timber.d("Story $storyPosition started")
+        }
+    }
+
+    fun onSlideLoaded(isLightImage: Boolean) {
+        if (isLightImage) {
+            val filterColor = ContextCompat.getColor(requireContext(), R.color.black)
+            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+        } else {
+            val filterColor = ContextCompat.getColor(requireContext(), R.color.white)
+            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
+        }
+//        Timber.d("Slide loaded")
+        startProgress = true
+        b.progress.resume()
+    }
+
+    fun onPageUnselected() {
+        b.progress.reset()
+        slidePosition = 0
+        b.pager.setCurrentItem(slidePosition, false)
+        Timber.d("Story $storyPosition unselected")
+    }
+
+    fun onPageSelected() {
+        Timber.d("Story $storyPosition selected")
     }
 
     private class OverlayTouchHandler(
@@ -260,7 +332,6 @@ class StoryFragment : BaseInjectFragment() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    Timber.d("ActionUP View id: %s", fragment.requireContext().resources.getResourceEntryName(v.id))
                     val endX = event.x
                     val endY = event.y
                     if (isSimpleClick(startX, endX, startY, endY) && (event.eventTime - touchDownTime) < 200) {
@@ -340,46 +411,6 @@ class StoryFragment : BaseInjectFragment() {
                 else -> true
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        b.progress.reset()
-        slidePosition = 0
-        b.pager.setCurrentItem(slidePosition, false)
-        Timber.d("Story ${slides[0].storyId} paused")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        b.progress.reset()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        b.progress.start()
-        if (!startProgress) {
-            b.progress.pause()
-        }
-
-        Timber.d("Story ${slides[0].storyId} resumed")
-    }
-
-    private var startProgress = false
-
-    fun onSlideLoaded(isLightImage: Boolean) {
-        if (isLightImage) {
-            val filterColor = ContextCompat.getColor(requireContext(), R.color.black)
-            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-        } else {
-            val filterColor = ContextCompat.getColor(requireContext(), R.color.white)
-            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-        }
-        Timber.d("Slide loaded")
-        startProgress = true
-        b.progress.resume()
     }
 
     class StorySlideAdapter(private val fragment: StoryFragment) : FragmentStateAdapter(fragment) {

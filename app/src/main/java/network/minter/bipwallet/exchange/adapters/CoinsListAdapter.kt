@@ -32,10 +32,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import network.minter.bipwallet.R
+import network.minter.bipwallet.databinding.SearchItemBinding
 import network.minter.bipwallet.internal.helpers.ViewExtensions
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.explorer.models.CoinItem
@@ -70,7 +68,7 @@ class CoinsListAdapter(context: Context, items: List<CoinItem>) : ArrayAdapter<C
         }
         if (v == null) {
             v = mInflater!!.inflate(mViewResourceId, null)
-            holder = ViewHolder(v)
+            holder = ViewHolder(SearchItemBinding.bind(v))
             v.tag = holder
         } else {
             holder = v.tag as ViewHolder
@@ -128,35 +126,21 @@ class CoinsListAdapter(context: Context, items: List<CoinItem>) : ArrayAdapter<C
     }
 
     private fun onBindViewHolder(vh: ViewHolder, position: Int) {
-        vh.itemView!!.setOnClickListener { mOnItemClickListener?.invoke(getItem(position)!!, position) }
+        vh.b.root.setOnClickListener { mOnItemClickListener?.invoke(getItem(position)!!, position) }
 
-        ViewExtensions.listItemBackgroundRippleRounded(vh.itemView!!, position, count)
+        ViewExtensions.listItemBackgroundRippleRounded(vh.b.root, position, count)
 
-        vh.separator!!.visible = !(count == 1 || position == count - 1)
+        vh.b.separator.visible = !(count == 1 || position == count - 1)
 
         val item = getItem(position)!!
-        vh.title!!.text = item.symbol
-        vh.subtitle!!.visibility = View.VISIBLE
-        vh.subtitle!!.text = item.name
+        vh.b.searchItemTitle.text = item.symbol
+        vh.b.searchItemSubtitle.visible = true
+        vh.b.searchItemSubtitle.text = item.name
     }
 
     interface OnItemClickListener {
         fun onClick(item: CoinItem, position: Int)
     }
 
-    internal class ViewHolder(var itemView: View?) {
-
-        @JvmField @BindView(R.id.search_item_title)
-        var title: TextView? = null
-
-        @JvmField @BindView(R.id.search_item_subtitle)
-        var subtitle: TextView? = null
-
-        @JvmField @BindView(R.id.separator)
-        var separator: View? = null
-
-        init {
-            ButterKnife.bind(this, itemView!!)
-        }
-    }
+    class ViewHolder(val b: SearchItemBinding)
 }

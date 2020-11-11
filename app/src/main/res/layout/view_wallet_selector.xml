@@ -25,13 +25,14 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:minHeight="?attr/actionBarSize"
     android:orientation="horizontal"
-    tools:background="@color/colorPrimary"
-    android:weightSum="10">
+    android:weightSum="10"
+    tools:background="@color/colorPrimary">
 
     <FrameLayout
         android:layout_width="24dp"
@@ -41,9 +42,9 @@
         <TextView
             android:id="@+id/icon"
             android:layout_width="wrap_content"
-            android:gravity="start|center_vertical"
             android:layout_height="match_parent"
             android:layout_marginStart="0dp"
+            android:gravity="start|center_vertical"
             android:minWidth="24dp"
             tools:text="🐠" />
 
@@ -57,28 +58,64 @@
             tools:visibility="visible" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/title"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/margin_edges_half"
-        android:ellipsize="end"
-        android:layout_weight="10"
-        android:textAlignment="textStart"
-        android:fontFamily="@font/_inter_semi_bold"
-        android:gravity="center_vertical|start"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textColor="@color/textColorWhite"
-        android:textSize="@dimen/text_size_fixed_18"
-        tools:text="Mx8d008d...пыпыпыпыпfefafafaffafafaffafaffafafafaf2f9f"
-        tools:textColor="@color/white" />
+        android:layout_weight="10">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin_edges_half"
+            android:layout_marginTop="10dp"
+
+            android:ellipsize="end"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:gravity="start"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="textStart"
+            android:textColor="@color/textColorWhite"
+            android:textSize="@dimen/text_size_fixed_18"
+            app:layout_constraintBottom_toTopOf="@id/subtitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Mx8d008d...gggggыпыпfefafafaffafafaffafaffafafafaf2f9f"
+            tools:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin_edges_half"
+            android:ellipsize="end"
+            android:fontFamily="@font/_inter_semi_bold"
+            android:gravity="top|start"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="textStart"
+            android:textColor="@color/textColorGrey"
+            android:textSize="@dimen/text_size_fixed_13"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            tools:text="Subtitle"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <ImageView
-        android:layout_height="match_parent"
         android:id="@+id/dropdown"
-        android:layout_gravity="center_vertical|start"
         android:layout_width="32dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical|start"
         android:layout_marginStart="0dp"
         android:contentDescription="@string/image_cd_wallet_selector_dropdown"
         android:src="@drawable/ic_drop_down_white" />

@@ -43,7 +43,8 @@ import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.stories.StoriesScope
 import network.minter.bipwallet.stories.models.Story
 import timber.log.Timber
-import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * minter-android-wallet. 2020
@@ -69,7 +70,8 @@ class StoriesPagerFragment : BaseInjectFragment() {
     private var stories: List<Story> = ArrayList()
     private var startPosition: Int = 0
     private var position: Int = 0
-    private var firstTab: WeakReference<StoryFragment>? = null
+    private val tabs = WeakHashMap<Int, StoryFragment>()
+    private var lastSelectedTab: Int = -1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         ViewHelper.setSystemBarsLightness(activity, true)
@@ -92,6 +94,12 @@ class StoriesPagerFragment : BaseInjectFragment() {
         b.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                if (lastSelectedTab != -1 && lastSelectedTab != position) {
+                    Timber.tag("StoryFragment").d("onPageSelected: $position , prev: $lastSelectedTab")
+                    tabs[lastSelectedTab]?.onPageUnselected()
+                }
+                lastSelectedTab = position
+                tabs[position]?.onPageSelected()
                 this@StoriesPagerFragment.position = position
             }
         })
@@ -112,8 +120,8 @@ class StoriesPagerFragment : BaseInjectFragment() {
 
             override fun onMapSharedElements(names: MutableList<String>, sharedElements: MutableMap<String, View>) {
                 super.onMapSharedElements(names, sharedElements)
-                if (firstTab != null && firstTab!!.get() != null) {
-                    val iv = firstTab?.get()?.view?.findViewById<ImageView>(R.id.image)
+                if (tabs.size > 0 && tabs[0] != null) {
+                    val iv = tabs[0]!!.view?.findViewById<ImageView>(R.id.image)
                     if (iv != null) {
                         Timber.d("Map shared view image")
                         sharedElements[names[0]] = iv
@@ -160,8 +168,8 @@ class StoriesPagerFragment : BaseInjectFragment() {
 
         override fun createFragment(position: Int): Fragment {
             val instance = StoryFragment.newInstance(fragment.stories[position].slides!!, position)
-            if (position == 0) {
-                fragment.firstTab = WeakReference(instance)
+            if (!fragment.tabs.containsKey(position)) {
+                fragment.tabs[position] = instance
             }
             return instance
         }

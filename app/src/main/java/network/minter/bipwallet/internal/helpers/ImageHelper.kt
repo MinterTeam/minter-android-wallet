@@ -103,6 +103,7 @@ class ImageHelper(private val context: Context, private val mDisplay: DisplayHel
                 //Timber.d("Average color: %s", avg.toString(16))
                 avg.and(mask) > middle
             } catch (e: Throwable) {
+                Timber.w(e, "Unable to detect image lightness")
                 false
             }
         }

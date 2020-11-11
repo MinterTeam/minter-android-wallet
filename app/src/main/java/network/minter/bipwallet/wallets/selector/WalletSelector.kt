@@ -29,19 +29,18 @@ import android.content.Context
 import android.graphics.PorterDuff
 import android.os.Build
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.lifecycle.LifecycleOwner
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.airbnb.paris.annotations.Attr
 import com.airbnb.paris.annotations.Styleable
 import network.minter.bipwallet.Paris
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.dp
+import network.minter.bipwallet.databinding.ViewWalletSelectorBinding
 import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.helpers.MathHelper.bdLT
@@ -54,21 +53,7 @@ import java.util.*
 
 @Styleable("WalletSelector")
 class WalletSelector : FrameLayout {
-    @JvmField
-    @BindView(R.id.icon)
-    var weight: TextView? = null
-
-    @JvmField
-    @BindView(R.id.icon_support)
-    var weightSupport: ImageView? = null
-
-    @JvmField
-    @BindView(R.id.title)
-    var name: TextView? = null
-
-    @JvmField
-    @BindView(R.id.dropdown)
-    var dropdown: ImageView? = null
+    private lateinit var b: ViewWalletSelectorBinding
 
     private var layout: ViewGroup? = null
     private var mAdapter: WalletListAdapter? = null
@@ -142,14 +127,16 @@ class WalletSelector : FrameLayout {
         mAdapter!!.setOnClickWalletListener { addressBalance: WalletItem -> onClickWallet(addressBalance) }
         mAdapter!!.setOnClickEditWalletListener { addressBalance: WalletItem -> onClickEditWallet(addressBalance) }
         mAdapter!!.setOnClickAddWalletListener { onClickAddWallet() }
-        layout = View.inflate(context, R.layout.view_wallet_selector, this) as ViewGroup
-        ButterKnife.bind(this, layout!!)
+//        layout = View.inflate(context, R.layout.view_wallet_selector, this) as ViewGroup
+        b = ViewWalletSelectorBinding.inflate(LayoutInflater.from(context), this, true)
+        layout = b.root
+
         layout!!.setOnClickListener { openPopup() }
         Paris.style(this).apply(attrs)
 
         if (!WalletWeight.supportsNativeEmoji()) {
-            weight?.visible = false
-            weightSupport?.visible = true
+            b.icon.visible = false
+            b.iconSupport.visible = true
         }
     }
 
@@ -182,12 +169,12 @@ class WalletSelector : FrameLayout {
 
     @Attr(value = R.styleable.WalletSelector_ws_name_color)
     fun setNameColor(@ColorInt color: Int) {
-        name!!.setTextColor(color)
+        b.title.setTextColor(color)
     }
 
     @Attr(value = R.styleable.WalletSelector_ws_dropdown_tint)
     fun setDropdownTint(@ColorInt color: Int) {
-        dropdown!!.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
+        b.dropdown.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
     }
 
     fun showPopupProgress(show: Boolean) {
@@ -216,17 +203,32 @@ class WalletSelector : FrameLayout {
     }
 
     internal fun setMainWallet(wallet: WalletItem) {
-        name!!.post {
-            name!!.text = Preconditions.firstNonNull(wallet.title, wallet.addressShort)
-            name!!.requestLayout()
+        b.title.post {
+            b.title.text = Preconditions.firstNonNull(wallet.title, wallet.addressShort)
+            b.title.requestLayout()
+
+            if (wallet.hasTitle()) {
+                val lp = b.title.layoutParams as MarginLayoutParams
+                lp.topMargin = 10.dp().toInt()
+                b.title.layoutParams = lp
+
+                b.subtitle.text = wallet.addressShort
+                b.subtitle.requestLayout()
+                b.subtitle.visible = true
+            } else {
+                val lp = b.title.layoutParams as MarginLayoutParams
+                lp.topMargin = 16.dp().toInt()
+                b.title.layoutParams = lp
+                b.subtitle.visible = false
+            }
         }
 
         if (WalletWeight.supportsNativeEmoji()) {
-            weight?.postApply {
+            b.icon.postApply {
                 it.text = wallet.weight.emoji
             }
         } else {
-            weightSupport?.postApply {
+            b.iconSupport.postApply {
                 it.setImageResource(wallet.weight.fallback)
             }
         }

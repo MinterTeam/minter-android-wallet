@@ -34,7 +34,6 @@ import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.fragment.app.Fragment
-import butterknife.ButterKnife
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.R
@@ -186,7 +185,6 @@ class PinEnterActivity : BaseMvpInjectActivity(), PinEnterView {
         super.onCreate(savedInstanceState)
         b = ActivityPinBinding.inflate(layoutInflater)
         setContentView(b.root)
-        ButterKnife.bind(this)
         setupToolbar(b.toolbar)
         presenter.handleExtras(intent)
         setResult(Activity.RESULT_CANCELED)

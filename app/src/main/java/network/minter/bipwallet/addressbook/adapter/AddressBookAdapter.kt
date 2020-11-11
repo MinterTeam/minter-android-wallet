@@ -26,28 +26,25 @@
 package network.minter.bipwallet.addressbook.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.zerobranch.layout.SwipeLayout
 import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressBookItem
 import network.minter.bipwallet.addressbook.models.AddressBookItemHeader
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.apis.reactive.avatar
+import network.minter.bipwallet.databinding.ItemListAddressBookBinding
+import network.minter.bipwallet.databinding.ItemListHeaderBinding
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
-import network.minter.bipwallet.internal.views.widgets.BipCircleImageView
 import java.util.*
 
 class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), DiffUtilDispatcherDelegate<AddressBookItem> {
     private var mItems: MutableList<AddressBookItem> = ArrayList()
-    private var mInflater: LayoutInflater? = null
+    private var inflater: LayoutInflater? = null
     private var mOnEditContactListener: ((AddressContact) -> Unit)? = null
     private var mOnDeleteContactListener: ((AddressContact) -> Unit)? = null
     private var mOnItemClickListener: ((AddressContact) -> Unit)? = null
@@ -90,16 +87,14 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if (mInflater == null) {
-            mInflater = LayoutInflater.from(parent.context)
+        if (inflater == null) {
+            inflater = LayoutInflater.from(parent.context)
         }
-        val view: View
+
         return if (viewType == AddressBookItem.TYPE_HEADER) {
-            view = mInflater!!.inflate(R.layout.item_list_header, parent, false)
-            HeaderViewHolder(view)
+            HeaderViewHolder(ItemListHeaderBinding.inflate(inflater!!, parent, false))
         } else {
-            view = mInflater!!.inflate(R.layout.item_list_address_book, parent, false)
-            ItemViewHolder(view)
+            ItemViewHolder(ItemListAddressBookBinding.inflate(inflater!!, parent, false))
         }
     }
 
@@ -125,18 +120,17 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is HeaderViewHolder) {
             val item = mItems[position] as AddressBookItemHeader
-            holder.title!!.text = item.header
+            holder.b.title.text = item.header
             lastHeaderPos = position
         } else {
             val vh = holder as ItemViewHolder
-            vh.separator!!.visible = true
+            vh.b.separator.visible = true
             val item = mItems[position] as AddressContact
 
             val enableSwipe = !item.isLastUsed
 
-            (vh.itemView as SwipeLayout).isEnabledSwipe = enableSwipe
-
-            vh.itemView.setOnActionsListener(object : SwipeLayout.SwipeActionsListener {
+            vh.b.root.isEnabledSwipe = enableSwipe
+            vh.b.root.setOnActionsListener(object : SwipeLayout.SwipeActionsListener {
                 override fun onOpen(direction: Int, isContinuous: Boolean) {
                     closeOpened()
                     lastOpened = vh.absoluteAdapterPosition
@@ -147,23 +141,22 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
             if (vh.absoluteAdapterPosition == lastOpened) {
                 vh.itemView.post {
                     lastOpened = -1
-                    vh.itemView.close(true)
+                    vh.b.root.close(true)
                 }
             }
 
-
-            vh.mainView!!.setOnClickListener {
+            vh.b.main.setOnClickListener {
                 mOnItemClickListener?.invoke(mItems[holder.bindingAdapterPosition] as AddressContact)
             }
-            item.applyAddressIcon(vh.avatar!!)
-            vh.avatar!!.setImageUrlFallback(item.minterAddress.avatar, R.drawable.img_avatar_default)
-            vh.title!!.text = item.name
-            vh.subtitle!!.text = item.address
-            vh.actionEdit!!.setOnClickListener {
+            item.applyAddressIcon(vh.b.avatar)
+            vh.b.avatar.setImageUrlFallback(item.minterAddress.avatar, R.drawable.img_avatar_default)
+            vh.b.title.text = item.name
+            vh.b.subtitle.text = item.address
+            vh.b.actionEdit.setOnClickListener {
                 closeOpened()
                 mOnEditContactListener?.invoke(mItems[holder.bindingAdapterPosition] as AddressContact)
             }
-            vh.actionDelete!!.setOnClickListener {
+            vh.b.actionDelete.setOnClickListener {
                 closeOpened()
                 mOnDeleteContactListener?.invoke(mItems[holder.bindingAdapterPosition] as AddressContact)
             }
@@ -195,42 +188,7 @@ class AddressBookAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Diff
         notifyDataSetChanged()
     }
 
-    class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @JvmField @BindView(R.id.title)
-        var title: TextView? = null
+    class HeaderViewHolder(val b: ItemListHeaderBinding) : RecyclerView.ViewHolder(b.root)
 
-        init {
-            ButterKnife.bind(this, itemView)
-        }
-    }
-
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        @JvmField @BindView(R.id.avatar)
-        var avatar: BipCircleImageView? = null
-
-        @JvmField @BindView(R.id.title)
-        var title: TextView? = null
-
-        @JvmField @BindView(R.id.subtitle)
-        var subtitle: TextView? = null
-
-        @JvmField @BindView(R.id.swipe_actions)
-        var swipeActions: View? = null
-
-        @JvmField @BindView(R.id.action_delete)
-        var actionDelete: View? = null
-
-        @JvmField @BindView(R.id.action_edit)
-        var actionEdit: View? = null
-
-        @JvmField @BindView(R.id.main)
-        var mainView: View? = null
-
-        @JvmField @BindView(R.id.separator)
-        var separator: View? = null
-
-        init {
-            ButterKnife.bind(this, itemView)
-        }
-    }
+    class ItemViewHolder(val b: ItemListAddressBookBinding) : RecyclerView.ViewHolder(b.root)
 }

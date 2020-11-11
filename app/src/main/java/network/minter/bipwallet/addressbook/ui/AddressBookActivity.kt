@@ -35,7 +35,6 @@ import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.ButterKnife
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.R
@@ -110,7 +109,6 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
         super.onCreate(savedInstanceState)
         binding = ActivityAddressBookBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ButterKnife.bind(this)
         setupToolbar(binding.toolbar)
 
 

@@ -86,12 +86,16 @@ class StorySlideFragment : BaseInjectFragment() {
         var showContentRoot = false
         if (!slide.title.isNullOrEmpty()) {
             b.title.text = HtmlCompat.fromHtml(slide.title)
+            b.title.visible = true
             showContentRoot = true
+        } else {
+            b.title.visible = false
         }
+
         if (!slide.text.isNullOrEmpty()) {
             b.text.text = HtmlCompat.fromHtml(slide.text)
+            b.text.visible = true
             showContentRoot = true
-            b.text.visible = false
         } else {
             b.text.visible = false
         }

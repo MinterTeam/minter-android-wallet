@@ -42,6 +42,10 @@ data class WalletItem(
         var isMain: Boolean = false
 ) : Parcelable {
 
+    fun hasTitle(): Boolean {
+        return !title.isNullOrBlank() && title != addressShort
+    }
+
     val addressShort: String
         get() = address.toShortString()
 

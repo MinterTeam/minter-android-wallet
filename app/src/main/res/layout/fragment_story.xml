@@ -88,7 +88,7 @@
         android:layout_marginStart="@dimen/margin_edges"
         android:layout_marginTop="@dimen/margin_edges"
         android:padding="3dp"
-        android:src="@drawable/ic_close_grey"
+        android:src="@drawable/ic_close_white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/progress_container"
         app:tint="@color/white" />
