@@ -70,7 +70,7 @@ data class Story(
         val updatedAt: Date?,
         @SerializedName("deleted_at")
         val deletedAt: Date?,
-        val slides: List<StorySlide>?,
+        var slides: List<StorySlide>?,
 
         // local
         var watchedLocal: Boolean = false

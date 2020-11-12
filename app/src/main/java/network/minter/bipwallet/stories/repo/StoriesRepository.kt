@@ -48,7 +48,7 @@ class StoriesRepository(
         storiesApiService: ApiService.Builder,
         private val storage: KVStorage,
         private val uid: String,
-        ) : DataRepository<StoriesEndpoint>(storiesApiService), CachedEntity<@kotlin.jvm.JvmSuppressWildcards List<Story>> {
+) : DataRepository<StoriesEndpoint>(storiesApiService), CachedEntity<@kotlin.jvm.JvmSuppressWildcards List<Story>> {
 
     companion object {
         private const val KEY_STORIES = BuildConfig.MINTER_CACHE_VERS + "stories"
@@ -58,6 +58,7 @@ class StoriesRepository(
     fun getStories(): Observable<List<Story>> {
         return instantService.list()
                 .map { it.data }
+                .map { stories -> stories.sortedByDescending { it.weight } }
                 .map { stories ->
                     val watched = getWatched()
                     stories.map { story ->
@@ -72,6 +73,12 @@ class StoriesRepository(
                     list.filter {
                         it.slides != null && it.isActive
                     }
+                }
+                .map { stories ->
+                    stories.forEach { story ->
+                        story.slides = story.slides!!.sortedByDescending { it.weight }
+                    }
+                    stories
                 }
                 .map { list ->
                     list.map {

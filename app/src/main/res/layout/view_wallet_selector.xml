@@ -98,7 +98,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textAlignment="textStart"
-            android:textColor="@color/textColorGrey"
+            android:textColor="@color/white70"
             android:textSize="@dimen/text_size_fixed_13"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"

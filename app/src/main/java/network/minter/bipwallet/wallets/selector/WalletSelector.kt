@@ -172,6 +172,11 @@ class WalletSelector : FrameLayout {
         b.title.setTextColor(color)
     }
 
+    @Attr(value = R.styleable.WalletSelector_ws_subtitle_color)
+    fun setSubtitleColor(@ColorInt color: Int) {
+        b.subtitle.setTextColor(color)
+    }
+
     @Attr(value = R.styleable.WalletSelector_ws_dropdown_tint)
     fun setDropdownTint(@ColorInt color: Int) {
         b.dropdown.setColorFilter(color, PorterDuff.Mode.MULTIPLY)

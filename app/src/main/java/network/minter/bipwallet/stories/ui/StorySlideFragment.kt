@@ -35,7 +35,6 @@ import network.minter.bipwallet.apis.reactive.dp
 import network.minter.bipwallet.databinding.FragmentStorySlideBinding
 import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.helpers.HtmlCompat
-import network.minter.bipwallet.internal.helpers.ImageHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.helpers.loadPicasso
@@ -138,7 +137,7 @@ class StorySlideFragment : BaseInjectFragment() {
         b.image.loadPicasso(slide.file, {
             slideLoaded = true
             b.progress.visible = false
-            isLightImage = ImageHelper.isLightImage(b.image)
+//            isLightImage = ImageHelper.isLightImage(b.image)
             (parentFragment as StoryFragment?)?.onSlideLoaded(isLightImage)
 
         }, {

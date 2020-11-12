@@ -32,9 +32,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.request.ImageRequest
+import coil.request.ImageResult
 import coil.transform.RoundedCornersTransformation
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ItemStoryBinding
 import network.minter.bipwallet.internal.helpers.HtmlCompat
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
 import network.minter.bipwallet.stories.models.Story
@@ -69,6 +73,14 @@ class StoriesListAdapter(
                     roundedCornersSize,
                     roundedCornersSize
             ))
+            fallback(R.drawable.stories_thumb)
+            error(R.drawable.stories_thumb)
+            listener(object : ImageRequest.Listener {
+                override fun onSuccess(request: ImageRequest, metadata: ImageResult.Metadata) {
+                    super.onSuccess(request, metadata)
+                    holder.b.progress.visible = false
+                }
+            })
         }
         holder.b.title.text = HtmlCompat.fromHtml(story.title)
         holder.b.root.setOnClickListener {

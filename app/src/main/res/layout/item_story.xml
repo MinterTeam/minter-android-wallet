@@ -28,6 +28,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="98dp"
     android:layout_height="98dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginEnd="@dimen/margin_edges"
     android:background="@drawable/shape_story"
     android:clickable="true"
@@ -37,18 +38,21 @@
     android:foreground="?attr/selectableItemBackground">
 
     <ImageView
-
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        tools:src="@drawable/img_welcome" />
+        android:src="@drawable/stories_thumb" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_black_half_vignette" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:background="@drawable/shape_black_half_vignette">
+        android:layout_gravity="bottom|start">
 
         <TextView
             android:id="@+id/title"
@@ -62,6 +66,13 @@
             android:textSize="@dimen/text_size_12"
             tools:text="Как праивльно выбирать мастерндоу?" />
     </FrameLayout>
+
+    <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
+        android:id="@+id/progress"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        app:color="@color/white" />
 
 
 </FrameLayout>

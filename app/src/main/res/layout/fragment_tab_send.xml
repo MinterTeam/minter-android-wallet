@@ -61,7 +61,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:ws_dropdown_tint="@color/grey"
-                app:ws_name_color="@color/textColorPrimary" />
+                app:ws_name_color="@color/textColorPrimary"
+                app:ws_subtitle_color="@color/textColorGrey" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 

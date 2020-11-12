@@ -29,16 +29,15 @@ package network.minter.bipwallet.stories.ui
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.R
+import network.minter.bipwallet.apis.reactive.dp
 import network.minter.bipwallet.databinding.FragmentStoryBinding
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.BaseInjectFragment
@@ -191,7 +190,7 @@ class StoryFragment : BaseInjectFragment() {
                 b.seeMoreContainer.paddingLeft,
                 b.seeMoreContainer.paddingTop,
                 b.seeMoreContainer.paddingRight,
-                ViewHelper.getNavigationBarHeight(requireContext()) + resources.getDimension(R.dimen.margin_edges).toInt()
+                ViewHelper.getNavigationBarHeight(requireContext()) + 4.dp().toInt()
         )
 
         return b.root
@@ -270,16 +269,6 @@ class StoryFragment : BaseInjectFragment() {
     }
 
     fun onSlideLoaded(isLightImage: Boolean) {
-        if (isLightImage) {
-            val filterColor = ContextCompat.getColor(requireContext(), R.color.black)
-            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-        } else {
-            val filterColor = ContextCompat.getColor(requireContext(), R.color.white)
-            b.actionClose.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-            b.actionShare.setColorFilter(filterColor, PorterDuff.Mode.MULTIPLY)
-        }
-//        Timber.d("Slide loaded")
         startProgress = true
         b.progress.resume()
     }

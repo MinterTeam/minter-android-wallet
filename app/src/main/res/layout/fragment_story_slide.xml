@@ -41,11 +41,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/shape_black_full_vignette"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/content_root"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_black_half_vignette"
         android:orientation="vertical"
         android:paddingTop="@dimen/margin_edges"
         android:visibility="gone"
@@ -60,9 +68,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges"
             android:layout_marginEnd="@dimen/margin_edges"
-            android:fontFamily="@font/_inter_extra_bold"
+            android:fontFamily="@font/_inter_semi_bold"
             android:textColor="@color/textColorWhite"
-            android:textSize="@dimen/text_size_32"
+            android:textSize="@dimen/text_size_24"
             tools:text="Неприкасаемые" />
 
         <TextView
@@ -70,9 +78,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_edges"
-            android:layout_marginTop="@dimen/margin_edges"
+            android:layout_marginTop="@dimen/margin_edges_half"
+            android:fontFamily="@font/_inter_regular"
             android:layout_marginEnd="@dimen/margin_edges"
             android:textColor="@color/textColorWhite"
+            android:textSize="@dimen/text_size_18"
             tools:text="Реальная история о том, как власти США пыталась посадить за решетку босса мафии Аль Капоне. Гангстерская драма Брайана де Пальмы с Коннери в роли честного полицейского, за которую он получил свой единственный «Оскар»." />
 
     </LinearLayout>
