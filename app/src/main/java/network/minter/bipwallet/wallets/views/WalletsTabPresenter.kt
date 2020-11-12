@@ -82,6 +82,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
 
     private val balanceState = BalanceCurrentState()
     private var storiesDisposable: Disposable? = null
+    private var smoothScrollStories = false
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -133,7 +134,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                         .subscribe {
                             if (it.isNotEmpty()) {
                                 Timber.d("Show stories")
-                                viewState.showStoriesList(it)
+                                viewState.showStoriesList(it, smoothScrollStories)
                             }
                         }
             }
@@ -262,7 +263,9 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
 
     private fun onRefresh() {
         viewState.showBalanceProgress(true)
+        smoothScrollStories = true
         forceUpdate()
+        smoothScrollStories = false
     }
 
     @Suppress("UNUSED_PARAMETER")

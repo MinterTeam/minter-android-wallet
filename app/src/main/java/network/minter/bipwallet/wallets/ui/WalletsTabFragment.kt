@@ -442,7 +442,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         Wallet.app().sounds().play(R.raw.refresh_pop_down)
     }
 
-    override fun showStoriesList(stories: List<Story>) {
+    override fun showStoriesList(stories: List<Story>, smoothScroll: Boolean) {
         synchronized(storiesListLock) {
             if (storiesListFragment == null) {
                 storiesListFragment = StoriesListFragment.newInstance(stories)
@@ -455,7 +455,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 }
             } else {
                 runOnUiThread {
-                    storiesListFragment!!.setData(stories)
+                    storiesListFragment!!.setData(stories, smoothScroll)
                 }
             }
         }

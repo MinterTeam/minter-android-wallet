@@ -58,6 +58,11 @@ class StoriesRepository(
     fun getStories(): Observable<List<Story>> {
         return instantService.list()
                 .map { it.data }
+                .map { list ->
+                    list.filter {
+                        it.slides != null && it.isActive
+                    }
+                }
                 .map { stories ->
                     val watched = getWatched()
                     stories.map { story ->
@@ -67,12 +72,9 @@ class StoriesRepository(
                         }
                         story
                     }
+                    stories.sortedByDescending { if (it.watchedLocal) 0 else 1 }
                 }
-                .map { list ->
-                    list.filter {
-                        it.slides != null && it.isActive
-                    }
-                }
+
                 .map { list ->
                     list.map {
                         it.slides!!.forEach { slide ->

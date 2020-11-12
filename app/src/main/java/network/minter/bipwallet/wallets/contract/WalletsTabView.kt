@@ -87,7 +87,7 @@ interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
     fun notifyUpdated()
 
     fun showBalanceProgress(show: Boolean)
-    fun showStoriesList(stories: List<Story>)
+    fun showStoriesList(stories: List<Story>, smoothScroll: Boolean = false)
     fun hideStoriesList()
     fun setStoriesListData(items: List<Story>)
 }

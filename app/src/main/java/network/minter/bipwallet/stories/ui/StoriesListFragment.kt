@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import network.minter.bipwallet.databinding.FragmentStoriesHorizontalListBinding
 import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.PaddingItemDecoration
 import network.minter.bipwallet.stories.adapter.StoriesDiffUtil
@@ -67,8 +68,15 @@ class StoriesListFragment : BaseInjectFragment() {
     private val adapter: StoriesListAdapter = StoriesListAdapter(::openStory)
     private var stories: List<Story> = ArrayList()
 
-    fun setData(stories: List<Story>) {
+    fun setData(stories: List<Story>, smoothScroll: Boolean = false) {
         adapter.dispatchChanges(StoriesDiffUtil::class.java, stories, true)
+        b.list.postApply {
+            if (smoothScroll) {
+                it.smoothScrollToPosition(0)
+            } else {
+                it.scrollToPosition(0)
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

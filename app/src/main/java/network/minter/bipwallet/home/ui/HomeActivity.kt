@@ -264,7 +264,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
 
         supportFragmentManager.beginTransaction()
                 .setReorderingAllowed(true)
-                .addSharedElement(sharedImage, sharedImage.transitionName)
+//                .addSharedElement(sharedImage, sharedImage.transitionName)
                 .setCustomAnimations(
                         R.anim.stories_pager_enter,
                         R.anim.stories_pager_exit,
