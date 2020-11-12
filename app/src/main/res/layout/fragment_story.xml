@@ -133,7 +133,6 @@
         android:layout_height="150dp"
         android:layout_gravity="bottom"
         android:alpha="0"
-        android:background="@drawable/shape_black_vignette"
         android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
