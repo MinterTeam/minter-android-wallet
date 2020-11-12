@@ -58,7 +58,6 @@ class StoriesRepository(
     fun getStories(): Observable<List<Story>> {
         return instantService.list()
                 .map { it.data }
-                .map { stories -> stories.sortedByDescending { it.weight } }
                 .map { stories ->
                     val watched = getWatched()
                     stories.map { story ->
@@ -73,12 +72,6 @@ class StoriesRepository(
                     list.filter {
                         it.slides != null && it.isActive
                     }
-                }
-                .map { stories ->
-                    stories.forEach { story ->
-                        story.slides = story.slides!!.sortedByDescending { it.weight }
-                    }
-                    stories
                 }
                 .map { list ->
                     list.map {
