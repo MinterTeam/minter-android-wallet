@@ -319,10 +319,10 @@ dependencies {
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP
-    implementation 'com.github.moxy-community:moxy:2.1.2'
-    implementation 'com.github.moxy-community:moxy-androidx:2.1.2'
-    implementation "com.github.moxy-community:moxy-ktx:2.1.2"
-    kapt 'com.github.moxy-community:moxy-compiler:2.1.2'
+    implementation 'com.github.moxy-community:moxy:2.2.0'
+    implementation 'com.github.moxy-community:moxy-androidx:2.2.0'
+    implementation "com.github.moxy-community:moxy-ktx:2.2.0"
+    kapt 'com.github.moxy-community:moxy-compiler:2.2.0'
 
     // Reactive
     implementation 'io.reactivex.rxjava2:rxjava:2.2.19'

@@ -76,35 +76,32 @@ abstract class BaseTabPageFragment : BaseFragment(), BaseWalletsPageView {
     }
 
     override fun setViewStatus(status: ViewStatus, error: CharSequence?) {
-        when (status) {
-            ViewStatus.Progress -> {
-                binding.list.visible = false
-                binding.emptyTitle.visible = false
-                binding.progress.visible = true
-            }
-            ViewStatus.Empty -> {
-                binding.list.visible = false
-                binding.emptyTitle.visible = true
-                binding.progress.visible = false
-//                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
+        runOnUiThread {
+            when (status) {
+                ViewStatus.Progress -> {
+                    binding.list.visible = false
+                    binding.emptyTitle.visible = false
+                    binding.progress.visible = true
+                }
+                ViewStatus.Empty -> {
+                    binding.list.visible = false
+                    binding.emptyTitle.visible = true
+                    binding.progress.visible = false
 
-            }
-            ViewStatus.Error -> {
-                binding.list.visible = false
-                binding.emptyTitle.visible = true
-                binding.emptyTitle.text = error ?: "Unexpected error"
-                binding.progress.visible = false
-//                CollapsingToolbarScrollDisabler.setOverlaps(javaClass, false)
-            }
-            ViewStatus.Normal -> {
-                binding.list.visible = true
-                binding.emptyTitle.visible = false
-                binding.progress.visible = false
-//                CollapsingToolbarScrollDisabler.bindRecycler(binding.list, javaClass)
+                }
+                ViewStatus.Error -> {
+                    binding.list.visible = false
+                    binding.emptyTitle.visible = true
+                    binding.emptyTitle.text = error ?: "Unexpected error"
+                    binding.progress.visible = false
+                }
+                ViewStatus.Normal -> {
+                    binding.list.visible = true
+                    binding.emptyTitle.visible = false
+                    binding.progress.visible = false
+                }
             }
         }
-
-
     }
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {
