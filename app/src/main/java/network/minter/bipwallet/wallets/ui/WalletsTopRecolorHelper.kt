@@ -42,42 +42,45 @@ import network.minter.bipwallet.internal.helpers.ViewHelper
 import java.lang.ref.WeakReference
 
 class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment) : AppBarOffsetChangedListener(), LifecycleObserver {
-    private val mCollapsedStatusColor = -0x1
-    private val mCollapsedTextColor = -0x1000000
-    private val mCollapsedDropdownColor: Int
-    private var mElevation: Float = 0.0f
-    private val mExpandedToolbarIconsColor = -0x1
-    private val mCollapsedToolbarIconsColor: Int
-    private val mRef: WeakReference<WalletsTabFragment> = WeakReference(fragment)
-    private var mStatusColor = -1
-    private var mEnableRecolor = true
-    private var mExpandedStatusColor: Int
-    private var mLightStatus = false
-    private var mToolbarIconsColor = mCollapsedStatusColor
-    private var waitForExpandPercent: Float = -1f
+    private val collapsedStatusColor = -0x1
+    private val collapsedTextColor = -0x1000000
+    private val collapsedSubtitleColor: Int
+    private val expandedSubtitleColor: Int
+    private val collapsedDropdownColor: Int
+    private var elevation: Float = 0.0f
+    private val expandedToolbarIconsColor = -0x1
+    private val collapsedToolbarIconsColor: Int
+    private val ref: WeakReference<WalletsTabFragment> = WeakReference(fragment)
+    private var statusColor = -1
+    private var enableRecolor = true
+    private var expandedStatusColor: Int
+    private var lightStatus = false
+    private var toolbarIconsColor = collapsedStatusColor
 
     init {
         ViewHelper.setSystemBarsLightness(fragment, false)
-        mExpandedStatusColor = ContextCompat.getColor(mRef.get()!!.activity!!, R.color.colorPrimary)
-        mCollapsedToolbarIconsColor = ContextCompat.getColor(mRef.get()!!.activity!!, R.color.colorPrimaryLight)
-        mStatusColor = mExpandedStatusColor
-        mCollapsedDropdownColor = ContextCompat.getColor(mRef.get()!!.activity!!, R.color.grey)
-        mElevation = fragment.resources.getDimension(R.dimen.toolbar_elevation)
+        expandedStatusColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.colorPrimary)
+        collapsedToolbarIconsColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.colorPrimaryLight)
+        collapsedSubtitleColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.textColorGrey)
+        expandedSubtitleColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.white70)
+        statusColor = expandedStatusColor
+        collapsedDropdownColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.grey)
+        elevation = fragment.resources.getDimension(R.dimen.toolbar_elevation)
         fragment.binding.appbar.setLiftable(true)
     }
 
     private val view: FragmentTabWalletsBinding by lazy {
-        mRef.get()!!.binding
+        ref.get()!!.binding
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     internal fun onDestroy() {
-        mRef.clear()
+        ref.clear()
     }
 
     private fun recolorToolbarMenu() {
         for (i in 0 until view.toolbar.menu.size()) {
-            view.toolbar.menu.getItem(i).icon.colorFilter = PorterDuffColorFilter(mToolbarIconsColor, PorterDuff.Mode.SRC_IN)
+            view.toolbar.menu.getItem(i).icon.colorFilter = PorterDuffColorFilter(toolbarIconsColor, PorterDuff.Mode.SRC_IN)
         }
     }
 
@@ -88,29 +91,32 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
     }
 
     override fun onStateChanged(appbar: AppBarLayout, state: State, verticalOffset: Int, percent: Float) {
-        val ctx = mRef.get()
-        if (!mEnableRecolor || ctx == null || ctx.activity == null) {
+        val ctx = ref.get()
+        if (!enableRecolor || ctx == null || ctx.activity == null) {
             return
         }
-        val textColor = blendColors(mCollapsedStatusColor, mCollapsedTextColor, 1.0f - percent)
-        val dropdownColor = blendColors(mCollapsedStatusColor, mCollapsedDropdownColor, 1.0f - percent)
-        mStatusColor = blendColors(mCollapsedStatusColor, mExpandedStatusColor, percent)
-        mLightStatus = percent < 0.5f
+        // blend colors between collapsed and expanded state
+        val textColor = blendColors(collapsedStatusColor, collapsedTextColor, 1.0f - percent)
+        val subtitleColor = blendColors(collapsedSubtitleColor, expandedSubtitleColor, percent)
+        val dropdownColor = blendColors(collapsedStatusColor, collapsedDropdownColor, 1.0f - percent)
+        statusColor = blendColors(collapsedStatusColor, expandedStatusColor, percent)
+        lightStatus = percent < 0.5f
         if (enableRecolorSystemUI()) {
-            ViewHelper.setSystemBarsLightness(ctx.activity, mLightStatus)
-            ViewHelper.setStatusBarColor(ctx.activity, mStatusColor)
+            ViewHelper.setSystemBarsLightness(ctx.activity, lightStatus)
+            ViewHelper.setStatusBarColor(ctx.activity, statusColor)
         }
 
         view.walletSelector.setNameColor(textColor)
+        view.walletSelector.setSubtitleColor(subtitleColor)
         view.walletSelector.setDropdownTint(dropdownColor)
-        if (mLightStatus) {
-            if (mToolbarIconsColor != mExpandedStatusColor) {
-                mToolbarIconsColor = mCollapsedToolbarIconsColor
+        if (lightStatus) {
+            if (toolbarIconsColor != expandedStatusColor) {
+                toolbarIconsColor = collapsedToolbarIconsColor
                 recolorToolbarMenu()
             }
         } else {
-            if (mToolbarIconsColor != mCollapsedStatusColor) {
-                mToolbarIconsColor = mExpandedToolbarIconsColor
+            if (toolbarIconsColor != collapsedStatusColor) {
+                toolbarIconsColor = expandedToolbarIconsColor
                 recolorToolbarMenu()
             }
         }
@@ -128,39 +134,18 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
         } else {
             view.overlay.visibility = View.GONE
         }
-        appbar.elevation = mElevation * (1 - percent)
-
-
-        /*
-        // does not work correctly for now
-        Timber.d("Percent: %f", percent)
-        if (waitForExpandPercent == -1f) {
-            if (percent <= 0.8f) {
-                waitForExpandPercent = 0f
-                appbar.setExpanded(false)
-                appbar.isSaveEnabled
-            } else if (percent >= 0.2f) {
-                waitForExpandPercent = 1f
-                appbar.setExpanded(true)
-            }
-        } else {
-            if (percent == waitForExpandPercent) {
-                waitForExpandPercent = -1f
-            }
-        }
-        */
-
+        appbar.elevation = elevation * (1 - percent)
     }
 
     fun setEnableRecolor(enable: Boolean) {
-        mEnableRecolor = enable
+        enableRecolor = enable
     }
 
     fun setTabSelected() {
-        if (mRef.get() == null) return
+        if (ref.get() == null) return
         if (enableRecolorSystemUI()) {
-            ViewHelper.setSystemBarsLightness(mRef.get(), mLightStatus)
-            ViewHelper.setStatusBarColorAnimate(mRef.get(), mStatusColor)
+            ViewHelper.setSystemBarsLightness(ref.get(), lightStatus)
+            ViewHelper.setStatusBarColorAnimate(ref.get(), statusColor)
         }
 
     }

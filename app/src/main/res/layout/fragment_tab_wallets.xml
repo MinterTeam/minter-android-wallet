@@ -327,7 +327,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:ws_dropdown_tint="@color/white"
-                    app:ws_name_color="@color/white" />
+                    app:ws_name_color="@color/white"
+                    app:ws_subtitle_color="@color/white70" />
 
             </androidx.appcompat.widget.Toolbar>
 

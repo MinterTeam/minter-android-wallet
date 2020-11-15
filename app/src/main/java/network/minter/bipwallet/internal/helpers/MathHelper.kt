@@ -348,6 +348,7 @@ object MathHelper {
         val r = Color.red(to) * ratio + Color.red(from) * inverseRatio
         val g = Color.green(to) * ratio + Color.green(from) * inverseRatio
         val b = Color.blue(to) * ratio + Color.blue(from) * inverseRatio
-        return Color.rgb(r.toInt(), g.toInt(), b.toInt())
+        val a = Color.alpha(to) * ratio + Color.alpha(from) * inverseRatio
+        return Color.argb(a.toInt(), r.toInt(), g.toInt(), b.toInt())
     }
 }
