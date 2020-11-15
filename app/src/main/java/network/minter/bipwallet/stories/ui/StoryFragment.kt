@@ -42,6 +42,7 @@ import network.minter.bipwallet.databinding.FragmentStoryBinding
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.stories.StoriesScope
@@ -73,6 +74,7 @@ class StoryFragment : BaseInjectFragment() {
 
     @Inject lateinit var repoCachedStories: RepoCachedStories
     private lateinit var b: FragmentStoryBinding
+    private val deferView = DeferredCall.create<FragmentStoryBinding>()
     private var slides: List<StorySlide> = ArrayList()
     private var slidePosition: Int = 0
     private var isFirstStory = false
@@ -121,6 +123,7 @@ class StoryFragment : BaseInjectFragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         b = FragmentStoryBinding.inflate(inflater, container, false)
+        deferView.attach(b)
         slides = arguments?.getParcelableArrayList(ARG_SLIDES) ?: ArrayList()
         storyPosition = arguments?.getInt(ARG_POSITION, 0) ?: 0
         isFirstStory = storyPosition == 0
@@ -194,6 +197,11 @@ class StoryFragment : BaseInjectFragment() {
         )
 
         return b.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        deferView.detach()
     }
 
     private fun onStorySelected(position: Int) {
@@ -274,10 +282,12 @@ class StoryFragment : BaseInjectFragment() {
     }
 
     fun onPageUnselected() {
-        b.progress.reset()
         slidePosition = 0
-        b.pager.setCurrentItem(slidePosition, false)
-        Timber.d("Story $storyPosition unselected")
+        deferView.call {
+            it.progress.reset()
+            it.pager.setCurrentItem(slidePosition, false)
+            Timber.d("Story $storyPosition unselected")
+        }
     }
 
     fun onPageSelected() {

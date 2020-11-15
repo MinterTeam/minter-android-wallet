@@ -47,7 +47,7 @@ data class StorySlide(
         val link: String?,
         val text: String?,
         @SerializedName("created_at")
-        val createdAt: Date,
+        val createdAt: Date?,
         @SerializedName("updated_at")
         val updatedAt: Date?,
         @SerializedName("deleted_at")
@@ -65,7 +65,7 @@ data class Story(
         @SerializedName("expire_date")
         val expireAt: Date?,
         @SerializedName("created_at")
-        val createdAt: Date,
+        val createdAt: Date?,
         @SerializedName("updated_at")
         val updatedAt: Date?,
         @SerializedName("deleted_at")

@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import network.minter.bipwallet.databinding.FragmentStoriesHorizontalListBinding
 import network.minter.bipwallet.internal.BaseInjectFragment
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.PaddingItemDecoration
@@ -42,6 +43,7 @@ import network.minter.bipwallet.stories.adapter.StoriesListAdapter
 import network.minter.bipwallet.stories.models.Story
 import network.minter.bipwallet.stories.repo.StoriesRepository
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -65,16 +67,20 @@ class StoriesListFragment : BaseInjectFragment() {
     @Inject lateinit var repo: StoriesRepository
 
     private lateinit var b: FragmentStoriesHorizontalListBinding
+    private val deferView = DeferredCall.create<FragmentStoriesHorizontalListBinding>()
     private val adapter: StoriesListAdapter = StoriesListAdapter(::openStory)
     private var stories: List<Story> = ArrayList()
 
     fun setData(stories: List<Story>, smoothScroll: Boolean = false) {
         adapter.dispatchChanges(StoriesDiffUtil::class.java, stories, true)
-        b.list.postApply {
-            if (smoothScroll) {
-                it.smoothScrollToPosition(0)
-            } else {
-                it.scrollToPosition(0)
+        deferView.call {
+            it.root.visible = stories.isNotEmpty()
+            it.list.postApply { recyclerView ->
+                if (smoothScroll) {
+                    recyclerView.smoothScrollToPosition(0)
+                } else {
+                    recyclerView.scrollToPosition(0)
+                }
             }
         }
     }
@@ -85,23 +91,25 @@ class StoriesListFragment : BaseInjectFragment() {
         b.list.addItemDecoration(PaddingItemDecoration(Wallet.app().display().dpToPx(48f)))
         b.list.adapter = adapter
         b.progress.visible = false
+        deferView.attach(b)
 
-//        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
-//        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
-        stories = arguments!!.getParcelableArrayList(ARG_STORIES)!!
-        setData(stories)
-
-        // todo: mark watched, reload immediately
+        if (arguments != null && arguments?.containsKey(ARG_STORIES) == true) {
+            stories = arguments!!.getParcelableArrayList(ARG_STORIES)!!
+            setData(stories)
+        } else {
+            b.root.visible = false
+            Timber.e("Unable to init stories list: fragment arguments is null")
+        }
 
         return b.root
     }
 
-    fun openStory(story: Story, position: Int, sharedView: View) {
-//        StoriesPagerActivity.Builder(this, adapter.items)
-//                .setStartPosition(position)
-//                .addSharedView(sharedView)
-//                .start()
-        (parentFragment as WalletsTabFragment?)?.startStoriesPager(adapter.items, position, sharedView)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        deferView.detach()
+    }
 
+    fun openStory(@Suppress("UNUSED_PARAMETER") story: Story, position: Int, sharedView: View) {
+        (parentFragment as WalletsTabFragment?)?.startStoriesPager(adapter.items, position, sharedView)
     }
 }
