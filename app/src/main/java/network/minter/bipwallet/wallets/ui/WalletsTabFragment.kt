@@ -449,9 +449,14 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
                 runOnUiThread {
                     Timber.d("Add stories fragment")
-                    childFragmentManager.beginTransaction()
-                            .add(R.id.fragment_stories, storiesListFragment!!, "stories_list")
-                            .commit()
+                    try {
+                        childFragmentManager.beginTransaction()
+                                .add(R.id.fragment_stories, storiesListFragment!!, "stories_list")
+                                .commit()
+                    } catch (illegal: java.lang.IllegalStateException) {
+                        Timber.w(illegal, "Unable to show stories fragment")
+                    }
+
                 }
             } else {
                 runOnUiThread {

@@ -42,12 +42,12 @@ import java.util.concurrent.ConcurrentHashMap
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 open class KVStorage : Storage {
-    private var mDbName = Hawk.DEFAULT_DB_TAG
+    private var dbName = Hawk.DEFAULT_DB_TAG
     private val dataLock: MutableMap<String, Any> = ConcurrentHashMap()
 
     constructor()
     constructor(dbTag: String) {
-        mDbName = dbTag
+        dbName = dbTag
     }
 
     private fun makeLock(key: String): Any {
@@ -59,7 +59,7 @@ open class KVStorage : Storage {
 
     override fun <T> put(key: String, value: T): Boolean {
         return synchronized(makeLock(key)) {
-            Hawk.db(mDbName).put(key, value)
+            Hawk.db(dbName).put(key, value)
         }
     }
 
@@ -70,17 +70,17 @@ open class KVStorage : Storage {
     }
 
     override fun batch(batch: StorageBatch) {
-        Hawk.db(mDbName).batch(batch)
+        Hawk.db(dbName).batch(batch)
     }
 
     override fun <T> get(key: String): T? {
         return synchronized(makeLock(key)) {
             try {
-                Hawk.db(mDbName).get<T>(key)
+                Hawk.db(dbName).get<T>(key)
             } catch (t: Throwable) {
                 Timber.w(t, "Unable to get value from kvstorage: %s", key)
                 try {
-                    Hawk.db(mDbName).delete(key)
+                    Hawk.db(dbName).delete(key)
                 } catch (ignore: Throwable) {
                     Timber.w(ignore)
                 }
@@ -90,11 +90,11 @@ open class KVStorage : Storage {
     }
 
     open fun <T> getQueue(key: String): Queue<T>? {
-        return LinkedList(Hawk.db(mDbName).get<ArrayList<T>>(key))
+        return LinkedList(Hawk.db(dbName).get<ArrayList<T>>(key))
     }
 
     open fun <T> putQueue(key: String, queue: Queue<T>?): Boolean {
-        return Hawk.db(mDbName).put(key, queue)
+        return Hawk.db(dbName).put(key, queue)
     }
 
     open operator fun <T> get(key: String, defaultValue: T): T {
@@ -106,7 +106,7 @@ open class KVStorage : Storage {
             if (!contains(key)) {
                 false
             } else {
-                Hawk.db(mDbName).delete(key)
+                Hawk.db(dbName).delete(key)
             }
         }
     }
@@ -118,14 +118,14 @@ open class KVStorage : Storage {
     }
 
     override fun deleteAll(): Boolean {
-        return Hawk.db(mDbName).deleteAll()
+        return Hawk.db(dbName).deleteAll()
     }
 
     override fun count(): Long {
-        return Hawk.db(mDbName).count()
+        return Hawk.db(dbName).count()
     }
 
     override fun contains(key: String): Boolean {
-        return Hawk.db(mDbName).contains(key)
+        return Hawk.db(dbName).contains(key)
     }
 }

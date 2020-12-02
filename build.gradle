@@ -28,8 +28,6 @@
 
 buildscript {
     ext.kotlin_version = "1.4.10"
-//    ext.kotlin_version = "1.3.72"
-//    ext.kotlin_version = "1.4-M1"
     repositories {
         mavenLocal()
         google()
@@ -39,7 +37,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
         classpath 'com.google.gms:google-services:4.3.4'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
         classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.1'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"

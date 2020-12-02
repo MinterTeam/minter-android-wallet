@@ -71,7 +71,7 @@ open class BindingMultiRowAdapter : RecyclerView.Adapter<BindingViewHolder<ViewB
 
     override fun onViewDetachedFromWindow(holder: BindingViewHolder<ViewBinding>) {
         super.onViewDetachedFromWindow(holder)
-        val position = holder.bindingAdapterPosition
+        val position = holder.absoluteAdapterPosition
         if (position < 0) {
             return
         }

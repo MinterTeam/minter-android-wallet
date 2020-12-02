@@ -30,7 +30,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
@@ -129,14 +128,15 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         if (settings[EnableStories]) {
             if (storiesDisposable == null) {
                 storiesDisposable = storiesRepository.observe()
-                        .observeOn(Schedulers.io())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe {
+                        .joinToUi()
+                        .subscribe({
                             if (it.isNotEmpty()) {
                                 Timber.d("Show stories")
                                 viewState.showStoriesList(it, smoothScrollStories)
                             }
-                        }
+                        }, { t ->
+                            Timber.w(t, "Unable to load stories")
+                        })
             }
 
             storiesRepository.update()
