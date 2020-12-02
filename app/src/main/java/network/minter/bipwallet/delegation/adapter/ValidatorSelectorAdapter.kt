@@ -141,7 +141,7 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
             holder.itemView.setOnClickListener {
                 onClickListener?.invoke(
-                        (items[holder.bindingAdapterPosition] as ItemValue).item
+                        (items[holder.absoluteAdapterPosition] as ItemValue).item
                 )
             }
         }
