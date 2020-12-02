@@ -270,7 +270,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
     override fun setWallets(walletItems: List<WalletItem>) {
         activity?.let {
             runOnUiThread {
-                WalletSelectorBroadcastReceiver.setWallets(activity!!, walletItems)
+                activity?.let {
+                    WalletSelectorBroadcastReceiver.setWallets(it, walletItems)
+                }
             }
         }
     }
@@ -278,7 +280,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
     override fun setMainWallet(walletItem: WalletItem) {
         activity?.let {
             runOnUiThread {
-                WalletSelectorBroadcastReceiver.setMainWallet(activity!!, walletItem)
+                activity?.let {
+                    WalletSelectorBroadcastReceiver.setMainWallet(it, walletItem)
+                }
             }
         }
     }
