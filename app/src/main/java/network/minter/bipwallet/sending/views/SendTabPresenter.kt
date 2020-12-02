@@ -797,7 +797,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             analytics.send(AppEvent.SentCoinPopupScreen)
             val builder = TxSendSuccessDialog.Builder(ctx)
                     .setLabel(R.string.tx_send_success_dialog_description)
-                    .setValue(mRecipient!!.name)
+                    .setValue(mRecipient?.name ?: mRecipient?.address ?: "")
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
                         viewState.startExplorer(result.result.hash.toString())
