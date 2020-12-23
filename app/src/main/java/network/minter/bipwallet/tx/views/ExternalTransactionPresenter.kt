@@ -543,9 +543,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                 //10+(n-1)*5 units
                 baseFee = OperationType.SendCoin.fee
-                baseFee = baseFee.add(
-                        BigDecimal(clamp(txData.items.size - 1, 0)).multiply(OperationType.FEE_BASE.multiply(BigDecimal("5")))
-                )
+                baseFee += (
+                        clamp(txData.items.size - 1, 0).toBigDecimal() * (OperationType.FEE_BASE * BigDecimal("5"))
+                        )
             }
             OperationType.CreateCoin -> {
                 // https://docs.minter.network/#section/Commissions
@@ -561,8 +561,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
         }
 
-        var fee = baseFee.add(BigDecimal(bytesLen).multiply(BigDecimal("0.002")))
-        fee = fee.multiply(BigDecimal(gasPrice))
+        // add to fee payload length fee (each byte is 0.002 units)
+        var fee = baseFee + (BigDecimal(bytesLen) * BigDecimal("0.002"))
+        fee *= gasPrice.toBigDecimal()
         viewState.setFee(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
     }
 

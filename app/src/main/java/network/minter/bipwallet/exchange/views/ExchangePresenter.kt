@@ -110,7 +110,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var mAccounts: List<CoinBalance> = ArrayList(1)
     private val mUseMax = AtomicBoolean(false)
     private val mClickedUseMax = AtomicBoolean(false)
-    private var mGasPrice = BigInteger("1")
+    private var mGasPrice = BigInteger.ONE
     private var mEstimate: BigDecimal? = null
     private var exchangeAmount: ExchangeAmount? = null
     private var buyForResult = false
@@ -221,6 +221,11 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.setCalculation(calculation!!)
     }
 
+    private val fee: BigDecimal
+        get() {
+            return operationType.fee.multiply(BigDecimal(mGasPrice))
+        }
+
     private fun loadAndSetFee() {
         gasRepo.minGas
                 .retryWhen(errorManager.createLocalRetryWhenHandler(GateGasRepository::class.java))
@@ -231,7 +236,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     if (res.isOk) {
                         mGasPrice = res.result.gas
                         Timber.d("Min Gas price: %s", mGasPrice.toString())
-                        viewState.setFee(String.format("%s %s", bdHuman(operationType.fee.multiply(BigDecimal(mGasPrice))), MinterSDK.DEFAULT_COIN))
+                        viewState.setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN))
                     }
                 }) { e: Throwable? ->
                     mGasPrice = BigInteger.ONE

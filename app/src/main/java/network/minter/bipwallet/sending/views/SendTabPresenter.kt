@@ -574,7 +574,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     }
 
     private val fee: BigDecimal
-        get() = OperationType.SendCoin.fee + payloadFee
+        get() = (OperationType.SendCoin.fee + payloadFee) * mGasPrice.toBigDecimal()
 
     private val feeNormalized: BigInteger
         get() = fee.normalize()
