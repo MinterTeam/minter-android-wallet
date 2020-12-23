@@ -177,11 +177,12 @@ class TxAllViewHolder(
 
         binding.apply {
             itemTitle.text = txItem.tx.fromName ?: item.from.toShortString()
-            itemAvatar.setImageUrlFallback(item.toAvatar, R.drawable.img_avatar_multisend)
 
             val coinsAmount: Map<CoinItemBase, BigDecimal>
 
             if (isIncoming) {
+                itemAvatar.setImageUrlFallback(item.fromAvatar, R.drawable.img_avatar_multisend)
+
                 coinsAmount = mapIncomingMultisend(myAddress, data.items)
 
                 if (coinsAmount.isEmpty()) {
@@ -196,6 +197,7 @@ class TxAllViewHolder(
                     itemSubamount.text = entry.key.symbol
                 }
             } else {
+                itemAvatar.setImageUrlFallback(item.toAvatar, R.drawable.img_avatar_multisend)
                 coinsAmount = mapMultisend(data.items)
 
                 if (coinsAmount.size > 1) {

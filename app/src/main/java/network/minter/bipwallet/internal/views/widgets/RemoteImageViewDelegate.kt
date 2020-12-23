@@ -88,6 +88,12 @@ internal class RemoteImageViewDelegate(imageView: ImageView) : RemoteImageView {
     }
 
     override fun setImageUrlFallback(url: String?, fallbackResId: Int) {
+        if (url == null || url.isEmpty()) {
+            if (fallbackResId != 0) {
+                mImage.get()?.setImageResource(fallbackResId)
+            }
+            return
+        }
         mImage.get()!!.loadPicasso(url, {}, {}) {
             error(fallbackResId)
         }
