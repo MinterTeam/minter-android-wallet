@@ -52,6 +52,7 @@ import network.minter.core.MinterSDK
 import network.minter.explorer.MinterExplorerSDK
 import network.minter.explorer.models.HistoryTransaction
 import org.joda.time.DateTime
+import timber.log.Timber
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -97,6 +98,26 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             Pair(HistoryTransaction.Type.EditCandidatePublicKey, R.string.tx_type_edit_candidate_pub_key),
     )
 
+    private fun dumpTx(tx: HistoryTransaction?): String {
+        if (tx == null) {
+            return "{null}"
+        }
+
+        return """{
+            |txn: ${tx.txn}
+            |hash: ${tx.hash}
+            |nonce; ${tx.nonce}
+            |height: ${tx.block}
+            |timestamp: ${tx.timestamp}
+            |fee: ${tx.fee}
+            |gasCoin: ${tx.gasCoin}
+            |type: ${tx.type.name}
+            |from: ${tx.from}
+            |data: ${if (tx.data == null) "null" else tx.data.javaClass.simpleName}
+            |payload: ${tx.payload}
+            |}""".trimMargin()
+    }
+
     @Suppress("DEPRECATION")
     @SuppressLint("SetTextI18n")
     private fun fillData() {
@@ -120,6 +141,7 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
         if (tx.data == null) {
             FirebaseSafe.setCustomKey("tx_id", tx.hash?.toHexString() ?: "null")
+            Timber.e("Decoded transaction data is null! Transaction: %s", dumpTx(tx))
         }
 
         val isIncoming = tx.isIncoming(listOf(secretStorage.mainWallet))

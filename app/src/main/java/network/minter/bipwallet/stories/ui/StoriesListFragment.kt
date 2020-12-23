@@ -74,12 +74,14 @@ class StoriesListFragment : BaseInjectFragment() {
     fun setData(stories: List<Story>, smoothScroll: Boolean = false) {
         adapter.dispatchChanges(StoriesDiffUtil::class.java, stories, true)
         deferView.call {
-            it.root.visible = stories.isNotEmpty()
-            it.list.postApply { recyclerView ->
-                if (smoothScroll) {
-                    recyclerView.smoothScrollToPosition(0)
-                } else {
-                    recyclerView.scrollToPosition(0)
+            if (it != null) {
+                it.root.visible = stories.isNotEmpty()
+                it.list.postApply { recyclerView ->
+                    if (smoothScroll) {
+                        recyclerView.smoothScrollToPosition(0)
+                    } else {
+                        recyclerView.scrollToPosition(0)
+                    }
                 }
             }
         }

@@ -121,7 +121,9 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
         val coinsAutocompletePresenter = CoinsAcPresenter(context!!, Wallet.app().coinsCacheRepo())
         val coinsAutocompleteCallback: AutocompleteCallback<CoinItem> = object : AutocompleteCallback<CoinItem> {
             override fun onPopupItemClicked(editable: Editable, item: CoinItem): Boolean {
-                onCoinSelected?.invoke(item, 0)
+                runOnUiThread {
+                    onCoinSelected?.invoke(item, 0)
+                }
                 return true
             }
 

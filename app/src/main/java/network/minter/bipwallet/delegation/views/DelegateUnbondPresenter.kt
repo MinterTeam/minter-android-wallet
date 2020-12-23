@@ -374,13 +374,18 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         Type.Unbond -> OperationType.Unbound.fee
                     }
 
-                    gas = (it.result.gas ?: BigInteger.ONE)
+                    gas = (it.result?.gas ?: BigInteger.ONE)
                     txFee * gas.toBigDecimal()
                 }
-                .subscribe {
-                    fee = it
-                    viewState.setFee("${it.humanize()} ${MinterSDK.DEFAULT_COIN}")
-                }
+                .subscribe(
+                        {
+                            fee = it
+                            viewState.setFee("${it.humanize()} ${MinterSDK.DEFAULT_COIN}")
+                        },
+                        { t ->
+                            Timber.w(t, "Can't setup fee")
+                        }
+                )
                 .disposeOnDestroy()
     }
 

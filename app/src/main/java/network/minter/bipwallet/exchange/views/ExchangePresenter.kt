@@ -27,6 +27,8 @@ package network.minter.bipwallet.exchange.views
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.annotation.CallSuper
 import com.annimon.stream.Stream
@@ -156,7 +158,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
         viewState.setSubmitEnabled(false)
         viewState.setFormValidationListener { valid ->
-            viewState.setSubmitEnabled(valid && checkZero(if (isBuying) mBuyAmount else mSellAmount))
+            Handler(Looper.getMainLooper()).post {
+                viewState.setSubmitEnabled(valid && checkZero(if (isBuying) mBuyAmount else mSellAmount))
+            }
         }
         viewState.setTextChangedListener { input, valid ->
             onInputChanged(input, valid)
