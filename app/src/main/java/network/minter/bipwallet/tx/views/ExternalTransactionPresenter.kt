@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -561,8 +561,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
         }
 
-        // add to fee payload length fee (each byte is 0.002 units)
-        var fee = baseFee + (BigDecimal(bytesLen) * BigDecimal("0.002"))
+        // add to fee payload length fee (each byte is 0.200 units)
+        var fee = baseFee + (BigDecimal(bytesLen) * BigDecimal("0.200"))
         fee *= gasPrice.toBigDecimal()
         viewState.setFee(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
     }

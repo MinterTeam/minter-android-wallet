@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -106,7 +106,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     companion object {
         private const val REQUEST_CODE_QR_SCAN_ADDRESS = 101
         private const val REQUEST_CODE_ADDRESS_BOOK_SELECT = 102
-        private val PAYLOAD_FEE = BigDecimal.valueOf(0.002)
+        private val PAYLOAD_FEE = BigDecimal.valueOf(0.200)
     }
 
     @Inject lateinit var secretStorage: SecretStorage

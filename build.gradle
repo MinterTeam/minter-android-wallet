@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -80,11 +80,11 @@ ext {
 
     minterExplorerSDK = "1.0.0"
     minterProfileSDK = "0.2.6"
-    minterBlockchainSDK = "1.0.1"
+    minterBlockchainSDK = "1.0.2"
     minterCoreSDK = "1.0.1"
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"
 
-    appVersionName = "2.2.2"
-    appVersionCode = 206
+    appVersionName = "2.2.3"
+    appVersionCode = 209
 }
