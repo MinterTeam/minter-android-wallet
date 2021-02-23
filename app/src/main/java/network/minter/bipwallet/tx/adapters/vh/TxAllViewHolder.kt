@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -77,9 +77,160 @@ class TxAllViewHolder(
             HistoryTransaction.Type.EditMultisig -> bindCreateMultisigAddress(item)
             HistoryTransaction.Type.PriceVote -> bindPriceVote(item)
             HistoryTransaction.Type.EditCandidatePublicKey -> bindEditCandidatePublicKey(item)
+            HistoryTransaction.Type.AddLiquidity -> bindAddLiquidity(item)
+            HistoryTransaction.Type.RemoveLiquidity -> bindRemoveLiquidity(item)
+            HistoryTransaction.Type.SellSwapPool,
+            HistoryTransaction.Type.SellAllSwapPool,
+            HistoryTransaction.Type.BuySwapPool -> bindExchangeSwapPool(item)
+            HistoryTransaction.Type.EditCandidateCommission -> bindEditCandidateCommission(item)
+            HistoryTransaction.Type.MoveStake -> bindMoveStake(item)
+            HistoryTransaction.Type.MintToken -> bindMintToken(item)
+            HistoryTransaction.Type.BurnToken -> bindBurnToken(item)
+            HistoryTransaction.Type.CreateToken,
+            HistoryTransaction.Type.RecreateToken -> bindCreateToken(item)
+            HistoryTransaction.Type.VoteCommission -> bindVoteCommission(item)
+            HistoryTransaction.Type.VoteUpdate -> bindVoteUpdate(item)
+            HistoryTransaction.Type.CreateSwapPool -> bindCreateSwapPool(item)
             else -> {
 
             }
+        }
+    }
+
+    private fun bindCreateSwapPool(item: TxItem) {
+        val data: HistoryTransaction.TxCreateSwapPoolResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_create_swap_pool)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = "${data.coin0} / ${data.coin1}"
+            itemAmount.text = data.liquidity.humanize()
+            itemSubamount.text = data.poolToken.symbol
+        }
+    }
+
+    private fun bindVoteUpdate(item: TxItem) {
+        val data: HistoryTransaction.TxVoteUpdateResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_vote_update)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = "Version: ${data.version}"
+            itemAmount.visible = false
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindVoteCommission(item: TxItem) {
+        val data: HistoryTransaction.TxVoteCommissionResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_vote_commission)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = "Vote for commissions"
+            itemAmount.visible = false
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindCreateToken(item: TxItem) {
+        var createCoin = true
+        val data = if (item.tx.type == HistoryTransaction.Type.CreateToken) {
+            item.tx.getData<HistoryTransaction.TxCreateTokenResult>()
+        } else {
+            createCoin = false
+            item.tx.getData<HistoryTransaction.TxRecreateTokenResult>()
+        }
+        binding.apply {
+            itemTitleType.setText(if (createCoin) R.string.tx_type_create_token else R.string.tx_type_recreate_token)
+            itemAvatar.setImageResource(R.drawable.img_avatar_create_coin)
+            itemAmount.text = data.initialAmount.humanize()
+            itemTitle.text = if (data.name.isEmpty()) data.symbol else data.name
+            itemSubamount.text = data.symbol
+        }
+    }
+
+    private fun bindMintToken(item: TxItem) {
+        val data: HistoryTransaction.TxMintTokenResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_mint_token)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = data.coin.symbol
+            itemAmount.text = data.value.humanize()
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindBurnToken(item: TxItem) {
+        val data: HistoryTransaction.TxBurnTokenResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_burn_token)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = data.coin.symbol
+            itemAmount.text = data.value.humanize()
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindMoveStake(item: TxItem) {
+        val data: HistoryTransaction.TxMoveStakeResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_move_stake)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_delegate)
+            itemTitle.text = data.to.toShortString()
+            itemAmount.text = data.stake.humanize()
+            itemSubamount.text = data.coin.symbol
+        }
+    }
+
+    private fun bindEditCandidateCommission(item: TxItem) {
+        val data: HistoryTransaction.TxEditCandidateCommissionResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_edit_candidate_commission)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = item.tx.toName ?: data.pubKey.toShortString()
+            itemAmount.text = "${data.commission}%"
+            itemSubamount.visible = false
+        }
+    }
+
+    private fun bindExchangeSwapPool(item: TxItem) {
+        val data: HistoryTransaction.TxConvertSwapPoolResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_exchange)
+            itemTitle.text = "${data.coinToSell} –> ${data.coinToBuy}"
+            itemAvatar.setImageResource(R.drawable.img_avatar_exchange)
+            itemAmount.text = data.valueToBuy.humanize()
+            itemSubamount.text = data.coinToBuy?.symbol ?: ""
+        }
+    }
+
+    private fun bindRemoveLiquidity(item: TxItem) {
+        val data: HistoryTransaction.TxRemoveLiquidityResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_remove_liquidity)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = "${data.coin0} / ${data.coin1}"
+            itemAmount.text = data.liquidity.humanize()
+            itemSubamount.text = data.poolToken.symbol
+        }
+    }
+
+    private fun bindAddLiquidity(item: TxItem) {
+        val data: HistoryTransaction.TxAddLiquidityResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_add_liquidity)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = "${data.coin0} / ${data.coin1}"
+            itemAmount.text = data.liquidity.humanize()
+            itemSubamount.text = data.poolToken.symbol
         }
     }
 

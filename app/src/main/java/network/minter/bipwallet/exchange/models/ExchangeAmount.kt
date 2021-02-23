@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,10 +26,11 @@
 
 package network.minter.bipwallet.exchange.models
 
-import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.WriteWith
+import network.minter.bipwallet.apis.parcel.CoinItemBaseParceler
 import network.minter.explorer.models.CoinItemBase
-import org.parceler.Parcels
 import java.math.BigDecimal
 
 /**
@@ -37,33 +38,8 @@ import java.math.BigDecimal
  * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
 
-class ExchangeAmount(
-        var coin: CoinItemBase,
+@Parcelize
+data class ExchangeAmount(
+        var coin: @WriteWith<CoinItemBaseParceler> CoinItemBase,
         var amount: BigDecimal
-) : Parcelable {
-
-    constructor(parcel: Parcel) : this(
-            Parcels.unwrap<CoinItemBase>(parcel.readParcelable(CoinItemBase::class.java.classLoader)),
-            parcel.readValue(BigDecimal::class.java.classLoader) as BigDecimal
-    )
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(Parcels.wrap(coin), flags)
-        parcel.writeValue(amount)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ExchangeAmount> {
-        override fun createFromParcel(parcel: Parcel): ExchangeAmount {
-            return ExchangeAmount(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ExchangeAmount?> {
-            return arrayOfNulls(size)
-        }
-    }
-
-}
+) : Parcelable

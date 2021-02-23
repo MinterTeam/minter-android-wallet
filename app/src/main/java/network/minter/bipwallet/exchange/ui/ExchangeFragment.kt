@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -72,6 +72,7 @@ import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.explorer.models.CoinBalance
 import network.minter.explorer.models.CoinItem
+import network.minter.explorer.models.CoinItemBase
 import java.util.regex.Pattern
 
 /**
@@ -118,7 +119,9 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
             }
         }
 
-        val coinsAutocompletePresenter = CoinsAcPresenter(context!!, Wallet.app().coinsCacheRepo())
+        val coinsAutocompletePresenter = CoinsAcPresenter(context!!, Wallet.app().coinsCacheRepo()) {
+            it.type != CoinItemBase.CoinType.PoolToken
+        }
         val coinsAutocompleteCallback: AutocompleteCallback<CoinItem> = object : AutocompleteCallback<CoinItem> {
             override fun onPopupItemClicked(editable: Editable, item: CoinItem): Boolean {
                 runOnUiThread {

@@ -24,28 +24,36 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.db;
+package network.minter.bipwallet.apis.parcel
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
-import network.minter.bipwallet.addressbook.db.AddressBookDao;
-import network.minter.bipwallet.addressbook.models.AddressContact;
-import network.minter.bipwallet.coins.CoinsDao;
-import network.minter.bipwallet.coins.DbCoin;
-import network.minter.bipwallet.internal.di.DbModule;
+import android.os.Parcel
+import kotlinx.parcelize.Parceler
+import network.minter.explorer.models.ValidatorMeta
 
-@Database(entities = {
-        AddressContact.class,
-        DbCoin.class,
-}, version = DbModule.DB_VERSION)
-@TypeConverters({
-        DbCoin.BigIntConverter.class,
-        DbCoin.BigDecimalConverter.class,
-        DbCoin.MinterAddressConverter.class,
-        DbCoin.CoinTypeConverter.class,
-})
-public abstract class WalletDatabase extends RoomDatabase {
-    public abstract AddressBookDao addressBook();
-    public abstract CoinsDao coins();
+/**
+ * minter-android-wallet. 2021
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+object ValidatorMetaParceler : Parceler<ValidatorMeta?> {
+    override fun create(parcel: Parcel): ValidatorMeta? {
+        val meta = ValidatorMeta()
+        if (parcel.dataSize() == 4) {
+            meta.name = parcel.readString()
+            meta.description = parcel.readString()
+            meta.iconUrl = parcel.readString()
+            meta.siteUrl = parcel.readString()
+            return meta
+        }
+
+        return null
+    }
+
+    override fun ValidatorMeta?.write(parcel: Parcel, flags: Int) {
+        if (this != null) {
+            parcel.writeString(name)
+            parcel.writeString(description)
+            parcel.writeString(iconUrl)
+            parcel.writeString(siteUrl)
+        }
+    }
 }

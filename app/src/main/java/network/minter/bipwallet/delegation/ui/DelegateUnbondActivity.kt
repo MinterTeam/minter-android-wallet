@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -57,7 +57,6 @@ import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
-import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
@@ -449,7 +448,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
             super.onBeforeStart(intent)
             intent.putExtra(ARG_TYPE, type)
             if (publicKey != null) {
-                intent.putExtra(ARG_PUB_KEY, publicKey.toParcel())
+                intent.putExtra(ARG_PUB_KEY, publicKey)
             }
             if (coin != null) {
                 intent.putExtra(ARG_COIN, Parcels.wrap(coin))

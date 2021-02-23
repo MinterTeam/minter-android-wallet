@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "404bc3f26dd9269353ddd658a492ed75",
+    "identityHash": "160fe7ea2ae822897ae8a78596461108",
     "entities": [
       {
         "tableName": "minter_contacts",
@@ -54,7 +54,7 @@
       },
       {
         "tableName": "minter_coins",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `coinId` TEXT, `symbol` TEXT, `crr` INTEGER, `reserveBalance` TEXT, `maxSupply` TEXT, `owner` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `coinId` TEXT, `symbol` TEXT, `crr` INTEGER, `reserveBalance` TEXT, `maxSupply` TEXT, `owner` TEXT, `mintable` INTEGER NOT NULL, `burnable` INTEGER NOT NULL, `type` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -97,6 +97,24 @@
             "columnName": "owner",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "mintable",
+            "columnName": "mintable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "burnable",
+            "columnName": "burnable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -122,7 +140,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '404bc3f26dd9269353ddd658a492ed75')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '160fe7ea2ae822897ae8a78596461108')"
     ]
   }
 }

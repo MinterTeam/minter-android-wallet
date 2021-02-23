@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,6 +36,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.RegexReplaceData
 import network.minter.bipwallet.internal.helpers.StringsHelper
 import network.minter.blockchain.models.operational.Transaction
+import network.minter.blockchain.models.operational.TxVoteCommission
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
@@ -45,6 +46,7 @@ import network.minter.explorer.models.GateResult
 import network.minter.explorer.models.HistoryTransaction
 import retrofit2.Call
 import java.math.BigDecimal
+import java.math.BigInteger
 
 val GATE_UNHANDLED_ERRORS = listOf(
         RegexReplaceData(
@@ -110,4 +112,50 @@ fun Float.dp(): Float {
 
 fun Int.dp(): Float {
     return Wallet.app().display().dpToPx(this).toFloat()
+}
+
+fun TxVoteCommission.nameValueMap(): Map<String, BigInteger> {
+    return hashMapOf(
+            Pair("Payload Byte", payloadByte),
+            Pair("Send", send),
+            Pair("Buy Bancor", buyBancor),
+            Pair("Sell Bancor", sellBancor),
+            Pair("Sell All Bancor", sellAllBancor),
+            Pair("Buy Pool", buyPool),
+            Pair("Sell Pool", sellPool),
+            Pair("Sell All Pool", sellAllPool),
+            Pair("Add Liquidity", addLiquidity),
+            Pair("Remove Liquidity", removeLiquidity),
+            Pair("Create Swap Pool", createSwapPool),
+            Pair("Create Ticker 3", createTicker3),
+            Pair("Create Ticker 4", createTicker4),
+            Pair("Create Ticker 5", createTicker5),
+            Pair("Create Ticker 6", createTicker6),
+            Pair("Create Ticker 7 to 10", createTicker7to10),
+            Pair("Create Coin", createCoin),
+            Pair("Recreate Coin", recreateCoin),
+            Pair("Create Token", createToken),
+            Pair("Recreate Token", recreateToken),
+            Pair("Mint Token", mintToken),
+            Pair("Burn Token", burnToken),
+            Pair("Declare Candidacy", declareCandidacy),
+            Pair("Delegate", delegate),
+            Pair("Unbond", unbond),
+            Pair("Move Stake", moveStake),
+            Pair("Redeem Check", redeemCheck),
+            Pair("Set Candidate On", setCandidateOn),
+            Pair("Set Candidate Off", setCandidateOff),
+            Pair("Create Multisig", createMultisig),
+            Pair("Edit Multisig", editMultisig),
+            Pair("Multisend Base", multisendBase),
+            Pair("Multisend Delta", multisendDelta),
+            Pair("Edit Candidate", editCandidate),
+            Pair("Edit Candidate Public Key", editCandidatePubKey),
+            Pair("Edit Candidate Commission", editCandidateCommission),
+            Pair("Set Halt Block", setHaltBlock),
+            Pair("Edit Ticker Owner", editTickerOwner),
+            Pair("Vote for Price", priceVote),
+            Pair("Vote for Update", voteUpdate),
+            Pair("Vote for Commissions", voteCommission),
+    )
 }

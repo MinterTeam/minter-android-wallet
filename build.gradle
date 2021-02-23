@@ -27,7 +27,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = "1.4.10"
+    ext.kotlin_version = "1.4.30"
     repositories {
         mavenLocal()
         google()
@@ -35,9 +35,9 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
-        classpath 'com.google.gms:google-services:4.3.4'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
+        classpath 'com.android.tools.build:gradle:4.1.2'
+        classpath 'com.google.gms:google-services:4.3.5'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.0'
         classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.1'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -78,13 +78,13 @@ ext {
     minterMaxSdk = 30
     minterBuildTools = "30.0.2"
 
-    minterExplorerSDK = "1.0.0"
+    minterExplorerSDK = "2.0.0"
     minterProfileSDK = "0.2.6"
-    minterBlockchainSDK = "1.0.2"
-    minterCoreSDK = "1.0.1"
+    minterBlockchainSDK = "2.0.0"
+    minterCoreSDK = "1.1.0"
     minterLedgerSDK = "0.1.0"
     roomVersion = "2.2.5"
 
-    appVersionName = "2.2.3"
-    appVersionCode = 209
+    appVersionName = "2.3.0-beta01"
+    appVersionCode = 210
 }

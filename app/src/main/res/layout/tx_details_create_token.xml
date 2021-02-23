@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2021
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/margin_edges_medium"
+    android:paddingEnd="@dimen/margin_edges_medium">
+
+    <TextView
+        android:id="@+id/label_coin_name"
+        style="@style/Wallet.ItemTxLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/label_coin_name"
+        app:layout_constraintEnd_toStartOf="@id/label_coin_symbol"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent=".5" />
+
+    <TextView
+        android:id="@+id/label_coin_symbol"
+        style="@style/Wallet.ItemTxLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/label_coin_symbol"
+        app:layout_constraintStart_toEndOf="@id/label_coin_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent=".5" />
+
+    <TextView
+        android:id="@+id/value_coin_name"
+        style="@style/Wallet.ItemTxValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_coin_name"
+        app:layout_constraintWidth_percent=".5"
+        tools:text="BELTCOIN" />
+
+    <TextView
+        android:id="@+id/value_coin_symbol"
+        style="@style/Wallet.ItemTxValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/value_coin_name"
+        app:layout_constraintTop_toBottomOf="@id/label_coin_symbol"
+        app:layout_constraintWidth_percent=".5"
+        tools:text="BLT" />
+
+    <TextView
+        android:id="@+id/label_initial_amount"
+        style="@style/Wallet.ItemTxLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/label_initial_amount"
+        app:layout_constraintEnd_toStartOf="@id/label_coin_symbol"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/value_coin_name"
+        app:layout_constraintWidth_percent=".5" />
+
+
+    <TextView
+        android:id="@+id/value_initial_amount"
+        style="@style/Wallet.ItemTxValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_initial_amount"
+        app:layout_constraintWidth_percent=".5"
+        tools:text="100000000" />
+
+    <TextView
+        android:id="@+id/label_max_supply"
+        style="@style/Wallet.ItemTxLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/label_max_supply"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/label_initial_amount"
+        app:layout_constraintTop_toBottomOf="@+id/value_coin_symbol"
+        app:layout_constraintWidth_percent=".5" />
+
+    <TextView
+        android:id="@+id/value_max_supply"
+        style="@style/Wallet.ItemTxValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/value_initial_amount"
+        app:layout_constraintTop_toBottomOf="@id/label_max_supply"
+        app:layout_constraintWidth_percent=".5"
+        tools:text="100000.000000" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

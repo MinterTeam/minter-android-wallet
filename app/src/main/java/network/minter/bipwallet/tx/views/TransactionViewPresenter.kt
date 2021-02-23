@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,6 +50,7 @@ import network.minter.bipwallet.tx.contract.TransactionView
 import network.minter.bipwallet.tx.ui.TransactionViewDialog
 import network.minter.core.MinterSDK
 import network.minter.explorer.MinterExplorerSDK
+import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.HistoryTransaction
 import org.joda.time.DateTime
 import timber.log.Timber
@@ -96,6 +97,20 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             Pair(HistoryTransaction.Type.EditMultisig, R.string.tx_type_edit_multisig),
             Pair(HistoryTransaction.Type.PriceVote, R.string.tx_type_price_vote),
             Pair(HistoryTransaction.Type.EditCandidatePublicKey, R.string.tx_type_edit_candidate_pub_key),
+            Pair(HistoryTransaction.Type.AddLiquidity, R.string.tx_type_add_liquidity),
+            Pair(HistoryTransaction.Type.RemoveLiquidity, R.string.tx_type_remove_liquidity),
+            Pair(HistoryTransaction.Type.BuySwapPool, R.string.tx_type_buy_swap_pool),
+            Pair(HistoryTransaction.Type.SellSwapPool, R.string.tx_type_sell_swap_pool),
+            Pair(HistoryTransaction.Type.SellAllSwapPool, R.string.tx_type_sell_all_swap_pool),
+            Pair(HistoryTransaction.Type.MoveStake, R.string.tx_type_move_stake),
+            Pair(HistoryTransaction.Type.EditCandidateCommission, R.string.tx_type_edit_candidate_commission),
+            Pair(HistoryTransaction.Type.MintToken, R.string.tx_type_mint_token),
+            Pair(HistoryTransaction.Type.BurnToken, R.string.tx_type_burn_token),
+            Pair(HistoryTransaction.Type.CreateToken, R.string.tx_type_create_token),
+            Pair(HistoryTransaction.Type.RecreateToken, R.string.tx_type_recreate_token),
+            Pair(HistoryTransaction.Type.VoteCommission, R.string.tx_type_vote_commission),
+            Pair(HistoryTransaction.Type.VoteUpdate, R.string.tx_type_vote_update),
+            Pair(HistoryTransaction.Type.CreateSwapPool, R.string.tx_type_create_swap_pool),
     )
 
     private fun dumpTx(tx: HistoryTransaction?): String {
@@ -173,6 +188,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     val b = TxDetailsSendBinding.bind(it)
                     b.valueAmount.text = data.amount.humanize()
                     b.valueCoin.text = data.coin.symbol
+                    if (data.coin.type != CoinItemBase.CoinType.Coin) {
+                        b.labelCoin.setText(R.string.label_token)
+                    }
                 }
             }
             HistoryTransaction.Type.MultiSend -> {
@@ -190,6 +208,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                             val b = TxDetailsSendBinding.bind(it)
                             b.valueAmount.text = entry.amount.humanize()
                             b.valueCoin.text = entry.coin.symbol
+                            if (entry.coin.type != CoinItemBase.CoinType.Coin) {
+                                b.labelCoin.setText(R.string.label_token)
+                            }
                         }
                     } else {
                         viewState.showTo(false)
@@ -401,6 +422,175 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     b.valueNewPublicKey.copyOnClick()
                 }
             }
+
+            // @since Minter 2.0
+
+            HistoryTransaction.Type.AddLiquidity -> {
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_pool) {
+                    val b = TxDetailsPoolBinding.bind(it)
+                    val data: HistoryTransaction.TxAddLiquidityResult = tx.getData()
+
+                    b.valueCoin0.text = data.coin0.symbol
+                    b.valueCoin1.text = data.coin1.symbol
+                    b.valueVolume0.text = data.volume0.humanize()
+                    b.valueVolume1.text = data.volume1.humanize()
+                    b.valuePoolToken.text = data.poolToken.symbol
+                    b.valueLiquidity.text = data.liquidity.humanize()
+                }
+            }
+            HistoryTransaction.Type.RemoveLiquidity -> {
+                viewState.showTo(false)
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_pool) {
+                    val b = TxDetailsPoolBinding.bind(it)
+                    val data: HistoryTransaction.TxRemoveLiquidityResult = tx.getData()
+
+                    b.valueCoin0.text = data.coin0.symbol
+                    b.valueCoin1.text = data.coin1.symbol
+                    b.valueVolume0.text = data.volume0.humanize()
+                    b.valueVolume1.text = data.volume1.humanize()
+                    b.valuePoolToken.text = data.poolToken.symbol
+                    b.valueLiquidity.text = data.liquidity.humanize()
+                }
+            }
+
+            HistoryTransaction.Type.SellSwapPool -> {
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_exchange) {
+                    val b = TxDetailsExchangeBinding.bind(it)
+
+                    val data: HistoryTransaction.TxSellSwapPoolResult = tx.getData()
+                    if (data.coins.size >= 1) {
+                        b.valueFromCoin.text = data.coins[0].symbol
+                    }
+                    if (data.coins.size >= 2) {
+                        b.valueToCoin.text = data.coins[1].symbol
+                    }
+//                    b.valueFromCoin.text = data.coinToSell.symbol
+//                    b.valueToCoin.text = data.coinToBuy.symbol
+                    b.valueAmountReceived.text = data.valueToBuy.humanize()
+                    b.valueAmountSpent.text = data.valueToSell.humanize()
+                }
+            }
+            HistoryTransaction.Type.SellAllSwapPool -> {
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_exchange) {
+                    val b = TxDetailsExchangeBinding.bind(it)
+
+                    val data: HistoryTransaction.TxSellAllSwapPoolResult = tx.getData()
+                    if (data.coins.size >= 1) {
+                        b.valueFromCoin.text = data.coins[0].symbol
+                    }
+                    if (data.coins.size >= 2) {
+                        b.valueToCoin.text = data.coins[1].symbol
+                    }
+//                    b.valueFromCoin.text = data.coinToSell.symbol
+//                    b.valueToCoin.text = data.coinToBuy.symbol
+                    b.valueAmountReceived.text = data.valueToBuy.humanize()
+                    b.valueAmountSpent.text = data.valueToSell.humanize()
+                }
+            }
+            HistoryTransaction.Type.BuySwapPool -> {
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_exchange) {
+                    val b = TxDetailsExchangeBinding.bind(it)
+
+                    val data: HistoryTransaction.TxBuySwapPoolResult = tx.getData()
+                    if (data.coins.size >= 1) {
+                        b.valueFromCoin.text = data.coins[0].symbol
+                    }
+                    if (data.coins.size >= 2) {
+                        b.valueToCoin.text = data.coins[1].symbol
+                    }
+//                    b.valueFromCoin.text = data.coinToSell.symbol
+//                    b.valueToCoin.text = data.coinToBuy.symbol
+                    b.valueAmountReceived.text = data.valueToBuy.humanize()
+                    b.valueAmountSpent.text = data.valueToSell.humanize()
+                }
+            }
+            HistoryTransaction.Type.EditCandidateCommission -> {
+                val data: HistoryTransaction.TxEditCandidateCommissionResult = tx.getData()
+
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
+                viewState.setToName(_tx?.toName)
+                viewState.setToAddress(data.pubKey.toString())
+
+                viewState.inflateDetails(R.layout.tx_details_edit_candidate_commission) {
+                    val b = TxDetailsEditCandidateCommissionBinding.bind(it)
+                    b.valueCommission.text = "${data.commission}%"
+                }
+            }
+            HistoryTransaction.Type.MoveStake -> {
+                viewState.showTo(false)
+
+                viewState.inflateDetails(R.layout.tx_details_move_stake) {
+                    val b = TxDetailsMoveStakeBinding.bind(it)
+                    val data: HistoryTransaction.TxMoveStakeResult = tx.getData()
+                    b.valueCoin.text = data.coin.symbol
+                    b.valueStake.text = data.stake.humanize()
+                    b.valueFrom.text = data.from.toString()
+                    b.valueTo.text = data.to.toString()
+                }
+            }
+
+            HistoryTransaction.Type.MintToken,
+            HistoryTransaction.Type.BurnToken -> {
+                viewState.showTo(false)
+
+                viewState.inflateDetails(R.layout.tx_details_send) {
+                    val b = TxDetailsSendBinding.bind(it)
+                    val data: HistoryTransaction.TxMintTokenResult = tx.getData()
+                    b.valueAmount.text = data.value.humanize()
+                    b.labelAmount.setText(R.string.value)
+                    b.valueCoin.text = data.coin.symbol
+                }
+            }
+            HistoryTransaction.Type.CreateToken,
+            HistoryTransaction.Type.RecreateToken -> {
+                viewState.showTo(false)
+
+                viewState.inflateDetails(R.layout.tx_details_create_token) {
+                    val b = TxDetailsCreateTokenBinding.bind(it)
+                    val data: HistoryTransaction.TxCreateTokenResult = tx.getData()
+                    b.valueCoinName.text = data.name
+                    b.valueCoinSymbol.text = data.symbol
+                    b.valueInitialAmount.text = data.initialAmount.humanize()
+
+                    b.valueMaxSupply.text = if (data.maxSupply < BigDecimal("10").pow(15)) {
+                        data.maxSupply.humanize()
+                    } else {
+                        "10¹⁵ (max)"
+                    }
+                }
+            }
+            HistoryTransaction.Type.VoteCommission -> {
+                viewState.showTo(false)
+
+            }
+            HistoryTransaction.Type.VoteUpdate -> {
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_vote_update) {
+                    val data: HistoryTransaction.TxVoteUpdateResult = tx.getData()
+                    val b = TxDetailsVoteUpdateBinding.bind(it)
+                    b.valueVersion.text = data.version
+                }
+            }
+            HistoryTransaction.Type.CreateSwapPool -> {
+                viewState.showTo(false)
+                viewState.inflateDetails(R.layout.tx_details_pool) {
+                    val b = TxDetailsPoolBinding.bind(it)
+                    val data: HistoryTransaction.TxCreateSwapPoolResult = tx.getData()
+
+                    b.valueCoin0.text = data.coin0.symbol
+                    b.valueCoin1.text = data.coin1.symbol
+                    b.valueVolume0.text = data.volume0.humanize()
+                    b.valueVolume1.text = data.volume1.humanize()
+                    b.valuePoolToken.text = data.poolToken.symbol
+                    b.valueLiquidity.text = data.liquidity.humanize()
+                }
+            }
+
             else -> {
                 viewState.showTo(false)
                 // nothing to do

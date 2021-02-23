@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -43,7 +43,8 @@ import timber.log.Timber
  */
 class CoinsAcPresenter(
         context: Context,
-        coinsRepo: RepoCoins
+        coinsRepo: RepoCoins,
+        val listFilter: (CoinItem) -> Boolean = { _ -> true }
 ) : RecyclerAcPresenter<CoinItem>(context), AutocompletePolicy {
     private val adapter: CoinsAcAdapter = CoinsAcAdapter(this)
     private var items: List<CoinItem> = ArrayList()
@@ -56,7 +57,7 @@ class CoinsAcPresenter(
                 .subscribe(
                         { res ->
                             synchronized(itemsLock) {
-                                items = res
+                                items = res.filter(listFilter)
                             }
                         },
                         { t ->
@@ -78,9 +79,11 @@ class CoinsAcPresenter(
 
         val filtered: List<CoinItem>
         synchronized(itemsLock) {
-            filtered = items.filter {
-                it.symbol.toLowerCase().startsWith(query.toString().toLowerCase())
-            }
+            filtered = items
+                    .filter(listFilter)
+                    .filter {
+                        it.symbol.toLowerCase().startsWith(query.toString().toLowerCase())
+                    }
         }
 
         adapter.setItems(filtered)

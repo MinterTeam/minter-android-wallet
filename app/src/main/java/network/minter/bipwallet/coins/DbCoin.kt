@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,6 +32,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.CoinItem
+import network.minter.explorer.models.CoinItemBase
 import org.parceler.Parcel
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -70,6 +71,15 @@ class DbCoin {
     @JvmField
     var owner: MinterAddress? = null
 
+    @JvmField
+    var mintable: Boolean = false
+
+    @JvmField
+    var burnable: Boolean = false
+
+    @JvmField
+    var type: CoinItemBase.CoinType = CoinItemBase.CoinType.Coin
+
     constructor()
 
     constructor(coinItem: CoinItem) {
@@ -79,6 +89,9 @@ class DbCoin {
         reserveBalance = coinItem.reserveBalance
         maxSupply = coinItem.maxSupply
         owner = coinItem.owner
+        mintable = coinItem.mintable
+        burnable = coinItem.burnable
+        type = coinItem.type
     }
 
     fun asCoin(): CoinItem {
@@ -89,6 +102,9 @@ class DbCoin {
         item.reserveBalance = reserveBalance
         item.maxSupply = maxSupply
         item.owner = owner
+        item.mintable = mintable
+        item.burnable = burnable
+        item.type = type
         return item
     }
 
@@ -113,6 +129,23 @@ class DbCoin {
         @TypeConverter
         fun bigDecimalToString(value: BigDecimal?): String? {
             return value?.toPlainString()
+        }
+    }
+
+    class CoinTypeConverter {
+        @TypeConverter
+        fun intToType(value: Int?): CoinItemBase.CoinType {
+            if (value == null) {
+                return CoinItemBase.CoinType.Coin
+            }
+
+            return CoinItemBase.CoinType.values()[value]
+        }
+
+        @TypeConverter
+        fun typeToInt(value: CoinItemBase.CoinType?): Int {
+            if (value == null) return 0
+            return value.ordinal
         }
     }
 

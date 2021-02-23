@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,11 +30,11 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
-import coil.load
+import coil.Coil
+import coil.request.ImageRequest
 import coil.size.Scale
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.annotations.Dp
-import network.minter.bipwallet.internal.helpers.loadPicasso
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -72,9 +72,17 @@ internal class RemoteImageViewDelegate(imageView: ImageView) : RemoteImageView {
     }
 
     override fun setImageUrl(uri: Uri?) {
-        mImage.get()?.load(uri) {
-            scale(Scale.FIT)
-        }
+//        mImage.get()?.load(uri) {
+//            scale(Scale.FIT)
+//        }
+        val request = ImageRequest.Builder(mImage.get()!!.context)
+                .data(uri)
+                .scale(Scale.FIT)
+                .target(onSuccess = { d ->
+                    mImage.get()!!.setImageDrawable(d)
+                })
+                .build()
+        Coil.enqueue(request)
     }
 
     override fun setImageUrl(url: String?) {
@@ -82,9 +90,17 @@ internal class RemoteImageViewDelegate(imageView: ImageView) : RemoteImageView {
             Timber.w("Image url is null")
             return
         }
-        mImage.get()?.load(url) {
-            scale(Scale.FIT)
-        }
+//        mImage.get()?.load(url) {
+//            scale(Scale.FIT)
+//        }
+        val request = ImageRequest.Builder(mImage.get()!!.context)
+                .data(url)
+                .scale(Scale.FIT)
+                .target(onSuccess = { d ->
+                    mImage.get()!!.setImageDrawable(d)
+                })
+                .build()
+        Coil.enqueue(request)
     }
 
     override fun setImageUrlFallback(url: String?, fallbackResId: Int) {
@@ -94,13 +110,54 @@ internal class RemoteImageViewDelegate(imageView: ImageView) : RemoteImageView {
             }
             return
         }
-        mImage.get()!!.loadPicasso(url, {}, {}) {
-            error(fallbackResId)
-        }
+//        mImage.get()!!.loadPicasso(url, {}, {}) {
+//            error(fallbackResId)
+//        }
+
+        val request = ImageRequest.Builder(mImage.get()!!.context)
+                .data(url)
+                .scale(Scale.FIT)
+                .target(onSuccess = { d ->
+                    mImage.get()!!.setImageDrawable(d)
+                }, onError = { d ->
+                    if (fallbackResId != 0) {
+                        mImage.get()!!.setImageResource(fallbackResId)
+                    }
+                })
+//                .listener(onCancel = {r ->
+//                    Timber.e("Canceled");
+//                }, onError = {r, t ->
+//                    Timber.e(t);
+//                })
+                .build()
+        Coil.enqueue(request)
+
 //        mImage.get()!!.load(url) {
+//            dispatcher(Dispatchers.IO)
 //            scale(Scale.FIT)
 //            fallback(fallbackResId)
 //            error(fallbackResId)
+//                    listener(object: ImageRequest.Listener {
+//                        override fun onCancel(request: ImageRequest) {
+//                            super.onCancel(request)
+//                            Timber.d("Image ${request.data as String} has been CANCELED")
+//                        }
+//
+//                        override fun onError(request: ImageRequest, throwable: Throwable) {
+//                            super.onError(request, throwable)
+//                            Timber.e("Image ${request.data as String} has been ERROR")
+//                        }
+//
+//                        override fun onStart(request: ImageRequest) {
+//                            super.onStart(request)
+//                            Timber.d("Image ${request.data as String} has been STARTED")
+//                        }
+//
+//                        override fun onSuccess(request: ImageRequest, metadata: ImageResult.Metadata) {
+//                            super.onSuccess(request, metadata)
+//                            Timber.d("Image ${request.data as String} has been LOADED")
+//                        }
+//                    })
 //        }
     }
 

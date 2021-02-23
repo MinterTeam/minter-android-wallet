@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -34,6 +34,7 @@
     <string name="dont_know">I don\'t know</string>
     <string name="today">Today</string>
     <string name="please_wait">Please wait a few seconds…</string>
+    <string name="value">Value</string>
 
     <!--crop-->
     <string name="crop_image_activity_title"></string>
@@ -214,6 +215,20 @@
     <string name="tx_type_change_coin_owner">Change Coin Owner</string>
     <string name="tx_type_set_halt_block">Set Halt Block</string>
     <string name="tx_type_redeem_check">Redeem Check</string>
+    <string name="tx_type_add_liquidity">Add Liquidity</string>
+    <string name="tx_type_remove_liquidity">Remove Liquidity</string>
+    <string name="tx_type_sell_swap_pool">Sell Swap Pool</string>
+    <string name="tx_type_sell_all_swap_pool">Sell All Swap Pool</string>
+    <string name="tx_type_buy_swap_pool">Buy Swap Pool</string>
+    <string name="tx_type_edit_candidate_commission">Edit Candidate Commission</string>
+    <string name="tx_type_move_stake">Move Stake</string>
+    <string name="tx_type_mint_token">Mint Token</string>
+    <string name="tx_type_burn_token">Burn Token</string>
+    <string name="tx_type_create_token">Create Token</string>
+    <string name="tx_type_recreate_token">Recreate Token</string>
+    <string name="tx_type_vote_commission">Vote Commission</string>
+    <string name="tx_type_vote_update">Vote Update</string>
+    <string name="tx_type_create_swap_pool">Create Swap Pool</string>
     <string name="tx_incoming_multisend">+ …</string>
     <string name="tx_outgoing_multisend">- …</string>
     <string name="label_coin_name">Coin name</string>
@@ -226,6 +241,7 @@
     <string name="label_validator_public_key">Validator Public Key</string>
     <string name="label_commission">Commission</string>
     <string name="label_coin">Coin</string>
+    <string name="label_token">Coin</string>
     <string name="label_stake">Stake</string>
     <string name="tx_type_set_candidate_online">Set Candidate Online</string>
     <string name="tx_type_set_candidate_offline">Set Candidate Offline</string>
@@ -402,5 +418,12 @@
     <string name="settings_sec_pin_enabled_label">Unlock with PIN-code</string>
     <string name="title_share_story">Share Story</string>
     <string name="action_see_more">See More</string>
+    <string name="label_coin_0">Coin 0</string>
+    <string name="label_coin_1">Coin 1</string>
+    <string name="label_volume_0">Volume 0</string>
+    <string name="label_volume_1">Volume 1</string>
+    <string name="label_pool_token">Pool Token</string>
+    <string name="label_liquidity">Liquidity</string>
+    <string name="label_version">Version</string>
 
 </resources>

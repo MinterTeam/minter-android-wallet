@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,45 +25,56 @@
  */
 package network.minter.bipwallet.delegation.adapter
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.WriteWith
+import network.minter.bipwallet.apis.parcel.CoinItemBaseParceler
+import network.minter.bipwallet.apis.parcel.ValidatorMetaParceler
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.internal.views.widgets.RemoteImageContainer
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinDelegation
 import network.minter.explorer.models.CoinItemBase
 import network.minter.explorer.models.ValidatorMeta
-import org.parceler.Parcel
 import java.math.BigDecimal
 
-@Parcel
-class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake> {
-    @JvmField
-    var coin: CoinItemBase? = null
+@Parcelize
+class DelegatedStake(
+        var coin: @WriteWith<CoinItemBaseParceler>() CoinItemBase,
+        var amount: BigDecimal = BigDecimal.ZERO,
+        var amountBIP: BigDecimal = BigDecimal.ZERO,
+        var publicKey: MinterPublicKey? = null,
+        var validatorMeta: @WriteWith<ValidatorMetaParceler>() ValidatorMeta? = null,
+        var isKicked: Boolean = false
+) : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake>, Parcelable {
 
-    @JvmField
-    var amount: BigDecimal = BigDecimal.ZERO
+//    @JvmField
+//    var coin: CoinItemBase? = null
+//
+//    @JvmField
+//    var amount: BigDecimal = BigDecimal.ZERO
+//
+//    @JvmField
+//    var amountBIP: BigDecimal = BigDecimal.ZERO
+//
+//    @JvmField
+//    var publicKey: MinterPublicKey? = null
+//
+//    @JvmField
+//    var validatorMeta: ValidatorMeta? = null
+//
+//    @JvmField
+//    var isKicked: Boolean = false
 
-    @JvmField
-    var amountBIP: BigDecimal = BigDecimal.ZERO
 
-    @JvmField
-    var publicKey: MinterPublicKey? = null
-
-    @JvmField
-    var validatorMeta: ValidatorMeta? = null
-
-    @JvmField
-    var isKicked: Boolean = false
-
-    constructor()
-
-    constructor(info: CoinDelegation) {
-        coin = info.coin!!
-        amount = info.amount
-        amountBIP = info.bipValue
-        publicKey = info.publicKey!!
-        validatorMeta = info.meta!!
-        isKicked = info.isInWaitlist
-    }
+    constructor(info: CoinDelegation) : this(
+            info.coin!!,
+            info.amount,
+            info.bipValue,
+            info.publicKey!!,
+            info.meta!!,
+            info.isInWaitlist
+    )
 
     override fun isSameOf(item: DelegatedItem): Boolean {
         return viewType == item.viewType && coin == (item as DelegatedStake).coin && publicKey == item.publicKey
@@ -74,7 +85,7 @@ class DelegatedStake : DelegatedItem, RemoteImageContainer, Comparable<Delegated
 
     @Deprecated("Use new variable binding", ReplaceWith("coin.avatar"))
     override val imageUrl: String
-        get() = coin!!.avatar
+        get() = coin.avatar
 
     override fun compareTo(other: DelegatedStake): Int {
         return other.amountBIP.compareTo(amountBIP)

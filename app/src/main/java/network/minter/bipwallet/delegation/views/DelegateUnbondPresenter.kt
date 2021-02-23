@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -54,7 +54,6 @@ import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.exceptions.RetryListener
-import network.minter.bipwallet.internal.helpers.IntentHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
@@ -136,7 +135,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         type = intent.getSerializableExtra(DelegateUnbondActivity.ARG_TYPE) as Type
 
         if (intent.hasExtra(DelegateUnbondActivity.ARG_PUB_KEY)) {
-            toValidator = IntentHelper.getParcelExtra(intent, DelegateUnbondActivity.ARG_PUB_KEY)
+            toValidator = intent.getSerializableExtra(DelegateUnbondActivity.ARG_PUB_KEY) as MinterPublicKey
         }
 
         if (intent.hasExtra(DelegateUnbondActivity.ARG_COIN)) {
@@ -329,7 +328,11 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
         viewState.setOnAccountSelectListener {
             if (type == Type.Delegate) {
-                viewState.startAccountSelector(selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList)) { account ->
+                viewState.startAccountSelector(
+                        selectorDataFromCoins(accountStorage.entity.mainWallet.coinsList.filter {
+                            it.coin.type == CoinItemBase.CoinType.Coin
+                        })
+                ) { account ->
                     onAccountSelected(account.data)
                 }
             } else {

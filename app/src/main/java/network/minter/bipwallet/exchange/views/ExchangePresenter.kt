@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -117,6 +117,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var exchangeAmount: ExchangeAmount? = null
     private var buyForResult = false
     private var fromAccount: MinterAddress? = null
+
+    // used to detect which type of coin is exchanging: simple coin, token or pool token
+    private var isBasicExchange = true
 
     protected abstract val isBuying: Boolean
 
@@ -314,7 +317,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
             balance: BigDecimal): ObservableSource<GateResult<PushResult>> {
 
         // creating tx
-        val tx = txData.build(initData.nonce!!.add(BigInteger.ONE), initData.gas, balance)
+        val tx = txData.build(initData.nonce!!.add(BigInteger.ONE), initData.gas!!, balance)
+        isBasicExchange = txData.isBasicExchange
 
         // if user created account with ledger, use it to sign tx
         return if (mSession.role == AuthSession.AuthType.Hardware) {
@@ -408,9 +412,21 @@ abstract class ExchangePresenter<V : ExchangeView>(
                 .subscribe(
                         { r ->
                             if (r.isOk) {
-                                val data = r.result.getData<HistoryTransaction.TxConvertCoinResult>()
-                                saveExchangeAmount(data.coinToBuy, data.valueToBuy)
-                                showSuccessDialog(r.result.hash.toString(), data.valueToBuy, data.coinToBuy)
+                                when (r.result.data) {
+                                    is HistoryTransaction.TxConvertCoinResult -> {
+                                        val data = r.result.getData<HistoryTransaction.TxConvertCoinResult>()
+                                        saveExchangeAmount(data.coinToBuy, data.valueToBuy)
+                                        showSuccessDialog(r.result.hash.toString(), data.valueToBuy, data.coinToBuy)
+                                    }
+                                    is HistoryTransaction.TxConvertSwapPoolResult -> {
+                                        val data = r.result.getData<HistoryTransaction.TxConvertSwapPoolResult>()
+                                        saveExchangeAmount(data.coinToBuy, data.valueToBuy)
+                                        showSuccessDialog(r.result.hash.toString(), data.valueToBuy, data.coinToBuy)
+                                    }
+                                    else -> {
+                                        Timber.e("Unknown result type: %s", r.result.data.javaClass.name)
+                                    }
+                                }
                                 return@subscribe
                             }
 
@@ -479,6 +495,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         when (editText.id) {
             R.id.input_incoming_coin -> {
                 mExplorerCoinsRepo.entity.findByName(text)
+                        .filter { it.type != CoinItemBase.CoinType.PoolToken }
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe(
@@ -551,7 +568,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         }
                         val amount = if (isBuying) mBuyAmount else mSellAmount
                         val txData = ConvertTransactionData(
-                                type, mGasCoin, mAccount!!.coin, mBuyCoin, amount, mEstimate)
+                                type, mGasCoin!!, mAccount!!.coin, mBuyCoin!!, amount!!, mEstimate!!)
 
                         onStartExecuteTransaction(txData)
                     }

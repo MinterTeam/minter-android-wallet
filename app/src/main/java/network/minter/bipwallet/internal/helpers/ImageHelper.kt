@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -116,7 +116,7 @@ class ImageHelper(private val context: Context, private val mDisplay: DisplayHel
         }
     }
 
-    private val imageLoader: ImageLoader
+    val imageLoader: ImageLoader
     val picasso: Picasso
 
     init {
@@ -141,6 +141,8 @@ class ImageHelper(private val context: Context, private val mDisplay: DisplayHel
                 .crossfade(160)
                 .okHttpClient { httpClient }
                 .dispatcher(Dispatchers.IO)
+                .launchInterceptorChainOnMainThread(false)
+                .availableMemoryPercentage(0.3)
                 .build()
 
         picasso = Picasso.Builder(context)
@@ -153,7 +155,6 @@ class ImageHelper(private val context: Context, private val mDisplay: DisplayHel
 
 //        CoilLogger.setEnabled(BuildConfig.DEBUG)
         Coil.setImageLoader(imageLoader)
-//        Coil.setDefaultImageLoader(imageLoader)
     }
 
     fun loadResize(iv: ImageView, imageUrl: Uri?, @Dp resizeDp: Float) {

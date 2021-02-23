@@ -42,6 +42,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.reactive.ReactiveGate
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
+import network.minter.bipwallet.apis.reactive.nameValueMap
 import network.minter.bipwallet.coins.CoinMapper
 import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
@@ -459,6 +460,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 val d = extTx!!.getData<TxCoinSell>()
                 out = BuyRequiredAmount(d.coinIdToSell, d.valueToSell)
             }
+            OperationType.SellSwapPool -> {
+                val d = extTx!!.getData<TxSwapPoolSell>()
+                out = BuyRequiredAmount(d.coinIdToSell, d.valueToSell)
+            }
             OperationType.Delegate -> {
                 val d = extTx!!.getData<TxDelegate>()
                 out = BuyRequiredAmount(d.coinId, d.stake)
@@ -549,8 +554,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             }
             OperationType.CreateCoin -> {
                 // https://docs.minter.network/#section/Commissions
-                val txData = tx.getData(TxCreateCoin::class.java)
-                baseFee = TxCreateCoin.calculateCreatingCost(txData.symbol)
+                val txData = tx.getData(TxCoinCreate::class.java)
+                baseFee = TxCoinCreate.calculateCreatingCost(txData.symbol)
+            }
+            OperationType.CreateToken -> {
+                val txData = tx.getData(TxTokenCreate::class.java)
+                baseFee = TxCoinCreate.calculateCreatingCost(txData.symbol)
             }
             OperationType.RedeemCheck -> {
                 viewState.setFee("You don't pay transaction fee.")
@@ -681,6 +690,124 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
                 allRows.addAll(rows)
             }
+            OperationType.SellSwapPool -> {
+                val data = tx.getData(TxSwapPoolSell::class.java)
+                if (data.coins.size == 2) {
+                    viewState.enableEditAction(true)
+                    val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
+                            .add {
+                                label = "You're selling within pool"
+                                //todo: map coin from db
+                                text = coinMapper.idToSymbolDef(data.coinIdToSell)
+                                enabled = enableEditInput
+                                tplCoin({ txCoinSell, s ->
+                                    //todo: map coin from db
+                                    txCoinSell.coins[0] = coinMapper[s]
+//                                txCoinSell.coinIdToSell = coinMapper[s]
+                                }, { validateEnoughCoins() })
+                            }
+                            .add {
+                                label = "Amount"
+                                text = data.valueToSell.toPlain()
+                                enabled = enableEditInput
+                                tplDecimal({ txCoinSell, s ->
+                                    txCoinSell.valueToSell = s.parseBigDecimal()
+                                }, { validateEnoughCoins() })
+                            }
+                            .add {
+                                label = "Coin To Buy"
+                                //todo: map coin from db
+                                text = coinMapper.idToSymbolDef(data.coinIdToBuy)
+                                enabled = enableEditInput
+                                tplCoin { txCoinSell, s ->
+                                    //todo: map coin from db
+                                    txCoinSell.coins[1] = coinMapper[s]
+                                }
+                            }
+                            .add {
+                                label = "Minimum Amount To Get"
+                                text = data.minValueToBuy.toPlain()
+                                enabled = enableEditInput
+                                tplDecimal { txCoinSell, s ->
+                                    txCoinSell.minValueToBuy = s.parseBigDecimal()
+                                }
+                            }
+                            .onValid { viewState.enableSubmit(it) }
+                            .build()
+                    allRows.addAll(rows)
+                } else {
+                    viewState.enableEditAction(false)
+                    val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
+                    data.coins.forEachIndexed { idx, value ->
+                        rows.add {
+                            label = "Coin ${idx + 1}"
+                            text = coinMapper.idToSymbolDef(value)
+                        }
+                    }
+                    rows.add {
+                        label = "Amount"
+                        text = data.valueToSell.toPlain()
+                    }
+                    rows.add {
+                        label = "Minimum Amount To Get"
+                        text = data.minValueToBuy.toPlain()
+                    }
+                    allRows.addAll(rows.build())
+                }
+            }
+            OperationType.SellAllSwapPool -> {
+                val data = tx.getData(TxSwapPoolSellAll::class.java)
+                if (data.coins.size == 2) {
+                    viewState.enableEditAction(true)
+                    val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSellAll::class.java, extTx!!)
+                            .add {
+                                label = "You're selling all within pool"
+                                //todo: map coin from db
+                                text = coinMapper.idToSymbolDef(data.coinIdToSell)
+                                enabled = enableEditInput
+                                tplCoin({ txCoinSell, s ->
+                                    //todo: map coin from db
+                                    txCoinSell.coins[0] = coinMapper[s]
+//                                txCoinSell.coinIdToSell = coinMapper[s]
+                                }, { validateEnoughCoins() })
+                            }
+                            .add {
+                                label = "Coin To Buy"
+                                //todo: map coin from db
+                                text = coinMapper.idToSymbolDef(data.coinIdToBuy)
+                                enabled = enableEditInput
+                                tplCoin { txCoinSell, s ->
+                                    //todo: map coin from db
+                                    txCoinSell.coins[1] = coinMapper[s]
+                                }
+                            }
+                            .add {
+                                label = "Minimum Amount To Get"
+                                text = data.minValueToBuy.toPlain()
+                                enabled = enableEditInput
+                                tplDecimal { txCoinSell, s ->
+                                    txCoinSell.minValueToBuy = s.parseBigDecimal()
+                                }
+                            }
+                            .onValid { viewState.enableSubmit(it) }
+                            .build()
+                    allRows.addAll(rows)
+                } else {
+                    viewState.enableEditAction(false)
+                    val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
+                    data.coins.forEachIndexed { idx, value ->
+                        rows.add {
+                            label = "Coin ${idx + 1}"
+                            text = coinMapper.idToSymbolDef(value)
+                        }
+                    }
+                    rows.add {
+                        label = "Minimum Amount To Get"
+                        text = data.minValueToBuy.toPlain()
+                    }
+                    allRows.addAll(rows.build())
+                }
+            }
             OperationType.SellAllCoins -> {
                 viewState.enableEditAction(true)
                 val data = tx.getData(TxCoinSellAll::class.java)
@@ -763,13 +890,95 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
                 allRows.addAll(rows)
             }
+            OperationType.BuySwapPool -> {
+                val data = tx.getData(TxSwapPoolBuy::class.java)
+                if (data.coins.size == 2) {
+                    viewState.enableEditAction(true)
+                    val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolBuy::class.java, extTx!!)
+                            .add {
+                                label = "You're buying within pool"
+                                //todo: map coin from db
+                                text = coinMapper.idToSymbolDef(data.coinIdToSell)
+                                enabled = enableEditInput
+                                tplCoin({ txCoinSell, s ->
+                                    //todo: map coin from db
+                                    txCoinSell.coins[0] = coinMapper[s]
+                                }, { validateEnoughCoins() })
+                            }
+                            .add {
+                                label = "Amount"
+                                text = data.valueToBuy.toPlain()
+                                enabled = enableEditInput
+                                tplDecimal({ txCoinSell, s ->
+                                    txCoinSell.valueToBuy = s.parseBigDecimal()
+                                }, { validateEnoughCoins() })
+                            }
+                            .add {
+                                label = "Coin To Sell"
+                                text = coinMapper.idToSymbolDef(data.coinIdToBuy)
+                                enabled = enableEditInput
+                                tplCoin { txCoinSell, s ->
+                                    txCoinSell.coins[1] = coinMapper[s]
+                                }
+                            }
+                            .add {
+                                label = "Maximum Amount To Sell"
+                                text = data.maxValueToSell.toPlain()
+                                enabled = enableEditInput
+                                tplDecimal { txCoinSell, s ->
+                                    txCoinSell.maxValueToSell = s.parseBigDecimal()
+                                }
+                            }
+                            .onValid { viewState.enableSubmit(it) }
+                            .build()
+                    allRows.addAll(rows)
+                } else {
+                    viewState.enableEditAction(false)
+                    val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
+                    data.coins.forEachIndexed { idx, value ->
+                        rows.add {
+                            label = "Coin ${idx + 1}"
+                            text = coinMapper.idToSymbolDef(value)
+                        }
+                    }
+                    rows.add {
+                        label = "Amount"
+                        text = data.valueToBuy.toPlain()
+                    }
+                    rows.add {
+                        label = "Maximum Amount To Sell"
+                        text = data.maxValueToSell.toPlain()
+                    }
+                    allRows.addAll(rows.build())
+                }
+            }
+            OperationType.CreateSwapPool -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxSwapPoolCreate::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolCreate::class.java, extTx!!)
+                        .add {
+                            label = "You're creating swap pool"
+                            text = "${coinMapper.idToSymbolDef(data.coin0)} / ${coinMapper.idToSymbolDef(data.coin1)}"
+                        }
+                        .add {
+                            label = "Volume of ${coinMapper.idToSymbolDef(data.coin0)}"
+                            text = data.volume0.toPlain()
+                        }
+                        .add {
+                            label = "Volume of ${coinMapper.idToSymbolDef(data.coin1)}"
+                            text = data.volume1.toPlain()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
             OperationType.CreateCoin,
             OperationType.RecreateCoin -> {
                 viewState.enableEditAction(false)
                 val data = if (tx.type == OperationType.RecreateCoin) {
-                    tx.getData<TxRecreateCoin>()
+                    tx.getData<TxCoinRecreate>()
                 } else {
-                    tx.getData<TxCreateCoin>()
+                    tx.getData<TxCoinCreate>()
                 }
 
                 val title = if (tx.type == OperationType.RecreateCoin) "You're re-creating coin" else "You're creating coin"
@@ -802,6 +1011,63 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                             } else {
                                 "10¹⁵ (max)"
                             }
+                        }
+                        .build()
+                allRows.addAll(rows)
+            }
+            OperationType.CreateToken,
+            OperationType.RecreateToken -> {
+                viewState.enableEditAction(false)
+                val data = if (tx.type == OperationType.RecreateToken) {
+                    tx.getData<TxTokenRecreate>()
+                } else {
+                    tx.getData<TxTokenCreate>()
+                }
+
+                val title = if (tx.type == OperationType.RecreateToken) "You're re-creating token" else "You're creating token"
+
+                val rows = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
+                        .add {
+                            label = title
+                            text = data.symbol
+                        }
+                        .add {
+                            label = "Initial Amount"
+                            text = data.initialAmount.humanize()
+                        }
+                        .add {
+                            label = "Coin Name"
+                            text = data.name
+                        }
+                        .add {
+                            label = "Max Supply"
+                            text = if (data.maxSupply < BigDecimal("10").pow(15)) {
+                                data.maxSupply.humanize()
+                            } else {
+                                "10¹⁵ (max)"
+                            }
+                        }
+                        .build()
+                allRows.addAll(rows)
+            }
+            OperationType.MintToken,
+            OperationType.BurnToken -> {
+                viewState.enableEditAction(false)
+                val data = if (tx.type == OperationType.MintToken) {
+                    tx.getData<TxTokenMint>()
+                } else {
+                    tx.getData<TxTokenBurn>()
+                }
+
+                val title = if (tx.type == OperationType.MintToken) "You're minting token" else "You're burning token"
+                val rows = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
+                        .add {
+                            label = title
+                            text = coinMapper.idToSymbolDef(data.coinId)
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.value.toPlain()
                         }
                         .build()
                 allRows.addAll(rows)
@@ -867,6 +1133,53 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
                 allRows.addAll(rows)
             }
+            OperationType.AddLiquidity -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxAddLiquidity::class.java)
+
+                val rows = TxInputFieldRow.MultiBuilder(TxAddLiquidity::class.java, extTx!!)
+                        .add {
+                            label = "You're adding liquidity"
+                            text = "${coinMapper.idToSymbolDef(data.coin0)} / ${coinMapper.idToSymbolDef(data.coin1)}"
+                        }
+                        .add {
+                            label = "Volume"
+                            text = data.volume.toPlain()
+                        }
+                        .add {
+                            label = "Max volume"
+                            text = data.maximumVolume.toPlain()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
+            OperationType.RemoveLiquidity -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxRemoveLiquidity::class.java)
+
+                val rows = TxInputFieldRow.MultiBuilder(TxRemoveLiquidity::class.java, extTx!!)
+                        .add {
+                            label = "You're removing liquidity"
+                            text = "${coinMapper.idToSymbolDef(data.coin0)} / ${coinMapper.idToSymbolDef(data.coin1)}"
+                        }
+                        .add {
+                            label = "Liquidity"
+                            text = "${data.liquidity}%"
+                        }
+                        .add {
+                            label = "Min Volume of ${coinMapper.idToSymbolDef(data.coin0)}"
+                            text = data.minVolume0.toPlain()
+                        }
+                        .add {
+                            label = "Min Volume of ${coinMapper.idToSymbolDef(data.coin1)}"
+                            text = data.minVolume1.toPlain()
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
+
             OperationType.Unbound -> {
                 viewState.enableEditAction(true)
                 val data = tx.getData(TxUnbound::class.java)
@@ -902,6 +1215,30 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         .build()
                 allRows.addAll(rows)
             }
+            OperationType.MoveStake -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxMoveStake::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxMoveStake::class.java, extTx!!)
+                        .add {
+                            label = "You're moving stake from"
+                            text = data.from.toString()
+                        }
+                        .add {
+                            label = "To"
+                            text = data.to.toString()
+                        }
+                        .add {
+                            label = "Amount"
+                            text = data.stake.toPlain()
+                        }
+                        .add {
+                            label = "Coin"
+                            text = coinMapper.idToSymbolDef(data.coinId)
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
             OperationType.RedeemCheck -> {
                 viewState.enableEditAction(false)
                 val data = tx.getData(TxRedeemCheck::class.java)
@@ -922,7 +1259,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .build()
                 allRows.addAll(rows)
-//                adapter.addRows(rows)
             }
             OperationType.SetCandidateOnline -> {
                 viewState.enableEditAction(false)
@@ -934,7 +1270,6 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                         }
                         .build()
                 allRows.addAll(rows)
-//                adapter.addRows(rows)
             }
             OperationType.SetCandidateOffline -> {
                 viewState.enableEditAction(false)
@@ -1036,6 +1371,22 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                 allRows.addAll(rows)
             }
+            OperationType.EditCandidateCommission -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxEditCandidateCommission::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxEditCandidateCommission::class.java, extTx!!)
+                        .add {
+                            label = "You're editing candidate commission"
+                            text = data.publicKey.toString()
+                        }
+                        .add {
+                            label = "New Commission"
+                            text = "${data.commission}%"
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
             OperationType.SetHaltBlock -> {
                 viewState.enableEditAction(false)
                 val data = tx.getData(TxSetHaltBlock::class.java)
@@ -1080,10 +1431,34 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                 allRows.addAll(rows)
             }
+            OperationType.VoteUpdate -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxVoteUpdate::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxVoteUpdate::class.java, extTx!!)
+                        .add {
+                            label = "You're voting for update"
+                            text = "Version: ${data.version}"
+                        }
+                        .build()
+
+                allRows.addAll(rows)
+            }
+            OperationType.VoteCommission -> {
+                viewState.enableEditAction(false)
+                val data = tx.getData(TxVoteCommission::class.java)
+                val rows = TxInputFieldRow.MultiBuilder(TxVoteCommission::class.java, extTx!!)
+                data.nameValueMap().forEach { kv ->
+                    rows.add {
+                        label = "Commission: ${kv.key}"
+                        text = "${kv.value.humanize()} ${MinterSDK.DEFAULT_COIN}"
+                    }
+                }
+                allRows.addAll(rows.build())
+            }
             else -> {
                 viewState.startDialog(false) { ctx: Context? ->
                     ConfirmDialog.Builder(ctx!!, "Unable to send")
-                            .setText("Wallet doesn't support this type of transaction: %s", tx.type.name)
+                            .setText("Wallet doesn't support this transaction type: %s", tx.type.name)
                             .setPositiveAction(R.string.btn_close) { d, _ ->
                                 d.dismiss()
                                 viewState.finishCancel()
@@ -1128,8 +1503,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .create()
 
             dialog.setCancelable(false)
-            val initData: Observable<TxInitData>
-            initData = if (extTx!!.nonce != null && extTx!!.nonce != BigInteger.ZERO) {
+            val initData: Observable<TxInitData> = if (extTx!!.nonce != null && extTx!!.nonce != BigInteger.ZERO) {
                 val d = TxInitData(extTx!!.nonce, extTx!!.gasPrice)
                 Observable.just(d)
             } else {

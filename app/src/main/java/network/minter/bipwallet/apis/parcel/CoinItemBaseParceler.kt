@@ -24,28 +24,23 @@
  * THE SOFTWARE.
  */
 
-package network.minter.bipwallet.db;
+package network.minter.bipwallet.apis.parcel
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
-import network.minter.bipwallet.addressbook.db.AddressBookDao;
-import network.minter.bipwallet.addressbook.models.AddressContact;
-import network.minter.bipwallet.coins.CoinsDao;
-import network.minter.bipwallet.coins.DbCoin;
-import network.minter.bipwallet.internal.di.DbModule;
+import kotlinx.parcelize.Parceler
+import network.minter.explorer.models.CoinItemBase
+import java.math.BigInteger
 
-@Database(entities = {
-        AddressContact.class,
-        DbCoin.class,
-}, version = DbModule.DB_VERSION)
-@TypeConverters({
-        DbCoin.BigIntConverter.class,
-        DbCoin.BigDecimalConverter.class,
-        DbCoin.MinterAddressConverter.class,
-        DbCoin.CoinTypeConverter.class,
-})
-public abstract class WalletDatabase extends RoomDatabase {
-    public abstract AddressBookDao addressBook();
-    public abstract CoinsDao coins();
+object CoinItemBaseParceler : Parceler<CoinItemBase> {
+    override fun create(parcel: android.os.Parcel): CoinItemBase {
+        return CoinItemBase(
+                parcel.readValue(BigInteger::class.java.classLoader) as BigInteger,
+                parcel.readString()
+        )
+    }
+
+    override fun CoinItemBase.write(parcel: android.os.Parcel, flags: Int) {
+        parcel.writeValue(id)
+        parcel.writeString(symbol)
+    }
+
 }

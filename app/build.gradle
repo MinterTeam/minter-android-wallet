@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,7 +29,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.appdistribution'
 //    id 'firebase.test.lab'
@@ -129,7 +129,7 @@ android {
     applicationVariants.all { variant ->
         variant.buildConfigField "String", "MINTER_BOT_SECRET", '"' + localProps.getProperty("minter_bot_secret") + '"'
         variant.buildConfigField "String", "MINTER_STORAGE_VERS", '"v2_"'
-        variant.buildConfigField "String", "MINTER_CACHE_VERS", '"v3_"'
+        variant.buildConfigField "String", "MINTER_CACHE_VERS", '"v4_"'
         variant.buildConfigField "Boolean", "ENABLE_LEDGER_UI", 'Boolean.parseBoolean("' + (localProps.getProperty("ledger_ui", "false")) + '")'
         variant.buildConfigField "Boolean", "ENABLE_STORIES", 'Boolean.parseBoolean("' + (localProps.getProperty("enable_stories", "false")) + '")'
 
@@ -206,11 +206,11 @@ android {
         netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", 'null'
-            buildConfigField "String", "EXPLORER_FRONT_URL", 'null'
-            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
-            buildConfigField "String", "GATE_API_URL", 'null'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.taconet.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", '"https://explorer-api.taconet.minter.network/api/v2/"'
+            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://explorer.taconet.minter.network/api/v2"'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.taconet.minter.network"'
+            buildConfigField "String", "GATE_API_URL", '"https://gate-api.taconet.minter.network/api/v2/"'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
@@ -286,7 +286,7 @@ dependencies {
 
     // yandex
     implementation 'com.yandex.android:mobmetricalib:3.1.0'
-    implementation 'com.android.installreferrer:installreferrer:2.1'
+    implementation 'com.android.installreferrer:installreferrer:2.2'
 
     // common
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -312,10 +312,10 @@ dependencies {
 //    implementation 'com.github.shts:StoriesProgressView:3.0.0'
 
     // Annotations and DI
-    kapt 'com.google.dagger:dagger-compiler:2.26'
-    kapt 'com.google.dagger:dagger-android-processor:2.26'
-    implementation 'com.google.dagger:dagger:2.26'
-    implementation 'com.google.dagger:dagger-android-support:2.26'
+    kapt 'com.google.dagger:dagger-compiler:2.27'
+    kapt 'com.google.dagger:dagger-android-processor:2.27'
+    implementation 'com.google.dagger:dagger:2.27'
+    implementation 'com.google.dagger:dagger-android-support:2.27'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP
@@ -338,7 +338,7 @@ dependencies {
     //ui
     implementation 'com.jakewharton:butterknife:10.2.1'
     kapt 'com.jakewharton:butterknife-compiler:10.2.1'
-    implementation 'io.coil-kt:coil:1.0.0'
+    implementation 'io.coil-kt:coil:1.1.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'com.edwardstock.android:BottomNavigationViewEx:2.1.0'
@@ -350,16 +350,16 @@ dependencies {
     implementation 'com.airbnb.android:paris:1.4.0'
     kapt 'com.airbnb.android:paris-processor:1.4.0'
 
-    implementation 'com.airbnb:deeplinkdispatch:5.1.0'
-    kapt 'com.airbnb:deeplinkdispatch-processor:5.1.0'
+    implementation 'com.airbnb:deeplinkdispatch:5.2.0'
+    kapt 'com.airbnb:deeplinkdispatch-processor:5.2.0'
 
 
     //tests
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.0"
     testImplementation 'org.mockito:mockito-core:2.25.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
-    androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+    androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0"
 //    androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.0.0"
 //    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.0.0"
     androidTestImplementation 'org.mockito:mockito-android:2.25.0'

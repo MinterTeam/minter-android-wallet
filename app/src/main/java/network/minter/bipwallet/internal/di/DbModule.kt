@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -42,6 +42,19 @@ class DbModule {
     @Provides
     @WalletApp
     fun provideWalletDB(context: Context?): WalletDatabase {
+
+        val migration_v3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val add_mintable = "ALTER TABLE `minter_coins` ADD COLUMN `mintable` INTEGER DEFAULT 0"
+                val add_burnable = "ALTER TABLE `minter_coins` ADD COLUMN `burnable` INTEGER DEFAULT 0"
+                val add_type = "ALTER TABLE `minter_coins` ADD COLUMN `type` INTEGER DEFAULT 0"
+
+                db.execSQL(add_mintable)
+                db.execSQL(add_burnable)
+                db.execSQL(add_type)
+            }
+
+        }
 
         val migration_v2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
