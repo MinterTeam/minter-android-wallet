@@ -425,5 +425,8 @@
     <string name="label_pool_token">Pool Token</string>
     <string name="label_liquidity">Liquidity</string>
     <string name="label_version">Version</string>
+    <string name="label_coin_chain">Coins</string>
+    <string name="label_mintable">Mintable</string>
+    <string name="label_burnable">Burnable</string>
 
 </resources>

@@ -81,6 +81,7 @@ class DbModule {
 
         return Room.databaseBuilder(context!!, WalletDatabase::class.java, DB_NAME)
                 .addMigrations(migration_v2)
+                .addMigrations(migration_v3)
                 .fallbackToDestructiveMigration()
                 .build()
     }

@@ -70,6 +70,7 @@ import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
+import network.minter.blockchain.api.EstimateSwapFrom
 import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
@@ -102,21 +103,22 @@ abstract class ExchangePresenter<V : ExchangeView>(
         protected val mGateTxRepo: GateTransactionRepository,
         protected val errorManager: ErrorManager
 ) : MvpBasePresenter<V>(), ErrorManager.ErrorGlobalReceiverListener, ErrorManager.ErrorLocalHandlerListener, ErrorManager.ErrorLocalReceiverListener {
-    private var mAccount: CoinBalance? = null
-    private var mCurrentCoin: CoinItemBase? = null
-    private var mBuyCoin: CoinItemBase? = null
-    private var mSellAmount: BigDecimal? = BigDecimal(0)
-    private var mBuyAmount: BigDecimal? = BigDecimal(0)
-    private var mInputChange: BehaviorSubject<Boolean>? = null
-    private var mGasCoin: BigInteger? = null
-    private var mAccounts: List<CoinBalance> = ArrayList(1)
-    private val mUseMax = AtomicBoolean(false)
-    private val mClickedUseMax = AtomicBoolean(false)
-    private var mGasPrice = BigInteger.ONE
-    private var mEstimate: BigDecimal? = null
+    private var account: CoinBalance? = null
+    private var currentCoin: CoinItemBase? = null
+    private var buyCoin: CoinItemBase? = null
+    private var sellAmount: BigDecimal? = BigDecimal(0)
+    private var buyAmount: BigDecimal? = BigDecimal(0)
+    private var inputChangeSubject: BehaviorSubject<Boolean>? = null
+    private var gasCoin: BigInteger? = null
+    private var accounts: List<CoinBalance> = ArrayList(1)
+    private val useMax = AtomicBoolean(false)
+    private val clickedUseMax = AtomicBoolean(false)
+    private var gasPrice = BigInteger.ONE
+    private var estimateAmount: BigDecimal? = null
     private var exchangeAmount: ExchangeAmount? = null
     private var buyForResult = false
     private var fromAccount: MinterAddress? = null
+    private var swapFrom: EstimateSwapFrom = EstimateSwapFrom.Default
 
     // used to detect which type of coin is exchanging: simple coin, token or pool token
     private var isBasicExchange = true
@@ -149,8 +151,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
         mAccountStorage.update()
 
-        mInputChange = BehaviorSubject.create()
-        mInputChange!!
+        inputChangeSubject = BehaviorSubject.create()
+        inputChangeSubject!!
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribe(
@@ -162,7 +164,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.setSubmitEnabled(false)
         viewState.setFormValidationListener { valid ->
             Handler(Looper.getMainLooper()).post {
-                viewState.setSubmitEnabled(valid && checkZero(if (isBuying) mBuyAmount else mSellAmount))
+                viewState.setSubmitEnabled(valid && checkZero(if (isBuying) buyAmount else sellAmount))
             }
         }
         viewState.setTextChangedListener { input, valid ->
@@ -178,12 +180,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
         super.handleExtras(bundle)
         if (bundle != null) {
             if (bundle.containsKey(ConvertCoinActivity.EXTRA_COIN_TO_BUY)) {
-                mBuyCoin = Parcels.unwrap(bundle.getParcelable(ConvertCoinActivity.EXTRA_COIN_TO_BUY))
-                mBuyAmount = BigDecimal(bundle.getString(ConvertCoinActivity.EXTRA_VALUE_TO_BUY))
+                buyCoin = Parcels.unwrap(bundle.getParcelable(ConvertCoinActivity.EXTRA_COIN_TO_BUY))
+                buyAmount = BigDecimal(bundle.getString(ConvertCoinActivity.EXTRA_VALUE_TO_BUY))
                 buyForResult = true
-                viewState.setIncomingCoin(mBuyCoin!!.symbol)
+                viewState.setIncomingCoin(buyCoin!!.symbol)
                 if (isBuying) {
-                    viewState.setAmount(mBuyAmount!!.toPlainString())
+                    viewState.setAmount(buyAmount!!.toPlainString())
                 }
 
                 viewState.validateForm()
@@ -204,14 +206,14 @@ abstract class ExchangePresenter<V : ExchangeView>(
                             val acc: AddressBalance = mAccountStorage.entity.getWalletByAddress(fromAccount!!)
 
                             if (!res.isEmpty) {
-                                mAccounts = acc.coinsList
-                                mAccount = acc.getCoin(MinterSDK.DEFAULT_COIN_ID)
-                                if (mCurrentCoin != null) {
-                                    mAccount = Stream.of(mAccounts).filter { value: CoinBalance -> (value.coin == mCurrentCoin) }.findFirst().orElse(mAccount)
+                                accounts = acc.coinsList
+                                account = acc.getCoin(MinterSDK.DEFAULT_COIN_ID)
+                                if (currentCoin != null) {
+                                    account = Stream.of(accounts).filter { value: CoinBalance -> (value.coin == currentCoin) }.findFirst().orElse(account)
                                 }
-                                onAccountSelected(mAccount, true)
+                                onAccountSelected(account, true)
 
-                                if (mBuyAmount != null && mBuyCoin != null) {
+                                if (buyAmount != null && buyCoin != null) {
                                     onAmountChangedInternal(isBuying)
                                 }
                             }
@@ -230,7 +232,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private val fee: BigDecimal
         get() {
-            return operationType.fee.multiply(BigDecimal(mGasPrice))
+            return operationType.fee.multiply(BigDecimal(gasPrice))
         }
 
     private fun loadAndSetFee() {
@@ -241,12 +243,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .subscribe({ res: GateResult<GasValue> ->
                     if (res.isOk) {
-                        mGasPrice = res.result.gas
-                        Timber.d("Min Gas price: %s", mGasPrice.toString())
+                        gasPrice = res.result.gas
+                        Timber.d("Min Gas price: %s", gasPrice.toString())
                         viewState.setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN))
                     }
                 }) { e: Throwable? ->
-                    mGasPrice = BigInteger.ONE
+                    gasPrice = BigInteger.ONE
                     Timber.w(e, "Unable to load min gas price for exchange")
                 }
     }
@@ -263,7 +265,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private fun setCoinsAutocomplete() {
         viewState.setCoinsAutocomplete { item: CoinItem, _ ->
-            mBuyCoin = item
+            buyCoin = item
             viewState.setIncomingCoin(item.symbol)
         }
     }
@@ -277,7 +279,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
             dialog.setCancelable(false)
             Observable
                     .combineLatest(
-                            estimateRepository.getTransactionCount(mAccount!!.address!!),
+                            estimateRepository.getTransactionCount(account!!.address!!),
                             gasRepo.minGas,
                             { t1: GateResult<TxCount>, t2: GateResult<GasValue> ->
                                 TxInitData(t1, t2)
@@ -290,7 +292,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         }
                         var balance = BigDecimal("0")
                         if (operationType == OperationType.SellCoin || operationType == OperationType.SellAllCoins) {
-                            balance = mAccount!!.amount
+                            balance = account!!.amount
                         }
                         signSendTx(dialog, txData, initData, balance)
                     }
@@ -332,7 +334,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     }
 
     private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
-        val data = mSecretStorage.getSecret(mAccount!!.address!!)
+        val data = mSecretStorage.getSecret(account!!.address!!)
         val sign = tx.signSingle(data.privateKey)!!
         return safeSubscribeIoToUi(
                 mGateTxRepo.sendTransaction(sign)
@@ -397,10 +399,10 @@ abstract class ExchangePresenter<V : ExchangeView>(
         mTxRepo.update(true)
 
         if (isBuying) {
-            saveExchangeAmount(mBuyCoin!!, mBuyAmount!!)
+            saveExchangeAmount(buyCoin!!, buyAmount!!)
 
             // for buy tab just show how much we've got
-            showSuccessDialog(result.result.hash.toString(), mBuyAmount!!, mBuyCoin!!)
+            showSuccessDialog(result.result.hash.toString(), buyAmount!!, buyCoin!!)
             return
         }
 
@@ -420,8 +422,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                     }
                                     is HistoryTransaction.TxConvertSwapPoolResult -> {
                                         val data = r.result.getData<HistoryTransaction.TxConvertSwapPoolResult>()
-                                        saveExchangeAmount(data.coinToBuy, data.valueToBuy)
-                                        showSuccessDialog(r.result.hash.toString(), data.valueToBuy, data.coinToBuy)
+                                        saveExchangeAmount(data.coinLast, data.valueToBuy)
+                                        showSuccessDialog(r.result.hash.toString(), data.valueToBuy, data.coinLast)
                                     }
                                     else -> {
                                         Timber.e("Unknown result type: %s", r.result.data.javaClass.name)
@@ -470,12 +472,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
         if (isBuying) {
             return
         }
-        if (mAccount == null) {
+        if (account == null) {
             return
         }
-        viewState.setAmount(mAccount!!.amount.toPlain())
-        mUseMax.set(true)
-        mClickedUseMax.set(true)
+        viewState.setAmount(account!!.amount.toPlain())
+        useMax.set(true)
+        clickedUseMax.set(true)
         viewState.hideKeyboard()
         analytics.send(AppEvent.ConvertSpendUseMaxButton)
     }
@@ -500,12 +502,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         .observeOn(Schedulers.io())
                         .subscribe(
                                 {
-                                    mBuyCoin = it
-                                    mInputChange!!.onNext(isBuying)
+                                    buyCoin = it
+                                    inputChangeSubject!!.onNext(isBuying)
                                 },
                                 {
-                                    mBuyCoin = null
-                                    mInputChange!!.onNext(isBuying)
+                                    buyCoin = null
+                                    inputChangeSubject!!.onNext(isBuying)
                                     Timber.d("Unable to find coin by name %s", text)
                                 }
                         )
@@ -514,22 +516,22 @@ abstract class ExchangePresenter<V : ExchangeView>(
                 val am = bigDecimalFromString(text)
                 checkZero(am)
                 if (isBuying) {
-                    mBuyAmount = am
+                    buyAmount = am
                 } else {
-                    if (!mClickedUseMax.get()) {
-                        mUseMax.set(false)
+                    if (!clickedUseMax.get()) {
+                        useMax.set(false)
                     }
-                    mClickedUseMax.set(false)
-                    mSellAmount = am
+                    clickedUseMax.set(false)
+                    sellAmount = am
                 }
 //                viewState.setSubmitEnabled(mAccount != null && am <= mAccount!!.amount)
-                mInputChange!!.onNext(isBuying)
+                inputChangeSubject!!.onNext(isBuying)
             }
         }
     }
 
     private fun onSubmit() {
-        if (mAccount == null || mBuyCoin == null || mBuyAmount == null || mSellAmount == null) {
+        if (account == null || buyCoin == null || buyAmount == null || sellAmount == null) {
             return
         }
         if (isBuying) {
@@ -555,20 +557,20 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.startDialog { ctx ->
             TxConfirmStartDialog.Builder(ctx, R.string.dialog_title_exchange_begin)
                     .setFirstLabel(R.string.dialog_label_exchange_you_will_spend)
-                    .setFirstValue(mSellAmount!!.humanize())
-                    .setFirstCoin(mAccount!!.coin!!.symbol)
+                    .setFirstValue(sellAmount!!.humanize())
+                    .setFirstCoin(account!!.coin!!.symbol)
                     .setSecondLabel(R.string.dialog_label_exchange_to_get)
-                    .setSecondValue(mBuyAmount!!)
-                    .setSecondCoin(mBuyCoin!!.symbol)
+                    .setSecondValue(buyAmount!!)
+                    .setSecondCoin(buyCoin!!.symbol)
                     .setPositiveAction(R.string.btn_confirm) { _, _ ->
                         val type: ConvertTransactionData.Type = when {
-                            mUseMax.get() -> ConvertTransactionData.Type.SellAll
+                            useMax.get() -> ConvertTransactionData.Type.SellAll
                             isBuying -> ConvertTransactionData.Type.Buy
                             else -> ConvertTransactionData.Type.Sell
                         }
-                        val amount = if (isBuying) mBuyAmount else mSellAmount
+                        val amount = if (isBuying) buyAmount else sellAmount
                         val txData = ConvertTransactionData(
-                                type, mGasCoin!!, mAccount!!.coin, mBuyCoin!!, amount!!, mEstimate!!)
+                                type, gasCoin!!, account!!.coin, buyCoin!!, amount!!, estimateAmount!!, swapFrom)
 
                         onStartExecuteTransaction(txData)
                     }
@@ -580,7 +582,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private val operationType: OperationType
         get() {
             return when {
-                mUseMax.get() -> OperationType.SellAllCoins
+                useMax.get() -> OperationType.SellAllCoins
                 isBuying -> OperationType.BuyCoin
                 else -> OperationType.SellCoin
             }
@@ -591,21 +593,21 @@ abstract class ExchangePresenter<V : ExchangeView>(
      */
     private fun onAmountChangedInternal(buying: Boolean) {
         Timber.d("OnAmountChangedInternal")
-        if (mBuyCoin == null) {
+        if (buyCoin == null) {
             Timber.i("Can't exchange: coin is not set")
             return
         }
-        if (mAccount == null) {
+        if (account == null) {
             Timber.i("Can't exchange until user account is not loaded")
             return
         }
         val calculator = ExchangeCalculator.Builder(
                 estimateRepository,
-                { mAccounts },
-                { mAccount!! },
-                { mBuyCoin!! },
-                { mBuyAmount ?: BigDecimal.ZERO },
-                { mSellAmount ?: BigDecimal.ZERO })
+                { accounts },
+                { account!! },
+                { buyCoin!! },
+                { buyAmount ?: BigDecimal.ZERO },
+                { sellAmount ?: BigDecimal.ZERO })
                 .doOnSubscribe { it.disposeOnDestroy() }
                 .build()
 
@@ -613,14 +615,15 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.showCalculationProgress(true)
         calculator.calculate(operationType,
                 { res: CalculationResult ->
-                    mEstimate = res.estimate
-                    mGasCoin = res.gasCoin
+                    estimateAmount = res.estimate
+                    gasCoin = res.gasCoin
+                    swapFrom = res.swapFrom
 
                     // we calculating estimate, so values are inverted
                     if (buying) {
-                        mSellAmount = res.amount
+                        sellAmount = res.amount
                     } else {
-                        mBuyAmount = res.amount
+                        buyAmount = res.amount
                     }
                     viewState.setError("income_coin", null)
                     viewState.showCalculationProgress(false)
@@ -636,13 +639,13 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private fun onAccountSelected(coinAccount: CoinBalance?, initial: Boolean) {
         if (coinAccount == null) return
-        mGasCoin = coinAccount.coin.id
-        mAccount = coinAccount
+        gasCoin = coinAccount.coin.id
+        account = coinAccount
         viewState.setOutAccountName("${coinAccount.coin} (${coinAccount.amount.humanize()})")
-        mCurrentCoin = coinAccount.coin
+        currentCoin = coinAccount.coin
 
         if (!initial) {
-            mInputChange!!.onNext(isBuying)
+            inputChangeSubject!!.onNext(isBuying)
         }
     }
 

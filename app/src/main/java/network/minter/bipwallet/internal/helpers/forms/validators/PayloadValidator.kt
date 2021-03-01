@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,6 +27,7 @@ package network.minter.bipwallet.internal.helpers.forms.validators
 
 import com.edwardstock.inputfield.form.validators.BaseValidator
 import io.reactivex.Single
+import network.minter.blockchain.models.operational.Transaction
 import java.nio.charset.StandardCharsets
 
 /**
@@ -34,7 +35,7 @@ import java.nio.charset.StandardCharsets
  */
 class PayloadValidator
 @JvmOverloads constructor(
-        errorMessage: CharSequence = "Maximum payload length is 1024",
+        errorMessage: CharSequence = "Maximum payload length is 10000",
         required: Boolean = false
 ) : BaseValidator(errorMessage, required) {
 
@@ -49,6 +50,6 @@ class PayloadValidator
     }
 
     companion object {
-        const val MAX_PAYLOAD_LENGTH = 1024
+        const val MAX_PAYLOAD_LENGTH = Transaction.MAX_PAYLOAD_LENGTH
     }
 }

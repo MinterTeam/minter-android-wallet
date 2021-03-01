@@ -83,8 +83,8 @@ ext {
     minterBlockchainSDK = "2.0.0"
     minterCoreSDK = "1.1.0"
     minterLedgerSDK = "0.1.0"
-    roomVersion = "2.2.5"
+    roomVersion = "2.2.6"
 
-    appVersionName = "2.3.0-beta01"
-    appVersionCode = 211
+    appVersionName = "2.3.0-beta02"
+    appVersionCode = 212
 }

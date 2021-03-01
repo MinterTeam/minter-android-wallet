@@ -116,8 +116,6 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_vote_update)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = "Version: ${data.version}"
-            itemAmount.visible = false
-            itemSubamount.visible = false
         }
     }
 
@@ -128,8 +126,6 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_vote_commission)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = "Vote for commissions"
-            itemAmount.visible = false
-            itemSubamount.visible = false
         }
     }
 
@@ -193,7 +189,6 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_edit_candidate_commission)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.pubKey.toShortString()
-            itemAmount.text = "${data.commission}%"
             itemSubamount.visible = false
         }
     }
@@ -203,10 +198,10 @@ class TxAllViewHolder(
 
         binding.apply {
             itemTitleType.setText(R.string.tx_type_exchange)
-            itemTitle.text = "${data.coinToSell} –> ${data.coinToBuy}"
+            itemTitle.text = "${data.coinFirst} –> ${data.coinLast}"
             itemAvatar.setImageResource(R.drawable.img_avatar_exchange)
             itemAmount.text = data.valueToBuy.humanize()
-            itemSubamount.text = data.coinToBuy?.symbol ?: ""
+            itemSubamount.text = data.coinLast?.symbol ?: ""
         }
     }
 

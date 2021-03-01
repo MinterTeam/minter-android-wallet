@@ -573,7 +573,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         // add to fee payload length fee (each byte is 0.200 units)
         var fee = baseFee + (BigDecimal(bytesLen) * BigDecimal("0.200"))
         fee *= gasPrice.toBigDecimal()
-        viewState.setFee(String.format("%s %s", fee, MinterSDK.DEFAULT_COIN))
+        viewState.setFee(String.format("%s %s", fee.humanize(), MinterSDK.DEFAULT_COIN))
     }
 
     fun toggleEditing() {
@@ -1047,6 +1047,14 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                 "10¹⁵ (max)"
                             }
                         }
+                        .add {
+                            label = "Mintable"
+                            text = if (data.isMintable) "Yes" else "No"
+                        }
+                        .add {
+                            label = "Burnable"
+                            text = if (data.isBurnable) "Yes" else "No"
+                        }
                         .build()
                 allRows.addAll(rows)
             }
@@ -1450,7 +1458,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 data.nameValueMap().forEach { kv ->
                     rows.add {
                         label = "Commission: ${kv.key}"
-                        text = "${kv.value.humanize()} ${MinterSDK.DEFAULT_COIN}"
+                        text = "${kv.value.toBigDecimal().multiply(OperationType.FEE_BASE).humanize()} ${MinterSDK.DEFAULT_COIN}"
                     }
                 }
                 allRows.addAll(rows.build())
@@ -1477,7 +1485,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     inputGroup.addValidator(inputField, PayloadValidator())
                     inputField.hint = Wallet.app().res().getString(R.string.label_payload_type)
                     inputGroup.addFilter(inputField) { source, _, _, _, _, _ ->
-                        if (inputField.text.toString().toByteArray().size >= 1024) {
+                        if (inputField.text.toString().toByteArray().size >= PayloadValidator.MAX_PAYLOAD_LENGTH) {
                             ""
                         } else {
                             source

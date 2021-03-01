@@ -457,54 +457,55 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
             HistoryTransaction.Type.SellSwapPool -> {
                 viewState.showTo(false)
-                viewState.inflateDetails(R.layout.tx_details_exchange) {
-                    val b = TxDetailsExchangeBinding.bind(it)
+                viewState.inflateDetails(R.layout.tx_details_exchange_pool) {
+                    val b = TxDetailsExchangePoolBinding.bind(it)
 
                     val data: HistoryTransaction.TxSellSwapPoolResult = tx.getData()
-                    if (data.coins.size >= 1) {
-                        b.valueFromCoin.text = data.coins[0].symbol
+                    val sb = StringBuilder()
+
+                    data.coins.forEachIndexed { idx, coin ->
+                        sb.append(coin.symbol)
+                        if (idx < data.coins.size - 1) {
+                            sb.append(" > ")
+                        }
                     }
-                    if (data.coins.size >= 2) {
-                        b.valueToCoin.text = data.coins[1].symbol
-                    }
-//                    b.valueFromCoin.text = data.coinToSell.symbol
-//                    b.valueToCoin.text = data.coinToBuy.symbol
+                    b.valueCoinChain.text = sb.toString()
                     b.valueAmountReceived.text = data.valueToBuy.humanize()
                     b.valueAmountSpent.text = data.valueToSell.humanize()
                 }
             }
             HistoryTransaction.Type.SellAllSwapPool -> {
                 viewState.showTo(false)
-                viewState.inflateDetails(R.layout.tx_details_exchange) {
-                    val b = TxDetailsExchangeBinding.bind(it)
+                viewState.inflateDetails(R.layout.tx_details_exchange_pool) {
+                    val b = TxDetailsExchangePoolBinding.bind(it)
 
                     val data: HistoryTransaction.TxSellAllSwapPoolResult = tx.getData()
-                    if (data.coins.size >= 1) {
-                        b.valueFromCoin.text = data.coins[0].symbol
+                    val sb = StringBuilder()
+                    data.coins.forEachIndexed { idx, coin ->
+                        sb.append(coin.symbol)
+                        if (idx < data.coins.size - 1) {
+                            sb.append(" > ")
+                        }
                     }
-                    if (data.coins.size >= 2) {
-                        b.valueToCoin.text = data.coins[1].symbol
-                    }
-//                    b.valueFromCoin.text = data.coinToSell.symbol
-//                    b.valueToCoin.text = data.coinToBuy.symbol
+                    b.valueCoinChain.text = sb.toString()
                     b.valueAmountReceived.text = data.valueToBuy.humanize()
                     b.valueAmountSpent.text = data.valueToSell.humanize()
                 }
             }
             HistoryTransaction.Type.BuySwapPool -> {
                 viewState.showTo(false)
-                viewState.inflateDetails(R.layout.tx_details_exchange) {
-                    val b = TxDetailsExchangeBinding.bind(it)
+                viewState.inflateDetails(R.layout.tx_details_exchange_pool) {
+                    val b = TxDetailsExchangePoolBinding.bind(it)
 
                     val data: HistoryTransaction.TxBuySwapPoolResult = tx.getData()
-                    if (data.coins.size >= 1) {
-                        b.valueFromCoin.text = data.coins[0].symbol
+                    val sb = StringBuilder()
+                    data.coins.forEachIndexed { idx, coin ->
+                        sb.append(coin.symbol)
+                        if (idx < data.coins.size - 1) {
+                            sb.append(" > ")
+                        }
                     }
-                    if (data.coins.size >= 2) {
-                        b.valueToCoin.text = data.coins[1].symbol
-                    }
-//                    b.valueFromCoin.text = data.coinToSell.symbol
-//                    b.valueToCoin.text = data.coinToBuy.symbol
+                    b.valueCoinChain.text = sb.toString()
                     b.valueAmountReceived.text = data.valueToBuy.humanize()
                     b.valueAmountSpent.text = data.valueToSell.humanize()
                 }
@@ -556,6 +557,8 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                     b.valueCoinName.text = data.name
                     b.valueCoinSymbol.text = data.symbol
                     b.valueInitialAmount.text = data.initialAmount.humanize()
+                    b.valueMintable.setText(if (data.mintable) R.string.yes else R.string.no)
+                    b.valueBurnable.setText(if (data.burnable) R.string.yes else R.string.no)
 
                     b.valueMaxSupply.text = if (data.maxSupply < BigDecimal("10").pow(15)) {
                         data.maxSupply.humanize()
@@ -565,13 +568,21 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
                 }
             }
             HistoryTransaction.Type.VoteCommission -> {
-                viewState.showTo(false)
+                val data: HistoryTransaction.TxVoteCommissionResult = tx.getData()
+
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
+                viewState.setToName(_tx?.toName)
+                viewState.setToAddress(data.pubKey.toString())
 
             }
             HistoryTransaction.Type.VoteUpdate -> {
-                viewState.showTo(false)
+                val data: HistoryTransaction.TxVoteUpdateResult = tx.getData()
+
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
+                viewState.setToName(_tx?.toName)
+                viewState.setToAddress(data.pubKey.toString())
+
                 viewState.inflateDetails(R.layout.tx_details_vote_update) {
-                    val data: HistoryTransaction.TxVoteUpdateResult = tx.getData()
                     val b = TxDetailsVoteUpdateBinding.bind(it)
                     b.valueVersion.text = data.version
                 }

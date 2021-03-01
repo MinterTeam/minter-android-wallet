@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,6 +34,7 @@ import network.minter.bipwallet.internal.exceptions.GateResponseException
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.firstOptional
+import network.minter.blockchain.api.EstimateSwapFrom
 import network.minter.blockchain.models.BlockchainStatus
 import network.minter.blockchain.models.ExchangeBuyValue
 import network.minter.blockchain.models.ExchangeSellValue
@@ -83,22 +84,28 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                         onErrorMessage(res.message ?: "Coin to buy not exists")
                                         return@subscribe
                                     } else {
-                                        Timber.w(GateResponseException(res))
+                                        if (res.message?.equals("not possible to exchange") == true) {
+                                            Timber.d(GateResponseException(res))
+                                        } else {
+                                            Timber.w(GateResponseException(res))
+                                        }
+
                                         onErrorMessage(res.message ?: "Error:${res.status.name}")
                                         return@subscribe
                                     }
                                 }
                                 out.amount = res.result.amount
                                 out.commission = res.result.getCommission()
+                                out.swapFrom = res.result.swapFrom
 
-                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
+                                val bipAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
                                 val getAccount = findAccountByCoin(sourceCoin)
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
 
-                                if (mntAccount.get().amount >= OperationType.BuyCoin.fee) {
+                                if (bipAccount.get().amount >= OperationType.BuyCoin.fee) {
                                     Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
 
-                                    out.gasCoin = mntAccount.get().coin.id
+                                    out.gasCoin = bipAccount.get().coin.id
                                     out.estimate = res.result.amount
                                     out.calculation = String.format("%s %s", bdHuman(res.result.amount), sourceCoin)
 
@@ -151,6 +158,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                 val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
                                 val getAccount = findAccountByCoin(sourceCoin)
                                 out.estimate = res.result.amount
+                                out.swapFrom = res.result.swapFrom
 
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
 
@@ -244,7 +252,8 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
             var estimate: BigDecimal = BigDecimal.ZERO,
             var amount: BigDecimal = BigDecimal.ZERO,
             var calculation: String? = null,
-            var commission: BigDecimal = BigDecimal.ZERO
+            var commission: BigDecimal = BigDecimal.ZERO,
+            var swapFrom: EstimateSwapFrom = EstimateSwapFrom.Default
     )
 
 }
