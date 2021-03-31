@@ -90,6 +90,7 @@ import javax.inject.Inject
  */
 
 private const val REQUEST_CODE_SELECT_VALIDATOR = 4000
+private const val DELEGATION_BLOCKS_RECOUNT = 720L
 
 @InjectViewState
 class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateUnbondView>(), ErrorManager.ErrorGlobalHandlerListener {
@@ -628,9 +629,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         rewardsMonthlyRepo.update(true)
         validatorsRepo.entity.writeLastUsed(toValidatorItem)
 
-        val height = result.result?.transaction?.height?.toLong() ?: 120L
+        val height = result.result?.transaction?.height?.toLong() ?: DELEGATION_BLOCKS_RECOUNT
 
-        val leftSeconds: Float = (120f - (height % 120)) * 5f
+        val leftSeconds: Float = (DELEGATION_BLOCKS_RECOUNT - (height % DELEGATION_BLOCKS_RECOUNT)) * 5f
         val msg = "Please allow ~${Plurals.timeValue(leftSeconds.toLong())} ${Plurals.timeUnitShort(leftSeconds.toLong())} for your delegated balance to update."
 
         viewState.startDialog {
