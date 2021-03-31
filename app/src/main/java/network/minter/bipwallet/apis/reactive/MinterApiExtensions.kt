@@ -146,7 +146,7 @@ fun TxVoteCommission.nameValueMap(): Map<String, BigInteger> {
             Pair("Declare Candidacy", declareCandidacy),
             Pair("Delegate", delegate),
             Pair("Unbond", unbond),
-            Pair("Move Stake", moveStake),
+//            Pair("Move Stake", moveStake),
             Pair("Redeem Check", redeemCheck),
             Pair("Set Candidate On", setCandidateOn),
             Pair("Set Candidate Off", setCandidateOff),
@@ -159,7 +159,6 @@ fun TxVoteCommission.nameValueMap(): Map<String, BigInteger> {
             Pair("Edit Candidate Commission", editCandidateCommission),
             Pair("Set Halt Block", setHaltBlock),
             Pair("Edit Ticker Owner", editTickerOwner),
-            Pair("Vote for Price", priceVote),
             Pair("Vote for Update", voteUpdate),
             Pair("Vote for Commissions", voteCommission),
     )

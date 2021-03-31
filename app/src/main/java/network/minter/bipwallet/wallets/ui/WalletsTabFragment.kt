@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -165,11 +165,11 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 binding.containerSwipeRefresh.isEnabled = expandedPercent == 1.0f
             }
         })
-        binding.walletSelector.registerLifecycle(activity!!)
+        binding.walletSelector.registerLifecycle(requireActivity())
 //        CollapsingToolbarScrollDisabler(binding)
 
         LastBlockHandler.handle(binding.balanceUpdatedLabel, null, LastBlockHandler.ViewType.Main)
-        val broadcastManager = BroadcastReceiverManager(activity!!)
+        val broadcastManager = BroadcastReceiverManager(requireActivity())
         broadcastManager.add(RTMBlockReceiver {
             LastBlockHandler.handle(binding.balanceUpdatedLabel, it, LastBlockHandler.ViewType.Main)
         })
@@ -180,7 +180,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
         binding.appbar.addOnOffsetChangedListener(mRecolorHelper)
         setHasOptionsMenu(true)
-        activity!!.menuInflater.inflate(R.menu.menu_wallets_toolbar, binding.toolbar.menu)
+        requireActivity().menuInflater.inflate(R.menu.menu_wallets_toolbar, binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
         setupTabAdapter()
         return binding.root
@@ -467,19 +467,23 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun hideStoriesList() {
-        if (storiesListFragment == null) {
-            return
+        synchronized(storiesListLock) {
+            if (storiesListFragment == null) {
+                return
+            }
+
+            childFragmentManager.beginTransaction()
+                    .remove(storiesListFragment!!)
+                    .commit()
+
+            storiesListFragment = null
         }
-
-        childFragmentManager.beginTransaction()
-                .remove(storiesListFragment!!)
-                .commit()
-
-        storiesListFragment = null
     }
 
     override fun setStoriesListData(items: List<Story>) {
-        storiesListFragment?.setData(items)
+        synchronized(storiesListLock) {
+            storiesListFragment?.setData(items)
+        }
     }
 
     fun startStoriesPager(stories: List<Story>, startPosition: Int, sharedImage: View) {

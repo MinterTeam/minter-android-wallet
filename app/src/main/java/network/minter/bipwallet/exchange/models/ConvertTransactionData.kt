@@ -53,7 +53,6 @@ class ConvertTransactionData(
 
     var isBasicExchange: Boolean = true
 
-    //ssh -R 8123:localhost:8123 fvds
     @Throws(OperationInvalidDataException::class)
     fun build(nonce: BigInteger, gasPrice: BigInteger, balance: BigDecimal?): Transaction {
         val tx: Transaction
