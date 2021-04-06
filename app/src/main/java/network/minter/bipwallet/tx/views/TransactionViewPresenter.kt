@@ -374,10 +374,14 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
             }
             HistoryTransaction.Type.SetHaltBlock -> {
-                viewState.showTo(false)
+                val data: HistoryTransaction.TxSetHaltBlockResult = tx.getData()
+
+                viewState.setToAvatar(_tx?.toAvatar, R.drawable.img_avatar_candidate)
+                viewState.setToName(_tx?.toName)
+                viewState.setToAddress(data.publicKey.toString())
 
                 viewState.inflateDetails(R.layout.tx_details_set_halt_block) {
-                    val data: HistoryTransaction.TxSetHaltBlockResult = tx.getData()
+
                     val b = TxDetailsSetHaltBlockBinding.bind(it)
                     b.valuePublicKey.text = data.publicKey.toString()
                     b.valuePublicKey.copyOnClick()
