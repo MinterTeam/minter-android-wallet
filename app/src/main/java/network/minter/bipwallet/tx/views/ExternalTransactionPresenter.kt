@@ -1457,6 +1457,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 label = "You're voting for update"
                                                 text = "Version: ${data.version}"
                                             }
+                                            .add {
+                                                label = "Public Key"
+                                                text = data.pubKey.toString()
+                                            }
                                             .build()
 
                                     allRows.addAll(rows)
