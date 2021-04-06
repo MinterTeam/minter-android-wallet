@@ -100,7 +100,7 @@ class TxInitData {
 
     fun calculateFeeText(opType: OperationType): CharSequence {
         return if (gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
-            String.format("%s %s", priceCommissions.getByType(opType), MinterSDK.DEFAULT_COIN)
+            String.format("%s %s", priceCommissions.getByType(opType).humanize(), gasRepresentingCoin.symbol)
         } else {
             val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
             String.format("%s %s (%s %s)",

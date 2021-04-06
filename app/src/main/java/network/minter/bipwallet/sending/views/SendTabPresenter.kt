@@ -402,7 +402,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     }
 
     private fun setupFee() {
-        if (initFeeData != null && initFeeData?.gasRepresentingCoin != DEFAULT_COIN_ID) {
+        if (initFeeData != null && initFeeData?.gasRepresentingCoin?.id != DEFAULT_COIN_ID) {
             sendFee = initFeeData!!.priceCommissions.send.humanizeDecimal().multiply(gasPrice.toBigDecimal())
             sendFee = sendFee!! + payloadFee
             val fee: String = String.format("%s %s (%s %s)",
@@ -413,7 +413,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
             viewState.setFee(fee)
         } else {
-            sendFee = OperationType.SendCoin.fee.multiply(BigDecimal(gasPrice))
+            sendFee = initFeeData!!.priceCommissions.send.humanizeDecimal() * gasPrice.toBigDecimal()
             sendFee = sendFee!! + payloadFee
             val fee: String = String.format("%s %s", sendFee!!.humanize(), DEFAULT_COIN)
             viewState.setFee(fee)
