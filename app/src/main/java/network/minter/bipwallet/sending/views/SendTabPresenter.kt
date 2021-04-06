@@ -48,6 +48,7 @@ import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
+import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
 import network.minter.bipwallet.home.HomeScope
 import network.minter.bipwallet.internal.Wallet
@@ -59,6 +60,7 @@ import network.minter.bipwallet.internal.exceptions.humanDetailsMessage
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.MathHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.normalize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
@@ -106,7 +108,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     companion object {
         private const val REQUEST_CODE_QR_SCAN_ADDRESS = 101
         private const val REQUEST_CODE_ADDRESS_BOOK_SELECT = 102
-        private val PAYLOAD_FEE = BigDecimal.valueOf(0.200)
+        private var PAYLOAD_FEE = BigDecimal.valueOf(0.200)
     }
 
     @Inject lateinit var secretStorage: SecretStorage
@@ -121,6 +123,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     @Inject lateinit var addressBookRepo: AddressBookRepository
     @Inject lateinit var walletSelectorController: WalletSelectorController
     @Inject lateinit var errorManager: ErrorManager
+    @Inject lateinit var initDataRepo: TxInitDataRepository
 
     private var mFromAccount: CoinBalance? = null
     private var mAmount: BigDecimal? = null
@@ -132,9 +135,10 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     private var mInputChange: BehaviorSubject<String>? = null
     private var mAddressChange: BehaviorSubject<String>? = null
     private var mGasCoinId = DEFAULT_COIN_ID
-    private var mGasPrice = BigInteger("1")
+    private var gasPrice = BigInteger("1")
+    private var initFeeData: TxInitData? = null
     private var mLastAccount: CoinBalance? = null
-    private var mSendFee: BigDecimal? = null
+    private var sendFee: BigDecimal? = null
     private var mPayload: ByteArray? = null
     private var handleAutocomplete: Boolean = true
     private var mFormValid = false
@@ -379,34 +383,53 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     }
 
     private fun loadAndSetFee() {
-        gasRepo.minGas
+        initDataRepo.loadFeeWithTx()
                 .retryWhen(errorManager.retryWhenHandler)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(
-                        { res: GateResult<GasValue> ->
-                            if (res.isOk) {
-                                mGasPrice = res.result.gas
-                                Timber.d("Min Gas price: %s", mGasPrice.toString())
-                                setupFee()
-                            }
+                        { res: TxInitData ->
+                            gasPrice = res.gas!!
+                            PAYLOAD_FEE = res.priceCommissions.payloadByte.humanizeDecimal()
+                            initFeeData = res
+                            setupFee()
                         },
-                        { e: Throwable? ->
-                            mGasPrice = BigInteger.ONE
+                        { e ->
+                            gasPrice = BigInteger.ONE
                             Timber.w(e, "Unable to get min gas price for sending")
                         }
                 )
     }
 
     private fun setupFee() {
-        mSendFee = OperationType.SendCoin.fee.multiply(BigDecimal(mGasPrice))
-        mSendFee = mSendFee!! + payloadFee
-        val fee: String = String.format("%s %s", mSendFee!!.humanize(), DEFAULT_COIN)
-        viewState.setFee(fee)
+        if (initFeeData != null && initFeeData?.gasRepresentingCoin != DEFAULT_COIN_ID) {
+            sendFee = initFeeData!!.priceCommissions.send.humanizeDecimal().multiply(gasPrice.toBigDecimal())
+            sendFee = sendFee!! + payloadFee
+            val fee: String = String.format("%s %s (%s %s)",
+                    sendFee!!.multiply(initFeeData!!.gasBaseCoinRate).humanize(),
+                    DEFAULT_COIN,
+                    sendFee!!.humanize(),
+                    initFeeData!!.gasRepresentingCoin.symbol)
+
+            viewState.setFee(fee)
+        } else {
+            sendFee = OperationType.SendCoin.fee.multiply(BigDecimal(gasPrice))
+            sendFee = sendFee!! + payloadFee
+            val fee: String = String.format("%s %s", sendFee!!.humanize(), DEFAULT_COIN)
+            viewState.setFee(fee)
+        }
+
     }
 
     private val payloadFee: BigDecimal
         get() = BigDecimal.valueOf(firstNonNull(mPayload, ByteArray(0)).size.toLong()).multiply(PAYLOAD_FEE)
+
+    private val payloadFeeBIP: BigDecimal
+        get() = payloadFee.multiply(initFeeData!!.gasBaseCoinRate)
+
+    private val sendFeeBIP: BigDecimal
+        get() = sendFee!!.multiply(initFeeData!!.gasBaseCoinRate)
+
 
     private fun checkEnoughBalance(amount: BigDecimal): Boolean {
         if (mFromAccount!!.coin!!.id != DEFAULT_COIN_ID) {
@@ -538,7 +561,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         val preTx: Transaction
         val builder = Transaction.Builder(BigInteger("1"))
                 .setGasCoinId(mGasCoinId)
-                .setGasPrice(mGasPrice)
+                .setGasPrice(gasPrice)
 
         if (mPayload != null && mPayload!!.isNotEmpty()) {
             builder.setPayload(mPayload)
@@ -559,7 +582,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         val tx: Transaction
         val builder = Transaction.Builder(nonce)
                 .setGasCoinId(mGasCoinId)
-                .setGasPrice(mGasPrice)
+                .setGasPrice(gasPrice)
         if (mPayload != null && mPayload!!.isNotEmpty()) {
             builder.setPayload(mPayload)
         }
@@ -574,7 +597,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     }
 
     private val fee: BigDecimal
-        get() = (OperationType.SendCoin.fee + payloadFee) * mGasPrice.toBigDecimal()
+        get() = sendFeeBIP * gasPrice.toBigDecimal()
 
     private val feeNormalized: BigInteger
         get() = fee.normalize()
@@ -832,7 +855,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         // clear form
         mAmount = null
         mRecipient = null
-        mSendFee = null
+        sendFee = null
         viewState.hidePayload()
         viewState.clearInputs()
         viewState.setSubmitEnabled(false)

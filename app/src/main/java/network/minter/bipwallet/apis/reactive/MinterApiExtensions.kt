@@ -115,7 +115,7 @@ fun Int.dp(): Float {
 }
 
 fun TxVoteCommission.nameValueMap(): Map<String, BigInteger> {
-    return hashMapOf(
+    return linkedMapOf(
             Pair("Payload Byte", payloadByte),
             Pair("Send", send),
             Pair("Buy Bancor", buyBancor),

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -178,6 +178,17 @@
                 app:layout_constraintStart_toEndOf="@id/fee_label"
                 app:layout_constraintTop_toBottomOf="@id/label_guide"
                 tools:text="@string/tx_send_fee_value" />
+
+            <network.minter.bipwallet.internal.views.widgets.ColoredProgressBar
+                android:id="@+id/fee_progress"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="24dp"
+                android:visibility="visible"
+                app:color="@color/colorPrimaryLight"
+                app:layout_constraintBottom_toBottomOf="@id/fee_value"
+                app:layout_constraintEnd_toEndOf="@id/fee_value"
+                app:layout_constraintTop_toTopOf="@id/fee_value" />
 
             <Space
                 android:id="@+id/button_guide"

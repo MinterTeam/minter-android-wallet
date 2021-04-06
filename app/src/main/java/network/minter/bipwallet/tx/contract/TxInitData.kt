@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,11 +27,12 @@
 package network.minter.bipwallet.tx.contract
 
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
+import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.blockchain.models.TransactionCommissionValue
+import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.MinterSDK
-import network.minter.explorer.models.GasValue
-import network.minter.explorer.models.GateResult
-import network.minter.explorer.models.TxCount
+import network.minter.explorer.models.*
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -39,7 +40,11 @@ class TxInitData {
     var nonce: BigInteger? = null
     var gas: BigInteger? = null
     var gasCoin: BigInteger = MinterSDK.DEFAULT_COIN_ID
+    var gasRepresentingCoin: CoinItemBase = CoinItemBase(MinterSDK.DEFAULT_COIN_ID, MinterSDK.DEFAULT_COIN)
+    var gasBaseCoinRate: BigDecimal = BigDecimal.ONE
+    var priceCommissions: PriceCommissions = PriceCommissions()
     var commission: BigDecimal? = null
+    var payloadFee: BigDecimal = BigDecimal("0.200")
     var errorResult: GateResult<*>? = null
 
     constructor(vararg values: GateResult<*>) {
@@ -85,6 +90,24 @@ class TxInitData {
             is TxCount -> {
                 nonce = (src.result as TxCount).count
             }
+            is PriceCommissions -> {
+                val pc = src.result as PriceCommissions
+                gasRepresentingCoin = pc.coin
+                priceCommissions = pc
+            }
+        }
+    }
+
+    fun calculateFeeText(opType: OperationType): CharSequence {
+        return if (gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
+            String.format("%s %s", priceCommissions.getByType(opType), MinterSDK.DEFAULT_COIN)
+        } else {
+            val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
+            String.format("%s %s (%s %s)",
+                    fee.multiply(gasBaseCoinRate).humanize(),
+                    MinterSDK.DEFAULT_COIN,
+                    fee.humanize(),
+                    gasRepresentingCoin.symbol)
         }
     }
 }

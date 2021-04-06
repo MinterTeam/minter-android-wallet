@@ -70,7 +70,6 @@ import network.minter.bipwallet.sending.account.selectorDataFromDelegatedAccount
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.TransactionSender
 import network.minter.bipwallet.tx.contract.TxInitData
-import network.minter.blockchain.models.operational.OperationType
 import network.minter.blockchain.models.operational.Transaction
 import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.MinterSDK
@@ -115,7 +114,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var useMax = false
     private var amount = BigDecimal.ZERO
     private var gas = BigInteger.ONE
-    private var fee = BigDecimal.ZERO
+    private var initFeeData: TxInitData? = null
     private var clickedUseMax: Boolean = false
     private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
     private var txSender: TransactionSender? = null
@@ -175,7 +174,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             }
         }
 
-        setupFee()
+        loadAndSetFee()
 
         viewState.setOnClickUseMax {
             clickedUseMax = true
@@ -368,26 +367,20 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         viewState.setValidatorSelectSuffix(::startValidatorSelector)
     }
 
-    private fun setupFee() {
-        initDataRepo.gasRepo.minGas
+    private fun loadAndSetFee() {
+        initDataRepo.loadFeeWithTx()
                 .retryWhen(errorManager.retryWhenHandler)
-                .joinToUi()
-                .map {
-                    val txFee = when (type) {
-                        Type.Delegate -> OperationType.Delegate.fee
-                        Type.Unbond -> OperationType.Unbound.fee
-                    }
-
-                    gas = (it.result?.gas ?: BigInteger.ONE)
-                    txFee * gas.toBigDecimal()
-                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .subscribe(
-                        {
-                            fee = it
-                            viewState.setFee("${it.humanize()} ${MinterSDK.DEFAULT_COIN}")
+                        { res: TxInitData ->
+                            gas = res.gas!!
+                            initFeeData = res
+                            viewState.setFee(res.calculateFeeText(type.opType))
                         },
-                        { t ->
-                            Timber.w(t, "Can't setup fee")
+                        { e ->
+                            gas = BigInteger.ONE
+                            Timber.w(e, "Unable to get min gas price for sending")
                         }
                 )
                 .disposeOnDestroy()
@@ -451,7 +444,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         }
 
     private fun onSubmit() {
-        setupFee()
+        loadAndSetFee()
 
         txSender = TransactionSender(secretStorage.mainWallet, initDataRepo, gateRepo)
         txSender!!.startListener = {

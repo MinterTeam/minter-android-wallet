@@ -53,7 +53,7 @@ import java.math.BigInteger
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 class ExchangeCalculator private constructor(private val mBuilder: Builder) {
-    fun calculate(opType: OperationType, onResult: (CalculationResult) -> Unit, onErrorMessage: (String) -> Unit) {
+    fun calculate(buyCoins: Boolean, onResult: (CalculationResult) -> Unit, onErrorMessage: (String) -> Unit) {
         val repo = mBuilder.estimateRepo
 
 
@@ -66,7 +66,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
             return
         }
 
-        if (opType == OperationType.BuyCoin) {
+        if (buyCoins) {
             // get (buy)
             repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin)
                     .subscribeOn(Schedulers.io())

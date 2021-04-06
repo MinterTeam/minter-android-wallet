@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -101,6 +101,7 @@ class ExternalTransactionActivity : BaseMvpInjectActivity(), ExternalTransaction
         if (fee.isEmpty()) {
             return
         }
+        b.feeProgress.visible = false
         b.feeValue.text = fee
         if (startsFromNumber(fee)) {
             b.feeLabel.visibility = View.VISIBLE

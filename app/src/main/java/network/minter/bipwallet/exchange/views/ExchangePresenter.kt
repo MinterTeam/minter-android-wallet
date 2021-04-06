@@ -42,6 +42,7 @@ import io.reactivex.subjects.BehaviorSubject
 import network.minter.bipwallet.R
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
+import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.apis.reactive.*
 import network.minter.bipwallet.apis.reactive.ReactiveGate.toGateError
 import network.minter.bipwallet.coins.RepoCoins
@@ -59,10 +60,10 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.exceptions.humanDetailsMessage
-import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -99,8 +100,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         protected val mTxRepo: RepoTransactions,
         protected val mExplorerCoinsRepo: RepoCoins,
         protected val gasRepo: GateGasRepository,
-        protected val estimateRepository: GateEstimateRepository,
+        protected val estimateRepo: GateEstimateRepository,
         protected val mGateTxRepo: GateTransactionRepository,
+        protected val initDataRepo: TxInitDataRepository,
         protected val errorManager: ErrorManager
 ) : MvpBasePresenter<V>(), ErrorManager.ErrorGlobalReceiverListener, ErrorManager.ErrorLocalHandlerListener, ErrorManager.ErrorLocalReceiverListener {
     private var account: CoinBalance? = null
@@ -232,25 +234,31 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private val fee: BigDecimal
         get() {
-            return operationType.fee.multiply(BigDecimal(gasPrice))
+            return if (initFeeData != null && initFeeData?.priceCommissions != null) {
+                initFeeData!!.priceCommissions.getByType(operationType).humanizeDecimal().multiply(BigDecimal(gasPrice))
+            } else {
+                operationType.fee.multiply(BigDecimal(gasPrice))
+            }
         }
 
+    private var initFeeData: TxInitData? = null
+
     private fun loadAndSetFee() {
-        gasRepo.minGas
-                .retryWhen(errorManager.createLocalRetryWhenHandler(GateGasRepository::class.java))
+        initDataRepo.loadFeeWithTx()
+                .retryWhen(errorManager.retryWhenHandler)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .subscribe({ res: GateResult<GasValue> ->
-                    if (res.isOk) {
-                        gasPrice = res.result.gas
-                        Timber.d("Min Gas price: %s", gasPrice.toString())
-                        viewState.setFee(String.format("%s %s", bdHuman(fee), MinterSDK.DEFAULT_COIN))
-                    }
-                }) { e: Throwable? ->
-                    gasPrice = BigInteger.ONE
-                    Timber.w(e, "Unable to load min gas price for exchange")
-                }
+                .subscribe(
+                        { res: TxInitData ->
+                            gasPrice = res.gas!!
+                            initFeeData = res
+                            viewState.setFee(res.calculateFeeText(operationType))
+                        },
+                        { e ->
+                            gasPrice = BigInteger.ONE
+                            Timber.w(e, "Unable to get min gas price for sending")
+                        }
+                )
     }
 
     private fun checkZero(amount: BigDecimal?): Boolean {
@@ -279,7 +287,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
             dialog.setCancelable(false)
             Observable
                     .combineLatest(
-                            estimateRepository.getTransactionCount(account!!.address!!),
+                            estimateRepo.getTransactionCount(account!!.address!!),
                             gasRepo.minGas,
                             { t1: GateResult<TxCount>, t2: GateResult<GasValue> ->
                                 TxInitData(t1, t2)
@@ -313,7 +321,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     @Throws(OperationInvalidDataException::class)
     private fun signSendTx(
-            dialog: WalletProgressDialog,
+            @Suppress("UNUSED_PARAMETER") dialog: WalletProgressDialog,
             txData: ConvertTransactionData,
             initData: TxInitData,
             balance: BigDecimal): ObservableSource<GateResult<PushResult>> {
@@ -322,6 +330,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
         val tx = txData.build(initData.nonce!!.add(BigInteger.ONE), initData.gas!!, balance)
         isBasicExchange = txData.isBasicExchange
 
+        return signSendTxInternally(tx)
+        /*
         // if user created account with ledger, use it to sign tx
         return if (mSession.role == AuthSession.AuthType.Hardware) {
             dialog.setText("Please, compare transaction hashes: %s", tx.unsignedTxHash)
@@ -331,6 +341,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
             // old school signing
             signSendTxInternally(tx)
         }
+
+         */
     }
 
     private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
@@ -579,12 +591,33 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
+    private var opTypeInternal: OperationType? = null
+
     private val operationType: OperationType
         get() {
             return when {
-                useMax.get() -> OperationType.SellAllCoins
-                isBuying -> OperationType.BuyCoin
-                else -> OperationType.SellCoin
+                useMax.get() -> {
+                    if (swapFrom == EstimateSwapFrom.Bancor) {
+                        OperationType.SellAllCoins
+                    } else {
+                        OperationType.SellAllSwapPool
+                    }
+                }
+                isBuying -> {
+                    if (swapFrom == EstimateSwapFrom.Bancor) {
+                        OperationType.BuyCoin
+                    } else {
+                        OperationType.BuySwapPool
+                    }
+                }
+                else -> {
+                    if (swapFrom == EstimateSwapFrom.Bancor) {
+                        OperationType.SellCoin
+                    } else {
+                        OperationType.SellSwapPool
+                    }
+
+                }
             }
         }
 
@@ -602,7 +635,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
             return
         }
         val calculator = ExchangeCalculator.Builder(
-                estimateRepository,
+                estimateRepo,
                 { accounts },
                 { account!! },
                 { buyCoin!! },
@@ -613,11 +646,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
         viewState.setCalculation("")
         viewState.showCalculationProgress(true)
-        calculator.calculate(operationType,
+        calculator.calculate(isBuying,
                 { res: CalculationResult ->
                     estimateAmount = res.estimate
                     gasCoin = res.gasCoin
                     swapFrom = res.swapFrom
+                    Timber.d("Exchange Type: ${swapFrom.name}")
 
                     // we calculating estimate, so values are inverted
                     if (buying) {
@@ -635,6 +669,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     viewState.setError("income_coin", err)
                 }
         )
+
+        loadAndSetFee()
     }
 
     private fun onAccountSelected(coinAccount: CoinBalance?, initial: Boolean) {

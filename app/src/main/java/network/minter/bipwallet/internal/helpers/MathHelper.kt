@@ -188,6 +188,10 @@ object MathHelper {
         return Transaction.humanizeValue(this).humanize()
     }
 
+    fun BigInteger.humanizeDecimal(): BigDecimal {
+        return Transaction.humanizeValue(this)
+    }
+
     fun BigDecimal.toPlain(): String {
         return stripTrailingZeros().toPlainString()
     }

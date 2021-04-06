@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,6 +28,7 @@ package network.minter.bipwallet.exchange.views
 import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
+import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.coins.RepoCoins
 import network.minter.bipwallet.exchange.contract.SellExchangeView
 import network.minter.bipwallet.internal.auth.AuthSession
@@ -56,6 +57,7 @@ open class SellExchangePresenter @Inject constructor(
         gasRepo: GateGasRepository,
         estimateRepository: GateEstimateRepository,
         gateTransactionRepository: GateTransactionRepository,
+        txInitDataRepo: TxInitDataRepository,
         errorManager: ErrorManager) :
         ExchangePresenter<SellExchangeView>(
                 session,
@@ -66,6 +68,7 @@ open class SellExchangePresenter @Inject constructor(
                 gasRepo,
                 estimateRepository,
                 gateTransactionRepository,
+                txInitDataRepo,
                 errorManager
         ) {
     override val isBuying: Boolean
