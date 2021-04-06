@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -56,7 +56,6 @@ import network.minter.bipwallet.stories.repo.RepoCachedStories
 import network.minter.bipwallet.stories.repo.StoriesRepository
 import network.minter.core.internal.api.ApiService
 import network.minter.explorer.repo.*
-import network.minter.ledger.connector.rxjava2.RxMinterLedger
 import javax.inject.Named
 
 /**
@@ -89,7 +88,6 @@ interface WalletComponent {
 
     @Named("uuid")
     fun uuid(): String
-    fun ledger(): RxMinterLedger
 
     // helpers
     fun display(): DisplayHelper

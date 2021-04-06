@@ -224,37 +224,29 @@ dependencies {
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
     netTestLocalImplementation([
             "network.minter.android:minter-android-core-testnet:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer-testnet:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}",
-            "network.minter.android:ledger-connector-testnet:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector-testnet:${minterLedgerSDK}"
     ])
 
     netMainImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
-            "network.minter.android:ledger-connector:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
 
     netMainLocalImplementation([
             "network.minter.android:minter-android-core:${minterCoreSDK}",
             "network.minter.android:minter-android-explorer:${minterExplorerSDK}",
             "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}",
-            "network.minter.android:ledger-connector:${minterLedgerSDK}",
-            "network.minter.android:ledger-rxjava2-connector:${minterLedgerSDK}"
     ])
 
     // android
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0-alpha01'
     implementation 'androidx.cardview:cardview:1.0.0'

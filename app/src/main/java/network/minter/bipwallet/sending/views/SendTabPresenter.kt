@@ -88,7 +88,6 @@ import network.minter.core.crypto.MinterPublicKey
 import network.minter.core.crypto.PrivateKey
 import network.minter.explorer.models.*
 import network.minter.explorer.repo.*
-import network.minter.ledger.connector.rxjava2.RxMinterLedger
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
@@ -735,47 +734,13 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     }
 
     @Throws(OperationInvalidDataException::class)
-    private fun signSendTx(dialog: WalletProgressDialog, nonce: BigInteger, amountToSend: BigDecimal?): ObservableSource<GateResult<PushResult>> {
+    private fun signSendTx(@Suppress("UNUSED_PARAMETER") dialog: WalletProgressDialog, nonce: BigInteger, amountToSend: BigDecimal?): ObservableSource<GateResult<PushResult>> {
         // creating tx
         val tx = createFinalTx(nonce.add(BigInteger.ONE), amountToSend)
 
-        // if user created account with ledger, use it to sign tx
-        return if (session.role == AuthSession.AuthType.Hardware) {
-            dialog.setText("Please, compare transaction hashes: %s", tx.unsignedTxHash)
-            Timber.d("Unsigned tx hash: %s", tx.unsignedTxHash)
-            signSendTxExternally(dialog, tx)
-        } else {
-            // old school signing
-            signSendTxInternally(tx)
-        }
-    }
-
-    private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = secretStorage.getSecret(mFromAccount!!.address!!)
         val sign = tx.signSingle(data.privateKey)!!
         return gateTxRepo.sendTransaction(sign).joinToUi()
-    }
-
-    private fun signSendTxExternally(dialog: WalletProgressDialog, tx: Transaction): ObservableSource<GateResult<PushResult>> {
-        val devInstance = Wallet.app().ledger()
-        if (!devInstance.isReady) {
-            dialog.setText("Connect ledger and open Minter Application")
-        }
-        return RxMinterLedger
-                .initObserve(devInstance)
-                .flatMap { dev: RxMinterLedger ->
-                    dialog.setText("Compare hashes: " + tx.unsignedTxHash.toHexString())
-                    dev.signTxHash(tx.unsignedTxHash)
-                }
-                .toObservable()
-                .switchMap { signatureSingleData: SignatureSingleData? ->
-                    val sign = tx.signExternal(signatureSingleData)
-                    dialog.setText(R.string.tx_send_in_progress)
-                    gateTxRepo.sendTransaction(sign).joinToUi()
-                }
-                .doFinally { devInstance.destroy() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
     }
 
     private fun onExecuteComplete() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -54,7 +54,6 @@ import network.minter.bipwallet.home.HomeTabsClasses
 import network.minter.bipwallet.home.contract.HomeView
 import network.minter.bipwallet.home.views.HomePresenter
 import network.minter.bipwallet.internal.BaseMvpActivity
-import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper
@@ -175,7 +174,6 @@ class HomeActivity : BaseMvpActivity(), HomeView {
     override fun onDestroy() {
         super.onDestroy()
         HomeModule.destroy()
-        Wallet.app().ledger().destroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

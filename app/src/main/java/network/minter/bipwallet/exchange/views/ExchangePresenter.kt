@@ -53,7 +53,6 @@ import network.minter.bipwallet.exchange.models.ConvertTransactionData
 import network.minter.bipwallet.exchange.models.ExchangeAmount
 import network.minter.bipwallet.exchange.ui.ConvertCoinActivity
 import network.minter.bipwallet.exchange.ui.dialogs.TxConfirmStartDialog
-import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.auth.AuthSession
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
@@ -79,7 +78,6 @@ import network.minter.explorer.models.*
 import network.minter.explorer.repo.GateEstimateRepository
 import network.minter.explorer.repo.GateGasRepository
 import network.minter.explorer.repo.GateTransactionRepository
-import network.minter.ledger.connector.rxjava2.RxMinterLedger
 import org.parceler.Parcels
 import timber.log.Timber
 import java.math.BigDecimal
@@ -330,52 +328,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
         val tx = txData.build(initData.nonce!!.add(BigInteger.ONE), initData.gas!!, balance)
         isBasicExchange = txData.isBasicExchange
 
-        return signSendTxInternally(tx)
-        /*
-        // if user created account with ledger, use it to sign tx
-        return if (mSession.role == AuthSession.AuthType.Hardware) {
-            dialog.setText("Please, compare transaction hashes: %s", tx.unsignedTxHash)
-            Timber.d("Unsigned tx hash: %s", tx.unsignedTxHash)
-            signSendTxExternally(tx, dialog)
-        } else {
-            // old school signing
-            signSendTxInternally(tx)
-        }
-
-         */
-    }
-
-    private fun signSendTxInternally(tx: Transaction): ObservableSource<GateResult<PushResult>> {
         val data = mSecretStorage.getSecret(account!!.address!!)
         val sign = tx.signSingle(data.privateKey)!!
         return safeSubscribeIoToUi(
                 mGateTxRepo.sendTransaction(sign)
                         .onErrorResumeNext(toGateError())
         )
-    }
-
-    private fun signSendTxExternally(tx: Transaction, dialog: WalletProgressDialog): ObservableSource<GateResult<PushResult>> {
-        val devInstance = Wallet.app().ledger()
-        if (!devInstance.isReady) {
-            dialog.setText("Please, connect ledger and open Minter Application")
-        }
-        return RxMinterLedger
-                .initObserve(devInstance)
-                .flatMap { dev: RxMinterLedger ->
-                    dialog.setText("Please, compare hashes: " + tx.unsignedTxHash.toHexString())
-                    dev.signTxHash(tx.unsignedTxHash)
-                }
-                .toObservable()
-                .switchMap { signatureSingleData: SignatureSingleData? ->
-                    val sign: TransactionSign = tx.signExternal(signatureSingleData)
-                    dialog.setText(R.string.tx_convert_in_progress)
-                    safeSubscribeIoToUi(
-                            mGateTxRepo.sendTransaction(sign).onErrorResumeNext(toGateError())
-                    )
-                }
-                .doFinally { devInstance.destroy() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
     }
 
     private fun showSuccessDialog(txHash: String, value: BigDecimal, coin: CoinItemBase) {

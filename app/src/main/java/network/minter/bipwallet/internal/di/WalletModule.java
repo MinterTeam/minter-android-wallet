@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,7 +31,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
-import android.hardware.usb.UsbManager;
 import android.os.Build;
 
 import com.annimon.stream.Stream;
@@ -101,13 +100,11 @@ import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.core.internal.log.TimberLogger;
 import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.models.HistoryTransaction;
-import network.minter.ledger.connector.rxjava2.RxMinterLedger;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import timber.log.Timber;
 
-import static android.content.Context.USB_SERVICE;
 import static network.minter.bipwallet.internal.Wallet.ENABLE_CRASHLYTICS;
 
 /**
@@ -373,11 +370,6 @@ public class WalletModule {
     @WalletApp
     public SettingsManager provideSettingsManager(@DbCache KVStorage storage) {
         return new SettingsManager(storage);
-    }
-
-    @Provides
-    public RxMinterLedger provideLedger(Context context) {
-        return new RxMinterLedger(context, (UsbManager) context.getSystemService(USB_SERVICE));
     }
 
     @Provides
