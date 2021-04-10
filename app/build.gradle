@@ -193,11 +193,11 @@ android {
         netTest {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.taconet.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", '"https://explorer-api.taconet.minter.network/api/v2/"'
-            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://explorer.taconet.minter.network/api/v2"'
-            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.taconet.minter.network"'
-            buildConfigField "String", "GATE_API_URL", '"https://gate-api.taconet.minter.network/api/v2/"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", '"https://explorer-api.testnet.minter.network/api/v2/"'
+            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://explorer.testnet.minter.network/api/v2"'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
+            buildConfigField "String", "GATE_API_URL", '"https://gate-api.testnet.minter.network/api/v2/"'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
@@ -206,11 +206,11 @@ android {
         netTestLocal {
             dimension "env"
             applicationId = "network.minter.bipwallet"
-            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.taconet.minter.network/connection/websocket"'
-            buildConfigField "String", "EXPLORER_API_URL", '"https://explorer-api.taconet.minter.network/api/v2/"'
-            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://explorer.taconet.minter.network/api/v2"'
-            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.taconet.minter.network"'
-            buildConfigField "String", "GATE_API_URL", '"https://gate-api.taconet.minter.network/api/v2/"'
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.testnet.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", '"https://explorer-api.testnet.minter.network/api/v2/"'
+            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://explorer.testnet.minter.network/api/v2"'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.testnet.minter.network"'
+            buildConfigField "String", "GATE_API_URL", '"https://gate-api.testnet.minter.network/api/v2/"'
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'

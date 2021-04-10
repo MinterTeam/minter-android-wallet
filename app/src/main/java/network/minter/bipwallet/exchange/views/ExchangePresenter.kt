@@ -164,11 +164,15 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.setSubmitEnabled(false)
         viewState.setFormValidationListener { valid ->
             Handler(Looper.getMainLooper()).post {
+                Timber.d("Submit status: valid=${valid}; checkZero=${if (isBuying) buyAmount else sellAmount}")
                 viewState.setSubmitEnabled(valid && checkZero(if (isBuying) buyAmount else sellAmount))
             }
         }
         viewState.setTextChangedListener { input, valid ->
             onInputChanged(input, valid)
+            if (!valid) {
+                Timber.d("Invalid field: ${input.fieldName} - ${input.error}")
+            }
         }
         viewState.setOnClickSelectAccount { view: View -> onClickSelectAccount(view) }
         viewState.setOnClickMaximum { onClickMaximum() }
@@ -193,10 +197,11 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
 
         fromAccount = if (bundle != null && bundle.containsKey(ConvertCoinActivity.EXTRA_ACCOUNT)) {
-            Parcels.unwrap(bundle.getParcelable(ConvertCoinActivity.EXTRA_ACCOUNT))
+            bundle.getSerializable(ConvertCoinActivity.EXTRA_ACCOUNT) as MinterAddress
         } else {
             mSecretStorage.mainWallet
         }
+        viewState.validateForm()
 
         mAccountStorage
                 .observe()
@@ -216,6 +221,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                 if (buyAmount != null && buyCoin != null) {
                                     onAmountChangedInternal(isBuying)
                                 }
+                                viewState.validateForm()
                             }
                         },
                         {
@@ -540,7 +546,13 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         }
                         val amount = if (isBuying) buyAmount else sellAmount
                         val txData = ConvertTransactionData(
-                                type, gasCoin!!, account!!.coin, buyCoin!!, amount!!, estimateAmount!!, swapFrom)
+                                type = type,
+                                gasCoin = gasCoin!!,
+                                sellCoin = account!!.coin,
+                                buyCoin = buyCoin!!,
+                                amount = amount!!,
+                                estimateAmount = estimateAmount ?: BigDecimal.ZERO,
+                                swapFrom = swapFrom)
 
                         onStartExecuteTransaction(txData)
                     }
@@ -617,6 +629,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     } else {
                         buyAmount = res.amount
                     }
+
+                    viewState.setSubmitEnabled(estimateAmount != null)
                     viewState.setError("income_coin", null)
                     viewState.showCalculationProgress(false)
                     viewState.setCalculation(res.calculation ?: "")
@@ -625,6 +639,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     viewState.showCalculationProgress(false)
                     viewState.hideCalculation()
                     viewState.setError("income_coin", err)
+                    viewState.validateForm()
+                    viewState.setSubmitEnabled(false)
                 }
         )
 

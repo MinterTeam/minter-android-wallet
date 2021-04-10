@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -187,7 +187,7 @@ class ConvertCoinActivity : BaseMvpInjectActivity(), ConvertCoinView {
                 intent.putExtra(EXTRA_VALUE_TO_BUY, mValueToBuy.toPlainString())
             }
             if (mFromAccount != null) {
-                intent.putExtra(EXTRA_ACCOUNT, Parcels.wrap(mFromAccount))
+                intent.putExtra(EXTRA_ACCOUNT, mFromAccount)
             }
         }
 
