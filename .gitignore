@@ -15,3 +15,5 @@ com_crashlytics_export_strings.xml
 centrifuge/build
 app/google-services.json
 checklist.md
+app/netMain
+app/netTest
