@@ -43,7 +43,7 @@ class DbModule {
 
     companion object {
         const val DB_NAME = "minter.db"
-        const val DB_VERSION = 4
+        const val DB_VERSION = 3
     }
 
     @Provides
