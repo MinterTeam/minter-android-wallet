@@ -36,9 +36,16 @@ import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.db.WalletDatabase
 import network.minter.bipwallet.internal.di.annotations.DbCache
 import network.minter.bipwallet.internal.storage.KVStorage
+import timber.log.Timber
 
 @Module
 class DbModule {
+
+    companion object {
+        const val DB_NAME = "minter.db"
+        const val DB_VERSION = 4
+    }
+
     @Provides
     @WalletApp
     fun provideWalletDB(context: Context?): WalletDatabase {
@@ -49,9 +56,14 @@ class DbModule {
                 val add_burnable = "ALTER TABLE `minter_coins` ADD COLUMN `burnable` INTEGER DEFAULT 0"
                 val add_type = "ALTER TABLE `minter_coins` ADD COLUMN `type` INTEGER DEFAULT 0"
 
-                db.execSQL(add_mintable)
-                db.execSQL(add_burnable)
-                db.execSQL(add_type)
+                try {
+                    db.execSQL(add_mintable)
+                    db.execSQL(add_burnable)
+                    db.execSQL(add_type)
+                } catch (e: Throwable) {
+                    Timber.w(e, "Unable to migrate from 2 to 3")
+                }
+
             }
 
         }
@@ -90,10 +102,5 @@ class DbModule {
     @WalletApp
     fun provideAddressBookRepository(db: WalletDatabase, validatorsRepo: RepoValidators, @DbCache storage: KVStorage): AddressBookRepository {
         return AddressBookRepository(db, validatorsRepo, storage)
-    }
-
-    companion object {
-        const val DB_NAME = "minter.db"
-        const val DB_VERSION = 3
     }
 }
