@@ -131,7 +131,7 @@ android {
         variant.buildConfigField "String", "MINTER_STORAGE_VERS", '"v2_"'
         variant.buildConfigField "String", "MINTER_CACHE_VERS", '"v4_"'
         variant.buildConfigField "Boolean", "ENABLE_LEDGER_UI", 'Boolean.parseBoolean("' + (localProps.getProperty("ledger_ui", "false")) + '")'
-        variant.buildConfigField "Boolean", "ENABLE_STORIES", 'Boolean.parseBoolean("' + (localProps.getProperty("enable_stories", "false")) + '")'
+        variant.buildConfigField "Boolean", "ENABLE_STORIES", 'Boolean.parseBoolean("' + (localProps.getProperty("enable_stories", "true")) + '")'
 
     }
 
