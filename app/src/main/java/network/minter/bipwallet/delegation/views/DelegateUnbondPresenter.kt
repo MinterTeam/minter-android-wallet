@@ -56,6 +56,7 @@ import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
@@ -413,13 +414,12 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
     @Suppress("UNUSED_PARAMETER")
     private fun onInputChanged(input: InputWrapper, valid: Boolean) {
-        if (!clickedUseMax) {
-            useMax = false
-        }
-        clickedUseMax = false
-
         when (input.id) {
             R.id.input_amount -> {
+                if (!clickedUseMax) {
+                    useMax = false
+                }
+                clickedUseMax = false
                 amount = (input.text ?: "").toString().parseBigDecimal()
             }
         }
@@ -483,7 +483,13 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
     private val realFee: BigDecimal
         get() {
-            return type.opType.fee * gas.toBigDecimal()
+            if (initFeeData == null || initFeeData?.priceCommissions == null) {
+                Timber.d("Calculate delegate/unbond fee: old=${(type.opType.fee * gas.toBigDecimal()).humanize()}, new=null")
+                return type.opType.fee * gas.toBigDecimal()
+            }
+
+            Timber.d("Calculate delegate/unbond fee: old=${(type.opType.fee * gas.toBigDecimal()).humanize()}, new=${(initFeeData!!.priceCommissions.getByType(type.opType).humanizeDecimal() * gas.toBigDecimal()).humanize()}")
+            return initFeeData!!.priceCommissions.getByType(type.opType).humanizeDecimal() * gas.toBigDecimal()
         }
 
     private fun createPreTx(): TransactionSign {
