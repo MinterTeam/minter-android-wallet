@@ -88,5 +88,5 @@ ext {
     roomVersion = "2.2.6"
 
     appVersionName = "2.3.3"
-    appVersionCode = 225
+    appVersionCode = 226
 }
