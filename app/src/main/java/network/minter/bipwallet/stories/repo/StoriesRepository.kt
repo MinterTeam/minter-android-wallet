@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -57,7 +57,13 @@ class StoriesRepository(
 
     fun getStories(): Observable<List<Story>> {
         return instantService.list()
-                .map { it.data }
+                .map {
+                    if (it.data == null) {
+                        emptyList<Story>()
+                    } else {
+                        it.data
+                    }
+                }
                 .map { list ->
                     list.filter {
                         it.slides != null && it.isActive
