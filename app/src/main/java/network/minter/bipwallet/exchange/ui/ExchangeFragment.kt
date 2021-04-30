@@ -119,7 +119,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
             }
         }
 
-        val coinsAutocompletePresenter = CoinsAcPresenter(context!!, Wallet.app().coinsCacheRepo()) {
+        val coinsAutocompletePresenter = CoinsAcPresenter(requireContext(), Wallet.app().coinsCacheRepo()) {
             it.type != CoinItemBase.CoinType.PoolToken
         }
         val coinsAutocompleteCallback: AutocompleteCallback<CoinItem> = object : AutocompleteCallback<CoinItem> {
@@ -138,12 +138,12 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
                 .with(coinsAutocompletePresenter as AutocompletePresenter<CoinItem>)
                 .with(coinsAutocompletePresenter as AutocompletePolicy)
                 .with(6f)
-                .with(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
+                .with(ContextCompat.getDrawable(requireContext(), R.drawable.shape_rounded_white))
                 .build()
 
 
         LastBlockHandler.handle(binding.lastUpdated)
-        val broadcastManager = BroadcastReceiverManager(activity!!)
+        val broadcastManager = BroadcastReceiverManager(requireActivity())
         broadcastManager.add(RTMBlockReceiver {
             LastBlockHandler.handle(binding.lastUpdated, it)
         })
@@ -172,7 +172,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun startAccountSelector(accounts: List<CoinBalance>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
-        SelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
+        SelectorDialog.Builder<CoinBalance>(requireActivity(), R.string.dialog_title_choose_coin)
                 .setItems(selectorDataFromCoins(accounts))
                 .setOnClickListener(clickListener)
                 .create().show()
@@ -195,14 +195,14 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
     }
 
     override fun finishCancel() {
-        activity!!.finish()
+        requireActivity().finish()
     }
 
     override fun finishSuccess(exchangeAmount: ExchangeAmount) {
         val data = Intent()
         data.putExtra(ConvertCoinActivity.RESULT_EXCHANGE_AMOUNT, exchangeAmount)
-        activity!!.setResult(Activity.RESULT_OK, data)
-        activity!!.finish()
+        requireActivity().setResult(Activity.RESULT_OK, data)
+        requireActivity().finish()
     }
 
     override fun hideKeyboard() {

@@ -71,6 +71,7 @@ import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.blockchain.api.EstimateSwapFrom
+import network.minter.blockchain.models.NodeResult
 import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
@@ -119,6 +120,16 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var buyForResult = false
     private var fromAccount: MinterAddress? = null
     private var swapFrom: EstimateSwapFrom = EstimateSwapFrom.Default
+
+    private val sellAmountSafe: BigDecimal
+        get() {
+            return sellAmount ?: BigDecimal.ZERO
+        }
+
+    private val buyAmountSafe: BigDecimal
+        get() {
+            return buyAmount ?: BigDecimal.ZERO
+        }
 
     // used to detect which type of coin is exchanging: simple coin, token or pool token
     private var isBasicExchange = true
@@ -635,10 +646,19 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     viewState.showCalculationProgress(false)
                     viewState.setCalculation(res.calculation ?: "")
                 },
-                { err: String ->
+                { errMessage: String, err: NodeResult.Error? ->
                     viewState.showCalculationProgress(false)
                     viewState.hideCalculation()
-                    viewState.setError("income_coin", err)
+                    if (errMessage == "not possible to exchange") {
+                        if ((buying && (sellAmountSafe == BigDecimal.ZERO)) || (!buying && (buyAmountSafe == BigDecimal.ZERO))) {
+                            checkZero(if (buying) sellAmountSafe else buyAmountSafe)
+                        } else {
+                            viewState.setError("income_coin", errMessage)
+                        }
+                    } else {
+                        viewState.setError("income_coin", errMessage)
+                    }
+
                     viewState.validateForm()
                     viewState.setSubmitEnabled(false)
                 }

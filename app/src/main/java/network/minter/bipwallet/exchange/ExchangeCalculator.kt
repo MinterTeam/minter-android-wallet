@@ -38,6 +38,7 @@ import network.minter.blockchain.api.EstimateSwapFrom
 import network.minter.blockchain.models.BlockchainStatus
 import network.minter.blockchain.models.ExchangeBuyValue
 import network.minter.blockchain.models.ExchangeSellValue
+import network.minter.blockchain.models.NodeResult
 import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinBalance
@@ -53,7 +54,7 @@ import java.math.BigInteger
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 class ExchangeCalculator private constructor(private val mBuilder: Builder) {
-    fun calculate(buyCoins: Boolean, onResult: (CalculationResult) -> Unit, onErrorMessage: (String) -> Unit) {
+    fun calculate(buyCoins: Boolean, onResult: (CalculationResult) -> Unit, onErrorMessage: (String, NodeResult.Error?) -> Unit) {
         val repo = mBuilder.estimateRepo
 
 
@@ -62,7 +63,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
         val targetCoin = mBuilder.getCoin()
 
         if (targetCoin.id == null) {
-            onErrorMessage("Coin to buy not exists")
+            onErrorMessage("Coin to buy not exists", null)
             return
         }
 
@@ -81,7 +82,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                 val out = CalculationResult()
                                 if (!res.isOk) {
                                     if (checkCoinNotExistError(res)) {
-                                        onErrorMessage(res.message ?: "Coin to buy not exists")
+                                        onErrorMessage(res.message ?: "Coin to buy not exists", res.error)
                                         return@subscribe
                                     } else {
                                         if (res.message?.equals("not possible to exchange") == true) {
@@ -90,7 +91,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                             Timber.w(GateResponseException(res))
                                         }
 
-                                        onErrorMessage(res.message ?: "Error:${res.status.name}")
+                                        onErrorMessage(res.message ?: "Error:${res.status.name}", res.error)
                                         return@subscribe
                                     }
                                 }
@@ -125,7 +126,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                             },
                             { t ->
                                 Timber.e(t, "Unable to get currency")
-                                onErrorMessage("Unable to get currency")
+                                onErrorMessage("Unable to get currency", null)
                             }
                     )
         } else {
@@ -142,11 +143,11 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                             { res: GateResult<ExchangeSellValue> ->
                                 if (!res.isOk) {
                                     if (checkCoinNotExistError(res)) {
-                                        onErrorMessage(res.message ?: "Coin to buy not exists")
+                                        onErrorMessage(res.message ?: "Coin to buy not exists", res.error)
                                         return@subscribe
                                     } else {
                                         Timber.w(GateResponseException(res), "Unable to calculate sell/sellAll currency")
-                                        onErrorMessage(res.message ?: "Error::${res.status.name}")
+                                        onErrorMessage(res.message ?: "Error::${res.status.name}", res.error)
                                         return@subscribe
                                     }
                                 }
@@ -171,13 +172,13 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                 } else {
                                     Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
                                     out.gasCoin = mntAccount.get().coin.id
-                                    onErrorMessage("Not enough balance")
+                                    onErrorMessage("Not enough balance", res.error)
                                 }
                                 onResult(out)
                             },
                             { t: Throwable? ->
                                 Timber.e(t, "Unable to get currency")
-                                onErrorMessage("Unable to get currency")
+                                onErrorMessage("Unable to get currency", null)
                             }
                     )
         }
