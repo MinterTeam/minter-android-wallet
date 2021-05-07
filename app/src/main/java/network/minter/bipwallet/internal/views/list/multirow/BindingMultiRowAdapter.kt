@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -86,11 +86,13 @@ open class BindingMultiRowAdapter : RecyclerView.Adapter<BindingViewHolder<ViewB
         return items.size
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun add(row: BindingRow<*>) {
         items.add(row as BindingRow<ViewBinding>)
         notifyItemInserted(itemCount)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun addAll(rows: List<BindingRow<*>>) {
         val pos = items.size
         items.addAll(rows.map { it as BindingRow<ViewBinding> })

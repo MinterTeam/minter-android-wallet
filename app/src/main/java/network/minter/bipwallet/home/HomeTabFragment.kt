@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,7 +33,6 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog
 import network.minter.bipwallet.wallets.dialogs.ui.AddWalletDialog
 import network.minter.bipwallet.wallets.dialogs.ui.EditWalletDialog
 import network.minter.bipwallet.wallets.selector.WalletItem
-import timber.log.Timber
 
 /**
  * minter-android-wallet. 2020
@@ -72,14 +71,10 @@ abstract class HomeTabFragment : BaseFragment() {
             bottomSheetDialog!!.dismiss()
             bottomSheetDialog = null
         }
-        if (fragmentManager == null) {
-            Timber.w("Fragment manager is NULL")
-            return
-        }
         bottomSheetDialog = EditWalletDialog.newInstance(walletItem, enableRemove)
         (bottomSheetDialog!! as EditWalletDialog).onSaveListener = submitListener
         (bottomSheetDialog!! as EditWalletDialog).onDeleteListener = deleteListener
-        bottomSheetDialog!!.show(fragmentManager!!, "wallet_edit")
+        bottomSheetDialog!!.show(parentFragmentManager, "wallet_edit")
     }
 
     fun startWalletAdd(onSubmit: (WalletItem) -> Unit, onDismiss: ActionListener?) {
@@ -87,31 +82,10 @@ abstract class HomeTabFragment : BaseFragment() {
             bottomSheetDialog!!.dismiss()
             bottomSheetDialog = null
         }
-        if (fragmentManager == null) {
-            Timber.w("Fragment manager is NULL")
-            return
-        }
         val addWalletDialog = AddWalletDialog.newInstance()
         addWalletDialog.onAddListener = onSubmit
         addWalletDialog.onDismissListener = onDismiss
         bottomSheetDialog = addWalletDialog
-        bottomSheetDialog!!.show(fragmentManager!!, "wallet_add")
-//        addWalletDialog.setOnGenerateNewWalletListener { submitListener: (WalletItem) -> Unit,
-//                                                         dismissListener: ActionListener?,
-//                                                         title: String? ->
-//
-//            bottomSheetDialog!!.dismiss()
-//            bottomSheetDialog = CreateWalletDialog.Builder()
-//                    .setEnableDescription(true)
-//                    .setEnableTitleInput(true)
-//                    .setWalletTitle(title)
-//                    .setTitle(getString(R.string.dialog_title_generate_new_wallet))
-//                    .setOnAddListener(submitListener)
-//                    .setOnDismissListener(dismissListener)
-//                    .setEnableStartHomeOnSubmit(false)
-//                    .build()
-//            bottomSheetDialog!!.show(fragmentManager!!, "wallet_generate")
-//        }
-
+        bottomSheetDialog!!.show(parentFragmentManager, "wallet_add")
     }
 }

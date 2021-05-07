@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -64,6 +64,7 @@ abstract class RecyclerAcPresenter<T>(
         return LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 
+    @Suppress("NULLABLE_TYPE_PARAMETER_AGAINST_NOT_NULL_TYPE_PARAMETER")
     fun dispatchClick(item: T) {
         clicks?.click(item)
     }

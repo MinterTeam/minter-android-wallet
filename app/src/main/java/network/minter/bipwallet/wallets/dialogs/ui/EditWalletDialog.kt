@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,8 +36,10 @@ import com.edwardstock.inputfield.form.validators.RegexValidator
 import dagger.android.support.AndroidSupportInjection
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogEditWalletBinding
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
@@ -107,7 +109,7 @@ class EditWalletDialog : BaseBottomSheetDialogFragment(), EditWalletView {
         inputGroup.addInput(binding.inputTitle)
         inputGroup.addFilter(binding.inputTitle, TitleInputFilter())
         inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s].*$").apply {
-            errorMessage = "Title can't starts from whitespace"
+            errorMessage = tr(R.string.input_validator_title_cant_starts_from_ws)
             isRequired = false
         })
 

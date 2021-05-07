@@ -65,6 +65,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.normalize
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.StringsHelper.utfStringSliceToBytes
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -282,8 +283,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                 } catch (t: Throwable) {
                     Timber.w(t, "Unable to parse remote transaction: %s", result)
                     viewState.startDialog { ctx ->
-                        ConfirmDialog.Builder(ctx, "Unable to scan QR")
-                                .setText("Invalid transaction data: %s", t.message)
+                        ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_scan_qr)
+                                .setText(tr(R.string.dialog_title_err_invalid_deeplink), t.message)
                                 .setPositiveAction(R.string.btn_close)
                                 .create()
                     }
@@ -470,11 +471,11 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     private fun onSubmit() {
         var valid = true
         if (mRecipient == null) {
-            viewState.setRecipientError("Recipient required")
+            viewState.setRecipientError(tr(R.string.input_validator_recipient_required))
             valid = false
         }
         if (sendAmount == null) {
-            viewState.setAmountError("Amount can't be empty")
+            viewState.setAmountError(tr(R.string.input_validator_amount_cant_be_empty))
             valid = false
         }
 
@@ -540,7 +541,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
     private fun onClickMaximum(view: View?) {
         if (fromAccount == null) {
-            viewState.setCommonError("Account didn't loaded yet...")
+            viewState.setCommonError(tr(R.string.account_err_not_loaded_yet))
             return
         }
         useMax.set(true)
@@ -639,9 +640,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             val baseAccount = findAccountByCoin(DEFAULT_COIN_ID).get()
             // this is the edge case, when coin balance created after some error
             if (baseAccount.address == null) {
-                return@startDialog ConfirmDialog.Builder(ctx, "Unable to send transaction")
-                        .setText("Can't get wallet balance. Maybe you have bad internet connection?")
-                        .setPositiveAction("Close")
+                return@startDialog ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
+                        .setText(R.string.dialog_text_err_cant_get_wallet_balance)
+                        .setPositiveAction(R.string.btn_close)
                         .create()
             }
             val sendAccount = fromAccount
@@ -687,7 +688,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                     .combineLatest(txFeeValueResolver, txNonceResolver, { t1: GateResult<TransactionCommissionValue>, t2: GateResult<TxCount> -> TxInitData(t1, t2) })
                     .switchMap { txInitData: TxInitData ->
                         // if in previous request we've got error, returning it
-                        if (!txInitData.isSuccess) {
+                        if (!txInitData.isOk) {
                             return@switchMap Observable.just(txInitData.errorResult!!.castErrorResultTo<PushResult>())
                         }
                         var amountToSend: BigDecimal
@@ -752,12 +753,12 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         Timber.w(throwable, "Uncaught tx error")
         var errorMessage = throwable.humanDetailsMessage
         if (throwable is SSLException) {
-            errorMessage = "Bad internet connection: ${throwable.message}"
+            errorMessage = tr(R.string.dialog_text_err_bad_internet_connection, throwable.message ?: "")
         }
         viewState.startDialog { ctx ->
-            ConfirmDialog.Builder(ctx, "Unable to send transaction")
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
                     .setText(errorMessage)
-                    .setPositiveAction("Close")
+                    .setPositiveAction(R.string.btn_close)
                     .create()
         }
     }
@@ -765,9 +766,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
     private fun onErrorExecuteTransaction(errorResult: GateResult<*>) {
         Timber.e(errorResult.message, "Unable to send transaction")
         viewState.startDialog { ctx ->
-            ConfirmDialog.Builder(ctx, "Unable to send transaction")
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
                     .setText(errorResult.message)
-                    .setPositiveAction("Close")
+                    .setPositiveAction(R.string.btn_close)
                     .create()
         }
     }

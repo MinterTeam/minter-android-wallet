@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -88,10 +88,10 @@ class EditWalletPresenter @Inject constructor() : MvpBasePresenter<EditWalletVie
 
     private fun onDeleteWallet() {
         viewState.startDialogFragment {
-            ConfirmDialogFragment.Builder(it, R.string.dialog_title_remote_wallet)
-                    .setDescription(HtmlCompat.fromHtml(it.getString(R.string.dialog_description_remove_wallet, walletItem!!.address.toShortString())))
+            ConfirmDialogFragment.Builder(it, R.string.dialog_title_delete_wallet)
+                    .setDescription(HtmlCompat.fromHtml(it.getString(R.string.dialog_description_delete_wallet, walletItem!!.address.toShortString())))
                     .setDescriptionTypeface(R.font._inter_regular)
-                    .setText(HtmlCompat.fromHtml(it.getString(R.string.dialog_text_remove_wallet)))
+                    .setText(HtmlCompat.fromHtml(it.getString(R.string.dialog_text_delete_wallet)))
                     .setPositiveActionStyle(R.style.Wallet_Button_Green)
                     .setPositiveAction(R.string.btn_confirm) { d, _ ->
                         secretStorage.delete(walletItem!!.address)

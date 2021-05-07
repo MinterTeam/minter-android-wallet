@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,6 +36,7 @@ import com.edwardstock.inputfield.form.validators.EmptyValidator
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.RowInputDecimalFieldBinding
 import network.minter.bipwallet.databinding.RowInputFieldBinding
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.DbCoinValidatorWithSuffix
 import network.minter.bipwallet.internal.helpers.forms.validators.MinterAddressValidator
@@ -194,7 +195,7 @@ class TxInputFieldRow<T : Operation> internal constructor(
                 validCallback?.invoke(ValidState.Undefined, inputField)
 
                 inputGroup.addFilter(inputField, DecimalInputFilter(inputField, 18))
-                inputGroup.addValidator(inputField, EmptyValidator("Value can't be empty", true))
+                inputGroup.addValidator(inputField, EmptyValidator(tr(R.string.input_validator_value_cant_be_empty), true))
                 handleTextChange(inputGroup, inputField, onChanged, afterChange)
             }
             return this

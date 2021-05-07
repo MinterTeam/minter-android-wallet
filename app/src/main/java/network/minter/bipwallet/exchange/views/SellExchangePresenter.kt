@@ -38,9 +38,11 @@ import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.MinterSDK
+import network.minter.explorer.repo.ExplorerPoolsRepository
 import network.minter.explorer.repo.GateEstimateRepository
 import network.minter.explorer.repo.GateGasRepository
 import network.minter.explorer.repo.GateTransactionRepository
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -56,6 +58,7 @@ open class SellExchangePresenter @Inject constructor(
         explorerCoinsRepository: RepoCoins,
         gasRepo: GateGasRepository,
         estimateRepository: GateEstimateRepository,
+        poolsRepository: ExplorerPoolsRepository,
         gateTransactionRepository: GateTransactionRepository,
         txInitDataRepo: TxInitDataRepository,
         errorManager: ErrorManager) :
@@ -67,6 +70,7 @@ open class SellExchangePresenter @Inject constructor(
                 explorerCoinsRepository,
                 gasRepo,
                 estimateRepository,
+                poolsRepository,
                 gateTransactionRepository,
                 txInitDataRepo,
                 errorManager
@@ -76,7 +80,7 @@ open class SellExchangePresenter @Inject constructor(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.setFee(String.format("%s %s", bdHuman(OperationType.SellCoin.fee), MinterSDK.DEFAULT_COIN.toUpperCase()))
+        viewState.setFee(String.format("%s %s", bdHuman(OperationType.SellCoin.fee), MinterSDK.DEFAULT_COIN.uppercase(Locale.getDefault())))
         viewState.setCalculationTitle(R.string.label_you_will_get_approximately)
     }
 

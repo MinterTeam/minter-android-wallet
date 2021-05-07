@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,6 +33,7 @@ import android.view.View;
 import javax.inject.Inject;
 
 import moxy.InjectViewState;
+import network.minter.bipwallet.R;
 import network.minter.bipwallet.auth.contract.SignInMnemonicView;
 import network.minter.bipwallet.internal.auth.AuthSession;
 import network.minter.bipwallet.internal.exceptions.FirebaseSafe;
@@ -41,6 +42,8 @@ import network.minter.bipwallet.internal.storage.SecretStorage;
 import network.minter.bipwallet.internal.system.SimpleTextWatcher;
 import network.minter.core.bip39.NativeBip39;
 import network.minter.core.crypto.MinterAddress;
+
+import static network.minter.bipwallet.internal.helpers.ViewExtensions.tr;
 
 @InjectViewState
 public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView> {
@@ -83,7 +86,7 @@ public class SingInMnemonicPresenter extends MvpBasePresenter<SignInMnemonicView
             public void afterTextChanged(Editable s) {
                 String res = s.toString();
                 if (res.isEmpty()) {
-                    getViewState().setError("Mnemonic can't be empty");
+                    getViewState().setError(tr(R.string.auth_err_mnemonic_cant_be_empty));
                     getViewState().setEnableSubmit(false);
                     return;
                 }

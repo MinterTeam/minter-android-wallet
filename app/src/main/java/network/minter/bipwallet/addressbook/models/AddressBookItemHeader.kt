@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,7 +31,7 @@ class AddressBookItemHeader(
         header: String,
         val lastUsed: Boolean = false
 ) : AddressBookItem {
-    val header: String = header.toUpperCase()
+    val header: String = header.uppercase(Locale.getDefault())
     override fun getViewType(): Int {
         return AddressBookItem.TYPE_HEADER
     }

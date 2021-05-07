@@ -41,6 +41,8 @@ class TxInitData {
     var gas: BigInteger? = null
     var gasCoin: BigInteger = MinterSDK.DEFAULT_COIN_ID
     var gasRepresentingCoin: CoinItemBase = CoinItemBase(MinterSDK.DEFAULT_COIN_ID, MinterSDK.DEFAULT_COIN)
+
+    // exchange rate for base coin (BIP/MNT) relatively to default gas representing coin
     var gasBaseCoinRate: BigDecimal = BigDecimal.ONE
     var priceCommissions: PriceCommissions = PriceCommissions()
     var commission: BigDecimal? = null
@@ -67,7 +69,7 @@ class TxInitData {
         errorResult = err
     }
 
-    val isSuccess: Boolean
+    val isOk: Boolean
         get() {
             val tmp = errorResult
             return tmp?.error == null || tmp.isOk

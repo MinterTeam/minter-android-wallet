@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -48,6 +48,7 @@ import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.views.SnackbarBuilder
@@ -94,14 +95,14 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTabSettingsBinding.inflate(inflater, container, false)
 
         setHasOptionsMenu(true)
 
         binding.apply {
             testnetWarning.visibleForTestnet()
-            activity!!.menuInflater.inflate(R.menu.menu_tab_settings, toolbar.menu)
+            requireActivity().menuInflater.inflate(R.menu.menu_tab_settings, toolbar.menu)
             toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
 
             val itemSeparator = BorderedItemSeparator(activity, R.drawable.shape_bottom_separator, false, true)
@@ -121,7 +122,7 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
             if (BuildConfig.DEBUG) {
                 appVersion.text = "${BuildConfig.FLAVOR}: ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
             } else {
-                appVersion.text = "Version: ${BuildConfig.VERSION_NAME}"
+                appVersion.text = tr(R.string.app_version_format, BuildConfig.VERSION_NAME)
             }
         }
 
@@ -152,7 +153,7 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
     override fun startPinCodeManager(requestCode: Int, mode: PinMode) {
         SingleCallHandler.call("pin-manager"
         ) {
-            PinEnterActivity.Builder(activity!!, mode)
+            PinEnterActivity.Builder(requireActivity(), mode)
                     .start(requestCode)
         }
     }
@@ -165,7 +166,7 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
                 .setNegativeButtonText(getString(R.string.btn_cancel))
                 .build()
         val executor: Executor = Executors.newSingleThreadExecutor()
-        val prompt = BiometricPrompt(activity!!, executor, callback)
+        val prompt = BiometricPrompt(requireActivity(), executor, callback)
         prompt.authenticate(info)
     }
 
@@ -235,8 +236,8 @@ class SettingsTabFragment : HomeTabFragment(), SettingsTabView {
     override fun startLogin() {
         val intent = Intent(activity, AuthActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        activity!!.startActivity(intent)
-        activity!!.finish()
+        requireActivity().startActivity(intent)
+        requireActivity().finish()
     }
 
     @ProvidePresenter

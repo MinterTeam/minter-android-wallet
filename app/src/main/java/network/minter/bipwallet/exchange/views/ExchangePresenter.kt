@@ -64,6 +64,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -76,6 +77,7 @@ import network.minter.blockchain.models.operational.*
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.*
+import network.minter.explorer.repo.ExplorerPoolsRepository
 import network.minter.explorer.repo.GateEstimateRepository
 import network.minter.explorer.repo.GateGasRepository
 import network.minter.explorer.repo.GateTransactionRepository
@@ -100,6 +102,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         protected val mExplorerCoinsRepo: RepoCoins,
         protected val gasRepo: GateGasRepository,
         protected val estimateRepo: GateEstimateRepository,
+        protected val poolsRepo: ExplorerPoolsRepository,
         protected val mGateTxRepo: GateTransactionRepository,
         protected val initDataRepo: TxInitDataRepository,
         protected val errorManager: ErrorManager
@@ -120,6 +123,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var buyForResult = false
     private var fromAccount: MinterAddress? = null
     private var swapFrom: EstimateSwapFrom = EstimateSwapFrom.Default
+    private var exchangeRoute: PoolRoute? = null
 
     private val sellAmountSafe: BigDecimal
         get() {
@@ -279,7 +283,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun checkZero(amount: BigDecimal?): Boolean {
         val valid = amount == null || !bdNull(amount)
         if (!valid) {
-            viewState.setError("amount", "Amount must be greater than 0")
+            viewState.setError("amount", tr(R.string.input_validator_amount_must_be_greater_zero))
         } else {
             viewState.setError("amount", null)
         }
@@ -295,7 +299,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     private fun onStartExecuteTransaction(txData: ConvertTransactionData) {
         viewState.startDialog { ctx: Context ->
-            val dialog = WalletProgressDialog.Builder(ctx, "Exchanging")
+            val dialog = WalletProgressDialog.Builder(ctx, R.string.dialog_title_exchanging)
                     .setText(R.string.tx_convert_began)
                     .create()
 
@@ -310,7 +314,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
                     .switchMap { initData ->
                         // if error occurred upper, notify error
-                        if (!initData.isSuccess) {
+                        if (!initData.isOk) {
                             return@switchMap initData.errorResult!!.castErrorResultTo<PushResult>().toObservable()
                         }
                         var balance = BigDecimal("0")
@@ -438,7 +442,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun onErrorExecuteTransaction(errorResult: GateResult<*>) {
         Timber.e(errorResult.message, "Unable to send transaction")
         viewState.startDialog { ctx: Context ->
-            ConfirmDialog.Builder(ctx, "Unable to send transaction")
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
                     .setText((errorResult.humanError()))
                     .setPositiveAction(R.string.btn_close)
                     .create()
@@ -448,8 +452,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun onErrorRequest(errorResult: ExpResult<*>) {
         Timber.e("Unable to send transaction: %s", errorResult.error?.message)
         viewState.startDialog { ctx: Context ->
-            ConfirmDialog.Builder(ctx, "Unable to send transaction")
-                    .setText((errorResult.message ?: "Caused unknown error"))
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
+                    .setText((errorResult.message ?: tr(R.string.dialog_text_err_unknown_error_caused)))
                     .setPositiveAction(R.string.btn_close)
                     .create()
         }
@@ -563,7 +567,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                 buyCoin = buyCoin!!,
                                 amount = amount!!,
                                 estimateAmount = estimateAmount ?: BigDecimal.ZERO,
-                                swapFrom = swapFrom)
+                                swapFrom = swapFrom,
+                                route = exchangeRoute!!
+                        )
 
                         onStartExecuteTransaction(txData)
                     }
@@ -617,11 +623,14 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
         val calculator = ExchangeCalculator.Builder(
                 estimateRepo,
+                poolsRepo,
                 { accounts },
                 { account!! },
                 { buyCoin!! },
                 { buyAmount ?: BigDecimal.ZERO },
-                { sellAmount ?: BigDecimal.ZERO })
+                { sellAmount ?: BigDecimal.ZERO },
+                { initFeeData!! }
+        )
                 .doOnSubscribe { it.disposeOnDestroy() }
                 .build()
 
@@ -632,6 +641,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     estimateAmount = res.estimate
                     gasCoin = res.gasCoin
                     swapFrom = res.swapFrom
+                    exchangeRoute = res.route
                     Timber.d("Exchange Type: ${swapFrom.name}")
 
                     // we calculating estimate, so values are inverted
@@ -639,6 +649,15 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         sellAmount = res.amount
                     } else {
                         buyAmount = res.amount
+                    }
+                    if (initFeeData!!.gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
+                        viewState.setFee("${res.commissionBIP.humanize()} ${MinterSDK.DEFAULT_COIN}")
+                    } else {
+                        viewState.setFee(String.format("%s %s (%s %s)",
+                                res.commissionBIP.humanize(),
+                                MinterSDK.DEFAULT_COIN,
+                                res.commissionBase.humanize(),
+                                initFeeData!!.gasRepresentingCoin.symbol))
                     }
 
                     viewState.setSubmitEnabled(estimateAmount != null)
@@ -650,10 +669,16 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     viewState.showCalculationProgress(false)
                     viewState.hideCalculation()
                     if (errMessage == "not possible to exchange") {
-                        if ((buying && (sellAmountSafe == BigDecimal.ZERO)) || (!buying && (buyAmountSafe == BigDecimal.ZERO))) {
-                            checkZero(if (buying) sellAmountSafe else buyAmountSafe)
+                        if ((buying && (buyAmountSafe == BigDecimal.ZERO)) || (!buying && (sellAmountSafe == BigDecimal.ZERO))) {
+                            checkZero(if (!buying) sellAmountSafe else buyAmountSafe)
                         } else {
-                            viewState.setError("income_coin", errMessage)
+                            var fullMessage = errMessage
+                            if (err?.data?.containsKey("pool") == true) {
+                                fullMessage += ": ${err.data["pool"]}"
+                            } else if (err?.data?.containsKey("bancor") == true) {
+                                fullMessage += ": ${err.data["bancor"]}"
+                            }
+                            viewState.setError("income_coin", fullMessage)
                         }
                     } else {
                         viewState.setError("income_coin", errMessage)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,9 +30,12 @@ import android.content.Intent;
 
 import com.airbnb.deeplinkdispatch.DeepLink;
 
+import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.exceptions.InvalidExternalTransaction;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import okhttp3.HttpUrl;
+
+import static network.minter.bipwallet.internal.helpers.ViewExtensions.tr;
 
 public final class DeepLinkHelper {
 
@@ -56,7 +59,7 @@ public final class DeepLinkHelper {
         if (result.startsWith("http")) {
             HttpUrl url = HttpUrl.parse(result);
             if (url == null) {
-                throw new InvalidExternalTransaction("Unable to parse transaction url", InvalidExternalTransaction.CODE_INVALID_LINK);
+                throw new InvalidExternalTransaction(tr(R.string.deeplink_err_unable_to_parse_transaction), InvalidExternalTransaction.CODE_INVALID_LINK);
             }
 
             // old-style deeplinks
@@ -80,7 +83,7 @@ public final class DeepLinkHelper {
                 }
                 intent.putExtra("data", url.pathSegments().get(1));
             } else {
-                throw new InvalidExternalTransaction("Unknown deeplink format", InvalidExternalTransaction.CODE_INVALID_DEEPLINK);
+                throw new InvalidExternalTransaction(tr(R.string.deeplink_err_unknown_deeplink_format), InvalidExternalTransaction.CODE_INVALID_DEEPLINK);
             }
         }
 
@@ -89,7 +92,7 @@ public final class DeepLinkHelper {
 
     public static ExternalTransaction parseRawTransaction(String rawTx) throws InvalidExternalTransaction {
         if (rawTx == null) {
-            throw new InvalidExternalTransaction("No transaction data passed", InvalidExternalTransaction.CODE_INVALID_LINK);
+            throw new InvalidExternalTransaction(tr(R.string.deeplink_err_no_tx_data_passed), InvalidExternalTransaction.CODE_INVALID_LINK);
         }
 
         ExternalTransaction tx;

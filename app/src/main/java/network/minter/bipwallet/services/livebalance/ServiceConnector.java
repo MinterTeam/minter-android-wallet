@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -73,7 +73,7 @@ public class ServiceConnector implements ServiceConnection {
                 context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
             }
         } catch (Throwable t) {
-            Timber.w(t, "Unble to bind");
+            Timber.w(t, "Unable to bind");
         }
     }
 
@@ -90,7 +90,7 @@ public class ServiceConnector implements ServiceConnection {
                 context.bindService(intent, instance, Context.BIND_AUTO_CREATE);
             }
         } catch (Throwable t) {
-            Timber.w(t, "Unble to bind");
+            Timber.w(t, "Unable to bind");
         }
     }
 

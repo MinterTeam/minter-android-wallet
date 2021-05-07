@@ -27,6 +27,8 @@ package network.minter.bipwallet.internal.helpers.forms.validators
 
 import com.edwardstock.inputfield.form.validators.BaseValidator
 import io.reactivex.Single
+import network.minter.bipwallet.R
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.blockchain.models.operational.Transaction
 import java.nio.charset.StandardCharsets
 
@@ -35,7 +37,7 @@ import java.nio.charset.StandardCharsets
  */
 class PayloadValidator
 @JvmOverloads constructor(
-        errorMessage: CharSequence = "Maximum payload length is 10000",
+        errorMessage: CharSequence = tr(R.string.input_validator_max_payload_length),
         required: Boolean = false
 ) : BaseValidator(errorMessage, required) {
 

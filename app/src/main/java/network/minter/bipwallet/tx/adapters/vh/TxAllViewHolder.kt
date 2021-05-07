@@ -34,6 +34,7 @@ import network.minter.bipwallet.databinding.ItemListTxBinding
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.tx.adapters.TxItem
 import network.minter.core.crypto.MinterAddress
@@ -115,17 +116,15 @@ class TxAllViewHolder(
         binding.apply {
             itemTitleType.setText(R.string.tx_type_vote_update)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = "Version: ${data.version}"
+            itemTitle.text = tr(R.string.tx_type_vote_update_title, data.version)
         }
     }
 
     private fun bindVoteCommission(item: TxItem) {
-        val data: HistoryTransaction.TxVoteCommissionResult = item.tx.getData()
-
         binding.apply {
             itemTitleType.setText(R.string.tx_type_vote_commission)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = "Vote for commissions"
+            itemTitle.setText(R.string.tx_type_vote_commission_title)
         }
     }
 
@@ -247,7 +246,7 @@ class TxAllViewHolder(
         binding.apply {
             itemTitleType.setText(R.string.tx_type_price_vote)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
-            itemTitle.text = "Value: ${data.price}"
+            itemTitle.text = tr(R.string.tx_type_price_vote_title, data.price.toString())
             itemAmount.text = ""
             itemSubamount.visible = false
         }

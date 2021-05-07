@@ -25,12 +25,12 @@
  */
 package network.minter.bipwallet.exchange.models
 
-import com.google.common.base.MoreObjects
 import network.minter.blockchain.api.EstimateSwapFrom
 import network.minter.blockchain.models.operational.OperationInvalidDataException
 import network.minter.blockchain.models.operational.Transaction
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinItemBase
+import network.minter.explorer.models.PoolRoute
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -45,7 +45,8 @@ class ConvertTransactionData(
         private val buyCoin: CoinItemBase,
         private val amount: BigDecimal,
         private val estimateAmount: BigDecimal,
-        private val swapFrom: EstimateSwapFrom
+        private val swapFrom: EstimateSwapFrom,
+        private val route: PoolRoute
 ) {
     enum class Type {
         Sell, SellAll, Buy
@@ -54,7 +55,7 @@ class ConvertTransactionData(
     var isBasicExchange: Boolean = true
 
     @Throws(OperationInvalidDataException::class)
-    fun build(nonce: BigInteger, gasPrice: BigInteger, balance: BigDecimal?): Transaction {
+    fun build(nonce: BigInteger, gasPrice: BigInteger, @Suppress("UNUSED_PARAMETER") balance: BigDecimal?): Transaction {
         val tx: Transaction
 
 //        isBasicExchange = !(sellCoin.type != CoinItemBase.CoinType.Coin || buyCoin.type != CoinItemBase.CoinType.Coin)
@@ -69,11 +70,12 @@ class ConvertTransactionData(
                     .setGasPrice(gasPrice)
 
             val txData = if (!isBasicExchange) {
-                tb.sellSwapPool()
-                        .addCoinId(sellCoin.id)
-                        .addCoinId(buyCoin.id)
-                        .setValueToSell(amount)
-                        .setMinValueToBuy(BigDecimal("0"))
+                val pre = tb.sellSwapPool().setMinValueToBuy(BigDecimal("0"))
+
+                route.coins.forEach {
+                    pre.addCoinId(it.id)
+                }
+                pre
             } else {
                 tb.sellCoin()
                         .setCoinIdToSell(sellCoin.id)
@@ -90,11 +92,13 @@ class ConvertTransactionData(
                     .setGasPrice(gasPrice)
 
             val txData = if (!isBasicExchange) {
-                tb.buySwapPool()
-                        .addCoinId(sellCoin.id)
+                val pre = tb.buySwapPool()
                         .setValueToBuy(amount)
-                        .addCoinId(buyCoin.id)
                         .setMaxValueToSell(estimateAmount.multiply(BigDecimal("1.1")))
+                route.coins.forEach {
+                    pre.addCoinId(it.id)
+                }
+                pre
             } else {
                 tb.buyCoin()
                         .setCoinIdToSell(sellCoin.id)
@@ -111,10 +115,9 @@ class ConvertTransactionData(
                     .setGasCoinId(gasCoin)
                     .setGasPrice(gasPrice)
             val txData = if (!isBasicExchange) {
-                tb.sellAllSwapPool()
-                        .addCoinId(sellCoin.id)
-                        .addCoinId(buyCoin.id)
-                        .setMinValueToBuy("0")
+                val pre = tb.sellAllSwapPool().setMinValueToBuy("0")
+                route.coins.forEach { pre.addCoinId(it.id) }
+                pre
             } else {
                 tb.sellAllCoins()
                         .setCoinIdToSell(sellCoin.id)
@@ -126,7 +129,4 @@ class ConvertTransactionData(
         }
         return tx
     }
-
-    private val estimate: BigDecimal
-        private get() = MoreObjects.firstNonNull(estimateAmount, BigDecimal(0))
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -88,7 +88,7 @@ class CoinsListAdapter(context: Context, items: List<CoinItem>) : ArrayAdapter<C
                 return if (constraint != null) {
                     mSuggestions!!.clear()
                     for (item in mItemsAll!!) {
-                        if (item.symbol != null && item.symbol.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                        if (item.symbol != null && item.symbol.lowercase(Locale.getDefault()).startsWith(constraint.toString().lowercase(Locale.getDefault()))) {
                             mSuggestions!!.add(item)
                         }
                     }

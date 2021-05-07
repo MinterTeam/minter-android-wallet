@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,13 +28,15 @@ package network.minter.bipwallet.internal.helpers.forms.validators
 
 import com.edwardstock.inputfield.form.validators.BaseValidator
 import io.reactivex.Single
+import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 
 /**
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class NumberNotZeroValidator : BaseValidator("Amount must be more than 0", true, false) {
+class NumberNotZeroValidator : BaseValidator(tr(R.string.input_validator_amount_must_be_greater_zero), true, false) {
 
     override fun validate(value: CharSequence?): Single<Boolean> {
         if (value == null || value.isEmpty()) {

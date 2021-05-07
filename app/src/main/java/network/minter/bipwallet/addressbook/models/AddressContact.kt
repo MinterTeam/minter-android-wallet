@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,6 +29,7 @@ import androidx.annotation.NonNull
 import androidx.room.*
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.views.widgets.RemoteImageView
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
@@ -75,7 +76,7 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
                         return t
                     }
                 }
-                throw IllegalArgumentException("Unknown address type $type")
+                throw IllegalArgumentException(Wallet.app().res().getString(R.string.address_book_err_unknown_type, type))
             }
         }
     }
@@ -87,7 +88,7 @@ class AddressContact : Comparable<AddressContact>, AddressBookItem {
         address = nameOrAddress
 
         if (address == null) {
-            throw IllegalStateException("Address can't be null")
+            throw IllegalStateException(Wallet.app().res().getString(R.string.address_book_err_address_is_null))
         }
 
         if (address!!.matches(MinterAddress.ADDRESS_PATTERN.toRegex())) {

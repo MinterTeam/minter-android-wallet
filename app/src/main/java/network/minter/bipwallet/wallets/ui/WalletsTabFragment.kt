@@ -142,7 +142,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun startExplorer(hash: String) {
-        activity!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)))
+        requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)))
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -155,8 +155,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         presenter.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTabWalletsBinding.inflate(inflater, container, false)
         presenter.onRestoreInstanceState(savedInstanceState)
         mRecolorHelper = WalletsTopRecolorHelper(this)
@@ -211,7 +210,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun notifyUpdated() {
-        RTMBlockReceiver.send(activity!!, DateTime().plusSeconds(Wallet.timeOffset()))
+        RTMBlockReceiver.send(requireActivity(), DateTime().plusSeconds(Wallet.timeOffset()))
     }
 
     override fun onTabUnselected() {
@@ -230,13 +229,13 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         if (item.itemId == R.id.menu_scan_tx) {
             SingleCallHandler.call(item) { startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX) }
         } else if (item.itemId == R.id.menu_share) {
-            ShareDialog().show(fragmentManager!!, "share")
+            ShareDialog().show(parentFragmentManager, "share")
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun startExternalTransaction(rawData: String) {
-        ExternalTransactionActivity.Builder(activity!!, rawData)
+        ExternalTransactionActivity.Builder(requireActivity(), rawData)
                 .start()
     }
 
@@ -250,7 +249,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         if (activity == null) {
             return
         }
-        activity!!.startActivityForResult(i, requestCode)
+        requireActivity().startActivityForResult(i, requestCode)
     }
 
     override fun showSendAndSetAddress(address: String) {
@@ -266,13 +265,13 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun setMainWallet(walletItem: WalletItem) {
         activity?.let {
-            WalletSelectorBroadcastReceiver.setMainWallet(activity!!, walletItem)
+            WalletSelectorBroadcastReceiver.setMainWallet(requireActivity(), walletItem)
         }
     }
 
     override fun setWallets(walletItems: List<WalletItem>) {
         activity?.let {
-            WalletSelectorBroadcastReceiver.setWallets(activity!!, walletItems)
+            WalletSelectorBroadcastReceiver.setWallets(requireActivity(), walletItems)
         }
     }
 
@@ -359,7 +358,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun startConvertCoins() {
-        activity!!.startActivity(Intent(activity, ConvertCoinActivity::class.java))
+        requireActivity().startActivity(Intent(activity, ConvertCoinActivity::class.java))
     }
 
     override fun startTab(@IdRes tab: Int) {
@@ -380,13 +379,13 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     @OnShowRationale(Manifest.permission.CAMERA)
     fun showRationaleForCamera(request: PermissionRequest) {
-        ConfirmDialog.Builder(activity!!, "Camera request")
-                .setText("We need access to your camera to take a shot with Minter Address QR Code")
-                .setPositiveAction("Sure") { d, _: Int ->
+        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
+                .setText(R.string.dialog_text_camera_permission)
+                .setPositiveAction(R.string.btn_ok) { d, _: Int ->
                     request.proceed()
                     d.dismiss()
                 }
-                .setNegativeAction("No, I've change my mind") { d: DialogInterface, _: Int ->
+                .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int ->
                     request.cancel()
                     d.dismiss()
                 }.create()
@@ -395,9 +394,9 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     @OnPermissionDenied(Manifest.permission.CAMERA)
     fun showOpenPermissionsForCamera() {
-        ConfirmDialog.Builder(activity!!, "Camera request")
-                .setText("We need access to your camera to take a shot with Minter QR Code")
-                .setPositiveAction("Open settings") { d: DialogInterface, _: Int ->
+        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
+                .setText(R.string.dialog_text_camera_permission)
+                .setPositiveAction(R.string.btn_open_settings) { d: DialogInterface, _: Int ->
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                     val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
@@ -405,7 +404,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                     startActivity(intent)
                     d.dismiss()
                 }
-                .setNegativeAction("Cancel")
+                .setNegativeAction(R.string.btn_cancel)
                 .create()
                 .show()
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,7 +27,9 @@
 package network.minter.bipwallet.internal.helpers
 
 import android.view.View
+import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.exceptions.humanMessage
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.ErrorViewWithRetry
 import network.minter.bipwallet.internal.views.error.BaseStaticErrorView
 
@@ -41,21 +43,21 @@ class ErrorViewHelper(
 
 
     override fun onError(t: Throwable?) {
-        errorView.setText(t?.humanMessage ?: "Unknown message").showFor()
+        errorView.setText(t?.humanMessage ?: tr(R.string.error_unknown)).showFor()
     }
 
     override fun onError(err: String?) {
-        errorView.setText(err ?: "Unknown error").showFor()
+        errorView.setText(err ?: tr(R.string.error_unknown)).showFor()
     }
 
     override fun onErrorWithRetry(errorMessage: String?, errorResolver: View.OnClickListener?) {
-        errorView.setText(errorMessage ?: "Unknown error")
+        errorView.setText(errorMessage ?: tr(R.string.error_unknown))
                 .setActionListener(errorResolver!!)
                 .show()
     }
 
     override fun onErrorWithRetry(errorMessage: String?, actionName: String?, errorResolver: View.OnClickListener?) {
-        errorView.setText(errorMessage ?: "Unknown error")
+        errorView.setText(errorMessage ?: tr(R.string.error_unknown))
                 .setActionName(actionName)
                 .setActionListener(errorResolver!!)
                 .show()

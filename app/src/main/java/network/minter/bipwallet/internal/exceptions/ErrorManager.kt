@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,6 +32,8 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
+import network.minter.bipwallet.R
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.core.internal.exceptions.NetworkException
 import org.reactivestreams.Publisher
 import java.util.concurrent.TimeUnit
@@ -68,7 +70,7 @@ val Throwable.humanMessage: String
         if (err is NetworkException) {
             return err.userMessage
         }
-        return err.message ?: "Unknown error"
+        return err.message ?: tr(R.string.error_unknown)
     }
 
 val Throwable.humanDetailsMessage: String
@@ -77,7 +79,7 @@ val Throwable.humanDetailsMessage: String
         if (err is NetworkException) {
             return "${err.userMessage}: ${err.message}"
         }
-        return err.message ?: "Unknown error"
+        return err.message ?: tr(R.string.error_unknown)
     }
 
 /**

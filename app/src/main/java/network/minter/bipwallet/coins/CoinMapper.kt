@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,6 +31,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.toMap
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.unique
 import network.minter.blockchain.models.operational.*
@@ -39,6 +40,9 @@ import network.minter.explorer.models.CoinItem
 import network.minter.explorer.repo.GateCoinRepository
 import timber.log.Timber
 import java.math.BigInteger
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * minter-android-wallet. 2020
@@ -159,7 +163,7 @@ class CoinMapper(
     }
 
     fun symbolToId(symbol: String): BigInteger? {
-        val name = symbol.toUpperCase()
+        val name = symbol.uppercase(Wallet.LC_EN)
         if (name == MinterSDK.DEFAULT_COIN) {
             return MinterSDK.DEFAULT_COIN_ID
         }
@@ -171,7 +175,7 @@ class CoinMapper(
 
         // try to find in global list
         val out = try {
-            idCache.values.first { it.symbol.toUpperCase() == name }
+            idCache.values.first { it.symbol.uppercase(Wallet.LC_EN) == name }
         } catch (e: Throwable) {
             null
         }

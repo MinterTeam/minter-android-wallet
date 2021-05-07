@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -125,8 +125,8 @@ public final class BalanceNotificationManager extends BaseNotificationManager {
         style.addLine("Status: updated").setSummaryText(address.toShortString());
 
         final Notification messageNotification = new NotificationCompat.Builder(mContext, WALLET_BALANCE_UPDATE_CHANNEL)
-                .setContentTitle("Balance")
-                .setContentText("Status: updated")
+                .setContentTitle(mContext.getResources().getString(R.string.notification_balance_update_title))
+                .setContentText(mContext.getResources().getString(R.string.notification_balance_update_text))
                 .setSmallIcon(R.drawable.ic_notify_coin)
                 .setColor(mContext.getResources().getColor(R.color.colorPrimaryDark))
                 .setAutoCancel(true)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,8 +26,11 @@
 
 package network.minter.bipwallet.internal.helpers;
 
+import android.content.res.Resources;
+
 import org.joda.time.Duration;
 
+import network.minter.bipwallet.R;
 import network.minter.core.MinterSDK;
 
 /**
@@ -35,11 +38,36 @@ import network.minter.core.MinterSDK;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class Plurals {
-    private static final String[] seconds = new String[]{"second", "seconds", "seconds"};
-    private static final String[] minutes = new String[]{"minute", "minutes", "minutes"};
-    private static final String[] hours = new String[]{"hour", "hours", "hours"};
-    private static final String[] days = new String[]{"day", "days", "days"};
-    private static final String[] bips = new String[]{"bip", "bips", "bips"};
+    private static String[] seconds;
+    private static String[] minutes;
+    private static String[] hours;
+    private static String[] days;
+    private static String[] bips;
+
+    public static void init(Resources res) {
+        seconds = new String[]{
+                res.getString(R.string.plurals_seconds_1),
+                res.getString(R.string.plurals_seconds_2_4),
+                res.getString(R.string.plurals_seconds_others)
+        };
+        minutes = new String[]{
+                res.getString(R.string.plurals_minutes_1),
+                res.getString(R.string.plurals_minutes_2_4),
+                res.getString(R.string.plurals_minutes_others)
+        };
+        hours = new String[]{
+                res.getString(R.string.plurals_hours_1),
+                res.getString(R.string.plurals_hours_2_4),
+                res.getString(R.string.plurals_hours_others)
+        };
+        days = new String[]{
+                res.getString(R.string.plurals_days_1),
+                res.getString(R.string.plurals_days_2_4),
+                res.getString(R.string.plurals_days_others)
+        };
+        bips = new String[]{"bip", "bip", "bip"};
+
+    }
 
 
     public static String seconds(Long n) {
@@ -76,7 +104,7 @@ public class Plurals {
         if (duration.getStandardSeconds() > 0) {
             out.append(String.format("%d %s", duration.getStandardSeconds(), seconds(duration.getStandardSeconds())));
         } else {
-            out.append("0 seconds");
+            out.append("0 ").append(seconds(0L));
         }
 
         return out.toString();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -220,7 +220,7 @@ class DelegatedListActivity : BaseMvpInjectActivity(), DelegatedListView {
     override fun startUnbond(delegated: DelegatedStake) {
         DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Unbond)
                 .setPublicKey(delegated.publicKey!!)
-                .setSelectedCoin(delegated.coin!!)
+                .setSelectedCoin(delegated.coin)
                 .start()
     }
 

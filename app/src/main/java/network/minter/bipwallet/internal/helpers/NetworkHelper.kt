@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,8 +28,10 @@ package network.minter.bipwallet.internal.helpers
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.*
-import android.os.Build
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.subjects.BehaviorSubject
@@ -109,22 +111,6 @@ class NetworkHelper(private val context: Context) {
 
     fun hasNetworkConnectionSubject(): BehaviorSubject<Boolean> {
         return networkSubject
-    }
-
-    fun hasNetworkConnection(): Boolean {
-        val res = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            hasInternet || connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
-        } else {
-            val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-            var result = false
-            if (activeNetwork != null) {
-                result = activeNetwork.isConnectedOrConnecting
-            }
-
-            hasInternet || result
-        }
-        networkSubject.onNext(res)
-        return res
     }
 
 }

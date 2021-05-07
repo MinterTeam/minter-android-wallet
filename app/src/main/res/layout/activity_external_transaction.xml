@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_edges_half"
                     android:fontFamily="@font/inter"
-                    android:text="sync..."
+                    android:text="@string/balance_last_updated_sync_in_progress"
                     android:textSize="@dimen/text_size_12" />
             </LinearLayout>
 

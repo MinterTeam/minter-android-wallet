@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -47,6 +47,7 @@ import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueWalletTitleValidator
@@ -101,7 +102,7 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
             inputGroup.addInput(inputTitle)
             inputGroup.addFilter(inputTitle, TitleInputFilter())
             inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s].*$").apply {
-                errorMessage = "Title can't starts from whitespace"
+                errorMessage = tr(R.string.input_validator_title_cant_starts_from_ws)
                 isRequired = false
             })
             inputGroup.addValidator(inputTitle, UniqueWalletTitleValidator())
@@ -157,8 +158,8 @@ class CreateWalletDialog : BaseBottomSheetDialogFragment(), CreateWalletView {
         val intent = Intent(activity, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TASK or
                 Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
-        activity!!.startActivity(intent)
-        activity!!.finish()
+        requireActivity().startActivity(intent)
+        requireActivity().finish()
     }
 
     override fun close() {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2018
-  ~ @link https://github.com/MinterTeam
-  ~ @link https://github.com/edwardstock
+  ~ Copyright (C) by MinterTeam. 2021
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
   ~ The MIT License
   ~
@@ -25,5 +25,4 @@
   ~ THE SOFTWARE.
   -->
 <resources>
-    <string name="app_name">BIP Wallet</string>
 </resources>

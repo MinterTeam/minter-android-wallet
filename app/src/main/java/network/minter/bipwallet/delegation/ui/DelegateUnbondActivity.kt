@@ -393,7 +393,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
         autocompletePresenter?.setItems(items)
     }
 
-    override fun setMaxAmountValidator(@StringRes error: Int, coinSupplier: () -> BaseCoinValue?) {
+    override fun setMaxAmountValidator(@StringRes errorMessage: Int, coinSupplier: () -> BaseCoinValue?) {
         inputGroup.addValidator(binding.inputAmount, CustomValidator {
             if (it.isNullOrEmpty() || coinSupplier() == null) {
                 return@CustomValidator true
@@ -401,7 +401,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
             val num = it.parseBigDecimal()
             num <= coinSupplier()!!.amount
-        }.apply { errorMessage = getString(error) })
+        }.apply { this.errorMessage = getString(errorMessage) })
     }
 
     override fun startExplorer(txHash: MinterHash) {

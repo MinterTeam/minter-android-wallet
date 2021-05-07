@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "160fe7ea2ae822897ae8a78596461108",
+    "identityHash": "d1e7f46812d2e61581f14c263a926714",
     "entities": [
       {
         "tableName": "minter_contacts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `address` TEXT NOT NULL, `type` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `address` TEXT, `type` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -18,13 +18,13 @@
             "fieldPath": "name",
             "columnName": "name",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "address",
             "columnName": "address",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "type",
@@ -140,7 +140,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '160fe7ea2ae822897ae8a78596461108')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd1e7f46812d2e61581f14c263a926714')"
     ]
   }
 }

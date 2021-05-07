@@ -119,7 +119,7 @@ internal class RemoteImageViewDelegate(imageView: ImageView) : RemoteImageView {
                 .scale(Scale.FIT)
                 .target(onSuccess = { d ->
                     mImage.get()!!.setImageDrawable(d)
-                }, onError = { d ->
+                }, onError = { _ ->
                     if (fallbackResId != 0) {
                         mImage.get()!!.setImageResource(fallbackResId)
                     }

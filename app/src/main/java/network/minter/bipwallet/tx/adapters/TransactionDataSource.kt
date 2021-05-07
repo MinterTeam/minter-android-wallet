@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -249,21 +249,21 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                         for (tx in result) {
                             for (address in addresses) {
 
-                                if (tx.from.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                if (tx.from.toString().lowercase(Locale.getDefault()) == address.address!!.lowercase(Locale.getDefault())) {
                                     tx.fromName = address.name
                                 }
 
                                 when (tx.type) {
                                     HistoryTransaction.Type.Send -> {
                                         val d = tx.getData<HistoryTransaction.TxSendCoinResult>()
-                                        if (d.to.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                        if (d.to.toString().lowercase(Locale.getDefault()) == address.address!!.lowercase(Locale.getDefault())) {
                                             tx.toName = address.name
                                         }
                                     }
                                     HistoryTransaction.Type.RedeemCheck -> {
                                         val d = tx.getData<HistoryTransaction.TxRedeemCheckResult>()
                                         @Suppress("DEPRECATION")
-                                        if (d.check.sender.toString().toLowerCase() == address.address!!.toLowerCase()) {
+                                        if (d.check.sender.toString().lowercase(Locale.getDefault()) == address.address!!.lowercase(Locale.getDefault())) {
                                             tx.toName = address.name
                                         }
                                     }

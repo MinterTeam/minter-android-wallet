@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,7 +36,9 @@ import io.reactivex.subjects.PublishSubject
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
 import network.minter.explorer.models.ValidatorItem
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 /**
@@ -63,12 +65,12 @@ class ValidatorsAcPresenter(
 
                     for (item in items) {
                         if (item.meta != null && item.meta?.name != null) {
-                            if (item.meta!!.name!!.toLowerCase().startsWith(query.toString().toLowerCase())) {
+                            if (item.meta!!.name!!.lowercase(Locale.getDefault()).startsWith(query.toString().lowercase(Locale.getDefault()))) {
                                 filtered.add(item)
                             }
                         }
 
-                        if (item.pubKey.toString().toLowerCase().startsWith(query.toString().toLowerCase()) && item.pubKey.toString().toLowerCase() != query.toString().toLowerCase()) {
+                        if (item.pubKey.toString().lowercase(Locale.getDefault()).startsWith(query.toString().lowercase(Locale.getDefault())) && item.pubKey.toString().lowercase(Locale.getDefault()) != query.toString().lowercase(Locale.getDefault())) {
                             filtered.add(item)
                         }
                     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,7 +27,8 @@
 package network.minter.bipwallet.delegation.adapter
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
+
 import network.minter.bipwallet.internal.views.widgets.RemoteImageContainer
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinDelegation

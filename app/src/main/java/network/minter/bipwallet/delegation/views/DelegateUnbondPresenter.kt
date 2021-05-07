@@ -61,6 +61,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.Plurals
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -230,7 +231,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 if ((s == null || s.isEmpty())) {
                     viewState.setValidatorSelectSuffix(::startValidatorSelector)
                     if (toValidator == null) {
-                        viewState.setValidatorError("Public key required")
+                        viewState.setValidatorError(tr(R.string.validator_err_pubkey_required))
                     } else {
                         viewState.setValidatorError(null)
                     }
@@ -241,7 +242,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 viewState.setValidatorClearSuffix(::clearSelectedValidator)
 
                 if (!s.matches(pubkeyPattern)) {
-                    viewState.setValidatorError("Invalid public key format")
+                    viewState.setValidatorError(tr(R.string.validator_err_invalid_pubkey_format))
                     checkEnableSubmit()
                     return
                 }
@@ -535,7 +536,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 if (useMax && fromAccount!!.coin.id == MinterSDK.DEFAULT_COIN_ID) {
                     amountToSend = amount - realFee
                     if (bdNull(amountToSend)) {
-                        return Observable.error<TransactionSign>(IllegalStateException("Can't delegate 0 coins"))
+                        return Observable.error<TransactionSign>(IllegalStateException(tr(R.string.validator_err_cant_delegate_zero_coins)))
                     }
                 }
                 val txBuilder = Transaction.Builder(initData.nonce!!)
@@ -556,7 +557,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             // if balance for custom coin not found - error
             if (!fromAccountOpt.isPresent) {
                 return Observable.error(
-                        IllegalStateException("Not enough balance to pay fee")
+                        IllegalStateException(tr(R.string.account_err_not_enough_balance_to_pay_fee))
                 )
             }
             val fromAcc = fromAccountOpt.get()
@@ -579,13 +580,13 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                             amountToSend = fromAcc.amount - customFee
 
                             if (amountToSend == BigDecimal.ZERO) {
-                                return@switchMap Observable.error<TransactionSign>(IllegalStateException("Can't unbond 0 coins"))
+                                return@switchMap Observable.error<TransactionSign>(IllegalStateException(tr(R.string.validator_err_cant_unbond_zero_coins)))
                             }
                         }
 
                         // we're don't have enough BIP, so check custom coin enough balance to pay at least fee
                         if ((fromAcc.amount - amountToSend - customFee) < 0.toBigDecimal()) {
-                            return@switchMap Observable.error<TransactionSign>(IllegalStateException("Insufficient funds for sending transaction"))
+                            return@switchMap Observable.error<TransactionSign>(IllegalStateException(tr(R.string.account_err_insufficient_funds)))
                         }
 
                         val txBuilder = Transaction.Builder(initData.nonce!!)
@@ -604,7 +605,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
             if (!bipAccountOpt.isPresent || bipAccountOpt.get().amount < realFee) {
                 val balance = bipAccountOpt.get()?.amount ?: 0.toBigDecimal()
-                return Observable.error<TransactionSign>(IllegalStateException("Insufficient funds for unbond: required ${realFee.humanize()} ${MinterSDK.DEFAULT_COIN}, balance: ${balance.humanize()} ${MinterSDK.DEFAULT_COIN}"))
+                return Observable.error<TransactionSign>(IllegalStateException(tr(R.string.validator_err_insufficient_funds_for_unbond, realFee.humanize(), MinterSDK.DEFAULT_COIN, balance.humanize(), MinterSDK.DEFAULT_COIN)))
             }
 
             val txBuilder = Transaction.Builder(initData.nonce!!)
@@ -631,7 +632,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         val height = result.result?.transaction?.height?.toLong() ?: DELEGATION_BLOCKS_RECOUNT
 
         val leftSeconds: Float = (DELEGATION_BLOCKS_RECOUNT - (height % DELEGATION_BLOCKS_RECOUNT)) * 5f
-        val msg = "Please allow ~${Plurals.timeValue(leftSeconds.toLong())} ${Plurals.timeUnitShort(leftSeconds.toLong())} for your delegated balance to update."
+        val msg = tr(R.string.validator_wait_for_stake_update, Plurals.timeValue(leftSeconds.toLong()), Plurals.timeUnitShort(leftSeconds.toLong()))
 
         viewState.startDialog {
             TxSendSuccessDialog.Builder(it)
@@ -653,7 +654,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun onErrorExecuteTransaction(errorResult: GateResult<*>) {
         Timber.e(errorResult.message, "Unable to send transaction")
         viewState.startDialog { ctx: Context ->
-            ConfirmDialog.Builder(ctx, "Unable to send transaction")
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
                     .setText((errorResult.message))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
@@ -679,7 +680,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         if (type == Type.Unbond) {
             if (!accountStorage.entity.mainWallet.hasDelegated(toValidator)) {
                 viewState.setAccountTitle(null)
-                viewState.setAccountError("You didn't delegated to selected validator")
+                viewState.setAccountError(tr(R.string.validator_err_didnt_delegated))
                 toValidator = null
             } else {
                 val coin = fromAccount?.coin ?: selectAccount

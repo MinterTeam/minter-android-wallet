@@ -32,9 +32,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.otaliastudios.autocomplete.AutocompletePolicy
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.coins.RepoCoins
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.autocomplete.RecyclerAcPresenter
 import network.minter.explorer.models.CoinItem
 import timber.log.Timber
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -82,7 +85,7 @@ class CoinsAcPresenter(
             filtered = items
                     .filter(listFilter)
                     .filter {
-                        it.symbol.toLowerCase().startsWith(query.toString().toLowerCase())
+                        it.symbol.lowercase(Wallet.LC_EN).startsWith(query.toString().lowercase(Locale.getDefault()))
                     }
         }
 

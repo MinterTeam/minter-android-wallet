@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <color android:color="@color/colorPrimary" />
-    </item>
-    <item android:drawable="@drawable/bg_rect_b" android:bottom="210dp" />
-    <item android:drawable="@drawable/bg_rect_a" android:bottom="250dp" />
-</layer-list>

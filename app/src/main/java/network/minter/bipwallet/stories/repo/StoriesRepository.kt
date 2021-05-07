@@ -58,6 +58,7 @@ class StoriesRepository(
     fun getStories(): Observable<List<Story>> {
         return instantService.list()
                 .map {
+                    @Suppress("SENSELESS_COMPARISON")
                     if (it.data == null) {
                         emptyList<Story>()
                     } else {

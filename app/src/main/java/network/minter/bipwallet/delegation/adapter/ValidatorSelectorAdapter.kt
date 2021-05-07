@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,6 +33,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ItemListValidatorHeaderBinding
 import network.minter.bipwallet.databinding.ItemListValidatorSelectorBinding
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.models.ValidatorMeta
@@ -80,10 +81,10 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
     fun setItems(lastUsed: List<ValidatorItem>, validators: List<ValidatorItem>) {
         val data = ArrayList<Item>(/*maximum capacity*/validators.size + lastUsed.size + 2)
         if (lastUsed.isNotEmpty()) {
-            data.add(ItemHeader("Last Used"))
+            data.add(ItemHeader(tr(R.string.validator_header_last_used)))
             data.addAll(lastUsed.map { ItemValue(it, true) })
         }
-        data.add(ItemHeader("All Validators"))
+        data.add(ItemHeader(tr(R.string.validator_header_all_validators)))
         data.addAll(validators.map { ItemValue(it) })
         items = data
     }

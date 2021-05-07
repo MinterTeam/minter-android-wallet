@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -111,10 +111,10 @@ class SplashFragment : BaseInjectFragment() {
     }
 
     private fun startPinEnter() {
-        PinEnterActivity.Builder(activity!!, SecurityModule.PinMode.Validation)
+        PinEnterActivity.Builder(requireActivity(), SecurityModule.PinMode.Validation)
                 .startHomeOnSuccess()
                 .startClearTop()
-        activity!!.finish()
+        requireActivity().finish()
     }
 
     private fun startAuth() {
@@ -128,7 +128,7 @@ class SplashFragment : BaseInjectFragment() {
         }
 
         (activity as BaseMvpInjectActivity?)!!.startActivityClearTop(activity, HomeActivity::class.java)
-        activity!!.finish()
+        requireActivity().finish()
     }
 
     interface AuthSwitchActivity {

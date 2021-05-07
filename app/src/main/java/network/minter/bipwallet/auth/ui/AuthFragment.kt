@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -81,13 +81,11 @@ class AuthFragment : BaseInjectFragment(), AuthView {
             mDialog = null
         }
         mDialog = SignInMnemonicDialog()
-        if (fragmentManager != null) {
-            mDialog!!.show(fragmentManager!!, null)
-        }
+        mDialog!!.show(parentFragmentManager, null)
     }
 
     override fun startHelp() {
-        activity!!.startActivity(newUrl("https://help.minter.network"))
+        requireActivity().startActivity(newUrl("https://help.minter.network"))
     }
 
     override fun startCreateWallet() {
@@ -100,11 +98,11 @@ class AuthFragment : BaseInjectFragment(), AuthView {
         }
         mDialog = CreateWalletDialog.Builder()
                 .build()
-        mDialog!!.show(fragmentManager!!, null)
+        mDialog!!.show(parentFragmentManager, null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         postponeEnterTransition()
 
         b = FragmentAuthBinding.inflate(inflater, container, false)

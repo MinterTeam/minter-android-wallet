@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,7 +28,9 @@ package network.minter.bipwallet.internal.helpers.forms.validators
 
 import com.edwardstock.inputfield.form.validators.BaseValidator
 import io.reactivex.Single
+import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 
 /**
  * minter-android-wallet. 2020
@@ -36,7 +38,7 @@ import network.minter.bipwallet.internal.Wallet
  */
 class UniqueWalletTitleValidator(
         private val exclude: String? = null,
-        errorMessage: CharSequence = "Wallet with this title already exists",
+        errorMessage: CharSequence = tr(R.string.input_validator_mnemonic_with_title_already_exists),
         required: Boolean = false
 ) : BaseValidator(errorMessage, required) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -65,7 +65,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
         viewState.startAddContact({ contact ->
             viewState.startDialog { ctx ->
                 TxSendSuccessDialog.Builder(ctx)
-                        .setLabel(R.string.dialog_description_success_add_address)
+                        .setLabel(R.string.dialog_addressbook_description_success_add_address)
                         .setValue(contact.name)
                         .setNegativeAction(R.string.btn_close)
                         .create()
@@ -85,8 +85,8 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
 
     private fun onDeleteContact(contact: AddressContact) {
         viewState.startDialog { ctx ->
-            ConfirmDialog.Builder(ctx, R.string.dialog_title_remove_address)
-                    .setText(HtmlCompat.fromHtml(ctx.getString(R.string.dialog_description_remove_address, contact.shortAddress)))
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_delete_address)
+                    .setText(HtmlCompat.fromHtml(ctx.getString(R.string.dialog_addressbook_description_delete_address, contact.shortAddress)))
                     .setTextTypeface(R.font._inter_regular)
                     .setPositiveActionStyle(R.style.Wallet_Button_Green)
                     .setPositiveAction(R.string.btn_confirm) { d, _ ->
@@ -149,9 +149,9 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
         for (contact in addressContacts) {
             val emojiLen = EmojiDetector.emojiLength(contact.name!!)
             val h = if (emojiLen > -1) {
-                contact.name!!.substring(0, emojiLen).toLowerCase()
+                contact.name!!.substring(0, emojiLen).lowercase(Locale.getDefault())
             } else {
-                contact.name!!.substring(0, 1).toLowerCase()
+                contact.name!!.substring(0, 1).lowercase(Locale.getDefault())
             }
 
             if (lastLetter == null || (lastLetter != h)) {

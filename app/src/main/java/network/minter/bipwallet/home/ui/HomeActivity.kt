@@ -250,7 +250,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
         }
     }
 
-    fun startStoriesPager(stories: List<Story>, startPosition: Int, sharedImage: View) {
+    fun startStoriesPager(stories: List<Story>, startPosition: Int, @Suppress("UNUSED_PARAMETER") sharedImage: View) {
         if (storiesPagerFragment != null) {
             return
         }
@@ -272,6 +272,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
                 .add(R.id.stories_pager, storiesPagerFragment!!, "stories_pager")
                 .commit()
     }
+
 
     fun closeStoriesPager(): Boolean {
         if (storiesPagerFragment == null) return false

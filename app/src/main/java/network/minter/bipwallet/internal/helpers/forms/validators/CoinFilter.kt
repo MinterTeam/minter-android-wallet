@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,6 +28,7 @@ package network.minter.bipwallet.internal.helpers.forms.validators
 
 import android.text.InputFilter
 import android.text.Spanned
+import network.minter.bipwallet.internal.Wallet
 
 /**
  * minter-android-wallet. 2020
@@ -36,6 +37,6 @@ import android.text.Spanned
 class CoinFilter : InputFilter {
 
     override fun filter(source: CharSequence?, start: Int, end: Int, dest: Spanned?, dstart: Int, dend: Int): CharSequence {
-        return source.toString().toUpperCase().replace("[^A-Z0-9\\-]".toRegex(), "")
+        return source.toString().uppercase(Wallet.LC_EN).replace("[^A-Z0-9\\-]".toRegex(), "")
     }
 }

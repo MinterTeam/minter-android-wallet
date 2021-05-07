@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -107,7 +107,7 @@ class WalletSelectorDialog(
                 }
             }.toTypedArray()
 
-            val arAdapter = ArrayAdapter(context!!, R.layout.list_item_textview, R.id.text, arItems)
+            val arAdapter = ArrayAdapter(requireContext(), R.layout.list_item_textview, R.id.text, arItems)
 
             popup!!.setAdapter(arAdapter)
             popup!!.isModal = true
@@ -117,7 +117,7 @@ class WalletSelectorDialog(
                 popup?.dismiss()
             }
 
-            popup!!.setBackgroundDrawable(ContextCompat.getDrawable(context!!, R.drawable.shape_rounded_white))
+            popup!!.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.shape_rounded_white))
             popup!!.show()
         }
 

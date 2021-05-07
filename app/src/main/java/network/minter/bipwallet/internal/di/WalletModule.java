@@ -75,6 +75,7 @@ import network.minter.bipwallet.internal.exceptions.ErrorManager;
 import network.minter.bipwallet.internal.gson.BigDecimalJsonConverter;
 import network.minter.bipwallet.internal.gson.HistoryTransactionsJsonConverter;
 import network.minter.bipwallet.internal.helpers.DateHelper;
+import network.minter.bipwallet.internal.helpers.Plurals;
 import network.minter.bipwallet.internal.settings.SettingsManager;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.system.ForegroundDetector;
@@ -175,6 +176,7 @@ public class WalletModule {
         }
 
         JodaTimeAndroid.init(context);
+        Plurals.init(context.getResources());
     }
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")

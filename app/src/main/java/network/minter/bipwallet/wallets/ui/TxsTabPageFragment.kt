@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -57,7 +57,7 @@ class TxsTabPageFragment : BaseTabPageFragment(), TxsTabPageView {
         bottomDialog?.dismiss()
         bottomDialog = null
         bottomDialog = TransactionViewDialog.Builder(tx).build()
-        bottomDialog!!.show(fragmentManager!!, "tx_view")
+        bottomDialog!!.show(parentFragmentManager, "tx_view")
     }
 
     @ProvidePresenter

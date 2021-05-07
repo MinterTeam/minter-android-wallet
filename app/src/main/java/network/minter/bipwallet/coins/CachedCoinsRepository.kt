@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,9 +33,12 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
+import network.minter.bipwallet.R
 import network.minter.bipwallet.db.WalletDatabase
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.data.CachedEntity
 import network.minter.bipwallet.internal.data.CachedRepository
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.core.MinterSDK
 import network.minter.core.internal.api.ApiService
@@ -45,6 +48,10 @@ import okhttp3.internal.toImmutableList
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.*
+import kotlin.Comparator
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * minter-android-wallet. 2020
@@ -72,7 +79,7 @@ class CachedCoinsRepository(
                 .map { res ->
                     if (res.isOk && res.result != null) {
                         res.result!!.filter {
-                            it.symbol.toUpperCase() == MinterSDK.DEFAULT_COIN
+                            it.symbol.uppercase(Wallet.LC_EN) == MinterSDK.DEFAULT_COIN
                         }.forEach {
                             it.reserveBalance = BigDecimal("10e9")
                         }
@@ -105,13 +112,13 @@ class CachedCoinsRepository(
     fun findByName(name: String): Maybe<CoinItem> {
         return db.coins().findByName(name)
                 .map { it.asCoin() }
-                .switchIfEmpty(Maybe.error(RuntimeException("Coin not found")))
+                .switchIfEmpty(Maybe.error(RuntimeException(tr(R.string.coin_err_not_found))))
     }
 
     fun findById(coinId: BigInteger): Maybe<CoinItem> {
         return db.coins().findById(coinId)
                 .map { it.asCoin() }
-                .switchIfEmpty(Maybe.error(RuntimeException("Coin not found")))
+                .switchIfEmpty(Maybe.error(RuntimeException(tr(R.string.coin_err_not_found))))
     }
 
     override fun onAfterUpdate(result: List<CoinItem>) {

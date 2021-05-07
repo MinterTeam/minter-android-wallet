@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -67,7 +67,6 @@
         />
 
     <ImageView
-        android:contentDescription="@string/empty"
         android:id="@+id/item_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"

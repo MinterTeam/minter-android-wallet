@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,6 +40,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.DialogAddWalletBinding
 import network.minter.bipwallet.internal.dialogs.ActionListener
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.forms.validators.IsMnemonicValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.TitleInputFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.UniqueMnemonicValidator
@@ -93,8 +94,6 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
     }
 
     override fun startGenerate() {
-        if (fragmentManager == null) return
-
         collapse()
         childDialog = CreateWalletDialog.Builder()
                 .setTitle(getString(R.string.dialog_title_generate_new_wallet))
@@ -114,10 +113,10 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
                 .build()
                 .fixNestedDialogBackgrounds()
 
-        childDialog!!.show(fragmentManager!!, "wallet_generate")
+        childDialog!!.show(parentFragmentManager, "wallet_generate")
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DialogAddWalletBinding.inflate(inflater, container, false)
 
         binding.apply {
@@ -125,13 +124,13 @@ class AddWalletDialog : BaseBottomSheetDialogFragment(), AddWalletView {
             scroll.setOnScrollChangeListener(ViewElevationOnScrollNestedScrollView(dialogTop))
 
             inputGroup.addInput(inputSeed)
-            inputGroup.addValidator(inputSeed, IsMnemonicValidator("Invalid mnemonic"))
+            inputGroup.addValidator(inputSeed, IsMnemonicValidator(tr(R.string.input_validator_invalid_mnemonic)))
             inputGroup.addValidator(inputSeed, UniqueMnemonicValidator())
 
             inputGroup.addInput(inputTitle)
             inputGroup.addFilter(inputTitle, TitleInputFilter())
             inputGroup.addValidator(binding.inputTitle, RegexValidator("^[^\\s].*$").apply {
-                errorMessage = "Title can't starts from whitespace"
+                errorMessage = tr(R.string.input_validator_title_cant_starts_from_ws)
                 isRequired = false
             })
             inputGroup.addValidator(inputTitle, UniqueWalletTitleValidator())

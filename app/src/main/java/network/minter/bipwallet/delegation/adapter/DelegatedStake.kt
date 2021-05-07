@@ -48,25 +48,6 @@ class DelegatedStake(
         var isKicked: Boolean = false
 ) : DelegatedItem, RemoteImageContainer, Comparable<DelegatedStake>, Parcelable {
 
-//    @JvmField
-//    var coin: CoinItemBase? = null
-//
-//    @JvmField
-//    var amount: BigDecimal = BigDecimal.ZERO
-//
-//    @JvmField
-//    var amountBIP: BigDecimal = BigDecimal.ZERO
-//
-//    @JvmField
-//    var publicKey: MinterPublicKey? = null
-//
-//    @JvmField
-//    var validatorMeta: ValidatorMeta? = null
-//
-//    @JvmField
-//    var isKicked: Boolean = false
-
-
     constructor(info: CoinDelegation) : this(
             info.coin!!,
             info.amount,

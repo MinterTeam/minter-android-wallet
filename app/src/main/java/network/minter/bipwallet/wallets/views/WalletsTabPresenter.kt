@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,6 +39,7 @@ import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.MathHelper.bdIntHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.Plurals
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.settings.EnableStories
 import network.minter.bipwallet.internal.settings.SettingsManager
@@ -238,8 +239,8 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
                 } catch (t: Throwable) {
                     Timber.w(t, "Unable to parse remote transaction: %s", result)
                     viewState.startDialog { ctx: Context? ->
-                        ConfirmDialog.Builder(ctx!!, "Unable to scan QR")
-                                .setText("Invalid transaction data: %s", t.message)
+                        ConfirmDialog.Builder(ctx!!, R.string.dialog_title_err_unable_scan_qr)
+                                .setText(tr(R.string.dialog_title_err_invalid_deeplink, t.message!!))
                                 .setPositiveAction(R.string.btn_close)
                                 .create()
                     }
@@ -273,6 +274,7 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         viewState.startDelegationList()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun setShowStories(enabled: Boolean) {
         initStories()
     }

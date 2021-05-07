@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -218,7 +218,7 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     }
 
     private fun onOurChannelClickListener() {
-        if (Locale.getDefault().isO3Language.toLowerCase() == "rus") {
+        if (Locale.getDefault().isO3Language.lowercase(Locale.getDefault()) == "rus") {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MinterNetwork"))
             viewState.startIntent(intent)
         } else {

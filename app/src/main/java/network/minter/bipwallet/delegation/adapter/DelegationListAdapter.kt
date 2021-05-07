@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -124,9 +124,9 @@ class DelegationListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), D
                 vh.b.itemAvatar.setImageUrl(item)
             }
 
-            vh.b.itemCoin.text = item.coin!!.symbol
+            vh.b.itemCoin.text = item.coin.symbol
             vh.b.itemAmount.text = bdHuman(item.amount)
-            if (item.coin!!.id == MinterSDK.DEFAULT_COIN_ID) {
+            if (item.coin.id == MinterSDK.DEFAULT_COIN_ID) {
                 vh.b.itemSubamount.visibility = View.GONE
                 vh.b.itemSubamount.text = null
             } else {
@@ -141,14 +141,14 @@ class DelegationListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(), D
         }
     }
 
-    fun getItem(pos: Int): DelegatedItem? {
+    fun getItem(pos: Int): DelegatedItem {
         return data[pos]
     }
 
     override fun getItemViewType(position: Int): Int {
         return if (hasProgressRow() && position == itemCount - 1) {
             ITEM_PROGRESS
-        } else getItem(position)!!.viewType
+        } else getItem(position).viewType
     }
 
     fun setLoadState(loadState: MutableLiveData<LoadState>?) {

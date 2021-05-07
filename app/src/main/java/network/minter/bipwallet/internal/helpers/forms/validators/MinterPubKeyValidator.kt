@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,6 +27,8 @@
 package network.minter.bipwallet.internal.helpers.forms.validators
 
 import com.edwardstock.inputfield.form.validators.RegexValidator
+import network.minter.bipwallet.R
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.core.crypto.MinterPublicKey
 
 /**
@@ -34,7 +36,7 @@ import network.minter.core.crypto.MinterPublicKey
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class MinterPubKeyValidator(
-        errorMessage: CharSequence = "Incorrect public key",
+        errorMessage: CharSequence = tr(R.string.input_validator_incorrect_pubkey_format),
         required: Boolean = true
 ) : RegexValidator(MinterPublicKey.PUB_KEY_PATTERN) {
 

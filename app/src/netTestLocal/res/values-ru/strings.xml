@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) by MinterTeam. 2020
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,21 +24,6 @@
   ~ THE SOFTWARE.
   -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="16dp" />
-            <stroke
-                android:width="1dp"
-                android:color="#E5E5E5" />
-            <solid android:color="#FFFFFF" />
-            <padding
-                android:bottom="8dp"
-                android:left="16dp"
-                android:right="16dp"
-                android:top="8dp" />
-        </shape>
-    </item>
-
-</layer-list>
+<resources>
+    <string name="bip_per_min_label">MNT в минуту</string>
+</resources>

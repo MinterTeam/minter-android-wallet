@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,6 +40,7 @@ import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
+import network.minter.explorer.repo.ExplorerPoolsRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import network.minter.explorer.repo.GateCoinRepository;
@@ -98,6 +99,12 @@ public class RepoModule {
     @WalletApp
     public ExplorerValidatorsRepository provideExplorerValidatorsRepo(MinterExplorerSDK api) {
         return api.validators();
+    }
+
+    @Provides
+    @WalletApp
+    public ExplorerPoolsRepository provideExplorerPoolsRepo(MinterExplorerSDK api) {
+        return api.pools();
     }
 
     @Provides

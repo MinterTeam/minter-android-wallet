@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,6 +26,9 @@
 
 package network.minter.bipwallet.internal.helpers.forms.validators
 
+import network.minter.bipwallet.R
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
+
 
 /**
  * minter-android-wallet. 2020
@@ -34,6 +37,6 @@ package network.minter.bipwallet.internal.helpers.forms.validators
 class CoinValidator : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}\$") {
 
     init {
-        errorMessage = "Invalid coin name"
+        errorMessage = tr(R.string.input_validator_err_invalid_coin_name)
     }
 }

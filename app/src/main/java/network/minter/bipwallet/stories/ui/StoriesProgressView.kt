@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -86,6 +86,7 @@ class StoriesProgressView : LinearLayout {
         init(context, attrs)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun init(context: Context, attrs: AttributeSet?) {
         orientation = HORIZONTAL
         storiesCount = 4

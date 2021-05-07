@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -43,6 +43,7 @@ import com.edwardstock.inputfield.InputField
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.IncludeTestnetWarningViewBinding
+import network.minter.bipwallet.internal.Wallet
 
 /**
  * minter-android-wallet. 2020
@@ -187,6 +188,20 @@ object ViewExtensions {
             offsetDescendantRectToMyCoords(descendant, it)
         }.bottom
         return (bottom - height - scrollY).takeIf { it > 0 }
+    }
+
+
+    @JvmStatic
+    fun tr(@StringRes id: Int): String {
+        return Wallet.app().res().getString(id)
+    }
+
+    fun trText(@StringRes id: Int): CharSequence {
+        return Wallet.app().res().getText(id)
+    }
+
+    fun tr(@StringRes id: Int, vararg format: Any): String {
+        return Wallet.app().res().getString(id, format)
     }
 
 }

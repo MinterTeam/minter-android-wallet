@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,9 +28,11 @@ package network.minter.bipwallet.addressbook.db
 import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.BuildConfig
+import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.db.WalletDatabase
+import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.core.crypto.MinterAddress
 
@@ -185,7 +187,7 @@ class AddressBookRepository(
         otherwise returning observable error
          */
         val def = AddressContact()
-        var defResult = Single.error<AddressContact?>(RuntimeException("Not found in address book"))
+        var defResult = Single.error<AddressContact?>(RuntimeException(Wallet.app().res().getString(R.string.address_book_err_not_found)))
         def.name = nameOrAddress
         def.address = nameOrAddress
         if (nameOrAddress.matches(MinterAddress.ADDRESS_PATTERN.toRegex())) {

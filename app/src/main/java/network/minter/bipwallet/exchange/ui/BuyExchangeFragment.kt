@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -95,7 +95,7 @@ class BuyExchangeFragment : ExchangeFragment(), BuyExchangeView {
             presenter!!.handleExtras(arguments)
 
             LastBlockHandler.handle(lastUpdated)
-            val broadcastManager = BroadcastReceiverManager(activity!!)
+            val broadcastManager = BroadcastReceiverManager(requireActivity())
             broadcastManager.add(RTMBlockReceiver {
                 LastBlockHandler.handle(lastUpdated, it)
             })

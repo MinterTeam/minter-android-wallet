@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -61,6 +61,7 @@ import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
@@ -141,7 +142,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputCoin.input.setFocusable(false)
 
             inputGroup.setup {
-                add(inputRecipient, RecipientValidator("Invalid recipient", true))
+                add(inputRecipient, RecipientValidator(tr(R.string.input_validator_invalid_recipient), true))
                 add(inputPayload, PayloadValidator())
             }
             inputGroup.addInput(inputAmount)
@@ -204,7 +205,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
             val num = it.parseBigDecimal()
             num <= coinSupplier()!!.amount
-        }.apply { errorMessage = getString(R.string.error_not_enough_coins) })
+        }.apply { errorMessage = tr(R.string.error_not_enough_coins) })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -253,7 +254,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startExternalTransaction(rawData: String?) {
-        ExternalTransactionActivity.Builder(activity!!, rawData!!)
+        ExternalTransactionActivity.Builder(requireActivity(), rawData!!)
                 .start()
     }
 
@@ -345,7 +346,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     @NeedsPermission(Manifest.permission.CAMERA)
     override fun startScanQR(requestCode: Int) {
         val i = Intent(activity, QRCodeScannerActivity::class.java)
-        activity!!.startActivityForResult(i, requestCode)
+        requireActivity().startActivityForResult(i, requestCode)
     }
 
     override fun startScanQRWithPermissions(requestCode: Int) {
@@ -460,7 +461,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun startAccountSelector(accounts: List<SelectorData<CoinBalance>>, clickListener: (SelectorData<CoinBalance>) -> Unit) {
-        SelectorDialog.Builder<CoinBalance>(activity!!, R.string.dialog_title_choose_coin)
+        SelectorDialog.Builder<CoinBalance>(requireActivity(), R.string.dialog_title_choose_coin)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
                 .create()
@@ -474,13 +475,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     @OnShowRationale(Manifest.permission.CAMERA)
     fun showRationaleForCamera(request: PermissionRequest) {
-        ConfirmDialog.Builder(activity!!, "Camera request")
-                .setText("We need access to your camera to take a shot with Minter Address QR Code")
-                .setPositiveAction("Sure") { d, _ ->
+        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
+                .setText(R.string.dialog_text_camera_permission)
+                .setPositiveAction(R.string.btn_ok) { d, _ ->
                     request.proceed()
                     d.dismiss()
                 }
-                .setNegativeAction("No, I've change my mind") { d: DialogInterface, _: Int ->
+                .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int ->
                     request.cancel()
                     d.dismiss()
                 }.create()
@@ -489,9 +490,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     @OnPermissionDenied(Manifest.permission.CAMERA)
     fun showOpenPermissionsForCamera() {
-        ConfirmDialog.Builder(activity!!, "Camera request")
-                .setText("We need access to your camera to take a shot with Minter Address QR Code")
-                .setPositiveAction("Open settings") { d: DialogInterface, _: Int ->
+        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
+                .setText(R.string.dialog_text_camera_permission)
+                .setPositiveAction(R.string.btn_open_settings) { d: DialogInterface, _: Int ->
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                     val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
@@ -499,16 +500,12 @@ class SendTabFragment : HomeTabFragment(), SendView {
                     startActivity(intent)
                     d.dismiss()
                 }
-                .setNegativeAction("Cancel") { d: DialogInterface, _: Int -> d.dismiss() }
+                .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int -> d.dismiss() }
                 .create()
                 .show()
     }
 
     override fun startAddContact(address: String, onAdded: (AddressContact) -> Unit) {
-        if (fragmentManager == null) {
-            return
-        }
-
         if (bottomSheetDialog != null) {
             bottomSheetDialog!!.dismiss()
             bottomSheetDialog = null
@@ -519,7 +516,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
         (bottomSheetDialog as AddressContactEditDialog).onContactAddedOrUpdated = onAdded
 
-        bottomSheetDialog!!.show(fragmentManager!!, "contact")
+        bottomSheetDialog!!.show(parentFragmentManager, "contact")
     }
 
     @ProvidePresenter

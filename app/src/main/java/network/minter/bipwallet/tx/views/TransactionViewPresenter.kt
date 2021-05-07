@@ -41,6 +41,7 @@ import network.minter.bipwallet.internal.helpers.IntentHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ResTextFormat
 import network.minter.bipwallet.internal.helpers.ViewExtensions.copyOnClick
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.share.ShareManager
@@ -622,10 +623,10 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
 
     private fun startShare() {
         val text = SharingText()
-        text.title = "Transaction " + tx.hash.toShortString()
+        text.title = "${tr(R.string.share_transaction_title_prefix)} " + tx.hash.toShortString()
         text.url = MinterExplorerSDK.newFrontUrl().addPathSegment("transactions").addPathSegment(tx.hash.toString()).build().toString()
 
-        val shareIntent = ShareManager.getInstance().createCommonIntent(text, "Share transaction")
+        val shareIntent = ShareManager.getInstance().createCommonIntent(text, tr(R.string.chooser_share_transaction))
         viewState.startIntent(shareIntent)
     }
 

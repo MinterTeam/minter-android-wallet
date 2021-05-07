@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -159,7 +159,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/_inter_semi_bold"
-            android:text="Swipe to open"
+            android:text="@string/hint_swipe_to_open"
             android:textAlignment="center"
             android:textColor="@color/textColorWhite"
             app:layout_constraintBottom_toBottomOf="parent"

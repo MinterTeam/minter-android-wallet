@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,6 +29,7 @@ import android.os.Bundle
 import android.util.SparseArray
 import com.annimon.stream.Optional
 import com.annimon.stream.Stream
+import network.minter.bipwallet.internal.Wallet
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.BaseCoinValue
 import network.minter.explorer.models.CoinBalance
@@ -235,8 +236,8 @@ object CollectionsHelper {
 
     class StableCoinSorting<T : BaseCoinValue> : Comparator<T> {
         override fun compare(ac: T, bc: T): Int {
-            val a = ac.coin!!.symbol.toLowerCase()
-            val b = bc.coin!!.symbol.toLowerCase()
+            val a = ac.coin!!.symbol.lowercase(Wallet.LC_EN)
+            val b = bc.coin!!.symbol.lowercase(Wallet.LC_EN)
             if (a == b) // update to make it stable
                 return 0
             if (a == sStable) return -1
@@ -244,14 +245,14 @@ object CollectionsHelper {
         }
 
         companion object {
-            private val sStable = MinterSDK.DEFAULT_COIN.toLowerCase()
+            private val sStable = MinterSDK.DEFAULT_COIN.lowercase(Wallet.LC_EN)
         }
     }
 
     class StableCoinSortingCoinBalance : Comparator<CoinBalance> {
         override fun compare(ac: CoinBalance, bc: CoinBalance): Int {
-            val a = ac.coin!!.symbol.toLowerCase()
-            val b = bc.coin!!.symbol.toLowerCase()
+            val a = ac.coin!!.symbol.lowercase(Wallet.LC_EN)
+            val b = bc.coin!!.symbol.lowercase(Wallet.LC_EN)
             if (a == b) // update to make it stable
                 return 0
             if (a == sStable) return -1
@@ -259,7 +260,7 @@ object CollectionsHelper {
         }
 
         companion object {
-            private val sStable = MinterSDK.DEFAULT_COIN.toLowerCase()
+            private val sStable = MinterSDK.DEFAULT_COIN.lowercase(Wallet.LC_EN)
         }
     }
 

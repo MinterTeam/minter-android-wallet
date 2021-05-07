@@ -62,6 +62,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.NetworkHelper
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.forms.validators.NumberNotZeroValidator
 import network.minter.bipwallet.internal.helpers.forms.validators.PayloadValidator
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -209,7 +210,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         if (intent == null) {
             viewState.startDialog { ctx ->
                 ConfirmDialog.Builder(ctx, R.string.error)
-                        .setText("Unable to send deeplink: no data were passed")
+                        .setText(R.string.dialog_text_err_unable_to_send_deeplink_no_data)
                         .setPositiveAction(R.string.btn_close) { d, _ ->
                             d.dismiss()
                             viewState.finishCancel()
@@ -262,7 +263,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 ).toHexString()
             } catch (e: Throwable) {
                 viewState.disableAll()
-                showTxErrorDialog("Unable to parse deeplink: %s", e.message!!)
+                showTxErrorDialog(tr(R.string.dialog_text_err_unable_to_parse_deeplink, e.message!!))
                 return
             }
             if (params.containsKey("p")) {
@@ -286,19 +287,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             } catch (t: StringIndexOutOfBoundsException) {
                 viewState.disableAll()
                 Timber.w(t, "Unable to parse remote transaction: %s", hash)
-                showTxErrorDialog("Invalid transaction data: non-hex string passed")
+                showTxErrorDialog(tr(R.string.dialog_text_err_invalid_tx_data_non_hex_string))
                 return
             } catch (t: Throwable) {
                 viewState.disableAll()
                 Timber.w(t, "Unable to parse remote transaction: %s", hash)
-                showTxErrorDialog("Invalid transaction data: %s", t.message!!)
+                showTxErrorDialog(tr(R.string.dialog_text_err_invalid_tx_data_format, t.message!!))
                 return
             }
         } else {
             val rawTx = intent.getStringExtra(ExternalTransactionActivity.EXTRA_RAW_DATA)
             try {
                 if (rawTx == null) {
-                    throw InvalidExternalTransaction("Empty transaction data", InvalidExternalTransaction.CODE_INVALID_TX)
+                    throw InvalidExternalTransaction(tr(R.string.dialog_text_err_empty_transaction_data), InvalidExternalTransaction.CODE_INVALID_TX)
                 }
                 val out = DeepLinkHelper.rawTxToIntent(rawTx)
                 handleExtras(out)
@@ -306,7 +307,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             } catch (t: Throwable) {
                 viewState.disableAll()
                 Timber.w(t, "Unable to parse remote transaction: %s", rawTx)
-                showTxErrorDialog("Invalid transaction data: %s", t.message!!)
+                showTxErrorDialog(tr(R.string.dialog_text_err_invalid_tx_data_format, t.message!!))
                 return
             }
         }
@@ -329,7 +330,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                     } catch (t: Throwable) {
                         viewState.hideProgress()
-                        showTxErrorDialog("Invalid transaction data: %s", t.message!!)
+                        showTxErrorDialog(tr(R.string.dialog_text_err_invalid_tx_data_format, t.message!!))
                     }
                 }
     }
@@ -415,7 +416,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
     private fun showTxErrorDialog(message: String, vararg args: Any) {
         viewState.startDialog(false) { ctx: Context ->
-            ConfirmDialog.Builder(ctx, "Unable to scan transaction")
+            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_handle_deeplink)
                     .setText(message, *args)
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
@@ -439,8 +440,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             } else if (d.proof.size() == 0 && checkPassword == null) {
                 viewState.disableAll()
                 viewState.startDialog(false) { ctx: Context? ->
-                    ConfirmDialog.Builder(ctx!!, "Unable to scan transaction")
-                            .setText("This check given without proof and password. One of parameters is required.")
+                    ConfirmDialog.Builder(ctx!!, R.string.dialog_title_err_unable_to_handle_deeplink)
+                            .setText(R.string.dialog_text_err_check_given_without_proof)
                             .setPositiveAction(R.string.btn_close) { d, _ ->
                                 d.dismiss()
                                 viewState.finishCancel()
@@ -546,7 +547,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
             OperationType.Multisend -> {
                 val txData = tx.getData(TxMultisend::class.java)
                 if (txData.items.size == 0) {
-                    onFailedExecuteTransaction(Exception("Multisend transaction must contains at least 1 target address"))
+                    onFailedExecuteTransaction(Exception(tr(R.string.deeplink_err_empty_multisend_recipients)))
                     return
                 }
 
@@ -569,7 +570,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                 baseFee = initFeeData!!.priceCommissions.calculateCoinCost(symbol).humanizeDecimal()
             }
             OperationType.RedeemCheck -> {
-                viewState.setFee("You don't pay transaction fee.")
+                viewState.setFee(tr(R.string.deeplink_check_no_redeem_fee))
                 return
             }
             else -> {
@@ -623,7 +624,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val rows = TxInputFieldRow.MultiBuilder(TxSendCoin::class.java, extTx!!)
                                             .onValid { viewState.enableSubmit(it) }
                                             .add {
-                                                label = "You're sending"
+                                                label = tr(R.string.deeplink_label_youre_sending)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinId)
                                                 enabled = enableEditInput
@@ -638,7 +639,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 )
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = data.value.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal({ data, value ->
@@ -646,7 +647,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }, { validateEnoughCoins() })
                                             }
                                             .add {
-                                                label = "To"
+                                                label = tr(R.string.deeplink_label_to)
                                                 text = data.to.toString()
                                                 enabled = enableEditInput
                                                 tplAddress { txSendCoin, s ->
@@ -661,7 +662,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxCoinSell::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxCoinSell::class.java, extTx!!)
                                             .add {
-                                                label = "You're selling"
+                                                label = tr(R.string.deeplink_label_send_youre_selling)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinIdToSell)
                                                 enabled = enableEditInput
@@ -671,7 +672,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }, { validateEnoughCoins() })
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = data.valueToSell.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal({ txCoinSell, s ->
@@ -679,7 +680,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }, { validateEnoughCoins() })
                                             }
                                             .add {
-                                                label = "Coin To Buy"
+                                                label = tr(R.string.deeplink_label_coin_to_buy)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinIdToBuy)
                                                 enabled = enableEditInput
@@ -689,7 +690,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Minimum Amount To Get"
+                                                label = tr(R.string.deeplink_label_min_amount_to_get)
                                                 text = data.minValueToBuy.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal { txCoinSell, s ->
@@ -706,7 +707,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         viewState.enableEditAction(true)
                                         val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
                                                 .add {
-                                                    label = "You're selling within pool"
+                                                    label = tr(R.string.deeplink_label_youre_selling_pool)
                                                     //todo: map coin from db
                                                     text = coinMapper.idToSymbolDef(data.coinIdToSell)
                                                     enabled = enableEditInput
@@ -717,7 +718,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }, { validateEnoughCoins() })
                                                 }
                                                 .add {
-                                                    label = "Amount"
+                                                    label = tr(R.string.deeplink_label_amount)
                                                     text = data.valueToSell.toPlain()
                                                     enabled = enableEditInput
                                                     tplDecimal({ txCoinSell, s ->
@@ -725,7 +726,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }, { validateEnoughCoins() })
                                                 }
                                                 .add {
-                                                    label = "Coin To Buy"
+                                                    label = tr(R.string.deeplink_label_coin_to_buy)
                                                     //todo: map coin from db
                                                     text = coinMapper.idToSymbolDef(data.coinIdToBuy)
                                                     enabled = enableEditInput
@@ -735,7 +736,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }
                                                 }
                                                 .add {
-                                                    label = "Minimum Amount To Get"
+                                                    label = tr(R.string.deeplink_label_min_amount_to_get)
                                                     text = data.minValueToBuy.toPlain()
                                                     enabled = enableEditInput
                                                     tplDecimal { txCoinSell, s ->
@@ -750,16 +751,16 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
                                         data.coins.forEachIndexed { idx, value ->
                                             rows.add {
-                                                label = "Coin ${idx + 1}"
+                                                label = "${tr(R.string.deeplink_label_coin_prefix)} ${idx + 1}"
                                                 text = coinMapper.idToSymbolDef(value)
                                             }
                                         }
                                         rows.add {
-                                            label = "Amount"
+                                            label = tr(R.string.deeplink_label_amount)
                                             text = data.valueToSell.toPlain()
                                         }
                                         rows.add {
-                                            label = "Minimum Amount To Get"
+                                            label = tr(R.string.deeplink_label_min_amount_to_get)
                                             text = data.minValueToBuy.toPlain()
                                         }
                                         allRows.addAll(rows.build())
@@ -771,7 +772,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         viewState.enableEditAction(true)
                                         val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSellAll::class.java, extTx!!)
                                                 .add {
-                                                    label = "You're selling all within pool"
+                                                    label = tr(R.string.deeplink_label_youre_selling_all_pool)
                                                     //todo: map coin from db
                                                     text = coinMapper.idToSymbolDef(data.coinIdToSell)
                                                     enabled = enableEditInput
@@ -782,7 +783,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }, { validateEnoughCoins() })
                                                 }
                                                 .add {
-                                                    label = "Coin To Buy"
+                                                    label = tr(R.string.deeplink_label_coin_to_buy)
                                                     //todo: map coin from db
                                                     text = coinMapper.idToSymbolDef(data.coinIdToBuy)
                                                     enabled = enableEditInput
@@ -792,7 +793,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }
                                                 }
                                                 .add {
-                                                    label = "Minimum Amount To Get"
+                                                    label = tr(R.string.deeplink_label_min_amount_to_get)
                                                     text = data.minValueToBuy.toPlain()
                                                     enabled = enableEditInput
                                                     tplDecimal { txCoinSell, s ->
@@ -807,12 +808,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
                                         data.coins.forEachIndexed { idx, value ->
                                             rows.add {
-                                                label = "Coin ${idx + 1}"
+                                                label = "${tr(R.string.deeplink_label_coin_prefix)} ${idx + 1}"
                                                 text = coinMapper.idToSymbolDef(value)
                                             }
                                         }
                                         rows.add {
-                                            label = "Minimum Amount To Get"
+                                            label = tr(R.string.deeplink_label_min_amount_to_get)
                                             text = data.minValueToBuy.toPlain()
                                         }
                                         allRows.addAll(rows.build())
@@ -823,7 +824,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxCoinSellAll::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxCoinSellAll::class.java, extTx!!)
                                             .add {
-                                                label = "You're selling (sell all)"
+                                                label = tr(R.string.deeplink_label_youre_selling_all)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinIdToSell)
                                                 enabled = enableEditInput
@@ -834,7 +835,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Coin To Buy"
+                                                label = tr(R.string.deeplink_label_coin_to_buy)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinIdToBuy)
                                                 enabled = enableEditInput
@@ -844,7 +845,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Minimum Amount To Get"
+                                                label = tr(R.string.deeplink_label_min_amount_to_get)
                                                 text = data.minValueToBuy.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal { txCoinSellAll, value ->
@@ -861,7 +862,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rows = TxInputFieldRow.MultiBuilder(TxCoinBuy::class.java, extTx!!)
                                             .add {
-                                                label = "You're buying"
+                                                label = tr(R.string.deeplink_label_youre_buying)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinIdToBuy)
                                                 enabled = enableEditInput
@@ -871,7 +872,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = data.valueToBuy.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal { txCoinBuy, s ->
@@ -879,7 +880,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Coin To Sell"
+                                                label = tr(R.string.deeplink_label_coin_to_sell)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinIdToSell)
                                                 enabled = enableEditInput
@@ -889,7 +890,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Maximum Amount To Spend"
+                                                label = tr(R.string.deeplink_amount_max_amount_to_spend)
                                                 text = data.maxValueToSell.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal { txCoinBuy, s ->
@@ -906,7 +907,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         viewState.enableEditAction(true)
                                         val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolBuy::class.java, extTx!!)
                                                 .add {
-                                                    label = "You're buying within pool"
+                                                    label = tr(R.string.deeplink_label_youre_buying_pool)
                                                     //todo: map coin from db
                                                     text = coinMapper.idToSymbolDef(data.coinIdToSell)
                                                     enabled = enableEditInput
@@ -916,7 +917,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }, { validateEnoughCoins() })
                                                 }
                                                 .add {
-                                                    label = "Amount"
+                                                    label = tr(R.string.deeplink_label_amount)
                                                     text = data.valueToBuy.toPlain()
                                                     enabled = enableEditInput
                                                     tplDecimal({ txCoinSell, s ->
@@ -924,7 +925,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }, { validateEnoughCoins() })
                                                 }
                                                 .add {
-                                                    label = "Coin To Sell"
+                                                    label = tr(R.string.deeplink_label_coin_to_sell)
                                                     text = coinMapper.idToSymbolDef(data.coinIdToBuy)
                                                     enabled = enableEditInput
                                                     tplCoin { txCoinSell, s ->
@@ -932,7 +933,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                     }
                                                 }
                                                 .add {
-                                                    label = "Maximum Amount To Sell"
+                                                    label = tr(R.string.deeplink_amount_max_amount_to_spend)
                                                     text = data.maxValueToSell.toPlain()
                                                     enabled = enableEditInput
                                                     tplDecimal { txCoinSell, s ->
@@ -947,16 +948,16 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolSell::class.java, extTx!!)
                                         data.coins.forEachIndexed { idx, value ->
                                             rows.add {
-                                                label = "Coin ${idx + 1}"
+                                                label = "${tr(R.string.deeplink_label_coin_prefix)} ${idx + 1}"
                                                 text = coinMapper.idToSymbolDef(value)
                                             }
                                         }
                                         rows.add {
-                                            label = "Amount"
+                                            label = tr(R.string.deeplink_label_amount)
                                             text = data.valueToBuy.toPlain()
                                         }
                                         rows.add {
-                                            label = "Maximum Amount To Sell"
+                                            label = tr(R.string.deeplink_amount_max_amount_to_spend)
                                             text = data.maxValueToSell.toPlain()
                                         }
                                         allRows.addAll(rows.build())
@@ -967,15 +968,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxSwapPoolCreate::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxSwapPoolCreate::class.java, extTx!!)
                                             .add {
-                                                label = "You're creating swap pool"
+                                                label = tr(R.string.deeplink_label_youre_creating_pool)
                                                 text = "${coinMapper.idToSymbolDef(data.coin0)} / ${coinMapper.idToSymbolDef(data.coin1)}"
                                             }
                                             .add {
-                                                label = "Volume of ${coinMapper.idToSymbolDef(data.coin0)}"
+                                                label = "${tr(R.string.deeplink_label_volume_of_prefix)} ${coinMapper.idToSymbolDef(data.coin0)}"
                                                 text = data.volume0.toPlain()
                                             }
                                             .add {
-                                                label = "Volume of ${coinMapper.idToSymbolDef(data.coin1)}"
+                                                label = "${tr(R.string.deeplink_label_volume_of_prefix)} ${coinMapper.idToSymbolDef(data.coin1)}"
                                                 text = data.volume1.toPlain()
                                             }
                                             .build()
@@ -991,7 +992,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         tx.getData<TxCoinCreate>()
                                     }
 
-                                    val title = if (tx.type == OperationType.RecreateCoin) "You're re-creating coin" else "You're creating coin"
+                                    val title = if (tx.type == OperationType.RecreateCoin)
+                                        tr(R.string.deeplink_label_youre_recreating_coin)
+                                    else
+                                        tr(R.string.deeplink_label_youre_creating_coin)
 
                                     val rows = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
                                             .add {
@@ -999,23 +1003,23 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 text = data.symbol
                                             }
                                             .add {
-                                                label = "Initial Amount"
+                                                label = tr(R.string.deeplink_label_initial_amount)
                                                 text = data.initialAmount.humanize()
                                             }
                                             .add {
-                                                label = "Coin Name"
+                                                label = tr(R.string.deeplink_label_coin_name)
                                                 text = data.name
                                             }
                                             .add {
-                                                label = "CRR (constant reserve ratio)"
+                                                label = tr(R.string.deeplnk_label_crr)
                                                 text = "${data.constantReserveRatio}%"
                                             }
                                             .add {
-                                                label = "Reserve"
+                                                label = tr(R.string.deeplink_label_reserve)
                                                 text = data.initialReserve.humanize()
                                             }
                                             .add {
-                                                label = "Max Supply"
+                                                label = tr(R.string.deeplink_label_max_supply)
                                                 text = if (data.maxSupply < BigDecimal("10").pow(15)) {
                                                     data.maxSupply.humanize()
                                                 } else {
@@ -1034,7 +1038,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         tx.getData<TxTokenCreate>()
                                     }
 
-                                    val title = if (tx.type == OperationType.RecreateToken) "You're re-creating token" else "You're creating token"
+                                    val title = if (tx.type == OperationType.RecreateToken)
+                                        tr(R.string.deeplink_label_youre_recreating_token)
+                                    else
+                                        tr(R.string.deeplink_label_youre_creating_token)
 
                                     val rows = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
                                             .add {
@@ -1042,15 +1049,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 text = data.symbol
                                             }
                                             .add {
-                                                label = "Initial Amount"
+                                                label = tr(R.string.deeplink_label_initial_amount)
                                                 text = data.initialAmount.humanize()
                                             }
                                             .add {
-                                                label = "Coin Name"
+                                                label = tr(R.string.deeplink_label_coin_name)
                                                 text = data.name
                                             }
                                             .add {
-                                                label = "Max Supply"
+                                                label = tr(R.string.deeplink_label_max_supply)
                                                 text = if (data.maxSupply < BigDecimal("10").pow(15)) {
                                                     data.maxSupply.humanize()
                                                 } else {
@@ -1058,12 +1065,12 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Mintable"
-                                                text = if (data.isMintable) "Yes" else "No"
+                                                label = tr(R.string.deeplink_label_mintable)
+                                                text = if (data.isMintable) tr(R.string.yes) else tr(R.string.no)
                                             }
                                             .add {
-                                                label = "Burnable"
-                                                text = if (data.isBurnable) "Yes" else "No"
+                                                label = tr(R.string.deeplink_label_burnable)
+                                                text = if (data.isBurnable) tr(R.string.yes) else tr(R.string.no)
                                             }
                                             .build()
                                     allRows.addAll(rows)
@@ -1077,7 +1084,10 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         tx.getData<TxTokenBurn>()
                                     }
 
-                                    val title = if (tx.type == OperationType.MintToken) "You're minting token" else "You're burning token"
+                                    val title = if (tx.type == OperationType.MintToken)
+                                        tr(R.string.deeplink_label_youre_minting_token)
+                                    else
+                                        tr(R.string.deeplink_label_youre_burning_token)
                                     val rows = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
                                             .add {
                                                 label = title
@@ -1096,20 +1106,20 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rows = TxInputFieldRow.MultiBuilder(TxDeclareCandidacy::class.java, extTx!!)
                                             .add {
-                                                label = "You're declaring candidacy"
+                                                label = tr(R.string.deeplink_label_youre_declaring_candidacy)
                                                 text = data.publicKey.toString()
                                             }
                                             .add {
-                                                label = "Address"
+                                                label = tr(R.string.deeplink_label_address)
                                                 text = data.address.toString()
                                             }
                                             .add {
-                                                label = "Coin"
+                                                label = tr(R.string.deeplink_label_coin)
 //                            todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinId)
                                             }
                                             .add {
-                                                label = "Commission Percent"
+                                                label = tr(R.string.deeplink_label_commission_percent)
                                                 text = "${data.commission}%"
                                             }
                                             .build()
@@ -1121,7 +1131,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rows = TxInputFieldRow.MultiBuilder(TxDelegate::class.java, extTx!!)
                                             .add {
-                                                label = "You're delegating"
+                                                label = tr(R.string.deeplink_label_youre_delegating)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinId)
                                                 enabled = enableEditInput
@@ -1131,7 +1141,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }, { validateEnoughCoins() })
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = data.stake.toPlain()
                                                 enabled = enableEditInput
                                                 addValidator(NumberNotZeroValidator())
@@ -1140,7 +1150,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }, { validateEnoughCoins() })
                                             }
                                             .add {
-                                                label = "To"
+                                                label = tr(R.string.deeplink_label_to)
                                                 text = data.publicKey.toString()
                                                 enabled = enableEditInput
                                                 tplPublicKey { txDelegate, s ->
@@ -1157,15 +1167,15 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rows = TxInputFieldRow.MultiBuilder(TxAddLiquidity::class.java, extTx!!)
                                             .add {
-                                                label = "You're adding liquidity"
+                                                label = tr(R.string.deeplink_label_youre_adding_liquidity)
                                                 text = "${coinMapper.idToSymbolDef(data.coin0)} / ${coinMapper.idToSymbolDef(data.coin1)}"
                                             }
                                             .add {
-                                                label = "Volume"
+                                                label = tr(R.string.deeplink_label_volume)
                                                 text = data.volume.toPlain()
                                             }
                                             .add {
-                                                label = "Max volume"
+                                                label = tr(R.string.deeplink_label_max_volume)
                                                 text = data.maximumVolume.toPlain()
                                             }
                                             .build()
@@ -1178,19 +1188,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rows = TxInputFieldRow.MultiBuilder(TxRemoveLiquidity::class.java, extTx!!)
                                             .add {
-                                                label = "You're removing liquidity"
+                                                label = tr(R.string.deeplink_label_youre_removing_liquidity)
                                                 text = "${coinMapper.idToSymbolDef(data.coin0)} / ${coinMapper.idToSymbolDef(data.coin1)}"
                                             }
                                             .add {
-                                                label = "Liquidity"
+                                                label = tr(R.string.deeplink_label_liquidity)
                                                 text = "${data.liquidity}%"
                                             }
                                             .add {
-                                                label = "Min Volume of ${coinMapper.idToSymbolDef(data.coin0)}"
+                                                label = "${tr(R.string.deeplink_label_min_volume_of_prefix)} ${coinMapper.idToSymbolDef(data.coin0)}"
                                                 text = data.minVolume0.toPlain()
                                             }
                                             .add {
-                                                label = "Min Volume of ${coinMapper.idToSymbolDef(data.coin1)}"
+                                                label = "${tr(R.string.deeplink_label_min_volume_of_prefix)} ${coinMapper.idToSymbolDef(data.coin1)}"
                                                 text = data.minVolume1.toPlain()
                                             }
                                             .build()
@@ -1204,7 +1214,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rows = TxInputFieldRow.MultiBuilder(TxUnbound::class.java, extTx!!)
                                             .add {
-                                                label = "You're unbonding"
+                                                label = tr(R.string.deeplink_label_youre_unbonding)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(data.coinId)
                                                 enabled = enableEditInput
@@ -1214,7 +1224,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = data.value.toPlain()
                                                 enabled = enableEditInput
                                                 tplDecimal { txUnbond, s ->
@@ -1222,7 +1232,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 }
                                             }
                                             .add {
-                                                label = "From"
+                                                label = tr(R.string.deeplink_label_from)
                                                 text = data.publicKey.toString()
                                                 enabled = enableEditInput
                                                 tplPublicKey { txUnbond, s ->
@@ -1238,19 +1248,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxMoveStake::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxMoveStake::class.java, extTx!!)
                                             .add {
-                                                label = "You're moving stake from"
+                                                label = tr(R.string.deeplink_label_youre_moving_stake_from)
                                                 text = data.from.toString()
                                             }
                                             .add {
-                                                label = "To"
+                                                label = tr(R.string.deeplink_label_to)
                                                 text = data.to.toString()
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = data.stake.toPlain()
                                             }
                                             .add {
-                                                label = "Coin"
+                                                label = tr(R.string.deeplink_label_coin)
                                                 text = coinMapper.idToSymbolDef(data.coinId)
                                             }
                                             .build()
@@ -1263,16 +1273,16 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val check = data.decodedCheck
                                     val rows = TxInputFieldRow.MultiBuilder(TxRedeemCheck::class.java, extTx!!)
                                             .add {
-                                                label = "You're using check"
+                                                label = tr(R.string.deeplink_label_youre_redeeming_check)
                                                 text = data.rawCheck.toString()
                                             }
                                             .add {
-                                                label = "Coin"
+                                                label = tr(R.string.deeplink_label_coin)
                                                 //todo: map coin from db
                                                 text = coinMapper.idToSymbolDef(check.coinId)
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.deeplink_label_amount)
                                                 text = check.value.humanize()
                                             }
                                             .build()
@@ -1283,7 +1293,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxSetCandidateOnline::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxSetCandidateOnline::class.java, extTx!!)
                                             .add {
-                                                label = "You're switching on candidate"
+                                                label = tr(R.string.deeplink_label_youre_switching_cand_on)
                                                 text = data.publicKey.toString()
                                             }
                                             .build()
@@ -1294,7 +1304,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxSetCandidateOffline::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxSetCandidateOffline::class.java, extTx!!)
                                             .add {
-                                                label = "You're switching off candidate"
+                                                label = tr(R.string.deeplink_label_youre_switching_cand_off)
                                                 text = data.publicKey.toString()
                                             }
                                             .build()
@@ -1306,8 +1316,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
 
                                     val rowsBuilder = TxInputFieldRow.MultiBuilder(TxMultisend::class.java, extTx!!)
                                             .add {
-                                                label = "You're multi-sending"
-                                                text = "To ${data.items.size} recipients"
+                                                label = tr(R.string.deeplink_label_youre_multisending)
+                                                text = tr(R.string.deeplink_label_to_n_recipients, data.items.size.toString())
                                             }
 
                                     for (item in data.items) {
@@ -1328,22 +1338,25 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                         tx.getData<TxEditMultisig>()
                                     }
 
-                                    val title = if (tx.type == OperationType.CreateMultisigAddress) "creating" else "editing"
+                                    val title = if (tx.type == OperationType.CreateMultisigAddress)
+                                        tr(R.string.deeplink_label_youre_creating_multisig)
+                                    else
+                                        tr(R.string.deeplink_label_youre_editing_multisig)
 
                                     val rowsBuilder = TxInputFieldRow.MultiBuilder(tx.type.opClass, extTx!!)
                                             .add {
-                                                label = "You're $title MultiSig address"
-                                                text = "With ${data.addresses.size} addresses"
+                                                label = title
+                                                text = tr(R.string.deeplink_label_with_n_addresses, data.addresses.size)
                                             }
                                             .add {
-                                                label = "Threshold"
+                                                label = tr(R.string.deeplink_label_threshold)
                                                 text = data.threshold.toString()
                                             }
 
                                     for ((i, item) in data.addresses.withIndex()) {
                                         val weight = data.weights[i]
                                         rowsBuilder.add {
-                                            label = "Weight: $weight"
+                                            label = tr(R.string.deeplink_label_weight_n, weight)
                                             text = "$item"
                                         }
                                     }
@@ -1354,19 +1367,19 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxEditCandidate::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxEditCandidate::class.java, extTx!!)
                                             .add {
-                                                label = "You're editing candidate"
+                                                label = tr(R.string.deeplink_label_youre_editing_cand)
                                                 text = data.publicKey.toString()
                                             }
                                             .add {
-                                                label = "Owner address"
+                                                label = tr(R.string.deeplink_label_owner_address)
                                                 text = data.ownerAddress.toString()
                                             }
                                             .add {
-                                                label = "Reward address"
+                                                label = tr(R.string.deeplink_label_reward_address)
                                                 text = data.rewardAddress.toString()
                                             }
                                             .add {
-                                                label = "Control address"
+                                                label = tr(R.string.deeplink_label_control_address)
                                                 text = data.controlAddress.toString()
                                             }
                                             .build()
@@ -1378,11 +1391,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxEditCandidatePublicKey::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxEditCandidatePublicKey::class.java, extTx!!)
                                             .add {
-                                                label = "You're editing candidate public key"
+                                                label = tr(R.string.deeplink_label_youre_editing_cand_pubkey)
                                                 text = data.publicKey.toString()
                                             }
                                             .add {
-                                                label = "New Public Key"
+                                                label = tr(R.string.deeplink_label_new_pubkey)
                                                 text = data.newPublicKey.toString()
                                             }
                                             .build()
@@ -1394,11 +1407,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxEditCandidateCommission::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxEditCandidateCommission::class.java, extTx!!)
                                             .add {
-                                                label = "You're editing candidate commission"
+                                                label = tr(R.string.deeplink_label_youre_editing_cand_commission)
                                                 text = data.publicKey.toString()
                                             }
                                             .add {
-                                                label = "New Commission"
+                                                label = tr(R.string.deeplink_label_new_commission)
                                                 text = "${data.commission}%"
                                             }
                                             .build()
@@ -1410,11 +1423,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxSetHaltBlock::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxSetHaltBlock::class.java, extTx!!)
                                             .add {
-                                                label = "You're setting halt block"
+                                                label = tr(R.string.deeplink_label_youre_setting_halt_block)
                                                 text = data.publicKey.toString()
                                             }
                                             .add {
-                                                label = "Height"
+                                                label = tr(R.string.deeplink_label_height)
                                                 text = data.height.toString()
                                             }
                                             .build()
@@ -1426,11 +1439,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxEditCoinOwner::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxEditCoinOwner::class.java, extTx!!)
                                             .add {
-                                                label = "You're changing coin owner"
+                                                label = tr(R.string.deeplink_label_youre_changing_coin_owner)
                                                 text = data.symbol
                                             }
                                             .add {
-                                                label = "New owner"
+                                                label = tr(R.string.deeplink_label_new_owner)
                                                 text = data.newOwner.toString()
                                             }
                                             .build()
@@ -1442,7 +1455,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxPriceVote::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxPriceVote::class.java, extTx!!)
                                             .add {
-                                                label = "You're voting for price"
+                                                label = tr(R.string.deeplink_label_youre_voting_for_price)
                                                 text = data.price.toString()
                                             }
                                             .build()
@@ -1454,11 +1467,11 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val data = tx.getData(TxVoteUpdate::class.java)
                                     val rows = TxInputFieldRow.MultiBuilder(TxVoteUpdate::class.java, extTx!!)
                                             .add {
-                                                label = "You're voting for update"
-                                                text = "Version: ${data.version}"
+                                                label = tr(R.string.deeplink_label_youre_voting_for_update)
+                                                text = "${tr(R.string.deeplink_label_version)}: ${data.version}"
                                             }
                                             .add {
-                                                label = "Public Key"
+                                                label = tr(R.string.deeplink_label_pubkey)
                                                 text = data.pubKey.toString()
                                             }
                                             .build()
@@ -1471,7 +1484,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                     val rows = TxInputFieldRow.MultiBuilder(TxVoteCommission::class.java, extTx!!)
                                     data.nameValueMap().forEach { kv ->
                                         rows.add {
-                                            label = "Commission: ${kv.key}"
+                                            label = "${tr(R.string.deeplink_label_commission)}: ${kv.key}"
                                             text = "${kv.value.humanizeDecimal()} ${initFeeData?.gasRepresentingCoin?.symbol ?: MinterSDK.DEFAULT_COIN}"
                                         }
                                     }
@@ -1479,8 +1492,8 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                 }
                                 else -> {
                                     viewState.startDialog(false) { ctx: Context? ->
-                                        ConfirmDialog.Builder(ctx!!, "Unable to send")
-                                                .setText("Wallet doesn't support this transaction type: %s", tx.type.name)
+                                        ConfirmDialog.Builder(ctx!!, R.string.dialog_title_err_unable_to_send_tx)
+                                                .setText(tr(R.string.dialog_text_err_unsupported_tx_type, tx.type.name))
                                                 .setPositiveAction(R.string.btn_close) { d, _ ->
                                                     d.dismiss()
                                                     viewState.finishCancel()
@@ -1543,7 +1556,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                     .joinToUi()
                     .switchMap(Function<TxInitData, ObservableSource<GateResult<PushResult>>> { cntRes: TxInitData ->
                         // if in previous request we've got error, returning it
-                        if (!cntRes.isSuccess) {
+                        if (!cntRes.isOk) {
                             return@Function Observable.just(cntRes.errorResult!!.castErrorResultTo<PushResult>())
                         }
                         val gasPrice = if (extTx!!.type == OperationType.RedeemCheck) {
@@ -1579,9 +1592,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private fun onErrorExecuteTransaction(errorResult: GateResult<*>) {
         Timber.e(errorResult.message, "Unable to send transaction")
         viewState.startDialog { ctx: Context? ->
-            ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
+            ConfirmDialog.Builder(ctx!!, R.string.dialog_title_err_unable_to_send_tx)
                     .setText(errorResult.message)
-                    .setPositiveAction("Close") { d, _ ->
+                    .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
 //                        viewState.finishCancel()
                     }
@@ -1592,9 +1605,9 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
     private fun onFailedExecuteTransaction(throwable: Throwable) {
         Timber.w(throwable, "Uncaught tx error")
         viewState.startDialog { ctx: Context? ->
-            ConfirmDialog.Builder(ctx!!, "Unable to send transaction")
+            ConfirmDialog.Builder(ctx!!, R.string.dialog_title_err_unable_to_send_tx)
                     .setText(throwable.message)
-                    .setPositiveAction("Close") { d, _ ->
+                    .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
                         //viewState.finishCancel()
                     }
@@ -1611,7 +1624,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
         cachedTxRepo.update(true)
         viewState.startDialog(false) { ctx: Context ->
             TxSendSuccessDialog.Builder(ctx)
-                    .setLabel("Transaction successfully sent")
+                    .setLabel(R.string.send_dialog_success_label)
                     .setValue(null)
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)

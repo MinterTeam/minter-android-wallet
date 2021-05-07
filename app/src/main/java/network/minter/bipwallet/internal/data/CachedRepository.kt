@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,7 +34,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.functions.Action
-import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
@@ -270,9 +269,10 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      * @param <T> Any type
      * @return Observable
      */
+    @Suppress("NULLABLE_TYPE_PARAMETER_AGAINST_NOT_NULL_TYPE_PARAMETER")
     fun <T> updateAfter(first: Observable<T>): Observable<ResultModel> {
         return Observable
-                .zip(first, entity.getUpdatableData(), BiFunction { _: T, resultModel: ResultModel -> resultModel })
+                .zip(first, entity.getUpdatableData(), { _: T, resultModel: ResultModel -> resultModel })
                 .observeOn(THREAD_MAIN)
                 .subscribeOn(THREAD_IO)
     }
@@ -411,6 +411,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         }
     }
 
+    @Suppress("NULLABLE_TYPE_PARAMETER_AGAINST_NOT_NULL_TYPE_PARAMETER")
     protected fun notifyOnSuccess(isNew: Boolean) {
         mMetaNotifier.onNext(MetaResult(entity.getData(), isNew))
         mNotifier.onNext(entity.getData())

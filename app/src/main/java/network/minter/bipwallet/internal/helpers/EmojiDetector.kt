@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -41,8 +41,8 @@ object EmojiDetector {
         //val pattern = Pattern.compile("""(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])""", Pattern.UNICODE_CHARACTER_CLASS)
         val data = string.toCharArray()
         if (data.size >= 2) {
-            val a = data[0].toInt()
-            val b = data[1].toInt()
+            val a = data[0].code
+            val b = data[1].code
 
             @Suppress("RedundantIf")
             return if (a == 0x00a9) {

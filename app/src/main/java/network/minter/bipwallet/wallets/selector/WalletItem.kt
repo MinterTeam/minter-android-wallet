@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,7 +26,7 @@
 package network.minter.bipwallet.wallets.selector
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal

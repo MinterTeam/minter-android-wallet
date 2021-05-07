@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,6 +37,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.core.MinterSDK
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
+import java.util.*
 
 /**
  * minter-android-wallet. 2018
@@ -93,7 +94,7 @@ class TxSendStartDialog(context: Context, private val builder: Builder) : Wallet
             if (coin == null) {
                 return this
             }
-            this.coin = coin.toUpperCase()
+            this.coin = coin.uppercase(Locale.getDefault())
             return this
         }
     }

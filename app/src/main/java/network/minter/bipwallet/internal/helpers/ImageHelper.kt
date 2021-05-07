@@ -147,7 +147,7 @@ class ImageHelper(private val context: Context, private val mDisplay: DisplayHel
 
         picasso = Picasso.Builder(context)
                 .downloader(OkHttp3Downloader(httpClient))
-                .listener { instance, uri, exception ->
+                .listener { _, uri, exception ->
                     Timber.w(exception, "Unable to load image %s", uri.toString())
                 }
                 .indicatorsEnabled(false)

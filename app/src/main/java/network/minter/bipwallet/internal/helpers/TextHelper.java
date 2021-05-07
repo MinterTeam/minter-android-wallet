@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,18 +31,20 @@ import android.util.Patterns;
 
 import java.util.List;
 
+import network.minter.bipwallet.R;
 import network.minter.bipwallet.internal.Wallet;
+
+import static network.minter.bipwallet.internal.helpers.ViewExtensions.tr;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
 public final class TextHelper {
 
     public static String booleanToWord(boolean input) {
-        return input ? "да" : "нет";
+        return input ? tr(R.string.yes) : tr(R.string.no);
     }
 
     public static boolean isValidEmail(String email) {

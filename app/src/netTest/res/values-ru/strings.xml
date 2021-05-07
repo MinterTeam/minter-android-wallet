@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (C) by MinterTeam. 2018
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -25,24 +24,6 @@
   ~ THE SOFTWARE.
   -->
 
-<com.google.android.material.textfield.TextInputLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/layout_input"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:hintEnabled="true"
-    app:passwordToggleDrawable="@null"
-    >
-
-    <network.minter.bipwallet.internal.views.text.PrefixEditText
-        android:id="@+id/input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-3dp"
-        android:layout_marginEnd="-3dp"
-        android:inputType="textVisiblePassword|textNoSuggestions"
-        android:text="@string/at"
-        android:textSize="@dimen/text_size_default"
-        />
-</com.google.android.material.textfield.TextInputLayout>
+<resources>
+    <string name="bip_per_min_label">MNT в минуту</string>
+</resources>

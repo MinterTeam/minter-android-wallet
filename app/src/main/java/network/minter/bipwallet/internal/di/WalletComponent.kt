@@ -121,6 +121,7 @@ interface WalletComponent {
     fun addressExplorerRepo(): ExplorerAddressRepository
     fun explorerCoinsRepo(): ExplorerCoinsRepository
     fun validatorsRepo(): ExplorerValidatorsRepository
+    fun pools(): ExplorerPoolsRepository
     fun gasRepo(): GateGasRepository
     fun txGateRepo(): GateTransactionRepository
     fun estimateRepo(): GateEstimateRepository

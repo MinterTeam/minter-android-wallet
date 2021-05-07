@@ -59,6 +59,7 @@ import network.minter.bipwallet.internal.dialogs.WalletDialog.Companion.switchDi
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.scrollDownTo
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinFilter
 import network.minter.bipwallet.internal.helpers.forms.validators.CoinValidatorWithSuffix
@@ -106,9 +107,9 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
 
         inputGroup.clearErrorBeforeValidate = false
         inputGroup.addInput(binding.inputIncomingCoin, binding.inputAmount)
-        inputGroup.addValidator(binding.inputAmount, DecimalValidator("Invalid number"))
+        inputGroup.addValidator(binding.inputAmount, DecimalValidator(tr(R.string.input_validator_err_invalid_number)))
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
-        inputGroup.addValidator(binding.inputIncomingCoin, CoinValidatorWithSuffix())
+        inputGroup.addValidator(binding.inputIncomingCoin, CoinValidatorWithSuffix(tr(R.string.input_validator_err_invalid_coin_name)))
         inputGroup.addFilter(binding.inputIncomingCoin, CoinFilter())
         inputGroup.addFilter(binding.inputAmount, DecimalInputFilter(binding.inputAmount))
         binding.calculationContainer.calculation.inputType = InputType.TYPE_NULL
@@ -256,7 +257,7 @@ abstract class ExchangeFragment : BaseInjectFragment(), ExchangeView {
                     do {
                         toConcat = calculation.substring(0, ++idx)
                     } while (toConcat[toConcat.length - 1] != ' ')
-                    toConcat += "THE MATRIX HAS YOU "
+                    toConcat += tr(R.string.easter_egg)
                     toConcat += calculation.substring(idx)
                     view.text = toConcat
                     return@post
