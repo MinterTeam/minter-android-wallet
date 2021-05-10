@@ -190,6 +190,8 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                     out.commissionBase = buyFee
                                     out.commissionBIP = buyFee
                                 }
+                                val getAmount = mBuilder.getAmount()
+                                val inCoinFee = ((res.amount * buyFee) / getAmount)
 
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
                                 if (bipAccount.get().amount >= buyFee) {
@@ -197,19 +199,20 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
 
                                     out.gasCoin = bipAccount.get().coin.id
                                     out.estimate = res.amount
-                                    out.calculation = String.format("%s %s", bdHuman(res.amount), sourceCoin)
+                                    out.calculation = String.format("%s %s", bdHuman(out.amount), sourceCoin)
 
-                                } else if (getAccount.isPresent && getAccount.get().bipValue >= (out.amount + buyFee)) {
+                                } else if (getAccount.isPresent && getAccount.get().amount >= (out.amount + inCoinFee)) {
                                     Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
+                                    //(0.000070727942238907*1.5)/1
                                     out.gasCoin = getAccount.get().coin.id
-                                    out.estimate = out.amount + buyFee
-                                    out.calculation = String.format("%s %s", (out.amount + buyFee).humanize(), sourceCoin)
+                                    out.estimate = out.amount + inCoinFee
+                                    out.calculation = String.format("%s %s", (out.amount + inCoinFee).humanize(), sourceCoin)
                                 } else {
                                     //@todo logic duplication to synchronize with iOS app
                                     Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
                                     out.gasCoin = getAccount.get().coin.id
                                     out.estimate = out.amount + buyFee
-                                    out.calculation = String.format("%s %s", bdHuman(out.amount + buyFee), sourceCoin)
+                                    out.calculation = String.format("%s %s", bdHuman(out.amount + inCoinFee), sourceCoin)
                                 }
                                 onResult(out)
                             },
@@ -263,6 +266,12 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                                 out.estimate = res.amount
                                 out.swapFrom = res.swapFrom
                                 out.route = res.route
+
+                                if (out.swapFrom == EstimateSwapFrom.Pool) {
+                                    out.calculation = String.format("%s %s", (res.route?.amountOut
+                                            ?: res.route?.amountOut ?: res.amount).humanize(), targetCoin)
+                                    out.amount = res.route?.amountOut ?: res.amount
+                                }
 
                                 // if exchanging via pool, calculate (intermediate coins count of route * delta) + base swap fee
                                 var sellFee: BigDecimal = if (out.swapFrom == EstimateSwapFrom.Pool) {
