@@ -39,9 +39,13 @@ import network.minter.core.MinterSDK;
  */
 public class Plurals {
     private static String[] seconds;
+    private static String secondsShort;
     private static String[] minutes;
+    private static String minutesShort;
     private static String[] hours;
+    private static String hoursShort;
     private static String[] days;
+    private static String daysShort;
     private static String[] bips;
 
     public static void init(Resources res) {
@@ -50,21 +54,25 @@ public class Plurals {
                 res.getString(R.string.plurals_seconds_2_4),
                 res.getString(R.string.plurals_seconds_others)
         };
+        secondsShort = res.getString(R.string.plurals_seconds_short);
         minutes = new String[]{
                 res.getString(R.string.plurals_minutes_1),
                 res.getString(R.string.plurals_minutes_2_4),
                 res.getString(R.string.plurals_minutes_others)
         };
+        minutesShort = res.getString(R.string.plurals_minutes_short);
         hours = new String[]{
                 res.getString(R.string.plurals_hours_1),
                 res.getString(R.string.plurals_hours_2_4),
                 res.getString(R.string.plurals_hours_others)
         };
+        hoursShort = res.getString(R.string.plurals_hours_short);
         days = new String[]{
                 res.getString(R.string.plurals_days_1),
                 res.getString(R.string.plurals_days_2_4),
                 res.getString(R.string.plurals_days_others)
         };
+        daysShort = res.getString(R.string.plurals_days_short);
         bips = new String[]{"bip", "bip", "bip"};
 
     }
@@ -128,13 +136,13 @@ public class Plurals {
 
     public static String timeUnitShort(Long seconds) {
         if (seconds < 60) {
-            return "sec";
+            return secondsShort;
         } else if (seconds < 3600) {
-            return "min";
+            return minutesShort;
         } else if (seconds < 86400) {
-            return "h";
+            return hoursShort;
         } else {
-            return "d";
+            return daysShort;
         }
     }
 

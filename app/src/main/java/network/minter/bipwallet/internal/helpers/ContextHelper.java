@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2018 by MinterTeam
- * @link https://github.com/MinterTeam
+ * Copyright (C) by MinterTeam. 2021
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -37,6 +38,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import network.minter.bipwallet.BuildConfig;
+import network.minter.bipwallet.R;
 import timber.log.Timber;
 
 public class ContextHelper {
@@ -63,7 +65,7 @@ public class ContextHelper {
 
         ClipData data = ClipData.newUri(ctx.getContentResolver(), label, uri);
         clipboard.setPrimaryClip(data);
-        Toast.makeText(ctx, "Copied", Toast.LENGTH_LONG).show();
+        Toast.makeText(ctx, ctx.getString(R.string.alert_copied), Toast.LENGTH_LONG).show();
     }
 
     public static void copyToClipboardNoAlert(Context ctx, CharSequence text) {
@@ -84,7 +86,7 @@ public class ContextHelper {
         }
         ClipData data = ClipData.newPlainText("", text);
         clipboard.setPrimaryClip(data);
-        Toast.makeText(ctx, "Copied", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctx, ctx.getString(R.string.alert_copied), Toast.LENGTH_SHORT).show();
     }
 
     @SuppressWarnings("ConstantConditions")

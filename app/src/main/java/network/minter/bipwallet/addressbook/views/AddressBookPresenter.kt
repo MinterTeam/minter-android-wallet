@@ -40,6 +40,7 @@ import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.EmojiDetector
 import network.minter.bipwallet.internal.helpers.HtmlCompat
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import timber.log.Timber
@@ -142,7 +143,7 @@ class AddressBookPresenter @Inject constructor() : MvpBasePresenter<AddressBookV
 
         if (lastUsed.isNotEmpty()) {
             lastUsed[0].isLastUsed = true
-            out.add(AddressBookItemHeader("Last Used", true))
+            out.add(AddressBookItemHeader(tr(R.string.list_header_last_used), true))
             out.add(lastUsed[0])
         }
 

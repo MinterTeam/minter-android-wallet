@@ -81,7 +81,7 @@ class ValidatorSelectorAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
     fun setItems(lastUsed: List<ValidatorItem>, validators: List<ValidatorItem>) {
         val data = ArrayList<Item>(/*maximum capacity*/validators.size + lastUsed.size + 2)
         if (lastUsed.isNotEmpty()) {
-            data.add(ItemHeader(tr(R.string.validator_header_last_used)))
+            data.add(ItemHeader(tr(R.string.list_header_last_used)))
             data.addAll(lastUsed.map { ItemValue(it, true) })
         }
         data.add(ItemHeader(tr(R.string.validator_header_all_validators)))

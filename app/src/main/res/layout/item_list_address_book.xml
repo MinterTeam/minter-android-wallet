@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -39,7 +39,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/swipe_actions"
-        android:layout_width="176dp"
+        android:layout_width="wrap_content"
+        android:minWidth="176dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -49,27 +50,27 @@
         <TextView
             android:id="@+id/action_edit"
             style="@style/Wallet.Button.SwipeAction"
-            android:layout_width="88dp"
+            android:layout_width="wrap_content"
+            android:minWidth="88dp"
             android:layout_height="0dp"
             android:background="@color/colorPrimaryLight"
             android:text="@string/btn_edit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/action_delete"
             app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/action_delete"
             style="@style/Wallet.Button.SwipeAction"
-            android:layout_width="88dp"
+            android:layout_width="wrap_content"
+            android:minWidth="88dp"
             android:layout_height="0dp"
             android:background="@color/colorPrimaryWarning"
             android:text="@string/btn_delete"
             android:textColor="@color/textColorWhite"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/action_edit"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

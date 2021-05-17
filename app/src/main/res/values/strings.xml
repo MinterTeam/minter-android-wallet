@@ -82,7 +82,6 @@
     <string name="title_pin_enter_new">Enter new PIN-code</string>
     <string name="hint_pin_enter">Please enter a 4-digit PIN</string>
     <string name="hint_pin_repeat">Please confirm your 4-digit PIN</string>
-    <string name="error_pin_invalid" formatted="false">Invalid PIN-code. Left %d tries.</string>
     <string name="error_pin_invalid_simple" formatted="false">Invalid PIN-code</string>
     <string name="pin_fp_title_enable">Unlock the wallet with fingerprint</string>
     <string name="notification_balance_update_name">Balance updates</string>
@@ -351,7 +350,7 @@
     <string name="address_book_err_unknown_type">Unknown address type %s</string>
     <string name="address_book_err_address_is_null">Address can\'t be null</string>
     <string name="coin_err_not_found">Coin not found</string>
-    <string name="validator_header_last_used">Last Used</string>
+    <string name="list_header_last_used">Last Used</string>
     <string name="validator_header_all_validators">All Validators</string>
     <string name="validator_err_pubkey_required">Public key required</string>
     <string name="validator_err_invalid_pubkey_format">Invalid public key format</string>
@@ -361,7 +360,7 @@
     <string name="validator_err_cant_unbond_zero_coins">Can\'t unbond 0 coins</string>
     <string name="account_err_insufficient_funds">Insufficient funds for sending transaction</string>
     <string name="validator_err_insufficient_funds_for_unbond">Insufficient funds for unbond: required %1$s %2$s, balance: %3$s %4$s</string>
-    <string name="validator_wait_for_stake_update" formatted="false">Please allow ~%d %s for your delegated balance to update.</string>
+    <string name="validator_wait_for_stake_update">Please allow ~%1$d %2$s for your delegated balance to update.</string>
     <string name="dialog_title_err_unable_to_send_tx">Unable to send transaction</string>
     <string name="dialog_text_err_unknown_error_caused">Caused unknown error</string>
     <string name="validator_err_didnt_delegated">You didn\'t delegated to selected validator</string>
@@ -401,6 +400,13 @@
     <string name="deeplink_err_unable_to_parse_transaction">Unable to parse transaction url</string>
     <string name="deeplink_err_unknown_deeplink_format">Unknown deeplink format</string>
     <string name="deeplink_err_no_tx_data_passed">No transaction data passed</string>
+
+    <string name="plurals_seconds_short">sec</string>
+    <string name="plurals_minutes_short">min</string>
+    <string name="plurals_hours_short">h</string>
+    <string name="plurals_days_short">d</string>
+
+
     <string name="plurals_seconds_1">second</string>
     <string name="plurals_seconds_2_4">seconds</string>
     <string name="plurals_seconds_others">seconds</string>
@@ -413,6 +419,16 @@
     <string name="plurals_days_1">day</string>
     <string name="plurals_days_2_4">days</string>
     <string name="plurals_days_others">days</string>
+
+    <plurals name="pin_code_left_tries">
+        <item quantity="zero">Invalid PIN-code. Left %1$d tries</item>
+        <item quantity="one">Invalid PIN-code. Left %1$d try</item>
+        <item quantity="two">Invalid PIN-code. Left %1$d tries</item>
+        <item quantity="few">Invalid PIN-code. Left %1$d tries</item>
+        <item quantity="many">Invalid PIN-code. Left %1$d tries</item>
+        <item quantity="other">Invalid PIN-code. Left %1$d tries</item>
+    </plurals>
+
     <string name="btn_open_settings">Open system settings</string>
     <string name="deeplink_err_empty_multisend_recipients">Multisend transaction must contains at least 1 target address</string>
     <string name="deeplink_check_no_redeem_fee">You don\'t pay transaction fee.</string>

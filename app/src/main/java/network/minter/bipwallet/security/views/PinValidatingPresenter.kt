@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -108,7 +108,7 @@ class PinValidatingPresenter @Inject constructor() : MvpBasePresenter<PinValidat
             logout()
             return
         }
-        viewState.setPinError(Wallet.app().res().getString(R.string.error_pin_invalid, SecurityModule.MAX_TRIES_UNTIL_LOCK - invalidCount))
+        viewState.setPinError(Wallet.app().res().getQuantityString(R.plurals.pin_code_left_tries, SecurityModule.MAX_TRIES_UNTIL_LOCK - invalidCount))
     }
 
     @Suppress("UNUSED_PARAMETER")

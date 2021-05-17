@@ -632,7 +632,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         val height = result.result?.transaction?.height?.toLong() ?: DELEGATION_BLOCKS_RECOUNT
 
         val leftSeconds: Float = (DELEGATION_BLOCKS_RECOUNT - (height % DELEGATION_BLOCKS_RECOUNT)) * 5f
-        val msg = tr(R.string.validator_wait_for_stake_update, Plurals.timeValue(leftSeconds.toLong()), Plurals.timeUnitShort(leftSeconds.toLong()))
+        val msg = tr(R.string.validator_wait_for_stake_update, Plurals.timeValue(leftSeconds.toLong()).toInt(), Plurals.timeUnitShort(leftSeconds.toLong()))
 
         viewState.startDialog {
             TxSendSuccessDialog.Builder(it)

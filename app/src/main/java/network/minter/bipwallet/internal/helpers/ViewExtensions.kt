@@ -201,7 +201,7 @@ object ViewExtensions {
     }
 
     fun tr(@StringRes id: Int, vararg format: Any): String {
-        return Wallet.app().res().getString(id, format)
+        return Wallet.app().res().getString(id, *format)
     }
 
 }

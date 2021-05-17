@@ -81,7 +81,6 @@
     <string name="title_pin_enter_new">Введите новый PIN-код</string>
     <string name="hint_pin_enter">Пожалуйста, введите PIN из 4-х цифр</string>
     <string name="hint_pin_repeat">Пожалуйста, подтвердите свой PIN из 4-х цифр</string>
-    <string name="error_pin_invalid" formatted="false">Неверный PIN-код. Осталось %d попыток.</string>
     <string name="error_pin_invalid_simple" formatted="false">Неверный PIN-код</string>
     <string name="pin_fp_title_enable">Разблокируйте кошелек с помощью отпечатка</string>
     <string name="notification_balance_update_name">Баланс обновляется</string>
@@ -222,12 +221,12 @@
     <string name="input_hint_wallet_seed">Или введите сид-фразу от своего уже существующего кошелька.</string>
     <string name="dialog_title_add_wallet">Добавить новый кошелек</string>
     <string name="btn_remove_wallet">Убрать кошелек</string>
-    <string name="tx_send_payload_hint">Вы можете добавить сообщение к своей транзакции.</string>
+    <string name="tx_send_payload_hint">Вы можете добавить сообщение к своей транзакции</string>
     <string name="title_address_book">Адресная книга</string>
     <string name="btn_edit">Редактировать</string>
     <string name="btn_delete">Удалить</string>
     <string name="input_hint_addressbook_address">Mx-адрес</string>
-    <string name="input_hint_addressbook_title">Присвойте адресу название.</string>
+    <string name="input_hint_addressbook_title">Присвойте адресу название</string>
     <string name="dialog_title_add_contact">Добавить новый адрес</string>
     <string name="dialog_title_edit_contact">Изменить адрес</string>
     <string name="hint_choose_def_wallet">Выберите кошелек, который будет открываться по умолчанию при запуске приложения.</string>
@@ -277,14 +276,14 @@
     <string name="dialog_label_unbond">Процесс будет завершен примерно через 30 дней после отправки запроса.</string>
     <string name="label_validator">Валидатор</string>
     <string name="menu_label_delegate">Делегировать</string>
-    <string name="empty_delegations">Делегированные стейки пока отсутствуют.</string>
+    <string name="empty_delegations">Делегированные стейки пока отсутствуют</string>
     <string name="warning_stake_in_waitlist">Внимание! На данный момент один или более ваших стейков находятся в списке ожидания, а значит, не приносят вам наград. Пожалуйста, делегируйте дополнительные монеты, чтобы соответствовать необходимому минимуму, либо дождитесь открытого слота, либо совершите разделегирование.</string>
-    <string name="empty_transactions">Транзакции пока отсутствуют.</string>
+    <string name="empty_transactions">Транзакции пока отсутствуют</string>
     <string name="dialog_label_delegate_progress">Делегирование…</string>
     <string name="dialog_label_unbond_progress">Разделегирование…</string>
     <string name="btn_save_changes">Сохранить изменения</string>
     <string name="dialog_title_your_address">Ваш адрес</string>
-    <string name="empty_address_book">Контакты пока отсутствуют.</string>
+    <string name="empty_address_book">Контакты пока отсутствуют</string>
     <string name="dialog_title_choose_wallet">Выбрать кошелек</string>
     <string name="dialog_title_delete_wallet">Удалить кошелек</string>
     <string name="dialog_description_delete_wallet"><![CDATA[Вы уверены, что хотите удалить кошелек <b>%s</b> из этого приложения?]]></string>
@@ -350,7 +349,7 @@
     <string name="address_book_err_unknown_type">Неизвестный тип адреса %s</string>
     <string name="address_book_err_address_is_null">Адрес не может принимать значение null</string>
     <string name="coin_err_not_found">Монета не найдена</string>
-    <string name="validator_header_last_used">Последнее использование</string>
+    <string name="list_header_last_used">Недавние</string>
     <string name="validator_header_all_validators">Все валидаторы</string>
     <string name="validator_err_pubkey_required">Необходим публичный ключ</string>
     <string name="validator_err_invalid_pubkey_format">Некорректный формат публичного ключа</string>
@@ -360,7 +359,7 @@
     <string name="validator_err_cant_unbond_zero_coins">Невозможно разделегировать 0 монет</string>
     <string name="account_err_insufficient_funds">Недостаточно средств для отправки транзакции</string>
     <string name="validator_err_insufficient_funds_for_unbond">Недостаточно средств для unbondа: необходимо %1$s %2$s, баланс: %3$s %4$s</string>
-    <string name="validator_wait_for_stake_update" formatted="false">Пожалуйста, подождите ~%d %s, чтобы увидеть обновленный баланс в делегировании.</string>
+    <string name="validator_wait_for_stake_update">Пожалуйста, подождите ~%1$d %2$s, чтобы увидеть обновленный баланс в делегировании.</string>
     <string name="dialog_title_err_unable_to_send_tx">Не удалось отправить транзакцию</string>
     <string name="dialog_text_err_unknown_error_caused">Вызвана неизвестная ошибка</string>
     <string name="validator_err_didnt_delegated">Вы не делегировали выбранному валидатору</string>
@@ -400,8 +399,14 @@
     <string name="deeplink_err_unable_to_parse_transaction">Не удалось разобрать url транзакции</string>
     <string name="deeplink_err_unknown_deeplink_format">Неизвестный формат диплинка</string>
     <string name="deeplink_err_no_tx_data_passed">Транзакционные данные не были переданы</string>
+
+    <string name="plurals_seconds_short">сек</string>
+    <string name="plurals_minutes_short">мин</string>
+    <string name="plurals_hours_short">ч</string>
+    <string name="plurals_days_short">д</string>
+
     <string name="plurals_seconds_1">секунда</string>
-    <string name="plurals_seconds_2_4">секунды</string>
+    <string name="plurals_seconds_2_4">секgунды</string>
     <string name="plurals_seconds_others">секунд</string>
     <string name="plurals_minutes_1">минута</string>
     <string name="plurals_minutes_2_4">минуты</string>
@@ -412,6 +417,16 @@
     <string name="plurals_days_1">день</string>
     <string name="plurals_days_2_4">дня</string>
     <string name="plurals_days_others">дней</string>
+
+    <plurals name="pin_code_left_tries">
+        <item quantity="zero">Неверный PIN-код. Осталось %1$d попыток</item>
+        <item quantity="one">Неверный PIN-код. Осталась %1$d попытка</item>
+        <item quantity="two">Неверный PIN-код. Осталось %1$d попытки</item>
+        <item quantity="few">Неверный PIN-код. Осталось %1$d попытки</item>
+        <item quantity="many">Неверный PIN-код. Осталось %1$d попыток</item>
+        <item quantity="other">Неверный PIN-код. Осталось %1$d попыток</item>
+    </plurals>
+
     <string name="btn_open_settings">Открыть системные настройки</string>
     <string name="deeplink_err_empty_multisend_recipients">Мультисенд-транзакция должна включать как минимум 1 конечный адрес.</string>
     <string name="deeplink_check_no_redeem_fee">Вы не уплачиваете комиссию.</string>
