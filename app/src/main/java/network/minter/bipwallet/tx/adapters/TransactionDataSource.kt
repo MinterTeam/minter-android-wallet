@@ -138,7 +138,15 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
     private fun lastDay(): String {
         return if (DateHelper.compareFlatDay(_lastDate!!, DateTime())) {
             Wallet.app().res().getString(R.string.today)
-        } else _lastDate!!.toString(DateTimeFormat.forPattern("EEEE, dd MMMM").withLocale(Locale.US))
+        } else {
+            if (_lastDate!!.year != DateTime().year().get()) {
+                _lastDate!!.toString(DateTimeFormat.forPattern("EEEE, dd MMMM YYYY"))
+            } else {
+                _lastDate!!.toString(DateTimeFormat.forPattern("EEEE, dd MMMM"))
+            }
+
+
+        }
     }
 
     private fun dt(d: Date): DateTime {

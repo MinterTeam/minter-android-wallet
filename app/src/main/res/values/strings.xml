@@ -406,7 +406,6 @@
     <string name="plurals_hours_short">h</string>
     <string name="plurals_days_short">d</string>
 
-
     <string name="plurals_seconds_1">second</string>
     <string name="plurals_seconds_2_4">seconds</string>
     <string name="plurals_seconds_others">seconds</string>
