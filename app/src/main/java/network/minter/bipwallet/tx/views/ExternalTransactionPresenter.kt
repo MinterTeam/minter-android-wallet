@@ -1094,7 +1094,7 @@ class ExternalTransactionPresenter @Inject constructor() : MvpBasePresenter<Exte
                                                 text = coinMapper.idToSymbolDef(data.coinId)
                                             }
                                             .add {
-                                                label = "Amount"
+                                                label = tr(R.string.label_amount)
                                                 text = data.value.toPlain()
                                             }
                                             .build()
