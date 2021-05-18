@@ -32,7 +32,7 @@
     <string name="today">Today</string>
     <string name="please_wait">Please wait a few seconds…</string>
     <string name="value">Value</string>
-    <string name="app_version_format">Version: %s</string>
+    <string name="app_version_format">Version: %1$s</string>
     <string name="menu_item_wallets">Wallets</string>
     <string name="menu_item_send">Send</string>
     <string name="menu_item_settings">Settings</string>
@@ -51,7 +51,6 @@
     <string name="btn_continue">Continue</string>
     <string name="btn_retry">Retry</string>
     <string name="btn_logout">Logout</string>
-
     <string name="btn_save">Save</string>
     <string name="btn_send">Send</string>
     <string name="btn_view_tx">View Transaction</string>
@@ -82,7 +81,7 @@
     <string name="title_pin_enter_new">Enter new PIN-code</string>
     <string name="hint_pin_enter">Please enter a 4-digit PIN</string>
     <string name="hint_pin_repeat">Please confirm your 4-digit PIN</string>
-    <string name="error_pin_invalid_simple" formatted="false">Invalid PIN-code</string>
+    <string name="error_pin_invalid_simple">Invalid PIN-code</string>
     <string name="pin_fp_title_enable">Unlock the wallet with fingerprint</string>
     <string name="notification_balance_update_name">Balance updates</string>
     <string name="notification_balance_list_tx_label">View transactions</string>
@@ -121,6 +120,8 @@
     <string name="label_balance">Balance</string>
     <string name="label_set_as_main">Set as main</string>
     <string name="tx_type_exchange">Exchange</string>
+    <string name="tx_type_delegate">Delegate</string>
+    <string name="tx_type_unbond">Unbond</string>
     <string name="label_from_coin">From coin</string>
     <string name="label_to_coin">To coin</string>
     <string name="tx_type_create_coin">Create Coin</string>
@@ -131,7 +132,7 @@
     <string name="tx_type_edit_candidate">Edit Candidate</string>
     <string name="tx_type_edit_candidate_pub_key">Edit Candidate Public Key</string>
     <string name="tx_type_price_vote">Price Voting</string>
-    <string name="tx_type_price_vote_title">Value: %s</string>
+    <string name="tx_type_price_vote_title">Value: %1$s</string>
     <string name="tx_type_change_coin_owner">Change Coin Owner</string>
     <string name="tx_type_set_halt_block">Set Halt Block</string>
     <string name="tx_type_redeem_check">Redeem Check</string>
@@ -149,7 +150,7 @@
     <string name="tx_type_vote_commission">Vote Commission</string>
     <string name="tx_type_vote_commission_title">Vote for commissions</string>
     <string name="tx_type_vote_update">Vote Update</string>
-    <string name="tx_type_vote_update_title">Version: %s</string>
+    <string name="tx_type_vote_update_title">Version: %1$s</string>
     <string name="tx_type_create_swap_pool">Create Swap Pool</string>
     <string name="tx_incoming_multisend">+ …</string>
     <string name="tx_outgoing_multisend">- …</string>
@@ -285,7 +286,7 @@
     <string name="empty_address_book">No contacts yet</string>
     <string name="dialog_title_choose_wallet">Choose Wallet</string>
     <string name="dialog_title_delete_wallet">Remove Wallet</string>
-    <string name="dialog_description_delete_wallet"><![CDATA[Are you sure, you want to remove wallet <b>%s</b> from this application?]]></string>
+    <string name="dialog_description_delete_wallet"><![CDATA[Are you sure, you want to remove wallet <b>%1$s</b> from this application?]]></string>
     <string name="dialog_text_delete_wallet"><![CDATA[<b>Attention!</b> The wallet will not be deleted from blockchain. You\'ll be able to readd it later with the saved seed-phrase.]]></string>
     <string name="dialog_title_choose_coin">Choose Coin</string>
     <string name="image_cd_wallet_selector_dropdown">Wallet Selector Dropdown</string>
@@ -299,7 +300,7 @@
     <string name="filter_tx_incoming">Incoming</string>
     <string name="filter_tx_outgoing">Outgoing</string>
     <string name="dialog_title_delete_address">Remove Address</string>
-    <string name="dialog_addressbook_description_delete_address"><![CDATA[Are you sure, you want to remove address <b>%s</b>?]]></string>
+    <string name="dialog_addressbook_description_delete_address"><![CDATA[Are you sure, you want to remove address <b>%1$s</b>?]]></string>
     <string name="dialog_addressbook_description_success_add_address">Successfully added address</string>
     <string name="error_unable_load_delegations">Unable to load delegations</string>
     <string name="input_hint_public_key_or_name">Public key or name…</string>
@@ -310,7 +311,7 @@
     <string name="title_latest_transactions">Latest Transactions</string>
     <string name="w_transaction">Transaction</string>
     <string name="fmt_decimal_and_coin">%1$s %2$s</string>
-    <string name="fmt_type_of_transaction">%s Transaction</string>
+    <string name="fmt_type_of_transaction">%1$s Transaction</string>
     <string name="tx_type_send_receive">Receive</string>
     <string name="tx_type_send">Send</string>
     <string name="label_check_issuer">Check Issuer</string>
@@ -347,7 +348,7 @@
     <string name="label_mintable">Mintable</string>
     <string name="label_burnable">Burnable</string>
     <string name="address_book_err_not_found">Not found in address book</string>
-    <string name="address_book_err_unknown_type">Unknown address type %s</string>
+    <string name="address_book_err_unknown_type">Unknown address type %1$s</string>
     <string name="address_book_err_address_is_null">Address can\'t be null</string>
     <string name="coin_err_not_found">Coin not found</string>
     <string name="list_header_last_used">Last Used</string>
@@ -367,11 +368,11 @@
     <string name="dialog_title_camera_permission">Camera Permissions</string>
     <string name="dialog_text_camera_permission">We need access to your camera to take a shot with Minter Address QR Code</string>
     <string name="dialog_title_err_unable_scan_qr">Unable to scan QR</string>
-    <string name="dialog_title_err_invalid_deeplink">Invalid transaction data: %s</string>
+    <string name="dialog_title_err_invalid_deeplink">Invalid transaction data: %1$s</string>
     <string name="dialog_text_err_cant_get_wallet_balance">Can\'t get wallet balance. Maybe you have bad internet connection?</string>
-    <string name="dialog_text_err_bad_internet_connection">Bad internet connection: %s</string>
+    <string name="dialog_text_err_bad_internet_connection">Bad internet connection: %1$s</string>
     <string name="dialog_text_err_unable_to_send_deeplink_no_data">Unable to send deeplink: no data were passed</string>
-    <string name="dialog_text_err_unable_to_parse_deeplink">Unable to parse deeplink: %s</string>
+    <string name="dialog_text_err_unable_to_parse_deeplink">Unable to parse deeplink: %1$s</string>
     <string name="dialog_text_err_invalid_tx_data_non_hex_string">Invalid transaction data: non-hex string passed</string>
     <string name="dialog_text_err_invalid_tx_data_format">Invalid transaction data: non-hex string passed</string>
     <string name="dialog_text_err_empty_transaction_data">Empty transaction data</string>
@@ -391,7 +392,7 @@
     <string name="input_validator_contact_with_title_already_exists">Contact with this title already exists</string>
     <string name="input_validator_mnemonic_already_exists">You\'ve already added this wallet</string>
     <string name="input_validator_mnemonic_with_title_already_exists">Wallet with this title already exists</string>
-    <string name="input_validator_delegation_is_not_allowed"><![CDATA[For delegation please go to <a href="minter://stakes/%s">Delegations</a> section.]]></string>
+    <string name="input_validator_delegation_is_not_allowed"><![CDATA[For delegation please go to <a href="minter://stakes/%1$s">Delegations</a> section.]]></string>
     <string name="input_validator_value_cant_be_empty">Value can\'t be empty</string>
     <string name="input_validator_invalid_mnemonic">Invalid mnemonic</string>
     <string name="input_validator_title_cant_starts_from_ws">Title can\'t starts from whitespace</string>
@@ -400,12 +401,10 @@
     <string name="deeplink_err_unable_to_parse_transaction">Unable to parse transaction url</string>
     <string name="deeplink_err_unknown_deeplink_format">Unknown deeplink format</string>
     <string name="deeplink_err_no_tx_data_passed">No transaction data passed</string>
-
     <string name="plurals_seconds_short">sec</string>
     <string name="plurals_minutes_short">min</string>
     <string name="plurals_hours_short">h</string>
     <string name="plurals_days_short">d</string>
-
     <string name="plurals_seconds_1">second</string>
     <string name="plurals_seconds_2_4">seconds</string>
     <string name="plurals_seconds_others">seconds</string>
@@ -418,16 +417,6 @@
     <string name="plurals_days_1">day</string>
     <string name="plurals_days_2_4">days</string>
     <string name="plurals_days_others">days</string>
-
-    <plurals name="pin_code_left_tries">
-        <item quantity="zero">Invalid PIN-code. Left %1$d tries</item>
-        <item quantity="one">Invalid PIN-code. Left %1$d try</item>
-        <item quantity="two">Invalid PIN-code. Left %1$d tries</item>
-        <item quantity="few">Invalid PIN-code. Left %1$d tries</item>
-        <item quantity="many">Invalid PIN-code. Left %1$d tries</item>
-        <item quantity="other">Invalid PIN-code. Left %1$d tries</item>
-    </plurals>
-
     <string name="btn_open_settings">Open system settings</string>
     <string name="deeplink_err_empty_multisend_recipients">Multisend transaction must contains at least 1 target address</string>
     <string name="deeplink_check_no_redeem_fee">You don\'t pay transaction fee.</string>
@@ -464,7 +453,7 @@
     <string name="deeplnk_label_crr">CRR (constant reserve ratio)</string>
     <string name="deeplink_label_reserve">Reserve</string>
     <string name="deeplink_label_threshold">Threshold</string>
-    <string name="deeplink_label_weight_n">Weight: %d</string>
+    <string name="deeplink_label_weight_n">Weight: %1$d</string>
     <string name="deeplink_label_max_supply">Max Supply</string>
     <string name="deeplink_label_mintable">Mintable</string>
     <string name="deeplink_label_burnable">Burnable</string>
@@ -480,10 +469,10 @@
     <string name="deeplink_label_youre_switching_cand_on">You\'re switching on candidate</string>
     <string name="deeplink_label_youre_switching_cand_off">You\'re switching off candidate</string>
     <string name="deeplink_label_youre_multisending">You\'re multi-sending</string>
-    <string name="deeplink_label_to_n_recipients">To %s recipient(s)</string>
+    <string name="deeplink_label_to_n_recipients">To %1$s recipient(s)</string>
     <string name="deeplink_label_youre_creating_multisig">You\'re creating MultiSig address</string>
     <string name="deeplink_label_youre_editing_multisig">You\'re editing MultiSig address</string>
-    <string name="deeplink_label_with_n_addresses" formatted="false">With %d address(es)</string>
+    <string name="deeplink_label_with_n_addresses">With %1$d address(es)</string>
     <string name="deeplink_label_youre_editing_cand">You\'re editing candidate</string>
     <string name="deeplink_label_owner_address">Owner address</string>
     <string name="deeplink_label_reward_address">Reward address</string>
@@ -501,7 +490,7 @@
     <string name="deeplink_label_version">Version</string>
     <string name="deeplink_label_pubkey">Public Key</string>
     <string name="deeplink_label_commission">Commission</string>
-    <string name="dialog_text_err_unsupported_tx_type">Wallet doesn\'t support this transaction type: %s</string>
+    <string name="dialog_text_err_unsupported_tx_type">Wallet doesn\'t support this transaction type: %1$s</string>
     <string name="send_dialog_success_label">Transaction successfully sent</string>
     <string name="chooser_share_transaction">Share transaction</string>
     <string name="share_transaction_title_prefix">Transaction</string>

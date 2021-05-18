@@ -82,6 +82,8 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
     }
 
     private val titleTypedMap: HashMap<HistoryTransaction.Type, Int> = hashMapOf(
+            Pair(HistoryTransaction.Type.Delegate, R.string.tx_type_delegate),
+            Pair(HistoryTransaction.Type.Unbond, R.string.tx_type_unbond),
             Pair(HistoryTransaction.Type.SellCoin, R.string.tx_type_exchange),
             Pair(HistoryTransaction.Type.SellAllCoins, R.string.tx_type_exchange),
             Pair(HistoryTransaction.Type.BuyCoin, R.string.tx_type_exchange),

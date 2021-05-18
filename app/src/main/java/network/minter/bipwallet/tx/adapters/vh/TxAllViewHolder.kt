@@ -49,7 +49,9 @@ import java.math.BigDecimal
  */
 @SuppressLint("SetTextI18n")
 class TxAllViewHolder(
-        var binding: ItemListTxBinding) : RecyclerView.ViewHolder(binding.root) {
+        var binding: ItemListTxBinding,
+
+        ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: TxItem, myAddress: () -> MinterAddress) {
 
@@ -78,6 +80,7 @@ class TxAllViewHolder(
             HistoryTransaction.Type.EditMultisig -> bindCreateMultisigAddress(item)
             HistoryTransaction.Type.PriceVote -> bindPriceVote(item)
             HistoryTransaction.Type.EditCandidatePublicKey -> bindEditCandidatePublicKey(item)
+            /** @since minter 2.0 */
             HistoryTransaction.Type.AddLiquidity -> bindAddLiquidity(item)
             HistoryTransaction.Type.RemoveLiquidity -> bindRemoveLiquidity(item)
             HistoryTransaction.Type.SellSwapPool,
@@ -322,6 +325,7 @@ class TxAllViewHolder(
 
         binding.apply {
             itemTitle.text = txItem.tx.fromName ?: item.from.toShortString()
+            itemTitleType.setText(R.string.tx_type_multisend)
 
             val coinsAmount: Map<CoinItemBase, BigDecimal>
 

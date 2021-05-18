@@ -167,7 +167,8 @@ class PinEnterPresenter @Inject constructor() : MvpBasePresenter<PinEnterView>()
             logout()
             return
         }
-        viewState.setPinError(Wallet.app().res().getQuantityString(R.plurals.pin_code_left_tries, SecurityModule.MAX_TRIES_UNTIL_LOCK - invalidCount))
+        val leftTries = SecurityModule.MAX_TRIES_UNTIL_LOCK - invalidCount
+        viewState.setPinError(Wallet.app().res().getQuantityString(R.plurals.pin_code_left_tries, leftTries, leftTries))
     }
 
     private fun logout() {

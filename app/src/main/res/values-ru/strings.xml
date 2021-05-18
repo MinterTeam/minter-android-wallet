@@ -32,7 +32,7 @@
     <string name="today">Сегодня</string>
     <string name="please_wait">Пожалуйста, подождите несколько секунд…</string>
     <string name="value">Значение</string>
-    <string name="app_version_format">Версия: %s</string>
+    <string name="app_version_format">Версия: %1$s</string>
     <string name="menu_item_wallets">Кошельки</string>
     <string name="menu_item_send">Отправить</string>
     <string name="menu_item_settings">Настройки</string>
@@ -81,7 +81,7 @@
     <string name="title_pin_enter_new">Введите новый PIN-код</string>
     <string name="hint_pin_enter">Пожалуйста, введите PIN из 4-х цифр</string>
     <string name="hint_pin_repeat">Пожалуйста, подтвердите свой PIN из 4-х цифр</string>
-    <string name="error_pin_invalid_simple" formatted="false">Неверный PIN-код</string>
+    <string name="error_pin_invalid_simple">Неверный PIN-код</string>
     <string name="pin_fp_title_enable">Разблокируйте кошелек с помощью отпечатка</string>
     <string name="notification_balance_update_name">Баланс обновляется</string>
     <string name="notification_balance_list_tx_label">Посмотреть транзакции</string>
@@ -109,7 +109,7 @@
     <string name="label_amount">Количество</string>
     <string name="label_amount_received">Полученное количество</string>
     <string name="label_amount_spent">Потраченное количество</string>
-    <string name="label_payload">Сообщение (максимум 1 024 байтов)</string>
+    <string name="label_payload">Сообщение (максимум 1 024 байта)</string>
     <string name="label_payload_type">Введите свое сообщение здесь…</string>
     <string name="label_payload_short">Сообщение в пэйлоуд</string>
     <string name="btn_use_max">Макс.</string>
@@ -120,6 +120,8 @@
     <string name="label_balance">Баланс</string>
     <string name="label_set_as_main">Сделать основным</string>
     <string name="tx_type_exchange">Обмен</string>
+    <string name="tx_type_delegate">Делегирование</string>
+    <string name="tx_type_unbond">Разделегирование</string>
     <string name="label_from_coin">Монету</string>
     <string name="label_to_coin">На монету</string>
     <string name="tx_type_create_coin">Создание монеты</string>
@@ -130,7 +132,7 @@
     <string name="tx_type_edit_candidate">Изменение кандидата</string>
     <string name="tx_type_edit_candidate_pub_key">Изменение публичного ключа кандидата</string>
     <string name="tx_type_price_vote">Голосование по цене</string>
-    <string name="tx_type_price_vote_title">Значение: %s</string>
+    <string name="tx_type_price_vote_title">Значение: %1$s</string>
     <string name="tx_type_change_coin_owner">Смена владельца монеты</string>
     <string name="tx_type_set_halt_block">Установка блока остановки</string>
     <string name="tx_type_redeem_check">Погашение чека</string>
@@ -148,7 +150,7 @@
     <string name="tx_type_vote_commission">Голосование по комиссии</string>
     <string name="tx_type_vote_commission_title">Проголосуйте за комиссии.</string>
     <string name="tx_type_vote_update">Голосование по обновлению</string>
-    <string name="tx_type_vote_update_title">Версия: %s</string>
+    <string name="tx_type_vote_update_title">Версия: %1$s</string>
     <string name="tx_type_create_swap_pool">Создание swap-пула</string>
     <string name="tx_type_send_receive">Получение</string>
     <string name="tx_type_send">Отправка</string>
@@ -220,7 +222,7 @@
     <string name="input_hint_seed">Сид-фраза</string>
     <string name="input_hint_wallet_seed">Или введите сид-фразу от своего уже существующего кошелька.</string>
     <string name="dialog_title_add_wallet">Добавить новый кошелек</string>
-    <string name="btn_remove_wallet">Убрать кошелек</string>
+    <string name="btn_remove_wallet">Удалить кошелек</string>
     <string name="tx_send_payload_hint">Вы можете добавить сообщение к своей транзакции</string>
     <string name="title_address_book">Адресная книга</string>
     <string name="btn_edit">Редактировать</string>
@@ -236,7 +238,7 @@
     <string name="label_rewards">Вознаграждения</string>
     <string name="label_stakes">Стейки</string>
     <string name="zero_amount_decimal">0.0000</string>
-    <string name="btn_unbond">Сделать unbond</string>
+    <string name="btn_unbond">Разделегировать монеты</string>
     <string name="decimal_digits">0,1,2,3,4,5,6,7,8,9,.,,</string>
     <string name="btn_add_message">Добавить сообщение</string>
     <string name="dialog_title_send_type">Вы отправляете</string>
@@ -248,8 +250,8 @@
     <string name="dialog_label_delegate_you_are_delegating">Делегировать</string>
     <string name="dialog_label_delegate_to">кому</string>
     <string name="dialog_label_delegate_result">Делегирование прошло успешно</string>
-    <string name="dialog_title_unbond_begin">Подтвердить unbond</string>
-    <string name="dialog_label_unbond_you_are_unbonding">Сделать unbond</string>
+    <string name="dialog_title_unbond_begin">Подтвердить разделегирование</string>
+    <string name="dialog_label_unbond_you_are_unbonding">Разделегировать монеты</string>
     <string name="dialog_label_unbond_from">от</string>
     <string name="dialog_label_unbond_result">Разделегирование прошло успешно</string>
     <string name="dialog_label_exchange_to_get">чтобы получить</string>
@@ -270,7 +272,7 @@
     <string name="label_multisig_address">Мультисиг-адрес</string>
     <string name="label_new_owner">Новый владелец</string>
     <string name="title_delegate">Новое делегирование</string>
-    <string name="title_unbond">Unbond</string>
+    <string name="title_unbond">Разделегирование</string>
     <string name="stake_validator_fees">Комиссия %1$d%% | Минимум %2$s %3$s</string>
     <string name="dialog_label_delegate">Делегируйте свои монеты валидаторам и получайте соответствующие регулярные начисления.</string>
     <string name="dialog_label_unbond">Процесс будет завершен примерно через 30 дней после отправки запроса.</string>
@@ -286,7 +288,7 @@
     <string name="empty_address_book">Контакты пока отсутствуют</string>
     <string name="dialog_title_choose_wallet">Выбрать кошелек</string>
     <string name="dialog_title_delete_wallet">Удалить кошелек</string>
-    <string name="dialog_description_delete_wallet"><![CDATA[Вы уверены, что хотите удалить кошелек <b>%s</b> из этого приложения?]]></string>
+    <string name="dialog_description_delete_wallet"><![CDATA[Вы уверены, что хотите удалить кошелек <b>%1$s</b> из этого приложения?]]></string>
     <string name="dialog_text_delete_wallet"><![CDATA[<b>Внимание!</b> Кошелек не удаляется из блокчейна. Вы сможете заново добавить его позже, используя сохраненную сид-фразу.]]></string>
     <string name="dialog_title_choose_coin">Выбрать монету</string>
     <string name="image_cd_wallet_selector_dropdown">Выпадающее меню кошельков</string>
@@ -300,7 +302,7 @@
     <string name="filter_tx_incoming">Входящие</string>
     <string name="filter_tx_outgoing">Исходящие</string>
     <string name="dialog_title_delete_address">Удалить адрес</string>
-    <string name="dialog_addressbook_description_delete_address"><![CDATA[Вы уверены, что хотите удалить адрес <b>%s</b>?]]></string>
+    <string name="dialog_addressbook_description_delete_address"><![CDATA[Вы уверены, что хотите удалить адрес <b>%1$s</b>?]]></string>
     <string name="dialog_addressbook_description_success_add_address">Адрес успешно добавлен</string>
     <string name="error_unable_load_delegations">Невозможно загрузить делегирования</string>
     <string name="input_hint_public_key_or_name">Публичный ключ или имя…</string>
@@ -311,7 +313,7 @@
     <string name="title_latest_transactions">Последние транзакции</string>
     <string name="w_transaction">Транзакция</string>
     <string name="fmt_decimal_and_coin">%1$s %2$s</string>
-    <string name="fmt_type_of_transaction">Транзакция: %s</string>
+    <string name="fmt_type_of_transaction">Транзакция: %1$s</string>
     <string name="label_check_issuer">Создатель чека</string>
     <string name="dialog_description_logout">Вы потеряете все свои настройки и список кошельков.</string>
     <string name="dialog_text_logout">Вы уверены, что хотите выйти?</string>
@@ -346,7 +348,7 @@
     <string name="label_mintable">Возможность допечатывания</string>
     <string name="label_burnable">Возможность сжигания</string>
     <string name="address_book_err_not_found">Не найден в адресной книге</string>
-    <string name="address_book_err_unknown_type">Неизвестный тип адреса %s</string>
+    <string name="address_book_err_unknown_type">Неизвестный тип адреса %1$s</string>
     <string name="address_book_err_address_is_null">Адрес не может принимать значение null</string>
     <string name="coin_err_not_found">Монета не найдена</string>
     <string name="list_header_last_used">Недавние</string>
@@ -358,7 +360,7 @@
     <string name="account_err_not_loaded_yet">Учетная запись еще загружается…</string>
     <string name="validator_err_cant_unbond_zero_coins">Невозможно разделегировать 0 монет</string>
     <string name="account_err_insufficient_funds">Недостаточно средств для отправки транзакции</string>
-    <string name="validator_err_insufficient_funds_for_unbond">Недостаточно средств для unbondа: необходимо %1$s %2$s, баланс: %3$s %4$s</string>
+    <string name="validator_err_insufficient_funds_for_unbond">Недостаточно средств для разделегирования: необходимо %1$s %2$s, баланс: %3$s %4$s</string>
     <string name="validator_wait_for_stake_update">Пожалуйста, подождите ~%1$d %2$s, чтобы увидеть обновленный баланс в делегировании.</string>
     <string name="dialog_title_err_unable_to_send_tx">Не удалось отправить транзакцию</string>
     <string name="dialog_text_err_unknown_error_caused">Вызвана неизвестная ошибка</string>
@@ -366,11 +368,11 @@
     <string name="dialog_title_camera_permission">Разрешения камеры</string>
     <string name="dialog_text_camera_permission">Нам нужен доступ к вашей камере, чтобы сканировать адреса в формате QR.</string>
     <string name="dialog_title_err_unable_scan_qr">Не удалось отсканировать QR</string>
-    <string name="dialog_title_err_invalid_deeplink">Некорректные транзакционные данные: %s</string>
+    <string name="dialog_title_err_invalid_deeplink">Некорректные транзакционные данные: %1$s</string>
     <string name="dialog_text_err_cant_get_wallet_balance">Не удалось получить баланс кошелька. Среди прочих, причиной может быть нестабильное интернет-соединение.</string>
-    <string name="dialog_text_err_bad_internet_connection">Плохое подключение к интернету: %s</string>
+    <string name="dialog_text_err_bad_internet_connection">Плохое подключение к интернету: %1$s</string>
     <string name="dialog_text_err_unable_to_send_deeplink_no_data">Не удалось отправить диплинк: отсутствуют передаваемые данные</string>
-    <string name="dialog_text_err_unable_to_parse_deeplink">Не удалось разобрать диплинк: %s</string>
+    <string name="dialog_text_err_unable_to_parse_deeplink">Не удалось разобрать диплинк: %1$s</string>
     <string name="dialog_text_err_invalid_tx_data_non_hex_string">Некорректные транзакционные данные: переданная строка не в hex-формате</string>
     <string name="dialog_text_err_invalid_tx_data_format">Некорректные транзакционные данные: переданная строка не в hex-формате</string>
     <string name="dialog_text_err_empty_transaction_data">Данные транзакции пусты</string>
@@ -390,7 +392,7 @@
     <string name="input_validator_contact_with_title_already_exists">Контакт с этим названием уже существует</string>
     <string name="input_validator_mnemonic_already_exists">Вы уже добавили этот кошелек</string>
     <string name="input_validator_mnemonic_with_title_already_exists">Кошелек с этим названием уже существует</string>
-    <string name="input_validator_delegation_is_not_allowed"><![CDATA[Чтобы делегировать, перейдите в раздел <a href="minter://stakes/%s">Делегирований</a>.]]></string>
+    <string name="input_validator_delegation_is_not_allowed"><![CDATA[Чтобы делегировать, перейдите в раздел <a href="minter://stakes/%1$s">Делегирований</a>.]]></string>
     <string name="input_validator_value_cant_be_empty">Значение не может быть пустым</string>
     <string name="input_validator_invalid_mnemonic">Неправильная мнемоника</string>
     <string name="input_validator_title_cant_starts_from_ws">Название не может начинаться с пробела</string>
@@ -399,12 +401,10 @@
     <string name="deeplink_err_unable_to_parse_transaction">Не удалось разобрать url транзакции</string>
     <string name="deeplink_err_unknown_deeplink_format">Неизвестный формат диплинка</string>
     <string name="deeplink_err_no_tx_data_passed">Транзакционные данные не были переданы</string>
-
     <string name="plurals_seconds_short">сек</string>
     <string name="plurals_minutes_short">мин</string>
     <string name="plurals_hours_short">ч</string>
     <string name="plurals_days_short">д</string>
-
     <string name="plurals_seconds_1">секунда</string>
     <string name="plurals_seconds_2_4">секgунды</string>
     <string name="plurals_seconds_others">секунд</string>
@@ -417,16 +417,6 @@
     <string name="plurals_days_1">день</string>
     <string name="plurals_days_2_4">дня</string>
     <string name="plurals_days_others">дней</string>
-
-    <plurals name="pin_code_left_tries">
-        <item quantity="zero">Неверный PIN-код. Осталось %1$d попыток</item>
-        <item quantity="one">Неверный PIN-код. Осталась %1$d попытка</item>
-        <item quantity="two">Неверный PIN-код. Осталось %1$d попытки</item>
-        <item quantity="few">Неверный PIN-код. Осталось %1$d попытки</item>
-        <item quantity="many">Неверный PIN-код. Осталось %1$d попыток</item>
-        <item quantity="other">Неверный PIN-код. Осталось %1$d попыток</item>
-    </plurals>
-
     <string name="btn_open_settings">Открыть системные настройки</string>
     <string name="deeplink_err_empty_multisend_recipients">Мультисенд-транзакция должна включать как минимум 1 конечный адрес.</string>
     <string name="deeplink_check_no_redeem_fee">Вы не уплачиваете комиссию.</string>
@@ -463,7 +453,7 @@
     <string name="deeplnk_label_crr">Коэффициент постоянного резервирования (Constant Reserve Ratio, CRR)</string>
     <string name="deeplink_label_reserve">Изначальное количество резервируемых BIP</string>
     <string name="deeplink_label_threshold">Порог</string>
-    <string name="deeplink_label_weight_n">Вес: %d</string>
+    <string name="deeplink_label_weight_n">Вес: %1$d</string>
     <string name="deeplink_label_max_supply">Максимальная эмиссия</string>
     <string name="deeplink_label_mintable">Возможность допечатывания</string>
     <string name="deeplink_label_burnable">Возможность сжигания</string>
@@ -473,16 +463,16 @@
     <string name="deeplink_label_youre_adding_liquidity">Вы добавляете ликвидность</string>
     <string name="deeplink_label_youre_removing_liquidity">Вы отзываете ликвидность</string>
     <string name="deeplink_label_liquidity">Ликвидность</string>
-    <string name="deeplink_label_youre_unbonding">Вы отзываете</string>
+    <string name="deeplink_label_youre_unbonding">Вы разделегируете</string>
     <string name="deeplink_label_youre_moving_stake_from">Вы отвязываете стейк от</string>
     <string name="deeplink_label_youre_redeeming_check">Вы погашаете чек</string>
     <string name="deeplink_label_youre_switching_cand_on">Вы включаете кандидата</string>
     <string name="deeplink_label_youre_switching_cand_off">Вы выключаете кандидата</string>
     <string name="deeplink_label_youre_multisending">Вы отправляете нескольким получателям</string>
-    <string name="deeplink_label_to_n_recipients">%s получателю(-ям)</string>
+    <string name="deeplink_label_to_n_recipients">%1$s получателю(-ям)</string>
     <string name="deeplink_label_youre_creating_multisig">Вы создаете мультисиг-адрес</string>
     <string name="deeplink_label_youre_editing_multisig">Вы вносите изменения в мультисиг-адрес</string>
-    <string name="deeplink_label_with_n_addresses" formatted="false">С %d адресом(-ами)</string>
+    <string name="deeplink_label_with_n_addresses">С %1$d адресом(-ами)</string>
     <string name="deeplink_label_youre_editing_cand">Вы вносите изменения в кандидата</string>
     <string name="deeplink_label_owner_address">Адрес владельца</string>
     <string name="deeplink_label_reward_address">Адрес для вознаграждений</string>
@@ -500,7 +490,7 @@
     <string name="deeplink_label_version">Версия</string>
     <string name="deeplink_label_pubkey">Публичный ключ</string>
     <string name="deeplink_label_commission">Комиссия</string>
-    <string name="dialog_text_err_unsupported_tx_type">Кошелек не поддерживает данный тип транзакции: %s</string>
+    <string name="dialog_text_err_unsupported_tx_type">Кошелек не поддерживает данный тип транзакции: %1$s</string>
     <string name="send_dialog_success_label">Транзакция успешно отправлена</string>
     <string name="chooser_share_transaction">Поделиться транзакцией</string>
     <string name="share_transaction_title_prefix">Транзакция</string>
