@@ -32,6 +32,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
+import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.internal.exceptions.GateResponseException
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
@@ -127,13 +128,34 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
 
         if (buyCoins) {
             // get (buy)
-            Observable.combineLatest(
-                    repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin),
-                    poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy),
-                    { a: GateResult<ExchangeBuyValue>, b: GateResult<PoolRoute> ->
-                        EstimateResult(a, b)
+
+
+//            Observable.combineLatest(
+//                    repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin),
+//                    poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy),
+//                    { simpleEstimateRes: GateResult<ExchangeBuyValue>, poolEstimateRes: GateResult<PoolRoute> ->
+//                        // hack for coins that does not have pools between to avoid error
+//                        if(sourceCoin.type == CoinItemBase.CoinType.Coin && targetCoin.type == CoinItemBase.CoinType.Coin) {
+//                            if(poolEstimateRes.error != null) {
+//                                poolEstimateRes.error = null
+//                            }
+//                        }
+//                        EstimateResult(simpleEstimateRes, poolEstimateRes)
+//                    }
+//            )
+            repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin)
+                    .switchMap { simpleEstimateResult ->
+                        if (simpleEstimateResult.isOk && simpleEstimateResult.result.swapFrom == EstimateSwapFrom.Bancor) {
+                            Observable.just(
+                                    EstimateResult(simpleEstimateResult)
+                            )
+                        } else {
+                            poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy)
+                                    .map { poolEstimateResult ->
+                                        EstimateResult(simpleEstimateResult, poolEstimateResult)
+                                    }
+                        }
                     }
-            )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe(mBuilder.disposableConsumer)
@@ -223,13 +245,36 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                     )
         } else {
             // spend (sell or sellAll)
-            Observable.combineLatest(
-                    repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin),
-                    poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell),
-                    { a: GateResult<ExchangeSellValue>, b: GateResult<PoolRoute> ->
-                        EstimateResult(a, b)
+
+
+//            Observable.combineLatest(
+//                    repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin),
+//                    poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell),
+//                    { simpleEstimateRes: GateResult<ExchangeSellValue>, poolEstimateRes: GateResult<PoolRoute> ->
+//                        // hack for coins that does not have pools between to avoid error
+//                        if(sourceCoin.type == CoinItemBase.CoinType.Coin && targetCoin.type == CoinItemBase.CoinType.Coin) {
+//                            if(poolEstimateRes.error != null) {
+//                                poolEstimateRes.error = null
+//                            }
+//                        }
+//                        EstimateResult(simpleEstimateRes, poolEstimateRes)
+//                    }
+//            )
+            repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin)
+                    .switchMap { simpleEstimateResult ->
+                        if (simpleEstimateResult.isOk) {
+                            if (simpleEstimateResult.result.swapFrom == EstimateSwapFrom.Bancor) {
+                                EstimateResult(simpleEstimateResult).toObservable()
+                            } else {
+                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell)
+                                        .map { poolEstimateResult ->
+                                            EstimateResult(simpleEstimateResult, poolEstimateResult)
+                                        }
+                            }
+                        } else {
+                            EstimateResult(simpleEstimateResult).toObservable()
+                        }
                     }
-            )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe(mBuilder.disposableConsumer)

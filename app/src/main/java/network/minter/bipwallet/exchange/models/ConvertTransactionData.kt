@@ -46,7 +46,7 @@ class ConvertTransactionData(
         private val amount: BigDecimal,
         private val estimateAmount: BigDecimal,
         private val swapFrom: EstimateSwapFrom,
-        private val route: PoolRoute
+        private val route: PoolRoute?
 ) {
     enum class Type {
         Sell, SellAll, Buy
@@ -70,9 +70,11 @@ class ConvertTransactionData(
                     .setGasPrice(gasPrice)
 
             val txData = if (!isBasicExchange) {
-                val pre = tb.sellSwapPool().setMinValueToBuy(BigDecimal("0"))
+                val pre = tb.sellSwapPool()
+                        .setMinValueToBuy(BigDecimal("0"))
+                        .setValueToSell(amount)
 
-                route.coins.forEach {
+                route!!.coins.forEach {
                     pre.addCoinId(it.id)
                 }
                 pre
@@ -95,7 +97,7 @@ class ConvertTransactionData(
                 val pre = tb.buySwapPool()
                         .setValueToBuy(amount)
                         .setMaxValueToSell(estimateAmount.multiply(BigDecimal("1.1")))
-                route.coins.forEach {
+                route!!.coins.forEach {
                     pre.addCoinId(it.id)
                 }
                 pre
@@ -115,8 +117,9 @@ class ConvertTransactionData(
                     .setGasCoinId(gasCoin)
                     .setGasPrice(gasPrice)
             val txData = if (!isBasicExchange) {
-                val pre = tb.sellAllSwapPool().setMinValueToBuy("0")
-                route.coins.forEach { pre.addCoinId(it.id) }
+                val pre = tb.sellAllSwapPool()
+                        .setMinValueToBuy("0")
+                route!!.coins.forEach { pre.addCoinId(it.id) }
                 pre
             } else {
                 tb.sellAllCoins()

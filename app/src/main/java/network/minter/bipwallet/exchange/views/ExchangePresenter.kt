@@ -568,7 +568,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                 amount = amount!!,
                                 estimateAmount = estimateAmount ?: BigDecimal.ZERO,
                                 swapFrom = swapFrom,
-                                route = exchangeRoute!!
+                                route = exchangeRoute
                         )
 
                         onStartExecuteTransaction(txData)
