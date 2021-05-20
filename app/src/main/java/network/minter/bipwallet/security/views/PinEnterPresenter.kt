@@ -85,7 +85,9 @@ class PinEnterPresenter @Inject constructor() : MvpBasePresenter<PinEnterView>()
                 viewState.setPinHint(R.string.hint_pin_repeat)
                 viewState.setEnableValidation(mSourcePin)
             }
-            PinMode.EnableFingerprint, PinMode.DisableFingerprint, PinMode.Validation -> {
+            PinMode.EnableFingerprint,
+            PinMode.DisableFingerprint,
+            PinMode.Validation -> {
                 viewState.setupTitle(R.string.title_pin_enter)
                 viewState.setPinHint(R.string.hint_pin_enter)
 

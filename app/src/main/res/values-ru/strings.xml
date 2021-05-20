@@ -220,7 +220,7 @@
     <string name="inter_zeroes">ноль</string>
     <string name="title_edit_title">Изменить название</string>
     <string name="input_hint_seed">Сид-фраза</string>
-    <string name="input_hint_wallet_seed">Или введите сид-фразу от своего уже существующего кошелька.</string>
+    <string name="input_hint_wallet_seed">Или введите сид-фразу от своего уже существующего кошелька</string>
     <string name="dialog_title_add_wallet">Добавить новый кошелек</string>
     <string name="btn_remove_wallet">Удалить кошелек</string>
     <string name="tx_send_payload_hint">Вы можете добавить сообщение к своей транзакции</string>

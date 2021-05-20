@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -199,6 +199,7 @@ class PinEnterActivity : BaseMvpInjectActivity(), PinEnterView {
         private val mMode: PinMode
         private var mPin: String? = ""
         private var mStartHome = false
+        private var canExit = false
         private var mSuccessIntent: Intent? = null
 
         constructor(from: Activity, mode: PinMode) : super(from) {
@@ -215,6 +216,11 @@ class PinEnterActivity : BaseMvpInjectActivity(), PinEnterView {
 
         fun setPin(pin: String?): Builder {
             mPin = pin
+            return this
+        }
+
+        fun setCanExit(canExit: Boolean): Builder {
+            this.canExit = canExit
             return this
         }
 

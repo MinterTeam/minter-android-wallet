@@ -399,14 +399,19 @@ class TxAllViewHolder(
     private fun bindDelegateUnbond(item: TxItem) {
         val data: HistoryTransaction.TxDelegateUnbondResult = item.tx.getData()
         binding.apply {
-            val fallbackAvatar = if (item.tx.type == HistoryTransaction.Type.Delegate) {
-                R.drawable.img_avatar_delegate
+            val fallbackAvatar: Int
+            val typeText: Int
+            if (item.tx.type == HistoryTransaction.Type.Delegate) {
+                fallbackAvatar = R.drawable.img_avatar_delegate
+                typeText = R.string.tx_type_delegate
             } else {
-                R.drawable.img_avatar_unbond
+                fallbackAvatar = R.drawable.img_avatar_unbond
+                typeText = R.string.tx_type_unbond
             }
 
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, fallbackAvatar)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
+            itemTitleType.setText(typeText)
             itemSubamount.text = data.coin.symbol
 
             if (item.tx.type == HistoryTransaction.Type.Delegate) {

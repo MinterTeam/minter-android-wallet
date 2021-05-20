@@ -279,9 +279,14 @@ class SettingsTabPresenter @Inject constructor() : MvpBasePresenter<SettingsTabV
     @Suppress("UNUSED_PARAMETER")
     private fun onEnablePinCode(enabled: Boolean) {
         if (!secretStorage.hasPinCode()) {
-            viewState.startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Creation)
+            if (enabled) {
+                viewState.startPinCodeManager(REQUEST_CREATE_PIN_CODE, SecurityModule.PinMode.Creation)
+            }
+
         } else {
-            viewState.startPinCodeManager(REQUEST_REMOVE_PIN_CODE, SecurityModule.PinMode.Deletion)
+            if (!enabled) {
+                viewState.startPinCodeManager(REQUEST_REMOVE_PIN_CODE, SecurityModule.PinMode.Deletion)
+            }
         }
     }
 
