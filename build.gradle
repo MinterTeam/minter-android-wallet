@@ -34,7 +34,7 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0'
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'com.google.gms:google-services:4.3.5'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
         classpath 'com.google.firebase:firebase-appdistribution-gradle:2.1.1'
@@ -82,6 +82,6 @@ ext {
     minterLedgerSDK = "0.1.0"
     roomVersion = '2.3.0'
 
-    appVersionName = "2.3.4-beta02"
-    appVersionCode = 228
+    appVersionName = "2.3.4-beta03"
+    appVersionCode = 229
 }
