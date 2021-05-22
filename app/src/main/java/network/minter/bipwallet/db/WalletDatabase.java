@@ -38,7 +38,9 @@ import network.minter.bipwallet.internal.di.DbModule;
 @Database(entities = {
         AddressContact.class,
         DbCoin.class,
-}, version = DbModule.DB_VERSION)
+},
+        version = DbModule.DB_VERSION,
+        exportSchema = true)
 @TypeConverters({
         DbCoin.BigIntConverter.class,
         DbCoin.BigDecimalConverter.class,
