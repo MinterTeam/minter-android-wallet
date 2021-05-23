@@ -61,9 +61,21 @@ private class EstimateResult {
     var swapFrom: EstimateSwapFrom = EstimateSwapFrom.Default
     var route: PoolRoute? = null
     var errorResult: GateResult<*>? = null
+    var poolSwapType: PoolRoute.SwapType? = null
 
     constructor(err: GateResult<*>?) {
         errorResult = err
+    }
+
+    constructor(swapType: PoolRoute.SwapType, vararg values: GateResult<*>) {
+        poolSwapType = swapType
+        for (item in values) {
+            if (!item.isOk) {
+                errorResult = item.castErrorResultTo<Any>()
+                return
+            }
+        }
+        setValues(*values)
     }
 
     constructor(vararg values: GateResult<*>) {
@@ -103,6 +115,13 @@ private class EstimateResult {
                 swapFrom = (src.result as ExchangeSellValue).swapFrom
             }
             is PoolRoute -> {
+                if (poolSwapType == PoolRoute.SwapType.Sell) {
+                    amount = (src.result as PoolRoute).amountOut
+                } else if (poolSwapType == PoolRoute.SwapType.Buy) {
+                    amount = (src.result as PoolRoute).amountIn
+                }
+
+                swapFrom = EstimateSwapFrom.Pool
                 route = src.result as PoolRoute
             }
         }
@@ -145,15 +164,27 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
 //            )
             repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin)
                     .switchMap { simpleEstimateResult ->
-                        if (simpleEstimateResult.isOk && simpleEstimateResult.result.swapFrom == EstimateSwapFrom.Bancor) {
-                            Observable.just(
-                                    EstimateResult(simpleEstimateResult)
-                            )
+
+                        if (simpleEstimateResult.isOk) {
+                            if (simpleEstimateResult.result.swapFrom == EstimateSwapFrom.Bancor) {
+                                Observable.just(
+                                        EstimateResult(simpleEstimateResult)
+                                )
+                            } else {
+                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy)
+                                        .map { poolEstimateResult ->
+                                            EstimateResult(PoolRoute.SwapType.Buy, simpleEstimateResult, poolEstimateResult)
+                                        }
+                            }
                         } else {
-                            poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy)
-                                    .map { poolEstimateResult ->
-                                        EstimateResult(simpleEstimateResult, poolEstimateResult)
-                                    }
+                            if (checkSwapPoolNotExists(simpleEstimateResult)) {
+                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy)
+                                        .map { poolEstimateResult ->
+                                            EstimateResult(PoolRoute.SwapType.Buy, poolEstimateResult)
+                                        }
+                            } else {
+                                EstimateResult(simpleEstimateResult).toObservable()
+                            }
                         }
                     }
                     .subscribeOn(Schedulers.io())
@@ -268,11 +299,19 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
                             } else {
                                 poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell)
                                         .map { poolEstimateResult ->
-                                            EstimateResult(simpleEstimateResult, poolEstimateResult)
+                                            EstimateResult(PoolRoute.SwapType.Sell, simpleEstimateResult, poolEstimateResult)
                                         }
                             }
                         } else {
-                            EstimateResult(simpleEstimateResult).toObservable()
+                            if (checkSwapPoolNotExists(simpleEstimateResult)) {
+                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell)
+                                        .map { poolEstimateResult ->
+                                            EstimateResult(PoolRoute.SwapType.Sell, poolEstimateResult)
+                                        }
+                            } else {
+                                EstimateResult(simpleEstimateResult).toObservable()
+                            }
+
                         }
                     }
                     .subscribeOn(Schedulers.io())
@@ -367,6 +406,14 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
         return if (res.error != null) {
             res.error.code == 404 || res.status == BlockchainStatus.CoinNotExists
         } else res.code == 404 || res.code == 400
+    }
+
+    private fun checkSwapPoolNotExists(res: GateResult<*>?): Boolean {
+        if (res == null) {
+            return false
+        }
+
+        return res.error != null && res.error.code == 119
     }
 
     private fun findAccountByCoin(id: BigInteger?): Optional<CoinBalance> {
