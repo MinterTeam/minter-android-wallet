@@ -406,7 +406,7 @@
     <string name="plurals_hours_short">ч</string>
     <string name="plurals_days_short">д</string>
     <string name="plurals_seconds_1">секунда</string>
-    <string name="plurals_seconds_2_4">секgунды</string>
+    <string name="plurals_seconds_2_4">секунды</string>
     <string name="plurals_seconds_others">секунд</string>
     <string name="plurals_minutes_1">минута</string>
     <string name="plurals_minutes_2_4">минуты</string>
