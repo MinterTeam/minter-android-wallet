@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -121,7 +121,7 @@ class ShareDialog : BaseBottomSheetDialogFragment() {
             shareIntent.putExtra(Intent.EXTRA_STREAM, qrPath)
             shareIntent.type = "image/jpg"
 
-            WalletFileProvider.grantPermissions(context!!, shareIntent, qrPath, false)
+            WalletFileProvider.grantPermissions(requireContext(), shareIntent, qrPath, false)
 
             startActivity(Intent.createChooser(shareIntent, "send"))
         }

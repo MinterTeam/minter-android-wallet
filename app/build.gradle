@@ -348,6 +348,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.0"
     testImplementation 'org.mockito:mockito-core:3.9.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    testImplementation "joda-time:joda-time:2.10.10"
 
     androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0"
 //    androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.0.0"

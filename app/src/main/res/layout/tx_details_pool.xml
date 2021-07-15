@@ -38,7 +38,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/label_coin_0"
-        app:layout_constraintEnd_toStartOf="@id/label_coin_symbol"
+        app:layout_constraintEnd_toStartOf="@id/label_coin_1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent=".5" />

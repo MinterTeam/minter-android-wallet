@@ -484,7 +484,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun onInputChanged(editText: InputWrapper, valid: Boolean) {
         val text = editText.text.toString()
         Timber.d("Input changed: %s", editText.text)
-        loadAndSetFee()
+//        loadAndSetFee()
         when (editText.id) {
             R.id.input_incoming_coin -> {
                 mExplorerCoinsRepo.entity.findByName(text)
@@ -666,6 +666,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                     viewState.setCalculation(res.calculation ?: "")
                 },
                 { errMessage: String, err: NodeResult.Error? ->
+                    loadAndSetFee()
                     viewState.showCalculationProgress(false)
                     viewState.hideCalculation()
                     if (errMessage == "not possible to exchange") {
@@ -689,7 +690,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                 }
         )
 
-        loadAndSetFee()
+
     }
 
     private fun onAccountSelected(coinAccount: CoinBalance?, initial: Boolean) {

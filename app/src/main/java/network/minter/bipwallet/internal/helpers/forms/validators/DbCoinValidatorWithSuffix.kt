@@ -37,7 +37,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class DbCoinValidatorWithSuffix : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}(\\-\\d+)?$") {
+class DbCoinValidatorWithSuffix : com.edwardstock.inputfield.form.validators.RegexValidator("^([a-zA-Z0-9]{3,10})|(LP)(\\-\\d+)?\$") {
 
     init {
         errorMessage = tr(R.string.input_validator_err_invalid_coin_name)

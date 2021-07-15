@@ -33,7 +33,7 @@ package network.minter.bipwallet.internal.helpers.forms.validators
  */
 class CoinValidatorWithSuffix(
         error: CharSequence? = null
-) : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}(\\-\\d+)?$") {
+) : com.edwardstock.inputfield.form.validators.RegexValidator("^([a-zA-Z0-9]{3,10})|(LP)(\\-\\d+)?\$") {
 
     init {
         errorMessage = error ?: "Invalid coin name"

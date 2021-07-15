@@ -26,27 +26,23 @@
 package network.minter.bipwallet.exchange
 
 import com.annimon.stream.Optional
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
-import network.minter.bipwallet.apis.reactive.toObservable
-import network.minter.bipwallet.internal.exceptions.GateResponseException
-import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
-import network.minter.bipwallet.internal.helpers.MathHelper.humanize
-import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.firstOptional
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.blockchain.api.EstimateSwapFrom
-import network.minter.blockchain.models.*
-import network.minter.core.MinterSDK
-import network.minter.explorer.models.*
+import network.minter.blockchain.models.BlockchainStatus
+import network.minter.blockchain.models.ExchangeBuyValue
+import network.minter.blockchain.models.ExchangeSellValue
+import network.minter.blockchain.models.NodeResult
+import network.minter.explorer.models.CoinBalance
+import network.minter.explorer.models.CoinItemBase
+import network.minter.explorer.models.GateResult
+import network.minter.explorer.models.PoolRoute
 import network.minter.explorer.repo.ExplorerPoolsRepository
 import network.minter.explorer.repo.GateEstimateRepository
-import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -54,7 +50,7 @@ import java.math.BigInteger
  * minter-android-wallet. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-private class EstimateResult {
+class EstimateResult {
     var amount: BigDecimal = BigDecimal.ZERO
     var commission: BigDecimal = BigDecimal.ZERO
     var amountWithCommission: BigDecimal = BigDecimal.ZERO
@@ -121,285 +117,42 @@ private class EstimateResult {
                     amount = (src.result as PoolRoute).amountIn
                 }
 
-                swapFrom = EstimateSwapFrom.Pool
+                swapFrom = (src.result as PoolRoute).swapIn
                 route = src.result as PoolRoute
             }
         }
     }
 }
 
+interface CalculatorVariant {
+    fun calculate(buyCoins: Boolean, onResult: (ExchangeCalculator.CalculationResult) -> Unit, onErrorMessage: (String, NodeResult.Error?) -> Unit)
+}
 
-class ExchangeCalculator private constructor(private val mBuilder: Builder) {
+
+class ExchangeCalculator private constructor(internal val builder: Builder) {
+
     fun calculate(buyCoins: Boolean, onResult: (CalculationResult) -> Unit, onErrorMessage: (String, NodeResult.Error?) -> Unit) {
-        val repo = mBuilder.estimateRepo
-        val poolsRepo = mBuilder.poolsRepo
+//        val repo = builder.estimateRepo
+        val poolsRepo = builder.poolsRepo
 
+        val sourceCoin = builder.account().coin
+        val targetCoin = builder.getCoin()
+//        val fees = builder.initFeeData().priceCommissions
 
         // this may happens when user has slow internet or something like this
-        val sourceCoin = mBuilder.account().coin
-        val targetCoin = mBuilder.getCoin()
-        val fees = mBuilder.initFeeData().priceCommissions
-
         if (targetCoin.id == null) {
             onErrorMessage(tr(R.string.exchange_err_coin_to_buy_not_exists), null)
             return
         }
 
-        if (buyCoins) {
-            // get (buy)
-
-
-//            Observable.combineLatest(
-//                    repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin),
-//                    poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy),
-//                    { simpleEstimateRes: GateResult<ExchangeBuyValue>, poolEstimateRes: GateResult<PoolRoute> ->
-//                        // hack for coins that does not have pools between to avoid error
-//                        if(sourceCoin.type == CoinItemBase.CoinType.Coin && targetCoin.type == CoinItemBase.CoinType.Coin) {
-//                            if(poolEstimateRes.error != null) {
-//                                poolEstimateRes.error = null
-//                            }
-//                        }
-//                        EstimateResult(simpleEstimateRes, poolEstimateRes)
-//                    }
-//            )
-            repo.getCoinExchangeCurrencyToBuy(sourceCoin!!, mBuilder.getAmount(), targetCoin)
-                    .switchMap { simpleEstimateResult ->
-
-                        if (simpleEstimateResult.isOk) {
-                            if (simpleEstimateResult.result.swapFrom == EstimateSwapFrom.Bancor) {
-                                Observable.just(
-                                        EstimateResult(simpleEstimateResult)
-                                )
-                            } else {
-                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy)
-                                        .map { poolEstimateResult ->
-                                            EstimateResult(PoolRoute.SwapType.Buy, simpleEstimateResult, poolEstimateResult)
-                                        }
-                            }
-                        } else {
-                            if (checkSwapPoolNotExists(simpleEstimateResult)) {
-                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.getAmount(), PoolRoute.SwapType.Buy)
-                                        .map { poolEstimateResult ->
-                                            EstimateResult(PoolRoute.SwapType.Buy, poolEstimateResult)
-                                        }
-                            } else {
-                                EstimateResult(simpleEstimateResult).toObservable()
-                            }
-                        }
-                    }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe(mBuilder.disposableConsumer)
-                    .doFinally {
-                        mBuilder.onCompleteListener?.invoke()
-                    }
-                    .subscribe(
-                            { res: EstimateResult ->
-                                val out = CalculationResult()
-                                if (!res.isOk) {
-                                    if (checkCoinNotExistError(res.errorResult)) {
-                                        onErrorMessage(res.errorResult?.message
-                                                ?: tr(R.string.exchange_err_coin_to_buy_not_exists), res.errorResult?.error)
-                                        return@subscribe
-                                    } else {
-                                        if (res.errorResult?.message?.equals("not possible to exchange") == true) {
-                                            Timber.d(GateResponseException(res.errorResult))
-                                        } else {
-                                            Timber.w(GateResponseException(res.errorResult))
-                                        }
-
-                                        if (res.errorResult != null) {
-                                            onErrorMessage(res.errorResult!!.message
-                                                    ?: "Error::${res.errorResult!!.status.name}", res.errorResult?.error)
-                                        } else {
-                                            onErrorMessage(res.errorResult!!.message
-                                                    ?: "Error::UNKNOWN", res.errorResult?.error)
-                                        }
-
-                                        return@subscribe
-                                    }
-                                }
-                                out.amount = res.amount
-                                out.commissionBIP = res.commission
-                                out.swapFrom = res.swapFrom
-                                out.route = res.route
-
-                                val bipAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
-                                val getAccount = findAccountByCoin(sourceCoin)
-
-
-                                // if exchanging via pool, calculate (intermediate coins count of route * delta) + base swap fee
-                                var buyFee: BigDecimal = if (out.swapFrom == EstimateSwapFrom.Pool) {
-                                    (fees.buyPoolBase + (res.route!!.extraCoinsCount().toBigInteger() * fees.buyPoolDelta)).humanizeDecimal()
-                                } else {
-                                    fees.buyBancor.humanizeDecimal()
-                                }
-                                // if default gas coin isn't BIP - multiplying default gas coin rate to BIP amount to get real BIP fee value
-                                if (mBuilder.initFeeData().gasRepresentingCoin.id != MinterSDK.DEFAULT_COIN_ID) {
-                                    out.commissionBase = buyFee
-                                    buyFee = buyFee.multiply(mBuilder.initFeeData().gasBaseCoinRate)
-                                    out.commissionBIP = buyFee
-                                } else {
-                                    out.commissionBase = buyFee
-                                    out.commissionBIP = buyFee
-                                }
-                                val getAmount = mBuilder.getAmount()
-                                val inCoinFee = ((res.amount * buyFee) / getAmount)
-
-                                // if enough (exact) MNT ot pay fee, gas coin is MNT
-                                if (bipAccount.get().amount >= buyFee) {
-                                    Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
-
-                                    out.gasCoin = bipAccount.get().coin.id
-                                    out.estimate = res.amount
-                                    out.calculation = String.format("%s %s", bdHuman(out.amount), sourceCoin)
-
-                                } else if (getAccount.isPresent && getAccount.get().amount >= (out.amount + inCoinFee)) {
-                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                                    //(0.000070727942238907*1.5)/1
-                                    out.gasCoin = getAccount.get().coin.id
-                                    out.estimate = out.amount + inCoinFee
-                                    out.calculation = String.format("%s %s", (out.amount + inCoinFee).humanize(), sourceCoin)
-                                } else {
-                                    //@todo logic duplication to synchronize with iOS app
-                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                                    out.gasCoin = getAccount.get().coin.id
-                                    out.estimate = out.amount + buyFee
-                                    out.calculation = String.format("%s %s", bdHuman(out.amount + inCoinFee), sourceCoin)
-                                }
-                                onResult(out)
-                            },
-                            { t ->
-                                Timber.e(t, "Unable to get exchange rate")
-                                onErrorMessage(tr(R.string.exchange_err_unable_to_get_exchange_rate), null)
-                            }
-                    )
-        } else {
-            // spend (sell or sellAll)
-
-
-//            Observable.combineLatest(
-//                    repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin),
-//                    poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell),
-//                    { simpleEstimateRes: GateResult<ExchangeSellValue>, poolEstimateRes: GateResult<PoolRoute> ->
-//                        // hack for coins that does not have pools between to avoid error
-//                        if(sourceCoin.type == CoinItemBase.CoinType.Coin && targetCoin.type == CoinItemBase.CoinType.Coin) {
-//                            if(poolEstimateRes.error != null) {
-//                                poolEstimateRes.error = null
-//                            }
-//                        }
-//                        EstimateResult(simpleEstimateRes, poolEstimateRes)
-//                    }
-//            )
-            repo.getCoinExchangeCurrencyToSell(sourceCoin!!, mBuilder.spendAmount(), targetCoin)
-                    .switchMap { simpleEstimateResult ->
-                        if (simpleEstimateResult.isOk) {
-                            if (simpleEstimateResult.result.swapFrom == EstimateSwapFrom.Bancor) {
-                                EstimateResult(simpleEstimateResult).toObservable()
-                            } else {
-                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell)
-                                        .map { poolEstimateResult ->
-                                            EstimateResult(PoolRoute.SwapType.Sell, simpleEstimateResult, poolEstimateResult)
-                                        }
-                            }
-                        } else {
-                            if (checkSwapPoolNotExists(simpleEstimateResult)) {
-                                poolsRepo.getRoute(sourceCoin, targetCoin, mBuilder.spendAmount(), PoolRoute.SwapType.Sell)
-                                        .map { poolEstimateResult ->
-                                            EstimateResult(PoolRoute.SwapType.Sell, poolEstimateResult)
-                                        }
-                            } else {
-                                EstimateResult(simpleEstimateResult).toObservable()
-                            }
-
-                        }
-                    }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe(mBuilder.disposableConsumer)
-                    .doFinally {
-                        mBuilder.onCompleteListener?.invoke()
-                    }
-                    .subscribe(
-                            { res: EstimateResult ->
-                                if (!res.isOk) {
-                                    if (checkCoinNotExistError(res.errorResult)) {
-                                        onErrorMessage(res.errorResult?.message
-                                                ?: tr(R.string.exchange_err_coin_to_buy_not_exists), res.errorResult?.error)
-                                        return@subscribe
-                                    } else {
-                                        Timber.w(GateResponseException(res.errorResult), "Unable to calculate sell/sellAll currency")
-
-                                        if (res.errorResult != null) {
-                                            onErrorMessage(res.errorResult!!.message
-                                                    ?: "Error::${res.errorResult!!.status.name}", res.errorResult?.error)
-                                        } else {
-                                            onErrorMessage(res.errorResult!!.message
-                                                    ?: "Error::UNKNOWN", res.errorResult?.error)
-                                        }
-                                        return@subscribe
-                                    }
-                                }
-
-                                val out = CalculationResult()
-                                out.calculation = String.format("%s %s", bdHuman(res.amount), targetCoin)
-                                out.amount = res.amount
-                                out.commissionBIP = res.commission
-                                val mntAccount = findAccountByCoin(MinterSDK.DEFAULT_COIN_ID)
-                                val getAccount = findAccountByCoin(sourceCoin)
-                                out.estimate = res.amount
-                                out.swapFrom = res.swapFrom
-                                out.route = res.route
-
-                                if (out.swapFrom == EstimateSwapFrom.Pool) {
-                                    out.calculation = String.format("%s %s", (res.route?.amountOut
-                                            ?: res.route?.amountOut ?: res.amount).humanize(), targetCoin)
-                                    out.amount = res.route?.amountOut ?: res.amount
-                                }
-
-                                // if exchanging via pool, calculate (intermediate coins count of route * delta) + base swap fee
-                                var sellFee: BigDecimal = if (out.swapFrom == EstimateSwapFrom.Pool) {
-                                    (fees.sellPoolBase + ((res.route?.extraCoinsCount()
-                                            ?: 0).toBigInteger() * fees.sellPoolDelta)).humanizeDecimal()
-                                } else {
-                                    fees.sellBancor.humanizeDecimal()
-                                }
-                                // if default gas coin isn't BIP - multiplying default gas coin rate to BIP amount to get real BIP fee value
-                                if (mBuilder.initFeeData().gasRepresentingCoin.id != MinterSDK.DEFAULT_COIN_ID) {
-                                    out.commissionBase = sellFee
-                                    sellFee = sellFee.multiply(mBuilder.initFeeData().gasBaseCoinRate)
-                                    out.commissionBIP = sellFee
-                                } else {
-                                    out.commissionBase = sellFee
-                                    out.commissionBIP = sellFee
-                                }
-
-                                // if enough (exact) MNT ot pay fee, gas coin is MNT
-                                if (mntAccount.get().amount >= sellFee) {
-                                    Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = mntAccount.get().coin.id
-                                }
-                                // if enough spending coin at least to pay fee
-                                else if (getAccount.isPresent && getAccount.get().bipValue >= sellFee) {
-                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = getAccount.get().coin.id
-                                } else {
-                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                                    out.gasCoin = mntAccount.get().coin.id
-                                    onErrorMessage(tr(R.string.account_err_insufficient_funds), res.errorResult?.error)
-                                }
-                                onResult(out)
-                            },
-                            { t: Throwable? ->
-                                Timber.e(t, "Unable to get exchange rate")
-                                onErrorMessage(tr(R.string.exchange_err_unable_to_get_exchange_rate), null)
-                            }
-                    )
-        }
+//        val impl = GateAndExplorerEstimateVariantImpl(this, repo, poolsRepo, sourceCoin, targetCoin)
+        val impl = ExplorerEstimateVariantImpl(this, poolsRepo, sourceCoin, targetCoin)
+        impl.calculate(buyCoins, onResult, onErrorMessage)
     }
 
+
     // Error hell TODO
-    private fun checkCoinNotExistError(res: GateResult<*>?): Boolean {
+    internal fun checkCoinNotExistError(res: GateResult<*>?): Boolean {
         if (res == null) {
             return false
         }
@@ -408,7 +161,7 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
         } else res.code == 404 || res.code == 400
     }
 
-    private fun checkSwapPoolNotExists(res: GateResult<*>?): Boolean {
+    internal fun checkSwapPoolNotExists(res: GateResult<*>?): Boolean {
         if (res == null) {
             return false
         }
@@ -416,13 +169,13 @@ class ExchangeCalculator private constructor(private val mBuilder: Builder) {
         return res.error != null && res.error.code == 119
     }
 
-    private fun findAccountByCoin(id: BigInteger?): Optional<CoinBalance> {
-        return mBuilder.accounts()
+    internal fun findAccountByCoin(id: BigInteger?): Optional<CoinBalance> {
+        return builder.accounts()
                 .firstOptional { it.coin.id == id!! }
     }
 
-    private fun findAccountByCoin(coin: CoinItemBase?): Optional<CoinBalance> {
-        return mBuilder.accounts()
+    internal fun findAccountByCoin(coin: CoinItemBase?): Optional<CoinBalance> {
+        return builder.accounts()
                 .firstOptional { it.coin == coin!! }
     }
 

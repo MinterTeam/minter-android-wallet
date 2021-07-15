@@ -34,6 +34,7 @@ import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+@Deprecated("Use CoinValidatorWithSuffix")
 class CoinValidator : com.edwardstock.inputfield.form.validators.RegexValidator("^[a-zA-Z0-9]{3,10}\$") {
 
     init {

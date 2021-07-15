@@ -137,7 +137,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
         binding.apply {
             testnetWarning.visibleForTestnet()
 
-            walletSelector.registerLifecycle(activity!!)
+            walletSelector.registerLifecycle(requireActivity())
 
             inputCoin.input.setFocusable(false)
 
