@@ -151,10 +151,14 @@ object MathHelper {
     }
 
     @JvmStatic
-    fun bdHuman(source: BigDecimal): String {
+    @JvmOverloads
+    fun bdHuman(source: BigDecimal, plainZero: Boolean = false): String {
         val num = Preconditions.firstNonNull(source, BigDecimal(0))
         // if 0 or null = 4 digits
         if (bdNull(num)) {
+            if(plainZero) {
+                return "0"
+            }
             return formatDecimalCurrency(num, 4, true)
         }
         // if less than 1 = min 4 digits, max 8
@@ -180,8 +184,63 @@ object MathHelper {
         return formatDecimalCurrency(out, 4, true)
     }
 
-    fun BigDecimal.humanize(): String {
-        return bdHuman(this)
+    /**
+     * Percent must be from 0 to 100
+     */
+    fun BigDecimal.percent(percent: BigDecimal): BigDecimal {
+        if(bdNull(percent)) {
+            return this
+        }
+        val sourcePrecision = precision()
+        val current = this.setScale(18, RoundingMode.HALF_UP)
+        return ((current *
+                        percent.setScale(18, RoundingMode.HALF_UP)
+                                .divide(BigDecimal("100.00").setScale(18, RoundingMode.HALF_UP), RoundingMode.HALF_UP)
+                        )
+                ).setScale(sourcePrecision, RoundingMode.HALF_UP)
+    }
+
+    fun BigDecimal.removePercent(percent: BigDecimal): BigDecimal {
+        return this.addPercent(percent.multiply(BigDecimal("-1")))
+    }
+
+    /**
+     * Adds percent to current value immutable
+     * @param percent integer value, for example: 5% = 5.0. If you want to get subtracted percent, then you need to pass negative percent value: -5% = -5.0
+     */
+    fun BigDecimal.addPercent(percent: BigDecimal): BigDecimal {
+        if(bdNull(percent)) {
+            return this
+        }
+        val sourcePrecision = precision()
+        val current = this.setScale(18, RoundingMode.HALF_UP)
+        return (current +
+                (current *
+                        percent.setScale(18, RoundingMode.HALF_UP)
+                                .divide(BigDecimal("100.00").setScale(18, RoundingMode.HALF_UP), RoundingMode.HALF_UP)
+                        )
+                ).setScale(sourcePrecision, RoundingMode.HALF_UP)
+    }
+
+    fun BigDecimal?.humanize(plainZero: Boolean = false): String {
+        if(this == null) {
+            return this.plain()
+        }
+        return bdHuman(this, plainZero)
+    }
+
+    fun BigDecimal?.plain(): String {
+        if(bdNull(this?: BigDecimal.ZERO)) {
+            return "0"
+        }
+        return this!!.toPlainString()
+    }
+
+    /**
+     * Fixed precision: 2
+     */
+    fun BigDecimal.asCurrency(): String {
+        return formatDecimalCurrency(this.setScale(2, RoundingMode.HALF_UP), 2, true)
     }
 
     fun BigInteger.humanize(): String {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -60,13 +60,14 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:visibility="visible" />
 
-        <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/navigation_bottom"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_gravity="bottom"
             android:background="#F8F8F8"
             android:minHeight="56dp"
+            app:itemIconSize="24dp"
             app:itemIconTint="@color/item_bottom_menu"
             app:itemTextAppearanceActive="@style/Wallet.BottomNavigation.ActiveItem"
             app:itemTextAppearanceInactive="@style/Wallet.BottomNavigation.InactiveItem"
@@ -74,6 +75,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:labelVisibilityMode="labeled"
             app:menu="@menu/menu_bottom_tabs" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

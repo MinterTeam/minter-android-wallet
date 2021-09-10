@@ -86,9 +86,6 @@ android {
 //        ignoreWarnings true
     }
 
-    aaptOptions {
-        additionalParameters "--no-version-vectors"
-    }
 
     testOptions {
         animationsDisabled true
@@ -174,6 +171,7 @@ android {
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
+            buildConfigField "String", "CHAINIK_API_URL", '"https://yf.chainik.io/api/v1/"'
         }
 
         netMainLocal {
@@ -187,6 +185,7 @@ android {
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.apps.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
+            buildConfigField "String", "CHAINIK_API_URL", '"https://yf.chainik.io/api/v1/"'
         }
 
         netTest {
@@ -200,6 +199,7 @@ android {
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
+            buildConfigField "String", "CHAINIK_API_URL", '"https://yf.chainik.io/api/v1/"'
         }
 
         netTestLocal {
@@ -213,7 +213,25 @@ android {
             buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
             buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
             buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
+            buildConfigField "String", "CHAINIK_API_URL", '"https://yf.chainik.io/api/v1/"'
         }
+
+        taconetLocal {
+            dimension "env"
+            applicationId = "network.minter.bipwallet"
+            buildConfigField "String", "LIVE_BALANCE_URL", '"wss://explorer-rtm.taconet.minter.network/connection/websocket"'
+            buildConfigField "String", "EXPLORER_API_URL", '"https://explorer-api.taconet.minter.network/api/v2/"'
+            buildConfigField "String", "EXPLORER_FRONT_URL", '"https://explorer.taconet.minter.network/api/v2"'
+            buildConfigField "String", "EXPLORER_STATIC_URL", '"https://explorer-static.taconet.minter.network"'
+            buildConfigField "String", "GATE_API_URL", '"https://gate-api.taconet.minter.network/api/v2/"'
+            buildConfigField "String", "COIN_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/coin/"'
+            buildConfigField "String", "ADDRESS_AVATAR_BASE_URL", '"https://my.beta.minter.network/api/v1/avatar/by/address/"'
+            buildConfigField "String", "STORIES_API_URL", '"https://stories-api.bip.to/api/v1/"'
+            buildConfigField "String", "CHAINIK_API_URL", '"https://yf.chainik.io/api/v1/"'
+        }
+    }
+    androidResources {
+        additionalParameters '--no-version-vectors'
     }
 }
 
@@ -253,8 +271,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
-    implementation 'androidx.exifinterface:exifinterface:1.3.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.exifinterface:exifinterface:1.3.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
     implementation platform('com.google.firebase:firebase-bom:25.12.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
@@ -262,16 +280,17 @@ dependencies {
 
     //kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC-native-mt'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.5.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
     // room db
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.room:room-rxjava2:$roomVersion"
 
     // android arch
-    implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
-    implementation 'androidx.paging:paging-rxjava2-ktx:2.1.2'
+    implementation 'androidx.paging:paging-runtime-ktx:3.0.1'
+    implementation 'androidx.paging:paging-rxjava2-ktx:3.0.1'
 
 
     // yandex
@@ -289,13 +308,13 @@ dependencies {
     kapt 'org.parceler:parceler:1.1.13'
     implementation 'com.edwardstock.android:hawk:3.0.1'
     implementation 'com.annimon:stream:1.2.1'
-    implementation 'net.danlew:android.joda:2.9.9.1'
+    implementation 'net.danlew:android.joda:2.10.9.1'
     implementation('com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.8.0') {
         exclude group: 'joda-time'
         exclude group: 'com.google.code.gson'
     }
-    implementation 'org.permissionsdispatcher:permissionsdispatcher:4.7.0'
-    kapt "org.permissionsdispatcher:permissionsdispatcher-processor:4.7.0"
+    implementation 'com.github.permissions-dispatcher:permissionsdispatcher:4.9.1'
+    kapt "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.9.1"
     implementation 'me.saket:better-link-movement-method:2.2.0'
     implementation 'io.github.centrifugal:centrifuge-java:0.0.5'
     implementation 'com.github.zerobranch:SwipeLayout:1.3.1'
@@ -309,10 +328,10 @@ dependencies {
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     // MVP
-    implementation 'com.github.moxy-community:moxy:2.2.0'
-    implementation 'com.github.moxy-community:moxy-androidx:2.2.0'
-    implementation "com.github.moxy-community:moxy-ktx:2.2.0"
-    kapt 'com.github.moxy-community:moxy-compiler:2.2.0'
+    implementation 'com.github.moxy-community:moxy:2.2.2'
+    implementation 'com.github.moxy-community:moxy-androidx:2.2.2'
+    implementation "com.github.moxy-community:moxy-ktx:2.2.2"
+    kapt 'com.github.moxy-community:moxy-compiler:2.2.2'
 
     // Reactive
     implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
@@ -345,6 +364,8 @@ dependencies {
 
 
     //tests
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'androidx.test:core:1.4.0'
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.0"
     testImplementation 'org.mockito:mockito-core:3.9.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"

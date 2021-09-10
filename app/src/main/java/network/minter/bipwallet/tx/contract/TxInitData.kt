@@ -100,6 +100,15 @@ class TxInitData {
         }
     }
 
+    fun calculateFeeInBip(opType: OperationType): BigDecimal {
+        return if(gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
+            priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
+        } else {
+            val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
+            fee.multiply(gasBaseCoinRate)
+        }
+    }
+
     fun calculateFeeText(opType: OperationType): CharSequence {
         return if (gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
             String.format("%s %s", priceCommissions.getByType(opType).humanize(), gasRepresentingCoin.symbol)

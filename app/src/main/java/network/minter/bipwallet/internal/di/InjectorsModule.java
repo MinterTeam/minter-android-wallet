@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -45,6 +45,8 @@ import network.minter.bipwallet.external.ui.ExternalActivity;
 import network.minter.bipwallet.internal.di.annotations.ActivityScope;
 import network.minter.bipwallet.internal.di.annotations.FragmentScope;
 import network.minter.bipwallet.internal.di.annotations.ServiceScope;
+import network.minter.bipwallet.pools.ui.PoolAddLiquidityActivity;
+import network.minter.bipwallet.pools.ui.PoolRemoveLiquidityActivity;
 import network.minter.bipwallet.security.SecurityModule;
 import network.minter.bipwallet.security.ui.PinEnterActivity;
 import network.minter.bipwallet.security.ui.PinValidationDialog;
@@ -193,6 +195,15 @@ public interface InjectorsModule {
     @ContributesAndroidInjector
     @FragmentScope
     ShareDialog shareDialogInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    PoolAddLiquidityActivity poolAddLiquidityInjector();
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    PoolRemoveLiquidityActivity poolRemoveLiquidityInjector();
+
 
 
 }

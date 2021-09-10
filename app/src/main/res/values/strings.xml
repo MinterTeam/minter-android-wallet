@@ -115,6 +115,7 @@
     <string name="btn_use_max">Use max</string>
     <string name="label_you_will_pay_approximately">You will pay approximately</string>
     <string name="attention_exchange_rate">The final amount depends on the exchange rate at the moment of transaction</string>
+    <string name="attention_remove_liquidity_rate">The final amount depends on the pool ratio at the moment of transaction.</string>
     <string name="label_coin_to_sell">Coin to sell</string>
     <string name="label_you_will_get_approximately">You will get approximately</string>
     <string name="label_balance">Balance</string>
@@ -277,6 +278,9 @@
     <string name="label_validator">Validator</string>
     <string name="menu_label_delegate">Delegate</string>
     <string name="empty_delegations">You don\'t have any delegated stakes yet</string>
+    <string name="empty_pools_all">There is no one pool yet</string>
+    <string name="empty_pools_staked">You don\'t have any pool stakes yet</string>
+    <string name="empty_pools_farming">There is no one farming program yet</string>
     <string name="warning_stake_in_waitlist">Attention! There are currently one or more of your stakes in wait list. It means they don’t bring any rewards. Please delegate more coins to fit the minimum requirement, wait for an open slot or unbond.</string>
     <string name="empty_transactions">No transactions yet</string>
     <string name="dialog_label_delegate_progress">Delegating…</string>
@@ -360,6 +364,7 @@
     <string name="account_err_not_loaded_yet">Account didn\'t loaded yet…</string>
     <string name="validator_err_cant_unbond_zero_coins">Can\'t unbond 0 coins</string>
     <string name="account_err_insufficient_funds">Insufficient funds for sending transaction</string>
+    <string name="account_err_insufficient_funds_for_amount">Insufficient funds: balance %1$s %2$s</string>
     <string name="validator_err_insufficient_funds_for_unbond">Insufficient funds for unbond: required %1$s %2$s, balance: %3$s %4$s</string>
     <string name="validator_wait_for_stake_update">Please allow ~%1$d %2$s for your delegated balance to update.</string>
     <string name="dialog_title_err_unable_to_send_tx">Unable to send transaction</string>
@@ -500,4 +505,37 @@
     <string name="hint_login_seed">Your seed phrase…</string>
     <string name="hint_address">Enter address</string>
     <string name="hint_swipe_to_open">Swipe to open</string>
+    <string name="menu_item_pools">Pools</string>
+    <string name="label_apy" translatable="false">APY</string>
+    <string name="label_volume_1d">Volume (1d)</string>
+    <string name="label_farming_apr">Farming APR</string>
+    <string name="label_end_date">End Date</string>
+    <string name="label_staked_amount">Staked Amount</string>
+    <string name="label_your_share">Your Share</string>
+    <string name="label_your_liquidity">Your Liquidity</string>
+    <string name="filter_pools_staked_only">Staked Only</string>
+    <string name="filter_pools_yield_farm">Yield Farm</string>
+    <string name="hint_filter_pools_by_coin">Filter pools by coin…</string>
+    <string name="title_add_liquidity">Add Liquidity</string>
+    <string name="dialog_title_add_liquidity">Add Liquidity to Swap Pool</string>
+    <string name="title_remove_liquidity">Remove Liquidity</string>
+    <string name="dialog_title_remove_liquidity">Remove Liquidity from Swap Pool</string>
+    <string name="hint_coin">Coin</string>
+    <string name="label_coin0">First Coin</string>
+    <string name="label_coin1">Second Coin</string>
+    <string name="hint_estimated">Estimated, depends on the pool ratio</string>
+    <string name="label_slippage">%1$s slippage tolerance</string>
+    <string name="label_max_amount_spend">%1$s max amount to spend</string>
+    <string name="btn_add_liquidity">Add Liquidity</string>
+    <string name="btn_remove_liquidity">Remove Liquidity</string>
+    <string name="input_pool_error_max_amount_too_low">Max amount too low. Minimum is amount of the second coin</string>
+    <string name="input_pool_error_slippage_exceed">Maximum slippage percent is 100</string>
+    <string name="label_estimated_return">Estimated Return</string>
+    <string name="label_pool_token_amount">Pool Tokens Amount</string>
+    <string translatable="false" name="label_percent">%</string>
+    <string name="hint_percentage_remove_liquidity">Percentage of your pool liquidity</string>
+    <string name="dialog_subtitle_liquidity_removed">Liquidity Removed</string>
+    <string name="dialog_subtitle_liquidity_added">Liquidity Added</string>
+    <string name="dialog_subtitle_liquidity_pool_name">Pool: %1$s / %2$s</string>
+    <string name="error_unable_load_pool">Unable to load pool info</string>
 </resources>

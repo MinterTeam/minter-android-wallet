@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -58,7 +58,8 @@ class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
         init {
             put(R.id.bottom_wallets, 0)
             put(R.id.bottom_send, 1)
-            put(R.id.bottom_settings, 2)
+            put(R.id.bottom_pools, 2)
+            put(R.id.bottom_settings, 3)
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,9 +39,14 @@ import network.minter.bipwallet.internal.storage.AccountStorage
 import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
+import network.minter.bipwallet.pools.repo.FarmingRepository
+import network.minter.bipwallet.pools.repo.RepoCachedFarming
+import network.minter.bipwallet.pools.repo.RepoCachedUserPools
+import network.minter.bipwallet.pools.repo.UserPoolsRepository
 import network.minter.bipwallet.stories.repo.RepoCachedStories
 import network.minter.bipwallet.stories.repo.StoriesRepository
 import network.minter.explorer.MinterExplorerSDK
+import network.minter.explorer.repo.ExplorerStatusRepository
 import network.minter.explorer.repo.GateCoinRepository
 import java.util.concurrent.TimeUnit
 
@@ -71,7 +76,7 @@ object CacheModule {
     @WalletApp
     fun provideCachedValidatorsRepo(@DbCache storage: KVStorage, api: MinterExplorerSDK, em: ErrorManager): RepoValidators {
         return RepoValidators(storage, CacheValidatorsRepository(storage, api.apiService))
-                .setTimeToLive(60 * 20)
+                .setTimeToLive(60L * 20L)
                 .retryWhen(em.retryWhenHandler)
     }
 
@@ -80,7 +85,16 @@ object CacheModule {
     @WalletApp
     fun provideCachedCoinsRepo(@DbCache storage: KVStorage, db: WalletDatabase, api: MinterExplorerSDK, em: ErrorManager): RepoCoins {
         return RepoCoins(storage, CachedCoinsRepository(storage, db, api.apiService))
-                .setTimeToLive(/*3  minutes */ 60 * 3)
+                .setTimeToLive(/*3  minutes */ 60L * 3L)
+                .retryWhen(em.retryWhenHandler)
+    }
+
+    @JvmStatic
+    @Provides
+    @WalletApp
+    fun provideCachedBipUsdRepo(@DbCache storage: KVStorage, repo: ExplorerStatusRepository, em: ErrorManager): RepoCachedBipUsdRate {
+        return RepoCachedBipUsdRate(storage, BipToUsdRepository(storage, repo))
+                .setTimeToLive(60L * 3L)
                 .retryWhen(em.retryWhenHandler)
     }
 
@@ -96,7 +110,7 @@ object CacheModule {
     @WalletApp
     fun provideCachedDailyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoDailyRewards {
         return RepoDailyRewards(storage, CachedDailyRewardStatisticsRepository(storage, secretStorage, api.apiService))
-                .setTimeToLive(60 * 10)
+                .setTimeToLive(60L * 10L)
     }
 
     @JvmStatic
@@ -104,7 +118,7 @@ object CacheModule {
     @WalletApp
     fun provideCachedMonthlyRewardStatsRepo(@DbCache storage: KVStorage, secretStorage: SecretStorage, api: MinterExplorerSDK): RepoMonthlyRewards {
         return RepoMonthlyRewards(storage, CachedMonthlyRewardsStatisticsRepository(storage, secretStorage, api.apiService))
-                .setTimeToLive(60 * 30)
+                .setTimeToLive(60L * 30L)
     }
 
     @JvmStatic
@@ -112,7 +126,27 @@ object CacheModule {
     @WalletApp
     fun provideCachedStoriesRepo(@DbCache storage: KVStorage, repo: StoriesRepository, em: ErrorManager): RepoCachedStories {
         return RepoCachedStories(storage, repo)
-                .setTimeToLive(10, TimeUnit.MINUTES)
+                .setTimeToLive(10L, TimeUnit.MINUTES)
+                .retryWhen(em.retryWhenHandler)
+    }
+
+
+
+    @JvmStatic
+    @Provides
+    @WalletApp
+    fun provideCachedFarmingRepo(@DbCache storage: KVStorage, repo: FarmingRepository, em: ErrorManager): RepoCachedFarming {
+        return RepoCachedFarming(storage, repo)
+                .setTimeToLive(10L, TimeUnit.MINUTES)
+                .retryWhen(em.retryWhenHandler)
+    }
+
+    @JvmStatic
+    @Provides
+    @WalletApp
+    fun provideCachedUserPoolsRepo(@DbCache storage: KVStorage, repo: UserPoolsRepository, em: ErrorManager): RepoCachedUserPools {
+        return RepoCachedUserPools(storage, repo)
+                .setTimeToLive(10L, TimeUnit.MINUTES)
                 .retryWhen(em.retryWhenHandler)
     }
 

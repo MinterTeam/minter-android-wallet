@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,8 +29,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.AsyncDifferConfig
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import network.minter.bipwallet.internal.adapter.LoadState
@@ -43,7 +42,7 @@ import network.minter.core.crypto.MinterAddress
  * minter-android-wallet. 2018
  * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
-class TransactionListAdapter : PagedListAdapter<TransactionItem, RecyclerView.ViewHolder> {
+class TransactionListAdapter : PagingDataAdapter<TransactionItem, RecyclerView.ViewHolder> {
     companion object {
         private val sDiffCallback: DiffUtil.ItemCallback<TransactionItem> = object : DiffUtil.ItemCallback<TransactionItem>() {
             override fun areItemsTheSame(oldItem: TransactionItem, newItem: TransactionItem): Boolean {
@@ -54,8 +53,6 @@ class TransactionListAdapter : PagedListAdapter<TransactionItem, RecyclerView.Vi
                 return oldItem == newItem
             }
         }
-
-
     }
 
     private var _myAddress: (() -> MinterAddress)? = null
@@ -63,11 +60,12 @@ class TransactionListAdapter : PagedListAdapter<TransactionItem, RecyclerView.Vi
     private var _loadState: MutableLiveData<LoadState>? = null
     private var _onExpandDetailsListener: ((View, TransactionFacade) -> Unit)? = null
 
+    constructor(): super(sDiffCallback)
     constructor(addressCallback: () -> MinterAddress) : super(sDiffCallback) {
         _myAddress = addressCallback
     }
 
-    protected constructor(config: AsyncDifferConfig<TransactionItem?>) : super(config)
+//    protected constructor(config: AsyncDifferConfig<TransactionItem?>) : super(config)
 
     override fun onCreateViewHolder(parent: ViewGroup, @TransactionItem.ListType viewType: Int): RecyclerView.ViewHolder {
         if (_inflater == null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,7 +37,7 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.common.DeferredCall
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.bipwallet.internal.views.list.PaddingItemDecoration
+import network.minter.bipwallet.internal.views.list.PaddingLeftFirstItemDecoration
 import network.minter.bipwallet.stories.adapter.StoriesDiffUtil
 import network.minter.bipwallet.stories.adapter.StoriesListAdapter
 import network.minter.bipwallet.stories.models.Story
@@ -90,7 +90,7 @@ class StoriesListFragment : BaseInjectFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         b = FragmentStoriesHorizontalListBinding.inflate(inflater, container, false)
         b.list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        b.list.addItemDecoration(PaddingItemDecoration(Wallet.app().display().dpToPx(48f)))
+        b.list.addItemDecoration(PaddingLeftFirstItemDecoration(Wallet.app().display().dpToPx(48f)))
         b.list.adapter = adapter
         b.progress.visible = false
         deferView.attach(b)

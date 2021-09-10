@@ -283,13 +283,17 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      * @see .observeWithMeta
      */
     fun fetch(): Observable<ResultModel> {
-        if (isDataReady) {
+        if (isDataReady && !isExpired) {
             return Observable.just(entity.getData())
+                    .subscribeOn(THREAD_IO)
                     .observeOn(THREAD_MAIN)
-                    .subscribeOn(THREAD_MAIN)
         }
-        update()
-        return onUpdate()
+
+        invalidateTime()
+        return updateObservable
+                .doOnNext(callOnNext(null))
+                .doOnError(callOnError(null))
+                .doOnComplete(callOnComplete(null))
     }
 
     @JvmOverloads

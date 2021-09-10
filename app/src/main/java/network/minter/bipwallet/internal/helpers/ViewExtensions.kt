@@ -29,6 +29,7 @@ package network.minter.bipwallet.internal.helpers
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
 import android.text.InputType
@@ -202,6 +203,30 @@ object ViewExtensions {
 
     fun tr(@StringRes id: Int, vararg format: Any): String {
         return Wallet.app().res().getString(id, *format)
+    }
+
+    fun CharSequence?.textWidthMono(input: InputField, extra: Int = 0): Int {
+        val paint = Paint()
+        val bounds = Rect()
+        paint.typeface = input.input.typeface
+        paint.textSize = input.input.textSize
+        var targetText: String = this.toString()
+        for(i in 0..extra) {
+            targetText += "0"
+        }
+
+        paint.getTextBounds(targetText, 0, targetText.length, bounds)
+        return bounds.width()
+    }
+
+    fun InputField.textWidth(): Int {
+        val paint = Paint()
+        val bounds = Rect()
+        paint.typeface = this.input.typeface
+        paint.textSize = this.input.textSize
+        paint.getTextBounds(this.text.toString(), 0, this.text?.length?:0, bounds)
+
+        return bounds.width()
     }
 
 }

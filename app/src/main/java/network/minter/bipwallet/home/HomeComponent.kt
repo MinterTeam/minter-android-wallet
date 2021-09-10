@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,6 +28,7 @@ package network.minter.bipwallet.home
 import dagger.Component
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.di.WalletComponent
+import network.minter.bipwallet.pools.ui.PoolsTabFragment
 import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.settings.ui.SettingsTabFragment
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment
@@ -43,6 +44,7 @@ interface HomeComponent {
     fun inject(fragment: WalletsTabFragment)
     fun inject(fragment: SendTabFragment)
     fun inject(fragment: SettingsTabFragment)
+    fun inject(fragment: PoolsTabFragment)
 
     @HomeTabsClasses
     fun tabsClasses(): @JvmSuppressWildcards List<Class<out HomeTabFragment>>

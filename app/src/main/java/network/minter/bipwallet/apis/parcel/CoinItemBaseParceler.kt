@@ -34,13 +34,15 @@ object CoinItemBaseParceler : Parceler<CoinItemBase> {
     override fun create(parcel: android.os.Parcel): CoinItemBase {
         return CoinItemBase(
                 parcel.readValue(BigInteger::class.java.classLoader) as BigInteger,
-                parcel.readString()
+                parcel.readString(),
+                parcel.readSerializable() as CoinItemBase.CoinType
         )
     }
 
     override fun CoinItemBase.write(parcel: android.os.Parcel, flags: Int) {
         parcel.writeValue(id)
         parcel.writeString(symbol)
+        parcel.writeSerializable(type)
     }
 
 }

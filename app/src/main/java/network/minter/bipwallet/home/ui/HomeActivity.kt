@@ -43,7 +43,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.annimon.stream.Stream
-import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.R
@@ -240,11 +240,11 @@ class HomeActivity : BaseMvpActivity(), HomeView {
     }
 
     private fun setupBottomNavigation() {
-        b.navigationBottom.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
+        b.navigationBottom.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_LABELED
         b.navigationBottom.isItemHorizontalTranslationEnabled = false
-        b.navigationBottom.enableAnimation(true)
-        b.navigationBottom.setTextVisibility(true)
-        b.navigationBottom.setOnNavigationItemSelectedListener { item ->
+//        b.navigationBottom.enableAnimation(true)
+//        b.navigationBottom.setTextVisibility(true)
+        b.navigationBottom.setOnItemSelectedListener { item ->
             runOnUiThread { b.homePager.currentItem = presenter.getBottomPositionById(item.itemId) }
             true
         }
@@ -284,6 +284,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.show(WindowInsets.Type.statusBars())
         } else {
+            @Suppress("DEPRECATION")
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         }
 //        supportFragmentManager.popBackStack()

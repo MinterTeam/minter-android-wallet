@@ -26,10 +26,12 @@
 package network.minter.bipwallet.tx.adapters
 
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.DataSource
-import androidx.paging.PageKeyedDataSource
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.rxjava2.RxPagingSource
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -64,58 +66,43 @@ import javax.inject.Inject
  * minter-android-wallet. 2018
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<Int, TransactionItem>() {
+class TransactionDataSource(private val factory: Factory) : RxPagingSource<Int, TransactionItem>() {
     private val _disposables = CompositeDisposable()
     private var _lastDate: DateTime? = null
 
-    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, TransactionItem>) {
-        factory.loadState?.postValue(LoadState.Loading)
-
-        resolveInfo(factory.repo.getTransactions(factory.address, 1, factory.txFilter))
-                .map { groupByDate(it) }
-                .doOnSubscribe { _disposables.add(it) }
-                .subscribe(
-                        {
-                            factory.loadState?.postValue(LoadState.Loaded)
-                            val nextPage = if (it.meta.lastPage == 1) null else it.meta.currentPage + 1
-                            callback.onResult(it.items, null, nextPage)
-                        },
-                        {
-                            Timber.w(it, "Unable to load initial tx list"
-                            )
-                        })
+    init {
+        registerInvalidatedCallback {
+            _disposables.dispose()
+        }
     }
 
-    override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
-        factory.loadState?.postValue(LoadState.Loading)
+    override fun getRefreshKey(state: PagingState<Int, TransactionItem>): Int? {
+        val ret = state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                    ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
 
-        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter))
-                .map { groupByDate(it) }
-                .doOnSubscribe { _disposables.add(it) }
-                .subscribe(
-                        {
-                            factory.loadState?.postValue(LoadState.Loaded)
-                            callback.onResult(it.items, if (params.key == 1) null else params.key - 1)
-                        },
-                        {
-                            Timber.w(it, "Unable to load previous tx list")
-                        })
+        Timber.d("TX_LIST: refresh key $ret")
+
+        return ret
     }
 
-    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, TransactionItem>) {
+    override fun loadSingle(params: LoadParams<Int>): Single<LoadResult<Int, TransactionItem>> {
         factory.loadState?.postValue(LoadState.Loading)
 
-        resolveInfo(factory.repo.getTransactions(factory.address, params.key, factory.txFilter))
-                .map { res: ExpResult<List<TransactionFacade>> -> groupByDate(res) }
+        Timber.d("TX_LIST: loadSingle page=${params.key}")
+        return resolveInfo(factory.repo.getTransactions(factory.myAddress, params.key ?: 1, factory.txFilter))
+                .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
-                .subscribe(
-                        { res: DataSourceMeta<TransactionItem> ->
-                            factory.loadState?.postValue(LoadState.Loaded)
-                            callback.onResult(res.items, if (params.key + 1 > res.meta.lastPage) null else params.key + 1)
-                        },
-                        {
-                            Timber.w(it, "Unable to load next tx list")
-                        })
+                .singleOrError()
+                .map {
+                    factory.loadState?.postValue(LoadState.Loaded)
+                    LoadResult.Page(
+                            data = it.items,
+                            prevKey = if (it.meta.currentPage == 1) null else it.meta.currentPage - 1,
+                            nextKey = if (it.meta.currentPage == it.meta.lastPage) null else it.meta.currentPage + 1
+                    )
+                }
     }
 
     private fun resolveInfo(source: Observable<ExpResult<List<HistoryTransaction>>>): Observable<ExpResult<List<TransactionFacade>>> {
@@ -130,10 +117,6 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
 
     }
 
-    override fun invalidate() {
-        super.invalidate()
-        _disposables.dispose()
-    }
 
     private fun lastDay(): String {
         return if (DateHelper.compareFlatDay(_lastDate!!, DateTime())) {
@@ -171,7 +154,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
         return meta
     }
 
-    class Factory @Inject constructor(secretStorage: SecretStorage) : DataSource.Factory<Int, TransactionItem>() {
+    class Factory @Inject constructor(secretStorage: SecretStorage) {
         @Inject lateinit var repo: ExplorerTransactionRepository
         @Inject lateinit var validatorsRepo: RepoValidators
         @Inject lateinit var addressBookRepo: AddressBookRepository
@@ -186,7 +169,7 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
                 return secretStorage.mainWallet
             }
 
-        override fun create(): DataSource<Int, TransactionItem> {
+        fun create(): PagingSource<Int, TransactionItem> {
             return TransactionDataSource(this)
         }
 
@@ -349,5 +332,6 @@ class TransactionDataSource(private val factory: Factory) : PageKeyedDataSource<
 
         }
     }
+
 
 }

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2021
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title=" ">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_add_liquidity" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_coin0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/Input"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:inputType="numberDecimal|textMultiLine"
+                app:fieldName="coin0"
+                app:label="@string/label_coin0"
+                app:labelEnabled="true"
+                app:suffixText="@string/btn_use_max"
+                app:suffixTextAppearance="@style/Input.SuffixButton.TextAppearance"
+                app:suffixTextStyle="@style/Input.SuffixButton"
+                app:errorEnabled="false"
+                />
+
+            <TextView
+                android:id="@+id/coin0_suffix"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textColor="@color/text_input_stateful"
+                android:layout_marginStart="16dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/input_coin0"
+                app:layout_constraintStart_toStartOf="@id/input_coin0"
+                app:layout_constraintEnd_toEndOf="@id/input_coin0"
+
+                />
+
+            <ImageView
+                android:layout_marginTop="@dimen/margin_edges"
+                android:id="@+id/action_swap_coins"
+                app:layout_constraintTop_toBottomOf="@id/input_coin0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_swap_coins"
+                />
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_coin1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/action_swap_coins"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/Input"
+                android:layout_marginTop="0dp"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:inputType="numberDecimal|textMultiLine"
+                app:fieldName="coin1"
+                app:label="@string/label_coin1"
+                app:labelEnabled="true"
+                app:suffixText="@string/btn_use_max"
+                app:suffixTextAppearance="@style/Input.SuffixButton.TextAppearance"
+                app:suffixTextStyle="@style/Input.SuffixButton"
+                app:errorEnabled="false"
+                tools:text="1"
+                />
+
+            <TextView
+                android:id="@+id/coin1_suffix"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textColor="@color/text_input_stateful"
+                android:layout_marginStart="16dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/input_coin1"
+                app:layout_constraintStart_toStartOf="@id/input_coin1"
+                app:layout_constraintEnd_toEndOf="@id/input_coin1"
+                tools:text="   HUB"
+                />
+
+            <TextView
+                android:id="@+id/hint_estimated"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/input_coin1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:text="@string/hint_estimated"
+                style="@style/Wallet.ItemTxLabel"
+                />
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@drawable/shape_bottom_separator"
+                app:layout_constraintTop_toBottomOf="@id/hint_estimated"
+                android:layout_marginTop="@dimen/margin_edges"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_slippage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/separator"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/Input"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                tools:text="5"
+                app:fieldName="slippage"
+                app:label="@string/label_slippage"
+                app:labelEnabled="true"
+                />
+
+            <TextView
+                android:id="@+id/slippage_suffix"
+                android:layout_marginTop="26dp"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textColor="@color/text_input_stateful"
+                android:layout_marginStart="16dp"
+                android:layout_width="0dp"
+                android:text="%"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/input_slippage"
+                app:layout_constraintBottom_toBottomOf="@id/input_slippage"
+                app:layout_constraintStart_toStartOf="@id/input_slippage"
+                app:layout_constraintEnd_toEndOf="@id/input_slippage"
+                />
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_max_spend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/input_slippage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="@style/Input"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                tools:text="0.1353 BOOM"
+                app:fieldName="max_spend"
+                app:label="@string/label_max_amount_spend"
+                app:labelEnabled="true"
+                />
+
+            <!--LABELS-->
+            <Space
+                android:id="@+id/label_guide"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_max_spend" />
+
+            <TextView
+                android:id="@+id/fee_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:text="@string/tx_send_fee_hint"
+                android:textSize="@dimen/text_size_14"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_guide" />
+
+            <TextView
+                android:id="@+id/fee_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_large"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textAlignment="textEnd"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/fee_label"
+                app:layout_constraintTop_toBottomOf="@id/label_guide"
+                tools:text="@string/tx_send_fee_value" />
+
+            <Space
+                android:id="@+id/button_guide"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fee_label" />
+
+            <TextView
+                android:id="@+id/text_error"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textColor="@color/errorColor"
+                android:textSize="@dimen/text_size_14"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/button_guide"
+                tools:text="Some uncaught error"
+                tools:visibility="visible" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/btn_add_liquidity"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_error" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.internal.helpers
 
+import android.os.Build
 import network.minter.bipwallet.internal.Wallet
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -33,6 +34,8 @@ import org.joda.time.format.DateTimeFormat
 import timber.log.Timber
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.*
 
 /**
@@ -151,5 +154,15 @@ object DateHelper {
 
     fun Int.days(): Days {
         return Days.days(this)
+    }
+
+    fun Date.formatDateLong(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val df = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+            df.format(toInstant())
+        } else {
+            val sdf = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+            sdf.format(this)
+        }
     }
 }

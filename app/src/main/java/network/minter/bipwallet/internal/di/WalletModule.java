@@ -341,6 +341,26 @@ public class WalletModule {
     }
 
     @Provides
+    @Named("chainik")
+    public ApiService.Builder provideChainikApiService() {
+        ApiService.Builder api = new ApiService.Builder(BuildConfig.CHAINIK_API_URL);
+        api.setDebug(mDebug);
+        api.addHeader("User-Agent", "Minter Android " + BuildConfig.VERSION_CODE);
+        api.addHeader("X-Client-Version", BuildConfig.VERSION_NAME);
+        api.addHeader("X-Client-Build", String.valueOf(BuildConfig.VERSION_CODE));
+        api.addHeader("Content-Type", "application/json");
+        api.addHeader("Accept-Language", Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry());
+
+        String dateFormat = "yyyy-MM-dd HH:mm:ssX";
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
+            dateFormat = "yyyy-MM-dd HH:mm:ssZ";
+        }
+        api.setDateFormat(dateFormat);
+        api.setRetrofitClientConfig(builder -> builder.addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io())));
+        return api;
+    }
+
+    @Provides
     @WalletApp
     public AuthSession provideAuthSession(KVStorage sessionStorage) {
         return new AuthSession(sessionStorage);

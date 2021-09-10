@@ -27,21 +27,20 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = "1.5.0"
+    ext.kotlin_version = "1.5.21"
     repositories {
         mavenLocal()
         google()
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
-        classpath 'com.google.gms:google-services:4.3.5'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
-        classpath 'com.google.firebase:firebase-appdistribution-gradle:2.1.1'
+        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.1'
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:2.1.3'
         classpath 'gradle.plugin.firebase.test.lab:plugin:1.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.6.0.0"
-
+        classpath 'de.mannodermaus.gradle.plugins:android-junit5:1.6.1.0'
     }
 }
 
@@ -50,19 +49,14 @@ allprojects {
         mavenLocal()
         mavenCentral()
         google()
-        maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url 'https://clojars.org/repo/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/'}
         maven { url 'https://jitpack.io' }
         maven { url "https://repo1.maven.org/maven2/com/google/zxing/" }
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://oss.jfrog.org/libs-snapshot/" }
-        maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
-        //
-        maven { url "https://dl.bintray.com/minterteam/android" }
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
         maven { url "https://minter.jfrog.io/artifactory/android/" }
-        maven { url "https://dl.bintray.com/edwardstock/android" }
-
     }
 }
 
@@ -75,13 +69,13 @@ ext {
     minterMaxSdk = 30
     minterBuildTools = "30.0.2"
 
-    minterExplorerSDK = "2.0.1"
+    minterExplorerSDK = "2.0.2"
     minterProfileSDK = "0.2.6"
     minterBlockchainSDK = "2.0.0"
     minterCoreSDK = "1.1.0"
     minterLedgerSDK = "0.1.0"
     roomVersion = '2.3.0'
 
-    appVersionName = "2.3.7"
-    appVersionCode = 235
+    appVersionName = "2.4.0-beta01"
+    appVersionCode = 240
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,6 +31,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -140,6 +141,10 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
         state.observe(this, Observer {
             cb(it)
         })
+    }
+
+    override fun onLifecycle(onLifecycle: (LifecycleOwner) -> Unit) {
+        onLifecycle(this)
     }
 
     override fun showProgress() {

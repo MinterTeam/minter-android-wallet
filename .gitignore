@@ -18,3 +18,4 @@ app/google-services.json
 checklist.md
 app/netMain
 app/netTest
+LocalTest.kt

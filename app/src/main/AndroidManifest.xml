@@ -165,6 +165,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/Wallet.Stories" />
 
+        <activity
+            android:name=".pools.ui.PoolAddLiquidityActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".pools.ui.PoolRemoveLiquidityActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
         <service
             android:name=".services.livebalance.RTMService"
             android:exported="false"

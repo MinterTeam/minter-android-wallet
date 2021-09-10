@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,6 +31,7 @@ import dagger.Module
 import dagger.Provides
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.pools.ui.PoolsTabFragment
 import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.settings.ui.SettingsTabFragment
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment
@@ -49,6 +50,7 @@ class HomeModule(activity: HomeActivity) {
         const val EXTRA_MENU_ID = "EXTRA_MENU_ID"
         val TAB_COINS = WalletsTabFragment::class.java.name
         val TAB_SENDING = SendTabFragment::class.java.name
+        val TAB_POOLS = PoolsTabFragment::class.java.name
         val TAB_SETTINGS = SettingsTabFragment::class.java.name
         var component: HomeComponent? = null
             private set
@@ -69,6 +71,7 @@ class HomeModule(activity: HomeActivity) {
     private val tabsClassesClient: List<Class<out HomeTabFragment>> = immutableListOf(
             WalletsTabFragment::class.java,
             SendTabFragment::class.java,
+            PoolsTabFragment::class.java,
             SettingsTabFragment::class.java
     )
     private val mActivity: WeakReference<HomeActivity> = WeakReference(activity)

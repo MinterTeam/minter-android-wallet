@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2021
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/WalletPrimaryToolbar.Light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back_grey"
+        app:popupTheme="@style/WalletPrimaryToolbar.Light"
+        app:title=" ">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            style="@style/Wallet.Toolbar.TitleDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_remove_liquidity" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_token"
+                style="@style/Input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:inputType="numberDecimal|textMultiLine"
+                app:errorEnabled="false"
+                app:fieldName="token"
+                app:label="@string/label_pool_token_amount"
+                app:labelEnabled="true"
+                app:suffixType="text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:suffixText="@string/btn_use_max"
+                app:suffixTextAppearance="@style/Input.SuffixButton.TextAppearance"
+                app:suffixTextStyle="@style/Input.SuffixButton" />
+
+            <com.edwardstock.inputfield.InputField
+                android:id="@+id/input_liquidity"
+                style="@style/Input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"
+                app:fieldName="liquidity"
+                app:label="@string/label_liquidity"
+                app:labelEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_token"
+                tools:text="5" />
+
+            <TextView
+                android:id="@+id/liquidity_suffix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:text="@string/label_percent"
+                android:textColor="@color/text_input_stateful"
+                app:layout_constraintEnd_toEndOf="@id/input_liquidity"
+                app:layout_constraintStart_toStartOf="@id/input_liquidity"
+                app:layout_constraintTop_toTopOf="@id/input_liquidity" />
+
+            <TextView
+                android:id="@+id/hint_percentage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/input_liquidity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges_half"
+                android:text="@string/hint_percentage_remove_liquidity"
+                style="@style/Wallet.ItemTxLabel"
+                />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/estimate_return_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:background="@drawable/bg_light_green_rounded"
+                android:paddingStart="@dimen/margin_edges"
+                android:paddingEnd="@dimen/margin_edges"
+                app:layout_constraintTop_toBottomOf="@id/hint_percentage">
+
+                <TextView
+                    android:id="@+id/label_return"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_edges_half"
+                    android:fontFamily="@font/_inter_semi_bold"
+                    android:text="@string/label_estimated_return"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/text_size_14"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
+                    android:id="@+id/coin0_avatar"
+                    style="@style/ListAvatar"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="@dimen/margin_edges"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/label_return"
+                    tools:src="@tools:sample/avatars" />
+
+                <TextView
+                    android:id="@+id/coin0"
+                    style="@style/ListTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_edges_half"
+                    android:layout_marginTop="4dp"
+                    android:textSize="@dimen/text_size_default"
+                    app:layout_constraintStart_toEndOf="@id/coin0_avatar"
+                    app:layout_constraintTop_toTopOf="@id/coin0_avatar"
+                    tools:text="BIP" />
+
+                <TextView
+                    android:id="@+id/coin0_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/_inter_semi_bold"
+                    android:textSize="@dimen/text_size_default"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toEndOf="@id/coin0"
+                    app:layout_constraintTop_toTopOf="@id/coin0"
+                    tools:text="100.00" />
+
+                <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
+                    android:id="@+id/coin1_avatar"
+                    style="@style/ListAvatar"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="@dimen/margin_edges"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/coin0_avatar"
+                    tools:src="@tools:sample/avatars" />
+
+                <TextView
+                    android:id="@+id/coin1"
+                    style="@style/ListTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_edges_half"
+                    android:layout_marginTop="4dp"
+                    android:textSize="@dimen/text_size_default"
+                    app:layout_constraintStart_toEndOf="@id/coin1_avatar"
+                    app:layout_constraintTop_toTopOf="@id/coin1_avatar"
+                    tools:text="BOOM" />
+
+                <TextView
+                    android:id="@+id/coin1_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/_inter_semi_bold"
+                    android:textSize="@dimen/text_size_default"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toEndOf="@id/coin1"
+                    app:layout_constraintTop_toTopOf="@id/coin1"
+                    tools:text="≈0.13" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/margin_edges"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/coin1_avatar" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--LABELS-->
+            <TextView
+                android:id="@+id/rate_attention"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_regular"
+                app:layout_constraintTop_toBottomOf="@id/estimate_return_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/attention_remove_liquidity_rate"
+                android:textAlignment="center"
+                android:textSize="@dimen/text_size_14" />
+            <Space
+                android:id="@+id/label_guide"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rate_attention" />
+
+            <TextView
+                android:id="@+id/fee_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges_large"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:text="@string/tx_send_fee_hint"
+                android:textSize="@dimen/text_size_14"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_guide" />
+
+            <TextView
+                android:id="@+id/fee_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges_large"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textAlignment="textEnd"
+                android:textSize="@dimen/text_size_14"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/fee_label"
+                app:layout_constraintTop_toBottomOf="@id/label_guide"
+                tools:text="@string/tx_send_fee_value" />
+
+            <Space
+                android:id="@+id/button_guide"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fee_label" />
+
+            <TextView
+                android:id="@+id/text_error"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:fontFamily="@font/_inter_semi_bold"
+                android:textColor="@color/errorColor"
+                android:textSize="@dimen/text_size_14"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/button_guide"
+                tools:text="Some uncaught error"
+                tools:visibility="visible" />
+
+            <network.minter.bipwallet.internal.views.widgets.WalletButton
+                android:id="@+id/action"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_edges"
+                android:layout_marginTop="@dimen/margin_edges"
+                android:layout_marginEnd="@dimen/margin_edges"
+                android:text="@string/btn_remove_liquidity"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_error" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="@dimen/margin_edges"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/action" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

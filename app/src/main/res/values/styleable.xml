@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2021
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -55,6 +55,14 @@
             <enum name="all" value="0" />
             <enum name="incoming" value="1" />
             <enum name="outgoing" value="2" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="PoolsFilterView">
+        <attr name="pf_def_value" format="enum">
+            <enum name="all" value="0" />
+            <enum name="staked" value="1" />
+            <enum name="farming" value="2" />
         </attr>
     </declare-styleable>
 </resources>

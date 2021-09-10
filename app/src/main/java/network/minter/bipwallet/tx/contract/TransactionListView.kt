@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,6 +25,7 @@
  */
 package network.minter.bipwallet.tx.contract
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
@@ -55,4 +56,5 @@ interface TransactionListView : MvpView, ProgressView {
     fun startDetails(tx: TransactionFacade)
     fun setFilterObserver(filterState: MutableLiveData<TxFilter>)
     fun lifecycle(state: MutableLiveData<TxFilter>, cb: (TxFilter) -> Unit)
+    fun onLifecycle(onLifecycle: (LifecycleOwner) -> Unit)
 }

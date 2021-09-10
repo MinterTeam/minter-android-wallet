@@ -31,7 +31,9 @@ import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.reactivex.Observable
 import network.minter.bipwallet.BuildConfig
+import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.Wallet
+import network.minter.bipwallet.internal.helpers.MathHelper.asCurrency
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.RegexReplaceData
 import network.minter.bipwallet.internal.helpers.StringsHelper
@@ -40,13 +42,11 @@ import network.minter.blockchain.models.operational.TxVoteCommission
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
-import network.minter.explorer.models.CoinItemBase
-import network.minter.explorer.models.ExpResult
-import network.minter.explorer.models.GateResult
-import network.minter.explorer.models.HistoryTransaction
+import network.minter.explorer.models.*
 import retrofit2.Call
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 val GATE_UNHANDLED_ERRORS = listOf(
         RegexReplaceData(
@@ -85,7 +85,15 @@ fun <R, T : Throwable> T.toObservable(): Observable<R> {
 
 val CoinItemBase.avatar: String
     get() {
-        return BuildConfig.COIN_AVATAR_BASE_URL + symbol
+        return when(id) {
+            BigInteger("2024") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_musd}"
+            BigInteger("2064") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_btc}"
+            BigInteger("1902") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_hub}"
+            BigInteger("1993") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_usdt}"
+            BigInteger("1994") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_usdc}"
+            BigInteger("2065") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_eth}"
+            else -> BuildConfig.COIN_AVATAR_BASE_URL + symbol
+        }
     }
 
 val HistoryTransaction.TxChangeCoinOwnerResult.avatar: String
@@ -159,4 +167,32 @@ fun TxVoteCommission.nameValueMap(): Map<String, BigInteger> {
             Pair("Vote for Update", voteUpdate),
             Pair("Vote for Commissions", voteCommission),
     )
+}
+
+fun Pool.calculateAPY(fee: BigDecimal = BigDecimal("0.002")): BigDecimal {
+
+    //const tradeFee = tradeVolume1d * fee;
+    //const apr = liquidity > 0 ? tradeFee / liquidity * 365 : 0;
+    //return ((1 + apr / 365) ** 365 - 1) * 100;
+
+    val year = BigDecimal("365.000").setScale(18)
+    val one = BigDecimal.ONE.setScale(18)
+    val hund = BigDecimal("100").setScale(18)
+
+    val tradeFee = ((volumeBip1d ?: BigDecimal.ZERO) * fee).setScale(18, RoundingMode.HALF_UP)
+    val apr = if(liquidityBip > BigDecimal.ZERO) {
+        tradeFee.divide(liquidityBip, RoundingMode.HALF_UP).multiply(year)
+    } else {
+        BigDecimal.ZERO
+    }.setScale(18, RoundingMode.HALF_UP)
+
+    if(apr.compareTo(BigDecimal.ZERO) == 0) {
+        return BigDecimal.ZERO
+    }
+
+    return ((one + apr.divide(year, RoundingMode.HALF_UP)).pow(365) - one) * hund
+}
+
+fun BigDecimal.bipToUsd(): CharSequence {
+    return "$" +(Wallet.app().bipUsdRateCachedRepo().data * this).asCurrency()
 }

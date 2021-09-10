@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) by MinterTeam. 2021
+  ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
+  ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
+  ~
+  ~ The MIT License
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+
+        <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
+            android:id="@+id/item_avatar_first"
+            style="@style/ListAvatar"
+            app:layout_constraintBottom_toBottomOf="@id/layout_main"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <network.minter.bipwallet.internal.views.widgets.BipCircleImageView
+            android:id="@+id/item_avatar_second"
+            style="@style/ListAvatar"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="21dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_main"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="12dp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/item_avatar_second"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/item_lp_title"
+                style="@style/ListSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/item_pair"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="LP-444" />
+
+            <TextView
+                android:id="@+id/item_pair"
+                style="@style/ListTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_edges_quart"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/item_lp_title"
+                tools:text="BOOMSTART1 / BOOMSTART2" />
+
+            <ImageView
+                android:id="@+id/action_remove"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:src="@drawable/ic_remove_circle_outline_black"
+                app:layout_constraintBottom_toBottomOf="@id/item_pair"
+                app:layout_constraintEnd_toStartOf="@id/action_add"
+                app:layout_constraintTop_toTopOf="@id/item_lp_title" />
+
+            <ImageView
+                android:id="@+id/action_add"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:src="@drawable/ic_add_circle_outline_primary"
+                app:layout_constraintBottom_toBottomOf="@id/item_pair"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/item_lp_title" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/greySeparator"
+            app:layout_constraintBottom_toBottomOf="@id/layout_main"
+            app:layout_constraintEnd_toEndOf="@id/layout_main"
+            app:layout_constraintStart_toStartOf="@id/layout_main" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_pool_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:minHeight="58dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/item_avatar_second"
+            app:layout_constraintTop_toBottomOf="@id/layout_main">
+
+            <TextView
+                android:id="@+id/label_apy"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_apy"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_apy"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_apy"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="132%" />
+
+            <TextView
+                android:id="@+id/label_volume_1d"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_volume_1d"
+                app:layout_constraintStart_toEndOf="@id/label_apy"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_volume_1d"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/value_apy"
+                app:layout_constraintTop_toBottomOf="@id/label_volume_1d"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="$1 365.92" />
+
+            <TextView
+                android:id="@+id/label_farming_apr"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_farming_apr"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/value_volume_1d"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_farming_apr"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_farming_apr"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="36%" />
+
+            <TextView
+                android:id="@+id/label_end_date"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_end_date"
+                app:layout_constraintStart_toEndOf="@id/label_farming_apr"
+                app:layout_constraintTop_toBottomOf="@id/value_volume_1d"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_end_date"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/value_farming_apr"
+                app:layout_constraintTop_toBottomOf="@id/label_end_date"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="September 1, 2021" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/separator_pool_stake"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/margin_edges"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_pool_info" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_stake"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="@dimen/margin_edges"
+            android:paddingBottom="@dimen/margin_edges"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/item_avatar_second"
+            app:layout_constraintTop_toBottomOf="@id/separator_pool_stake">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/greySeparator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/label_staked_amount"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_staked_amount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_staked_amount_first"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_staked_amount"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="132%" />
+
+
+            <TextView
+                android:id="@+id/value_staked_amount_second"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/value_staked_amount_first"
+                app:layout_constraintTop_toBottomOf="@id/label_staked_amount"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="$1 365.92" />
+
+            <TextView
+                android:id="@+id/label_your_share"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_your_share"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/value_staked_amount_first"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_your_share"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_your_share"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="36%" />
+
+            <TextView
+                android:id="@+id/label_your_liquidity"
+                style="@style/Wallet.ItemPoolLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/label_your_liquidity"
+                app:layout_constraintStart_toEndOf="@id/label_your_share"
+                app:layout_constraintTop_toBottomOf="@id/value_staked_amount_second"
+                app:layout_constraintWidth_percent=".5" />
+
+            <TextView
+                android:id="@+id/value_your_liquidity"
+                style="@style/Wallet.ItemTxValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/value_your_share"
+                app:layout_constraintTop_toBottomOf="@id/label_your_liquidity"
+                app:layout_constraintWidth_percent=".5"
+                tools:text="$215.40" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/shape_bottom_separator"
+        />
+    <View
+        android:id="@+id/separator_stake_border"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/margin_edges"
+        />
+</LinearLayout>

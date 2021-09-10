@@ -35,12 +35,15 @@ import network.minter.bipwallet.internal.di.annotations.DbCache;
 import network.minter.bipwallet.internal.storage.AccountStorage;
 import network.minter.bipwallet.internal.storage.KVStorage;
 import network.minter.bipwallet.internal.storage.SecretStorage;
+import network.minter.bipwallet.pools.repo.FarmingRepository;
+import network.minter.bipwallet.pools.repo.UserPoolsRepository;
 import network.minter.bipwallet.stories.repo.StoriesRepository;
 import network.minter.core.internal.api.ApiService;
 import network.minter.explorer.MinterExplorerSDK;
 import network.minter.explorer.repo.ExplorerAddressRepository;
 import network.minter.explorer.repo.ExplorerCoinsRepository;
 import network.minter.explorer.repo.ExplorerPoolsRepository;
+import network.minter.explorer.repo.ExplorerStatusRepository;
 import network.minter.explorer.repo.ExplorerTransactionRepository;
 import network.minter.explorer.repo.ExplorerValidatorsRepository;
 import network.minter.explorer.repo.GateCoinRepository;
@@ -109,6 +112,12 @@ public class RepoModule {
 
     @Provides
     @WalletApp
+    public ExplorerStatusRepository provideExplorerStatusRepo(MinterExplorerSDK api) {
+        return api.status();
+    }
+
+    @Provides
+    @WalletApp
     public GateGasRepository provideGateGasRepo(MinterExplorerSDK api) {
         return api.gas();
     }
@@ -141,5 +150,17 @@ public class RepoModule {
     @WalletApp
     public StoriesRepository provideStoriesRepo(@Named("stories") ApiService.Builder api, @DbCache KVStorage storage, @Named("uuid") String uuid) {
         return new StoriesRepository(api, storage, uuid);
+    }
+
+    @Provides
+    @WalletApp
+    public FarmingRepository provideFarmingRepo(@Named("chainik") ApiService.Builder api, @DbCache KVStorage storage) {
+        return new FarmingRepository(api, storage);
+    }
+
+    @Provides
+    @WalletApp
+    public UserPoolsRepository provideUserPools(KVStorage storage, SecretStorage secretStorage, ExplorerPoolsRepository repo) {
+        return new UserPoolsRepository(secretStorage, storage, repo);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -23,20 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package network.minter.bipwallet.internal.views.list
 
-import android.graphics.Rect
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+package network.minter.bipwallet.pools.models
 
-class PaddingItemDecoration(private val size: Int) : ItemDecoration() {
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        super.getItemOffsets(outRect, view, parent, state)
+/**
+ * minter-android-wallet. 2021
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
+ */
+data class ChainikError(
+        val code: Int,
+        val message: String?
+)
 
-        // Apply offset only to first item
-        if (parent.getChildAdapterPosition(view) == 0) {
-            outRect.left += size
-        }
+data class ChainikResult<T>(
+        val data: T,
+        val error: ChainikError? = null
+) {
+    fun isOk(): Boolean {
+        return error == null
     }
 }

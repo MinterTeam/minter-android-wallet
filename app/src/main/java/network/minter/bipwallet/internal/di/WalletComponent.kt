@@ -32,10 +32,7 @@ import com.google.gson.GsonBuilder
 import dagger.Component
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.analytics.AnalyticsManager
-import network.minter.bipwallet.apis.explorer.RepoDailyRewards
-import network.minter.bipwallet.apis.explorer.RepoMonthlyRewards
-import network.minter.bipwallet.apis.explorer.RepoTransactions
-import network.minter.bipwallet.apis.explorer.RepoValidators
+import network.minter.bipwallet.apis.explorer.*
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.coins.CoinMapper
 import network.minter.bipwallet.coins.RepoCoins
@@ -51,6 +48,10 @@ import network.minter.bipwallet.internal.storage.KVStorage
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.system.ForegroundDetector
+import network.minter.bipwallet.pools.repo.FarmingRepository
+import network.minter.bipwallet.pools.repo.RepoCachedFarming
+import network.minter.bipwallet.pools.repo.RepoCachedUserPools
+import network.minter.bipwallet.pools.repo.UserPoolsRepository
 import network.minter.bipwallet.services.livebalance.notification.BalanceNotificationManager
 import network.minter.bipwallet.stories.repo.RepoCachedStories
 import network.minter.bipwallet.stories.repo.StoriesRepository
@@ -122,6 +123,7 @@ interface WalletComponent {
     fun explorerCoinsRepo(): ExplorerCoinsRepository
     fun validatorsRepo(): ExplorerValidatorsRepository
     fun pools(): ExplorerPoolsRepository
+    fun status(): ExplorerStatusRepository
     fun gasRepo(): GateGasRepository
     fun txGateRepo(): GateTransactionRepository
     fun estimateRepo(): GateEstimateRepository
@@ -131,6 +133,12 @@ interface WalletComponent {
 
     fun storiesRepo(): StoriesRepository
     fun storiesCachedRepo(): RepoCachedStories
+
+    fun farmingRepo(): FarmingRepository
+    fun farmingCachedRepo(): RepoCachedFarming
+    fun userPoolsRepo(): UserPoolsRepository
+    fun userPoolsCachedRepo(): RepoCachedUserPools
+    fun bipUsdRateCachedRepo(): RepoCachedBipUsdRate
 
     // db
     fun db(): WalletDatabase

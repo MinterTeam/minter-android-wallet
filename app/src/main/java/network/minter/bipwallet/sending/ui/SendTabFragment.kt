@@ -180,7 +180,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
             inputAmount.clearFocus()
 
             LastBlockHandler.handle(binding.lastUpdated)
-            val broadcastManager = BroadcastReceiverManager(activity!!)
+            val broadcastManager = BroadcastReceiverManager(requireActivity())
             broadcastManager.add(RTMBlockReceiver {
                 LastBlockHandler.handle(binding.lastUpdated, it)
             })
@@ -188,9 +188,9 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
 
             setHasOptionsMenu(true)
-            activity!!.menuInflater.inflate(R.menu.menu_tab_send, toolbar.menu)
+            requireActivity().menuInflater.inflate(R.menu.menu_tab_send, toolbar.menu)
             toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
-            recipientListAdapter = RecipientListAdapter(context!!)
+            recipientListAdapter = RecipientListAdapter(requireContext())
             inputRecipient.input.setAdapter(recipientListAdapter)
             inputRecipient.input.setDropDownBackgroundResource(R.drawable.shape_rounded_white)
         }
