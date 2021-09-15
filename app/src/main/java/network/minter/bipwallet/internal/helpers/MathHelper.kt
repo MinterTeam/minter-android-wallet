@@ -328,7 +328,7 @@ object MathHelper {
     fun bigDecimalFromString(text: CharSequence?): BigDecimal {
         if (text == null) {
             return BigDecimal.ZERO
-        } else if (text.toString() == "0.") {
+        } else if (text.toString() == "0." || text.toString() == ".") {
             return BigDecimal.ZERO
         }
         var amountText = text
@@ -345,10 +345,9 @@ object MathHelper {
             amountText = "0$amountText"
         }
         if (amountText.substring(amountText.length - 1) == ".") {
-            amountText = amountText + "0"
+            amountText += "0"
         }
-        val out: BigDecimal
-        out = try {
+        val out: BigDecimal = try {
             BigDecimal(amountText)
         } catch (e: NumberFormatException) {
             BigDecimal.ZERO
@@ -390,6 +389,14 @@ object MathHelper {
 
     fun BigDecimal.normalize(): BigInteger {
         return (this * Transaction.VALUE_MUL_DEC).toBigInteger()
+    }
+
+    fun String?.asBigDecimal(): BigDecimal {
+        return bigDecimalFromString(this)
+    }
+
+    fun CharSequence?.asBigDecimal(): BigDecimal {
+        return bigDecimalFromString(this)
     }
 
 

@@ -130,12 +130,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="@dimen/margin_edges"
-            android:minHeight="58dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/item_avatar_second"
             app:layout_constraintTop_toBottomOf="@id/layout_main">
 
             <TextView
+
                 android:id="@+id/label_apy"
                 style="@style/Wallet.ItemPoolLabel"
                 android:layout_width="0dp"
@@ -146,6 +146,7 @@
                 app:layout_constraintWidth_percent=".5" />
 
             <TextView
+
                 android:id="@+id/value_apy"
                 style="@style/Wallet.ItemTxValue"
                 android:layout_width="0dp"

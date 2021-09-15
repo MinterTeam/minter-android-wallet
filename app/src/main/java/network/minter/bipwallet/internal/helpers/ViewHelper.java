@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,6 +29,7 @@ package network.minter.bipwallet.internal.helpers;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ClipData;
@@ -177,6 +178,7 @@ public final class ViewHelper {
         }
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     public static void setButtonStyle(Button button, @StyleRes int styleRes) {
         Context context = button.getContext();
 

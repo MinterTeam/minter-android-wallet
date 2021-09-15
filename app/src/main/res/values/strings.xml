@@ -108,6 +108,10 @@
     <string name="label_coin_to_buy">Coin to buy</string>
     <string name="label_amount">Amount</string>
     <string name="label_amount_received">Amount Received</string>
+    <string name="label_amount_to_get">Amount to Get</string>
+    <string name="label_amount_to_spend">Amount to Spend</string>
+    <string name="label_order_id">Order ID</string>
+
     <string name="label_amount_spent">Amount Spent</string>
     <string name="label_payload">Message (max 1024 bytes)</string>
     <string name="label_payload_type">Type your message here…</string>
@@ -153,6 +157,8 @@
     <string name="tx_type_vote_update">Vote Update</string>
     <string name="tx_type_vote_update_title">Version: %1$s</string>
     <string name="tx_type_create_swap_pool">Create Swap Pool</string>
+    <string name="tx_type_add_limit_order">Add Limit Order</string>
+    <string name="tx_type_remove_limit_order">Remove Limit Order</string>
     <string name="tx_incoming_multisend">+ …</string>
     <string name="tx_outgoing_multisend">- …</string>
     <string name="label_coin_name">Coin name</string>

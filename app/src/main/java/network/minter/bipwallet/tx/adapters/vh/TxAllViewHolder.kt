@@ -95,9 +95,34 @@ class TxAllViewHolder(
             HistoryTransaction.Type.VoteCommission -> bindVoteCommission(item)
             HistoryTransaction.Type.VoteUpdate -> bindVoteUpdate(item)
             HistoryTransaction.Type.CreateSwapPool -> bindCreateSwapPool(item)
+            /** @since minter 2.6 */
+            HistoryTransaction.Type.AddLimitOrder -> bindAddLimitOrder(item)
+            HistoryTransaction.Type.RemoveLimitOrder -> bindRemoveLimitOrder(item)
             else -> {
 
             }
+        }
+    }
+
+    private fun bindRemoveLimitOrder(item: TxItem) {
+        val data: HistoryTransaction.TxLimitOrderRemoveResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_remove_limit_order)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_exchange)
+            itemTitle.text = "ID: ${data.id}"
+        }
+    }
+
+    private fun bindAddLimitOrder(item: TxItem) {
+        val data: HistoryTransaction.TxLimitOrderAddResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_add_limit_order)
+            itemAvatar.setImageResource(R.drawable.img_avatar_exchange)
+            itemTitle.text = "${data.coinToSell} –> ${data.coinToBuy}"
+            itemAmount.text = data.valueToBuy.humanize()
+            itemSubamount.text = data.coinToBuy.symbol
         }
     }
 

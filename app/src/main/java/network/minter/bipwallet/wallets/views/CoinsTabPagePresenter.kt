@@ -49,7 +49,6 @@ import network.minter.bipwallet.wallets.views.rows.RowWalletsHeader
 import network.minter.bipwallet.wallets.views.rows.RowWalletsList
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.CoinBalance
-import network.minter.explorer.models.CoinItemBase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -77,11 +76,7 @@ class CoinsTabPagePresenter @Inject constructor() : MvpBasePresenter<CoinsTabPag
                     vh.title!!.text = item.coin.symbol
                     vh.separator!!.visible = true
                     vh.amount!!.text = item.amount.humanize()
-                    if (item.coin.type == CoinItemBase.CoinType.PoolToken) {
-                        vh.avatar!!.setImageResource(R.drawable.ic_lp_token_bg)
-                    } else {
-                        vh.avatar!!.setImageUrlFallback(item.coin.avatar, R.drawable.img_avatar_default)
-                    }
+                    vh.avatar!!.setImageUrlFallback(item.coin.avatar, R.drawable.img_avatar_default)
 
                     if (item.coin.id != MinterSDK.DEFAULT_COIN_ID) {
                         vh.subname!!.setTextFormat(R.string.fmt_decimal_and_coin, item.bipValue.humanize(), MinterSDK.DEFAULT_COIN)

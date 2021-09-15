@@ -42,7 +42,6 @@ import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.pools.models.PoolCombined
 import network.minter.bipwallet.pools.models.PoolsFilter
-import java.math.BigDecimal
 
 /**
  * minter-android-wallet. 2021
@@ -132,8 +131,10 @@ class PoolListAdapter : PagingDataAdapter<PoolCombined, PoolListAdapter.ViewHold
                 holder.b.valueVolume1d.text = pool.volume1dUsd
             } else {
                 if(pool.filter == PoolsFilter.Staked) {
-                    holder.b.valueApy.text = BigDecimal.ZERO.humanize()
-                    holder.b.valueVolume1d.text = BigDecimal.ZERO.humanize()
+                    holder.b.labelApy.visible = false
+                    holder.b.valueApy.visible = false
+                    holder.b.labelVolume1d.visible = false
+                    holder.b.valueVolume1d.visible = false
                 }
             }
 

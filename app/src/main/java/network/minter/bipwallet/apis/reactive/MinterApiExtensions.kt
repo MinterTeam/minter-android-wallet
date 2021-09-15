@@ -85,6 +85,9 @@ fun <R, T : Throwable> T.toObservable(): Observable<R> {
 
 val CoinItemBase.avatar: String
     get() {
+        if(type == CoinItemBase.CoinType.PoolToken) {
+            return "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_lp_token_bg}"
+        }
         return when(id) {
             BigInteger("2024") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_musd}"
             BigInteger("2064") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_btc}"

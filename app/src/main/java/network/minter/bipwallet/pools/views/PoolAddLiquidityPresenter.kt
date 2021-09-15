@@ -44,6 +44,7 @@ import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.MathHelper.addPercent
+import network.minter.bipwallet.internal.helpers.MathHelper.asBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.asCurrency
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
@@ -298,7 +299,7 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
     private fun onInputTextChanged(input: InputWrapper, valid: Boolean) {
         presenterScope.launch {
             val s = input.text.toString()
-            val sNum = if (s.isEmpty()) BigDecimal("0") else BigDecimal(s)
+            val sNum = s.asBigDecimal()
             when (input.id) {
                 R.id.input_coin0 -> {
                     if (ignoreInputAmount.getAndSet(false)) {

@@ -59,8 +59,8 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.exceptions.RetryListener
 import network.minter.bipwallet.internal.exceptions.humanDetailsMessage
+import network.minter.bipwallet.internal.helpers.MathHelper.asBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
-import network.minter.bipwallet.internal.helpers.MathHelper.bigDecimalFromString
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
@@ -484,7 +484,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private fun onInputChanged(editText: InputWrapper, valid: Boolean) {
         val text = editText.text.toString()
         Timber.d("Input changed: %s", editText.text)
-//        loadAndSetFee()
         when (editText.id) {
             R.id.input_incoming_coin -> {
                 mExplorerCoinsRepo.entity.findByName(text)
@@ -504,7 +503,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         )
             }
             R.id.input_amount -> {
-                val am = bigDecimalFromString(text)
+                val am = text.asBigDecimal()
                 checkZero(am)
                 if (isBuying) {
                     buyAmount = am
