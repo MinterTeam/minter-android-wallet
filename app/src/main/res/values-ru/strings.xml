@@ -505,7 +505,7 @@
     <string name="label_volume_1d">Объем (1д)</string>
     <string name="label_farming_apr">Фарминг APR</string>
     <string name="label_end_date">Дата окончания</string>
-    <string name="label_staked_amount">Суммарный стейка</string>
+    <string name="label_staked_amount">Суммарный стейк</string>
     <string name="label_your_share">Ваш вклад</string>
     <string name="label_your_liquidity">Ваша ликвидность</string>
     <string name="filter_pools_staked_only">Стейки</string>
