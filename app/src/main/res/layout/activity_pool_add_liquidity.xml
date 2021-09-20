@@ -83,21 +83,8 @@
                 app:suffixText="@string/btn_use_max"
                 app:suffixTextAppearance="@style/Input.SuffixButton.TextAppearance"
                 app:suffixTextStyle="@style/Input.SuffixButton"
+                app:presuffixTextAppearance="@style/Input.CurrencyPreSuffix.TextAppearance"
                 app:errorEnabled="false"
-                />
-
-            <TextView
-                android:id="@+id/coin0_suffix"
-                android:layout_marginTop="40dp"
-                android:fontFamily="@font/_inter_semi_bold"
-                android:textColor="@color/text_input_stateful"
-                android:layout_marginStart="16dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/input_coin0"
-                app:layout_constraintStart_toStartOf="@id/input_coin0"
-                app:layout_constraintEnd_toEndOf="@id/input_coin0"
-
                 />
 
             <ImageView
@@ -126,25 +113,13 @@
                 app:fieldName="coin1"
                 app:label="@string/label_coin1"
                 app:labelEnabled="true"
+                app:presuffixTextAppearance="@style/Input.CurrencyPreSuffix.TextAppearance"
                 app:suffixText="@string/btn_use_max"
                 app:suffixTextAppearance="@style/Input.SuffixButton.TextAppearance"
                 app:suffixTextStyle="@style/Input.SuffixButton"
+                tools:suffixType="text"
                 app:errorEnabled="false"
-                tools:text="1"
-                />
-
-            <TextView
-                android:id="@+id/coin1_suffix"
-                android:layout_marginTop="40dp"
-                android:fontFamily="@font/_inter_semi_bold"
-                android:textColor="@color/text_input_stateful"
-                android:layout_marginStart="16dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/input_coin1"
-                app:layout_constraintStart_toStartOf="@id/input_coin1"
-                app:layout_constraintEnd_toEndOf="@id/input_coin1"
-                tools:text="   HUB"
+                tools:text="116546464846464644.4646464648464684684"
                 />
 
             <TextView
@@ -191,21 +166,6 @@
                 app:labelEnabled="true"
                 />
 
-            <TextView
-                android:id="@+id/slippage_suffix"
-                android:layout_marginTop="26dp"
-                android:fontFamily="@font/_inter_semi_bold"
-                android:textColor="@color/text_input_stateful"
-                android:layout_marginStart="16dp"
-                android:layout_width="0dp"
-                android:text="%"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/input_slippage"
-                app:layout_constraintBottom_toBottomOf="@id/input_slippage"
-                app:layout_constraintStart_toStartOf="@id/input_slippage"
-                app:layout_constraintEnd_toEndOf="@id/input_slippage"
-                />
-
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_max_spend"
                 android:layout_width="0dp"
@@ -223,7 +183,9 @@
                 app:fieldName="max_spend"
                 app:label="@string/label_max_amount_spend"
                 app:labelEnabled="true"
-                />
+                app:presuffixText="%"
+                app:presuffixTextAppearance="@style/Input.CurrencyPreSuffix.TextAppearance"
+                app:suffixType="presuffix" />
 
             <!--LABELS-->
             <Space

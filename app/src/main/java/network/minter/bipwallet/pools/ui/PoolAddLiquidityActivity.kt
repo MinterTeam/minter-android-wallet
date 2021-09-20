@@ -31,8 +31,6 @@ import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.edwardstock.inputfield.InputField
@@ -45,7 +43,6 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.MathHelper.plain
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
-import network.minter.bipwallet.internal.helpers.ViewExtensions.textWidth
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.pools.contracts.PoolAddLiquidityView
 import network.minter.bipwallet.pools.models.PoolCombined
@@ -59,7 +56,7 @@ import javax.inject.Provider
  * minter-android-wallet. 2021
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
+class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
 
     companion object {
         const val ARG_POOL = "ARG_POOL"
@@ -90,29 +87,6 @@ class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
             inputGroup.addFilter(inputCoin1, DecimalInputFilter(inputCoin1))
             inputGroup.addFilter(inputSlippage, DecimalInputFilter(inputSlippage, 2))
             inputGroup.addFilter(inputMaxSpend, DecimalInputFilter(inputMaxSpend))
-
-            inputCoin0.input.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    calcCoin0Padding(coin0Suffix.text.toString())
-                }
-                override fun afterTextChanged(s: Editable?) {}
-            })
-            inputCoin1.input.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    calcCoin1Padding(coin1Suffix.text.toString())
-                }
-                override fun afterTextChanged(s: Editable?) {}
-            })
-            inputSlippage.input.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    b.slippageSuffix.setPadding(calcSuffixPadding(inputSlippage), 0, 0, 0)
-
-                }
-                override fun afterTextChanged(s: Editable?) {}
-            })
         }
     }
 
@@ -128,15 +102,6 @@ class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
         b.action.isEnabled = enable
     }
 
-    private fun calcSuffixPadding(input: InputField): Int {
-        return input.textWidth() + Wallet.app().display().dpToPx(4)
-    }
-
-    override fun calcCoin0Padding(coin0: String) {
-        b.coin0Suffix.setPadding(calcSuffixPadding(b.inputCoin0), 0, 0, 0)
-        b.coin0Suffix.text = coin0
-    }
-
     override fun setOnClickUseMax0(listener: (View) -> Unit) {
         b.inputCoin0.setOnSuffixTextClickListener(listener)
     }
@@ -145,17 +110,12 @@ class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
         b.inputCoin1.setOnSuffixTextClickListener(listener)
     }
 
-    override fun setCoin0SuffixEnable(enable: Boolean) {
-        b.inputCoin0.setSuffixType(if(enable) InputField.SuffixType.Text else InputField.SuffixType.None)
+    override fun setCoin0EnableUseMax(enable: Boolean) {
+        b.inputCoin0.setSuffixType(if (enable) InputField.SuffixType.TextAndPreSuffix else InputField.SuffixType.PreSuffix)
     }
 
-    override fun setCoin1SuffixEnable(enable: Boolean) {
-        b.inputCoin1.setSuffixType(if(enable) InputField.SuffixType.Text else InputField.SuffixType.None)
-    }
-
-    override fun calcCoin1Padding(coin0: String) {
-        b.coin1Suffix.setPadding(calcSuffixPadding(b.inputCoin1), 0, 0, 0)
-        b.coin1Suffix.text = coin0
+    override fun setCoin1EnableUseMax(enable: Boolean) {
+        b.inputCoin1.setSuffixType(if (enable) InputField.SuffixType.TextAndPreSuffix else InputField.SuffixType.PreSuffix)
     }
 
     override fun setOnSwapCoins(listener: (View) -> Unit) {
@@ -168,16 +128,14 @@ class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
 
     override fun setCoin0(coin0Amount: BigDecimal?, coin0: String) {
         coin0Amount?.let {
-            if(it == BigDecimal.ZERO) {
+            if (it == BigDecimal.ZERO) {
                 b.inputCoin0.setText("0")
-                b.inputCoin0.input.setSelection(0, b.inputCoin0.text?.length?:0)
+                b.inputCoin0.input.setSelection(0, b.inputCoin0.text?.length ?: 0)
             } else {
                 b.inputCoin0.setText(it.plain())
             }
-
+            b.inputCoin0.setPreSuffixText(coin0)
         }
-
-        calcCoin0Padding(coin0)
     }
 
     override fun setOnSubmit(listener: (View) -> Unit) {
@@ -200,14 +158,15 @@ class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
 
     override fun setCoin1(coin1Amount: BigDecimal?, coin1: String) {
         coin1Amount?.let {
-            if(it == BigDecimal.ZERO) {
+            if (it == BigDecimal.ZERO) {
                 b.inputCoin1.setText("0")
-                b.inputCoin1.input.setSelection(0, b.inputCoin1.text?.length?:0)
+                b.inputCoin1.input.setSelection(0, b.inputCoin1.text?.length ?: 0)
             } else {
                 b.inputCoin1.setText(it.plain())
             }
+            b.inputCoin1.setPreSuffixText(coin1)
         }
-        calcCoin1Padding(coin1)
+//        calcCoin1Padding(coin1)
     }
 
     override fun setSlippage(amount: String) {
@@ -250,7 +209,7 @@ class PoolAddLiquidityActivity: BaseMvpInjectActivity(), PoolAddLiquidityView {
             this.pool = pool
         }
 
-        constructor(from: Service,pool: PoolCombined) : super(from) {
+        constructor(from: Service, pool: PoolCombined) : super(from) {
             this.pool = pool
         }
 

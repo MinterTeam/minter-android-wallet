@@ -224,7 +224,17 @@ object ViewExtensions {
         val bounds = Rect()
         paint.typeface = this.input.typeface
         paint.textSize = this.input.textSize
-        paint.getTextBounds(this.text.toString(), 0, this.text?.length?:0, bounds)
+        paint.getTextBounds(this.text.toString(), 0, this.text?.length ?: 0, bounds)
+
+        return bounds.width()
+    }
+
+    fun TextView.textWidth(): Int {
+        val paint = Paint()
+        val bounds = Rect()
+        paint.typeface = this.typeface
+        paint.textSize = this.textSize
+        paint.getTextBounds(this.text.toString(), 0, this.text?.length ?: 0, bounds)
 
         return bounds.width()
     }

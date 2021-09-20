@@ -31,8 +31,6 @@ import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.edwardstock.inputfield.InputField
@@ -97,14 +95,6 @@ class PoolRemoveLiquidityActivity: BaseMvpInjectActivity(), PoolRemoveLiquidityV
             inputGroup.addFilter(inputLiquidity, DecimalInputFilter(inputLiquidity, 2))
 
             inputGroup.addValidator(inputLiquidity, BigDecimalNumberValidator(BigDecimal.ZERO, BigDecimal("100")).apply { errorMessage = "Percent must be from 0 to 100" })
-
-            inputLiquidity.input.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    calcLiquidityPadding()
-                }
-                override fun afterTextChanged(s: Editable?) {}
-            })
         }
     }
 
@@ -130,10 +120,6 @@ class PoolRemoveLiquidityActivity: BaseMvpInjectActivity(), PoolRemoveLiquidityV
 
     private fun calcSuffixPadding(input: InputField): Int {
         return input.textWidth() + Wallet.app().display().dpToPx(4)
-    }
-
-    override fun calcLiquidityPadding() {
-        b.liquiditySuffix.setPadding(calcSuffixPadding(b.inputLiquidity), 0, 0, 0)
     }
 
     override fun setTokenAmountValidator(maxValue: BigDecimal) {

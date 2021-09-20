@@ -379,12 +379,12 @@ dependencies {
 
     implementation 'com.edwardstock.android:BottomNavigationViewEx:2.1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.edwardstock.android:input-field:0.0.3'
+    implementation 'com.edwardstock.android:input-field:0.1.0'
     implementation 'com.edwardstock.android:autocomplete:1.1.2'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    implementation 'com.airbnb.android:paris:1.4.0'
-    kapt 'com.airbnb.android:paris-processor:1.4.0'
+    implementation 'com.airbnb.android:paris:1.7.3'
+    kapt 'com.airbnb.android:paris-processor:1.7.3'
 
     implementation 'com.airbnb:deeplinkdispatch:5.2.0'
     kapt 'com.airbnb:deeplinkdispatch-processor:5.2.0'

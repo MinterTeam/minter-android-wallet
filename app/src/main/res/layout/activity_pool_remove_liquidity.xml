@@ -99,23 +99,13 @@
                 app:fieldName="liquidity"
                 app:label="@string/label_liquidity"
                 app:labelEnabled="true"
+                app:presuffixText="%"
+                app:presuffixTextAppearance="@style/Input.CurrencyPreSuffix.TextAppearance"
+                app:suffixType="presuffix"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/input_token"
                 tools:text="5" />
-
-            <TextView
-                android:id="@+id/liquidity_suffix"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="40dp"
-                android:fontFamily="@font/_inter_semi_bold"
-                android:text="@string/label_percent"
-                android:textColor="@color/text_input_stateful"
-                app:layout_constraintEnd_toEndOf="@id/input_liquidity"
-                app:layout_constraintStart_toStartOf="@id/input_liquidity"
-                app:layout_constraintTop_toTopOf="@id/input_liquidity" />
 
             <TextView
                 android:id="@+id/hint_percentage"

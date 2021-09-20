@@ -227,7 +227,6 @@ class PoolRemoveLiquidityPresenter @Inject constructor() : MvpBasePresenter<Pool
                         }
                         viewState.setLiquidityPercent(liquidityPercent)
                     }
-                    viewState.calcLiquidityPadding()
                     viewState.setCoin0(amount0.percent(liquidityPercent), coin0)
                     viewState.setCoin1(amount1.percent(liquidityPercent), coin1)
                 }
@@ -241,7 +240,6 @@ class PoolRemoveLiquidityPresenter @Inject constructor() : MvpBasePresenter<Pool
                     viewState.setTokenAmount(userLiquidity)
                     viewState.setCoin0(amount0.percent(liquidityPercent), coin0)
                     viewState.setCoin1(amount1.percent(liquidityPercent), coin1)
-                    viewState.calcLiquidityPadding()
                 }
             }
         }

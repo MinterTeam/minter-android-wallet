@@ -50,7 +50,6 @@ interface PoolRemoveLiquidityView: MvpView {
     fun setTokenAmountValidator(maxValue: BigDecimal)
     fun setLiquidityPercentError(error: CharSequence?)
     fun setTokenAmountError(error: CharSequence?)
-    fun calcLiquidityPadding()
 
     fun setOnUseMaxClickListener(listener: (View) -> Unit)
 

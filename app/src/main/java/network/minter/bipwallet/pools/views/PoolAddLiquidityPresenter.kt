@@ -204,8 +204,8 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
             coin0Account = coin1Account
             coin1Account = tmpAccount0
 
-            viewState.setCoin0SuffixEnable(coin0Account!!.amount.isNotZero())
-            viewState.setCoin1SuffixEnable(coin1Account!!.amount.isNotZero())
+            viewState.setCoin0EnableUseMax(coin0Account!!.amount.isNotZero())
+            viewState.setCoin1EnableUseMax(coin1Account!!.amount.isNotZero())
 
             checkEnoughBalance()
 
@@ -239,8 +239,8 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
                                         .findCoin(coin1!!.id)
                                         .orElse(CoinBalance(coin1!!, ZERO, ZERO, secretStorage.mainWallet))
 
-                                viewState.setCoin0SuffixEnable(coin0Account!!.amount.isNotZero())
-                                viewState.setCoin1SuffixEnable(coin1Account!!.amount.isNotZero())
+                                viewState.setCoin0EnableUseMax(coin0Account!!.amount.isNotZero())
+                                viewState.setCoin1EnableUseMax(coin1Account!!.amount.isNotZero())
 
                                 viewState.setOnClickUseMax0 {
                                     viewState.setCoin0(coin0Account!!.amount, coin0!!.symbol)
@@ -305,7 +305,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
                     if (ignoreInputAmount.getAndSet(false)) {
                         return@launch
                     }
-                    viewState.calcCoin0Padding(coin0!!.symbol)
                     ignoreInputAmount.set(true)
                     amount0 = sNum
                     amount1 = amount0 * price0
@@ -335,7 +334,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
                         slippage = BigDecimal("5.0")
                     }
                     maxAmount = amount1.addPercent(slippage)
-                    viewState.calcCoin1Padding(coin1!!.symbol)
                     viewState.setCoin0(amount0, coin0!!.symbol)
                     viewState.setMaxAmount(maxAmount.plain())
 
