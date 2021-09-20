@@ -360,7 +360,7 @@
     <string name="account_err_not_loaded_yet">Учетная запись еще загружается…</string>
     <string name="validator_err_cant_unbond_zero_coins">Невозможно разделегировать 0 монет</string>
     <string name="account_err_insufficient_funds">Недостаточно средств для отправки транзакции</string>
-    <string name="account_err_insufficient_funds_for_amount">Нехватает средств: баланс %1$s %2$s</string>
+    <string name="account_err_insufficient_funds_for_amount">Не хватает средств: баланс %1$s %2$s</string>
     <string name="validator_err_insufficient_funds_for_unbond">Недостаточно средств для разделегирования: необходимо %1$s %2$s, баланс: %3$s %4$s</string>
     <string name="validator_wait_for_stake_update">Пожалуйста, подождите ~%1$d %2$s, чтобы увидеть обновленный баланс в делегировании.</string>
     <string name="dialog_title_err_unable_to_send_tx">Не удалось отправить транзакцию</string>
@@ -535,4 +535,11 @@
     <string name="empty_pools_all">Пока что пулов нет</string>
     <string name="empty_pools_staked">У вас пока нет стейков ни в одном пуле</string>
     <string name="empty_pools_farming">Фарминговые программы пока отсутствуют</string>
+    <string name="label_amount_to_get">Сумма к получению</string>
+    <string name="label_amount_to_spend">Сумма к продаже</string>
+    <string name="label_order_id">ID ордера</string>
+    <string name="tx_type_add_limit_order">Добавление лимитного ордера</string>
+    <string name="tx_type_remove_limit_order">Удаление лимитного ордера</string>
+    <string name="error_unable_load_pool">Не удалось загрузить информацию о пуле</string>
+    <string name="error_percent_max_100">Процент должен быть указан в диапазоне от 0 до 100</string>
 </resources>

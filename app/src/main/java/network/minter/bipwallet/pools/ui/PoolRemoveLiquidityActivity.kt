@@ -39,6 +39,7 @@ import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.avatar
 import network.minter.bipwallet.databinding.ActivityPoolRemoveLiquidityBinding
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
@@ -46,6 +47,7 @@ import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.plain
 import network.minter.bipwallet.internal.helpers.ViewExtensions.textWidth
+import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.forms.validators.BigDecimalNumberValidator
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.pools.contracts.PoolRemoveLiquidityView
@@ -94,7 +96,7 @@ class PoolRemoveLiquidityActivity: BaseMvpInjectActivity(), PoolRemoveLiquidityV
             inputGroup.addFilter(inputToken, DecimalInputFilter(inputToken))
             inputGroup.addFilter(inputLiquidity, DecimalInputFilter(inputLiquidity, 2))
 
-            inputGroup.addValidator(inputLiquidity, BigDecimalNumberValidator(BigDecimal.ZERO, BigDecimal("100")).apply { errorMessage = "Percent must be from 0 to 100" })
+            inputGroup.addValidator(inputLiquidity, BigDecimalNumberValidator(BigDecimal.ZERO, BigDecimal("100")).apply { errorMessage = tr(R.string.error_percent_max_100) })
         }
     }
 
