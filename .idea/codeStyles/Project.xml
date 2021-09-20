@@ -470,8 +470,5 @@
         </rules>
       </arrangement>
     </codeStyleSettings>
-    <codeStyleSettings language="kotlin">
-      <option name="FIELD_ANNOTATION_WRAP" value="0" />
-    </codeStyleSettings>
   </code_scheme>
 </component>

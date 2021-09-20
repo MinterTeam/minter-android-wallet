@@ -164,9 +164,11 @@
         android:layout_width="55dp"
         android:layout_height="55dp"
         android:layout_gravity="center"
+        android:layout_marginTop="?attr/actionBarSize"
         app:color="@color/colorPrimaryLight" />
 
     <TextView
+        android:layout_marginTop="?attr/actionBarSize"
         android:id="@+id/empty_text"
         style="@style/ListSubtitle"
         android:textAllCaps="true"

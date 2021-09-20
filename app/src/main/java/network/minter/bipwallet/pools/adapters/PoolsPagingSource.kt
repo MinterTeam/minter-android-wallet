@@ -118,7 +118,12 @@ class PoolsPagingSource(private val factory: Factory) : RxPagingSource<Int, Pool
                         }
             }
             else -> {
-                allPoolsObservable = factory.poolsRepo.getPools(pageOpts)
+                allPoolsObservable = if (factory.filterCoin == null || factory.filterCoin!!.length < 3) {
+                    factory.poolsRepo.getPools(pageOpts)
+                } else {
+                    factory.poolsRepo.searchPoolsByToken(factory.filterCoin!!, pageOpts)
+                }
+
             }
         }
 
@@ -157,7 +162,7 @@ class PoolsPagingSource(private val factory: Factory) : RxPagingSource<Int, Pool
                             val combined = PoolCombined(pool, farmingItem, stake, factory.filterType)
                             combined
                         }.filter { pool ->
-                            if (factory.filterCoin == null || factory.filterCoin!!.length < 3) {
+                            if (hasPagination || factory.filterCoin == null || factory.filterCoin!!.length < 3) {
                                 true
                             } else {
                                 pool.pool.coin0.symbol.contains(factory.filterCoin!!, true) ||
