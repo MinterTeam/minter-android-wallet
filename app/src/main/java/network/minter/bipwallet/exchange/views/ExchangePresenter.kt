@@ -699,6 +699,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.setOutAccountName("${coinAccount.coin} (${coinAccount.amount.humanize()})")
         currentCoin = coinAccount.coin
 
+        useMax.set(false)
+        clickedUseMax.set(false)
+
         if (!initial) {
             inputChangeSubject!!.onNext(isBuying)
         }
