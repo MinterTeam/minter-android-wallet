@@ -124,7 +124,7 @@ class CachedCoinsRepository(
     override fun onAfterUpdate(result: List<CoinItem>) {
     }
 
-    override fun onAfterUpdateDeferred(result: List<CoinItem>): Completable? {
+    override fun onAfterUpdateDeferred(result: List<CoinItem>): Completable {
         return Completable.create { emitter ->
             storage.put(KEY_COINS, result)
             db.coins().findAll()
@@ -210,8 +210,6 @@ class CachedCoinsRepository(
     override fun isDataReady(): Boolean {
         return storage.contains(KEY_COINS)
     }
-
-
 
 
 }

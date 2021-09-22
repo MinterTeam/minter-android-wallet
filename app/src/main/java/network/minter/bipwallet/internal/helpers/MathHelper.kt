@@ -230,10 +230,14 @@ object MathHelper {
     }
 
     fun BigDecimal?.plain(): String {
-        if(bdNull(this?: BigDecimal.ZERO)) {
+        if (bdNull(this ?: BigDecimal.ZERO)) {
             return "0"
         }
         return this!!.toPlainString()
+    }
+
+    fun BigDecimal.scaleUp(): BigDecimal {
+        return this.setScale(18, RoundingMode.HALF_UP)
     }
 
     /**

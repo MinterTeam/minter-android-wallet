@@ -83,6 +83,7 @@ import org.parceler.Parcels
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 /**
@@ -113,11 +114,11 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var fromAccount: BaseCoinValue? = null
     private var lastAccount: BaseCoinValue? = null
     private var type: Type = Type.Delegate
-    private var useMax = false
+    private var useMax = AtomicBoolean(false)
     private var amount = BigDecimal.ZERO
     private var gas = BigInteger.ONE
     private var initFeeData: TxInitData? = null
-    private var clickedUseMax: Boolean = false
+    private var clickedUseMax = AtomicBoolean(false)
     private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
     private var txSender: TransactionSender? = null
 
@@ -179,8 +180,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         loadAndSetFee()
 
         viewState.setOnClickUseMax {
-            clickedUseMax = true
-            useMax = true
+            clickedUseMax.set(true)
+            useMax.set(true)
             if (type == Type.Delegate) {
                 viewState.setAmount(fromAccount!!.amount.toPlain())
             } else {
@@ -417,10 +418,9 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun onInputChanged(input: InputWrapper, valid: Boolean) {
         when (input.id) {
             R.id.input_amount -> {
-                if (!clickedUseMax) {
-                    useMax = false
+                if (!clickedUseMax.getAndSet(false)) {
+                    useMax.set(false)
                 }
-                clickedUseMax = false
                 amount = (input.text ?: "").toString().parseBigDecimal()
             }
         }
@@ -533,7 +533,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
             if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= realFee) {
                 var amountToSend = amount
-                if (useMax && fromAccount!!.coin.id == MinterSDK.DEFAULT_COIN_ID) {
+                if (useMax.get() && fromAccount!!.coin.id == MinterSDK.DEFAULT_COIN_ID) {
                     amountToSend = amount - realFee
                     if (bdNull(amountToSend)) {
                         return Observable.error<TransactionSign>(IllegalStateException(tr(R.string.validator_err_cant_delegate_zero_coins)))
@@ -575,7 +575,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                         // to send - amount typed by user
                         var amountToSend = amount
 
-                        if (useMax) {
+                        if (useMax.get()) {
                             // if clicked "use max", fill with full balance - fee
                             amountToSend = fromAcc.amount - customFee
 
@@ -614,7 +614,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             val tx = txBuilder.unbound().apply {
                 coinId = fromAccount!!.coin.id!!
                 publicKey = toValidator!!
-                value = if (useMax) fromAccount!!.amount else amount
+                value = if (useMax.get()) fromAccount!!.amount else amount
             }.build()
 
             return tx.signSingle(secretStorage.mainSecret.privateKey)!!.toObservable()
@@ -668,6 +668,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         fromAccount = account
         viewState.setAccountTitle(account.title)
         lastAccount = account
+
+        useMax.set(false)
+        clickedUseMax.set(false)
+
         checkEnableSubmit()
     }
 
