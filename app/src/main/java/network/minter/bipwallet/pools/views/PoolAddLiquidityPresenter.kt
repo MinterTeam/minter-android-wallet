@@ -50,6 +50,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.plain
+import network.minter.bipwallet.internal.helpers.MathHelper.scaleUp
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
@@ -371,8 +372,8 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
                         viewState.setMaxAmountError(null)
                     }
 
-                    slippage = if (maxAmount.isNotZero()) {
-                        ((maxAmount.setScale(18, RoundingMode.HALF_UP).divide(amount1.setScale(18, RoundingMode.HALF_UP), RoundingMode.HALF_UP)) * BigDecimal("100.0")) - BigDecimal("100.0")
+                    slippage = if (maxAmount.isNotZero() && amount1.isNotZero()) {
+                        ((maxAmount.scaleUp().divide(amount1.scaleUp(), RoundingMode.HALF_UP)) * BigDecimal("100.0")) - BigDecimal("100.0")
                     } else {
                         ZERO
                     }
