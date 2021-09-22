@@ -34,6 +34,7 @@ import org.joda.time.format.DateTimeFormat
 import timber.log.Timber
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
@@ -159,6 +160,7 @@ object DateHelper {
     fun Date.formatDateLong(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val df = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+            df.withZone(ZoneId.systemDefault())
             df.format(toInstant())
         } else {
             val sdf = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
