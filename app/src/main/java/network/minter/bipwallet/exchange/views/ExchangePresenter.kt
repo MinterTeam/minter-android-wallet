@@ -614,12 +614,21 @@ abstract class ExchangePresenter<V : ExchangeView>(
         Timber.d("OnAmountChangedInternal")
         if (buyCoin == null) {
             Timber.i("Can't exchange: coin is not set")
-            return
         }
         if (account == null) {
             Timber.i("Can't exchange until user account is not loaded")
+        }
+
+        if (initFeeData == null || account == null || buyCoin == null) {
+            Timber.w("Can't exchange until init data not loaded")
+            viewState.showCalculationProgress(false)
+            viewState.hideCalculation()
+            viewState.setSubmitEnabled(false)
+            viewState.setError("income_coin", tr(R.string.error_init_data_not_loaded))
             return
         }
+
+        viewState.setError("income_coin", null)
         val calculator = ExchangeCalculator.Builder(
                 estimateRepo,
                 poolsRepo,

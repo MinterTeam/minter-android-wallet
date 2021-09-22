@@ -545,4 +545,5 @@
     <string name="dialog_subtitle_liquidity_pool_name">Pool: %1$s / %2$s</string>
     <string name="error_unable_load_pool">Unable to load pool info</string>
     <string name="error_percent_max_100">Percent must be from 0 to 100</string>
+    <string name="error_init_data_not_loaded">Required info not loaded yet…</string>
 </resources>

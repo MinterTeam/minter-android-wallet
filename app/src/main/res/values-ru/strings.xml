@@ -542,4 +542,5 @@
     <string name="tx_type_remove_limit_order">Удаление лимитного ордера</string>
     <string name="error_unable_load_pool">Не удалось загрузить информацию о пуле</string>
     <string name="error_percent_max_100">Процент должен быть указан в диапазоне от 0 до 100</string>
+    <string name="error_init_data_not_loaded">Требуемые данные еще не загрузились…</string>
 </resources>
