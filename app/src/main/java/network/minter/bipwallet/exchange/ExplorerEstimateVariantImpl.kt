@@ -31,6 +31,7 @@ import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.R
 import network.minter.bipwallet.internal.exceptions.GateResponseException
 import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
+import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.humanizeDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
@@ -119,7 +120,7 @@ class ExplorerEstimateVariantImpl(
                                     out.commissionBase = buyFee
                                     out.commissionBIP = buyFee
                                 }
-                                val inCoinFee = ((res.amount * buyFee) / amount)
+                                val inCoinFee = if (bdNull(amount)) BigDecimal.ZERO else ((res.amount * buyFee) / amount)
 
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
                                 if (bipAccount.get().amount >= buyFee) {
