@@ -56,13 +56,16 @@ val GATE_UNHANDLED_ERRORS = listOf(
 )
 
 fun GateResult<*>.humanError(defValue: String? = "Caused unknown error"): String? {
-    for (d in GATE_UNHANDLED_ERRORS) {
-        if (d.pattern.matches(message!!)) {
-            return StringsHelper.replaceGroups(message, d)
+    if (message == null) {
+        return defValue
+    }
+    for (replaceData in GATE_UNHANDLED_ERRORS) {
+        if (replaceData.pattern.matches(message)) {
+            return StringsHelper.replaceGroups(message, replaceData)
         }
     }
 
-    return message ?: defValue
+    return message
 }
 
 
@@ -85,18 +88,21 @@ fun <R, T : Throwable> T.toObservable(): Observable<R> {
 
 val CoinItemBase.avatar: String
     get() {
-        if(type == CoinItemBase.CoinType.PoolToken) {
+        if (type == CoinItemBase.CoinType.PoolToken || symbol.startsWith("LP-")) {
             return "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_lp_token_bg}"
         }
-        return when(id) {
-            BigInteger("2024") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_musd}"
-            BigInteger("2064") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_btc}"
-            BigInteger("1902") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_hub}"
-            BigInteger("1993") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_usdt}"
-            BigInteger("1994") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_usdc}"
-            BigInteger("2065") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_eth}"
-            else -> BuildConfig.COIN_AVATAR_BASE_URL + symbol
+        if (BuildConfig.FLAVOR.startsWith("netMain")) {
+            return when (id) {
+                BigInteger("2024") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_musd}"
+                BigInteger("2064") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_btc}"
+                BigInteger("1902") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_hub}"
+                BigInteger("1993") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_usdt}"
+                BigInteger("1994") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_usdc}"
+                BigInteger("2065") -> "android.resource://${BuildConfig.APPLICATION_ID}/${R.drawable.ic_logo_eth}"
+                else -> BuildConfig.COIN_AVATAR_BASE_URL + symbol
+            }
         }
+        return BuildConfig.COIN_AVATAR_BASE_URL + symbol
     }
 
 val HistoryTransaction.TxChangeCoinOwnerResult.avatar: String

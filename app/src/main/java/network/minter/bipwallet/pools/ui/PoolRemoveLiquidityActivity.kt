@@ -33,7 +33,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import com.edwardstock.inputfield.InputField
 import com.edwardstock.inputfield.form.DecimalInputFilter
 import com.edwardstock.inputfield.form.InputGroup
 import com.edwardstock.inputfield.form.InputWrapper
@@ -46,7 +45,6 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.plain
-import network.minter.bipwallet.internal.helpers.ViewExtensions.textWidth
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.helpers.forms.validators.BigDecimalNumberValidator
 import network.minter.bipwallet.internal.system.ActivityBuilder
@@ -120,12 +118,8 @@ class PoolRemoveLiquidityActivity: BaseMvpInjectActivity(), PoolRemoveLiquidityV
         b.inputToken.setText(amount.plain())
     }
 
-    private fun calcSuffixPadding(input: InputField): Int {
-        return input.textWidth() + Wallet.app().display().dpToPx(4)
-    }
-
     override fun setTokenAmountValidator(maxValue: BigDecimal) {
-        inputGroup.addValidator(b.inputToken, BigDecimalNumberValidator(BigDecimal.ZERO, maxValue, "Incorrect amount: balance ${maxValue.humanize()}"))
+        inputGroup.addValidator(b.inputToken, BigDecimalNumberValidator(BigDecimal.ZERO, maxValue, tr(R.string.error_incorrect_amount_with_balance, maxValue.humanize())))
     }
 
     override fun setOnTextChangedListener(listener: (InputWrapper, Boolean) -> Unit) {

@@ -39,6 +39,8 @@ import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.launch
+import moxy.presenterScope
 import network.minter.bipwallet.R
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
@@ -93,17 +95,16 @@ import java.util.concurrent.atomic.AtomicBoolean
  * minter-android-wallet. 2018
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-
 abstract class ExchangePresenter<V : ExchangeView>(
-        private val mSession: AuthSession,
-        protected val mSecretStorage: SecretStorage,
-        protected val mAccountStorage: RepoAccounts,
-        protected val mTxRepo: RepoTransactions,
-        protected val mExplorerCoinsRepo: RepoCoins,
+        private val session: AuthSession,
+        protected val secretStorage: SecretStorage,
+        protected val accountStorage: RepoAccounts,
+        protected val txRepo: RepoTransactions,
+        protected val explorerCoinsRepo: RepoCoins,
         protected val gasRepo: GateGasRepository,
         protected val estimateRepo: GateEstimateRepository,
         protected val poolsRepo: ExplorerPoolsRepository,
-        protected val mGateTxRepo: GateTransactionRepository,
+        protected val gateTxRepo: GateTransactionRepository,
         protected val initDataRepo: TxInitDataRepository,
         protected val errorManager: ErrorManager
 ) : MvpBasePresenter<V>(), ErrorManager.ErrorGlobalReceiverListener, ErrorManager.ErrorLocalHandlerListener, ErrorManager.ErrorLocalReceiverListener {
@@ -124,6 +125,23 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var fromAccount: MinterAddress? = null
     private var swapFrom: EstimateSwapFrom = EstimateSwapFrom.Default
     private var exchangeRoute: PoolRoute? = null
+    private var opTypeInternal: OperationType? = null
+
+    // used to detect which type of coin is exchanging: simple coin, token or pool token
+    private var isBasicExchange = true
+
+    protected abstract val isBuying: Boolean
+
+    private val fee: BigDecimal
+        get() {
+            return if (initFeeData != null && initFeeData?.priceCommissions != null) {
+                initFeeData!!.priceCommissions.getByType(operationType).humanizeDecimal().multiply(BigDecimal(gasPrice))
+            } else {
+                operationType.fee.multiply(BigDecimal(gasPrice))
+            }
+        }
+
+    private var initFeeData: TxInitData? = null
 
     private val sellAmountSafe: BigDecimal
         get() {
@@ -134,11 +152,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
         get() {
             return buyAmount ?: BigDecimal.ZERO
         }
-
-    // used to detect which type of coin is exchanging: simple coin, token or pool token
-    private var isBasicExchange = true
-
-    protected abstract val isBuying: Boolean
 
     override fun onError(t: Throwable) {
         Timber.w("Unable to get balance for exchanging: %s", t.humanDetailsMessage)
@@ -164,7 +177,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
-        mAccountStorage.update()
+        accountStorage.update()
 
         inputChangeSubject = BehaviorSubject.create()
         inputChangeSubject!!
@@ -174,7 +187,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
                         { buying: Boolean -> onAmountChangedInternal(buying) },
                         { t -> Timber.w(t, "Error after exchange amount changed") }
                 )
-//                .disposeOnDestroy()
 
         viewState.setSubmitEnabled(false)
         viewState.setFormValidationListener { valid ->
@@ -211,19 +223,19 @@ abstract class ExchangePresenter<V : ExchangeView>(
             }
         }
 
-        fromAccount = if (bundle != null && bundle.containsKey(ConvertCoinActivity.EXTRA_ACCOUNT)) {
+        fromAccount = if (bundle?.containsKey(ConvertCoinActivity.EXTRA_ACCOUNT) == true) {
             bundle.getSerializable(ConvertCoinActivity.EXTRA_ACCOUNT) as MinterAddress
         } else {
-            mSecretStorage.mainWallet
+            secretStorage.mainWallet
         }
         viewState.validateForm()
 
-        mAccountStorage
+        accountStorage
                 .observe()
                 .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
-                            val acc: AddressBalance = mAccountStorage.entity.getWalletByAddress(fromAccount!!)
+                            val acc: AddressBalance = accountStorage.entity.getWalletByAddress(fromAccount!!)
 
                             if (!res.isEmpty) {
                                 accounts = acc.coinsList
@@ -250,17 +262,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
     protected fun setCalculation(calculation: String?) {
         viewState.setCalculation(calculation!!)
     }
-
-    private val fee: BigDecimal
-        get() {
-            return if (initFeeData != null && initFeeData?.priceCommissions != null) {
-                initFeeData!!.priceCommissions.getByType(operationType).humanizeDecimal().multiply(BigDecimal(gasPrice))
-            } else {
-                operationType.fee.multiply(BigDecimal(gasPrice))
-            }
-        }
-
-    private var initFeeData: TxInitData? = null
 
     private fun loadAndSetFee() {
         initDataRepo.loadFeeWithTx()
@@ -349,10 +350,10 @@ abstract class ExchangePresenter<V : ExchangeView>(
         val tx = txData.build(initData.nonce!!.add(BigInteger.ONE), initData.gas!!, balance)
         isBasicExchange = txData.isBasicExchange
 
-        val data = mSecretStorage.getSecret(account!!.address!!)
+        val data = secretStorage.getSecret(account!!.address!!)
         val sign = tx.signSingle(data.privateKey)!!
         return safeSubscribeIoToUi(
-                mGateTxRepo.sendTransaction(sign)
+                gateTxRepo.sendTransaction(sign)
                         .onErrorResumeNext(toGateError())
         )
     }
@@ -374,8 +375,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
                 d.dismiss()
                 viewState.finishSuccess(exchangeAmount!!)
             }
-
-
             dialogBuilder.create()
         }
     }
@@ -386,8 +385,8 @@ abstract class ExchangePresenter<V : ExchangeView>(
             return
         }
 
-        mAccountStorage.update(true)
-        mTxRepo.update(true)
+        accountStorage.update(true)
+        txRepo.update(true)
 
         if (isBuying) {
             saveExchangeAmount(buyCoin!!, buyAmount!!)
@@ -399,7 +398,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
         // get transaction from explorer to show exact value what we've got after sell
         // todo: show "Coins have been exchanged" if can't get transaction after 30 seconds
-        mTxRepo.entity.waitTransactionUntilUncommitted(result.result.hash.toString())
+        txRepo.entity.waitTransactionUntilUncommitted(result.result.hash.toString())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -475,7 +474,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
     @Suppress("UNUSED_PARAMETER")
     private fun onClickSelectAccount(view: View) {
-        viewState.startAccountSelector(mAccountStorage.entity.getWalletByAddress(fromAccount!!).coinsList) {
+        viewState.startAccountSelector(accountStorage.entity.getWalletByAddress(fromAccount!!).coinsList) {
             onAccountSelected(it.data, false)
         }
     }
@@ -486,7 +485,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
         Timber.d("Input changed: %s", editText.text)
         when (editText.id) {
             R.id.input_incoming_coin -> {
-                mExplorerCoinsRepo.entity.findByName(text)
+                explorerCoinsRepo.entity.findByName(text)
                         .filter { it.type != CoinItemBase.CoinType.PoolToken }
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
@@ -577,8 +576,6 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
-    private var opTypeInternal: OperationType? = null
-
     private val operationType: OperationType
         get() {
             return when {
@@ -614,17 +611,22 @@ abstract class ExchangePresenter<V : ExchangeView>(
         Timber.d("OnAmountChangedInternal")
         if (buyCoin == null) {
             Timber.i("Can't exchange: coin is not set")
-        }
-        if (account == null) {
-            Timber.i("Can't exchange until user account is not loaded")
+            return
         }
 
-        if (initFeeData == null || account == null || buyCoin == null) {
+        if (account == null) {
+            Timber.i("Can't exchange until user account is not loaded")
+            return
+        }
+
+        if (initFeeData == null) {
             Timber.w("Can't exchange until init data not loaded")
-            viewState.showCalculationProgress(false)
-            viewState.hideCalculation()
-            viewState.setSubmitEnabled(false)
-            viewState.setError("income_coin", tr(R.string.error_init_data_not_loaded))
+            presenterScope.launch {
+                viewState.showCalculationProgress(false)
+                viewState.hideCalculation()
+                viewState.setSubmitEnabled(false)
+                viewState.setError("income_coin", tr(R.string.error_init_data_not_loaded))
+            }
             return
         }
 
