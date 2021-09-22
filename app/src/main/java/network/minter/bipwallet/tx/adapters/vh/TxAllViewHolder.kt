@@ -239,7 +239,7 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_remove_liquidity)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = "${data.coin0} / ${data.coin1}"
-            itemAmount.text = data.liquidity.humanize()
+            itemAmount.text = "- ${data.liquidity.humanize()}"
             itemSubamount.text = data.poolToken.symbol
         }
     }
@@ -524,7 +524,7 @@ class TxAllViewHolder(
                     itemAmount.text = data.amount.humanize()
                 } else {
                     itemTitle.text = txItem.tx.toName ?: data.to.toShortString()
-                    itemAmount.text = String.format("- %s", bdHuman(data.amount))
+                    itemAmount.text = "- ${data.amount.humanize()}"
                 }
             }
 
