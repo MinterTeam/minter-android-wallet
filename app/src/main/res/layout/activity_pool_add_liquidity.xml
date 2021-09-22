@@ -164,7 +164,9 @@
                 app:fieldName="slippage"
                 app:label="@string/label_slippage"
                 app:labelEnabled="true"
-                />
+                app:presuffixText="%"
+                app:presuffixTextAppearance="@style/Input.CurrencyPreSuffix.TextAppearance"
+                app:suffixType="presuffix" />
 
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_max_spend"
@@ -182,10 +184,7 @@
                 tools:text="0.1353 BOOM"
                 app:fieldName="max_spend"
                 app:label="@string/label_max_amount_spend"
-                app:labelEnabled="true"
-                app:presuffixText="%"
-                app:presuffixTextAppearance="@style/Input.CurrencyPreSuffix.TextAppearance"
-                app:suffixType="presuffix" />
+                app:labelEnabled="true" />
 
             <!--LABELS-->
             <Space
