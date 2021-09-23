@@ -151,8 +151,8 @@ class PoolsPagingSource(private val factory: Factory) : RxPagingSource<Int, Pool
                         var prevKey: Int? = null
 
                         if (hasPagination) {
-                            nextKey = if (it.meta.currentPage == 1) null else it.meta.currentPage - 1
-                            prevKey = if (it.meta.currentPage == it.meta.lastPage) null else it.meta.currentPage + 1
+                            nextKey = if (it.meta.currentPage >= it.meta.lastPage) null else it.meta.currentPage + 1
+                            prevKey = if (it.meta.currentPage == 1) null else it.meta.currentPage - 1
                         }
 
                         Timber.d("POOLS_LIST: data loaded")
@@ -179,8 +179,8 @@ class PoolsPagingSource(private val factory: Factory) : RxPagingSource<Int, Pool
 
                         LoadResult.Page<Int, PoolCombined>(
                                 data = data,
-                                prevKey = nextKey,
-                                nextKey = prevKey
+                                prevKey = prevKey,
+                                nextKey = nextKey
                         )
                     }
                 }
