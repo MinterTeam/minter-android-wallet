@@ -95,7 +95,7 @@ class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
     }
 
     override fun setMaxAmountError(text: CharSequence?) {
-        inputGroup.setError("max_amount", text)
+        inputGroup.setError("max_spend", text)
     }
 
     override fun setEnableSubmit(enable: Boolean) {
@@ -122,19 +122,14 @@ class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
         b.actionSwapCoins.setOnClickListener(listener)
     }
 
-    override fun setOnTextChangedListener(listener: (InputWrapper, Boolean) -> Unit) {
-        inputGroup.addTextChangedListener(listener)
-    }
-
-    override fun setCoin0(coin0Amount: BigDecimal?, coin0: String) {
-        coin0Amount?.let {
-            if (it == BigDecimal.ZERO) {
-                b.inputCoin0.setText("0")
-                b.inputCoin0.input.setSelection(0, b.inputCoin0.text?.length ?: 0)
+    override fun setOnTextChangedListener(listener: (InputWrapper, Boolean, Boolean) -> Unit) {
+        inputGroup.addTextChangedListener { a, b ->
+            if (a.inputField.tag != null) {
+                a.inputField.tag = null
+                listener(a, b, false)
             } else {
-                b.inputCoin0.setText(it.plain())
+                listener(a, b, true)
             }
-            b.inputCoin0.setPreSuffixText(coin0)
         }
     }
 
@@ -156,8 +151,22 @@ class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
         }
     }
 
+    override fun setCoin0(coin0Amount: BigDecimal?, coin0: String) {
+        coin0Amount?.let {
+            b.inputCoin0.tag = Any()
+            if (it == BigDecimal.ZERO) {
+                b.inputCoin0.setText("0")
+                b.inputCoin0.input.setSelection(0, b.inputCoin0.text?.length ?: 0)
+            } else {
+                b.inputCoin0.setText(it.plain())
+            }
+            b.inputCoin0.setPreSuffixText(coin0)
+        }
+    }
+
     override fun setCoin1(coin1Amount: BigDecimal?, coin1: String) {
         coin1Amount?.let {
+            b.inputCoin1.tag = Any()
             if (it == BigDecimal.ZERO) {
                 b.inputCoin1.setText("0")
                 b.inputCoin1.input.setSelection(0, b.inputCoin1.text?.length ?: 0)
@@ -166,14 +175,16 @@ class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
             }
             b.inputCoin1.setPreSuffixText(coin1)
         }
-//        calcCoin1Padding(coin1)
     }
 
     override fun setSlippage(amount: String) {
+        b.inputSlippage.tag = Any()
         b.inputSlippage.setText(amount)
+
     }
 
     override fun setMaxAmount(amount: String) {
+        b.inputMaxSpend.tag = Any()
         b.inputMaxSpend.setText(amount)
     }
 

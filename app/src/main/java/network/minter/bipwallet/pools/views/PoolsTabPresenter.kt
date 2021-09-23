@@ -37,7 +37,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
@@ -101,17 +100,28 @@ class PoolsTabPresenter @Inject constructor() : MvpBasePresenter<PoolsTabView>()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == START_ADD_REMOVE_LIQUIDITY_REQUEST && resultCode == Activity.RESULT_OK) {
+        if (requestCode == START_ADD_REMOVE_LIQUIDITY_REQUEST && resultCode == Activity.RESULT_OK) {
             viewState.showProgress()
             needsRefresh = true
             adapter?.refresh()
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         walletSelectorController.onFirstViewAttach(viewState)
+    }
+
+
+    override fun attachView(view: PoolsTabView) {
+        walletSelectorController.attachView(view)
+        walletSelectorController.onWalletSelected = {
+//            viewState.showBalanceProgress(true)
+//            viewState.clearAmount()
+            onRefresh()
+        }
+        super.attachView(view)
+
         bipUsdRate.update()
 
 
@@ -201,18 +211,6 @@ class PoolsTabPresenter @Inject constructor() : MvpBasePresenter<PoolsTabView>()
                         }
                     }
                 }
-        unsubscribeOnDestroy(listDisposable)
-    }
-
-
-    override fun attachView(view: PoolsTabView) {
-        walletSelectorController.attachView(view)
-        walletSelectorController.onWalletSelected = {
-//            viewState.showBalanceProgress(true)
-//            viewState.clearAmount()
-            onRefresh()
-        }
-        super.attachView(view)
 
         viewState.setAdapter(adapter!!)
         viewState.setOnRefreshListener {
@@ -221,6 +219,7 @@ class PoolsTabPresenter @Inject constructor() : MvpBasePresenter<PoolsTabView>()
         }
 //        viewState.scrollTo(lastPosition)
         viewState.setFilterObserver(filterType)
+
 
     }
 
@@ -234,5 +233,12 @@ class PoolsTabPresenter @Inject constructor() : MvpBasePresenter<PoolsTabView>()
     override fun detachView(view: PoolsTabView) {
         super.detachView(view)
         walletSelectorController.detachView()
+        listDisposable?.dispose()
+        listDisposable = null
+    }
+
+    override fun destroyView(view: PoolsTabView?) {
+        super.destroyView(view)
+
     }
 }

@@ -95,8 +95,8 @@ class CachedCoinsRepository(
                         emptyList()
                     }
                 }
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun getAllDb(): Single<List<CoinItem>> {

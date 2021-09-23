@@ -96,7 +96,9 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/ic_swap_coins"
-                />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true" />
 
             <com.edwardstock.inputfield.InputField
                 android:id="@+id/input_coin1"
@@ -155,12 +157,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 style="@style/Input"
+                android:inputType="numberDecimal"
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
-                android:inputType="text"
                 android:singleLine="true"
                 android:maxLines="1"
-                tools:text="5"
+                android:text="5"
                 app:fieldName="slippage"
                 app:label="@string/label_slippage"
                 app:labelEnabled="true"
@@ -176,9 +178,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 style="@style/Input"
+                android:inputType="numberDecimal"
                 android:layout_marginStart="@dimen/margin_edges"
                 android:layout_marginEnd="@dimen/margin_edges"
-                android:inputType="text"
                 android:singleLine="true"
                 android:maxLines="1"
                 tools:text="0.1353 BOOM"

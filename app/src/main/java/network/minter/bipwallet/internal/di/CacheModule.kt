@@ -86,6 +86,7 @@ object CacheModule {
     fun provideCachedCoinsRepo(@DbCache storage: KVStorage, db: WalletDatabase, api: MinterExplorerSDK, em: ErrorManager): RepoCoins {
         return RepoCoins(storage, CachedCoinsRepository(storage, db, api.apiService))
                 .setTimeToLive(/*3  minutes */ 60L * 3L)
+                .setEnableInMemoryCache(true)
                 .retryWhen(em.retryWhenHandler)
     }
 

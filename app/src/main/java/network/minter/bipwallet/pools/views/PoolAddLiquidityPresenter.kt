@@ -46,7 +46,6 @@ import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.MathHelper.addPercent
 import network.minter.bipwallet.internal.helpers.MathHelper.asBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.asCurrency
-import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
 import network.minter.bipwallet.internal.helpers.MathHelper.plain
@@ -109,12 +108,10 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
     private var coin0Account: CoinBalance? = null
     private var coin1Account: CoinBalance? = null
     private var txSender: TransactionSender? = null
-    private var useMax: Boolean = false
-    private val clickedUseMax = AtomicBoolean(false)
+    private var useMaxCoin0: Boolean = false
+    private val clickedUseMaxCoin0 = AtomicBoolean(false)
     private var gas = BigInteger.ONE
     private var initFeeData: TxInitData? = null
-    private var ignoreInputAmount: AtomicBoolean = AtomicBoolean(false)
-    private var ignoreInputSlippage: AtomicBoolean = AtomicBoolean(false)
 
     override fun handleExtras(intent: Intent?) {
         super.handleExtras(intent)
@@ -135,7 +132,7 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             { res ->
-                                if(res.isOk) {
+                                if (res.isOk) {
                                     pool!!.pool = res.result
                                     init()
                                 } else {
@@ -158,7 +155,7 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         viewState.startDialog {
             val d = ConfirmDialog.Builder(it, R.string.error_unable_load_pool)
                     .setDescription("${pool!!.pool.coin0} / ${pool!!.pool.coin1}")
-                    .setText(errorResult.message?:"Unknown error")
+                    .setText(errorResult.message ?: "Unknown error")
                     .setNegativeAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
                         viewState.finishCancel()
@@ -190,7 +187,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
 
     override fun attachView(view: PoolAddLiquidityView) {
         super.attachView(view)
-        viewState.setOnTextChangedListener(this::onInputTextChanged)
         viewState.setOnSwapCoins {
             val tmpCoin0 = coin0!!
             val tmpAmount0 = amount0
@@ -209,13 +205,13 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
             viewState.setCoin1EnableUseMax(coin1Account!!.amount.isNotZero())
 
             checkEnoughBalance()
-
-            ignoreInputAmount.set(true)
             setupData()
+            handleCoin0Input(amount0)
         }
         viewState.setOnSubmit {
             onSubmit()
         }
+        viewState.setOnTextChangedListener(this::onInputTextChanged)
     }
 
 
@@ -245,16 +241,17 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
 
                                 viewState.setOnClickUseMax0 {
                                     viewState.setCoin0(coin0Account!!.amount, coin0!!.symbol)
-                                    useMax = true
-                                    clickedUseMax.set(true)
+                                    handleCoin0Input(coin0Account!!.amount)
+                                    useMaxCoin0 = true
+                                    clickedUseMaxCoin0.set(true)
                                 }
                                 viewState.setOnClickUseMax1 {
                                     viewState.setCoin1(coin1Account!!.amount, coin1!!.symbol)
-                                    useMax = true
-                                    clickedUseMax.set(true)
+                                    handleCoin1Input(coin1Account!!.amount)
+                                    useMaxCoin0 = false
+                                    clickedUseMaxCoin0.set(false)
                                 }
                             }
-//                            viewState.showBalanceProgress(false)
                         },
                         { t: Throwable ->
                             Timber.w(t, "Unable to load balance for sending")
@@ -266,13 +263,9 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
     }
 
     private fun setupData() {
-        ignoreInputAmount.set(true)
         viewState.setCoin0(amount0, coin0!!.symbol)
-        ignoreInputAmount.set(true)
         viewState.setCoin1(amount1, coin1!!.symbol)
-        ignoreInputSlippage.set(true)
         viewState.setSlippage(slippage.asCurrency())
-        ignoreInputSlippage.set(true)
         viewState.setMaxAmount(maxAmount.plain())
 
         viewState.setSlippageLabel(tr(R.string.label_slippage, coin1!!.symbol))
@@ -280,108 +273,116 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
     }
 
     private fun checkEnoughBalance() {
-        if(coin0Account?.amount?: ZERO < amount0) {
-            viewState.setCoin0Error(tr(R.string.account_err_insufficient_funds_for_amount, (coin0Account?.amount?:ZERO).humanize(), coin0!!.symbol ))
+        val coin0Amount = (coin0Account?.amount ?: ZERO).scaleUp()
+        val coin1Amount = (coin1Account?.amount ?: ZERO).scaleUp()
+
+        if (amount0.scaleUp() > coin0Amount) {
+            viewState.setCoin0Error(tr(R.string.account_err_insufficient_funds_for_amount, coin0Amount.humanize(), coin0!!.symbol))
         } else {
             viewState.setCoin0Error(null)
         }
-        if(coin1Account?.amount?: ZERO < amount1) {
-            viewState.setCoin1Error(tr(R.string.account_err_insufficient_funds_for_amount, (coin1Account?.amount?:ZERO).humanize(), coin1!!.symbol ))
+        if (amount1.scaleUp() > coin1Amount) {
+            viewState.setCoin1Error(tr(R.string.account_err_insufficient_funds_for_amount, coin1Amount.humanize(), coin1!!.symbol))
         } else {
             viewState.setCoin1Error(null)
         }
-        if(coin1Account?.amount?: ZERO < maxAmount) {
-            viewState.setMaxAmountError(tr(R.string.account_err_insufficient_funds_for_amount, (coin1Account?.amount?:ZERO).humanize(), coin1!!.symbol ))
+        if (maxAmount.scaleUp() > coin1Amount) {
+            viewState.setMaxAmountError(tr(R.string.account_err_insufficient_funds_for_amount, coin1Amount.humanize(), coin1!!.symbol))
         } else {
             viewState.setMaxAmountError(null)
         }
     }
 
-    private fun onInputTextChanged(input: InputWrapper, valid: Boolean) {
+
+    private fun onInputTextChanged(input: InputWrapper, valid: Boolean, changedByUser: Boolean) {
         presenterScope.launch {
+            if (!changedByUser) {
+                Timber.d("Ignore NON-user input")
+                return@launch
+            }
+
             val s = input.text.toString()
             val sNum = s.asBigDecimal()
             when (input.id) {
                 R.id.input_coin0 -> {
-                    if (ignoreInputAmount.getAndSet(false)) {
-                        return@launch
-                    }
-                    ignoreInputAmount.set(true)
-                    amount0 = sNum
-                    amount1 = amount0 * price0
-                    if (bdNull(slippage)) {
-                        slippage = BigDecimal("5.0")
-                    }
-                    maxAmount = amount1.addPercent(slippage)
-                    viewState.setCoin1(amount1, coin1!!.symbol)
-                    viewState.setMaxAmount(maxAmount.plain())
-
-                    checkEnoughBalance()
-
-                    if (!clickedUseMax.get()) {
-                        useMax = false
-                    }
-
-                    clickedUseMax.set(false)
+                    handleCoin0Input(sNum)
                 }
                 R.id.input_coin1 -> {
-                    if (ignoreInputAmount.getAndSet(false)) {
-                        return@launch
-                    }
-                    ignoreInputAmount.set(true)
-                    amount1 = sNum
-                    amount0 = amount1 * price1
-                    if (bdNull(slippage)) {
-                        slippage = BigDecimal("5.0")
-                    }
-                    maxAmount = amount1.addPercent(slippage)
-                    viewState.setCoin0(amount0, coin0!!.symbol)
-                    viewState.setMaxAmount(maxAmount.plain())
-
-                    checkEnoughBalance()
-
-                    if (!clickedUseMax.get()) {
-                        useMax = false
-                    }
-
-                    clickedUseMax.set(false)
+                    handleCoin1Input(sNum)
                 }
                 R.id.input_slippage -> {
-                    if (ignoreInputSlippage.getAndSet(false)) {
-                        return@launch
-                    }
-                    ignoreInputSlippage.set(true)
-                    slippage = sNum.setScale(18, RoundingMode.HALF_UP)
-                    maxAmount = amount1.setScale(18, RoundingMode.HALF_UP).addPercent(slippage)
-                    viewState.setMaxAmount(maxAmount.plain())
-
-                    if (slippage > BigDecimal("100.00")) {
-                        viewState.setSlippageError(tr(R.string.input_pool_error_slippage_exceed))
-                    }
+                    handleSlippageInput(sNum)
                 }
                 R.id.input_max_spend -> {
-                    if (ignoreInputSlippage.getAndSet(false)) {
-                        return@launch
-                    }
-                    ignoreInputSlippage.set(true)
-                    maxAmount = sNum
-                    if (maxAmount < amount1) {
-                        maxAmount = amount1
-                        viewState.setMaxAmountError(tr(R.string.input_pool_error_max_amount_too_low))
-                    } else {
-                        viewState.setMaxAmountError(null)
-                    }
-
-                    slippage = if (maxAmount.isNotZero() && amount1.isNotZero()) {
-                        ((maxAmount.scaleUp().divide(amount1.scaleUp(), RoundingMode.HALF_UP)) * BigDecimal("100.0")) - BigDecimal("100.0")
-                    } else {
-                        ZERO
-                    }
-                    viewState.setSlippage(slippage.asCurrency())
+                    handleMaxAmountInput(sNum)
                 }
             }
             viewState.setEnableSubmit(valid && coin0Account?.amount.isNotZero() && coin1Account?.amount.isNotZero())
         }
+    }
+
+    private fun handleCoin0Input(num: BigDecimal) {
+        amount0 = num
+        amount1 = amount0 * price0
+
+        maxAmount = amount1.addPercent(slippage)
+
+        viewState.setCoin1(amount1, coin1!!.symbol)
+        viewState.setMaxAmount(maxAmount.plain())
+        checkEnoughBalance()
+
+        if (!clickedUseMaxCoin0.get()) {
+            useMaxCoin0 = false
+        }
+
+        clickedUseMaxCoin0.set(false)
+    }
+
+    private fun handleCoin1Input(num: BigDecimal) {
+        amount1 = num
+        amount0 = amount1 * price1
+        maxAmount = amount1.addPercent(slippage)
+
+        viewState.setCoin0(amount0, coin0!!.symbol)
+        viewState.setMaxAmount(maxAmount.plain())
+
+        checkEnoughBalance()
+
+        if (!clickedUseMaxCoin0.get()) {
+            useMaxCoin0 = false
+        }
+
+        clickedUseMaxCoin0.set(false)
+    }
+
+    private fun handleSlippageInput(num: BigDecimal) {
+        slippage = num.setScale(18, RoundingMode.HALF_UP)
+        maxAmount = amount1.setScale(18, RoundingMode.HALF_UP).addPercent(slippage)
+
+        viewState.setMaxAmount(maxAmount.plain())
+
+        if (slippage > BigDecimal("100.00")) {
+            viewState.setSlippageError(tr(R.string.input_pool_error_slippage_exceed))
+        }
+
+        checkEnoughBalance()
+    }
+
+    private fun handleMaxAmountInput(num: BigDecimal) {
+        maxAmount = num
+        if (maxAmount < amount1) {
+            maxAmount = amount1
+            viewState.setMaxAmount(maxAmount.plain())
+        }
+
+        slippage = if (maxAmount.isNotZero() && amount1.isNotZero()) {
+            ((maxAmount.scaleUp().divide(amount1.scaleUp(), RoundingMode.HALF_UP)) * BigDecimal("100.0")) - BigDecimal("100.0")
+        } else {
+            ZERO
+        }
+        viewState.setSlippage(slippage.asCurrency())
+
+        checkEnoughBalance()
     }
 
     private fun onSubmit() {
@@ -445,14 +446,13 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         Timber.e(errorResult.message, "Unable to send transaction")
         viewState.startDialog { ctx: Context ->
             ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
-                    .setText((errorResult.message?: "Unknown error"))
+                    .setText((errorResult.message ?: "Unknown error"))
                     .setPositiveAction(R.string.btn_close) { d, _ ->
                         d.dismiss()
                     }
                     .create()
         }
     }
-
 
     private fun signTx(initData: TxInitData): Observable<TransactionSign> {
         val txBuilder = Transaction.Builder(initData.nonce)
@@ -463,7 +463,7 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         txPre.coin0 = coin0!!.id
         txPre.coin1 = coin1!!.id
 
-        if (useMax) {
+        if (useMaxCoin0) {
             txPre.volume = coin0Account!!.amount
 
             if (coin0!!.id == MinterSDK.DEFAULT_COIN_ID) {
@@ -472,7 +472,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         } else {
             txPre.volume = amount0
         }
-
         txPre.maximumVolume = maxAmount
 
         val tx = txPre.build().signSingle(secretStorage.mainSecret.privateKey)!!

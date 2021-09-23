@@ -75,6 +75,9 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
     private val subscriptions = CompositeDisposable()
     private val updateLock = Any()
 
+    private var enableInMemoryCache: Boolean = false
+    private var entityCachedData: ResultModel? = null
+
     private val expiredEntityStorageKey: String
         get() {
             return KEY_EXPIRED_ITEM + entity.getDataKey()
@@ -134,6 +137,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      */
     @CallSuper
     fun onAfterUpdate(result: ResultModel) {
+        entityCachedData = result
         entity.onAfterUpdate(result)
     }
 
@@ -203,6 +207,11 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         return this
     }
 
+    fun setEnableInMemoryCache(enable: Boolean): CachedRepository<ResultModel, Entity> {
+        enableInMemoryCache = enable
+        return this
+    }
+
     /**
      * Make data expired
      */
@@ -232,7 +241,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      * @return null if not loaded
      */
     val data: ResultModel
-        get() = entity.getData()
+        get() = getEntityData()
 
     /**
      * Setting data
@@ -284,7 +293,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
      */
     fun fetch(): Observable<ResultModel> {
         if (isDataReady && !isExpired) {
-            return Observable.just(entity.getData())
+            return Observable.just(getEntityData())
                     .subscribeOn(THREAD_IO)
                     .observeOn(THREAD_MAIN)
         }
@@ -356,12 +365,21 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
             onError: Consumer<Throwable>? = null,
             onComplete: Action? = null
     ): CachedRepository<ResultModel, Entity> {
-
         val sub = Observable.timer(delay.toLong(), unit)
                 .subscribeOn(THREAD_IO)
                 .subscribe { updateInternal(force, onNext, onError, onComplete) }
         subscriptions.add(sub)
         return this
+    }
+
+    private fun getEntityData(): ResultModel {
+        if (!enableInMemoryCache) {
+            return entity.getData()
+        }
+        if (entityCachedData == null) {
+            entityCachedData = entity.getData()
+        }
+        return entityCachedData ?: entity.getData()
     }
 
     fun updateBlockingSingle(force: Boolean = false,
@@ -371,7 +389,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
         synchronized(updateLock) {
             val observable: Observable<ResultModel>
             if (!force && !isExpired && isDataReady) {
-                observable = Observable.just(entity.getData())
+                observable = Observable.just(getEntityData())
             } else {
                 observable = updateObservable
                 invalidateTime()
@@ -401,7 +419,7 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
                 if (notifyStrategy == NOTIFY_ONLY_ON_UPDATE) {
                     return
                 }
-                observable = Observable.just(entity.getData())
+                observable = Observable.just(getEntityData())
             } else {
                 observable = updateObservable
                 invalidateTime()
@@ -417,8 +435,8 @@ open class CachedRepository<ResultModel, Entity : CachedEntity<ResultModel>>(
 
     @Suppress("NULLABLE_TYPE_PARAMETER_AGAINST_NOT_NULL_TYPE_PARAMETER")
     protected fun notifyOnSuccess(isNew: Boolean) {
-        mMetaNotifier.onNext(MetaResult(entity.getData(), isNew))
-        mNotifier.onNext(entity.getData())
+        mMetaNotifier.onNext(MetaResult(getEntityData(), isNew))
+        mNotifier.onNext(getEntityData())
     }
 
     protected fun notifyOnError(t: Throwable?) {

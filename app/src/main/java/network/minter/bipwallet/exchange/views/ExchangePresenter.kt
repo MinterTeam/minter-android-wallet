@@ -29,7 +29,6 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import androidx.annotation.CallSuper
 import com.annimon.stream.Stream
 import com.edwardstock.inputfield.form.InputWrapper
@@ -39,8 +38,6 @@ import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.coroutines.launch
-import moxy.presenterScope
 import network.minter.bipwallet.R
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
@@ -118,7 +115,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
     private var accounts: List<CoinBalance> = ArrayList(1)
     private val useMax = AtomicBoolean(false)
     private val clickedUseMax = AtomicBoolean(false)
-    private var gasPrice = BigInteger.ONE
+    @Volatile private var gasPrice = BigInteger.ONE
     private var estimateAmount: BigDecimal? = null
     private var exchangeAmount: ExchangeAmount? = null
     private var buyForResult = false
@@ -141,6 +138,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
             }
         }
 
+    @Volatile
     private var initFeeData: TxInitData? = null
 
     private val sellAmountSafe: BigDecimal
@@ -183,8 +181,10 @@ abstract class ExchangePresenter<V : ExchangeView>(
         inputChangeSubject!!
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        { buying: Boolean -> onAmountChangedInternal(buying) },
+                        { onAmountChangedInternal() },
                         { t -> Timber.w(t, "Error after exchange amount changed") }
                 )
 
@@ -196,12 +196,12 @@ abstract class ExchangePresenter<V : ExchangeView>(
             }
         }
         viewState.setTextChangedListener { input, valid ->
-            onInputChanged(input, valid)
+            onInputChanged(input)
             if (!valid) {
                 Timber.d("Invalid field: ${input.fieldName} - ${input.error}")
             }
         }
-        viewState.setOnClickSelectAccount { view: View -> onClickSelectAccount(view) }
+        viewState.setOnClickSelectAccount { onClickSelectAccount() }
         viewState.setOnClickMaximum { onClickMaximum() }
         viewState.setOnClickSubmit { onSubmit() }
         setCoinsAutocomplete()
@@ -246,7 +246,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                 onAccountSelected(account, true)
 
                                 if (buyAmount != null && buyCoin != null) {
-                                    onAmountChangedInternal(isBuying)
+                                    onAmountChangedInternal()
                                 }
                                 viewState.validateForm()
                             }
@@ -458,13 +458,15 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
+    /**
+     * Handle USE MAX click
+     */
     private fun onClickMaximum() {
-        if (isBuying) {
+        // if is "buy" screen or account not loaded yet, do nothing
+        if (isBuying || account == null) {
             return
         }
-        if (account == null) {
-            return
-        }
+
         viewState.setAmount(account!!.amount.toPlain())
         useMax.set(true)
         clickedUseMax.set(true)
@@ -472,15 +474,17 @@ abstract class ExchangePresenter<V : ExchangeView>(
         analytics.send(AppEvent.ConvertSpendUseMaxButton)
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun onClickSelectAccount(view: View) {
+    private fun onClickSelectAccount() {
         viewState.startAccountSelector(accountStorage.entity.getWalletByAddress(fromAccount!!).coinsList) {
             onAccountSelected(it.data, false)
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun onInputChanged(editText: InputWrapper, valid: Boolean) {
+    /**
+     * Handle inputs
+     * Called in main thread
+     */
+    private fun onInputChanged(editText: InputWrapper) {
         val text = editText.text.toString()
         Timber.d("Input changed: %s", editText.text)
         when (editText.id) {
@@ -519,6 +523,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
     }
 
+    /**
+     * Handles submit button click
+     */
     private fun onSubmit() {
         if (account == null || buyCoin == null || buyAmount == null || sellAmount == null) {
             return
@@ -605,9 +612,9 @@ abstract class ExchangePresenter<V : ExchangeView>(
         }
 
     /**
-     * @param buying
+     * Handles amount input with backpressure buffer (last one with delay 200ms)
      */
-    private fun onAmountChangedInternal(buying: Boolean) {
+    private fun onAmountChangedInternal() {
         Timber.d("OnAmountChangedInternal")
         if (buyCoin == null) {
             Timber.i("Can't exchange: coin is not set")
@@ -621,12 +628,10 @@ abstract class ExchangePresenter<V : ExchangeView>(
 
         if (initFeeData == null) {
             Timber.w("Can't exchange until init data not loaded")
-            presenterScope.launch {
-                viewState.showCalculationProgress(false)
-                viewState.hideCalculation()
-                viewState.setSubmitEnabled(false)
-                viewState.setError("income_coin", tr(R.string.error_init_data_not_loaded))
-            }
+            viewState.showCalculationProgress(false)
+            viewState.hideCalculation()
+            viewState.setSubmitEnabled(false)
+            viewState.setError("income_coin", tr(R.string.error_init_data_not_loaded))
             return
         }
 
@@ -647,62 +652,67 @@ abstract class ExchangePresenter<V : ExchangeView>(
         viewState.setCalculation("")
         viewState.showCalculationProgress(true)
         calculator.calculate(isBuying,
-                { res: CalculationResult ->
-                    estimateAmount = res.estimate
-                    gasCoin = res.gasCoin
-                    swapFrom = res.swapFrom
-                    exchangeRoute = res.route
-                    Timber.d("Exchange Type: ${swapFrom.name}")
-
-                    // we calculating estimate, so values are inverted
-                    if (buying) {
-                        sellAmount = res.amount
-                    } else {
-                        buyAmount = res.amount
-                    }
-                    if (initFeeData!!.gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
-                        viewState.setFee("${res.commissionBIP.humanize()} ${MinterSDK.DEFAULT_COIN}")
-                    } else {
-                        viewState.setFee(String.format("%s %s (%s %s)",
-                                res.commissionBIP.humanize(),
-                                MinterSDK.DEFAULT_COIN,
-                                res.commissionBase.humanize(),
-                                initFeeData!!.gasRepresentingCoin.symbol))
-                    }
-
-                    viewState.setSubmitEnabled(estimateAmount != null)
-                    viewState.setError("income_coin", null)
-                    viewState.showCalculationProgress(false)
-                    viewState.setCalculation(res.calculation ?: "")
-                },
-                { errMessage: String, err: NodeResult.Error? ->
-                    loadAndSetFee()
-                    viewState.showCalculationProgress(false)
-                    viewState.hideCalculation()
-                    if (errMessage == "not possible to exchange") {
-                        if ((buying && (buyAmountSafe == BigDecimal.ZERO)) || (!buying && (sellAmountSafe == BigDecimal.ZERO))) {
-                            checkZero(if (!buying) sellAmountSafe else buyAmountSafe)
-                        } else {
-                            var fullMessage = errMessage
-                            if (err?.data?.containsKey("pool") == true) {
-                                fullMessage += ": ${err.data["pool"]}"
-                            } else if (err?.data?.containsKey("bancor") == true) {
-                                fullMessage += ": ${err.data["bancor"]}"
-                            }
-                            viewState.setError("income_coin", fullMessage)
-                        }
-                    } else {
-                        viewState.setError("income_coin", errMessage)
-                    }
-
-                    viewState.validateForm()
-                    viewState.setSubmitEnabled(false)
-                }
+                this::onCalculationResult,
+                this::onCalculationError
         )
-
-
     }
 
+    private fun onCalculationResult(res: CalculationResult) {
+        estimateAmount = res.estimate
+        gasCoin = res.gasCoin
+        swapFrom = res.swapFrom
+        exchangeRoute = res.route
+        Timber.d("Exchange Type: ${swapFrom.name}")
+
+        // we calculating estimate, so values are inverted
+        if (isBuying) {
+            sellAmount = res.amount
+        } else {
+            buyAmount = res.amount
+        }
+        if (initFeeData!!.gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
+            viewState.setFee("${res.commissionBIP.humanize()} ${MinterSDK.DEFAULT_COIN}")
+        } else {
+            viewState.setFee(String.format("%s %s (%s %s)",
+                    res.commissionBIP.humanize(),
+                    MinterSDK.DEFAULT_COIN,
+                    res.commissionBase.humanize(),
+                    initFeeData!!.gasRepresentingCoin.symbol))
+        }
+
+        viewState.setSubmitEnabled(estimateAmount != null)
+        viewState.setError("income_coin", null)
+        viewState.showCalculationProgress(false)
+        viewState.setCalculation(res.calculation ?: "")
+    }
+
+    private fun onCalculationError(errMessage: String, err: NodeResult.Error?) {
+        loadAndSetFee()
+        viewState.showCalculationProgress(false)
+        viewState.hideCalculation()
+        if (errMessage == "not possible to exchange") {
+            if ((isBuying && (buyAmountSafe == BigDecimal.ZERO)) || (!isBuying && (sellAmountSafe == BigDecimal.ZERO))) {
+                checkZero(if (!isBuying) sellAmountSafe else buyAmountSafe)
+            } else {
+                var fullMessage = errMessage
+                if (err?.data?.containsKey("pool") == true) {
+                    fullMessage += ": ${err.data["pool"]}"
+                } else if (err?.data?.containsKey("bancor") == true) {
+                    fullMessage += ": ${err.data["bancor"]}"
+                }
+                viewState.setError("income_coin", fullMessage)
+            }
+        } else {
+            viewState.setError("income_coin", errMessage)
+        }
+
+        viewState.validateForm()
+        viewState.setSubmitEnabled(false)
+    }
+
+    /**
+     * Handles selling coin selection
+     */
     private fun onAccountSelected(coinAccount: CoinBalance?, initial: Boolean) {
         if (coinAccount == null) return
         gasCoin = coinAccount.coin.id

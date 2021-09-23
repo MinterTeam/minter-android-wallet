@@ -48,7 +48,7 @@ interface PoolAddLiquidityView: MvpView {
     fun setMaxAmountLabel(text: CharSequence)
     fun setSlippage(amount: String)
     fun setMaxAmount(amount: String)
-    fun setOnTextChangedListener(listener: (InputWrapper, Boolean) -> Unit)
+    fun setOnTextChangedListener(listener: (InputWrapper, Boolean, Boolean) -> Unit)
     fun setOnSwapCoins(listener: (View) -> Unit)
     fun setEnableSubmit(enable: Boolean)
     fun setOnClickUseMax0(listener: (View) -> Unit)
