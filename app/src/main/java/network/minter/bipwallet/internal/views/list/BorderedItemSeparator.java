@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -44,7 +44,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
+import static network.minter.core.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-wallet. 2018
@@ -53,11 +53,11 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class BorderedItemSeparator extends RecyclerView.ItemDecoration {
 
     int mOrientation = -1;
-    private Drawable mDivider;
+    private final Drawable mDivider;
     private boolean mShowFirstDivider = false;
     private boolean mShowLastDivider = false;
     private int mFirstElementOffset = 0;
-    private Rect mDividerOffsets = new Rect();
+    private final Rect mDividerOffsets = new Rect();
     private Rect mLastDividerOffsets = null;
     private List<Integer> mSkipDrawOnIndex = new ArrayList<>(0);
 

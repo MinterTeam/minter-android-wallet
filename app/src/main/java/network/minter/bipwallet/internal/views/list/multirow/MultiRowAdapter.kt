@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,7 +32,6 @@ import androidx.annotation.LayoutRes
 import androidx.collection.SimpleArrayMap
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.annimon.stream.Stream
 import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowAdapter.RowViewHolder
 import network.minter.bipwallet.internal.views.list.multirow.MultiRowContract.Row
@@ -70,11 +69,6 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
     }
 
     constructor()
-
-    fun updateRows(newRows: List<Row<*>>) {
-        val diffResult = DiffUtil.calculateDiff(DiffCallback(newRows), true)
-        diffResult.dispatchUpdatesTo(this)
-    }
 
 
     @Suppress("UNCHECKED_CAST")
@@ -293,17 +287,6 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
         } else mItems[position]
     }
 
-    fun <T> findStream(rowClass: Class<T>): Stream<T> {
-        return Stream.of(mItems)
-                .filter { item: Row<*>? ->
-                    if (item is SortableRow<*, *>) {
-                        return@filter rowClass.isInstance(item) || rowClass.isInstance(item.row)
-                    }
-                    rowClass.isInstance(item)
-                }
-                .map { obj: Row<*>? -> rowClass.cast(obj) }
-    }
-
     fun sort(c: Comparator<Row<*>?>?) {
         Collections.sort(mItems, c)
     }
@@ -338,14 +321,6 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
         return clazz.isMemberClass && !Modifier.isStatic(clazz.modifiers)
     }
 
-    private fun findRow(@LayoutRes viewId: Int): Row<*> {
-        val row = rowsViewIdClassCache[viewId]
-        if (row == null) {
-            makeHoldersCache()
-        }
-        return rowsViewIdClassCache[viewId]!!
-    }
-
     @Throws(NoSuchMethodException::class, IllegalAccessException::class, InvocationTargetException::class, InstantiationException::class)
     private fun findViewHolder(@LayoutRes viewId: Int, view: View): RowViewHolder {
         var holderClass = holderViewIdClassCache[viewId]
@@ -365,15 +340,6 @@ open class MultiRowAdapter : RecyclerView.Adapter<RowViewHolder> {
     class Builder {
         val mRows = ArrayList<Row<*>>()
         var mEnableSort = false
-        fun addRow(row: Row<*>): Builder {
-            mRows.add(row)
-            return this
-        }
-
-        fun enableSort(enable: Boolean): Builder {
-            mEnableSort = enable
-            return this
-        }
 
         fun build(): MultiRowAdapter {
             return MultiRowAdapter(this)

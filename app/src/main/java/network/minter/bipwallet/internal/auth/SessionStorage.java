@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -50,10 +50,10 @@ import timber.log.Timber;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class SessionStorage {
-    private SharedPreferences mPrefs;
-    private SharedPreferences.Editor editor;
-    private Gson gson;
-    private Context mContext;
+    private final SharedPreferences mPrefs;
+    private final SharedPreferences.Editor editor;
+    private final Gson gson;
+    private final Context mContext;
 
     @SuppressLint("CommitPrefEdits")
     public SessionStorage(Context context, GsonBuilder gsonBuilder) {

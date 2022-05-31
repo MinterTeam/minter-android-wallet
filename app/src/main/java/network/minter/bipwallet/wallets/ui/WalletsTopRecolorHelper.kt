@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,8 +31,8 @@ import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.appbar.AppBarLayout
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.FragmentTabWalletsBinding
@@ -41,7 +41,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.clamp
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import java.lang.ref.WeakReference
 
-class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment) : AppBarOffsetChangedListener(), LifecycleObserver {
+class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment) : AppBarOffsetChangedListener(), LifecycleEventObserver {
     private val collapsedStatusColor = -0x1
     private val collapsedTextColor = -0x1000000
     private val collapsedSubtitleColor: Int
@@ -59,23 +59,25 @@ class WalletsTopRecolorHelper internal constructor(fragment: WalletsTabFragment)
 
     init {
         ViewHelper.setSystemBarsLightness(fragment, false)
-        expandedStatusColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.colorPrimary)
-        collapsedToolbarIconsColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.colorPrimaryLight)
-        collapsedSubtitleColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.textColorGrey)
-        expandedSubtitleColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.white70)
+        expandedStatusColor = ContextCompat.getColor(ref.get()!!.requireActivity(), R.color.colorPrimary)
+        collapsedToolbarIconsColor = ContextCompat.getColor(ref.get()!!.requireActivity(), R.color.colorPrimaryLight)
+        collapsedSubtitleColor = ContextCompat.getColor(ref.get()!!.requireActivity(), R.color.textColorGrey)
+        expandedSubtitleColor = ContextCompat.getColor(ref.get()!!.requireActivity(), R.color.white70)
         statusColor = expandedStatusColor
-        collapsedDropdownColor = ContextCompat.getColor(ref.get()!!.activity!!, R.color.grey)
+        collapsedDropdownColor = ContextCompat.getColor(ref.get()!!.requireActivity(), R.color.grey)
         elevation = fragment.resources.getDimension(R.dimen.toolbar_elevation)
         fragment.binding.appbar.setLiftable(true)
     }
 
-    private val view: FragmentTabWalletsBinding by lazy {
-        ref.get()!!.binding
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when(event) {
+            Lifecycle.Event.ON_DESTROY -> ref.clear()
+            else -> Unit
+        }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    internal fun onDestroy() {
-        ref.clear()
+    private val view: FragmentTabWalletsBinding by lazy {
+        ref.get()!!.binding
     }
 
     private fun recolorToolbarMenu() {

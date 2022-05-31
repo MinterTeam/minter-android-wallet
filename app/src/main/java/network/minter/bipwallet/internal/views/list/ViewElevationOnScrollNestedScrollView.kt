@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -48,7 +48,7 @@ class ViewElevationOnScrollNestedScrollView @JvmOverloads constructor(
 
     private var elevated = false
 
-    override fun onScrollChange(v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
+    override fun onScrollChange(v: NestedScrollView, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
         if (scrollY > 0 && !elevated) {
             elevated = true
             view.elevation = elevation
@@ -57,4 +57,6 @@ class ViewElevationOnScrollNestedScrollView @JvmOverloads constructor(
             view.elevation = 0f
         }
     }
+
+
 }

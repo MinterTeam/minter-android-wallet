@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,7 +26,6 @@
 package network.minter.bipwallet.delegation.views
 
 import androidx.lifecycle.MutableLiveData
-import com.annimon.stream.Stream
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -64,7 +63,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 /**
  * minter-android-wallet. 2020
@@ -187,9 +185,9 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
     }
 
     private fun rewardsToEntry(stats: List<RewardStatistics>): List<Entry> {
-        return Stream.of(stats)
-                .map { item: RewardStatistics -> Entry(item.time!!.time.toFloat(), item.amount.setScale(4, RoundingMode.HALF_DOWN).toFloat(), item) }
-                .toList()
+        return stats.map {
+            Entry(it.time!!.time.toFloat(), it.amount.setScale(4, RoundingMode.HALF_DOWN).toFloat(), it)
+        }.toList()
     }
 
     private fun getMinMaxRewardAmount(res: List<RewardStatistics>): FloatArray {

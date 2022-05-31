@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2020
+  ~ Copyright (C) by MinterTeam. 2022
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -31,8 +31,8 @@
     <color name="colorPrimaryLight">#5024C5</color>
     <color name="colorPrimaryLighter">#502EC2</color>
     <color name="colorPrimaryWarning">#DC4840</color>
-    <color name="colorPrimaryOrange">#FFFFA055</color>
     <color name="colorPrimaryWarningDark">#AE3A34</color>
+    <color name="colorPrimaryOrange">#FFFFA055</color>
 
     <color name="colorPrimaryFocused">#19502EC2</color>
     <color name="colorPrimaryPressed">#33502EC2</color>

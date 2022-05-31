@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -61,7 +61,7 @@ public class Wallet extends MultiDexApplication implements HasAndroidInjector {
 
     public static final Locale LC_EN = Locale.US;
     @SuppressWarnings("ConstantConditions")
-    public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("netTest") || BuildConfig.FLAVOR.equalsIgnoreCase("netMain") || BuildConfig.FLAVOR.equalsIgnoreCase("taconet");
+    public final static boolean ENABLE_CRASHLYTICS = BuildConfig.FLAVOR.equalsIgnoreCase("netTest") || BuildConfig.FLAVOR.equalsIgnoreCase("netMain") || BuildConfig.FLAVOR.equalsIgnoreCase("toronet");
     protected static WalletComponent app;
     protected static boolean sEnableInject = true;
 

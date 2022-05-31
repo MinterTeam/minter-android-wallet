@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -162,7 +162,7 @@ object MathHelper {
             return formatDecimalCurrency(num, 4, true)
         }
         // if less than 1 = min 4 digits, max 8
-        if (bdLT(num, BigDecimal(1))) {
+        if (num < BigDecimal(1)) {
             // if precision < 4, show 4 digits
             return if (num.stripTrailingZeros().scale() <= 4) {
                 formatDecimalCurrency(num.setScale(4, BigDecimal.ROUND_DOWN), 4, true)
@@ -281,8 +281,7 @@ object MathHelper {
 
     @JvmStatic
     fun bdNull(source: BigDecimal): Boolean {
-        val test: BigDecimal
-        test = if (source.scale() > 18) {
+        val test: BigDecimal = if (source.scale() > 18) {
             source.setScale(18, BigDecimal.ROUND_UP)
         } else {
             source
@@ -295,33 +294,33 @@ object MathHelper {
     fun biGT(from: BigInteger?, to: Long): Boolean {
         return if (from == null) {
             false
-        } else from.compareTo(BigInteger(to.toString())) > 0
+        } else from > BigInteger(to.toString())
     }
 
     @JvmStatic
     fun biGTE(from: BigInteger?, to: Long): Boolean {
         return if (from == null) {
             false
-        } else from.compareTo(BigInteger(to.toString())) >= 0
+        } else from >= BigInteger(to.toString())
     }
 
     @JvmStatic
     fun biLT(from: BigInteger?, to: Long): Boolean {
         return if (from == null) {
             false
-        } else from.compareTo(BigInteger(to.toString())) < 0
+        } else from < BigInteger(to.toString())
     }
 
     @JvmStatic
     fun biLTE(from: BigInteger?, to: Long): Boolean {
         return if (from == null) {
             false
-        } else from.compareTo(BigInteger(to.toString())) <= 0
+        } else from <= BigInteger(to.toString())
     }
 
     @JvmStatic
     fun startsFromNumber(value: CharSequence?): Boolean {
-        if (value == null || value.length == 0) {
+        if (value.isNullOrBlank()) {
             return false
         }
         val `val` = value.toString()

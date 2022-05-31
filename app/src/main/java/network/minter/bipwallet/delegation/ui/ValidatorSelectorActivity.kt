@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,27 +27,23 @@
 package network.minter.bipwallet.delegation.ui
 
 import android.app.Activity
-import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
 import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ActivityValidatorSelectorBinding
+import network.minter.bipwallet.delegation.contract.GetValidator
 import network.minter.bipwallet.delegation.contract.ValidatorSelectorView
 import network.minter.bipwallet.delegation.views.ValidatorSelectorPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
 import network.minter.explorer.models.ValidatorItem
-import org.parceler.Parcels
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -56,8 +52,10 @@ import javax.inject.Provider
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView {
-    @Inject lateinit var presenterProvider: Provider<ValidatorSelectorPresenter>
-    @InjectPresenter lateinit var presenter: ValidatorSelectorPresenter
+    @Inject
+    lateinit var presenterProvider: Provider<ValidatorSelectorPresenter>
+    @InjectPresenter
+    lateinit var presenter: ValidatorSelectorPresenter
     private lateinit var binding: ActivityValidatorSelectorBinding
     private var itemSeparator: BorderedItemSeparator? = null
 
@@ -73,20 +71,20 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
         Delegated
     }
 
-    companion object {
-        const val RESULT = "RESULT_VALIDATOR"
-        const val EXTRA_FILTER = "EXTRA_FILTER"
-
-        fun getResult(intent: Intent): ValidatorItem? {
-            if (!intent.hasExtra(RESULT)) {
-                return null
-            }
-
-            return Parcels.unwrap<ValidatorItem>(
-                    intent.getParcelableExtra(RESULT)
-            )
-        }
-    }
+//    companion object {
+//        const val RESULT = "RESULT_VALIDATOR"
+//        const val EXTRA_FILTER = "EXTRA_FILTER"
+//
+//        fun getResult(intent: Intent): ValidatorItem? {
+//            if (!intent.hasExtra(RESULT)) {
+//                return null
+//            }
+//
+//            return Parcels.unwrap<ValidatorItem>(
+//                    intent.getParcelableExtra(RESULT)
+//            )
+//        }
+//    }
 
     override fun createItemSeparator(haveLastUsedHeader: Boolean) {
         if (itemSeparator != null) {
@@ -112,31 +110,9 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
         binding.list.layoutManager = LinearLayoutManager(this)
     }
 
-    class Builder : ActivityBuilder {
-        private var filter: Filter = Filter.None
-
-        constructor(from: Activity) : super(from)
-        constructor(from: Fragment) : super(from)
-        constructor(from: Service) : super(from)
-
-        fun setFilter(filter: Filter): Builder {
-            this.filter = filter
-            return this
-        }
-
-        override fun onBeforeStart(intent: Intent) {
-            super.onBeforeStart(intent)
-            intent.putExtra(EXTRA_FILTER, filter)
-        }
-
-        override fun getActivityClass(): Class<*> {
-            return ValidatorSelectorActivity::class.java
-        }
-    }
-
     override fun showEmpty(show: Boolean) {
         runOnUiThread {
-            binding.emptyText.visible = show
+            T.isVisible = v = show
         }
     }
 
@@ -166,16 +142,16 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
 
     override fun finishSuccess(validator: ValidatorItem) {
         val res = Intent()
-        res.putExtra(RESULT, validator.toParcel())
+        res.putExtra(GetValidator.RESULT, validator.toParcel())
         setResult(Activity.RESULT_OK, res)
         finish()
     }
 
     override fun showProgress() {
-        binding.progress.visible = true
+        T.isVisible = v = true
     }
 
     override fun hideProgress() {
-        binding.progress.visible = false
+        T.isVisible = v = false
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -83,37 +83,6 @@ import static network.minter.bipwallet.internal.Wallet.app;
 
 public final class ViewHelper {
 
-
-    public static void visible(@Nullable View view, boolean cond) {
-        if (view == null) {
-            return;
-        }
-        view.setVisibility(cond ? View.VISIBLE : View.GONE);
-    }
-
-    public static void visible(@Nullable TextView tv, CharSequence text) {
-        if (tv == null) {
-            return;
-        }
-
-        if (text == null || text.equals("")) {
-            tv.setVisibility(View.GONE);
-            tv.setText(null);
-        } else {
-            tv.setText(text);
-            tv.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public static void switchView(View firstTrue, View secondFalse, boolean cond) {
-        if (cond) {
-            firstTrue.setVisibility(View.VISIBLE);
-            secondFalse.setVisibility(View.GONE);
-        } else {
-            firstTrue.setVisibility(View.GONE);
-            secondFalse.setVisibility(View.VISIBLE);
-        }
-    }
 
     public static void setTypeface(TextView textView, @StringRes int resId) {
         final Context context = textView.getContext();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -33,7 +33,10 @@ import androidx.paging.PagingSource
 import androidx.paging.rxjava2.flowable
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import moxy.InjectViewState
+import moxy.presenterScope
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.analytics.base.HasAnalyticsEvent
 import network.minter.bipwallet.internal.adapter.LoadState
@@ -58,28 +61,28 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
     @Inject lateinit var secretRepo: SecretStorage
     @Inject lateinit var sourceFactory: TransactionDataSource.Factory
 
-    private var mAdapter: TransactionListAdapter? = null
-    private var mListDisposable: Disposable? = null
+    private var adapter: TransactionListAdapter? = null
+    private var listDisposable: Disposable? = null
     private var listBuilder: Pager<Int, TransactionItem>? = null
-    private var mLastPosition = 0
-    private var mLoadState: MutableLiveData<LoadState>? = null
+    private var lastPosition = 0
+    private var loadState: MutableLiveData<LoadState>? = null
     private val filterState: MutableLiveData<ExplorerTransactionRepository.TxFilter> = MutableLiveData()
 
     var source: PagingSource<Int, TransactionItem>? = null
 
     override fun attachView(view: TransactionListView) {
         super.attachView(view)
-        viewState.setAdapter(mAdapter!!)
+        viewState.setAdapter(adapter!!)
         viewState.setOnRefreshListener {
             onRefresh()
         }
-        viewState.scrollTo(mLastPosition)
+        viewState.scrollTo(lastPosition)
         viewState.setFilterObserver(filterState)
 
     }
 
     fun onScrolledTo(position: Int) {
-        mLastPosition = position
+        lastPosition = position
     }
 
     override fun getAnalyticsEvent(): AppEvent {
@@ -97,12 +100,13 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
             onRefresh()
         }
 
-        mAdapter = TransactionListAdapter { secretRepo.mainWallet }
-        mAdapter!!.setOnExpandDetailsListener { v, tx -> onExpandTx(v, tx) }
-        mLoadState = MutableLiveData()
-        viewState.syncProgress(mLoadState!!)
-        mAdapter!!.setLoadState(mLoadState)
-        sourceFactory.observeLoadState(mLoadState!!)
+        adapter = TransactionListAdapter { secretRepo.mainWallet }
+        adapter?.setOnExpandDetailsListener { v, tx -> onExpandTx(v, tx) }
+        loadState = MutableLiveData<LoadState>().also {
+            viewState.syncProgress(it)
+            adapter?.setLoadState(it)
+            sourceFactory.observeLoadState(it)
+        }
 
         listBuilder = Pager(
                 config = PagingConfig(
@@ -112,20 +116,23 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
                 initialKey = 1,
                 pagingSourceFactory = {
                     Timber.d("TX_LIST: create source instance")
-                    source = sourceFactory.create()
-                    source!!
+                    sourceFactory.create().also {
+                        source = it
+                    }
                 }
         )
-
-        mListDisposable = listBuilder!!.flowable
-                .subscribe { pd ->
-                    viewState.onLifecycle {
-                        Timber.d("TX_LIST: Submit adapter")
-                        mAdapter!!.submitData(it.lifecycle, pd)
-                    }
-
-                }
-        unsubscribeOnDestroy(mListDisposable)
+        listBuilder?.flow?.onEach { pd ->
+            viewState.onLifecycle { lifecycleOwner ->
+                Timber.d("TX_LIST: Submit adapter")
+                adapter?.submitData(lifecycleOwner.lifecycle, pd)
+            }
+        }?.launchIn(presenterScope)
+//        listDisposable = listBuilder?.flowable
+//                .subscribe { pd ->
+//
+//
+//                }
+//        unsubscribeOnDestroy(listDisposable)
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -139,17 +146,17 @@ class TransactionListPresenter @Inject constructor() : MvpBasePresenter<Transact
         viewState.scrollTo(0)
 
 //        source?.invalidate()
-        mAdapter?.refresh()
+        adapter?.refresh()
 //        refresh()
     }
 
     @ExperimentalCoroutinesApi
     private fun refresh() {
-        mListDisposable = listBuilder!!.flowable
+        listDisposable = listBuilder!!.flowable
                 .subscribe { pd ->
                     viewState.onLifecycle {
                         Timber.d("TX_LIST: Submit adapter")
-                        mAdapter!!.submitData(it.lifecycle, pd)
+                        adapter!!.submitData(it.lifecycle, pd)
                     }
 
                 }

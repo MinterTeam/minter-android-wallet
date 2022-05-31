@@ -1,0 +1,115 @@
+[versions]
+
+appVersion = "2.4.0"
+appVersionCode = "247"
+
+minSdk = "21"
+maxSdk = "32"
+buildTools = "32.0.0"
+ndkVersion = "21.1.6352462"
+cmakeVersion = "3.18.1"
+agp = "7.1.1"
+
+minter-explorer = "2.1.0"
+minter-blockchain = "2.1.0"
+minter-core = "1.2.0"
+
+kotlin-base = "1.6.10"
+kotlin-coroutines = "1.6.0"
+
+
+androidx-appcompat = "1.4.1"
+androidx-core-ktx = "1.8.0-alpha04"
+androidx-annotations = "1.3.0"
+androidx-view-recyclerview = "1.2.1"
+androidx-view-viewpager2 = "1.1.0-beta01"
+androidx-view-cardview = "1.0.0"
+androidx-view-constraintlayout = "2.1.3"
+androidx-view-swiperefreshlayout = "1.1.0"
+androidx-biometric = "1.1.0"
+androidx-legacySupportV13 = "1.0.0"
+androidx-material = "1.5.0"
+androidx-vectordrawable = "1.1.0"
+androidx-exitinterface = "1.3.3"
+androidx-room = "2.4.1"
+androidx-paging = "3.1.0"
+androidx-multidex = "2.0.1"
+
+firebase-bom = "25.12.0"
+
+zxing-base = "3.3.0"
+
+log-timber = "5.0.1"
+parceler = "1.1.13"
+hawk = "3.0.2"
+
+
+[libraries]
+minter-sdk-core-mainnet = { module = "network.minter.android:minter-android-core", version.ref = "minter-core" }
+minter-sdk-core-testnet = { module = "network.minter.android:minter-android-core-testnet", version.ref = "minter-core" }
+minter-sdk-blockchain-mainnet = { module = "network.minter.android:minter-android-blockchain", version.ref = "minter-blockchain" }
+minter-sdk-blockchain-testnet = { module = "network.minter.android:minter-android-blockchain-testnet", version.ref = "minter-blockchain" }
+minter-sdk-explorer-mainnet = { module = "network.minter.android:minter-android-explorer", version.ref = "minter-explorer" }
+minter-sdk-explorer-testnet = { module = "network.minter.android:minter-android-explorer-testnet", version.ref = "minter-explorer" }
+
+base-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-base" }
+base-kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+base-kotlin-coroutines-coreJvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlin-coroutines" }
+base-kotlin-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
+base-kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
+
+legacy-androidx-supportV13 = { module = "androidx.legacy:legacy-support-v13", version.ref = "androidx-legacySupportV13" }
+base-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+base-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+base-androidx-annotations = { module = "androidx.annotation:annotation", version.ref = "androidx-annotations" }
+base-androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "androidx-biometric" }
+base-androidx-material = { module = "com.google.android.material:material", version.ref = "androidx-material" }
+base-androidx-vectordrawable = { module = "androidx.vectordrawable:vectordrawable", version.ref = "androidx-vectordrawable" }
+base-androidx-exitinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "androidx-exitinterface" }
+base-androidx-paging-runtime = { module = "androidx.paging:paging-runtime-ktx", version.ref = "androidx-paging" }
+base-androidx-paging-rxjava2 = { module = "androidx.paging:paging-rxjava2-ktx", version.ref = "androidx-paging" }
+base-androidx-multidex = { module = "androidx.multidex:multidex", version.ref = "androidx-multidex" }
+
+base-androidx-view-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx-view-recyclerview" }
+base-androidx-view-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "androidx-view-viewpager2" }
+base-androidx-view-cardview = { module = "androidx.cardview:cardview", version.ref = "androidx-view-cardview" }
+base-androidx-view-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-view-constraintlayout" }
+base-androidx-view-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "androidx-view-swiperefreshlayout" }
+
+storage-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+storage-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
+storage-androidx-room-rxjava2 = { module = "androidx.room:room-rxjava2", version.ref = "androidx-room" }
+storage-kv-hawk = { module = "com.edwardstock:hawk", version.ref = "hawk" }
+
+analytics-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom"}
+analytics-firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
+analytics-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+analytics-android-installreferer = { module = "com.android.installreferrer:installreferrer", version = "2.2" }
+
+analytics-yandex-mobmetrica = { module = "com.yandex.android:mobmetricalib", version = "3.20.2" }
+
+qrscanner = { module = "com.github.edwardstock:code-scanner", version = "2.2.2"}
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing-base"}
+zxing-androidCore = { module = "com.google.zxing:android-core", version.ref = "zxing-base"}
+zxing-androidIntegration = { module = "com.google.zxing:android-integration", version.ref = "zxing-base"}
+
+log-timber = { module = "com.jakewharton.timber:timber", version.ref = "log-timber"}
+
+parceler-api = { module = "org.parceler:parceler-api", version.ref = "parceler" }
+parceler-compiler = { module = "org.parceler:parceler", version.ref = "parceler" }
+
+
+#implementation ("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+#    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+#    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
+#    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.6.0")
+#    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
+
+#minterExplorerSDK = "2.1.0"
+#    minterBlockchainSDK = "2.1.0"
+#    minterCoreSDK = "1.2.0"
+#    minterLedgerSDK = "0.1.0"
+#    roomVersion = '2.3.0'
+#
+#    appVersionName = "2.4.0-beta05"
+#    appVersionCode = 244

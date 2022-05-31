@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,7 +26,6 @@
 
 package network.minter.bipwallet.delegation.views
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.text.Editable
@@ -62,7 +61,6 @@ import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.Plurals
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -114,11 +112,12 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private var fromAccount: BaseCoinValue? = null
     private var lastAccount: BaseCoinValue? = null
     private var type: Type = Type.Delegate
-    private var useMax = AtomicBoolean(false)
+    private val useMax = AtomicBoolean(false)
+    private val clickedUseMax = AtomicBoolean(false)
     private var amount = BigDecimal.ZERO
     private var gas = BigInteger.ONE
     private var initFeeData: TxInitData? = null
-    private var clickedUseMax = AtomicBoolean(false)
+    private var sendFee: BigDecimal = BigDecimal.ZERO
     private val pubkeyPattern = MinterPublicKey.PUB_KEY_PATTERN.toRegex()
     private var txSender: TransactionSender? = null
 
@@ -180,8 +179,8 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         loadAndSetFee()
 
         viewState.setOnClickUseMax {
-            clickedUseMax.set(true)
             useMax.set(true)
+            clickedUseMax.set(true)
             if (type == Type.Delegate) {
                 viewState.setAmount(fromAccount!!.amount.toPlain())
             } else {
@@ -193,21 +192,6 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                             ).toPlain()
                     )
                 }
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-
-        if (requestCode == REQUEST_CODE_SELECT_VALIDATOR && data != null) {
-            val validator = ValidatorSelectorActivity.getResult(data)
-            if (validator != null) {
-                onValidatorSelected(validator)
             }
         }
     }
@@ -380,6 +364,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                             gas = res.gas!!
                             initFeeData = res
                             viewState.setFee(res.calculateFeeText(type.opType))
+                            sendFee = res.calculateFeeInBip(type.opType)
                         },
                         { e ->
                             gas = BigInteger.ONE
@@ -399,7 +384,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             val b = StubValidatorNameBinding.bind(v)
             if (validator.meta?.name.isNullOrEmpty()) {
                 b.title.text = validator.pubKey?.toShortString()
-                b.subtitle.visible = false
+                T.isVisible = v = false
             } else {
                 b.title.text = validator.meta?.name
                 b.subtitle.text = validator.pubKey?.toShortString()
@@ -408,7 +393,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
             if (type == Type.Unbond) {
                 b.root.background.state = intArrayOf(-android.R.attr.state_enabled)
-                b.dropdown.visible = false
+                T.isVisible = v = false
             }
 
         }
@@ -418,9 +403,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun onInputChanged(input: InputWrapper, valid: Boolean) {
         when (input.id) {
             R.id.input_amount -> {
-                if (!clickedUseMax.getAndSet(false)) {
+                if (!clickedUseMax.get()) {
                     useMax.set(false)
                 }
+                clickedUseMax.set(false)
                 amount = (input.text ?: "").toString().parseBigDecimal()
             }
         }
@@ -447,39 +433,42 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
     private fun onSubmit() {
         loadAndSetFee()
 
-        txSender = TransactionSender(secretStorage.mainWallet, initDataRepo, gateRepo)
-        txSender!!.startListener = {
-            viewState.startDialog {
-                TxConfirmStartDialog.Builder(it, type.titleRes)
+        txSender = TransactionSender(secretStorage.mainWallet, initDataRepo, gateRepo).apply {
+            startListener = {
+                viewState.startDialog {
+                    TxConfirmStartDialog.Builder(it, type.titleRes)
                         .setFirstLabel(type.firstLabelRes)
                         .setFirstValue(amount.humanize())
                         .setFirstCoin(fromAccount!!.coin!!.symbol)
                         .setSecondLabel(type.secondLabelRes)
                         .setSecondValueText(validatorFullName)
                         .setPositiveAction(R.string.btn_confirm) { _, _ ->
-                            txSender!!.next()
+                            txSender?.next()
                         }
                         .setNegativeAction(R.string.btn_cancel) { d, _ ->
                             d.dismiss()
                         }
                         .create()
+                }
             }
-        }
-        txSender!!.progressListener = {
-            viewState.startDialog { ctx ->
-                val dialog = WalletProgressDialog.Builder(ctx, type.progressTitleRes)
+
+            progressListener = {
+                viewState.startDialog { ctx ->
+                    val dialog = WalletProgressDialog.Builder(ctx, type.progressTitleRes)
                         .setText(R.string.tx_convert_began)
                         .create()
 
-                dialog.setCancelable(false)
-                dialog
+                    dialog.setCancelable(false)
+                    dialog
+                }
             }
-        }
-        txSender!!.txCreatorObservable = ::signTx
-        txSender!!.successCallback = ::onSuccessExecuteTransaction
-        txSender!!.errorCallback = ::onErrorExecuteTransaction
 
-        txSender!!.start()
+            txCreatorObservable = ::signTx
+            successCallback = ::onSuccessExecuteTransaction
+            errorCallback = ::onErrorExecuteTransaction
+
+            start()
+        }
     }
 
     private val realFee: BigDecimal
@@ -489,8 +478,10 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
                 return type.opType.fee * gas.toBigDecimal()
             }
 
-            Timber.d("Calculate delegate/unbond fee: old=${(type.opType.fee * gas.toBigDecimal()).humanize()}, new=${(initFeeData!!.priceCommissions.getByType(type.opType).humanizeDecimal() * gas.toBigDecimal()).humanize()}")
-            return initFeeData!!.priceCommissions.getByType(type.opType).humanizeDecimal() * gas.toBigDecimal()
+            val fee = initFeeData!!.priceCommissions.getByType(type.opType).humanizeDecimal() * gas.toBigDecimal()
+
+            Timber.d("Calculate delegate/unbond fee: old=${(type.opType.fee * gas.toBigDecimal()).humanize()}, new=${fee.humanize()}")
+            return fee
         }
 
     private fun createPreTx(): TransactionSign {
@@ -531,14 +522,16 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
         if (type == Type.Delegate) {
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
-            if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= realFee) {
+            if (bipAccountOpt.isPresent && bipAccountOpt.get().amount >= sendFee) {
                 var amountToSend = amount
                 if (useMax.get() && fromAccount!!.coin.id == MinterSDK.DEFAULT_COIN_ID) {
-                    amountToSend = amount - realFee
+                    amountToSend = amount - sendFee
+                    Timber.d("PreSign: USEMAX. subtract fee from amount")
                     if (bdNull(amountToSend)) {
                         return Observable.error<TransactionSign>(IllegalStateException(tr(R.string.validator_err_cant_delegate_zero_coins)))
                     }
                 }
+                Timber.d("PreSign: Amount=${amountToSend.humanize()}, Fee=${sendFee.humanize()}, RealFee=${realFee.humanize()}")
                 val txBuilder = Transaction.Builder(initData.nonce!!)
                 txBuilder.setGasPrice(gas)
                 txBuilder.setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
@@ -600,12 +593,17 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
                         tx.signSingle(secretStorage.mainSecret.privateKey).toObservable()
                     }
-
         } else {
             // check enough a BIP balance to pay fee, even if delegated coin is not the BIP
-            if (!bipAccountOpt.isPresent || bipAccountOpt.get().amount < realFee) {
-                val balance = bipAccountOpt.get()?.amount ?: 0.toBigDecimal()
-                return Observable.error<TransactionSign>(IllegalStateException(tr(R.string.validator_err_insufficient_funds_for_unbond, realFee.humanize(), MinterSDK.DEFAULT_COIN, balance.humanize(), MinterSDK.DEFAULT_COIN)))
+            if (!bipAccountOpt.isPresent || bipAccountOpt.get().amount < sendFee) {
+                val balance = bipAccountOpt.get().amount ?: 0.toBigDecimal()
+                return Observable.error<TransactionSign>(IllegalStateException(
+                    tr(R.string.validator_err_insufficient_funds_for_unbond,
+                        realFee.humanize(),
+                        MinterSDK.DEFAULT_COIN,
+                        balance.humanize(),
+                        MinterSDK.DEFAULT_COIN
+                    )))
             }
 
             val txBuilder = Transaction.Builder(initData.nonce!!)
@@ -675,7 +673,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
         checkEnableSubmit()
     }
 
-    private fun onValidatorSelected(validator: ValidatorItem) {
+    fun onValidatorSelected(validator: ValidatorItem) {
         toValidatorItem = validator
         toValidatorName = validator.meta?.name
         toValidator = validator.pubKey

@@ -8,7 +8,6 @@ local.properties
 /release
 /captures
 .externalNativeBuild
-gradle/wrapper/gradle-wrapper.jar
 .keychain
 app/fabric.properties
 crashlytics-build.properties

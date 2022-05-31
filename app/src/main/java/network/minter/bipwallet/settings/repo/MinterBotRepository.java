@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,8 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.annotation.Nonnull;
-
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
@@ -117,7 +116,7 @@ public class MinterBotRepository extends DataRepository<MinterBotEndpoint> imple
         });
     }
 
-    @Nonnull
+    @NonNull
     @Override
     protected Class<MinterBotEndpoint> getServiceClass() {
         return MinterBotEndpoint.class;

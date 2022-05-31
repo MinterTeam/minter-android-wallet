@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,12 +25,10 @@
  */
 package network.minter.bipwallet.exchange
 
-import com.annimon.stream.Optional
 import io.reactivex.disposables.Disposable
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.reactive.castErrorResultTo
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
-import network.minter.bipwallet.internal.helpers.data.CollectionsHelper.firstOptional
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.blockchain.api.EstimateSwapFrom
 import network.minter.blockchain.models.BlockchainStatus
@@ -169,14 +167,14 @@ class ExchangeCalculator private constructor(internal val builder: Builder) {
         return res.error != null && res.error.code == 119
     }
 
-    internal fun findAccountByCoin(id: BigInteger?): Optional<CoinBalance> {
+    internal fun findAccountByCoin(id: BigInteger?): CoinBalance? {
         return builder.accounts()
-                .firstOptional { it.coin.id == id!! }
+                .firstOrNull { it.coin.id == id!! }
     }
 
-    internal fun findAccountByCoin(coin: CoinItemBase?): Optional<CoinBalance> {
+    internal fun findAccountByCoin(coin: CoinItemBase?): CoinBalance? {
         return builder.accounts()
-                .firstOptional { it.coin == coin!! }
+                .firstOrNull { it.coin == coin }
     }
 
     class Builder(

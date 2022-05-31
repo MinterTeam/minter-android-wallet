@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,7 +26,6 @@
 package network.minter.bipwallet.wallets.views
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import io.reactivex.disposables.Disposable
@@ -46,11 +45,9 @@ import network.minter.bipwallet.internal.settings.SettingsManager
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
-import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
 import network.minter.bipwallet.stories.repo.RepoCachedStories
 import network.minter.bipwallet.wallets.contract.WalletsTabView
 import network.minter.bipwallet.wallets.data.BalanceCurrentState
-import network.minter.bipwallet.wallets.ui.WalletsTabFragment
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
@@ -68,17 +65,24 @@ import javax.inject.Inject
  */
 @HomeScope
 @InjectViewState
-class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabView>(), ErrorManager.ErrorGlobalReceiverListener {
-    @Inject lateinit var accountStorage: RepoAccounts
-
-    //    @Inject lateinit var dailyRewardsRepo: RepoDailyRewards
-    @Inject lateinit var addressRepo: ExplorerAddressRepository
-    @Inject lateinit var secretStorage: SecretStorage
-    @Inject lateinit var txRepo: RepoTransactions
-    @Inject lateinit var walletSelectorController: WalletSelectorController
-    @Inject lateinit var errorManager: ErrorManager
-    @Inject lateinit var storiesRepository: RepoCachedStories
-    @Inject lateinit var settings: SettingsManager
+class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabView>(),
+    ErrorManager.ErrorGlobalReceiverListener {
+    @Inject
+    lateinit var accountStorage: RepoAccounts
+    @Inject
+    lateinit var addressRepo: ExplorerAddressRepository
+    @Inject
+    lateinit var secretStorage: SecretStorage
+    @Inject
+    lateinit var txRepo: RepoTransactions
+    @Inject
+    lateinit var walletSelectorController: WalletSelectorController
+    @Inject
+    lateinit var errorManager: ErrorManager
+    @Inject
+    lateinit var storiesRepository: RepoCachedStories
+    @Inject
+    lateinit var settings: SettingsManager
 
     private val balanceState = BalanceCurrentState()
     private var storiesDisposable: Disposable? = null
@@ -100,22 +104,22 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         }
 
         accountStorage
-                .observe()
-                .joinToUi()
-                .subscribe(
-                        { res: AddressListBalancesTotal ->
-                            Timber.d("Update coins list")
-                            viewState.notifyUpdated()
-                            onBalanceReady(res)
-                            viewState.hideRefreshProgress()
-                            viewState.showBalanceProgress(false)
-                        },
-                        {
-                            Timber.e(it, "Unable to get balance for Wallets tab")
-                            viewState.hideProgress()
-                            viewState.showBalanceProgress(false)
-                        }
-                ).disposeOnDestroy()
+            .observe()
+            .joinToUi()
+            .subscribe(
+                { res: AddressListBalancesTotal ->
+                    Timber.d("Update coins list")
+                    viewState.notifyUpdated()
+                    onBalanceReady(res)
+                    viewState.hideRefreshProgress()
+                    viewState.showBalanceProgress(false)
+                },
+                {
+                    Timber.e(it, "Unable to get balance for Wallets tab")
+                    viewState.hideProgress()
+                    viewState.showBalanceProgress(false)
+                }
+            ).disposeOnDestroy()
 
         accountStorage.update()
     }
@@ -129,15 +133,15 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         if (settings[EnableStories]) {
             if (storiesDisposable == null) {
                 storiesDisposable = storiesRepository.observe()
-                        .joinToUi()
-                        .subscribe({
-                            if (it.isNotEmpty()) {
-                                Timber.d("Show stories")
-                                viewState.showStoriesList(it, smoothScrollStories)
-                            }
-                        }, { t ->
-                            Timber.w(t, "Unable to load stories")
-                        })
+                    .joinToUi()
+                    .subscribe({
+                        if (it.isNotEmpty()) {
+                            Timber.d("Show stories")
+                            viewState.showStoriesList(it, smoothScrollStories)
+                        }
+                    }, { t ->
+                        Timber.w(t, "Unable to load stories")
+                    })
             }
 
             storiesRepository.update()
@@ -180,28 +184,27 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         val totalUSD = splitDecimalStringFractions(mainWallet.totalBalanceUSD.setScale(2, RoundingMode.DOWN))
 
         balanceState.setAvailableBIP(
-                bdIntHuman(availableBIP.intPart),
-                availableBIP.fractionalPart,
-                MinterSDK.DEFAULT_COIN
+            bdIntHuman(availableBIP.intPart),
+            availableBIP.fractionalPart,
+            MinterSDK.DEFAULT_COIN
         )
 
         balanceState.setTotalBIP(
-                bdIntHuman(totalBIP.intPart),
-                totalBIP.fractionalPart,
-                MinterSDK.DEFAULT_COIN
+            bdIntHuman(totalBIP.intPart),
+            totalBIP.fractionalPart,
+            MinterSDK.DEFAULT_COIN
         )
         balanceState.setTotalUSD(
-                Plurals.usd(bdIntHuman(totalUSD.intPart)),
-                totalUSD.fractionalPart
+            Plurals.usd(bdIntHuman(totalUSD.intPart)),
+            totalUSD.fractionalPart
         )
         balanceState.applyTo(viewState)
 
 
         // show delegated
-        if (res.find(secretStorage.mainWallet).isPresent) {
-            val delegated = res.find(secretStorage.mainWallet).get().delegated
-            viewState.setDelegationAmount("${delegated.humanize()} ${MinterSDK.DEFAULT_COIN}")
-        } else {
+        res.find(secretStorage.mainWallet)?.let {
+            viewState.setDelegationAmount("${it.delegated.humanize()} ${MinterSDK.DEFAULT_COIN}")
+        } ?: kotlin.run {
             viewState.setDelegationAmount("${BigDecimal.ZERO.humanize()} ${MinterSDK.DEFAULT_COIN}")
         }
     }
@@ -216,34 +219,26 @@ class WalletsTabPresenter @Inject constructor() : MvpBasePresenter<WalletsTabVie
         balanceState.onRestoreInstanceState(savedInstanceState)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == WalletsTabFragment.REQUEST_CODE_QR_SCAN_TX) {
-            if (data == null) {
-                Timber.w("Something wrong on activity result: req(%d), res(%d), data(null)", requestCode, resultCode)
+    fun handleQRResult(result: String?) {
+        result?.let {
+            val isMxAddress = it.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
+            val isMpAddress = it.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
+            if (isMxAddress) {
+                viewState.showSendAndSetAddress(it)
+                return
+            } else if (isMpAddress) {
+                viewState.startDelegate(MinterPublicKey(it))
                 return
             }
-            val result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT)
-            if (result != null) {
-                val isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
-                val isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
-                if (isMxAddress) {
-                    viewState.showSendAndSetAddress(result)
-                    return
-                } else if (isMpAddress) {
-                    viewState.startDelegate(MinterPublicKey(result))
-                    return
-                }
-                try {
-                    viewState.startExternalTransaction(result)
-                } catch (t: Throwable) {
-                    Timber.w(t, "Unable to parse remote transaction: %s", result)
-                    viewState.startDialog { ctx: Context? ->
-                        ConfirmDialog.Builder(ctx!!, R.string.dialog_title_err_unable_scan_qr)
-                                .setText(tr(R.string.dialog_title_err_invalid_deeplink, t.message!!))
-                                .setPositiveAction(R.string.btn_close)
-                                .create()
-                    }
+            try {
+                viewState.startExternalTransaction(it)
+            } catch (t: Throwable) {
+                Timber.w(t, "Unable to parse remote transaction: %s", it)
+                viewState.startDialog { ctx: Context ->
+                    ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_scan_qr)
+                        .setText(tr(R.string.dialog_title_err_invalid_deeplink, t.message!!))
+                        .setPositiveAction(R.string.btn_close)
+                        .create()
                 }
             }
         }

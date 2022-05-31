@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,45 +30,31 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-
-import com.annimon.stream.Stream;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.util.Pair;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
-import timber.log.Timber;
+import kotlin.Deprecated;
 
 import static network.minter.bipwallet.internal.common.Preconditions.checkNotNull;
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
- * @deprecated rewrite to new activity result api
  */
-@Deprecated
 public abstract class ActivityBuilder {
     private Intent mIntent;
     private Bundle mBundle;
     private WeakReference<Activity> mActivity;
     private WeakReference<Fragment> mFragment;
     private WeakReference<Service> mService;
-    private WeakHashMap<String, View> mSharedViews;
 
     public ActivityBuilder(@NonNull Activity from) {
         mActivity = new WeakReference<>(checkNotNull(from, "Activity can't be null"));
         if (getActivityClass() != null) {
             mIntent = new Intent(from, getActivityClass());
         }
-        mSharedViews = new WeakHashMap<>();
     }
 
     public ActivityBuilder(@NonNull Fragment from) {
@@ -76,7 +62,6 @@ public abstract class ActivityBuilder {
         if (getActivityClass() != null) {
             mIntent = new Intent(from.getActivity(), getActivityClass());
         }
-        mSharedViews = new WeakHashMap<>();
     }
 
     public ActivityBuilder(@NonNull Service from) {
@@ -86,57 +71,8 @@ public abstract class ActivityBuilder {
         }
     }
 
-    public ActivityBuilder addSharedView(View view) {
-        return addSharedView(ViewCompat.getTransitionName(view), view);
-    }
-
-    public ActivityBuilder addSharedView(String name, View view) {
-        if (mActivity == null && mFragment == null) {
-            Timber.w("Attaching shared views make sense only from activity or fragment context");
-            return this;
-        }
-
-        mSharedViews.put(name, view);
-        return this;
-    }
-
-    public ActivityBuilder addSharedView(View... view) {
-        if (mActivity == null && mFragment == null) {
-            Timber.w("Attaching shared views make sense only from activity or fragment context");
-            return this;
-        }
-
-        Stream.of(view)
-                .filter(item -> item != null)
-                .forEach(item -> mSharedViews.put(ViewCompat.getTransitionName(item), item));
-
-        return this;
-    }
-
-    public ActivityBuilder addSharedViews(List<View> views) {
-        if (mActivity == null || mFragment == null) {
-            Timber.w("Attaching shared views make sense only from activity or fragment context");
-            return this;
-        }
-
-        Stream.of(views)
-                .filter(item -> item != null && ViewCompat.getTransitionName(item) != null)
-                .forEach(item -> mSharedViews.put(ViewCompat.getTransitionName(item), item));
-        return this;
-    }
-
-    public ActivityBuilder addSharedViews(Map<String, View> views) {
-        if (mActivity == null || mFragment == null) {
-            Timber.w("Attaching shared views make sense only for activity or fragment context");
-            return this;
-        }
-        mSharedViews.putAll(views);
-        return this;
-    }
-
     public void start() {
         onBeforeStart(getIntent());
-        makeSharedViews();
         if (mActivity != null) {
             if (mBundle != null) {
                 mActivity.get().startActivity(getIntent(), mBundle);
@@ -146,9 +82,9 @@ public abstract class ActivityBuilder {
             mActivity.clear();
         } else if (mFragment != null) {
             if (mBundle != null) {
-                mFragment.get().getActivity().startActivity(getIntent(), mBundle);
+                mFragment.get().startActivity(getIntent(), mBundle);
             } else {
-                mFragment.get().getActivity().startActivity(getIntent());
+                mFragment.get().startActivity(getIntent());
             }
             mFragment.clear();
         } else if (mService != null) {
@@ -171,9 +107,9 @@ public abstract class ActivityBuilder {
         return this;
     }
 
+    @Deprecated(message = "Use new ActivityResult API instead")
     public void start(int requestCode) {
         onBeforeStart(getIntent());
-        makeSharedViews();
         if (mActivity != null && mActivity.get() != null) {
             if (mBundle != null) {
                 mActivity.get().startActivityForResult(getIntent(), requestCode, mBundle);
@@ -223,38 +159,9 @@ public abstract class ActivityBuilder {
 
     /**
      * Activity class to start
-     *
      * @return
      */
     protected abstract Class<?> getActivityClass();
-
-    private void makeSharedViews() {
-        if (mSharedViews == null || mSharedViews.isEmpty()) {
-            return;
-        }
-
-        final Activity a;
-        if (mActivity != null && mActivity.get() != null) {
-            a = mActivity.get();
-        } else if (mFragment != null && mFragment.get() != null && mFragment.get().getActivity() != null) {
-            a = mFragment.get().getActivity();
-        } else {
-            throw new IllegalStateException("Activity or fragment is null. Can't start activity with shared views");
-        }
-        //noinspection unchecked
-        final Pair<View, String>[] pairs = (Pair<View, String>[]) new Pair[mSharedViews.size()];
-        Stream.of(mSharedViews.entrySet())
-                .forEachIndexed((idx, item) -> pairs[idx] = Pair.create(item.getValue(), item.getKey()));
-
-        assert a != null;
-        final Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(a, pairs).toBundle();
-
-        if (mBundle != null) {
-            mBundle.putAll(bundle);
-        } else {
-            mBundle = bundle;
-        }
-    }
 
     private void makeIntent() {
         if (mIntent != null) return;

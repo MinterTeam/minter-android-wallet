@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,10 +30,10 @@ import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
@@ -44,14 +44,13 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
-import network.minter.bipwallet.internal.helpers.ViewExtensions.nvisible
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.tx.adapters.TransactionFacade
 import network.minter.bipwallet.tx.contract.TransactionListView
 import network.minter.bipwallet.tx.views.TransactionListPresenter
 import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -97,7 +96,7 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
     }
 
     override fun showRefreshProgress() {
-        if (!b.progress.visible) {
+        if (!(T.isVisible = v)) {
             b.containerSwipeRefresh.isRefreshing = true
         }
     }
@@ -118,11 +117,8 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
     }
 
     override fun syncProgress(loadState: MutableLiveData<LoadState>) {
-        loadState.observe(this, Observer { s: LoadState? ->
-            if (s == null) {
-                showProgress()
-                return@Observer
-            }
+        loadState.observe(this) { s: LoadState ->
+            Timber.v("TxList Load state: $s")
             when (s) {
                 LoadState.Loaded,
                 LoadState.Failed
@@ -131,16 +127,13 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
                     hideProgress()
                 }
                 LoadState.Loading -> showProgress()
-                else -> {
-                }
+                else -> hideProgress()
             }
-        })
+        }
     }
 
     override fun lifecycle(state: MutableLiveData<TxFilter>, cb: (TxFilter) -> Unit) {
-        state.observe(this, Observer {
-            cb(it)
-        })
+        state.observe(this) { cb(it) }
     }
 
     override fun onLifecycle(onLifecycle: (LifecycleOwner) -> Unit) {
@@ -148,13 +141,17 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
     }
 
     override fun showProgress() {
-        if (!b.containerSwipeRefresh.isRefreshing) {
-            b.progress.nvisible = true
+        runOnUiThread {
+            if (!b.containerSwipeRefresh.isRefreshing) {
+                b.progress.isInvisible = false
+            }
         }
     }
 
     override fun hideProgress() {
-        b.progress.nvisible = false
+        runOnUiThread {
+            b.progress.isInvisible = true
+        }
     }
 
     override fun setAdapter(adapter: RecyclerView.Adapter<*>) {

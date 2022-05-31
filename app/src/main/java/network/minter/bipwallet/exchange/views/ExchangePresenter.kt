@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,7 +30,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.CallSuper
-import com.annimon.stream.Stream
 import com.edwardstock.inputfield.form.InputWrapper
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -72,7 +71,8 @@ import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.blockchain.api.EstimateSwapFrom
 import network.minter.blockchain.models.NodeResult
-import network.minter.blockchain.models.operational.*
+import network.minter.blockchain.models.operational.OperationInvalidDataException
+import network.minter.blockchain.models.operational.OperationType
 import network.minter.core.MinterSDK
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.*
@@ -84,7 +84,6 @@ import org.parceler.Parcels
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -241,7 +240,7 @@ abstract class ExchangePresenter<V : ExchangeView>(
                                 accounts = acc.coinsList
                                 account = acc.getCoin(MinterSDK.DEFAULT_COIN_ID)
                                 if (currentCoin != null) {
-                                    account = Stream.of(accounts).filter { value: CoinBalance -> (value.coin == currentCoin) }.findFirst().orElse(account)
+                                    accounts.firstOrNull { it.coin == currentCoin } ?: account
                                 }
                                 onAccountSelected(account, true)
 

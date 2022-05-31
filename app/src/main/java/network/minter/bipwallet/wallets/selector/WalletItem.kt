@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,7 +32,6 @@ import network.minter.bipwallet.internal.storage.models.AddressBalanceTotal
 import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.wallets.selector.WalletSelector.WalletWeight
 import network.minter.core.crypto.MinterAddress
-import java.util.*
 
 @Parcelize
 data class WalletItem(
@@ -63,8 +62,8 @@ data class WalletItem(
             for (data in secretStorage.secretsListSafe) {
                 val balance = balances.find(data.minterAddress)
                 isMain = secretStorage.isMainWallet(data.minterAddress)
-                if (balance.isPresent) {
-                    val total = balance.get().totalBalance + balance.get().delegated
+                if (balance != null) {
+                    val total = balance.totalBalance + balance.delegated
                     val weight = WalletWeight.detect(total)
                     out.add(WalletItem(data.minterAddress, data.title, weight, isMain))
                 } else {

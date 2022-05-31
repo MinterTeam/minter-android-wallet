@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,8 +29,8 @@ package network.minter.bipwallet.services.livebalance.broadcast;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ import timber.log.Timber;
 public class RTMBalanceUpdateReceiver extends BaseBroadcastReceiver {
     public static final String BROADCAST_ACTION = BuildConfig.APPLICATION_ID + ".RTM_BALANCE_UPDATE_RECEIVER";
     public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
-    private Listener mListener;
+    private final Listener mListener;
 
     public RTMBalanceUpdateReceiver(Listener listener) {
         mListener = listener;

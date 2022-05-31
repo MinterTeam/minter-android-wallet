@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,8 +30,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.annimon.stream.Stream
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
+
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
 import network.minter.bipwallet.tx.adapters.TxItem
@@ -70,7 +69,7 @@ class TransactionShortListAdapter(
             it.itemView.setOnClickListener { v ->
                 mOnExpandDetailsListener?.invoke(v, getItem(holder.bindingAdapterPosition).tx)
             }
-            it.binding.separator.visible = true
+            T.isVisible = v = true
         }
     }
 
@@ -95,20 +94,17 @@ class TransactionShortListAdapter(
     }
 
     override fun getItems(): List<TransactionFacade> {
-        return Stream.of(mItems)
-                .map(TxItem::tx)
-                .toList()
+        return mItems.map(TxItem::tx).toList()
     }
 
     override fun setItems(items: List<TransactionFacade>) {
-        mItems = Stream.of(items)
-                .map { TxItem(it) }
-                .toList()
+        mItems = items.map { TxItem(it) }.toMutableList()
     }
 
     override fun clear() {
+        val oldSize = mItems.size
         mItems.clear()
-        notifyDataSetChanged()
+        notifyItemRangeRemoved(0, oldSize)
     }
 
 }

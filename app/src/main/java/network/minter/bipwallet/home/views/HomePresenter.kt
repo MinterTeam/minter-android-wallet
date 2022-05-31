@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,6 +32,7 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.home.HomeTabsClasses
+import network.minter.bipwallet.home.HomeTabsMenuIds
 import network.minter.bipwallet.home.contract.HomeView
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.exceptions.ErrorGlobalHandler
@@ -45,7 +46,6 @@ import network.minter.bipwallet.services.livebalance.broadcast.RTMBalanceUpdateR
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver.Companion.send
 import network.minter.core.crypto.MinterAddress
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -54,15 +54,7 @@ import javax.inject.Inject
  */
 @InjectViewState
 class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
-    private val mBottomIdPositionMap: HashMap<Int, Int> = object : HashMap<Int, Int>() {
-        init {
-            put(R.id.bottom_wallets, 0)
-            put(R.id.bottom_send, 1)
-            put(R.id.bottom_pools, 2)
-            put(R.id.bottom_settings, 3)
-        }
-    }
-
+    @Inject @HomeTabsMenuIds lateinit var bottomIdPositionMap: Set<Int>
     @Inject @HomeTabsClasses lateinit var tabsClasses: @JvmSuppressWildcards List<Class<out HomeTabFragment>>
     @Inject lateinit var storage: KVStorage
     @Inject lateinit var accountStorage: RepoAccounts
@@ -73,7 +65,7 @@ class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
     override fun attachView(view: HomeView) {
         super.attachView(view)
         errorManager.subscribe(ErrorGlobalHandler(javaClass, this::handlerError, this::doOnErrorResolve))
-        viewState!!.setCurrentPage(mLastPosition)
+        viewState.setCurrentPage(mLastPosition)
     }
 
     override fun detachView(view: HomeView) {
@@ -97,26 +89,24 @@ class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
 
     override fun handleExtras(intent: Intent?) {
         super.handleExtras(intent)
-        if (intent!!.getBooleanExtra(DeepLink.IS_DEEP_LINK, false)) {
-            val params = intent.extras ?: return
+        intent?.let {
+            val params = it.extras ?: return
             val uri = params.getString(DeepLink.URI, null) ?: return
             if (uri.startsWith("minter://tx")) {
-                viewState!!.setCurrentPage(mBottomIdPositionMap[R.id.bottom_send]!!)
-                val hash = params.getString("d", null)
-                Timber.d("Deeplink URI: %s", uri)
-                Timber.d("Deeplink TX: %s", hash)
-                viewState!!.startRemoteTransaction(hash)
+                viewState?.let { view ->
+
+                    view.setCurrentPage(bottomIdPositionMap.indexOf(R.id.bottom_send))
+                    val hash = params.getString("d", null)
+                    Timber.d("Deeplink URI: %s", uri)
+                    Timber.d("Deeplink TX: %s", hash)
+                    view.startRemoteTransaction(hash)
+                }
             }
         }
     }
 
     fun getBottomIdByPosition(position: Int): Int {
-        for ((key, value) in mBottomIdPositionMap) {
-            if (value == position) {
-                return key
-            }
-        }
-        return 0
+        return bottomIdPositionMap.elementAt(position)
     }
 
     fun getTabPosition(name: String): Int {
@@ -131,7 +121,7 @@ class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
     }
 
     fun getBottomPositionById(itemId: Int): Int {
-        return mBottomIdPositionMap[itemId]!!
+        return bottomIdPositionMap.indexOf(itemId)
     }
 
     override fun onFirstViewAttach() {
@@ -142,17 +132,22 @@ class HomePresenter @Inject constructor() : MvpBasePresenter<HomeView>() {
                         { res: RTMService ->
                             res.setOnMessageListener { message: String?, channel: String, address: MinterAddress? ->
                                 if (channel == RTMService.CHANNEL_BLOCKS) {
-                                    send(Wallet.app().context(), message!!)
+                                    message?.let {
+                                        send(Wallet.app().context(), message)
+                                    }
                                 } else {
-                                    RTMBalanceUpdateReceiver.send(Wallet.app().context(), message)
-                                    accountStorage.update(true, {
-                                        Wallet.app().balanceNotifications().showBalanceUpdate(message, address)
-                                    })
-                                    Wallet.app().explorerTransactionsRepoCache().update(true)
-                                    Timber.d("WS ON MESSAGE[%s]: %s", channel, message)
+                                    message?.let {
+                                        RTMBalanceUpdateReceiver.send(Wallet.app().context(), message)
+                                        accountStorage.update(true, {
+                                            Wallet.app().balanceNotifications().showBalanceUpdate(message, address)
+                                        })
+                                        Wallet.app().explorerTransactionsRepoCache().update(true)
+                                        Timber.d("WS ON MESSAGE[%s]: %s", channel, message)
+                                    }
+
                                 }
                             }
                         }
-                ) { t: Throwable? -> Timber.w(t, "Unable to connect to RTM service") }
+                ) { t: Throwable -> Timber.w(t, "Unable to connect to RTM service") }
     }
 }

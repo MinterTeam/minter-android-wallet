@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,15 +25,12 @@
  */
 package network.minter.bipwallet.wallets.ui
 
-import android.Manifest
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -46,7 +43,6 @@ import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.appbar.AppBarLayout
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.models.AddressContact
 import network.minter.bipwallet.databinding.FragmentTabWalletsBinding
@@ -57,12 +53,10 @@ import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
-import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
+import network.minter.bipwallet.sending.contract.QRLauncher
 import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
 import network.minter.bipwallet.share.ShareDialog
@@ -79,7 +73,6 @@ import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.bipwallet.wallets.views.WalletsTabPresenter
 import network.minter.core.crypto.MinterPublicKey
 import org.joda.time.DateTime
-import permissions.dispatcher.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -88,20 +81,26 @@ import javax.inject.Provider
  * minter-android-wallet. 2018
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@RuntimePermissions
+
 class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     companion object {
         const val REQUEST_CODE_QR_SCAN_TX = 2002
     }
 
-    @Inject lateinit var presenterProvider: Provider<WalletsTabPresenter>
-    @InjectPresenter lateinit var presenter: WalletsTabPresenter
+    @Inject
+    lateinit var presenterProvider: Provider<WalletsTabPresenter>
+    @InjectPresenter
+    lateinit var presenter: WalletsTabPresenter
 
     private val swipeRefreshHacker = SwipeRefreshHacker()
     private lateinit var mRecolorHelper: WalletsTopRecolorHelper
     lateinit var binding: FragmentTabWalletsBinding
     private var storiesListFragment: StoriesListFragment? = null
     private var storiesListLock = Any()
+
+    private val qrLauncher = QRLauncher(this, { requireActivity() }) {
+        presenter.handleQRResult(it)
+    }
 
     override fun onAttach(context: Context) {
         HomeModule.component!!.inject(this)
@@ -142,25 +141,30 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
     }
 
     override fun startExplorer(hash: String) {
-        requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)))
+        requireActivity().startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + hash)
+            )
+        )
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        presenter.onRestoreInstanceState(savedInstanceState)
-        super.onActivityCreated(savedInstanceState)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        presenter.onActivityResult(requestCode, resultCode, data)
-    }
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        presenter.onRestoreInstanceState(savedInstanceState)
+//        super.onActivityCreated(savedInstanceState)
+//    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTabWalletsBinding.inflate(inflater, container, false)
         presenter.onRestoreInstanceState(savedInstanceState)
         mRecolorHelper = WalletsTopRecolorHelper(this)
         binding.appbar.addOnOffsetChangedListener(object : AppBarOffsetChangedListener() {
-            override fun onStateChanged(appBarLayout: AppBarLayout?, state: State?, verticalOffset: Int, expandedPercent: Float) {
+            override fun onStateChanged(
+                appBarLayout: AppBarLayout?,
+                state: State?,
+                verticalOffset: Int,
+                expandedPercent: Float
+            ) {
                 binding.containerSwipeRefresh.isEnabled = expandedPercent == 1.0f
             }
         })
@@ -189,24 +193,24 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         binding.balanceProgress.postApply {
 
             it.animate()
-                    .alpha(if (show) 1f else 0f)
-                    .setListener(object : Animator.AnimatorListener {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            it.visible = show
-                        }
+                .alpha(if (show) 1f else 0f)
+                .setListener(object : Animator.AnimatorListener {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        T.isVisible = v = show
+                    }
 
-                        override fun onAnimationRepeat(animation: Animator?) {}
-                        override fun onAnimationCancel(animation: Animator?) {
-                            it.visible = show
-                        }
+                    override fun onAnimationRepeat(animation: Animator?) {}
+                    override fun onAnimationCancel(animation: Animator?) {
+                        T.isVisible = v = show
+                    }
 
-                        override fun onAnimationStart(animation: Animator?) {}
-                    })
-                    .setDuration(150)
-                    .start()
+                    override fun onAnimationStart(animation: Animator?) {}
+                })
+                .setDuration(150)
+                .start()
 
         }
-        binding.balanceProgress.visible = show
+        T.isVisible = v = show
     }
 
     override fun notifyUpdated() {
@@ -227,7 +231,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_scan_tx) {
-            SingleCallHandler.call(item) { startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX) }
+            SingleCallHandler.call(item) { startScanQR() }
         } else if (item.itemId == R.id.menu_share) {
             ShareDialog().show(parentFragmentManager, "share")
         }
@@ -236,30 +240,21 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun startExternalTransaction(rawData: String) {
         ExternalTransactionActivity.Builder(requireActivity(), rawData)
-                .start()
+            .start()
     }
 
     override fun setOnClickScanQR(listener: View.OnClickListener) {
 
     }
 
-    @NeedsPermission(Manifest.permission.CAMERA)
-    override fun startScanQR(requestCode: Int) {
-        val i = Intent(activity, QRCodeScannerActivity::class.java)
-        if (activity == null) {
-            return
-        }
-        requireActivity().startActivityForResult(i, requestCode)
+    override fun startScanQR() {
+        qrLauncher.launch()
     }
 
     override fun showSendAndSetAddress(address: String) {
         runOnUiThread {
-            try {
-                (activity as HomeActivity?)!!.setCurrentPage(1)
-                ((activity as HomeActivity?)!!.currentTabFragment as SendTabFragment).setRecipient(AddressContact(address))
-            } catch (t: Throwable) {
-                Timber.w("Unable to scan address directly to send tab")
-            }
+            (activity as? HomeActivity)?.setCurrentPage(1)
+            ((activity as? HomeActivity)?.currentTabFragment as? SendTabFragment)?.setRecipient(AddressContact(address))
         }
     }
 
@@ -289,10 +284,6 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun setOnClickDelegated(listener: View.OnClickListener) {
         binding.delegatedLayout.setOnClickListener(listener)
-    }
-
-    override fun startScanQRWithPermissions(requestCode: Int) {
-        startScanQRWithPermissionCheck(requestCode)
     }
 
     override fun onTrimMemory(level: Int) {
@@ -353,8 +344,8 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
 
     override fun startDelegate(publicKey: MinterPublicKey) {
         DelegateUnbondActivity.Builder(this, DelegateUnbondActivity.Type.Delegate)
-                .setPublicKey(publicKey)
-                .start()
+            .setPublicKey(publicKey)
+            .start()
     }
 
     override fun startConvertCoins() {
@@ -367,49 +358,12 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        onRequestPermissionsResult(requestCode, grantResults)
-    }
-
     @ProvidePresenter
     fun providePresenter(): WalletsTabPresenter {
         return presenterProvider.get()
     }
 
-    @OnShowRationale(Manifest.permission.CAMERA)
-    fun showRationaleForCamera(request: PermissionRequest) {
-        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
-                .setText(R.string.dialog_text_camera_permission)
-                .setPositiveAction(R.string.btn_ok) { d, _: Int ->
-                    request.proceed()
-                    d.dismiss()
-                }
-                .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int ->
-                    request.cancel()
-                    d.dismiss()
-                }.create()
-                .show()
-    }
-
-    @OnPermissionDenied(Manifest.permission.CAMERA)
-    fun showOpenPermissionsForCamera() {
-        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
-                .setText(R.string.dialog_text_camera_permission)
-                .setPositiveAction(R.string.btn_open_settings) { d: DialogInterface, _: Int ->
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                    intent.data = uri
-                    startActivity(intent)
-                    d.dismiss()
-                }
-                .setNegativeAction(R.string.btn_cancel)
-                .create()
-                .show()
-    }
-
-    private val pagerAdapter: PagerAdapter by lazy {
+    private val pagerAdapter: PagerAdapter by lazy(LazyThreadSafetyMode.NONE) {
         object : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getCount(): Int {
                 return 2
@@ -450,8 +404,8 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                     Timber.d("Add stories fragment")
                     try {
                         childFragmentManager.beginTransaction()
-                                .add(R.id.fragment_stories, storiesListFragment!!, "stories_list")
-                                .commit()
+                            .add(R.id.fragment_stories, storiesListFragment!!, "stories_list")
+                            .commit()
                     } catch (illegal: java.lang.IllegalStateException) {
                         Timber.w(illegal, "Unable to show stories fragment")
                     }
@@ -472,8 +426,8 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
             }
 
             childFragmentManager.beginTransaction()
-                    .remove(storiesListFragment!!)
-                    .commit()
+                .remove(storiesListFragment!!)
+                .commit()
 
             storiesListFragment = null
         }

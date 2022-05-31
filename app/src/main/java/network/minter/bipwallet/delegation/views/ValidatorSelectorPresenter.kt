@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,8 +30,8 @@ import android.content.Intent
 import moxy.InjectViewState
 import network.minter.bipwallet.apis.explorer.RepoValidators
 import network.minter.bipwallet.delegation.adapter.ValidatorSelectorAdapter
+import network.minter.bipwallet.delegation.contract.GetValidator
 import network.minter.bipwallet.delegation.contract.ValidatorSelectorView
-import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity
 import network.minter.bipwallet.delegation.ui.ValidatorSelectorActivity.Filter
 import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.exceptions.RetryListener
@@ -57,8 +57,8 @@ class ValidatorSelectorPresenter @Inject constructor() : MvpBasePresenter<Valida
 
     override fun handleExtras(intent: Intent?) {
         super.handleExtras(intent)
-        if (intent?.hasExtra(ValidatorSelectorActivity.EXTRA_FILTER) == true) {
-            filter = intent.getSerializableExtra(ValidatorSelectorActivity.EXTRA_FILTER) as Filter
+        if (intent?.hasExtra(GetValidator.EXTRA_FILTER) == true) {
+            filter = intent.getSerializableExtra(GetValidator.EXTRA_FILTER) as Filter
         }
 
         repoValidators.observe()

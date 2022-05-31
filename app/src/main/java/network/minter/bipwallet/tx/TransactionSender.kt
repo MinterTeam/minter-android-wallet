@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -31,7 +31,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
 import network.minter.bipwallet.apis.reactive.ReactiveGate.*
-
 import network.minter.bipwallet.apis.reactive.toObservable
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.blockchain.models.operational.TransactionSign

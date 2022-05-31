@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -35,7 +35,6 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.tx.adapters.TxItem
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.CoinItemBase
@@ -56,7 +55,7 @@ class TxAllViewHolder(
     fun bind(item: TxItem, myAddress: () -> MinterAddress) {
 
         binding.itemTitleType.text = item.tx.type.name
-        binding.separator.visible = true
+        T.isVisible = v = true
 
         when (item.tx.type) {
             HistoryTransaction.Type.Send -> bindSend(item, myAddress)
@@ -98,9 +97,37 @@ class TxAllViewHolder(
             /** @since minter 2.6 */
             HistoryTransaction.Type.AddLimitOrder -> bindAddLimitOrder(item)
             HistoryTransaction.Type.RemoveLimitOrder -> bindRemoveLimitOrder(item)
-            else -> {
+            /** @since minter 3.0 */
+            HistoryTransaction.Type.LockStake -> bindLockStake(item)
+            HistoryTransaction.Type.LockCoins -> bindLockCoins(item)
+            else -> bindDefault(item)
+        }
+    }
 
-            }
+    private fun bindDefault(item: TxItem) {
+        binding.apply {
+            itemTitle.setText(R.string.na)
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun bindLockStake(item: TxItem) {
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_lock_stake)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.setText(R.string.tx_lock_stake_title)
+        }
+    }
+
+    private fun bindLockCoins(item: TxItem) {
+        val data: HistoryTransaction.TxLockCoinsResult = item.tx.getData()
+
+        binding.apply {
+            itemTitleType.setText(R.string.tx_type_lock_coins)
+            itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
+            itemTitle.text = tr(R.string.label_due_block_n, data.dueBlock?.toString() ?: "n/a")
+            itemAmount.text = data.value?.humanize() ?: "n/a"
+            itemSubamount.text = data.coin?.symbol ?: "n/a"
         }
     }
 
@@ -181,7 +208,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = data.coin.symbol
             itemAmount.text = data.value.humanize()
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -193,7 +220,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = data.coin.symbol
             itemAmount.text = data.value.humanize()
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -216,7 +243,7 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_edit_candidate_commission)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.pubKey.toShortString()
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -264,7 +291,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -276,7 +303,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = tr(R.string.tx_type_price_vote_title, data.price.toString())
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -288,7 +315,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(data.avatar, R.drawable.img_avatar_create_coin)
             itemTitle.text = data.newOwner.toShortString()
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -300,7 +327,7 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_set_halt_block)
             itemTitle.text = data.height.toString()
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -312,7 +339,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -398,7 +425,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey?.toShortString() ?: "<unknown>"
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -479,7 +506,7 @@ class TxAllViewHolder(
             itemAvatar.setImageResource(R.drawable.img_avatar_multisig)
             itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
             itemAmount.text = ""
-            itemSubamount.visible = false
+            T.isVisible = v = false
         }
     }
 

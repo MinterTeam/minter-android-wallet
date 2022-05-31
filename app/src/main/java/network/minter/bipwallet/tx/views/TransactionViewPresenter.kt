@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -111,8 +111,10 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             Pair(HistoryTransaction.Type.VoteCommission, R.string.tx_type_vote_commission),
             Pair(HistoryTransaction.Type.VoteUpdate, R.string.tx_type_vote_update),
             Pair(HistoryTransaction.Type.CreateSwapPool, R.string.tx_type_create_swap_pool),
-            Pair(HistoryTransaction.Type.AddLimitOrder, R.string.tx_type_add_limit_order),
-            Pair(HistoryTransaction.Type.RemoveLimitOrder, R.string.tx_type_remove_limit_order),
+            HistoryTransaction.Type.AddLimitOrder to R.string.tx_type_add_limit_order,
+            HistoryTransaction.Type.RemoveLimitOrder to R.string.tx_type_remove_limit_order,
+            HistoryTransaction.Type.LockStake to R.string.tx_type_lock_stake,
+            HistoryTransaction.Type.LockCoins to R.string.tx_type_lock_coins,
     )
 
     private fun dumpTx(tx: HistoryTransaction?): String {
@@ -242,9 +244,9 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             HistoryTransaction.Type.EditCandidateCommission -> {
                 TxCandidateEditCommissionViewBinder(_tx!!, viewState).bind()
             }
-            HistoryTransaction.Type.MoveStake -> {
-                TxMoveStakeViewBinder(_tx!!, viewState).bind()
-            }
+//            HistoryTransaction.Type.MoveStake -> {
+//                TxMoveStakeViewBinder(_tx!!, viewState).bind()
+//            }
             HistoryTransaction.Type.MintToken,
             HistoryTransaction.Type.BurnToken -> {
                 TxTokenMintBurnViewBinder(_tx!!, viewState).bind()
@@ -268,6 +270,13 @@ class TransactionViewPresenter @Inject constructor() : MvpBasePresenter<Transact
             }
             HistoryTransaction.Type.RemoveLimitOrder -> {
                 TxLimitOrderRemoveViewBinder(_tx!!, viewState).bind()
+            }
+            // @since Minter 3.0
+            HistoryTransaction.Type.LockStake -> {
+                TxLockStakeViewBinder(_tx!!, viewState).bind()
+            }
+            HistoryTransaction.Type.LockCoins -> {
+                TxLockCoinsViewBinder(_tx!!, viewState).bind()
             }
             else -> {
                 viewState.showTo(false)

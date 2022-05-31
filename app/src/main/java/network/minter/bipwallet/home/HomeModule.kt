@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,9 +29,9 @@ package network.minter.bipwallet.home
 import androidx.lifecycle.LifecycleOwner
 import dagger.Module
 import dagger.Provides
+import network.minter.bipwallet.R
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.pools.ui.PoolsTabFragment
 import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.settings.ui.SettingsTabFragment
 import network.minter.bipwallet.wallets.ui.WalletsTabFragment
@@ -46,21 +46,15 @@ import java.lang.ref.WeakReference
 @Module
 class HomeModule(activity: HomeActivity) {
     companion object {
-        const val EXTRA_TAB = "EXTRA_TAB"
-        const val EXTRA_MENU_ID = "EXTRA_MENU_ID"
-        val TAB_COINS = WalletsTabFragment::class.java.name
-        val TAB_SENDING = SendTabFragment::class.java.name
-        val TAB_POOLS = PoolsTabFragment::class.java.name
-        val TAB_SETTINGS = SettingsTabFragment::class.java.name
         var component: HomeComponent? = null
             private set
 
         fun create(rootView: HomeActivity): HomeComponent {
-            component = DaggerHomeComponent.builder()
+            return DaggerHomeComponent.builder()
                     .walletComponent(Wallet.app())
                     .homeModule(HomeModule(rootView))
                     .build()
-            return component!!
+                    .also { component = it }
         }
 
         fun destroy() {
@@ -71,9 +65,17 @@ class HomeModule(activity: HomeActivity) {
     private val tabsClassesClient: List<Class<out HomeTabFragment>> = immutableListOf(
             WalletsTabFragment::class.java,
             SendTabFragment::class.java,
-            PoolsTabFragment::class.java,
+//            PoolsTabFragment::class.java,
             SettingsTabFragment::class.java
     )
+
+    private val tabMenuIds = setOf(
+            R.id.bottom_wallets,
+            R.id.bottom_send,
+//            R.id.bottom_pools,
+            R.id.bottom_settings,
+    )
+
     private val mActivity: WeakReference<HomeActivity> = WeakReference(activity)
 
     @Provides
@@ -88,12 +90,6 @@ class HomeModule(activity: HomeActivity) {
         return mActivity.get()!!
     }
 
-//    @Provides
-//    @HomeScope
-//    fun provideFragmentManager(activity: HomeActivity): FragmentManager {
-//        return activity.fragmentManager
-//    }
-
     @Provides
     @HomeScope
     fun provideSupportFragmentManager(activity: HomeActivity): androidx.fragment.app.FragmentManager {
@@ -103,9 +99,12 @@ class HomeModule(activity: HomeActivity) {
     @Provides
     @HomeScope
     @HomeTabsClasses
-    fun provideTabsClasses(): @JvmSuppressWildcards List<Class<out HomeTabFragment>> {
-        return tabsClassesClient
-    }
+    fun provideTabsClasses(): @JvmSuppressWildcards List<Class<out HomeTabFragment>> = tabsClassesClient
+
+    @Provides
+    @HomeScope
+    @HomeTabsMenuIds
+    fun provideMenuIds(): Set<Int> = tabMenuIds
 
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -123,23 +123,23 @@ class ExplorerEstimateVariantImpl(
                                 val inCoinFee = if (bdNull(amount)) BigDecimal.ZERO else ((res.amount * buyFee) / amount)
 
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
-                                if (bipAccount.get().amount >= buyFee) {
+                                if (bipAccount != null && bipAccount.amount >= buyFee) {
                                     Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
 
-                                    out.gasCoin = bipAccount.get().coin.id
+                                    out.gasCoin = bipAccount.coin.id
                                     out.estimate = res.amount
                                     out.calculation = String.format("%s %s", bdHuman(out.amount), sourceCoin)
 
-                                } else if (getAccount.isPresent && getAccount.get().amount >= (out.amount + inCoinFee)) {
-                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
+                                } else if (getAccount != null && getAccount.amount >= (out.amount + inCoinFee)) {
+                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.coin, MinterSDK.DEFAULT_COIN)
                                     //(0.000070727942238907*1.5)/1
-                                    out.gasCoin = getAccount.get().coin.id
+                                    out.gasCoin = getAccount.coin.id
                                     out.estimate = out.amount + inCoinFee
                                     out.calculation = String.format("%s %s", (out.amount + inCoinFee).humanize(), sourceCoin)
                                 } else {
                                     //@todo logic duplication to synchronize with iOS app
-                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                                    out.gasCoin = getAccount.get().coin.id
+                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount?.coin)
+                                    out.gasCoin = getAccount?.coin?.id
                                     out.estimate = out.amount + buyFee
                                     out.calculation = String.format("%s %s", bdHuman(out.amount + inCoinFee), sourceCoin)
                                 }
@@ -220,17 +220,17 @@ class ExplorerEstimateVariantImpl(
                                 }
 
                                 // if enough (exact) MNT ot pay fee, gas coin is MNT
-                                if (mntAccount.get().amount >= sellFee) {
+                                if (mntAccount != null && mntAccount.amount >= sellFee) {
                                     Timber.d("Enough %s to pay fee using %s", MinterSDK.DEFAULT_COIN, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = mntAccount.get().coin.id
+                                    out.gasCoin = mntAccount.coin.id
                                 }
                                 // if enough spending coin at least to pay fee
-                                else if (getAccount.isPresent && getAccount.get().bipValue >= sellFee) {
-                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.get().coin, MinterSDK.DEFAULT_COIN)
-                                    out.gasCoin = getAccount.get().coin.id
+                                else if (getAccount != null && getAccount.bipValue >= sellFee) {
+                                    Timber.d("Enough %s to pay fee using instead %s", getAccount.coin, MinterSDK.DEFAULT_COIN)
+                                    out.gasCoin = getAccount.coin.id
                                 } else {
-                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount.get().coin)
-                                    out.gasCoin = mntAccount.get().coin.id
+                                    Timber.d("Not enough balance in %s and %s to pay fee", MinterSDK.DEFAULT_COIN, getAccount?.coin)
+                                    out.gasCoin = mntAccount?.coin?.id
                                     onErrorMessage(tr(R.string.account_err_insufficient_funds), res.errorResult?.error)
                                 }
                                 onResult(out)

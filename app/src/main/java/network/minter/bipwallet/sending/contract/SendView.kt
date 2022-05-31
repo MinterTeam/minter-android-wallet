@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -69,16 +69,13 @@ interface SendView : WalletSelectorControllerView, MvpView {
     fun startExplorer(txHash: String)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startScanQR(requestCode: Int)
-
-    @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startScanQRWithPermissions(requestCode: Int)
+    fun startScanQR()
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun startAddContact(address: String, onAdded: (AddressContact) -> Unit)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startAddressBook(requestCode: Int)
+    fun startAddressBook()
     fun setRecipient(to: AddressContact)
     fun setRecipientError(error: CharSequence?)
     fun setAmountError(error: CharSequence?)

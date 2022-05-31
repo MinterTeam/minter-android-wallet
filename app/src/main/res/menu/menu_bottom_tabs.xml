@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) by MinterTeam. 2021
+  ~ Copyright (C) by MinterTeam. 2022
   ~ @link <a href="https://github.com/MinterTeam">Org Github</a>
   ~ @link <a href="https://github.com/edwardstock">Maintainer Github</a>
   ~
@@ -39,11 +39,11 @@
         android:title="@string/menu_item_send"
         />
 
-    <item
-        android:id="@+id/bottom_pools"
-        android:icon="@drawable/ic_menu_pools"
-        android:title="@string/menu_item_pools"
-        />
+<!--    <item-->
+<!--        android:id="@+id/bottom_pools"-->
+<!--        android:icon="@drawable/ic_menu_pools"-->
+<!--        android:title="@string/menu_item_pools"-->
+<!--        />-->
 
     <item
         android:id="@+id/bottom_settings"

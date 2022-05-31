@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,11 +25,11 @@
  */
 package network.minter.bipwallet.internal.storage.models
 
-import com.google.common.base.MoreObjects
 import network.minter.core.crypto.BytesData
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.PrivateKey
 import network.minter.core.crypto.PublicKey
+import network.minter.core.internal.common.Preconditions.firstNonNull
 import java.io.Serializable
 import java.util.*
 
@@ -73,7 +73,7 @@ class SecretData : Serializable, Cloneable {
         this.privateKey = privateKey
         this.publicKey = publicKey
         minterAddress = publicKey.toMinter()
-        mTitle = MoreObjects.firstNonNull(title, minterAddress.toShortString())
+        mTitle = firstNonNull(title, minterAddress.toShortString())
     }
 
     val hasTitle: Boolean

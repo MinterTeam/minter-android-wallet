@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,8 +25,6 @@
  */
 package network.minter.bipwallet.internal.storage.models
 
-import com.annimon.stream.Optional
-import com.annimon.stream.Stream
 import network.minter.bipwallet.internal.helpers.data.CollectionsHelper
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.AddressBalance
@@ -53,14 +51,12 @@ class AddressListBalancesTotal(
         return balances[i]
     }
 
-    fun find(address: MinterAddress): Optional<AddressBalanceTotal> {
-        return Stream.of(balances)
-                .filter { item: AddressBalanceTotal -> item.address != null && item.address == address }
-                .findFirst()
+    fun find(address: MinterAddress): AddressBalanceTotal? {
+        return balances.firstOrNull { it.address == address }
     }
 
     fun remove(address: MinterAddress) {
-        if (!find(address).isPresent) {
+        if (find(address) == null) {
             return
         }
 

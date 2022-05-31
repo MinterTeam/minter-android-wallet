@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,12 +27,10 @@ package network.minter.bipwallet.addressbook.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import moxy.presenter.InjectPresenter
@@ -45,15 +43,15 @@ import network.minter.bipwallet.addressbook.views.AddressBookPresenter
 import network.minter.bipwallet.databinding.ActivityAddressBookBinding
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.dialogs.ActionListener
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
-import network.minter.bipwallet.internal.system.ActivityBuilder
 import org.parceler.Parcels
 import javax.inject.Inject
 import javax.inject.Provider
 
 class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
-    @Inject lateinit var presenterProvider: Provider<AddressBookPresenter>
-    @InjectPresenter lateinit var presenter: AddressBookPresenter
+    @Inject
+    lateinit var presenterProvider: Provider<AddressBookPresenter>
+    @InjectPresenter
+    lateinit var presenter: AddressBookPresenter
 
     private lateinit var binding: ActivityAddressBookBinding
 
@@ -62,7 +60,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
     }
 
     override fun showEmpty(show: Boolean) {
-        binding.emptyText.visible = show
+        T.isVisible = v = show
     }
 
     override fun startAddContact(onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?) {
@@ -128,31 +126,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
         binding.toolbar.setOnMenuItemClickListener { item: MenuItem -> onOptionsItemSelected(item) }
     }
 
-    class Builder : ActivityBuilder {
-        private val mContact: AddressContact? = null
-
-        constructor(from: Activity) : super(from)
-        constructor(from: Fragment) : super(from)
-        constructor(from: Service) : super(from)
-
-        override fun onBeforeStart(intent: Intent) {
-            super.onBeforeStart(intent)
-            if (mContact != null) {
-                intent.putExtra(EXTRA_CONTACT, Parcels.wrap(mContact))
-            }
-        }
-
-        override fun getActivityClass(): Class<*> {
-            return AddressBookActivity::class.java
-        }
-    }
-
     companion object {
         const val EXTRA_CONTACT = "EXTRA_CONTACT"
-        fun getResult(data: Intent): AddressContact? {
-            return if (!data.hasExtra(EXTRA_CONTACT)) {
-                null
-            } else Parcels.unwrap<AddressContact>(data.getParcelableExtra(EXTRA_CONTACT))
-        }
     }
 }

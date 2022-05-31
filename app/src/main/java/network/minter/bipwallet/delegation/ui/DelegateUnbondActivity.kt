@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -53,13 +53,14 @@ import network.minter.bipwallet.R
 import network.minter.bipwallet.databinding.ActivityDelegateUnbondBinding
 import network.minter.bipwallet.delegation.adapter.autocomplete.ValidatorsAcPresenter
 import network.minter.bipwallet.delegation.contract.DelegateUnbondView
+import network.minter.bipwallet.delegation.contract.GetValidator
+import network.minter.bipwallet.delegation.contract.GetValidatorOptions
 import network.minter.bipwallet.delegation.views.DelegateUnbondPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.forms.validators.NewLineInputFilter
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
@@ -122,6 +123,12 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
     private val inputGroup = InputGroup()
     private var type: Type = Type.Delegate
     private var autocomplete: Autocomplete<ValidatorItem>? = null
+
+    private val getValidatorLauncher = registerForActivityResult(GetValidator()) {
+        it?.let {
+            presenter.onValidatorSelected(it)
+        }
+    }
 
     @ProvidePresenter
     fun providePresenter(): DelegateUnbondPresenter {
@@ -213,11 +220,6 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
                 .with(6f)
                 .with(ContextCompat.getDrawable(this, R.drawable.shape_rounded_white))
                 .build()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        presenter.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun hideValidatorOverlay() {
@@ -321,9 +323,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
     }
 
     override fun startValidatorSelector(requestCode: Int, filter: ValidatorSelectorActivity.Filter) {
-        ValidatorSelectorActivity.Builder(this)
-                .setFilter(filter)
-                .start(requestCode)
+        getValidatorLauncher.launch(GetValidatorOptions(filter))
     }
 
     override fun startAccountSelector(items: List<SelectorData<BaseCoinValue>>, listener: (SelectorData<BaseCoinValue>) -> Unit) {
@@ -346,7 +346,7 @@ class DelegateUnbondActivity : BaseMvpInjectActivity(), DelegateUnbondView {
 
     override fun onError(err: CharSequence?) {
         binding.textError.postApply {
-            it.visible = err != null
+            T.isVisible = v = err != null
             it.text = err
         }
     }

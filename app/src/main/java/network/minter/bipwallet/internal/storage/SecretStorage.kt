@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,7 +25,6 @@
  */
 package network.minter.bipwallet.internal.storage
 
-import com.annimon.stream.Stream
 import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.internal.common.Preconditions
 import network.minter.bipwallet.internal.common.Preconditions.checkNotNull
@@ -38,7 +37,6 @@ import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.PrivateKey
 import java.security.SecureRandom
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * minter-android-wallet. 2018
@@ -148,7 +146,7 @@ class SecretStorage(private val mStorage: KVStorage) {
         get() {
             val src = secretsSafe
             val main = getSecret(mainWallet)
-            val out = Stream.of(src.values).toList()
+            val out = src.values.toList()
 
             Collections.sort(out, Comparator { av, bv ->
                 val a = av.date

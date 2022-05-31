@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,14 +27,11 @@ package network.minter.bipwallet.internal.helpers.data
 
 import android.os.Bundle
 import android.util.SparseArray
-import com.annimon.stream.Optional
-import com.annimon.stream.Stream
 import network.minter.bipwallet.internal.Wallet
 import network.minter.core.MinterSDK
 import network.minter.explorer.models.BaseCoinValue
 import network.minter.explorer.models.CoinBalance
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * minter-android-wallet. 2020
@@ -76,7 +73,7 @@ object CollectionsHelper {
     @SafeVarargs
     fun <C> asList(vararg items: C): List<C> {
         val arrayList: MutableList<C> = ArrayList(items.size)
-        Stream.of(*items).forEach { e: C -> arrayList.add(e) }
+        items.forEach { e: C -> arrayList.add(e) }
         return arrayList
     }
 
@@ -139,16 +136,14 @@ object CollectionsHelper {
     @JvmStatic
     fun <K, V> topValue(map: HashMap<K, V>): V {
         if (map.size == 0) throw IndexOutOfBoundsException("Trying to get sw value from empty map")
-        return Stream
-                .of(map.values)
-                .toList()[0]
+        return map.values.first()
     }
 
     @JvmStatic
     fun <K, V> topValue(list: HashMap<K, V>, defaultValue: V): V {
-        return if (list.size == 0) defaultValue else Stream
-                .of(list.values)
-                .toList()[0]
+        return if (list.size == 0)
+            defaultValue
+        else list.values.first()
     }
 
     @JvmStatic
@@ -211,14 +206,14 @@ object CollectionsHelper {
         return out
     }
 
-    fun <T> Iterable<T>.firstOptional(predicate: (T) -> Boolean): Optional<T> {
-        for (element in this) {
-            if (predicate(element)) {
-                return Optional.of(element)
-            }
-        }
-        return Optional.empty()
-    }
+//    fun <T> Iterable<T>.firstOptional(predicate: (T) -> Boolean): Optional<T> {
+//        for (element in this) {
+//            if (predicate(element)) {
+//                return Optional.of(element)
+//            }
+//        }
+//        return Optional.empty()
+//    }
 
     interface IOFunc<Input, Output> {
         fun apply(input: Input): Output

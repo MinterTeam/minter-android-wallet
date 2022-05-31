@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -45,10 +45,8 @@ import network.minter.bipwallet.internal.dialogs.WalletProgressDialog
 import network.minter.bipwallet.internal.exceptions.ErrorManager
 import network.minter.bipwallet.internal.helpers.MathHelper.addPercent
 import network.minter.bipwallet.internal.helpers.MathHelper.asBigDecimal
-import network.minter.bipwallet.internal.helpers.MathHelper.asCurrency
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.MathHelper.isNotZero
-import network.minter.bipwallet.internal.helpers.MathHelper.plain
 import network.minter.bipwallet.internal.helpers.MathHelper.scaleUp
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
@@ -103,7 +101,7 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
     private var coin1: CoinItemBase? = null
     private var amount0: BigDecimal = ZERO
     private var amount1: BigDecimal = ZERO
-    private var slippage: BigDecimal = BigDecimal("5.0")
+    private var slippage: BigDecimal = BigDecimal("3.0")
     private var maxAmount: BigDecimal = BigDecimal("0")
     private var coin0Account: CoinBalance? = null
     private var coin1Account: CoinBalance? = null
@@ -265,11 +263,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
     private fun setupData() {
         viewState.setCoin0(amount0, coin0!!.symbol)
         viewState.setCoin1(amount1, coin1!!.symbol)
-        viewState.setSlippage(slippage.asCurrency())
-        viewState.setMaxAmount(maxAmount.plain())
-
-        viewState.setSlippageLabel(tr(R.string.label_slippage, coin1!!.symbol))
-        viewState.setMaxAmountLabel(tr(R.string.label_max_amount_spend, coin1!!.symbol))
     }
 
     private fun checkEnoughBalance() {
@@ -285,11 +278,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
             viewState.setCoin1Error(tr(R.string.account_err_insufficient_funds_for_amount, coin1Amount.humanize(), coin1!!.symbol))
         } else {
             viewState.setCoin1Error(null)
-        }
-        if (maxAmount.scaleUp() > coin1Amount) {
-            viewState.setMaxAmountError(tr(R.string.account_err_insufficient_funds_for_amount, coin1Amount.humanize(), coin1!!.symbol))
-        } else {
-            viewState.setMaxAmountError(null)
         }
     }
 
@@ -310,12 +298,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
                 R.id.input_coin1 -> {
                     handleCoin1Input(sNum)
                 }
-                R.id.input_slippage -> {
-                    handleSlippageInput(sNum)
-                }
-                R.id.input_max_spend -> {
-                    handleMaxAmountInput(sNum)
-                }
             }
             viewState.setEnableSubmit(valid && coin0Account?.amount.isNotZero() && coin1Account?.amount.isNotZero())
         }
@@ -328,7 +310,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         maxAmount = amount1.addPercent(slippage)
 
         viewState.setCoin1(amount1, coin1!!.symbol)
-        viewState.setMaxAmount(maxAmount.plain())
         checkEnoughBalance()
 
         if (!clickedUseMaxCoin0.get()) {
@@ -344,7 +325,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         maxAmount = amount1.addPercent(slippage)
 
         viewState.setCoin0(amount0, coin0!!.symbol)
-        viewState.setMaxAmount(maxAmount.plain())
 
         checkEnoughBalance()
 
@@ -353,36 +333,6 @@ class PoolAddLiquidityPresenter @Inject constructor() : MvpBasePresenter<PoolAdd
         }
 
         clickedUseMaxCoin0.set(false)
-    }
-
-    private fun handleSlippageInput(num: BigDecimal) {
-        slippage = num.setScale(18, RoundingMode.HALF_UP)
-        maxAmount = amount1.setScale(18, RoundingMode.HALF_UP).addPercent(slippage)
-
-        viewState.setMaxAmount(maxAmount.plain())
-
-        if (slippage > BigDecimal("100.00")) {
-            viewState.setSlippageError(tr(R.string.input_pool_error_slippage_exceed))
-        }
-
-        checkEnoughBalance()
-    }
-
-    private fun handleMaxAmountInput(num: BigDecimal) {
-        maxAmount = num
-        if (maxAmount < amount1) {
-            maxAmount = amount1
-            viewState.setMaxAmount(maxAmount.plain())
-        }
-
-        slippage = if (maxAmount.isNotZero() && amount1.isNotZero()) {
-            ((maxAmount.scaleUp().divide(amount1.scaleUp(), RoundingMode.HALF_UP)) * BigDecimal("100.0")) - BigDecimal("100.0")
-        } else {
-            ZERO
-        }
-        viewState.setSlippage(slippage.asCurrency())
-
-        checkEnoughBalance()
     }
 
     private fun onSubmit() {

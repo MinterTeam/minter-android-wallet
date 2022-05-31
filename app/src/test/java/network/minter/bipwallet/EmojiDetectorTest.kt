@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,9 +26,9 @@
 
 package network.minter.bipwallet
 
+import junit.framework.Assert.assertEquals
 import network.minter.bipwallet.internal.helpers.EmojiDetector
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import org.junit.Test
 
 
 /**

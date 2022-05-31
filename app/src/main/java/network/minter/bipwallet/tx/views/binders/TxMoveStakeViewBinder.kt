@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -44,10 +44,10 @@ class TxMoveStakeViewBinder(
             it.inflateDetails(R.layout.tx_details_move_stake) { view ->
                 val b = TxDetailsMoveStakeBinding.bind(view)
                 val data: HistoryTransaction.TxMoveStakeResult = tx.getData()
-                b.valueCoin.text = data.coin.symbol
-                b.valueStake.text = data.stake.humanize()
-                b.valueFrom.text = data.from.toString()
-                b.valueTo.text = data.to.toString()
+                b.valueCoin.text = data.coin?.symbol?: ""
+                b.valueStake.text = data.stake?.humanize() ?: ""
+                b.valueFrom.text = data.from?.toString() ?:""
+                b.valueTo.text = data.to?.toString() ?:""
             }
         }
     }

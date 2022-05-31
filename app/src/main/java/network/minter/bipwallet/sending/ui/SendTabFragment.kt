@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,14 +25,11 @@
  */
 package network.minter.bipwallet.sending.ui
 
-import android.Manifest
 import android.animation.Animator
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -47,22 +44,19 @@ import io.reactivex.schedulers.Schedulers
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
-import network.minter.bipwallet.BuildConfig
 import network.minter.bipwallet.R
+import network.minter.bipwallet.addressbook.contract.GetAddressBookContact
 import network.minter.bipwallet.addressbook.models.AddressContact
-import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.addressbook.ui.AddressContactEditDialog
 import network.minter.bipwallet.databinding.FragmentTabSendBinding
 import network.minter.bipwallet.delegation.ui.DelegateUnbondActivity
 import network.minter.bipwallet.home.HomeModule
 import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.internal.Wallet
-import network.minter.bipwallet.internal.dialogs.ConfirmDialog
 import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator
@@ -73,6 +67,7 @@ import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.account.SelectorData
 import network.minter.bipwallet.sending.account.SelectorDialog
 import network.minter.bipwallet.sending.adapters.RecipientListAdapter
+import network.minter.bipwallet.sending.contract.QRLauncher
 import network.minter.bipwallet.sending.contract.SendView
 import network.minter.bipwallet.sending.views.SendTabPresenter
 import network.minter.bipwallet.services.livebalance.broadcast.RTMBlockReceiver
@@ -84,7 +79,6 @@ import network.minter.bipwallet.wallets.ui.WalletsTopRecolorHelper
 import network.minter.bipwallet.wallets.utils.LastBlockHandler
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.explorer.models.CoinBalance
-import permissions.dispatcher.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -93,16 +87,49 @@ import javax.inject.Provider
  * minter-android-wallet. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@RuntimePermissions
 class SendTabFragment : HomeTabFragment(), SendView {
-    @Inject lateinit var presenterProvider: Provider<SendTabPresenter>
-    @InjectPresenter lateinit var presenter: SendTabPresenter
+    @Inject
+    lateinit var presenterProvider: Provider<SendTabPresenter>
+    @InjectPresenter
+    lateinit var presenter: SendTabPresenter
 
     private val inputGroup: InputGroup = InputGroup()
     private var recipientListAdapter: RecipientListAdapter? = null
 
     private lateinit var binding: FragmentTabSendBinding
     private var tabIsActive: Boolean = false
+
+    private val qrLauncher = QRLauncher(this, { requireActivity() }) {
+        presenter.handleQRResult(it)
+    }
+//    private var launchQRScannerDeniedDialog: Dialog? = null
+//    private var launchQRScannerRationaleDialog: Dialog? = null
+//    private val launchQRScanner = registerForActivityResult(GetQRResultString()) {
+//        presenter.handleQRResult(it)
+//    }
+//    private val launchQRScannerPermissions = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+//        if (isGranted) {
+//            launchQRScanner.launch(Unit)
+//        } else {
+//            launchQRScannerDeniedDialog = ConfirmDialog.Builder(requireContext(), R.string.dialog_title_camera_permission)
+//                    .setText(R.string.dialog_text_camera_permission)
+//                    .setPositiveAction(R.string.btn_open_settings) { d: DialogInterface, _: Int ->
+//                        val intent = Intent()
+//                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+//                        val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+//                        intent.data = uri
+//                        startActivity(intent)
+//                        d.dismiss()
+//                    }
+//                    .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int -> d.dismiss() }
+//                    .create()
+//                    .also { it.show() }
+//        }
+//    }
+
+    private val launchAddressBook = registerForActivityResult(GetAddressBookContact()) {
+        presenter.handleAddressBookResult(it)
+    }
 
     override fun onTabSelected() {
         super.onTabSelected()
@@ -121,12 +148,12 @@ class SendTabFragment : HomeTabFragment(), SendView {
     }
 
     override fun onAttach(context: Context) {
-        HomeModule.component!!.inject(this)
+        HomeModule.component?.inject(this)
         super.onAttach(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        HomeModule.component!!.inject(this)
+        HomeModule.component?.inject(this)
         super.onCreate(savedInstanceState)
     }
 
@@ -197,6 +224,13 @@ class SendTabFragment : HomeTabFragment(), SendView {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        qrLauncher.release()
+//        launchQRScannerRationaleDialog?.dismiss().also { launchQRScannerRationaleDialog = null }
+//        launchQRScannerDeniedDialog?.dismiss().also { launchQRScannerDeniedDialog = null }
+    }
+
     override fun setMaxAmountValidator(coinSupplier: () -> CoinBalance?) {
         inputGroup.addValidator(binding.inputAmount, CustomValidator {
             if (it.isNullOrEmpty() || coinSupplier() == null) {
@@ -210,7 +244,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_scan_tx) {
-            SingleCallHandler.call(item) { startScanQRWithPermissions(REQUEST_CODE_QR_SCAN_TX) }
+            SingleCallHandler.call(item) { startScanQR() }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -343,19 +377,32 @@ class SendTabFragment : HomeTabFragment(), SendView {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Wallet.urlExplorerFront() + "/transactions/" + txHash)))
     }
 
-    @NeedsPermission(Manifest.permission.CAMERA)
-    override fun startScanQR(requestCode: Int) {
-        val i = Intent(activity, QRCodeScannerActivity::class.java)
-        requireActivity().startActivityForResult(i, requestCode)
+    override fun startScanQR() {
+        qrLauncher.launch()
+//        val permission = Manifest.permission.CAMERA
+//        when {
+//            ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED -> {
+//                launchQRScanner.launch(Unit)
+//            }
+//            shouldShowRequestPermissionRationale(permission) -> {
+//                launchQRScannerRationaleDialog = ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
+//                        .setText(R.string.dialog_text_camera_permission)
+//                        .setPositiveAction(R.string.btn_ok) { d, _ ->
+//                            launchQRScannerPermissions.launch(permission)
+//                            d.dismiss()
+//                        }
+//                        .setNegativeAction(R.string.btn_cancel) { d, _ -> d.dismiss() }
+//                        .create()
+//                        .also { it.show() }
+//            }
+//            else -> {
+//                launchQRScannerPermissions.launch(permission)
+//            }
+//        }
     }
 
-    override fun startScanQRWithPermissions(requestCode: Int) {
-        startScanQRWithPermissionCheck(requestCode)
-    }
-
-    override fun startAddressBook(requestCode: Int) {
-        AddressBookActivity.Builder(this)
-                .start(requestCode)
+    override fun startAddressBook() {
+        launchAddressBook.launch(Unit)
     }
 
     override fun setRecipient(to: AddressContact) {
@@ -379,14 +426,14 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     override fun setCommonError(error: CharSequence?) {
         binding.textError.post {
-            binding.textError.visible = !error.isNullOrEmpty()
+            T.isVisible = v = !error.isNullOrEmpty()
             binding.textError.text = error
         }
     }
 
     override fun setError(error: Int) {
         binding.textError.post {
-            binding.textError.visible = error != 0
+            T.isVisible = v = error != 0
             binding.textError.setText(error)
         }
     }
@@ -430,12 +477,12 @@ class SendTabFragment : HomeTabFragment(), SendView {
                     .alpha(if (show) 1f else 0f)
                     .setListener(object : Animator.AnimatorListener {
                         override fun onAnimationEnd(animation: Animator?) {
-                            it.visible = show
+                            T.isVisible = v = show
                         }
 
                         override fun onAnimationRepeat(animation: Animator?) {}
                         override fun onAnimationCancel(animation: Animator?) {
-                            it.visible = show
+                            T.isVisible = v = show
                         }
 
                         override fun onAnimationStart(animation: Animator?) {}
@@ -444,17 +491,17 @@ class SendTabFragment : HomeTabFragment(), SendView {
                     .start()
 
         }
-        binding.balanceProgress.visible = show
+        T.isVisible = v = show
     }
 
     override fun hideAutocomplete() {
         binding.inputRecipient.postApply { it.input.dismissDropDown() }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        presenter.onActivityResult(requestCode, resultCode, data)
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        presenter.onActivityResult(requestCode, resultCode, data)
+//    }
 
     override fun setFormValidationListener(listener: (Boolean) -> Unit) {
         inputGroup.addFormValidateListener(listener)
@@ -464,43 +511,6 @@ class SendTabFragment : HomeTabFragment(), SendView {
         SelectorDialog.Builder<CoinBalance>(requireActivity(), R.string.dialog_title_choose_coin)
                 .setItems(accounts)
                 .setOnClickListener(clickListener)
-                .create()
-                .show()
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        onRequestPermissionsResult(requestCode, grantResults)
-    }
-
-    @OnShowRationale(Manifest.permission.CAMERA)
-    fun showRationaleForCamera(request: PermissionRequest) {
-        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
-                .setText(R.string.dialog_text_camera_permission)
-                .setPositiveAction(R.string.btn_ok) { d, _ ->
-                    request.proceed()
-                    d.dismiss()
-                }
-                .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int ->
-                    request.cancel()
-                    d.dismiss()
-                }.create()
-                .show()
-    }
-
-    @OnPermissionDenied(Manifest.permission.CAMERA)
-    fun showOpenPermissionsForCamera() {
-        ConfirmDialog.Builder(requireActivity(), R.string.dialog_title_camera_permission)
-                .setText(R.string.dialog_text_camera_permission)
-                .setPositiveAction(R.string.btn_open_settings) { d: DialogInterface, _: Int ->
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    val uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                    intent.data = uri
-                    startActivity(intent)
-                    d.dismiss()
-                }
-                .setNegativeAction(R.string.btn_cancel) { d: DialogInterface, _: Int -> d.dismiss() }
                 .create()
                 .show()
     }

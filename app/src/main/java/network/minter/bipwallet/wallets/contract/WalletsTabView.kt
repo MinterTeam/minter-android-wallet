@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -66,9 +66,6 @@ interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
     fun startExternalTransaction(rawData: String)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startScanQRWithPermissions(requestCode: Int)
-
-    @StateStrategyType(OneExecutionStateStrategy::class)
     fun startTransactionList()
 
     @StateStrategyType(OneExecutionStateStrategy::class)
@@ -82,7 +79,7 @@ interface WalletsTabView : MvpView, WalletSelectorControllerView, ProgressView {
     fun startTab(tab: Int)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun startScanQR(requestCode: Int)
+    fun startScanQR()
 
     fun notifyUpdated()
 

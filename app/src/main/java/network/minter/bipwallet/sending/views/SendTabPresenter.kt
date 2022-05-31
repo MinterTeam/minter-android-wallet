@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,13 +28,10 @@ package network.minter.bipwallet.sending.views
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import com.annimon.stream.Optional
 import com.edwardstock.inputfield.form.InputWrapper
-import com.google.common.base.MoreObjects.firstNonNull
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
@@ -45,7 +42,6 @@ import moxy.InjectViewState
 import network.minter.bipwallet.R
 import network.minter.bipwallet.addressbook.db.AddressBookRepository
 import network.minter.bipwallet.addressbook.models.AddressContact
-import network.minter.bipwallet.addressbook.ui.AddressBookActivity
 import network.minter.bipwallet.analytics.AppEvent
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
@@ -74,20 +70,25 @@ import network.minter.bipwallet.internal.storage.models.AddressListBalancesTotal
 import network.minter.bipwallet.internal.system.SimpleTextWatcher
 import network.minter.bipwallet.sending.account.selectorDataFromCoins
 import network.minter.bipwallet.sending.contract.SendView
-import network.minter.bipwallet.sending.ui.QRCodeScannerActivity
-import network.minter.bipwallet.sending.ui.SendTabFragment
 import network.minter.bipwallet.sending.ui.dialogs.TxSendStartDialog
 import network.minter.bipwallet.sending.ui.dialogs.TxSendSuccessDialog
 import network.minter.bipwallet.tx.contract.TxInitData
 import network.minter.bipwallet.wallets.views.WalletSelectorController
 import network.minter.blockchain.models.TransactionCommissionValue
-import network.minter.blockchain.models.operational.*
+import network.minter.blockchain.models.operational.OperationInvalidDataException
+import network.minter.blockchain.models.operational.OperationType
+import network.minter.blockchain.models.operational.Transaction
+import network.minter.blockchain.models.operational.TransactionSign
 import network.minter.core.MinterSDK.DEFAULT_COIN
 import network.minter.core.MinterSDK.DEFAULT_COIN_ID
 import network.minter.core.crypto.MinterAddress
 import network.minter.core.crypto.MinterPublicKey
 import network.minter.core.crypto.PrivateKey
-import network.minter.explorer.models.*
+import network.minter.core.internal.common.Preconditions.firstNonNull
+import network.minter.explorer.models.CoinBalance
+import network.minter.explorer.models.GateResult
+import network.minter.explorer.models.PushResult
+import network.minter.explorer.models.TxCount
 import network.minter.explorer.repo.*
 import timber.log.Timber
 import java.math.BigDecimal
@@ -111,29 +112,54 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         private var PAYLOAD_FEE = BigDecimal.valueOf(0.200)
     }
 
-    @Inject lateinit var secretStorage: SecretStorage
-    @Inject lateinit var session: AuthSession
-    @Inject lateinit var cachedTxRepo: RepoTransactions
-    @Inject lateinit var accountStorage: RepoAccounts
-    @Inject lateinit var coinRepo: ExplorerCoinsRepository
-    @Inject lateinit var validatorsRepo: ExplorerValidatorsRepository
-    @Inject lateinit var gasRepo: GateGasRepository
-    @Inject lateinit var estimateRepo: GateEstimateRepository
-    @Inject lateinit var gateTxRepo: GateTransactionRepository
-    @Inject lateinit var addressBookRepo: AddressBookRepository
-    @Inject lateinit var walletSelectorController: WalletSelectorController
-    @Inject lateinit var errorManager: ErrorManager
-    @Inject lateinit var initDataRepo: TxInitDataRepository
+    @Inject
+    lateinit var secretStorage: SecretStorage
+
+    @Inject
+    lateinit var session: AuthSession
+
+    @Inject
+    lateinit var cachedTxRepo: RepoTransactions
+
+    @Inject
+    lateinit var accountStorage: RepoAccounts
+
+    @Inject
+    lateinit var coinRepo: ExplorerCoinsRepository
+
+    @Inject
+    lateinit var validatorsRepo: ExplorerValidatorsRepository
+
+    @Inject
+    lateinit var gasRepo: GateGasRepository
+
+    @Inject
+    lateinit var estimateRepo: GateEstimateRepository
+
+    @Inject
+    lateinit var gateTxRepo: GateTransactionRepository
+
+    @Inject
+    lateinit var addressBookRepo: AddressBookRepository
+
+    @Inject
+    lateinit var walletSelectorController: WalletSelectorController
+
+    @Inject
+    lateinit var errorManager: ErrorManager
+
+    @Inject
+    lateinit var initDataRepo: TxInitDataRepository
 
     private var fromAccount: CoinBalance? = null
     private var sendAmount: BigDecimal? = null
-    private var mRecipient: AddressContact? = null
+    private var recipient: AddressContact? = null
     private var mAvatar: String? = null
 
     private val useMax = AtomicBoolean(false)
     private val clickedUseMax = AtomicBoolean(false)
-    private var mInputChange: BehaviorSubject<String>? = null
-    private var mAddressChange: BehaviorSubject<String>? = null
+    private var inputChangeSubject: BehaviorSubject<String>? = null
+    private var addressChangeSubject: BehaviorSubject<String>? = null
     private var mGasCoinId = DEFAULT_COIN_ID
     private var gasPrice = BigInteger("1")
     private var initFeeData: TxInitData? = null
@@ -174,10 +200,10 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
         viewState.setOnSubmit { onSubmit() }
         viewState.setOnClickMaximum { v -> onClickMaximum(v) }
-        viewState.setOnClickAddPayload { v -> onClickAddPayload(v) }
-        viewState.setOnClickClearPayload { onClickClearPayload() }
+        viewState.setOnClickAddPayload { viewState.showPayload() }
+        viewState.setOnClickClearPayload { viewState.hidePayload() }
         viewState.setPayloadChangeListener(mPayloadChangeListener)
-        viewState.setOnContactsClickListener { onClickContacts() }
+        viewState.setOnContactsClickListener { viewState.startAddressBook() }
         viewState.setRecipientAutocompleteItemClickListener { contact: AddressContact, pos: Int ->
             onAutocompleteSelected(contact, pos)
         }
@@ -220,23 +246,23 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
      * and change input
      */
     private fun checkRecipientContactExists() {
-        if (mRecipient == null || mRecipient?.id == 0) {
+        if (recipient == null || recipient?.id == 0) {
             return
         }
 
-        addressBookRepo.exist(mRecipient!!)
+        addressBookRepo.exist(recipient!!)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
                             if (!it) {
-                                val contact = mRecipient!!
+                                val contact = recipient!!
                                 contact.id = 0
                                 contact.name = contact.address
                                 handleAutocomplete = false
                                 viewState.setRecipientAutocompleteItems(ArrayList(0))
-                                mRecipient = contact
-                                viewState.setRecipient(mRecipient!!)
+                                recipient = contact
+                                viewState.setRecipient(recipient!!)
                                 handleAutocomplete = true
                             }
                         },
@@ -245,62 +271,46 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) {
-            return
+    fun handleQRResult(result: String?) {
+        result?.let {
+            val isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
+            val isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
+            recipient = AddressContact(result)
+            when {
+                isMxAddress -> recipient?.let {
+                    it.type = AddressContact.AddressType.Address
+                    viewState.setRecipient(it)
+                }
+                isMpAddress -> viewState.startDelegate(MinterPublicKey(result))
+                else -> {
+                    try {
+                        viewState.startExternalTransaction(result)
+                    } catch (t: Throwable) {
+                        Timber.w(t, "Unable to parse remote transaction: %s", result)
+                        viewState.startDialog { ctx ->
+                            ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_scan_qr)
+                                    .setText(tr(R.string.dialog_title_err_invalid_deeplink), t.message)
+                                    .setPositiveAction(R.string.btn_close)
+                                    .create()
+                        }
+                    }
+                }
+            }
         }
-        //todo: refactor below
-        if (requestCode == REQUEST_CODE_QR_SCAN_ADDRESS) {
-            if (data != null && data.hasExtra(QRCodeScannerActivity.RESULT_TEXT)) {
-                //Getting the passed result
-                val result = data.getStringExtra(QRCodeScannerActivity.RESULT_TEXT)
-                if (result != null) {
-                    val isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
-                    val isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
-                    mRecipient = AddressContact(result)
-                    if (isMxAddress) {
-                        mRecipient!!.type = AddressContact.AddressType.Address
-                        viewState.setRecipient(mRecipient!!)
-                    } else if (isMpAddress) {
-                        viewState.startDelegate(
-                                MinterPublicKey(result)
-                        )
-                    }
-                }
-            }
-        } else if (requestCode == SendTabFragment.REQUEST_CODE_QR_SCAN_TX) {
-            val result = data?.getStringExtra(QRCodeScannerActivity.RESULT_TEXT)
-            if (result != null) {
-                val isMxAddress = result.matches(MinterAddress.ADDRESS_PATTERN.toRegex())
-                val isMpAddress = result.matches(MinterPublicKey.PUB_KEY_PATTERN.toRegex())
-                if (isMxAddress || isMpAddress) {
-                    onActivityResult(REQUEST_CODE_QR_SCAN_ADDRESS, resultCode, data)
-                    return
-                }
-                try {
-                    viewState.startExternalTransaction(result)
-                } catch (t: Throwable) {
-                    Timber.w(t, "Unable to parse remote transaction: %s", result)
-                    viewState.startDialog { ctx ->
-                        ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_scan_qr)
-                                .setText(tr(R.string.dialog_title_err_invalid_deeplink), t.message)
-                                .setPositiveAction(R.string.btn_close)
-                                .create()
-                    }
-                }
-            }
-        } else if (requestCode == REQUEST_CODE_ADDRESS_BOOK_SELECT) {
-            val contact = AddressBookActivity.getResult(data!!) ?: return
+    }
+
+    fun handleAddressBookResult(result: AddressContact?) {
+        result?.let { contact ->
             handleAutocomplete = false
             viewState.setRecipientAutocompleteItems(ArrayList(0))
-            mRecipient = contact
-            if (mRecipient!!.id == 0) {
-                mRecipient!!.name = mRecipient!!.address
+            recipient = contact
+            if (recipient!!.id == 0) {
+                recipient!!.name = recipient!!.address
             }
-            viewState.setRecipient(mRecipient!!)
+            viewState.setRecipient(recipient!!)
             handleAutocomplete = true
         }
+
     }
 
     override fun onFirstViewAttach() {
@@ -312,14 +322,19 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                 .joinToUi()
                 .subscribe(
                         { res: AddressListBalancesTotal ->
-                            if (!res.isEmpty) {
+                            res.takeUnless { it.isEmpty }.let {
                                 val acc = accountStorage.entity.mainWallet
                                 if (mLastAccount != null) {
-                                    onAccountSelected(acc.findCoin(mLastAccount!!.coin.id).orElse(acc.coinsList[0]))
+                                    mLastAccount?.let { account ->
+                                        acc.findCoin(account.coin.id).orElse(acc.coinsList[0])?.let { balance ->
+                                            onAccountSelected(balance)
+                                        }
+                                    }
                                 } else {
-                                    onAccountSelected(acc.coinsList[0])
+                                    acc.coinsList.firstOrNull()?.let { onAccountSelected(it) }
                                 }
                             }
+
                             viewState.showBalanceProgress(false)
                         },
                         { t: Throwable ->
@@ -328,29 +343,32 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                 )
                 .disposeOnDestroy()
 
-        mInputChange = BehaviorSubject.create()
-        mAddressChange = BehaviorSubject.create()
+        inputChangeSubject = BehaviorSubject.create()
+        addressChangeSubject = BehaviorSubject.create()
 
-        mInputChange!!
-                .toFlowable(BackpressureStrategy.LATEST)
-                .debounce(200, TimeUnit.MILLISECONDS)
-                .subscribe(
-                        { amount: String? ->
-                            onAmountChanged(amount)
-                        },
-                        { t ->
-                            Timber.e(t, "Unable to handle amount change")
-                        }
-                )
-                .disposeOnDestroy()
 
-        mAddressChange!!
-                .toFlowable(BackpressureStrategy.LATEST)
-                .debounce(200, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { address: String -> onAddressChanged(address) }
-                .disposeOnDestroy()
+        inputChangeSubject?.let {
+            it.toFlowable(BackpressureStrategy.LATEST)
+                    .debounce(200, TimeUnit.MILLISECONDS)
+                    .subscribe(
+                            { amount: String? ->
+                                onAmountChanged(amount)
+                            },
+                            { t ->
+                                Timber.e(t, "Unable to handle amount change")
+                            }
+                    )
+                    .disposeOnDestroy()
+        }
+
+        addressChangeSubject?.let {
+            it.toFlowable(BackpressureStrategy.LATEST)
+                    .debounce(200, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { address: String -> onAddressChanged(address) }
+                    .disposeOnDestroy()
+        }
 
         checkEnableSubmit()
 
@@ -369,18 +387,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         }
     }
 
-    private fun onClickClearPayload() {
-        viewState.hidePayload()
-    }
-
-    private fun onClickContacts() {
-        viewState.startAddressBook(REQUEST_CODE_ADDRESS_BOOK_SELECT)
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun onClickAddPayload(view: View) {
-        viewState.showPayload()
-    }
 
     private fun loadAndSetFee() {
         initDataRepo.loadFeeWithTx()
@@ -389,7 +395,9 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                 .observeOn(Schedulers.io())
                 .subscribe(
                         { res: TxInitData ->
-                            gasPrice = res.gas!!
+                            res.gas?.let {
+                                gasPrice = it
+                            }
                             PAYLOAD_FEE = res.priceCommissions.payloadByte.humanizeDecimal()
                             initFeeData = res
                             setupFee()
@@ -403,6 +411,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
     private fun setupFee() {
         if (initFeeData != null) {
+            // if fee represented not in BIP
             if (initFeeData?.gasRepresentingCoin?.id != DEFAULT_COIN_ID) {
                 sendFee = initFeeData!!.priceCommissions.send.humanizeDecimal().multiply(gasPrice.toBigDecimal())
                 sendFee = sendFee!! + payloadFee
@@ -420,7 +429,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                 viewState.setFee(fee)
             }
         }
-
     }
 
     private val payloadFee: BigDecimal
@@ -431,7 +439,6 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
     private val sendFeeBIP: BigDecimal
         get() = (sendFee ?: OperationType.SendCoin.fee).multiply(initFeeData!!.gasBaseCoinRate)
-
 
     private fun checkEnoughBalance(amount: BigDecimal): Boolean {
         if (fromAccount!!.coin!!.id != DEFAULT_COIN_ID) {
@@ -461,7 +468,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             viewState.setFee("")
         } else {
             setupFee()
-            if (mRecipient != null) {
+            if (recipient != null) {
                 viewState.setRecipientError(null)
             }
 
@@ -470,7 +477,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
     private fun onSubmit() {
         var valid = true
-        if (mRecipient == null) {
+        if (recipient == null) {
             viewState.setRecipientError(tr(R.string.input_validator_recipient_required))
             valid = false
         }
@@ -483,7 +490,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             return
         }
         analytics.send(AppEvent.SendCoinsSendButton)
-        mAvatar = mRecipient!!.avatar
+        mAvatar = recipient!!.avatar
         startSendDialog()
     }
 
@@ -494,7 +501,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
 
                 val dialog = TxSendStartDialog.Builder(ctx, R.string.tx_send_overall_title)
                         .setAmount(sendAmount)
-                        .setRecipientName(mRecipient!!.name)
+                        .setRecipientName(recipient!!.name)
                         .setCoin(fromAccount!!.coin.symbol)
                         .setPositiveAction(R.string.btn_confirm) { d, _ ->
                             Wallet.app().sounds().play(R.raw.bip_beep_digi_octave)
@@ -554,8 +561,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         }
     }
 
-    private fun findAccountByCoin(coin: BigInteger): Optional<CoinBalance> {
-        return accountStorage.entity.mainWallet.findCoin(coin)
+    private fun findAccountByCoin(coin: BigInteger): CoinBalance? {
+        return accountStorage.entity.mainWallet.findCoin(coin)?.get()
     }
 
     @Throws(OperationInvalidDataException::class)
@@ -571,7 +578,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         preTx = builder
                 .sendCoin()
                 .setCoinId(fromAccount!!.coin.id)
-                .setTo(mRecipient!!.address)
+                .setTo(recipient!!.address)
                 .setValue(sendAmount)
                 .build()
 
@@ -591,7 +598,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
         tx = builder
                 .sendCoin()
                 .setCoinId(fromAccount!!.coin.id)
-                .setTo(mRecipient!!.address)
+                .setTo(recipient!!.address)
                 .setValue(amountToSend)
                 .build()
 
@@ -637,37 +644,36 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             dialog.setCancelable(false)
 
             // BIP account exists anyway
-            val baseAccount = findAccountByCoin(DEFAULT_COIN_ID).get()
+            val baseAccount = findAccountByCoin(DEFAULT_COIN_ID)
             // this is the edge case, when coin balance created after some error
-            if (baseAccount.address == null) {
+            if (baseAccount?.address == null) {
                 return@startDialog ConfirmDialog.Builder(ctx, R.string.dialog_title_err_unable_to_send_tx)
                         .setText(R.string.dialog_text_err_cant_get_wallet_balance)
                         .setPositiveAction(R.string.btn_close)
                         .create()
             }
             val sendAccount = fromAccount
-            val isBaseAccount = sendAccount!!.coin.id == DEFAULT_COIN_ID
-            val enoughBaseForFee: Boolean
+            val isBaseAccount = sendAccount?.coin?.id == DEFAULT_COIN_ID
 
             // default coin for pay fee - MNT (base coin)
             val txFeeValue = GateResult<TransactionCommissionValue>()
             txFeeValue.result = TransactionCommissionValue()
             txFeeValue.result.value = feeNormalized
-            enoughBaseForFee = baseAccount.amount >= fee
+            val enoughBaseForFee: Boolean = baseAccount.amount >= fee
             var txFeeValueResolver: Observable<GateResult<TransactionCommissionValue>> = Observable.just(txFeeValue)
             val txNonceResolver = estimateRepo.getTransactionCount(fromAccount!!.address!!)
 
             // if enough balance on base BIP account, set it as gas coin
             if (enoughBaseForFee) {
                 Timber.tag("TX Send").d("Using base coin commission %s", DEFAULT_COIN)
-                mGasCoinId = baseAccount.coin.id!!
+                mGasCoinId = baseAccount.coin.id
             }
             // if sending coin is not a BIP AND not enough BIPs to pay fee
             else if (!isBaseAccount) {
-                Timber.tag("TX Send").d("Not enough balance in %s to pay fee, using %s coin", DEFAULT_COIN, sendAccount.coin)
-                mGasCoinId = sendAccount.coin.id!!
+                Timber.tag("TX Send").d("Not enough balance in %s to pay fee, using %s coin", DEFAULT_COIN, sendAccount?.coin)
+                mGasCoinId = sendAccount?.coin?.id
                 // otherwise getting
-                Timber.tag("TX Send").d("Resolving REAL fee value in custom coin %s relatively to base coin", fromAccount!!.coin)
+                Timber.tag("TX Send").d("Resolving REAL fee value in custom coin %s relatively to base coin", fromAccount?.coin)
                 // resolving fee currency for custom currency
                 // creating tx
                 try {
@@ -788,7 +794,7 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             analytics.send(AppEvent.SentCoinPopupScreen)
             val builder = TxSendSuccessDialog.Builder(ctx)
                     .setLabel(R.string.tx_send_success_dialog_description)
-                    .setValue(mRecipient?.name ?: mRecipient?.address ?: "")
+                    .setValue(recipient?.name ?: recipient?.address ?: "")
                     .setPositiveAction(R.string.btn_view_tx) { d, _ ->
                         Wallet.app().sounds().play(R.raw.click_pop_zap)
                         viewState.startExplorer(result.result.hash.toString())
@@ -800,8 +806,8 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                         analytics.send(AppEvent.SentCoinPopupCloseButton)
                     }
 
-            if (mRecipient != null && mRecipient!!.id == 0 && mRecipient!!.address != null) {
-                val recipientAddress = mRecipient!!.address!!
+            if (recipient != null && recipient!!.id == 0 && recipient!!.address != null) {
+                val recipientAddress = recipient!!.address!!
                 builder.setNeutralAction(R.string.btn_save_address) { d, _ ->
                     viewState.startAddContact(recipientAddress) {
                         addressBookRepo.writeLastUsed(it)
@@ -813,16 +819,16 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
             builder.create()
         }
 
-        if (mRecipient != null) {
-            if (mRecipient!!.id == 0) {
-                mRecipient!!.name = mRecipient!!.minterAddress.toShortString()
+        if (recipient != null) {
+            if (recipient!!.id == 0) {
+                recipient!!.name = recipient!!.minterAddress.toShortString()
             }
-            addressBookRepo.writeLastUsed(mRecipient!!)
+            addressBookRepo.writeLastUsed(recipient!!)
         }
 
         // clear form
         sendAmount = null
-        mRecipient = null
+        recipient = null
         sendFee = null
         viewState.hidePayload()
         viewState.clearInputs()
@@ -844,18 +850,18 @@ class SendTabPresenter @Inject constructor() : MvpBasePresenter<SendView>(), Err
                         .subscribeOn(Schedulers.io())
                         .subscribe(
                                 { res: AddressContact? ->
-                                    mRecipient = res
-                                    mAddressChange!!.onNext(mRecipient!!.name!!)
+                                    recipient = res
+                                    addressChangeSubject!!.onNext(recipient!!.name!!)
                                 },
                                 { t: Throwable ->
                                     Timber.d("Unable to find recipient %s: %s", s, t.message)
-                                    mRecipient = null
+                                    recipient = null
                                     viewState.setSubmitEnabled(false)
 
                                 })
                         .disposeOnDestroy()
             }
-            R.id.input_amount -> mInputChange!!.onNext(editText.text.toString())
+            R.id.input_amount -> inputChangeSubject!!.onNext(editText.text.toString())
         }
     }
 

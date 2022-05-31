@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -55,6 +55,7 @@ import network.minter.explorer.models.ValidatorItem
 import network.minter.explorer.models.ValidatorMeta
 import network.minter.explorer.repo.ExplorerTransactionRepository
 import network.minter.explorer.repo.ExplorerTransactionRepository.TxFilter
+import network.minter.explorer.repo.TxSearchQuery
 import okhttp3.internal.toImmutableList
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -91,16 +92,26 @@ class TransactionDataSource(private val factory: Factory) : RxPagingSource<Int, 
         factory.loadState?.postValue(LoadState.Loading)
 
         Timber.d("TX_LIST: loadSingle page=${params.key}")
-        return resolveInfo(factory.repo.getTransactions(factory.myAddress, params.key ?: 1, factory.txFilter))
+        val q = TxSearchQuery().apply {
+            setPage(params.key?.toLong() ?: 1L)
+        }
+        return resolveInfo(factory.repo.getTransactions(q))
+//        return resolveInfo(factory.repo.getTransactions(factory.myAddress, params.key ?: 1, factory.txFilter))
                 .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
                 .singleOrError()
+                .doOnError { factory.loadState?.postValue(LoadState.Failed) }
                 .map {
                     factory.loadState?.postValue(LoadState.Loaded)
+                    val nextKey = if(it.meta.lastPage > it.meta.currentPage) {
+                        it.meta.currentPage + 1
+                    } else {
+                        null
+                    }
                     LoadResult.Page(
                             data = it.items,
                             prevKey = if (it.meta.currentPage == 1) null else it.meta.currentPage - 1,
-                            nextKey = if (it.meta.currentPage == it.meta.lastPage) null else it.meta.currentPage + 1
+                            nextKey = nextKey
                     )
                 }
     }
@@ -120,7 +131,7 @@ class TransactionDataSource(private val factory: Factory) : RxPagingSource<Int, 
 
     private fun lastDay(): String {
         return if (DateHelper.compareFlatDay(_lastDate!!, DateTime())) {
-            Wallet.app().res().getString(R.string.today)
+            Wallet.app().res().getString(R.string.day_today)
         } else {
             if (_lastDate!!.year != DateTime().year().get()) {
                 _lastDate!!.toString(DateTimeFormat.forPattern("EEEE, dd MMMM YYYY"))

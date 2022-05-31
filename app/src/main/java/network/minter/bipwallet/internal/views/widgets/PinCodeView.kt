@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,9 +32,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
-import com.annimon.stream.Stream
 import network.minter.bipwallet.databinding.ViewPincodeKbdBinding
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import java.util.*
 
 /**
@@ -131,7 +129,7 @@ class PinCodeView @JvmOverloads constructor(
 
     fun setEnableFingerprint(enable: Boolean) {
         enableFingerprint = enable
-        b.pinKeyFp.visible = enableFingerprint
+        T.isVisible = v = enableFingerprint
     }
 
     fun reset() {
@@ -139,16 +137,16 @@ class PinCodeView @JvmOverloads constructor(
         valueInternal.clear()
         validValue.clear()
 
-        Stream.of(indicators).forEach { item: View -> item.background.state = IntArray(0) }
+        indicators.forEach { it.background.state = IntArray(0) }
         setPinHint(null)
         setError(null)
     }
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
-        Stream.of(pinKeys).forEach { item: View ->
-            item.isEnabled = enabled
-            item.alpha = if (enabled) 1f else .5f
+        pinKeys.forEach {
+            it.isEnabled = enabled
+            it.alpha = if (enabled) 1f else .5f
         }
     }
 
@@ -159,10 +157,10 @@ class PinCodeView @JvmOverloads constructor(
     fun setError(error: CharSequence?) {
         if (error == null) {
             b.pinError.text = null
-            b.pinError.visible = false
+            T.isVisible = v = false
         } else {
             b.pinError.text = error
-            b.pinError.visible = true
+            T.isVisible = v = true
         }
     }
 

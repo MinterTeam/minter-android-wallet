@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -81,21 +81,9 @@ class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
             setupToolbar(b.toolbar)
             inputGroup.addInput(inputCoin0)
             inputGroup.addInput(inputCoin1)
-            inputGroup.addInput(inputSlippage)
-            inputGroup.addInput(inputMaxSpend)
             inputGroup.addFilter(inputCoin0, DecimalInputFilter(inputCoin0))
             inputGroup.addFilter(inputCoin1, DecimalInputFilter(inputCoin1))
-            inputGroup.addFilter(inputSlippage, DecimalInputFilter(inputSlippage, 2))
-            inputGroup.addFilter(inputMaxSpend, DecimalInputFilter(inputMaxSpend))
         }
-    }
-
-    override fun setSlippageError(text: CharSequence?) {
-        inputGroup.setError("slippage", text)
-    }
-
-    override fun setMaxAmountError(text: CharSequence?) {
-        inputGroup.setError("max_spend", text)
     }
 
     override fun setEnableSubmit(enable: Boolean) {
@@ -175,25 +163,6 @@ class PoolAddLiquidityActivity : BaseMvpInjectActivity(), PoolAddLiquidityView {
             }
             b.inputCoin1.setPreSuffixText(coin1)
         }
-    }
-
-    override fun setSlippage(amount: String) {
-        b.inputSlippage.tag = Any()
-        b.inputSlippage.setText(amount)
-
-    }
-
-    override fun setMaxAmount(amount: String) {
-        b.inputMaxSpend.tag = Any()
-        b.inputMaxSpend.setText(amount)
-    }
-
-    override fun setSlippageLabel(text: CharSequence) {
-        b.inputSlippage.label = text
-    }
-
-    override fun setMaxAmountLabel(text: CharSequence) {
-        b.inputMaxSpend.label = text
     }
 
     override fun finishSuccess() {

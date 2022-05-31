@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,6 +39,8 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.edwardstock.inputfield.InputField
 import network.minter.bipwallet.BuildConfig
@@ -52,8 +54,8 @@ import network.minter.bipwallet.internal.Wallet
  */
 
 class ResTextFormat(
-        @StringRes val resId: Int,
-        vararg format: Any?
+    @StringRes val resId: Int,
+    vararg format: Any?
 ) {
     @Suppress("UNCHECKED_CAST")
     val data: Array<Any?> = format as Array<Any?>
@@ -61,18 +63,26 @@ class ResTextFormat(
 
 object ViewExtensions {
 
+    @Deprecated(
+        replaceWith = ReplaceWith("T.isVisible = v", imports = ["androidx.core.view.isVisible"]),
+        message = "Use View.isVisible = value instead"
+    )
     var View.visible: Boolean
-        get() = visibility == View.VISIBLE
+        get() = this.isVisible
         set(v) {
             this.post {
-                this.visibility = if (v) View.VISIBLE else View.GONE
+                this.isVisible = v
             }
         }
 
+    @Deprecated(
+        replaceWith = ReplaceWith("isInvisible", imports = ["androidx.core.view.isInvisible"]),
+        message = "Use View.isInvisible = value instead"
+    )
     var View.nvisible: Boolean
-        get() = visibility == View.VISIBLE
+        get() = isInvisible
         set(v) {
-            this.visibility = if (v) View.VISIBLE else View.INVISIBLE
+            this.isInvisible = !v
         }
 
     fun <T : View?> T.postApply(cb: (T) -> Unit) {
@@ -95,13 +105,15 @@ object ViewExtensions {
             return
         }
 
-        val stateList = ColorStateList(arrayOf(
+        val stateList = ColorStateList(
+            arrayOf(
                 intArrayOf(android.R.attr.state_pressed),
                 intArrayOf()
-        ), intArrayOf(
+            ), intArrayOf(
                 ContextCompat.getColor(context, R.color.colorPrimaryLighter),
                 textColors.defaultColor
-        ))
+            )
+        )
 
         setTextColor(stateList)
 
@@ -118,18 +130,20 @@ object ViewExtensions {
         if (this == null) return
 
         if (BuildConfig.FLAVOR == "netTest") {
-            visible = true
+            T.isVisible = v = true
             setOnClickListener {
                 try {
-                    val goToMarket = Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"))
+                    val goToMarket =
+                        Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=network.minter.bipwallet.mainnet"))
                     it.context.startActivity(goToMarket)
                 } catch (e: ActivityNotFoundException) {
-                    val goToMarket = Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://play.google.com/store/apps/details?id=network.minter.bipwallet.mainnet"))
+                    val goToMarket =
+                        Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://play.google.com/store/apps/details?id=network.minter.bipwallet.mainnet"))
                     it.context.startActivity(goToMarket)
                 }
             }
         } else {
-            visible = false
+            T.isVisible = v = false
         }
     }
 
@@ -211,7 +225,7 @@ object ViewExtensions {
         paint.typeface = input.input.typeface
         paint.textSize = input.input.textSize
         var targetText: String = this.toString()
-        for(i in 0..extra) {
+        for (i in 0..extra) {
             targetText += "0"
         }
 

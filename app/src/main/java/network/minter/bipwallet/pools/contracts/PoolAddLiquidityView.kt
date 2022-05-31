@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -44,10 +44,6 @@ import java.math.BigDecimal
 interface PoolAddLiquidityView: MvpView {
     fun setCoin0(coin0Amount: BigDecimal?, coin0: String)
     fun setCoin1(coin1Amount: BigDecimal?, coin1: String)
-    fun setSlippageLabel(text: CharSequence)
-    fun setMaxAmountLabel(text: CharSequence)
-    fun setSlippage(amount: String)
-    fun setMaxAmount(amount: String)
     fun setOnTextChangedListener(listener: (InputWrapper, Boolean, Boolean) -> Unit)
     fun setOnSwapCoins(listener: (View) -> Unit)
     fun setEnableSubmit(enable: Boolean)
@@ -55,8 +51,6 @@ interface PoolAddLiquidityView: MvpView {
     fun setOnClickUseMax1(listener: (View) -> Unit)
     fun setCoin0EnableUseMax(enable: Boolean)
     fun setCoin1EnableUseMax(enable: Boolean)
-    fun setMaxAmountError(text: CharSequence?)
-    fun setSlippageError(text: CharSequence?)
     fun setOnSubmit(listener: (View) -> Unit)
 
     @StateStrategyType(OneExecutionStateStrategy::class)

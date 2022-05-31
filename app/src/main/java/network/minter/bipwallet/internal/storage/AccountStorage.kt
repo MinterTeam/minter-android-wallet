@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -221,7 +221,7 @@ class AccountStorage(
 
     fun remove(address: MinterAddress) {
         val data = getData()
-        if (data.find(address).isPresent) {
+        data.find(address)?.let {
             data.remove(address)
             storage.put(KEY_BALANCE, data)
         }

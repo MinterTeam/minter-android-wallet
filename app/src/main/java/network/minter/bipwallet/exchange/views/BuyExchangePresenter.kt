@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -25,7 +25,9 @@
  */
 package network.minter.bipwallet.exchange.views
 
+import kotlinx.coroutines.launch
 import moxy.InjectViewState
+import moxy.presenterScope
 import network.minter.bipwallet.R
 import network.minter.bipwallet.apis.explorer.RepoTransactions
 import network.minter.bipwallet.apis.gate.TxInitDataRepository
@@ -80,6 +82,9 @@ open class BuyExchangePresenter @Inject constructor(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        presenterScope.launch {
+
+        }
         viewState!!.setFee(String.format("%s %s", bdHuman(OperationType.BuyCoin.fee), MinterSDK.DEFAULT_COIN.uppercase(Locale.getDefault())))
         viewState.setCalculationTitle(R.string.label_you_will_pay_approximately)
     }

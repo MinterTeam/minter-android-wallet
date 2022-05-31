@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,8 +30,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.annimon.stream.Stream;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,13 +50,12 @@ import static network.minter.bipwallet.internal.common.Preconditions.checkNotNul
 
 /**
  * minter-android-wallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 
 public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> implements DiffUtilDispatcherDelegate<Data> {
 
-    private Builder<Data, VH> mBuilder;
+    private final Builder<Data, VH> mBuilder;
 
     private SimpleRecyclerAdapter(Builder<Data, VH> builder) {
         mBuilder = builder;
@@ -84,10 +81,6 @@ public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> ext
 
     public void setItems(List<Data> items) {
         mBuilder.data = items;
-    }
-
-    public void setItems(Stream<Data> stream) {
-        setItems(stream.toList());
     }
 
     public void setItems(Collection<Data> collection) {
@@ -166,10 +159,6 @@ public class SimpleRecyclerAdapter<Data, VH extends RecyclerView.ViewHolder> ext
 
         public Builder(List<Data> data) {
             this.data = data;
-        }
-
-        public Builder(Stream<Data> stream) {
-            this.data = stream.toList();
         }
 
         public Builder(Data[] data) {

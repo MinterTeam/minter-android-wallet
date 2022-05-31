@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -94,31 +94,29 @@ class WalletSelectorDialog(
         builder.bindAction(this, binding.actionDecline, DialogInterface.BUTTON_NEGATIVE)
 
         val selectOnClick = View.OnClickListener {
-            popup = ListPopupWindow(context!!)
-            popup!!.anchorView = binding.inputAddress.input
-            popup!!.width = binding.inputAddress.input.width
-            popup!!.height = ViewGroup.LayoutParams.WRAP_CONTENT
-
-            val arItems: Array<String> = builder.items.map {
-                if (it.subtitle != null) {
-                    "${it.title} (${it.subtitle})"
-                } else {
-                    "${it.title}"
+            popup = ListPopupWindow(requireContext()).apply {
+                anchorView = binding.inputAddress.input
+                width = binding.inputAddress.input.width
+                height = ViewGroup.LayoutParams.WRAP_CONTENT
+                val arItems: Array<String> = builder.items.map {
+                    if (it.subtitle != null) {
+                        "${it.title} (${it.subtitle})"
+                    } else {
+                        "${it.title}"
+                    }
+                }.toTypedArray()
+                val arAdapter = ArrayAdapter(requireContext(), R.layout.list_item_textview, R.id.text, arItems)
+                setAdapter(arAdapter)
+                isModal = true
+                setOnItemClickListener { _, _, position, _ ->
+                    item = builder.items[position]
+                    fillInput(item!!)
+                    popup?.dismiss()
                 }
-            }.toTypedArray()
-
-            val arAdapter = ArrayAdapter(requireContext(), R.layout.list_item_textview, R.id.text, arItems)
-
-            popup!!.setAdapter(arAdapter)
-            popup!!.isModal = true
-            popup!!.setOnItemClickListener { _, _, position, _ ->
-                item = builder.items[position]
-                fillInput(item!!)
-                popup?.dismiss()
+                setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.shape_rounded_white))
+            }.also {
+                it.show()
             }
-
-            popup!!.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.shape_rounded_white))
-            popup!!.show()
         }
 
         binding.title.text = builder.title

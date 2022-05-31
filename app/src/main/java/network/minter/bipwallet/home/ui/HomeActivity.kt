@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -42,7 +42,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.annimon.stream.Stream
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
@@ -55,7 +54,6 @@ import network.minter.bipwallet.home.contract.HomeView
 import network.minter.bipwallet.home.views.HomePresenter
 import network.minter.bipwallet.internal.BaseMvpActivity
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
-import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BackPressedListener
@@ -71,8 +69,10 @@ import javax.inject.Provider
  * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
  */
 class HomeActivity : BaseMvpActivity(), HomeView {
-    @Inject lateinit var presenterProvider: Provider<HomePresenter>
-    @InjectPresenter lateinit var presenter: HomePresenter
+    @Inject
+    lateinit var presenterProvider: Provider<HomePresenter>
+    @InjectPresenter
+    lateinit var presenter: HomePresenter
 
     @Inject
     @HomeTabsClasses
@@ -84,7 +84,8 @@ class HomeActivity : BaseMvpActivity(), HomeView {
     private lateinit var b: ActivityHomeBinding
     private var storiesPagerFragment: StoriesPagerFragment? = null
 
-    @get:VisibleForTesting val activeTabs: Map<Int, HomeTabFragment?>
+    @get:VisibleForTesting
+    val activeTabs: Map<Int, HomeTabFragment?>
         get() = mActiveTabs
 
     override fun setCurrentPage(position: Int) {
@@ -224,10 +225,11 @@ class HomeActivity : BaseMvpActivity(), HomeView {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 presenter.onPageSelected(position)
-                Stream.of<Map.Entry<Int, HomeTabFragment?>>(mActiveTabs.entries)
-                        .filter { item: Map.Entry<Int, HomeTabFragment?> -> item.value != null }
-                        .filter { item: Map.Entry<Int, HomeTabFragment?> -> item.key != position }
-                        .forEach { item: Map.Entry<Int, HomeTabFragment?> -> item.value!!.onTabUnselected() }
+                mActiveTabs
+                        .filter { it.value != null }
+                        .filter { it.key != position }
+                        .forEach { it.value?.onTabUnselected() }
+
                 if (mActiveTabs[position] != null && mActiveTabs[position] != null) {
                     val f = mActiveTabs[position]
                     f?.onTabSelected()
@@ -255,7 +257,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
             return
         }
         b.navigationBottom.animate().translationY(b.navigationBottom.height.toFloat() * 2f).setDuration(150).start()
-        b.storiesPager.visible = true
+        T.isVisible = v = true
 
         storiesPagerFragment = StoriesPagerFragment.newInstance(stories, startPosition)
         storiesPagerFragment!!.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(R.transition.image_shared_element_transition)

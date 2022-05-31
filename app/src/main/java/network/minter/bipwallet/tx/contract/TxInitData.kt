@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2021
+ * Copyright (C) by MinterTeam. 2022
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -48,6 +48,9 @@ class TxInitData {
     var commission: BigDecimal? = null
     var payloadFee: BigDecimal = BigDecimal("0.200")
     var errorResult: GateResult<*>? = null
+
+    private val safeGas: BigInteger
+        get() = gas ?: BigInteger.ZERO
 
     constructor(vararg values: GateResult<*>) {
         for (item in values) {
@@ -102,9 +105,9 @@ class TxInitData {
 
     fun calculateFeeInBip(opType: OperationType): BigDecimal {
         return if(gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
-            priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
+            priceCommissions.getByType(opType).humanizeDecimal().multiply(safeGas.toBigDecimal())
         } else {
-            val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
+            val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(safeGas.toBigDecimal())
             fee.multiply(gasBaseCoinRate)
         }
     }
@@ -113,7 +116,7 @@ class TxInitData {
         return if (gasRepresentingCoin.id == MinterSDK.DEFAULT_COIN_ID) {
             String.format("%s %s", priceCommissions.getByType(opType).humanize(), gasRepresentingCoin.symbol)
         } else {
-            val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(gas!!.toBigDecimal())
+            val fee = priceCommissions.getByType(opType).humanizeDecimal().multiply(safeGas.toBigDecimal())
             String.format("%s %s (%s %s)",
                     fee.multiply(gasBaseCoinRate).humanize(),
                     MinterSDK.DEFAULT_COIN,
