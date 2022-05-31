@@ -95,8 +95,8 @@ class TransactionDataSource(private val factory: Factory) : RxPagingSource<Int, 
         val q = TxSearchQuery().apply {
             setPage(params.key?.toLong() ?: 1L)
         }
-        return resolveInfo(factory.repo.getTransactions(q))
-//        return resolveInfo(factory.repo.getTransactions(factory.myAddress, params.key ?: 1, factory.txFilter))
+//        return resolveInfo(factory.repo.getTransactions(q))
+        return resolveInfo(factory.repo.getTransactions(factory.myAddress, params.key ?: 1, factory.txFilter))
                 .map { groupByDate(it) }
                 .doOnSubscribe { _disposables.add(it) }
                 .singleOrError()

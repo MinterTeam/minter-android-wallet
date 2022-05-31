@@ -42,6 +42,7 @@ import network.minter.bipwallet.delegation.views.ValidatorSelectorPresenter
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
 import network.minter.bipwallet.internal.helpers.IntentHelper.toParcel
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.views.list.BorderedItemSeparator
 import network.minter.explorer.models.ValidatorItem
 import javax.inject.Inject
@@ -112,7 +113,7 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
 
     override fun showEmpty(show: Boolean) {
         runOnUiThread {
-            T.isVisible = v = show
+            binding.emptyText.visible = show
         }
     }
 
@@ -148,10 +149,10 @@ class ValidatorSelectorActivity : BaseMvpInjectActivity(), ValidatorSelectorView
     }
 
     override fun showProgress() {
-        T.isVisible = v = true
+        binding.progress.visible = true
     }
 
     override fun hideProgress() {
-        T.isVisible = v = false
+        binding.progress.visible = false
     }
 }

@@ -35,6 +35,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.bdHuman
 import network.minter.bipwallet.internal.helpers.MathHelper.bdNull
 import network.minter.bipwallet.internal.helpers.MathHelper.humanize
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.tx.adapters.TxItem
 import network.minter.core.crypto.MinterAddress
 import network.minter.explorer.models.CoinItemBase
@@ -55,7 +56,7 @@ class TxAllViewHolder(
     fun bind(item: TxItem, myAddress: () -> MinterAddress) {
 
         binding.itemTitleType.text = item.tx.type.name
-        T.isVisible = v = true
+        binding.separator.visible = true
 
         when (item.tx.type) {
             HistoryTransaction.Type.Send -> bindSend(item, myAddress)
@@ -208,7 +209,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = data.coin.symbol
             itemAmount.text = data.value.humanize()
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -220,7 +221,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = data.coin.symbol
             itemAmount.text = data.value.humanize()
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -243,7 +244,7 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_edit_candidate_commission)
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.pubKey.toShortString()
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -291,7 +292,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -303,7 +304,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = tr(R.string.tx_type_price_vote_title, data.price.toString())
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -315,7 +316,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(data.avatar, R.drawable.img_avatar_create_coin)
             itemTitle.text = data.newOwner.toShortString()
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -327,7 +328,7 @@ class TxAllViewHolder(
             itemTitleType.setText(R.string.tx_type_set_halt_block)
             itemTitle.text = data.height.toString()
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -339,7 +340,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey.toShortString()
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -425,7 +426,7 @@ class TxAllViewHolder(
             itemAvatar.setImageUrlFallback(item.tx.toAvatar, R.drawable.img_avatar_candidate)
             itemTitle.text = item.tx.toName ?: data.publicKey?.toShortString() ?: "<unknown>"
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 
@@ -506,7 +507,7 @@ class TxAllViewHolder(
             itemAvatar.setImageResource(R.drawable.img_avatar_multisig)
             itemTitle.text = data.multisigAddress?.toShortString() ?: "<none>"
             itemAmount.text = ""
-            T.isVisible = v = false
+            itemSubamount.visible = false
         }
     }
 

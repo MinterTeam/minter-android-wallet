@@ -33,6 +33,7 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import network.minter.bipwallet.databinding.ViewPincodeKbdBinding
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import java.util.*
 
 /**
@@ -129,7 +130,7 @@ class PinCodeView @JvmOverloads constructor(
 
     fun setEnableFingerprint(enable: Boolean) {
         enableFingerprint = enable
-        T.isVisible = v = enableFingerprint
+        b.pinKeyFp.visible = enableFingerprint
     }
 
     fun reset() {
@@ -157,10 +158,10 @@ class PinCodeView @JvmOverloads constructor(
     fun setError(error: CharSequence?) {
         if (error == null) {
             b.pinError.text = null
-            T.isVisible = v = false
+            b.pinError.visible = false
         } else {
             b.pinError.text = error
-            T.isVisible = v = true
+            b.pinError.visible = true
         }
     }
 

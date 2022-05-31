@@ -54,6 +54,7 @@ import network.minter.bipwallet.home.contract.HomeView
 import network.minter.bipwallet.home.views.HomePresenter
 import network.minter.bipwallet.internal.BaseMvpActivity
 import network.minter.bipwallet.internal.helpers.ErrorViewHelper
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.internal.system.BackPressedListener
@@ -257,7 +258,7 @@ class HomeActivity : BaseMvpActivity(), HomeView {
             return
         }
         b.navigationBottom.animate().translationY(b.navigationBottom.height.toFloat() * 2f).setDuration(150).start()
-        T.isVisible = v = true
+        b.storiesPager.visible = true
 
         storiesPagerFragment = StoriesPagerFragment.newInstance(stories, startPosition)
         storiesPagerFragment!!.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(R.transition.image_shared_element_transition)

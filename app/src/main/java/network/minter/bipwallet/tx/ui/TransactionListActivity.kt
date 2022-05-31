@@ -44,6 +44,7 @@ import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.adapter.LoadState
 import network.minter.bipwallet.internal.dialogs.BaseBottomSheetDialogFragment
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.system.ActivityBuilder
 import network.minter.bipwallet.tx.adapters.TransactionFacade
@@ -96,7 +97,7 @@ class TransactionListActivity : BaseMvpInjectActivity(), TransactionListView {
     }
 
     override fun showRefreshProgress() {
-        if (!(T.isVisible = v)) {
+        if (!b.progress.visible) {
             b.containerSwipeRefresh.isRefreshing = true
         }
     }

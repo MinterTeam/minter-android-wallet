@@ -61,6 +61,7 @@ import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.MathHelper.toPlain
 import network.minter.bipwallet.internal.helpers.Plurals
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.mvp.MvpBasePresenter
 import network.minter.bipwallet.internal.storage.RepoAccounts
 import network.minter.bipwallet.internal.storage.SecretStorage
@@ -384,7 +385,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
             val b = StubValidatorNameBinding.bind(v)
             if (validator.meta?.name.isNullOrEmpty()) {
                 b.title.text = validator.pubKey?.toShortString()
-                T.isVisible = v = false
+                b.subtitle.visible = false
             } else {
                 b.title.text = validator.meta?.name
                 b.subtitle.text = validator.pubKey?.toShortString()
@@ -393,7 +394,7 @@ class DelegateUnbondPresenter @Inject constructor() : MvpBasePresenter<DelegateU
 
             if (type == Type.Unbond) {
                 b.root.background.state = intArrayOf(-android.R.attr.state_enabled)
-                T.isVisible = v = false
+                b.dropdown.visible = false
             }
 
         }

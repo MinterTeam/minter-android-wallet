@@ -43,6 +43,7 @@ import network.minter.bipwallet.addressbook.views.AddressBookPresenter
 import network.minter.bipwallet.databinding.ActivityAddressBookBinding
 import network.minter.bipwallet.internal.BaseMvpInjectActivity
 import network.minter.bipwallet.internal.dialogs.ActionListener
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import org.parceler.Parcels
 import javax.inject.Inject
 import javax.inject.Provider
@@ -60,7 +61,7 @@ class AddressBookActivity : BaseMvpInjectActivity(), AddressBookView {
     }
 
     override fun showEmpty(show: Boolean) {
-        T.isVisible = v = show
+        binding.emptyText.visible = show
     }
 
     override fun startAddContact(onSubmit: (AddressContact) -> Unit, onDismiss: ActionListener?) {

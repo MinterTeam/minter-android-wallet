@@ -130,7 +130,7 @@ object ViewExtensions {
         if (this == null) return
 
         if (BuildConfig.FLAVOR == "netTest") {
-            T.isVisible = v = true
+            visible = true
             setOnClickListener {
                 try {
                     val goToMarket =
@@ -143,7 +143,7 @@ object ViewExtensions {
                 }
             }
         } else {
-            T.isVisible = v = false
+            visible = false
         }
     }
 

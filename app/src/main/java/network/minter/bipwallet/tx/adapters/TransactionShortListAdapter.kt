@@ -30,6 +30,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcher
 import network.minter.bipwallet.internal.views.list.diff.DiffUtilDispatcherDelegate
@@ -69,7 +70,7 @@ class TransactionShortListAdapter(
             it.itemView.setOnClickListener { v ->
                 mOnExpandDetailsListener?.invoke(v, getItem(holder.bindingAdapterPosition).tx)
             }
-            T.isVisible = v = true
+            it.binding.separator.visible = true
         }
     }
 

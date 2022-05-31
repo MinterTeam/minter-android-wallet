@@ -54,6 +54,7 @@ import network.minter.bipwallet.home.HomeTabFragment
 import network.minter.bipwallet.home.ui.HomeActivity
 import network.minter.bipwallet.internal.Wallet
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.system.BroadcastReceiverManager
 import network.minter.bipwallet.internal.views.utils.SingleCallHandler
 import network.minter.bipwallet.sending.contract.QRLauncher
@@ -196,12 +197,12 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 .alpha(if (show) 1f else 0f)
                 .setListener(object : Animator.AnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        T.isVisible = v = show
+                        it.visible = show
                     }
 
                     override fun onAnimationRepeat(animation: Animator?) {}
                     override fun onAnimationCancel(animation: Animator?) {
-                        T.isVisible = v = show
+                        it.visible = show
                     }
 
                     override fun onAnimationStart(animation: Animator?) {}
@@ -210,7 +211,7 @@ class WalletsTabFragment : HomeTabFragment(), WalletsTabView {
                 .start()
 
         }
-        T.isVisible = v = show
+        binding.balanceProgress.visible = show
     }
 
     override fun notifyUpdated() {

@@ -57,6 +57,7 @@ import network.minter.bipwallet.internal.helpers.KeyboardHelper
 import network.minter.bipwallet.internal.helpers.MathHelper.parseBigDecimal
 import network.minter.bipwallet.internal.helpers.ViewExtensions.postApply
 import network.minter.bipwallet.internal.helpers.ViewExtensions.tr
+import network.minter.bipwallet.internal.helpers.ViewExtensions.visible
 import network.minter.bipwallet.internal.helpers.ViewExtensions.visibleForTestnet
 import network.minter.bipwallet.internal.helpers.ViewHelper
 import network.minter.bipwallet.internal.helpers.forms.validators.IsNotMnemonicValidator
@@ -426,14 +427,14 @@ class SendTabFragment : HomeTabFragment(), SendView {
 
     override fun setCommonError(error: CharSequence?) {
         binding.textError.post {
-            T.isVisible = v = !error.isNullOrEmpty()
+            binding.textError.visible = !error.isNullOrEmpty()
             binding.textError.text = error
         }
     }
 
     override fun setError(error: Int) {
         binding.textError.post {
-            T.isVisible = v = error != 0
+            binding.textError.visible = error != 0
             binding.textError.setText(error)
         }
     }
@@ -477,12 +478,12 @@ class SendTabFragment : HomeTabFragment(), SendView {
                     .alpha(if (show) 1f else 0f)
                     .setListener(object : Animator.AnimatorListener {
                         override fun onAnimationEnd(animation: Animator?) {
-                            T.isVisible = v = show
+                            it.visible = show
                         }
 
                         override fun onAnimationRepeat(animation: Animator?) {}
                         override fun onAnimationCancel(animation: Animator?) {
-                            T.isVisible = v = show
+                            it.visible = show
                         }
 
                         override fun onAnimationStart(animation: Animator?) {}
@@ -491,7 +492,7 @@ class SendTabFragment : HomeTabFragment(), SendView {
                     .start()
 
         }
-        T.isVisible = v = show
+        binding.balanceProgress.visible = show
     }
 
     override fun hideAutocomplete() {
