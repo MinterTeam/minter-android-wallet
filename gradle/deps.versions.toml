@@ -1,7 +1,7 @@
 [versions]
 
 appVersion = "2.4.1"
-appVersionCode = "248"
+appVersionCode = "249"
 
 minSdk = "21"
 maxSdk = "32"
