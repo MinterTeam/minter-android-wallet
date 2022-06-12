@@ -259,10 +259,10 @@ class DelegatedListPresenter @Inject constructor() : MvpBasePresenter<DelegatedL
                 viewState!!.hideChartProgress()
                 return
             }
-            val oldVals = rewardsSet!!.values
+            val oldVals = rewardsSet!!.values.toMutableList()
             val newVals = rewardsToEntry(rewardsRes.result!!)
             oldVals.addAll(newVals)
-            Collections.sort(oldVals) { o1, o2 -> java.lang.Float.compare(o1.x, o2.x) }
+            oldVals.sortWith { o1, o2 -> o1.x.compareTo(o2.x) }
             rewardsSet!!.values = oldVals
             val dataSets = LineData(rewardsSet)
             viewState.invalidateChartData(dataSets)

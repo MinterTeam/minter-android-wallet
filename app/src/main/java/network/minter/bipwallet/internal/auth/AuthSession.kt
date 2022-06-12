@@ -30,7 +30,7 @@ import network.minter.bipwallet.internal.storage.KVStorage
 
 /**
  * minter-android-wallet. 2018
- * @author Eduard Maximovich <edward.vstock></edward.vstock>@gmail.com>
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 class AuthSession(private val storage: KVStorage) {
     private var _isLoggedIn = false

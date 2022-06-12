@@ -146,7 +146,7 @@ class SecretStorage(private val mStorage: KVStorage) {
         get() {
             val src = secretsSafe
             val main = getSecret(mainWallet)
-            val out = src.values.toList()
+            val out = src.values.toMutableList()
 
             Collections.sort(out, Comparator { av, bv ->
                 val a = av.date
